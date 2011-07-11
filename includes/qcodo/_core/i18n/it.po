@@ -1,0 +1,110 @@
+# Qcodo Distributed Language File
+# for Italian (default)
+# Contributed by Antonello Oliveri
+
+
+# For QTextBoxBase controls
+MsgId "%s is required"
+MsgStr "%s è obbligatorio"
+
+MsgId "Required"
+MsgStr "Richesto"
+
+
+# For QWriteBox controls
+MsgId ""
+"Tags &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; and &lt;http://...&gt; are allowed.  "
+"Use ** at the beginning of any line for a bulleted list."
+MsgStr ""
+"I Tags &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; y &lt;http://...&gt; sono consentiti.  "
+"Usare ** all'inizio di ogni linea per un elenco puntato."
+
+
+# For QPaginatedControl controls
+MsgId "item"
+MsgStr "elemento"
+
+MsgId "items"
+MsgStr "elementi"
+
+
+# For QListBox and QCalendar controls
+MsgId "Reset"
+MsgStr "Reimposta"
+
+
+# For QIntegerTextBox and QFloatTextBox controls
+MsgId "Invalid Integer"
+MsgStr "Intero non valido"
+
+MsgId "Invalid Float"
+MsgStr "Decimale non valido"
+
+MsgId "Value must be less than %s"
+MsgStr "Il valore deve essere minore di %s"
+
+MsgId "Value must be greater than %s"
+MsgStr "Il Numero deve essere maggiore di %s"
+
+
+# For QDataGrid controls
+MsgId "<b>Results:</b>&nbsp;Viewing&nbsp;%s&nbsp;%s-%s&nbsp;of&nbsp;%s."
+MsgStr "<b>Risultati:</b>&nbsp;Visualizza&nbsp;%s&nbsp;%s-%s&nbsp;di&nbsp;%s."
+
+MsgId "<b>Results:</b> No %s found."
+MsgStr "<b>Resultati:</b> %s non trovato."
+
+MsgId "<b>Results:</b> 1 %s found."
+MsgId_Plural "<b>Results:</b> %s %s found."
+MsgStr[0] "<b>Resultati:</b> Trovato 1 %s."
+MsgStr[1] "<b>Resultati:</b> Trovati %s %s."
+
+
+# For QPaginator controls
+MsgId "Previous"
+MsgStr "Precedente"
+
+MsgId "Next"
+MsgStr "Successivo"
+
+
+# For the List FormDraft Include template
+MsgId "List All"
+MsgStr "Elenca Tutti"
+
+MsgId "Create a New"
+MsgStr "Crea Nuovo"
+
+MsgId "Go to \"Form Drafts\""
+MsgStr "Vai a \"Form Drafts\""
+
+
+# For the Edit FormBase class template
+MsgId "Create"
+MsgStr "Crea"
+
+MsgId "Edit"
+MsgStr "Modifica"
+
+MsgId "Save"
+MsgStr "Salva"
+
+MsgId "Cancel"
+MsgStr "Annulla"
+
+MsgId "Delete"
+MsgStr "Elimina"
+
+MsgId "Are you SURE you want to DELETE this %s?"
+MsgStr "Sei SICURO di volere ELIMINARE questo %s?"
+
+
+# For the form_drafts/index.php page
+MsgId "List of Form Drafts"
+MsgStr "Lista delle \"Form Drafts\""
+
+MsgId "View List"
+MsgStr "Visualizza Elenco"
+
+MsgId "Create New"
+MsgStr "Crea Nuovo"

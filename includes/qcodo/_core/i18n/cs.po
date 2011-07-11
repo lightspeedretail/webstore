@@ -1,0 +1,110 @@
+# Qcodo Distributed Language File
+# for Czech (default)
+# Contributed by "Poisson"
+
+
+# For QTextBoxBase controls
+MsgId "%s is required"
+MsgStr "%s je povinný"
+
+MsgId "Required"
+MsgStr "Povinný"
+
+
+# For QWriteBox controls
+MsgId ""
+"Tags &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; and &lt;http://...&gt; are allowed.  "
+"Use ** at the beginning of any line for a bulleted list."
+MsgStr ""
+"Tagy &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; a &lt;http://...&gt; jsou povoleny.  "
+"Použijte ** na začátku řádku pro vytvoření nečíslovaného seznamu."
+
+
+# For QPaginatedControl controls
+MsgId "item"
+MsgStr "položka"
+
+MsgId "items"
+MsgStr "záznamy"
+
+
+# For QListBox and QCalendar controls
+MsgId "Reset"
+MsgStr "Reset"
+
+
+# For QIntegerTextBox and QFloatTextBox controls
+MsgId "Invalid Integer"
+MsgStr "Neplatné celé číslo"
+
+MsgId "Invalid Float"
+MsgStr "Neplatné desetinné číslo"
+
+MsgId "Value must be less than %s"
+MsgStr "Hodnota musí být menší než %s"
+
+MsgId "Value must be greater than %s"
+MsgStr "Hodnota musí být větší než %s"
+
+
+# For QDataGrid controls
+MsgId "<b>Results:</b>&nbsp;Viewing&nbsp;%s&nbsp;%s-%s&nbsp;of&nbsp;%s."
+MsgStr "<b>Výsledek:</b>&nbsp;Zobrazeny&nbsp;%s&nbsp;%s-%s&nbsp;z&nbsp;%s."
+
+MsgId "<b>Results:</b> No %s found."
+MsgStr "<b>Výsledek:</b> Nenalezeno %s."
+
+MsgId "<b>Results:</b> 1 %s found."
+MsgId_Plural "<b>Results:</b> %s %s found."
+MsgStr[0] "<b>Výsledek:</b> Nalezen 1 %s ."
+MsgStr[1] "<b>Results:</b> Nalezeno %s %s ."
+
+
+# For QPaginator controls
+MsgId "Previous"
+MsgStr "Předchozí"
+
+MsgId "Next"
+MsgStr "Následující"
+
+
+# For the List FormDraft Include template
+MsgId "List All"
+MsgStr "Zobrazit vše"
+
+MsgId "Create a New"
+MsgStr "Vytvořit nový"
+
+MsgId "Go to \"Form Drafts\""
+MsgStr "Přejít na \"Form Drafts\""
+
+
+# For the Edit FormBase class template
+MsgId "Create"
+MsgStr "Vytvořit"
+
+MsgId "Edit"
+MsgStr "Editovat"
+
+MsgId "Save"
+MsgStr "Uložit"
+
+MsgId "Cancel"
+MsgStr "Zrušit"
+
+MsgId "Delete"
+MsgStr "Odstranit"
+
+MsgId "Are you SURE you want to DELETE this %s?"
+MsgStr "Opravdu odstranit %s?"
+
+
+# For the form_drafts/index.php page
+MsgId "List of Form Drafts"
+MsgStr "Seznam návrhů formulářů"
+
+MsgId "View List"
+MsgStr "Zobrazit seznam"
+
+MsgId "Create New"
+MsgStr "Vytvořit nový"

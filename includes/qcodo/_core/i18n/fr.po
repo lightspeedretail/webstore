@@ -1,0 +1,110 @@
+# Qcodo Distributed Language File
+# for French (default) [ &eacute; -> é | &egrave; -> è | &ecirc; -> ê | &agrave; -> à | &oacute; -> ô ]
+# Contributed by Christophe Damour and "gibran"
+
+
+# For QTextBoxBase controls
+MsgId "%s is required"
+MsgStr "%s doit &ecirc;tre renseign&eacute;"
+
+MsgId "Required"
+MsgStr "Requis"
+
+
+# For QWriteBox controls
+MsgId ""
+"Tags &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; and &lt;http://...&gt; are allowed.  "
+"Use ** at the beginning of any line for a bulleted list."
+MsgStr ""
+"Les balises &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; et &lt;http://...&gt; sont autoris&eacute;es.  "
+"Utiliser ** au d&eacute;but d\'une ligne pour une liste &agrave; puces."
+
+
+# For QPaginatedControl controls
+MsgId "item"
+MsgStr "&eacute;l&eacute;ment"
+
+MsgId "items"
+MsgStr "&eacute;l&eacute;ments"
+
+
+# For QListBox and QCalendar controls
+MsgId "Reset"
+MsgStr "R&eacute;initialiser"
+
+
+# For QIntegerTextBox and QFloatTextBox controls
+MsgId "Invalid Integer"
+MsgStr "Entier incorrect"
+
+MsgId "Invalid Float"
+MsgStr "Nombre d&eacute;cimal incorrect"
+
+MsgId "Value must be less than %s"
+MsgStr "La valeur doit &ecirc;tre inf&eacute;rieure &agrave; %s"
+
+MsgId "Value must be greater than %s"
+MsgStr "La valeur doit &ecirc;tre sup&eacute;rieure &agrave; %s"
+
+
+# For QDataGrid controls
+MsgId "<b>Results:</b>&nbsp;Viewing&nbsp;%s&nbsp;%s-%s&nbsp;of&nbsp;%s."
+MsgStr "<b>R&eacute;sultats:</b>&nbsp;Liste des&nbsp;%s&nbsp;%s-%s&nbsp;sur&nbsp;%s."
+
+MsgId "<b>Results:</b> No %s found."
+MsgStr "<b>R&eacute;sultats:</b> %s introuvable."
+
+MsgId "<b>Results:</b> 1 %s found."
+MsgId_Plural "<b>Results:</b> %s %s found."
+MsgStr[0] "<b>R&eacute;sultats:</b> 1 %s trouv&eacute;."
+MsgStr[1] "<b>R&eacute;sultats:</b> %s %s trouv&eacute;s."
+
+
+# For QPaginator controls
+MsgId "Previous"
+MsgStr "Pr&eacute;c&eacute;dent"
+
+MsgId "Next"
+MsgStr "Suivant"
+
+
+# For the List FormDraft Include template
+MsgId "List All"
+MsgStr "Tout Afficher"
+
+MsgId "Create a New"
+MsgStr "Ajouter"
+
+MsgId "Go to \"Form Drafts\""
+MsgStr "Retour \"Brouillons de formulaires\""
+
+
+# For the Edit FormBase class template
+MsgId "Create"
+MsgStr "Ajouter"
+
+MsgId "Edit"
+MsgStr "Modifier"
+
+MsgId "Save"
+MsgStr "Enregistrer"
+
+MsgId "Cancel"
+MsgStr "Annuler"
+
+MsgId "Delete"
+MsgStr "Supprimer"
+
+MsgId "Are you SURE you want to DELETE this %s?"
+MsgStr "Etes vous CERTAIN de vouloir SUPPRIMER ce %s?"
+
+
+# For the form_drafts/index.php page
+MsgId "List of Form Drafts"
+MsgStr "Liste des Brouillons de Formulaires"
+
+MsgId "View List"
+MsgStr "Afficher la Liste"
+
+MsgId "Create New"
+MsgStr "Ajouter"

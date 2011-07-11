@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<codegen>
+<!--
+	This XML file defines the settings used when running the Code Generator.
+	When running CodeGen, you must specify a CodeGenSettings XML file like
+	this one to use.  Feel free to copy, modify, etc.
+-->
+	<!-- General CodeGen Settings -->
+	<name application="Xsilva Web Store"/>
+	<templateEscape begin="&lt;%" end="%&gt;"/>
+
+	<!-- Define Data Sources (e.g. Databases, Services, etc.) -->
+	<dataSources>
+
+		<database index="1">
+			<!-- Append Prefixes/Suffixes to the Following Code Generated Items -->
+			<className prefix="" suffix=""/>
+			<associatedObjectName prefix="" suffix=""/>
+
+			<!-- Table Type Identifiers - Used to Classify Tables in your Data Model -->
+			<typeTableIdentifier suffix="_type"/>
+			<associationTableIdentifier suffix="_assn"/>
+
+			<!-- Other -->
+			<stripFromTableName prefix="xlsws_"/>
+
+			<!-- Specific Tables to Exclude or Include in the CodeGen process -->
+			<!--
+					* "include" is used to override any "exclude" patterns or lists
+					* "list" should be a  comma-separated list of table names
+					* "pattern" is a regexp pattern
+				So for example, if you only want to codegen any table prefixed with "qc_",
+				you should set an excludeTables pattern to exclude all, or "[0-9a-zA-Z_]*".
+				And then you should set an includeTables pattern of "^qc_[0-9a-zA-Z_]*".
+			-->
+			<excludeTables pattern="" list=""/>
+			<includeTables pattern="" list=""/>
+
+			<!-- Support for "Beta 2" version of Manual Queries and Hard Coded Column Names -->
+			<manualQuery support="false"/>
+
+			<!-- Virtual Foreign Key Relationships -->
+			<!--
+				There are two ways to define relationships.  To signify a virtual FK
+				relationship (for example, on foo.bar_id which would key to bar.id)
+				you can:
+
+				A) Simply define the relationship in the <relationships/> tag using
+				   the following format:
+					foo.bar_id => bar.id
+					bar.other_id => other.id
+					(with one relationship per line)
+				   Note that because the relationships data uses a ">" symbol, proper
+				   XML rules dictate that the content of the relationships script must
+				   be escaped with <![CDATA[ and ]]> tags.
+
+				B) You can define the relationships in totally separate relationships
+				   script file by using the <relationshipsScript/> tag, where you can
+				   specify a filepath and a format.  Format can either be:
+					qcodo - follows the same "foo.bar_id => bar.id" as above
+					sql - parses the script, looking for SQL-based ALTER TABLE statments like:
+				    	ALTER TABLE foo ADD CONSTRAINT blah FOREIGN KEY (bar_id) REFERENCES bar (id);
+			-->
+			<relationships><![CDATA[
+			]]></relationships>
+        <relationshipsScript filepath="settings/relations.txt" format="qcodo"/>
+		</database>
+	</dataSources>
+</codegen>

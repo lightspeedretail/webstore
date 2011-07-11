@@ -1,0 +1,231 @@
+/*
+  LightSpeed Web Store
+ 
+  NOTICE OF LICENSE
+ 
+  This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to support@lightspeedretail.com <mailto:support@lightspeedretail.com>
+ * so we can send you a copy immediately.
+   
+ * @copyright  Copyright (c) 2011 Xsilva Systems, Inc. http://www.lightspeedretail.com
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ 
+ */
+
+/**
+ * ie7.css contains overrides for Internet Explorer 7 for items where 
+ * webstore.css causes issues
+ * 
+ *
+ */
+
+body {
+margin-bottom:0;
+}
+
+#login .right {
+margin:0 8px 0 -55px;
+}
+
+#loginpane {
+position:absolute;
+top:25px;
+margin:15px 0 0 -235px;
+padding:8px 0 10px;
+}
+
+.login a:link,.login a:visited,.login a:hover,.login a:active {
+color:#111;
+border-bottom:1px solid #111;
+}
+
+input.login_input {
+font-size:12px;
+font-weight:bold;
+padding-top:8px;
+height:22px;
+}
+
+.box_close {
+position:relative;
+margin-bottom:-25px;
+}
+
+.msg {
+color:#555;
+}
+
+#customer_registration legend {
+display:block;
+float:left;
+margin-top:15px;
+}
+
+#shipstreet2_ctl {
+clear:both;
+}
+
+#htmlmail_ctl,.opt {
+margin-left:25px;
+position:releative;
+top:15px;
+}
+
+.cbtext {
+position:relative;
+top:-25px;
+left:25px;
+}
+
+li#search {
+display:block;
+float:right;
+position:relative;
+left:0;
+width:180px;
+padding:8px 10px 0 18px;
+}
+
+#applesearch .sbox input {
+background:#fff;
+border:1px solid #222;
+height:12px;
+position:relative;
+padding:0 0 -10px;
+}
+
+#applesearch .sbox_l,#applesearch .sbox_r,.wishlist img {
+display:none;
+}
+
+#breadcrumbs img {
+margin-top:-4px;
+}
+
+#pagination li {
+padding-top:8px;
+width:10px;
+}
+
+#pagination img {
+position:relative;
+top:-5px;
+}
+
+.product_cell_price {
+display:block;
+max-width:75px;
+}
+
+.product_cell_price a {
+font-size:11px;
+padding:0;
+}
+
+.button,input.button,input#btnCalcShipping,#checkout input.button,#customer_registration input.button,.border input.button {
+padding-top:8px;
+height:30px;
+border:none;
+}
+
+.receipt_row .qty input {
+height:13px;
+}
+
+.receipt_total {
+margin-top:15px;
+width:235px;
+z-index:100;
+border:none;
+float:right;
+}
+
+.receipt_checkout {
+margin-top:30px;
+}
+
+.receipt_subtotals {
+width:235px;
+margin:0;
+}
+
+.cwl {
+position:relative;
+top:-6px;
+border:none;
+}
+
+.psubmit {
+position:relative;
+top:-25px;
+right:-225px;
+height:24px;
+width:78px;
+display:block;
+}
+
+.grl {
+width:500px;
+}
+
+.registry_row input.invitee_name,.registry_row input.invitee_email {
+margin:0;
+}
+
+.registry_row .invitee_save,.registry_row .invitee_edit {
+margin-top:14px;
+}
+
+.cart {
+margin-top:50px;
+margin-bottom:-50px;
+}
+
+.button,input#btnCalcShipping,#checkout input.button,#customer_registration input.button,.border input.button,input.button {
+border:1px solid #666;
+padding:0 10px;
+}
+
+.modal_reg_box_body {
+width:425px;
+}
+
+.modal_reg_input_wrap textarea {
+width:168px;
+height:10px;
+}
+
+.modal_reg_draw_verify {
+float:right;
+position:relative;
+top:-30px;
+left:-30px;
+}
+
+#captcha-verif-img {
+margin:20px 0 0;
+}
+
+#captcha-verif-refresh {
+float:left;
+margin:-60px 0 0 160px;
+}
+
+#captcha-verif-audio {
+float:left;
+margin:-20px 0 0 160px;
+}
+
+.model_reg_buttons input.button {
+margin-left:15px;
+}
+
+.cbhtml,.shipping {
+position:relative;
+top:15px;
+}

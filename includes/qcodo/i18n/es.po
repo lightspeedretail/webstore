@@ -1,0 +1,82 @@
+# Note: This file needs to be in /includes/i18n to work properly
+# Be sure to copy this file into that directory to enable translation
+
+# Qcodo Examples Site
+# Spanish (Generic) Translation
+
+msgid "Internationalization and Translation"
+msgstr "Internacionalización y Traducción"
+
+
+msgid "\n"
+"		Qcodo offers internationalization support via <b>QApplication::Translate()</b> (which internally\n"
+"		will use the <b>QI18n</b> class).  Language and country\n"
+"		settings can be setup in <b>prepend.inc</b>.  By default, Qcodo will check the session to determine\n"
+"		which language and country is currently being used, but it is really up to the developer to\n"
+"		determine how you want the language and country codes get discovered (e.g., via the URL, via\n"
+"		GET arguments, etc.)"
+msgstr "\n"
+"		Qcodo ofrece internacionalización apoyo vía <b>QApplication::Translate()</b> (que utilizaró internamente el <b>QI18n</b> La clase). Los "
+"		escenarios del idioma y el país pueden ser arreglos en el <b>prepend.inc</b>. Por omisión, Qcodo verificaró la sesión para determinar cuál idioma y el "
+"		país se utilizan actualmente, pero son realmente hasta el revelador para determinar cómo usted quiere que los códigos del idioma y el país "
+"		obtienen descubierto (por ejemplo, vía el URL, vía OBTIENE los argumentos, etc.)"
+
+
+msgid "Language files are in the GNU PO format (see"
+msgstr "Los archivos del idioma están en el formato de GNU PO (ve"
+
+
+msgid "for more information), and are placed in the <b>/includes/i18n</b> directory."
+msgstr "para más información), y son colocados en el <b>/includes/i18n</b> guía."
+
+
+msgid "\n"
+"		To translate any piece of text, simply use <b>QApplication::Translate(xxx)</b>.  Or as a shortcut,\n"
+"		if you want to do a PHP <b>print()</b> of any translated text in your template, you can use\n"
+"		the qcodo printing shortcut <b>_t(xxx)</b> -- this does the equivalent of\n"
+"		<b>print(QApplication::Translate(xxx))</b>."
+msgstr "\n"
+"		Para traducir cualquier pedazo de texto, simplemente uso <b>QApplication::Translate(xxx)</b>. O cuando un atajo, si usted quiere hacer un PHP "
+"		<b>print()</b> de algén texto traducido en su plantilla, usted puede utilizar el qcodo que imprime el atajo <b>_t(xxx)</b> -- esto hace "
+"		el equivalente de <b>print(QApplication::Translate(xxx))</b>."
+
+
+msgid "\n"
+"		Note that generated Form Drafts and the QControls are all I18n aware -- they will translate themselves\n"
+"		based on the selected language (as long as the appropriate language file exists).  Qcodo-specific\n"
+"		langauge files are part of Qcodo core, and exist in <b>/includes/qcodo/i18n</b>.  <b>Please Note:</b>\n"
+"		we are desparately in need of more language files.  If you are able to contribute, please take\n"
+"		the current en.po file and translate it to any currently unsupported language and feel free to\n"
+"		submit it.  Also note that the Spanish translation (es.po) language files (both in the example\n"
+"		and in Qcodo core) need to be corrected."
+msgstr "\n"
+"		Note que Forma engendrada Redacta y el QControls es todo I18n enterado -- ellos traduciron a sí mismo se basaron en el idioma escogido (tan largo como el "
+"		archivo apropiado del idioma existe). Los archivos Qcodo-específicos de langauge forman parte del centro de Qcodo, y existen en "
+"		<b>/includes/qcodo/i18n</b>.  <b>Favor de notar:</b> "
+"		Somos desparately necesitados de más archivos del idioma. Si usted es capaz de contribuir, complacer toma el archivo de en.po de corriente y lo traduce a "
+"		cualquier idioma actualmente no apoyado y se siente libre someterselo. Note también que la traducción española (es.po) los archivos del idioma (en el "
+"		ejemplo y en el centro de Qcodo) la necesidad de ser corregida."
+
+
+msgid "\n"
+"		Finally, due to the heavy processing of PO parsing, the results of the PO parsing are cached\n"
+"		using QCache, and cached files are stored in <b>/includes/cache/i18n</b>."
+msgstr "\n"
+"		Finalmente, debido al procesamiento pesado de analizar sintácticamente de PO, los resultados del analizar sintácticamente de PO se "
+"		guardan utilizar QCache, y los archivos guardados se almacenan en <b>/includes/cache/i18n</b>."
+
+
+msgid "Internationalization Example"
+msgstr "Ejemplo de Internacionalización"
+
+
+msgid "Current Language"
+msgstr "Idioma Actual"
+
+
+msgid "Switch to"
+msgstr "Cambie a"
+
+
+msgid "To view the People form draft translated into the selected language, go to"
+msgstr "Para ver el \"Form Draft\" de las Personas tradujo al idioma escogido, va a"

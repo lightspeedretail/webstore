@@ -1,0 +1,110 @@
+# Qcodo Distributed Language File
+# for Swedish (default)
+# Contributed by "mickis"
+
+
+# For QTextBoxBase controls
+MsgId "%s is required"
+MsgStr "%s er obligatorisk"
+
+MsgId "Required"
+MsgStr "Obligatorisk"
+
+
+# For QWriteBox controls
+MsgId ""
+"Tags &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; and &lt;http://...&gt; are allowed.  "
+"Use ** at the beginning of any line for a bulleted list."
+MsgStr ""
+"Taggar &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; och &lt;http://...&gt; &auml;r till&aring;tna.  "
+"Anv&auml;nd ** i b&ouml;rjan av rader f&ouml;r punkt lista."
+
+
+# For QPaginatedControl controls
+MsgId "item"
+MsgStr "rad"
+
+MsgId "items"
+MsgStr "rader"
+
+
+# For QListBox and QCalendar controls
+MsgId "Reset"
+MsgStr "Nollst&auml;ll"
+
+
+# For QIntegerTextBox and QFloatTextBox controls
+MsgId "Invalid Integer"
+MsgStr "Ogiltigt heltall"
+
+MsgId "Invalid Float"
+MsgStr "Ogiltigt flyttall"
+
+MsgId "Value must be less than %s"
+MsgStr "V&auml;rdet m&aring;ste vara mindre &auml;n %s"
+
+MsgId "Value must be greater than %s"
+MsgStr "V&auml;rdet m&aring;ste vara st&ouml;rre &auml;n %s"
+
+
+# For QDataGrid controls
+MsgId "<b>Results:</b>&nbsp;Viewing&nbsp;%s&nbsp;%s-%s&nbsp;of&nbsp;%s."
+MsgStr "<b>Resultat:</b>&nbsp;Visar&nbsp;%s&nbsp;%s-%s&nbsp;av&nbsp;%s."
+
+MsgId "<b>Results:</b> No %s found."
+MsgStr "<b>Resultat:</b> Inget %s funnet."
+
+MsgId "<b>Results:</b> 1 %s found."
+MsgId_Plural "<b>Results:</b> %s %s found."
+MsgStr[0] "<b>Resultat:</b> 1 %s funnet."
+MsgStr[1] "<b>Resultat:</b> %s %s funnet."
+
+
+# For QPaginator controls
+MsgId "Previous"
+MsgStr "F&ouml;reg&aring;nde"
+
+MsgId "Next"
+MsgStr "N&auml;sta"
+
+
+# For the List FormDraft Include template
+MsgId "List All"
+MsgStr "Visa alla"
+
+MsgId "Create a New"
+MsgStr "Skapa en ny"
+
+MsgId "Go to \"Form Drafts\""
+MsgStr "G&aring; til \"formul&auml;rutkast\""
+
+
+# For the Edit FormBase class template
+MsgId "Create"
+MsgStr "Skapa"
+
+MsgId "Edit"
+MsgStr "Redigera"
+
+MsgId "Save"
+MsgStr "Spara"
+
+MsgId "Cancel"
+MsgStr "Avbryt"
+
+MsgId "Delete"
+MsgStr "Radera"
+
+MsgId "Are you SURE you want to DELETE this %s?"
+MsgStr "&Auml;r du s&auml;ker p&aring; att du vill RADERA %s?"
+
+
+# For the form_drafts/index.php page
+MsgId "List of Form Drafts"
+MsgStr "Lista over formul&auml;rutkast"
+
+MsgId "View List"
+MsgStr "Visa lista"
+
+MsgId "Create New"
+MsgStr "Skapa ny"

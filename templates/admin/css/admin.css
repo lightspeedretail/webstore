@@ -1,0 +1,555 @@
+/*
+  LightSpeed Web Store
+ 
+  NOTICE OF LICENSE
+ 
+  This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to support@lightspeedretail.com <mailto:support@lightspeedretail.com>
+ * so we can send you a copy immediately.
+   
+ * @copyright  Copyright (c) 2011 Xsilva Systems, Inc. http://www.lightspeedretail.com
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ 
+ */
+
+/**
+ * Web Admin css template
+ * 
+ * 
+ *
+ */
+
+body {
+background:#000 url(images/bg.png)repeat-x;
+color:#fff;
+font-family:Arial, Helvetica, sans-serif;
+font-size:12px;
+margin:0;
+text-shadow:#333 1px 1px 1px;
+}
+
+#selector {
+margin:50px auto;
+width:475px;
+}
+
+#selector h2 {
+display:block;
+float:left;
+font-size:16px;
+margin:0 auto;
+}
+
+#dropdown {
+background:url(images/dropdown_bg.png) no-repeat;
+display:block;
+float:left;
+font-size:14px;
+font-weight:700;
+height:26px;
+margin:-22px 0 0 15px;
+padding:8px 0 0 10px;
+text-shadow:#000 -1px -1px -2px;
+width:191px;
+}
+
+#tabs {
+color:#fff;
+display:block;
+float:right;
+height:47px;
+margin:-42px 1px 0 0;
+max-width:1000px;
+text-shadow:#000 1px 1px 1px;
+}
+
+#tabs a {
+text-decoration:none;
+}
+
+#tabs ul {
+height:47px;
+list-style:none;
+}
+
+#tabs li {
+background:url(images/tab_bg.png) repeat-x;
+border:1px solid #888;
+border-bottom:none;
+color:#fff;
+display:block;
+float:left;
+font-size:14px;
+font-weight:700;
+height:33px;
+margin:-16px -1px 0 0;
+max-width:300px;
+min-width:100px;
+padding:13px 10px 0;
+text-align:center;
+}
+
+#tabs li:hover {
+background:url(images/tab_bg_hover.png) repeat-x;
+}
+
+#tabs li.active {
+background:url(images/title_bg.png) repeat-x;
+color:#111;
+text-shadow:#FFF -1px -1px -2px;
+}
+
+#listOrder li {
+background:#d9d9d9;
+list-style-image:none;
+list-style-position:inherit;
+list-style-type:none;
+margin:0 0 0 -40px;
+width:505px;
+}
+
+#options {
+background:#d9d9d9;
+color:#222;
+margin:0 auto;
+text-shadow:#FFF -1px -1px -2px;
+width:960px;
+}
+
+#options .move,#options .info {
+display:block;
+float:left;
+margin:6px 0 0 2px;
+}
+
+#options .info_right {
+display:block;
+float:left;
+margin:0 0 0 10px;
+}
+
+#options .title {
+background:#d9d9d9 url(images/title_bg.png) repeat-x;
+border-bottom:1px solid #666;
+border-top:1px solid #666;
+height:37px;
+margin:-1px 0 0;
+overflow:hidden;
+padding:9px 0 0 15px;
+width:945px;
+}
+
+#options .title p,#options .title .name {
+display:inline;
+float:left;
+font-size:18px;
+font-weight:700;
+margin-left:20px;
+margin-top:5px;
+}
+
+#options .title .fieldvalue {
+display:inline;
+float:left;
+font-size:18px;
+font-weight:700;
+height:10px;
+margin-left:20px;
+margin-top:5px;
+}
+
+#options .title .btns {
+display:inline;
+float:right;
+margin-right:20px;
+}
+
+#options .title .updown {
+display:inline;
+float:left;
+}
+
+#options .chart {
+border:1px solid #555;
+clear:both;
+display:block;
+margin:20px auto 0;
+}
+
+input {
+color:#111;
+display:block;
+float:left;
+font-size:11px;
+font-weight: bold;
+height:15px;
+margin:3px 0 0 -5px;
+padding:3px 5px;
+}
+
+#options .on,#options .off,#options .settings {
+display:block;
+margin:1px 15px 0 0;
+padding: 0 0 0 10px;
+}
+
+#options .on {
+background:url(images/btn_on.png);
+height:27px;
+width:94px;
+}
+
+#options .on_inline {
+background:url(images/btn_on.png);
+height:27px;
+margin:0;
+width:94px;
+}
+
+#options .off_inline {
+background:url(images/btn_off.png);
+height:27px;
+margin:-5px 0 0;
+width:94px;
+}
+
+#options .off {
+background:url(images/btn_off.png);
+height:27px;
+width:94px;
+}
+
+#options .settings,#options .key {
+display:block;
+float:right;
+margin:4px 15px 0 0;
+}
+
+#options .ajax {
+display:block;
+float:right;
+margin:7px 15px 0 0;
+}
+
+#options .button,.button input {
+background:url(images/tab_bg.png) repeat-x;
+border:1px solid #000;
+color:#fff;
+display:block;
+float:right;
+font-size:14px;
+font-weight:700;
+height:22px;
+margin:1px 15px 0 0;
+height: 17px;
+padding:5px 15px;
+text-shadow:#000 1px 1px 1px;
+}
+
+#options a {
+color:#222;
+text-decoration:none;
+}
+
+#options p {
+padding:15px;
+}
+
+#optionsContent p {
+clear:both;
+float:left;
+}
+
+#tooltip {
+background:#fff;
+border:1px solid #666;
+color:#333;
+display:none;
+max-width:400px;
+padding:8px 10px;
+position:absolute;
+text-shadow:none;
+}
+
+.admin_config_field {
+margin:-3px 0 0;
+}
+
+.admin_config_button_save,.admin_config_button_cancel {
+margin:6px 10px 0 0;
+}
+
+.left {
+display:block;
+float:left;
+}
+
+.right {
+display:block;
+float:right;
+text-align:right;
+}
+
+.module_config {
+margin:0 auto;
+padding-bottom:30px;
+padding-left:20px;
+padding-top:10px;
+width:940px;
+display: block;
+background: #eee;
+}
+
+.module_config p {
+font-size:14px;
+font-weight:700;
+height:0;
+}
+
+.module_config input {
+color:#111;
+display:inline;
+float:left;
+font-size:14px;
+height:15px;
+margin-top:-4px;
+text-align:left;
+}
+
+.module_config textarea {
+color:#111;
+display:block;
+float:left;
+font-size:14px;
+height:300px !important;
+margin:-4px 0 -50px -5px;
+max-height:300px !important;
+max-width:350px !important;
+min-height:300px !important;
+min-width:350px !important;
+text-align:left;
+width:350px !important;
+}
+
+.module_config select {
+background:#222;
+border:1px solid #111;
+color:#fff;
+display:inline;
+float:left;
+font-size:14px;
+height:28px;
+margin-top:-6px;
+text-align:left;
+display: block;
+}
+
+.module_config .label {
+float:left;
+margin-left:20px;
+margin-right:12px;
+text-align:right;
+width:39%;
+display: block;
+}
+
+.module_config .btn {
+display:block;
+padding-left:41%;
+text-align:center;
+width:100%;
+}
+
+.module_config .btn input {
+margin-left:30px;
+padding-left:20px;
+}
+
+.extra_height{
+	height: 150px;
+}
+
+.file_asset_dbox {
+background-color:#fff;
+}
+
+.file_asset {
+display:inline;
+width:200px;
+height: 200px;
+}
+
+.charts img {
+border:1px solid #666;
+margin:25px;
+}
+
+.field {
+clear:both;
+height:300px;
+}
+
+.task_list {
+padding:25px;
+}
+
+table#c13,table#c10,table#c12,table#c8,table#c6,table#c5 {
+width:100%;
+z-index:500;
+}
+
+.header {
+background:url(images/header.png) repeat-x;
+font-size:12px;
+height:44px;
+overflow:hidden;
+}
+
+.header a {
+color:#fff;
+text-decoration:none;
+text-shadow:#222 -1px -1px 0;
+}
+
+.ttitle {
+display:block;
+float:left;
+font-size:12px;
+font-weight:700;
+margin:5px 0 0;
+text-shadow:#fff -1px -1px -1px;
+}
+
+.paginator {
+font-size:11px;
+margin:5px 10px 4px 0;
+text-align:right;
+}
+
+.paginator a {
+color:#111;
+text-decoration:none;
+text-shadow:#fff -1px -1px -1px;
+}
+
+.row {
+background:url(images/title_bg.png) repeat-x;
+height:47px;
+overflow-y:hidden;
+}
+
+.id {
+min-width:5%;
+padding:0 0 0 15px;
+}
+
+.code,.a3,.n3 {
+min-width:20%;
+text-align:center;
+}
+
+.latitude,.longitude,.available {
+min-width:10%;
+text-align:center;
+}
+
+.zip {
+min-width:25%;
+text-align:center;
+}
+
+.country,.region {
+height:10px;
+min-width:30%;
+overflow:hidden;
+}
+
+.id,.country,.code,.a3,.n3,.region,.latitude,.longitude,.available,.zip {
+padding-top:10px;
+}
+
+.table_base {
+position: absolute;
+left: -400px;
+top: 531px;
+padding:5px 0;
+position:relative;
+word-spacing: 15px;
+z-index: 1000;
+color: #fff;
+text-shadow: 1px 1px 1px #000;
+}
+
+.table_base a, .table_base .page a, #c11 a, #c6 a { 
+color: #fff;
+text-shadow: 1px 1px 1px #000;
+}
+
+#c11 .page, #c11 .arrow, #c11 .break, #c11 .ellipsis, #c6 .page, #c6 .arrow, #c6 .break, #c6 .ellipsis { margin: 0 3px; }
+
+.wide {
+width: 890px;
+}
+
+.add {
+font-size:16px;
+font-weight:700;
+position:relative;
+top:12px;
+color:#fff;
+width: 100px;
+text-shadow: 1px 1px 1px #000;
+}
+
+a.add {
+color:#fff;
+text-decoration:none;
+text-shadow: 1px 1px 1px #000;
+}
+
+.results {
+color:#333;
+font-size:11px;
+margin:3px 10px 0 15px;
+}
+
+.search {
+display:block;
+float:right;
+width:300px;
+margin: -18px 0 0 0;
+}
+
+.search input {
+	margin: -14px 0 0 40px;
+	border: 1px solid #222;
+	height: 20px;
+	color: #222;
+}
+
+.searchButton {
+position:relative;
+top:-16px;
+margin: 0 0 0 -100px;
+padding: 0 100px 0 0;
+font-size: 8px;
+}
+
+.rounded {
+-webkit-border-radius: 5px;
+}
+
+.rounded-top {
+-webkit-border-top-left-radius: 5px;
+-webkit-border-top-right-radius: 5px;
+}
+
+.rounded-bottom {
+-webkit-border-bottom-left-radius: 5px;
+-webkit-border-bottom-left-radius: 5px;
+}

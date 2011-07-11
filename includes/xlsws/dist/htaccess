@@ -1,0 +1,45 @@
+#
+#    Copyright (c) 2005-2009 Xsilva Systems Inc. All rights reserved. 
+# 
+#    This file controls search engine friendly urls and redirection
+#
+
+
+DirectoryIndex index.php
+
+#Change directory index to another file if you want that to be your homepage
+
+
+<IfModule mod_rewrite.c>
+RewriteEngine on
+# Some hostings require RewriteBase to be uncommented
+# Example:
+# Your store url is http://www.yourcompany.com/store/xlsws
+# So "RewriteBase" should be:
+# RewriteBase /store/xlsws
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . index.php?seo_rewrite=1 [L,QSA]
+
+RewriteRule xls_image_upload.php - [E=XSILVA_AUTHORIZATION:%{HTTP:Authorization},L]
+
+</IfModule>
+
+#PHP Settings
+#php_flag register_globals off
+#php_flag session.bug_compat_42 off
+#php_flag session.bug_compat_warn off
+#php_flag session.auto_start on
+
+
+# WS2.0.2 bug fix : removing uppercase file name to show product codes with all uppercase codes
+# block all files with uppercase names (i.e. VERSION)
+#RedirectMatch 410 ^/[A-Z].+$ 
+
+# block all templates (no reason to have these exposed)
+RedirectMatch 410 ^/.*\.tpl$ 
+
+# block all .log (log files), .sql (sql dump/export) and .conf (config files) files
+# in case some day these files move to another directory
+RedirectMatch 410 ^.*\.(sql|log|conf)$ 

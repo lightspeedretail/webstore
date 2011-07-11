@@ -1,0 +1,112 @@
+# Qcodo Distributed Language File
+# for Russian (default)
+# Contributed by "bermuda"
+
+
+# For QTextBoxBase controls
+MsgId "%s is required"
+MsgStr "%s требуется"
+
+MsgId "Required"
+MsgStr "Требуется"
+
+
+# For QWriteBox controls
+MsgId ""
+"Tags &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; and &lt;http://...&gt; are allowed.  "
+"Use ** at the beginning of any line for a bulleted list."
+MsgStr ""
+"Разрешена разметка &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; and &lt;http://...&gt;.  "
+"Пользуйтесь ** в начале линии для того чтобы создать список."
+
+
+# For QPaginatedControl controls
+MsgId "item"
+MsgStr "элемент"
+
+MsgId "items"
+MsgStr "элементы"
+
+
+# For QListBox and QCalendar controls
+MsgId "Reset"
+MsgStr "Сбросить"
+
+
+# For QIntegerTextBox and QFloatTextBox controls
+MsgId "Invalid Integer"
+MsgStr "Ошибочное целое"
+
+MsgId "Invalid Float"
+MsgStr "Ошибочное действительное"
+
+MsgId "Value must be less than %s"
+MsgStr "Значение должно быть меньше чем %s"
+
+MsgId "Value must be greater than %s"
+MsgStr "Значение должно быть больше чем  %s"
+
+
+# For QDataGrid controls
+MsgId "<b>Results:</b>&nbsp;Viewing&nbsp;%s&nbsp;%s-%s&nbsp;of&nbsp;%s."
+MsgStr "<b>Результаты:</b>&nbsp;Просмотр&nbsp;%s&nbsp;%s-%s&nbsp;of&nbsp;%s."
+
+MsgId "<b>Results:</b> No %s found."
+MsgStr "<b>Результаты:</b> %s не найдено."
+
+MsgId "<b>Results:</b> 1 %s found."
+MsgStr "<b>Результаты:</b> Один %s найден."
+
+MsgId_Plural "<b>Results:</b> %s %s found."
+MsgStr[0] "<b>Results:</b> Один %s найден."
+MsgStr[1] "<b>Results:</b> %s %s найдено."
+
+
+# For QPaginator controls
+MsgId "Previous"
+MsgStr "Предыдущий"
+
+MsgId "Next"
+MsgStr "Следующий"
+
+
+# For the List FormDraft Include template
+MsgId "List All"
+MsgStr "Показать все"
+
+MsgId "Create a New"
+MsgStr "Создать новый"
+
+MsgId "Go to \"Form Drafts\""
+MsgStr "Перейти к \"Form Drafts\""
+
+
+# For the Edit FormBase class template
+MsgId "Create"
+MsgStr "Создать"
+
+MsgId "Edit"
+MsgStr "Редактировать"
+
+MsgId "Save"
+MsgStr "Сохранить"
+
+MsgId "Cancel"
+MsgStr "Отмена"
+
+MsgId "Delete"
+MsgStr "Удалить"
+
+MsgId "Are you SURE you want to DELETE this %s?"
+MsgStr "Вы уверены в том, что хотите УДАЛИТЬ %s?"
+
+
+# For the form_drafts/index.php page
+MsgId "List of Form Drafts"
+MsgStr "Список Form Drafts"
+
+MsgId "View List"
+MsgStr "Просмотр список"
+
+MsgId "Create New"
+MsgStr "Создать новый"

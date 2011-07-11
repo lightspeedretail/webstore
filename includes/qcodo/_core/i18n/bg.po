@@ -1,0 +1,110 @@
+# Qcodo Distributed Language File
+# for Bulgarian (default)
+# Contributed by Delian Angelov
+
+
+# For QTextBoxBase controls
+MsgId "%s is required"
+MsgStr "%s е задължително"
+
+MsgId "Required"
+MsgStr "Задължително"
+
+
+# For QWriteBox controls
+MsgId ""
+"Tags &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; and &lt;http://...&gt; are allowed.  "
+"Use ** at the beginning of any line for a bulleted list."
+MsgStr ""
+"Позволени са таговете &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; and &lt;http://...&gt; .  "
+"Използвайте ** в началото на реда за да получите списък с точки."
+
+
+# For QPaginatedControl controls
+MsgId "item"
+MsgStr "елемент"
+
+MsgId "items"
+MsgStr "елементи"
+
+
+# For QListBox and QCalendar controls
+MsgId "Reset"
+MsgStr "Възстанови"
+
+
+# For QIntegerTextBox and QFloatTextBox controls
+MsgId "Invalid Integer"
+MsgStr "Невалидно цяло"
+
+MsgId "Invalid Float"
+MsgStr "Невалидно реално"
+
+MsgId "Value must be less than %s"
+MsgStr "Стойноста трябва да е по-малка от %s"
+
+MsgId "Value must be greater than %s"
+MsgStr "Стойноста трябва да е по-голяма от than %s"
+
+
+# For QDataGrid controls
+MsgId "<b>Results:</b>&nbsp;Viewing&nbsp;%s&nbsp;%s-%s&nbsp;of&nbsp;%s."
+MsgStr "<b>Резултати:</b>&nbsp;Гледате&nbsp;%s&nbsp;%s-%s&nbsp;of&nbsp;%s."
+
+MsgId "<b>Results:</b> No %s found."
+MsgStr "<b>Резултати:</b> Не е намерен %s."
+
+MsgId "<b>Results:</b> 1 %s found."
+MsgId_Plural "<b>Results:</b> %s %s found."
+MsgStr[0] "<b>Резултат:</b> Един %s беше намерен."
+MsgStr[1] "<b>Резултати:</b> %s %s намерени."
+
+
+# For QPaginator controls
+MsgId "Previous"
+MsgStr "Предишни"
+
+MsgId "Next"
+MsgStr "Следващи"
+
+
+# For the List FormDraft Include template
+MsgId "List All"
+MsgStr "Покажи всички"
+
+MsgId "Create a New"
+MsgStr "Създай нов"
+
+MsgId "Go to \"Form Drafts\""
+MsgStr "Посетете \"Черновите на Формулярите\""
+
+
+# For the Edit FormBase class template
+MsgId "Create"
+MsgStr "Създай"
+
+MsgId "Edit"
+MsgStr "Редактирай"
+
+MsgId "Save"
+MsgStr "Запиши"
+
+MsgId "Cancel"
+MsgStr "Откажи"
+
+MsgId "Delete"
+MsgStr "Delete"
+
+MsgId "Are you SURE you want to DELETE this %s?"
+MsgStr "Сигурни ли сте, че желаете да изтриете %s?"
+
+
+# For the form_drafts/index.php page
+MsgId "List of Form Drafts"
+MsgStr "Списък на Черновите на Формулярите"
+
+MsgId "View List"
+MsgStr "Покажи списъка"
+
+MsgId "Create New"
+MsgStr "Създай нов"

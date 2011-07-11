@@ -1,0 +1,110 @@
+# Qcodo Distributed Language File
+# for Norwegian (default)
+# Contributed by Martin Kronstad
+
+
+# For QTextBoxBase controls
+MsgId "%s is required"
+MsgStr "%s er påkrevd"
+
+MsgId "Required"
+MsgStr "Påkrevd"
+
+
+# For QWriteBox controls
+MsgId ""
+"Tags &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; and &lt;http://...&gt; are allowed.  "
+"Use ** at the beginning of any line for a bulleted list."
+MsgStr ""
+"Tagger &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; og &lt;http://...&gt; er tillatt.  "
+"Bruk ** i begynnelsen av linjer for uordnet liste."
+
+
+# For QPaginatedControl controls
+MsgId "item"
+MsgStr "rad"
+
+MsgId "items"
+MsgStr "rader"
+
+
+# For QListBox and QCalendar controls
+MsgId "Reset"
+MsgStr "Nullstill"
+
+
+# For QIntegerTextBox and QFloatTextBox controls
+MsgId "Invalid Integer"
+MsgStr "Ugyldig heltall"
+
+MsgId "Invalid Float"
+MsgStr "Ugyldig flyttall"
+
+MsgId "Value must be less than %s"
+MsgStr "Verdien må være mindre enn %s"
+
+MsgId "Value must be greater than %s"
+MsgStr "Verdien må være større enn %s"
+
+
+# For QDataGrid controls
+MsgId "<b>Results:</b>&nbsp;Viewing&nbsp;%s&nbsp;%s-%s&nbsp;of&nbsp;%s."
+MsgStr "<b>Resultater:</b>&nbsp;Viser&nbsp;%s&nbsp;%s-%s&nbsp;av&nbsp;%s."
+
+MsgId "<b>Results:</b> No %s found."
+MsgStr "<b>Resultater:</b> No %s found."
+
+MsgId "<b>Results:</b> 1 %s found."
+MsgId_Plural "<b>Results:</b> %s %s found."
+MsgStr[0] "<b>Resultat:</b> 1 %s funnet."
+MsgStr[1] "<b>Resultat:</b> %s %s funnet."
+
+
+# For QPaginator controls
+MsgId "Previous"
+MsgStr "Forrige"
+
+MsgId "Next"
+MsgStr "Neste"
+
+
+# For the List FormDraft Include template
+MsgId "List All"
+MsgStr "Vis alle"
+
+MsgId "Create a New"
+MsgStr "Opprett en ny"
+
+MsgId "Go to \"Form Drafts\""
+MsgStr "Gå til \"Skjemautkast\""
+
+
+# For the Edit FormBase class template
+MsgId "Create"
+MsgStr "Opprett"
+
+MsgId "Edit"
+MsgStr "Rediger"
+
+MsgId "Save"
+MsgStr "Lagre"
+
+MsgId "Cancel"
+MsgStr "Avbryt"
+
+MsgId "Delete"
+MsgStr "Slett"
+
+MsgId "Are you SURE you want to DELETE this %s?"
+MsgStr "Er du sikker på at du vil SLETTE denne %s?"
+
+
+# For the form_drafts/index.php page
+MsgId "List of Form Drafts"
+MsgStr "Liste over skjemautkast"
+
+MsgId "View List"
+MsgStr "Vis liste"
+
+MsgId "Create New"
+MsgStr "Opprett ny"

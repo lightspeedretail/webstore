@@ -1,0 +1,439 @@
+/*
+  LightSpeed Web Store
+ 
+  NOTICE OF LICENSE
+ 
+  This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to support@lightspeedretail.com <mailto:support@lightspeedretail.com>
+ * so we can send you a copy immediately.
+   
+ * @copyright  Copyright (c) 2011 Xsilva Systems, Inc. http://www.lightspeedretail.com
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ 
+ */
+
+/**
+ * main.css is an older template for Webstore versions below 2 
+ * It is only included for legacy systems who may still be calling
+ * this template
+ *
+ */
+ 
+/*** Checkout Forms ***/
+
+#ls_checkout_form fieldset
+{
+	border:0px;
+}
+
+#ls_checkout_form legend
+{
+	font-size: 110%;
+	font-weight: bold;
+}
+
+#ls_checkout_form label
+{
+	width: 100px;
+	display: block;
+	margin-left: 10px;
+	float: left;
+	line-height: 22px;
+}
+
+#ls_checkout_form input.stretch
+{
+	width: 130px;
+}
+
+/*** Categories ***/
+
+#xls_include_menu
+{
+	width: 148px;
+	margin: 0px;
+	padding: 10px;
+
+}
+
+#xls_include_menu ul
+{
+	width: 148px;
+	list-style-type: none;
+	
+}
+	
+#xls_include_menu ul li
+{
+	text-decoration:none;
+	list-style-type: none;
+	font-size:12px;
+	line-height:16px;
+}
+	
+#xls_include_menu ul li a
+{
+	display:block; 	color:#666666; 	line-height:16px;
+}
+	
+#xls_include_menu ul li a:hover
+{
+	color:#204e9b; text-decoration: none;
+}
+	
+#xls_include_menu ul li.selected a
+{
+	color:#204e9b; text-decoration: none;	
+}
+
+#minicart{
+
+	margin:0;
+	padding:0;
+	font-size:9px;
+}
+
+#xls_include_minicart p{
+
+	margin:0;
+	padding:0;
+}
+
+a.minicartLink:link {
+	font-size:12px;
+	color:#579f21;
+	text-decoration:underline;
+}
+
+a.minicartLink:hover {
+	font-size:12px;
+	color:#204e9b;
+	text-decoration:none;
+}
+a.minicartLink:visited {
+	font-size:12px;
+	color:#579f21;
+	text-decoration:underline;
+}
+
+/* Batch Navigation Elements */
+
+div.batch {
+	background: #CCC;
+	padding: 5px 0px;
+	font-size: 13px;
+	color: #333;
+	font-weight: bold;
+	text-align: right;
+	}
+div.batch span.selected {
+	color: #333;
+	background-color: #FFF;
+	padding: 1px 4px;
+	border: 1px solid #999;
+	margin-right: 5px;
+	cursor: pointer;
+	cursor: hand;
+	}
+
+div.batch span.unselected {
+	color: #03C;
+	background-color: #CCC;
+	padding: 1px 4px;
+	border: 1px solid #999;
+	margin-right: 5px;
+	text-decoration: underline;
+	cursor: pointer;
+	cursor: hand;
+	}
+	
+/*** Breadtrail ***/
+
+#xls_include_crumbtrail
+{
+	width: auto;
+	margin: 0px;
+	padding: 0px;
+}
+
+#xls_include_crumbtrail ul
+{
+	margin:0;
+	padding:0;
+	list-style:none;
+}
+	
+#xls_include_crumbtrail ul li
+{
+	color:#000000;
+	display:inline;
+	margin-left:5px;
+}
+	
+
+#xls_include_crumbtrail li a
+{
+	background:url(images/crumb_bullet.gif) no-repeat center left;
+	padding-left: 13px;
+	text-decoration:none;
+	color:#333;
+}
+
+#xls_include_crumbtrail li a:hover
+{
+	text-decoration:underline;
+	color:#030;
+}
+	
+#xls_include_crumbtrail li a:visited
+{
+	color:#333;
+}
+		
+#xls_include_crumbtrail li.first a
+{
+	padding-left: 0px;
+	background: none;
+}
+
+/**** Main Content *****/
+
+#ls_maincontent
+{
+	margin: 0px;
+	padding: 5px;
+}
+
+
+//** Product List **/
+table.xls_product_table{
+
+}
+
+.product_title
+{
+	height:30px;
+	font-size:10px;
+	vertical-align: top;
+	text-align: center;
+}
+
+
+
+td.product_photo
+{
+	text-align:center;
+		
+
+}
+
+.product_price
+{
+	font-size:11px;
+	text-align:right;
+	display: inline;
+}
+
+
+
+img.product_photo
+{
+	margin:5px auto;
+	padding:5px;
+	background-color:#eee;
+	border:1px solid #ccc;
+	vertical-align:middle;
+	width: 80px;   
+	height : 80px; 
+}
+.product_list_item
+{
+	margin-top:-1px;
+	margin-left:-1px;
+	float:left;
+	width:167px;
+	padding:4px;
+	border:1px solid #cccccc;
+	display: inline;
+}
+
+a.product_list:link {
+	color:#204e9b;
+	text-decoration:none;
+	font-size: 10px;
+}
+
+a.product_list:hover {
+	color:#666666;
+	text-decoration:underline;
+	font-size: 10px;
+}
+
+
+/*** Footer Element ***/
+
+
+#footer table {
+	border-top:1px #333 solid;
+	font-size:11px;
+	padding-top: 8px;
+}
+
+#footer a {
+	text-decoration: none;
+}
+
+#footer a:hover {
+	color: #000066;
+	text-decoration: underline;
+}
+
+	
+/*** Other ***/
+.clearfix:after
+{
+    content: "."; 
+    display: block; 
+    height: 0; 
+    clear: both; 
+    visibility: hidden;
+}
+
+
+.shoppingcarttablediv
+{
+	float:left;
+	width:100%;
+}
+	
+.shoppingcartrowdiv
+{
+	float:left;
+	width:100%;
+}
+
+.underline
+{
+	border-bottom:1px solid #eee;
+}
+	
+.shoppingcartheaderdiv
+{
+	float:left;
+}
+	
+
+#content .shoppingcartrowdiv
+{
+}
+
+
+.shoppingcarttotalrowdiv
+{
+	float:left;
+}
+	
+
+.itm
+{
+	width:70%;
+}
+
+.itminfo
+{
+	line-height:12px;
+	font-size:90%;
+}
+	
+.itminfo img
+{
+	float:left;
+	margin:2px;
+	width:40px;
+}
+
+.qty
+{
+	width:10%;
+	text-align:center;
+}
+
+.price
+{
+	width:20%;
+	text-align:right;
+}
+
+.shipping-total
+{
+	float:right;
+}
+	
+.purchase-total
+{
+	clear:left;
+	border-top:1px solid gray;
+	padding-top:10px;
+	margin-top:10px;
+}
+	
+.total
+{
+	font-size:120%;
+	letter-spacing:2px;
+}
+	
+.total-price
+{
+	float:right;
+	font-weight:bold;
+}
+
+table.ls_cart_list
+{
+	font-size:97%;
+}
+
+table.ls_cart_list th
+{
+	border-bottom: 1px solid #cccccc;
+}
+
+table.ls_cart_list tr.ls_cart_list_subtotal td
+{
+	border-top: 1px solid #cccccc;
+	font-weight: bold;
+}
+
+table.ls_cart_list tr.ls_cart_list_tax td
+{
+	font-weight: bold;
+}
+
+table.ls_cart_list tr.ls_cart_list_total td
+{
+	font-weight: bold;
+}
+
+p.ls_cart_total_note
+{
+	font-size: 95%;
+	clear: both;
+}
+
+
+#result_holder{
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+
+.paginator_right{
+	text-align: right;
+}
+

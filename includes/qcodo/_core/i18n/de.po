@@ -1,0 +1,110 @@
+# Qcodo Distributed Language File
+# for German (default)
+# Contributed by Wolfgang Reinhardt
+
+
+# For QTextBoxBase controls
+MsgId "%s is required"
+MsgStr "%s wird ben&ouml;tigt"
+
+MsgId "Required"
+MsgStr "Ben&ouml;tigt"
+
+
+# For QWriteBox controls
+MsgId ""
+"Tags &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; and &lt;http://...&gt; are allowed.  "
+"Use ** at the beginning of any line for a bulleted list."
+MsgStr ""
+"Die  &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; and &lt;http://...&gt; sind zul&auml;ssig.  "
+"Benutze ** am Anfang einer beliebigen Zeile f&uuml;r eine Liste mit Aufz&auml;hlungszeichen."
+
+
+# For QPaginatedControl controls
+MsgId "item"
+MsgStr "Objekt"
+
+MsgId "items"
+MsgStr "Objekte"
+
+
+# For QListBox and QCalendar controls
+MsgId "Reset"
+MsgStr "Reset"
+
+
+# For QIntegerTextBox and QFloatTextBox controls
+MsgId "Invalid Integer"
+MsgStr "Keine g&uuml;ltige ganze Zahl"
+
+MsgId "Invalid Float"
+MsgStr "Keine g&uuml;ltige Gleitkomma-Zahl"
+
+MsgId "Value must be less than %s"
+MsgStr "Der Wert mu&szlig; kleiner als %s sein."
+
+MsgId "Value must be greater than %s"
+MsgStr "Der Wert mu&szlig; gr&ouml;&szlig;er als %s sein."
+
+
+# For QDataGrid controls
+MsgId "<b>Results:</b>&nbsp;Viewing&nbsp;%s&nbsp;%s-%s&nbsp;of&nbsp;%s."
+MsgStr "<b>Ergebnisse:</b>&nbsp;Angezeigt:&nbsp;%s&nbsp;%s-%s&nbsp;von&nbsp;%s."
+
+MsgId "<b>Results:</b> No %s found."
+MsgStr "<b>Ergebnisse:</b> Kein %s gefunden."
+
+MsgId "<b>Results:</b> 1 %s found."
+MsgId_Plural "<b>Results:</b> %s %s found."
+MsgStr[0] "<b>Ergebnisse:</b> 1 %s gefunden."
+MsgStr[1] "<b>Ergebnisse:</b> %s %s gefunden."
+
+
+# For QPaginator controls
+MsgId "Previous"
+MsgStr "Vorherige"
+
+MsgId "Next"
+MsgStr "N&auml;chste"
+
+
+# For the List FormDraft Include template
+MsgId "List All"
+MsgStr "Alle anzeigen"
+
+MsgId "Create a New"
+MsgStr "Ein neues erstellen"
+
+MsgId "Go to \"Form Drafts\""
+MsgStr "Go to \"Form Drafts\""
+
+
+# For the Edit FormBase class template
+MsgId "Create"
+MsgStr "Erstellen"
+
+MsgId "Edit"
+MsgStr "&Auml;ndern"
+
+MsgId "Save"
+MsgStr "Speichern"
+
+MsgId "Cancel"
+MsgStr "Abbruch"
+
+MsgId "Delete"
+MsgStr "L&ouml;schen"
+
+MsgId "Are you SURE you want to DELETE this %s?"
+MsgStr "Soll %s WIRKLICH GEL&Ouml;SCHT werden??"
+
+
+# For the form_drafts/index.php page
+MsgId "List of Form Drafts"
+MsgStr "Liste der Formular Vorlagen"
+
+MsgId "View List"
+MsgStr "Liste anzeigen"
+
+MsgId "Create New"
+MsgStr "Neuen Eintrag erstellen"

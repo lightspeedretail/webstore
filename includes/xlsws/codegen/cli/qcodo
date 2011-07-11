@@ -1,0 +1,18 @@
+#!/usr/bin/env php
+<?php
+	// Qcodo CLI Runner Wrapper for POSIX-based Systems (Linux, Unix, Mac OS X, Cygwin, etc.)
+	// Copyright (c) 2005-2009, Quasidea Development, LLC
+
+	/*
+	 * Line #1 of this file (above) tries to execute the PHP CLI bin based on
+	 * your POSIX enviornment.  If the above line fails to find and run the correct
+	 * version of the PHP CLI bin in your system, it can be modified to
+	 * be the explicit, absolute path to your PHP CLI bin file.
+	 * Note that this is typically /usr/local/bin/php or /usr/bin/php
+	 * on most POSIX-based systems.  Feel free to modify as needed.
+	 */
+
+	// Calling qcodo_cli.inc.php to setup the PHP/Qcodo environment and to run the requested script
+	// For more information, please refer to the comments in qcodo_cli.inc.php
+	require(dirname(__FILE__) . '/qcodo_cli.inc.php');
+?>

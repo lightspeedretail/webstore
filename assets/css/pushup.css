@@ -1,0 +1,101 @@
+/*
+  LightSpeed Web Store
+ 
+  NOTICE OF LICENSE
+ 
+  This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to support@lightspeedretail.com <mailto:support@lightspeedretail.com>
+ * so we can send you a copy immediately.
+ 
+  DISCLAIMER
+ 
+ * Do not edit or add to this file if you wish to upgrade Web Store to newer
+ * versions in the future. If you wish to customize Web Store for your
+ * needs please refer to http://www.lightspeedretail.com for more information.
+ 
+ * @copyright  Copyright (c) 2011 Xsilva Systems, Inc. http://www.lightspeedretail.com
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ 
+ */
+
+#pushup {
+background:#ffffc6;
+border:1px solid #b0dfc8;
+border-left:none;
+border-right:none;
+border-top:none;
+font-family:Arial, Helvetica, sans-serif;
+position:fixed;
+right:0;
+text-decoration:none;
+top:0;
+width:100%;
+z-index:9999;
+margin:0;
+padding:4px 0 10px 25px;
+}
+
+* html #pushup {
+position:absolute;
+top:expression(_pushupIETop=10+(document.documentElement.scrollTop||0) 0 px);
+}
+
+#pushup * {
+background:none;
+border:0;
+margin:0;
+padding:0;
+}
+
+.withReminder {
+padding-bottom:6px;
+}
+
+#pushup a {
+outline-style:none;
+text-decoration:none;
+}
+
+#pushup .pushup_messageLink {
+color:#4293cd;
+cursor:pointer;
+float:left;
+font-size:12px;
+position:relative;
+}
+
+#pushup .pushup_icon {
+float:left;
+height:22px;
+overflow:hidden;
+position:relative;
+vertical-align:middle;
+width:22px;
+margin:5px 5px 15px 25px;
+}
+
+#pushup .pushup_message {
+float:left;
+line-height:22px;
+position:relative;
+vertical-align:middle;
+margin:5px 3px 0 0;
+}
+
+#pushup .pushup_reminder {
+clear:both;
+color:#84a2ac;
+cursor:pointer;
+float:left;
+font-size:10px;
+margin-left:27px;
+}
+
+#pushup .pushup_messageLink:hover,#pushup .pushup_reminder:hover {
+text-decoration:underline;
+}

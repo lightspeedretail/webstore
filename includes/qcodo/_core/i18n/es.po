@@ -1,0 +1,115 @@
+# Qcodo Distributed Language File
+# for Spanish (Generic)
+# Contributed by Nino Dafonte <nino.dafonte@gmail.com>
+
+
+# For QTextBoxBase controls
+MsgId "%s is required"
+MsgStr "%s es obligatorio"
+
+MsgId "Required"
+MsgStr "Obligatorio"
+
+
+# For QWriteBox controls
+MsgId ""
+"Tags &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; and &lt;http://...&gt; are allowed.  "
+"Use ** at the beginning of any line for a bulleted list."
+MsgStr ""
+"Etiquetas &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; y &lt;http://...&gt; están permitidas.  "
+"Use ** al comienzo de cada linea para una lista por puntos."
+
+
+# For QPaginatedControl controls
+MsgId "item"
+MsgStr "artículo"
+
+MsgId "items"
+MsgStr "artículos"
+
+
+# For QListBox and QCalendar controls
+MsgId "Reset"
+MsgStr "Borrar"
+
+
+# For ListBoxes in Generated Forms
+MsgId "- Select One -"
+MsgStr "- Seleccione Uno -"
+
+
+# For QIntegerTextBox and QFloatTextBox controls
+MsgId "Invalid Integer"
+MsgStr "N&uacute;mero entero no v&aacute;lido"
+
+MsgId "Invalid Float"
+MsgStr "NN&uacute;meromero decimal no v&aacute;lido"
+
+MsgId "Value must be less than %s"
+MsgStr "El valor debe ser menor de %s"
+
+MsgId "Value must be greater than %s"
+MsgStr "El valor debe ser mayor de %s"
+
+
+# For QDataGrid controls
+MsgId "<b>Results:</b>&nbsp;Viewing&nbsp;%s&nbsp;%s-%s&nbsp;of&nbsp;%s."
+MsgStr "<b>Resultados:</b>&nbsp;Mostrando&nbsp;%s&nbsp;%s-%s&nbsp;de&nbsp;%s."
+
+MsgId "<b>Results:</b> No %s found."
+MsgStr "<b>Resultados:</b> No se ha encontrado ning&uacute; %s."
+
+MsgId "<b>Results:</b> 1 %s found."
+MsgId_Plural "<b>Results:</b> %s %s found."
+MsgStr[0] "<b>Resultados:</b> Hay 1 %s."
+MsgStr[1] "<b>Resultados:</b> Hay %s %s."
+
+
+# For QPaginator controls
+MsgId "Previous"
+MsgStr "Anterior"
+
+MsgId "Next"
+MsgStr "Siguiente"
+
+
+# For the List FormDraft Include template
+MsgId "List All"
+MsgStr "Mostrar Todos"
+
+MsgId "Create a New"
+MsgStr "Crear uno Nuevo"
+
+MsgId "Go to \"Form Drafts\""
+MsgStr "Ir a \"Formularios Modelo\""
+
+
+# For the Edit FormBase class template
+MsgId "Create"
+MsgStr "Crear"
+
+MsgId "Edit"
+MsgStr "Editar"
+
+MsgId "Save"
+MsgStr "Guardar"
+
+MsgId "Cancel"
+MsgStr "Cancelar"
+
+MsgId "Delete"
+MsgStr "Borrar"
+
+MsgId "Are you SURE you want to DELETE this %s?"
+MsgStr "¿Está SEGURO de querer BORRAR este %s?"
+
+
+# For the form_drafts/index.php page
+MsgId "List of Form Drafts"
+MsgStr "Lista de Formularios Modelo"
+
+MsgId "View List"
+MsgStr "Mostrar Lista"
+
+MsgId "Create New"
+MsgStr "Crear Nuevo"

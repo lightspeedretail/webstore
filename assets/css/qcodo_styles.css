@@ -1,0 +1,152 @@
+/*
+  LightSpeed Web Store
+ 
+  NOTICE OF LICENSE
+ 
+  This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to support@lightspeedretail.com <mailto:support@lightspeedretail.com>
+ * so we can send you a copy immediately.
+ 
+  DISCLAIMER
+ 
+ * Do not edit or add to this file if you wish to upgrade Web Store to newer
+ * versions in the future. If you wish to customize Web Store for your
+ * needs please refer to http://www.lightspeedretail.com for more information.
+ 
+ * @copyright  Copyright (c) 2011 Xsilva Systems, Inc. http://www.lightspeedretail.com
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ 
+ */
+
+/* These are all EXAMPLES -- they are meant to be updated/changed/modified */
+TD,BODY {
+font:12px Verdana,Arial,Helvetica,Sans-Serif;
+text-align:left;
+}
+
+TH {
+font:12px Verdana,Arial,Helvetica,Sans-Serif;
+text-align:left;
+font-weight:bold;
+}
+
+.title {
+font:30px Verdana,Arial,Helvetica,Sans-Serif;
+font-weight:bold;
+margin-left:-2px;
+}
+
+.title_action {
+font:12px Verdana,Arial,Helvetica,Sans-Serif;
+font-weight:bold;
+margin-bottom:-4px;
+}
+
+.warning {
+color:#ff0000;
+}
+
+.instructions {
+font:9px Arial,Helvetica,Sans-Serif;
+font-style:italic;
+}
+
+.item_divider {
+line-height:16px;
+}
+
+.item_label {
+font:12px Verdana,Arial,Helvetica,Sans-Serif;
+padding-bottom:4px;
+}
+
+.item_label_disabled {
+font:12px Verdana,Arial,Helvetica,Sans-Serif;
+padding-bottom:4px;
+color:#999999;
+}
+
+.button {
+font:10px Verdana,Arial,Helvetica,Sans-Serif;
+font-weight:bold;
+}
+
+.paginator_inactive_step {
+font-weight:bold;
+color:#aaaaaa;
+}
+
+.paginator_active_step {
+font-weight:bold;
+color:#000000;
+text-decoration:none;
+}
+
+.paginator_page {
+text-decoration:none;
+color:#000000;
+padding:0 3px;
+}
+
+.paginator_selected_page {
+font-weight:bold;
+background-color:#ddccff;
+border:1px;
+border-style:solid;
+padding:0 3px;
+}
+
+.dashboard_top {
+width:854px;
+margin-left:170px;
+color:#000066;
+font:30px Verdana,Arial,Helvetica,Sans-Serif;
+font-weight:bold;
+height:40px;
+}
+
+.dashboard_pane {
+float:left;
+font-size:10px;
+width:160px;
+}
+
+.file_asset_dbox {
+border:1px solid #1c4a8c;
+background-color:#fff;
+width:400px;
+overflow:auto;
+padding:20px;
+}
+
+.file_asset_dbox h1 {
+margin:0;
+}
+
+.file_asset_dbox input {
+margin-right:5px;
+padding:3px;
+}
+
+.listbox,.textbox {
+font:12px Verdana,Arial,Helvetica,Sans-Serif;
+width:250px;
+}
+
+.dashboard_left,.dashboard_right {
+float:left;
+background-color:#eeeeff;
+width:400px;
+height:500px;
+margin-left:10px;
+overflow:auto;
+border-color:black;
+border-style:solid;
+border-width:1px;
+padding:10px;
+}

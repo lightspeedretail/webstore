@@ -1,0 +1,167 @@
+/*
+* jQuery UI CSS Framework
+* Copyright (c) 2009 AUTHORS.txt (http://ui.jquery.com/about)
+* Dual licensed under the MIT (MIT-LICENSE.txt) and GPL (GPL-LICENSE.txt) licenses.
+* To view and modify this theme, visit http://themeroller.com/{themeurl}
+
+
+/* Component containers
+----------------------------------*/
+.ui-widget { font-family: Verdana,Arial,sans-serif/*{ffDefault}*/; font-size: 1.1em/*{fsDefault}*/; }
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Verdana,Arial,sans-serif/*{ffDefault}*/; font-size: 1em; }
+.ui-widget-header { border: 1px solid #aaaaaa/*{borderColorHeader}*/; background: #cccccc; color: #222222/*{fcHeader}*/; font-weight: bold; }
+.ui-widget-header a { color: #222222/*{fcHeader}*/; }
+.ui-widget-content { border: 1px solid #aaaaaa/*{borderColorContent}*/; background: #ffffff/*{bgColorContent}*/; color: #222222/*{fcContent}*/; }
+.ui-widget-content a { color: #222222/*{fcContent}*/; }
+
+/* Interaction states
+----------------------------------*/
+.ui-state-default, .ui-widget-content .ui-state-default { border: 1px solid #d3d3d3/*{borderColorDefault}*/; background: #e6e6e6; font-weight: normal/*{fwDefault}*/; color: #555555/*{fcDefault}*/; outline: none; }
+.ui-state-default a { color: #555555/*{fcDefault}*/; text-decoration: none; outline: none; }
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus { border: 1px solid #999999/*{borderColorHover}*/; background: #dadada; font-weight: normal/*{fwDefault}*/; color: #212121/*{fcHover}*/; outline: none; }
+.ui-state-hover a { color: #212121/*{fcHover}*/; text-decoration: none; outline: none; }
+.ui-state-active, .ui-widget-content .ui-state-active { border: 1px solid #aaaaaa/*{borderColorActive}*/; background: #ffffff; font-weight: normal/*{fwDefault}*/; color: #212121/*{fcActive}*/; outline: none; }
+.ui-state-active a { color: #212121/*{fcActive}*/; outline: none; text-decoration: none; }
+
+/* Interaction Cues
+----------------------------------*/
+.ui-state-highlight, .ui-widget-content .ui-state-highlight {border: 1px solid #fcefa1/*{borderColorHighlight}*/; background: #fbf9ee; color: #363636/*{fcHighlight}*/; }
+.ui-state-error, .ui-widget-content .ui-state-error {border: 1px solid #cd0a0a/*{borderColorError}*/; background: #fef1ec; color: #cd0a0a/*{fcError}*/; }
+.ui-state-error-text, .ui-widget-content .ui-state-error-text { color: #cd0a0a/*{fcError}*/; }
+.ui-state-disabled, .ui-widget-content .ui-state-disabled { opacity: .35; filter:Alpha(Opacity=35); background-image: none; }
+.ui-priority-primary, .ui-widget-content .ui-priority-primary { font-weight: bold; }
+.ui-priority-secondary, .ui-widget-content .ui-priority-secondary { opacity: .7; filter:Alpha(Opacity=70); font-weight: normal; }
+
+
+
+/* Icons
+----------------------------------  states and images  */.ui-icon{background-image:url(images/222222_256x240_icons_icons.png);height:16px;width:16px;}
+/* positioning  */.ui-icon-circle-triangle-e{background-position:-48px -192px;}
+.ui-icon-circle-triangle-w{background-position:-80px -192px;}
+/* Misc visuals
+----------------------------------  Corner radius  */.ui-corner-tl{-moz-border-radius-topleft:4px;-webkit-border-top-left-radius:4px;}
+.ui-corner-tr{-moz-border-radius-topright:4px;-webkit-border-top-right-radius:4px;}
+.ui-corner-bl{-moz-border-radius-bottomleft:4px;-webkit-border-bottom-left-radius:4px;}
+.ui-corner-br{-moz-border-radius-bottomright:4px;-webkit-border-bottom-right-radius:4px;}
+.ui-corner-top{-moz-border-radius-topleft:4px;-moz-border-radius-topright:4px;-webkit-border-top-left-radius:4px;-webkit-border-top-right-radius:4px;}
+.ui-corner-bottom{-moz-border-radius-bottomleft:4px;-moz-border-radius-bottomright:4px;-webkit-border-bottom-left-radius:4px;-webkit-border-bottom-right-radius:4px;}
+.ui-corner-right{-moz-border-radius-bottomright:4px;-moz-border-radius-topright:4px;-webkit-border-bottom-right-radius:4px;-webkit-border-top-right-radius:4px;}
+.ui-corner-left{-moz-border-radius-bottomleft:4px;-moz-border-radius-topleft:4px;-webkit-border-bottom-left-radius:4px;-webkit-border-top-left-radius:4px;}
+.ui-corner-all{-moz-border-radius:4px;-webkit-border-radius:4px;}
+
+/* Datepicker
+---------------------------------- */.ui-datepicker{font-family:"Trebuchet MS", "Helvetica", "Arial", "Verdana", "sans-serif";font-size:12px;width:17em;}
+.ui-datepicker-header{padding:.2em 0;position:relative;}
+.ui-datepicker-prev,.ui-datepicker-next{height:1.8em;position:absolute;top:2px;width:1.8em;}
+.ui-datepicker-prev-hover,.ui-datepicker-next-hover{top:1px;}
+.ui-datepicker-prev{left:2px;}
+.ui-datepicker-next{right:2px;}
+.ui-datepicker-prev-hover{left:1px;}
+.ui-datepicker-next-hover{right:1px;}
+.ui-datepicker .ui-datepicker-prev span,.ui-datepicker .ui-datepicker-next span{display:block;left:50%;margin-left:-8px;margin-top:-8px;position:absolute;top:50%;}
+.ui-datepicker-title{line-height:1.8em;margin:0 2.3em;text-align:center;}
+.ui-datepicker-title select{float:left;font-size:1em;margin:1px 0;}
+.ui-datepicker select.ui-datepicker-month-year{width:100%;}
+.ui-datepicker select.ui-datepicker-month,.ui-datepicker select.ui-datepicker-year{width:49%;}
+.ui-datepicker table{border-collapse:collapse;font-size:.9em;margin:0 0 .4em;width:100%;}
+.ui-datepicker th{font-weight:700;padding:.7em .3em;text-align:center;}
+.ui-datepicker td span,.ui-datepicker td a{display:block;padding:.2em;text-align:right;text-decoration:none;}
+.ui-datepicker-buttonpane{background-image:none;border-bottom:0;border-left:0;border-right:0;margin:.7em 0 0;padding:0 .2em;}
+.ui-datepicker-buttonpane button{cursor:pointer;float:right;margin:.5em .2em .4em;overflow:visible;padding:.2em .6em .3em;width:auto;}
+/* with multiple calendars  */.ui-datepicker.ui-datepicker-multi{width:auto;}
+.ui-datepicker-multi .ui-datepicker-group table{margin:0 auto .4em;width:95%;}
+.ui-datepicker-multi-3 .ui-datepicker-group{width:33.3%;}
+.ui-datepicker-multi-4 .ui-datepicker-group{width:25%;}
+.ui-datepicker-multi .ui-datepicker-buttonpane{clear:left;}
+/* RTL support  */.ui-datepicker-rtl{direction:rtl;}
+.ui-datepicker-rtl .ui-datepicker-prev{left:auto;right:2px;}
+.ui-datepicker-rtl .ui-datepicker-next{left:2px;right:auto;}
+.ui-datepicker-rtl .ui-datepicker-prev:hover{left:auto;right:1px;}
+.ui-datepicker-rtl .ui-datepicker-next:hover{left:1px;right:auto;}
+.ui-datepicker-rtl .ui-datepicker-buttonpane{clear:right;}
+/* IE6 IFRAME FIX (taken from datepicker 1.5.3  */.ui-datepicker-cover{display:block;filter:mask();height:200px;left:-4px;position:absolute;top:-4px;width:200px;z-index:-1;}
+/* Layout
+   --------------------------------  */.layout-grid{width:960px;}
+.layout-grid td{vertical-align:top;}
+.layout-grid td.left-nav{width:140px;}
+.layout-grid td.normal{border-left:1px solid #eee;font-family:"Trebuchet MS", "Helvetica", "Arial", "Verdana", "sans-serif";padding:20px 24px;}
+.layout-grid td.demos{background:url('/images/demos_bg.jpg') no-repeat;height:337px;overflow:hidden;}
+/* Normal
+   --------------------------------  */.normal h3,.normal h4{font-weight:400;margin:0;}
+.normal h3{font-size:1.8em;padding:0 0 9px;}
+.normal h4{border-bottom:1px dashed #999;font-size:1.2em;font-weight:700;padding-bottom:21px;}
+.normal p{font-size:1.2em;}
+.demos-nav{float:left;font-size:1.3em;width:170px;}
+.demos-nav dt,.demos-nav h4{border-bottom:1px solid #F4F4F4;color:#e87b10;font:normal 1.1em "Trebuchet MS", "Helvetica", "Arial", "Verdana", "sans-serif";letter-spacing:0.75pt;line-height:1.2em;margin:1.5em 0 0;padding:0 0 5px 8px;}
+.demos-nav dd a,.demos-nav li a{border-bottom:1px solid #F4F4F4;color:#555;display:block;font-size:90%;height:13px;margin:2px 0;padding:4px 3px 4px 8px;text-decoration:none;}
+.demos-nav dd a:hover,.demos-nav dd a:focus,.demos-nav dd a:hover,.demos-nav dd a:focus{-moz-border-radius:5px;-webkit-border-radius:5px;background:#f3f3f3;color:#000;}
+.demos-nav dd a.selected{-moz-border-radius:5px;-webkit-border-radius:5px;background:#555;color:#fff;}
+/* new styles for demo pages, added by Filament 12.29.08
+eventually we should convert the font sizes to ems -- using px for now to minimize style conflicts
+ */.normal h3.demo-header{border-bottom:1px solid #eee;font-size:32px;padding:0 0 5px;text-transform:capitalize;}
+.normal h4.demo-subheader{border:0;color:#999;font-size:10px;margin:0;padding:8px 0 3px;text-transform:uppercase;}
+#demo-config{padding:20px 0 0;}
+#demo-frame{border:1px solid #ddd;float:left;height:380px;overflow:auto;position:relative;width:540px;}
+#demo-frame h3,#demo-frame h4{font-size:1em;font-weight:700;padding:0;}
+#demo-config-menu{float:right;width:180px;}
+#demo-config-menu h4{border:0;color:#666;font-size:13px;font-weight:400;padding-left:18px;}
+#demo-config-menu ul{list-style:none;margin:0;padding:0;}
+#demo-config-menu li{font-size:12px;margin:3px 0;padding:0 0 0 10px;zoom:1px;}
+#demo-config-menu li a:link,#demo-config-menu li a:visited{border-bottom:1px dotted #b3b3b3;display:block;padding:3px 8px 4px;}
+#demo-config-menu li a:hover,#demo-config-menu li a:active{background-color:#f6f6f6;}
+#demo-config-menu li.demo-config-on{background:url(images/demo-config-on-tile.gif) repeat-x left center;}
+#demo-config-menu li.demo-config-on a:link,#demo-config-menu li.demo-config-on a:visited,#demo-config-menu li.demo-config-on a:hover,#demo-config-menu li.demo-config-on a:active{background:url(images/demo-config-on.gif) no-repeat left;border:0;color:#fff;margin-left:-10px;padding-left:18px;}
+#demo-source,#demo-notes{clear:both;font-size:1.3em;padding:20px 0 0;}
+#demo-notes{color:#333;font-size:1em;width:520px;}
+code,pre{font-size:1.2em;line-height:130%;padding:8px 0 8px 20px;}
+#demo-source a:link,#demo-source a:visited,#demo-source a:hover,#demo-source a:active{background-position:left center;background-repeat:no-repeat;font-size:12px;padding-left:13px;}
+#demo-source a.source-open:link,#demo-source a.source-open:visited,#demo-source a.source-open:hover,#demo-source a.source-open:active{background-image:url(images/demo-spindown-open.gif);}
+#demo-source a.source-closed:link,#demo-source a.source-closed:visited,#demo-source a.source-closed:hover,#demo-source a.source-closed:active{background-image:url(images/demo-spindown-closed.gif);}
+div.demo{font-family:"Trebuchet MS", "Arial", "Helvetica", "Verdana", "sans-serif";padding:12px;}
+#demo-frame div.demo h3{clear:left;font-size:12px;font-weight:400;margin:0;padding:0 0 1em;}
+div.demo-description{clear:both;font-family:"Trebuchet MS", "Arial", "Helvetica", "Verdana", "sans-serif";font-size:1.3em;line-height:1.4em;padding:12px;}
+.ui-draggable,.ui-droppable{background-position:top left;}
+.left-nav .demos-nav{padding-right:10px;}
+#demo-link{clear:both;font-size:11px;overflow:hidden;padding-top:6px;}
+#demo-link a span.ui-icon{float:left;margin-right:3px;}
+#widget-docs{border:none;margin:20px 0 0;}
+#widget-docs code{color:#444;display:block;font-size:.9em;margin:0 0 1em;}
+#widget-docs code strong{color:#000;}
+#widget-docs p{margin:0 3em 1.2em 0;}
+#widget-docs p.intro{color:#666;font-size:13px;line-height:1.3;}
+#widget-docs ul{list-style-type:none;}
+#widget-docs h2{font-size:16px;margin:1.2em 0 .5em;}
+#widget-docs h3{color:#e6820E;font-size:14px;margin:1.5em 0 .5em;}
+.normal #widget-docs h4{border:0;color:#000;font-size:12px;margin:0 0 .5em;}
+#docs-overview-main{width:400px;}
+#docs-overview-sidebar{float:right;width:200px;}
+#docs-overview-sidebar a span{color:#666;}
+#widget-docs #docs-overview-main p{margin-right:0;}
+#widget-docs #docs-overview-sidebar h4{padding-left:0;}
+.docs-list-header{border-bottom:1px solid #eee;float:left;margin:10px 0 0;width:100%;}
+#widget-docs .docs-list-header h2{float:left;margin:0;}
+#widget-docs .docs-list-header p{float:right;font-size:11px;margin:5px 0;}
+.docs-list{float:left;padding:0 0 10px;width:100%;}
+.docs-list .param-header{border-top:1px solid #eee;clear:left;float:left;padding:8px 0;width:100%;}
+#widget-docs .param-header h3,#widget-docs .param-header p{float:left;margin:0;}
+#widget-docs .param-header h3 span{background:url(images/demo-spindown-closed.gif) no-repeat left;padding-left:13px;}
+#widget-docs .param-open .param-header h3 span{background:url(images/demo-spindown-open.gif) no-repeat left;}
+#widget-docs .param-header p{width:24%;}
+#widget-docs .param-header p.param-type span{background:url(images/icon-docs-info.gif) no-repeat left;border-bottom:1px dashed #ccc;cursor:pointer;padding-left:15px;}
+.param-details{padding-left:13px;}
+.param-args{border-top:1px dotted #ccc;margin:0 0 1.5em;}
+.param-args td{border-bottom:1px dotted #ccc;padding:3px 30px 3px 5px;}
+/* overrides for ui-tab styles  */#widget-docs ul.ui-tabs-nav{padding:0 0 0 8px;}
+#widget-docs .ui-tabs-nav li{margin:5px 5px 0 0;}
+#widget-docs .ui-tabs-nav li a:link,#widget-docs .ui-tabs-nav li a:visited,#widget-docs .ui-tabs-nav li a:hover,#widget-docs .ui-tabs-nav li a:active{color:#fff;font-size:14px;padding:4px 1.2em 3px;}
+#widget-docs .ui-tabs-nav li.ui-tabs-selected a:link,#widget-docs .ui-tabs-nav li.ui-tabs-selected a:visited,#widget-docs .ui-tabs-nav li.ui-tabs-selected a:hover,#widget-docs .ui-tabs-nav li.ui-tabs-selected a:active{color:#e6820E;}
+#widget-docs .ui-tabs-panel{color:#000;font-size:12px;line-height:1.4;padding:20px 9px;}
+.ui-widget-header a,.ui-widget-content a{color:#222;}
+.ui-datepicker-title select.ui-datepicker-year,.ui-datepicker-rtl .ui-datepicker-buttonpane button.ui-datepicker-current,.ui-datepicker-rtl .ui-datepicker-group{float:right;}
+.ui-datepicker-buttonpane button.ui-datepicker-current,.ui-datepicker-multi .ui-datepicker-group,.ui-datepicker-rtl .ui-datepicker-buttonpane button{float:left;}
+.ui-datepicker-multi-2 .ui-datepicker-group,#widget-docs .param-header h3{width:50%;}
+.ui-datepicker-multi .ui-datepicker-group-last .ui-datepicker-header,.ui-datepicker-multi .ui-datepicker-group-middle .ui-datepicker-header{border-left-width:0;}
+.ui-datepicker-rtl .ui-datepicker-group-last .ui-datepicker-header,.ui-datepicker-rtl .ui-datepicker-group-middle .ui-datepicker-header{border-left-width:1px;border-right-width:0;}
+.demos-nav,.demos-nav dt,.demos-nav dd,.demos-nav ul,.demos-nav li,#widget-docs h2,#widget-docs h3,#widget-docs h4,#widget-docs p,#widget-docs ul,#widget-docs code{margin:0;padding:0;}
+.normal a:link,.normal a:visited,#widget-docs .ui-widget-content a:link,#widget-docs .ui-widget-content a:visited{color:#1b75bb;text-decoration:none;}
+.normal a:hover,.normal a:active,#widget-docs .ui-widget-content a:hover,#widget-docs .ui-widget-content a:active{color:#0b559b;}

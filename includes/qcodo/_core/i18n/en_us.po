@@ -1,0 +1,121 @@
+# Qcodo Distributed Language File
+# for English (U.S.)
+
+
+
+# For QTextBoxBase controls
+MsgId "%s is required"
+MsgStr "%s is required"
+
+MsgId "Required"
+MsgStr "Required"
+
+MsgId "%s must have at least %s characters"
+MsgStr "%s must have at least %s characters"
+
+MsgId "Must have at least %s characters"
+MsgStr "Must have at least %s characters"
+
+
+# For QWriteBox controls
+MsgId ""
+"Tags &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; and &lt;http://...&gt; are allowed.  "
+"Use ** at the beginning of any line for a bulleted list."
+MsgStr ""
+"Tags &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; and &lt;http://...&gt; are allowed.  "
+"Use ** at the beginning of any line for a bulleted list."
+
+
+# For QPaginatedControl controls
+MsgId "item"
+MsgStr "item"
+
+MsgId "items"
+MsgStr "items"
+
+
+# For QListBox and QCalendar controls
+MsgId "Reset"
+MsgStr "Reset"
+
+
+# For ListBoxes in Generated Forms
+MsgId "- Select One -"
+MsgStr "- Select One -"
+
+
+# For QIntegerTextBox and QFloatTextBox controls
+MsgId "Invalid Integer"
+MsgStr "Invalid Integer"
+
+MsgId "Invalid Float"
+MsgStr "Invalid Float"
+
+MsgId "Value must be less than %s"
+MsgStr "Value must be less than %s"
+
+MsgId "Value must be greater than %s"
+MsgStr "Value must be greater than %s"
+
+
+# For QDataGrid controls
+MsgId "<b>Results:</b>&nbsp;Viewing&nbsp;%s&nbsp;%s-%s&nbsp;of&nbsp;%s."
+MsgStr "<b>Results:</b>&nbsp;Viewing&nbsp;%s&nbsp;%s-%s&nbsp;of&nbsp;%s."
+
+MsgId "<b>Results:</b> No %s found."
+MsgStr "<b>Results:</b> No %s found."
+
+MsgId "<b>Results:</b> 1 %s found."
+MsgId_Plural "<b>Results:</b> %s %s found."
+MsgStr[0] "<b>Results:</b> 1 %s found."
+MsgStr[1] "<b>Results:</b> %s %s found."
+
+
+# For QPaginator controls
+MsgId "Previous"
+MsgStr "Previous"
+
+MsgId "Next"
+MsgStr "Next"
+
+
+# For the List FormDraft Include template
+MsgId "List All"
+MsgStr "List All"
+
+MsgId "Create a New"
+MsgStr "Create a New"
+
+MsgId "Go to \"Form Drafts\""
+MsgStr "Go to \"Form Drafts\""
+
+
+# For the Edit FormBase class template
+MsgId "Create"
+MsgStr "Create"
+
+MsgId "Edit"
+MsgStr "Edit"
+
+MsgId "Save"
+MsgStr "Save"
+
+MsgId "Cancel"
+MsgStr "Cancel"
+
+MsgId "Delete"
+MsgStr "Delete"
+
+MsgId "Are you SURE you want to DELETE this %s?"
+MsgStr "Are you SURE you want to DELETE this %s?"
+
+
+# For the form_drafts/index.php page
+MsgId "List of Form Drafts"
+MsgStr "List of Form Drafts"
+
+MsgId "View List"
+MsgStr "View List"
+
+MsgId "Create New"
+MsgStr "Create New"

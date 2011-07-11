@@ -1,0 +1,109 @@
+# Qcodo Distributed Language File
+# for Traditional Chinese (Taiwan), using BIG5 encoding
+# Contributed by Edward Chou
+
+
+# For QTextBoxBase controls
+MsgId "%s is required"
+MsgStr "%s 是必需的"
+MsgId "Required"
+MsgStr "必需的"
+
+
+# For QWriteBox controls
+MsgId ""
+"Tags &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; and &lt;http://...&gt; are allowed.  "
+"Use ** at the beginning of any line for a bulleted list."
+MsgStr ""
+"可使用以下標記 &lt;b&gt; &lt;u&gt; &lt;i&gt; &lt;br&gt; &lt;code&gt; 及 &lt;http://...&gt;   "
+"在資料行首輸入 ** 可顯示項目符號."
+
+
+# For QPaginatedControl controls
+MsgId "item"
+MsgStr "項目"
+
+MsgId "items"
+MsgStr "項目"
+
+
+# For QListBox and QCalendar controls
+MsgId "Reset"
+MsgStr "重設"
+
+
+# For QIntegerTextBox and QFloatTextBox controls
+MsgId "Invalid Integer"
+MsgStr "不正確的整數"
+
+MsgId "Invalid Float"
+MsgStr "不正確的浮點數"
+
+MsgId "Value must be less than %s"
+MsgStr "值必需小於 %s"
+
+MsgId "Value must be greater than %s"
+MsgStr "值必需大於 %s"
+
+
+# For QDataGrid controls
+MsgId "<b>Results:</b>&nbsp;Viewing&nbsp;%s&nbsp;%s-%s&nbsp;of&nbsp;%s."
+MsgStr "<b>結果:</b>&nbsp;顯示&nbsp;%s&nbsp;%s-%s&nbsp;of&nbsp;%s."
+
+MsgId "<b>Results:</b> No %s found."
+MsgStr "<b>結果:</b> 未發現 %s."
+
+MsgId "<b>Results:</b> 1 %s found."
+MsgId_Plural "<b>Results:</b> %s %s found."
+MsgStr[0] "<b>結果:</b> 發現 1 %s ."
+MsgStr[1] "<b>結果:</b> 發現 %s %s ."
+
+
+# For QPaginator controls
+MsgId "Previous"
+MsgStr "前一項"
+
+MsgId "Next"
+MsgStr "後一項"
+
+
+# For the List FormDraft Include template
+MsgId "List All"
+MsgStr "顯示全部"
+
+MsgId "Create a New"
+MsgStr "新建"
+
+MsgId "Go to \"Form Drafts\""
+MsgStr "轉至 \"草稿\""
+
+
+# For the Edit FormBase class template
+MsgId "Create"
+MsgStr "新建"
+
+MsgId "Edit"
+MsgStr "編輯"
+
+MsgId "Save"
+MsgStr "儲存"
+
+MsgId "Cancel"
+MsgStr "取消"
+
+MsgId "Delete"
+MsgStr "刪除"
+
+MsgId "Are you SURE you want to DELETE this %s?"
+MsgStr "你確定刪除這個 %s?"
+
+
+# For the form_drafts/index.php page
+MsgId "List of Form Drafts"
+MsgStr "草稿列表"
+
+MsgId "View List"
+MsgStr "視界列表"
+
+MsgId "Create New"
+MsgStr "新建"

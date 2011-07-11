@@ -1,0 +1,61 @@
+Changelog
+
+# 2.1.0
+
+### Structural
+* Removed Zend Optimizer requirement, all Zend encryption on files removed
+* Added Open Source license
+* Web Store now works on PHP 5.3.x
+* Web Store tested to work on Godaddy 4GH hosting environment, HostMonster hosting
+
+### Payments
+* Added Promo Code (Coupon Code) functionality 
+* Added MerchantWARE Online to Payment Options
+* Added Axia/USAePAY to Payment Options
+
+### Shipping
+* Added Tier-Shipping to Shipping Options
+* Added Free Shipping to Shipping Options
+* Zip validation now works consistently especially with Canadian postal codes, regex verification
+* Destinations are now evaluated in correct order, specific zip ranges first, then specific states, then Any state catch-all
+* Changed Restricted Shipping to only show Destionation countries based on shipping options, avoiding having to mark each country as "No" in the countries table.
+* Fixed issue where turning on Tax on Shipping would incorrectly calculate with multiple tax rates set
+* Changed terminology in FedEx shipping panel to match FedEx terms ("Production Password")
+
+### Templates
+* Added Advanced Search option for user product search
+* Correctly use the _xt() function for translate in all templates (enables using PO files for translation)
+* Fixed incorrect mouse pointer over Add To Cart on IE7 CSS
+* Fixed double lines on Framework template set
+* Fixed issue where the word "Available" was not displaying after inventory quantity, displaying just the number by itself when Inventory Qty Display is turned on
+* Fixed misspelling in CSS element (products_sliber_theme_bg)
+* Removed unused gift registry files that were duplicates 
+* Fixed issue where sort order was being ignored on some search results
+* Fixed issue where a failing SMTP email send would abort checkout process and fail to mark purchase as Paid
+* Added error message, stop processing if template file is missing rather than simply "white screen" (missing template noted in System Log)
+
+### Installer
+* Installer now checks for all requirements and displays any fails to be corrected before allowing install
+* Tested against Godaddy 4GH hosting, Hostmonster hosting
+* All databases and installation files are now completely UTF8 encoded
+* Image storage now defaults to File System to store photos in /photos folder
+* Session storage now defaults to File System and uses /qcodo/cache/state folder
+
+### Admin Panel
+* Added On/Off option on whether to include child products in general search results
+* Corrected misaligned columns on some screens
+* Updated System Tasks->Upgrade Database to add new 2.1 configuration options and tables
+
+### LightSpeed Sync
+* Fixed issue where photos are properly removed 
+* Apostrophes in Product Code now handled correctly 
+* Reset Store properly blanks out tax tables since taxes are reuploaded in this scenario 
+
+### Database
+* Fixed issue where a large xlsws_cart table would hang attempted customer Login
+* removed offensive words from Captcha word list
+* Fixed issue where xlsws_cart.database_cre and datetime_due always showed year 2021 instead of correct year
+
+### Source Code
+* Many optimizations and cleanup in source code
+* Added comments to all functions to describe functionality for Open Source preparation
