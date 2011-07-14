@@ -56,12 +56,18 @@
                         QQ::Equal(QQN::Destination()->Country, $strCountry), 
                         QQ::Equal(QQN::Destination()->State, '*')
                     ))) { 
+                        $arrStates = State::QueryArray(
+                            QQ::AndCondition(
+                                QQ::Equal(
+                                    QQN::State()->CountryCode, $strCountry),
+                                QQ::Equal(
+                                    QQN::State()->Avail, 'Y')
+                            ),
+                            State::GetDefaultOrdering()
+                        );
+
                         return Destination::ConvertStatesToDestinations(
-                            $strCountry, 
-                            State::LoadArrayByCountryCode(
-                                $strCountry, 
-                                State::GetDefaultOrdering()
-                            )
+                            $strCountry, $arrStates
                         );
                 }
             }
