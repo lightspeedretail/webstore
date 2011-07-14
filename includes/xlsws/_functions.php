@@ -712,7 +712,7 @@ EOS;
      */
     function _xls_site_dir($ssl_attempt = true) {
         $strUrlPfx = '';
-        if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 1))
+        if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on'))
             $strUrlPfx = 'https://';
         else
             $strUrlPfx = 'http://';
