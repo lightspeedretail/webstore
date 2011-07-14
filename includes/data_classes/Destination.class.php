@@ -49,23 +49,32 @@
                 );
         }
 
-        public static function LoadByCountry($country,$checkrestriction = false) {
-	        if ($checkrestriction){
-	        	// check if there's even a need to find restrictive states for a given country
-            	$objDatabase = Destination::GetDatabase();
-	        	$objResult = $objDatabase->Query("select count(rowid) as total_matches from xlsws_destination where country='".mysql_real_escape_string($country)."' and state='*'");
-				$total_arr = $objResult->FetchArray();
-				$total = $total_arr['total_matches'];	        
-	        	if ($total)
-		        	return Destination::ConvertStatesToDestinations($country,State::LoadArrayByCountryCode($country)); 
-        	}
-        	
+        public static function LoadByCountry($strCountry, $blnRestrict = false) {
+            if ($blnRestrict) {
+                if (Destination::QueryCount(
+                    QQ::AndCondition(
+                        QQ::Equal(QQN::Destination()->Country, $strCountry), 
+                        QQ::Equal(QQN::Destination()->State, '*')
+                    ))) { 
+                        return Destination::ConvertStatesToDestinations(
+                            $strCountry, 
+                            State::LoadArrayByCountryCode(
+                                $strCountry, 
+                                State::GetDefaultOrdering()
+                            )
+                        );
+                }
+            }
+
             return Destination::QueryArray(
-            QQ::AndCondition(QQ::Equal(QQN::Destination()->Country, $country)),
-            Destination::GetDefaultOrdering()
+                QQ::AndCondition(
+                    QQ::Equal(QQN::Destination()->Country, 
+                    $strCountry)
+                ),
+                Destination::GetDefaultOrdering()
             );
         }
-        
+
         public static function ConvertStatesToDestinations($country,$arrStates)
         {
 	        $arrDests = array();
