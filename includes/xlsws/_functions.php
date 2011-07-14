@@ -987,7 +987,7 @@ EOS;
         
         if(!$tcode){
             if($code!= -1)  // Only complain about things that are not -1
-                _xls_log(sp("Unknown tax code passed") . " $code");
+                _xls_log(_sp("Unknown tax code passed") . " $code");
             return array($newprice , $rtaxamount);
         }
         
