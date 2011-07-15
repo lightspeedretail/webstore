@@ -283,8 +283,6 @@ class iups extends xlsws_class_shipping {
 		$found = 0;
 		$ret = array();
 
-				
-		
 			$rates = $this->rate(
 					 $selected
 					,$zipcode
@@ -297,7 +295,7 @@ class iups extends xlsws_class_shipping {
 					,($company!='')?0:1
 					,$cart->Total
 					,$this->package_type);
-					
+	
 
 			if($rates === FALSE)
 				return false;
@@ -774,31 +772,17 @@ EOT;
 		
 		$this->__runCurl(); 
 		
-		$doc = new XLS_XMLDocument();
-		$xp = new XLS_XMLParser();
-		$xp->setDocument($doc);
-		$xp->parse($this->xmlreturndata);
-		$doc = $xp->getDocument();
-		 
-		 
-		$return = array();
-			
-		$root = $doc->getRoot();
 		
-		if( ($error =  $root->getElementByName("Error"))){
-			_xls_log("IUPS error: Error found in returned xml  $this->xmlreturndata");
-			return false;
-		}
-			
-		if(! ($estimates =  $root->getElementsByName("RatedShipment"))){
-			_xls_log("IUPS error: RatedShipment not found in returned xml  $this->xmlreturndata");
-			return false;
-		}
-			
-		foreach($estimates as $est)      		 
-			$return[$code->getValue()] = floatval($netcharge->getValue());
-			
-		return $return;
+		$retval = array();
+		
+		// Parse xml for response values
+        $oXML = new SimpleXMLElement($this->xmlreturndata);
+               
+		foreach($oXML->RatedShipment as $key=>$val)
+			$retval[''.$val->Service->Code] = floatval($val->TotalCharges->MonetaryValue);
+    		
+	
+		return $retval;
 
     } 
 
@@ -814,7 +798,7 @@ EOT;
 		curl_setopt ($ch, CURLOPT_POSTFIELDS, "$y");  
 		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1); 
 		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0); 
-		$this->xmlreturndata = curl_exec ($ch);  
+		$this->xmlreturndata = curl_exec ($ch);
 		curl_close ($ch); 
 
     } 
