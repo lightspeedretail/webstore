@@ -253,7 +253,12 @@ if(!defined('__DOCROOT__'))
 				if ($_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?check")
 				{
 					$warning_text .= "<tr><td colspan='2'><b>SYSTEM CHECK</b></td></tr>";
-					$warning_text .= "<tr><td colspan='2'>The chart below shows the results of the pre-install system check.</td></td>";
+					$warning_text .= "<tr><td colspan='2'>The chart below shows the results of the system check and if upgrades have been performed.</td></td>";
+					
+					//For 2.1.x upgrade, have the upgrades been run?			
+					if ($_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?check")
+						$checkenv = array_merge($checkenv,$this->xls_check_upgrades());
+					
 				}
 				else
 				{
@@ -264,6 +269,9 @@ if(!defined('__DOCROOT__'))
 				foreach ($checkenv as $key=>$value)
 				$warning_text .= "<tr><td>$key</td><td>".($value=="fail" ? "<font color='#cc0000'><b>$value</b></font>" : "$value" )."</td>";
 				
+				
+					
+					
 				$warning_text .= "</table>";
 				
 				$this->hideControls();
@@ -1067,7 +1075,23 @@ EOT;
 			
 				return $checked;
 			}	
-			
+			protected function xls_check_upgrades()
+			{ 
+				$checked=array();
+				$checked['Ran upgrade check']= "pass";
+				
+				//Have we run the Upgrade Database to add new fields to the database?				
+				$result = _dbx_first_cell("select `key` from xlsws_configuration where `key`='SESSION_HANDLER'");
+				$checked['Upgrade Database command run from Admin Panel'] = ($result=="SESSION_HANDLER" ? "pass" : "fail");								
+				//Have new 2.1 templates been added
+				$template = _dbx_first_cell("select `value` from xlsws_configuration where `key`='DEFAULT_TEMPLATE'");
+				$checked['search_advanced.tpl.php added to your templates'] = file_exists("templates/".$template."/search_advanced.tpl.php") ? "pass" : "fail";
+				$checked['slider.tpl.php added to your templates'] = file_exists("templates/".$template."/slider.tpl.php") ? "pass" : "fail";				
+				$checked['promo_code.tpl.php added to your templates'] = file_exists("templates/".$template."/promo_code.tpl.php") ? "pass" : "fail";
+				
+
+				return $checked;
+			}
 			
 
 			protected function connect_db(){
