@@ -1057,40 +1057,58 @@ EOT;
 				$checked['GD Library PNG']= ($phpinfo['gd']['PNG Support']=="enabled" ? "pass" : "fail");
 				$checked['GD Library Freetype Support']= ($phpinfo['gd']['FreeType Support']=="enabled" ? "pass" : "fail");
 				$checked['MCrypt Encryption Library']= isset($phpinfo['mcrypt']) ? "pass" : "fail";
-				$checked['Session use_only_cookies turned Off']= ($phpinfo['session']['session.use_only_cookies']=="Off" ? "pass" : "fail");
+				$checked['Session use_only_cookies must be turned Off']= ($phpinfo['session']['session.use_only_cookies']=="Off" ? "pass" : "fail");
 				$checked['Soap Library']= ($phpinfo['soap']['Soap Client']=="enabled" ? "pass" : "fail");
 			
 				//Check php.ini settings
-				$checked['allow_call_time_pass_reference in Php.ini turned On']=($phpinfo['Core']['allow_call_time_pass_reference']=="On" ? "pass" : "fail");
-				$checked['magic_quotes_gpc in Php.ini turned Off']=($phpinfo['Core']['magic_quotes_gpc']=="Off" ? "pass" : "fail");
-				$checked['register_globals in Php.ini turned Off']=($phpinfo['Core']['register_globals']=="Off" ? "pass" : "fail");
-				$checked['short_open_tag in Php.ini turned On']=($phpinfo['Core']['short_open_tag']=="On" ? "pass" : "fail");
+				$checked['allow_call_time_pass_reference in Php.ini must be turned On']=($phpinfo['Core']['allow_call_time_pass_reference']=="On" ? "pass" : "fail");
+				$checked['magic_quotes_gpc in Php.ini must be turned Off']=($phpinfo['Core']['magic_quotes_gpc']=="Off" ? "pass" : "fail");
+				$checked['register_globals in Php.ini must be turned Off']=($phpinfo['Core']['register_globals']=="Off" ? "pass" : "fail");
+				$checked['short_open_tag in Php.ini must be turned On']=($phpinfo['Core']['short_open_tag']=="On" ? "pass" : "fail");
 			
 				
 				//Check folder permissions
-				$checked['/photos folder writeable']= (is_writable(__DOCROOT__.__SUBDIRECTORY__.'/photos') ? "pass" : "fail");
-				$checked['/includes/qcodo/cache folder writeable']= (is_writable(__DOCROOT__.__SUBDIRECTORY__.'/includes/qcodo/cache') ? "pass" : "fail");
-				$checked['/includes/qcodo/cache/soap folder writeable']= (is_writable(__DOCROOT__.__SUBDIRECTORY__.'/includes/qcodo/cache/soap') ? "pass" : "fail");
-				$checked['/includes/qcodo/cache/state folder writeable']= (is_writable(__DOCROOT__.__SUBDIRECTORY__.'/includes/qcodo/cache/state') ? "pass" : "fail");
+				$checked['/photos folder must be writeable']= (is_writable(__DOCROOT__.__SUBDIRECTORY__.'/photos') ? "pass" : "fail");
+				$checked['/includes/qcodo/cache folder must be writeable']= (is_writable(__DOCROOT__.__SUBDIRECTORY__.'/includes/qcodo/cache') ? "pass" : "fail");
+				$checked['/includes/qcodo/cache/soap folder must be writeable']= (is_writable(__DOCROOT__.__SUBDIRECTORY__.'/includes/qcodo/cache/soap') ? "pass" : "fail");
+				$checked['/includes/qcodo/cache/state folder must be writeable']= (is_writable(__DOCROOT__.__SUBDIRECTORY__.'/includes/qcodo/cache/state') ? "pass" : "fail");
 			
 				return $checked;
 			}	
 			protected function xls_check_upgrades()
 			{ 
 				$checked=array();
-				$checked['Ran upgrade check']= "pass";
+				$checked['<b>--Upgrade Check RESULTS BELOW--</b>']= "pass";
 				
 				//Have we run the Upgrade Database to add new fields to the database?				
 				$result = _dbx_first_cell("select `key` from xlsws_configuration where `key`='SESSION_HANDLER'");
-				$checked['Upgrade Database command run from Admin Panel'] = ($result=="SESSION_HANDLER" ? "pass" : "fail");								
+				$checked['Upgrade Database command has been run from Admin Panel'] = ($result=="SESSION_HANDLER" ? "pass" : "fail");								
 				//Have new 2.1 templates been added
 				$template = _dbx_first_cell("select `value` from xlsws_configuration where `key`='DEFAULT_TEMPLATE'");
 				$checked['search_advanced.tpl.php added to your templates'] = file_exists("templates/".$template."/search_advanced.tpl.php") ? "pass" : "fail";
 				$checked['slider.tpl.php added to your templates'] = file_exists("templates/".$template."/slider.tpl.php") ? "pass" : "fail";				
 				$checked['promo_code.tpl.php added to your templates'] = file_exists("templates/".$template."/promo_code.tpl.php") ? "pass" : "fail";
-				
+				$checked['adv_search.png added to your templates css/images'] = file_exists("templates/".$template."/css/images/adv_search.png") ? "pass" : "fail";
 
-				return $checked;
+				//Has CSS been updated
+				$filename = "templates/".$template."/css/webstore.css";
+                $handle = fopen($filename, "r");
+                $contents = fread($handle, filesize($filename));
+                fclose($handle);               
+                $checked['products_sliber_theme_bg removed from your templates/css'] = !preg_match('/products_sliber_theme_bg/', $contents) ? "pass" : "fail";
+				
+				//Has configuration_inc.php either been replaced or modified correctly
+				$filename = "includes/configuration.inc.php";
+                $handle = fopen($filename, "r");
+                $contents = fread($handle, filesize($filename));
+                fclose($handle);               
+                $checked['configuration.inc.php removed DEVTOOLS_CLI line'] = !preg_match('/__DEVTOOLS_CLI__/', $contents) ? "pass" : "fail";
+                $checked['configuration.inc.php removed ERROR_PAGE_PATH line'] = !preg_match('/ERROR_PAGE_PATH/', $contents) ? "pass" : "fail";
+                $checked['configuration.inc.php has utf8 on db connect'] = preg_match('/\'encoding\' => \'utf8\',/', $contents) ? "pass" : "fail";
+             
+				$checked['<b>Note: Specific template code changes are not checked.</b>']= "pass";
+             
+                return $checked;
 			}
 			
 
