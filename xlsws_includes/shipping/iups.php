@@ -297,9 +297,11 @@ class iups extends xlsws_class_shipping {
 					,$this->package_type);
 	
 
-			if($rates === FALSE)
+			if($rates === FALSE){
+                $fields['service']->Visible = false;
 				return false;
-					
+            }
+		
 		foreach($rates as $type=>$rate){
 			
 			if(isset($this->service_types[$type]))
@@ -318,9 +320,13 @@ class iups extends xlsws_class_shipping {
 		
 		
 
-		if($found <=0){
-			_xls_log("IUPS: Could not get iups rate for  $country, $state , $zipcode .");
-			_xls_log("IUPS Response: " . print_r($rates,TRUE));
+		if($found <=0){		
+			QApplication::Log(E_ERROR, __CLASS__, 
+                            'Could not get shipping information for '.$state." ".$zipcode." ".$country); 
+   			QApplication::Log(E_ERROR, __CLASS__, 
+                            "Shipper Response: " . print_r($rates,TRUE));
+                         
+                            
 			$fields['service']->Visible = false;
 			return FALSE;
 		}
@@ -771,13 +777,19 @@ EOT;
 		$this->value = $val;
 		
 		$this->__runCurl(); 
-		
-		
-		$retval = array();
-		
+				
 		// Parse xml for response values
         $oXML = new SimpleXMLElement($this->xmlreturndata);
-               
+
+        if($oXML->Response->ResponseStatusDescription=="Failure")
+        {
+            //What we have is ... failure to communicate
+            QApplication::Log(E_ERROR, __CLASS__, 
+                            'Could not get shipping information for '.$tstate." ".$tzip." ".$tcountry); 
+            return false;
+        }  
+        
+        $retval = array();       
 		foreach($oXML->RatedShipment as $key=>$val)
 			$retval[''.$val->Service->Code] = floatval($val->TotalCharges->MonetaryValue);
     		
