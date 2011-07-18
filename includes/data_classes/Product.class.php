@@ -178,16 +178,6 @@
             $strField = $this->GetInventoryField();
             $intInventory = $this->$strField;
 
-            // LEGACY :: REMOVE2.1.1
-            // A change to the uploader now updates master inventory levels to
-            // an aggregate of it's children. For legacy purposes, we'll 
-            // populate this on the fly as we go. 
-            if ($intInventory == 0) { 
-                if ($this->UpdateAggregateInventoryCount()){
-                   	//$this->Save(false,true);
-                   }
-            }
-
             return $this->$strField;
         }
 
@@ -555,7 +545,7 @@ EOS;
          * @return integer :: Rowid of any Product modified
          */
         protected function UpdateMasterInventory() {
-            if ($this->IsIndependant() || !$this->Inventoried)
+            if ($this->IsIndependent() || !$this->Inventoried)
                 return false;
 
             $objProduct = $this;
@@ -578,7 +568,7 @@ EOS;
             if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0) == 1)
                 return false;
 
-            if ($this->IsIndependant() || !$this->Inventoried)
+            if ($this->IsIndependent() || !$this->Inventoried)
                 return false;
 
             $objProduct = $this;
@@ -609,7 +599,9 @@ EOS;
             if ($this->IsChild()) {
                 $this->UpdateMasterInventory();
                 $this->UpdateMasterAvailability();
-                $this->FkProductMaster->Save();
+
+                if ($this->FkProductMaster)
+                    $this->FkProductMaster->Save();
             }
         }
 
