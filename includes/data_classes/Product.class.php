@@ -45,6 +45,9 @@
         // Define the Object Manager for semi-persistent storage
         public static $Manager;
 
+        // Boolean detaining if object was updated
+        public $Updated = false;
+
         // Default "to string" handler
         public function __toString() {
             return sprintf('Product Object %s',  $this->intRowid);
@@ -551,73 +554,63 @@ EOS;
          * aggregate of it's Children.
          * @return integer :: Rowid of any Product modified
          */
-        protected function UpdateAggregateInventoryCount() {
-            if (!$this->IsMaster() || !$this->Inventoried)
-                return;
+        protected function UpdateMasterInventory() {
+            if ($this->IsIndependant() || !$this->Inventoried)
+                return false;
+
+            $objProduct = $this;
+            if ($this->IsChild())
+                $objProduct = $this->FkProductMaster;
+
+            if (!$objProduct)
+                return false;
 
             list($intInv, $intInvTotal) = $this->GetAggregateInventory();
 
-            $this->fltInventory = $intInv;
-            $this->fltInventoryTotal = $intInvTotal;
-			_dbx("UPDATE xlsws_product SET 
-				inventory='".$this->fltInventory."', 
-				inventory_total='".$this->fltInventoryTotal."' WHERE rowid=".$this->intRowid,'NonQuery');
-            return;
+            $objProduct->Inventory = $intInv;
+            $objProduct->InventoryTotal = $intInvTotal;
+
+            return $objProduct;
         }
 
+        protected function UpdateMasterAvailability() {
+            // Non inventoried Products may be added to cart
+            if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0) == 1)
+                return false;
 
-		/**
-		* When a child or master product is updated in the database, update the master inventory
-		* so it's always current
-		*/
-		protected function UpdateMatrixInventory()
-		{
-			if(!$this->Inventoried || $this->IsIndependent()) return;
-			if($this->IsChild()){
-				$objMaster = $this->GetMaster();
-				$rowid=$objMaster->intRowid;
-			} else $rowid=$this->intRowid;
-			
-			if (!isset($rowid))
-			{
-				//we have a lost child
-				//if $rowid is not set, return
-				//this can happen if we are uploading new matrix products and the child arrives before the 
-				//parent, so we can't find it yet
-				return;
-			}
-			
-			list($intInv, $intInvTotal) = 
-                $this->GetAggregateInventory($rowid);
- 
-            $strQuery = "UPDATE xlsws_product
-            	SET inventory='".$intInv."',
-                inventory_total='".$intInvTotal."' ";
-                
-            if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0) != 0)
-            {
-            	$Web=0;
-            	if(	( _xls_get_conf('INVENTORY_FIELD_TOTAL','0')==0 && $intInv>0) ||
-            		(_xls_get_conf('INVENTORY_FIELD_TOTAL','0')==1 && $intInvTotal>0))
-            		$Web=1;
-            	$strQuery .= ", Web='".$Web."' ";
-            }    
-            $strQuery .= "WHERE rowid='".$rowid."'";
+            if ($this->IsIndependant() || !$this->Inventoried)
+                return false;
 
-			$objQuery = _dbx($strQuery, 'NonQuery');  
-			
-			return;
-		
-		}
-		
-		
-   
+            $objProduct = $this;
+
+            if ($this->IsChild())
+                $objProduct = $this->FkProductMaster;
+
+            if (!$objProduct)
+                return false;
+
+            $blnWeb = $objProduct->Web;
+
+            if ($objProduct->GetInventory() < 1) $objProduct->Web = 0;
+            else $objProduct->Web = 1;
+
+            if ($blnWeb != $objProduct->Web)
+                return $objProduct;
+        }
+
         public function PreSaveHandler() {
-
+            if ($this->IsMaster()) {
+                $this->UpdateMasterInventory();
+                $this->UpdateMasterAvailability();
+            }
         }
 
         public function PostSaveHandler() {
-            $this->UpdateMatrixInventory();
+            if ($this->IsChild()) {
+                $this->UpdateMasterInventory();
+                $this->UpdateMasterAvailability();
+                $this->FkProductMaster->Save();
+            }
         }
 
         /**
