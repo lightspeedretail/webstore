@@ -2418,8 +2418,7 @@ float:left;
 width:180px;
 }
 
-.products_slider_theme_bg, .products_sliber_theme_bg {
-/* Misspelling for legacy only, deprecated */
+.products_slider_theme_bg {
 background:url(images/slider_bg.png) no-repeat;
 clear:both;
 display:block;
