@@ -61,10 +61,10 @@
         $uriPath = str_replace(__SUBDIRECTORY__, '', $uriPath);
         $uriPath = substr($uriPath, 1, strlen($uriPath));
         $uriPath = str_replace('.html', '', $uriPath);
+        $uriPath = rtrim($uriPath, '/');
 
         $uriPathParts = explode('/', $uriPath);
         $uriPathLower = strtolower($uriPath);
-
 
         // Skip index -- nothing to do in SEO
         if ($uriPathLower == "index") {
