@@ -1,5 +1,20 @@
 Changelog
 
+Please see https://github.com/lightspeedretail/webstore/issues for technical details of these issues
+
+# 2.1.1
+
+* Added troubleshooting system check for current and future upgrades
+* Improved handling of States using restricted Shipping
+* Improved handling of AJAX calls when using an SSL certificate
+* Improved XML parsing of the iUPS Shipping module to correct an AJAX error
+* Corrected an issue where a trailing slash in a URL would not search properly
+* Removed products_sliber_theme_bg misspelling from CSS files
+* Improved calculation of master product inventory during product uploads
+* Improved handling of subcategories in a product list
+* Corrected an issue with crumbtrail display on product details
+
+
 # 2.1.0
 
 ### Structural
