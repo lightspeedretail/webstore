@@ -247,7 +247,8 @@ EOS;
             &$arrCategories, $arrSelected, $strPrefix = '') {
                 QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
 
-                $arrCategories = array($this);
+                $arrCategories[] = $this;
+                error_log(print_r($arrCategories,true));
 
                 if (_xls_get_conf('DISPLAY_EMPTY_CATEGORY', '0') != '1' &&
                     !$this->HasChildOrProduct())
@@ -260,6 +261,7 @@ EOS;
                     if ($objChild)
                         $arrCategories[] = $objChild;
                 }
+
         }
 
         public function get_childs_array() {
