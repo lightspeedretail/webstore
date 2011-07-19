@@ -95,6 +95,18 @@ if (!file_exists('includes/configuration.inc.php'))
 
 }
 
+
+//////////////////////////////////////////////////////////////////
+// Verify the state and soap folders exist and if not, create them
+// These may fail if cache isn't yet writable, so we ignore errors
+// and will get them again after fixing cache
+if (!file_exists('includes/qcodo/cache/state'))
+    @mkdir('includes/qcodo/cache/state');
+if (!file_exists('includes/qcodo/cache/soap'))
+    @mkdir('includes/qcodo/cache/soap');
+ 
+ 
+ 
 //////////////////////////////////////////////////////////////////
 // Set up initial pathing so install can continue
 define ('__SUBDIRECTORY__', preg_replace('/\/?\w+\.php$/', '', $_SERVER['PHP_SELF']));
