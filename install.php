@@ -1082,8 +1082,12 @@ EOT;
 				//Check folder permissions
 				$checked['/photos folder must be writeable']= (is_writable(__DOCROOT__.__SUBDIRECTORY__.'/photos') ? "pass" : "fail");
 				$checked['/includes/qcodo/cache folder must be writeable']= (is_writable(__DOCROOT__.__SUBDIRECTORY__.'/includes/qcodo/cache') ? "pass" : "fail");
-				$checked['/includes/qcodo/cache/soap folder must be writeable']= (is_writable(__DOCROOT__.__SUBDIRECTORY__.'/includes/qcodo/cache/soap') ? "pass" : "fail");
-				$checked['/includes/qcodo/cache/state folder must be writeable']= (is_writable(__DOCROOT__.__SUBDIRECTORY__.'/includes/qcodo/cache/state') ? "pass" : "fail");
+				if(is_writable(__DOCROOT__.__SUBDIRECTORY__.'/includes/qcodo/cache'))
+				{
+					//Because we create these, don't bother checking unless the parent is writable
+					$checked['/includes/qcodo/cache/soap folder must be writeable']= (is_writable(__DOCROOT__.__SUBDIRECTORY__.'/includes/qcodo/cache/soap') ? "pass" : "fail");
+					$checked['/includes/qcodo/cache/state folder must be writeable']= (is_writable(__DOCROOT__.__SUBDIRECTORY__.'/includes/qcodo/cache/state') ? "pass" : "fail");
+				}
 			
 				return $checked;
 			}	
