@@ -86,7 +86,6 @@
          * Create a cloned copy of the Cart
          * @return newcart[]
          */ 
-        // TODO :: This doesn't actually clone, objects are passed as reference
         public static function CloneCart(){
             $objCart = Cart::GetCart();
             $arrItems = $objCart->GetCartItemArray();
@@ -96,7 +95,7 @@
             $objNewCart->Save(true);
             
             // Copy over each items
-            foreach($items as $item){
+            foreach($arrItems as $item){
                 $item->CartId = $objNewCart->Rowid;
                 $item->Save(true);      
             }
@@ -806,8 +805,7 @@
             $cart->UpdateCart();
             
             // TODO Carts that have been disabled or expired
-            
-            Cart::SaveCart($cart);
+            //Cart::SaveCart($cart);
 
             // Clone the cart so we don't have modified carts everywhere...
             if ($clone){
@@ -946,7 +944,7 @@
         // Overload GetCartItemArray to provide to use the CartItem manager
         public function GetCartItemArray() {
             if (CartItem::$Manager) {
-                if (!CartItem::$Manager->Populated)
+                if (!CartItem::$Manager->HasAssociation($this->Rowid))
                     CartItem::$Manager->AddArray(parent::GetCartItemArray());
                 return CartItem::$Manager->GetByAssociation($this->Rowid);
             }
