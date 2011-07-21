@@ -21,6 +21,7 @@ Please see https://github.com/lightspeedretail/webstore/issues for technical det
 * Removed Zend Optimizer requirement, all Zend encryption on files removed
 * Added Open Source license
 * Web Store now works on PHP 5.3.x
+* Web Store tested to work on Godaddy 4GH hosting environment, HostMonster hosting
 
 ### Payments
 * Added Promo Code (Coupon Code) functionality 
