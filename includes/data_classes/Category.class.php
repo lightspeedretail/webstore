@@ -248,8 +248,6 @@ EOS;
                 QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
 
                 $arrCategories[] = $this;
-                error_log(print_r($arrCategories,true));
-
                 if (_xls_get_conf('DISPLAY_EMPTY_CATEGORY', '0') != '1' &&
                     !$this->HasChildOrProduct())
                         return;

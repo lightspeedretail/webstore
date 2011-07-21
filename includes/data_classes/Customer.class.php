@@ -131,35 +131,25 @@
          * @return boolean
          */
         public static function Login($strEmail, $strPassword) {
-            error_log(__FUNCTION__);
             if (empty($strEmail) || empty($strPassword))
                 return false;
 
-            error_log(__FUNCTION__);
             $objCustomer = Customer::LoadByEmail($strEmail);
 
             // Only existing customers can log in
-            error_log(__FUNCTION__);
             if (!$objCustomer)
                 return false;
 
             // Verify whether the customer is allowed to log in
-            error_log(__FUNCTION__);
-            error_log($objCustomer);
-            error_log($strEmail);
-            error_log($objCustomer->AllowLogin);
             if ($objCustomer->AllowLogin == 0)
                 return false;
 
-            error_log(__FUNCTION__);
             if (!$objCustomer->Authenticate($objCustomer, $strPassword))
                 return false;
 
             // assign customer to the visitor
-            error_log(__FUNCTION__);
             Visitor::update_with_customer_id($objCustomer->Rowid);
 
-            error_log(__FUNCTION__);
             $_SESSION['customer'] = $objCustomer;
             return true;
         }
