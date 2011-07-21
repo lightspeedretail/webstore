@@ -192,16 +192,17 @@
             if ($intQuantity == $objItem->Qty)
                 return;
 
-            if ($intQuantity > $objItem->Qty)
-                if ($objItem->Product->Inventoried && 
-                    ($objItem->Product->Inventory < $intQuantity)) {
-                        _qalert(_sp('Your chosen quantity is not available' . 
-                        ' for ordering. Please come back and order later.'));
-                        return;
+            if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD','0') != '1' &&
+                $intQuantity > $objItem->Qty && 
+                $objItem->Product->Inventoried && 
+                $objItem->Product->Inventory < $intQuantity) {
+                    _qalert(_sp('Your chosen quantity is not available' . 
+                    ' for ordering. Please come back and order later.'));
+                    return false;
                 }
 
             $objItem->Qty = $intQuantity;
-            return $objItem->Rowid;
+            return $objItem;
         }
 
         /**
@@ -504,7 +505,6 @@
             $UpdateShipping = true, 
             $SaveCart = true)
         {
-
             $this->UpdateMissingProducts();
 
             if ($this->IsExpired())
@@ -614,7 +614,7 @@
                 $intTotalQty = $intQuantity + ($objItem->Qty?$objItem->Qty:0);
 
                 if ($this->UpdateItemQuantity($objItem, $intTotalQty))
-                    $this->UpdateCart(false,true,false);
+                    $this->UpdateCart(false,true,false,true);
 
                 return $objItem->Rowid;
             }
