@@ -1347,4 +1347,14 @@ EOS;
         return $results;
     }
 
+    /**
+     * Mimic mysql_real_escape_String
+     */
+    function _xls_escape($strText) {
+        if (!empty($strText) && is_string($strText)) 
+            return str_replace(array('\\', "\0", "\n", "\r", "'", '"', "\x1a"),
+                array('\\\\', '\\0', '\\n', '\\r', "\\'", '\\"', '\\Z'), 
+                $strText);
+        return $strText;
+    } 
 ?>
