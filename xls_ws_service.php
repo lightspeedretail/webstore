@@ -518,7 +518,7 @@ EOS;
             if ($intDuplicateId)
                 if ($intDuplicateId != $intRowid) { 
                     QApplication::Log(E_ERROR, 'uploader', 
-                        'Duplicate product code found : ' . $this->strCode, 
+                        'Duplicate product code found : ' . $strCode, 
                         __FUNCTION__);
                     return false;
                 }
