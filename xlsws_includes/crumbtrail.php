@@ -31,28 +31,20 @@ This script is used to generate an array with each crumb in the crumbtrail set i
 	global $XLSWS_VARS;
 	
 	//if category OR product is set
-	if(isset($XLSWS_VARS['c']) || isset($XLSWS_VARS['product'])){
-
+    if (isset($XLSWS_VARS['c']) || isset($XLSWS_VARS['product'])) {
 		if(isset($XLSWS_VARS['product']) && ($product = Product::LoadByCode($XLSWS_VARS['product']))){
-			
+
 			array_push($tmpcrumbs , array( 'link' => $product->Link , 'tag' => 'product'  ,'name' => $product->Name));
 			
 			// find the reverse category
-			if(!isset($XLSWS_VARS['c'])){
-				$ccs = Category::LoadArrayByProduct($product->Rowid);
+            if(empty($XLSWS_VARS['c'])) {
+                $ccs = Category::LoadArrayByProduct($product->Rowid);
 				if($ccs && (count($ccs) > 0))
 					$XLSWS_VARS['c'] = current($ccs)->Rowid;
 			}
-			
-			
 		}
-		
-		if(!isset($XLSWS_VARS['c']))
-			$XLSWS_VARS['c'] = 0;
-		
-		
-		$category_id = $XLSWS_VARS['c'];
 
+        $category_id = $XLSWS_VARS['c'];
 		$category_id = explode("." , $category_id);
 
 		if(count($category_id) >0 )
@@ -67,7 +59,6 @@ This script is used to generate an array with each crumb in the crumbtrail set i
 				array_push($tmpcrumbs , array( 'key' => $category_id , 'tag' => 'c' , 'name' => $category->Name , 'link' => $category->Link));
 		}while($category && ($category_id = $category->Parent));
 	}
-	
 	
 	$tmpcrumbs = array_reverse($tmpcrumbs);
 	
@@ -91,7 +82,6 @@ This script is used to generate an array with each crumb in the crumbtrail set i
 		$crumbs[] = array('key' => $crumb['key'], 'name' => $crumb['name'] , 'case' => 'other' , 'link' => $crumb['link']);
 	}
 	
-
 	$this->crumbs = $crumbs;
 	// Let's have the pnlPanel auto render any and all child controls
 		

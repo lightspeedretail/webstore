@@ -200,7 +200,7 @@
         /**
          * Verify whether the association exists within Cache
          */
-        public function HasAssociation($miAssociationxKeyValue) {
+        public function HasAssociation($mixAssociationKeyValue) {
             return array_key_exists($mixAssociationKeyValue, 
                 $this->Associations);
         }

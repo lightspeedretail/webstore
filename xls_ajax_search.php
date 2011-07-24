@@ -35,7 +35,7 @@
     $SQL_FROM = "xlsws_product";
     $SQL_WHERE = "name";
 
-    $searchq = mysql_real_escape_string(strip_tags($_GET['q']));
+    $searchq = _xls_escape(strip_tags($_GET['q']));
     $matches =	$db->Query(
         'SELECT ' . $SQL_WHERE . 
         ' FROM ' . $SQL_FROM . 

@@ -83,7 +83,7 @@
         }
 
         protected function HasProducts() {
-            if (count($this->intChildCount) > 0)
+            if ($this->intChildCount > 0)
                 return true;
             return false;
         }
@@ -147,7 +147,7 @@
          * Additional functionality
          */
         public function PrintCategory($arrSelected, $strPrefix = '') {
-            if (!_xls_get_conf('DISPLAY_EMPTY_CATEGORY', false) &&
+            if (_xls_get_conf('DISPLAY_EMPTY_CATEGORY', '0') != '1' &&
                 !$this->HasChildOrProduct())
                     return;
 
@@ -247,9 +247,8 @@ EOS;
             &$arrCategories, $arrSelected, $strPrefix = '') {
                 QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
 
-                $arrCategories = array($this);
-
-                if (!_xls_get_conf('DISPLAY_EMPTY_CATEGORY', false) &&
+                $arrCategories[] = $this;
+                if (_xls_get_conf('DISPLAY_EMPTY_CATEGORY', '0') != '1' &&
                     !$this->HasChildOrProduct())
                         return;
 
@@ -260,6 +259,7 @@ EOS;
                     if ($objChild)
                         $arrCategories[] = $objChild;
                 }
+
         }
 
         public function get_childs_array() {

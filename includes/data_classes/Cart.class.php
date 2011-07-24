@@ -86,7 +86,6 @@
          * Create a cloned copy of the Cart
          * @return newcart[]
          */ 
-        // TODO :: This doesn't actually clone, objects are passed as reference
         public static function CloneCart(){
             $objCart = Cart::GetCart();
             $arrItems = $objCart->GetCartItemArray();
@@ -96,7 +95,7 @@
             $objNewCart->Save(true);
             
             // Copy over each items
-            foreach($items as $item){
+            foreach($arrItems as $item){
                 $item->CartId = $objNewCart->Rowid;
                 $item->Save(true);      
             }
@@ -193,16 +192,17 @@
             if ($intQuantity == $objItem->Qty)
                 return;
 
-            if ($intQuantity > $objItem->Qty)
-                if ($objItem->Product->Inventoried && 
-                    ($objItem->Product->Inventory < $intQuantity)) {
-                        _qalert(_sp('Your chosen quantity is not available' . 
-                        ' for ordering. Please come back and order later.'));
-                        return;
+            if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD','0') != '1' &&
+                $intQuantity > $objItem->Qty && 
+                $objItem->Product->Inventoried && 
+                $objItem->Product->Inventory < $intQuantity) {
+                    _qalert(_sp('Your chosen quantity is not available' . 
+                    ' for ordering. Please come back and order later.'));
+                    return false;
                 }
 
             $objItem->Qty = $intQuantity;
-            return $objItem->Rowid;
+            return $objItem;
         }
 
         /**
@@ -505,7 +505,6 @@
             $UpdateShipping = true, 
             $SaveCart = true)
         {
-
             $this->UpdateMissingProducts();
 
             if ($this->IsExpired())
@@ -615,7 +614,7 @@
                 $intTotalQty = $intQuantity + ($objItem->Qty?$objItem->Qty:0);
 
                 if ($this->UpdateItemQuantity($objItem, $intTotalQty))
-                    $this->UpdateCart(false,true,false);
+                    $this->UpdateCart(false,true,false,true);
 
                 return $objItem->Rowid;
             }
@@ -806,8 +805,7 @@
             $cart->UpdateCart();
             
             // TODO Carts that have been disabled or expired
-            
-            Cart::SaveCart($cart);
+            //Cart::SaveCart($cart);
 
             // Clone the cart so we don't have modified carts everywhere...
             if ($clone){
@@ -946,7 +944,7 @@
         // Overload GetCartItemArray to provide to use the CartItem manager
         public function GetCartItemArray() {
             if (CartItem::$Manager) {
-                if (!CartItem::$Manager->Populated)
+                if (!CartItem::$Manager->HasAssociation($this->Rowid))
                     CartItem::$Manager->AddArray(parent::GetCartItemArray());
                 return CartItem::$Manager->GetByAssociation($this->Rowid);
             }
