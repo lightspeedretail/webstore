@@ -222,8 +222,11 @@
          */
         public function UpdateMissingProducts() {
             foreach ($this->GetCartItemArray() as $objItem) {
-                if (!$objItem->Product)
+                if (!$objItem->Product) { 
+                    QApplication::(E_WARNING, 'cart', 
+                        'Removing missing product code cart : ' . $this->Rowid);
                     $objItem->Delete();
+                }
             }
         }
 
@@ -507,8 +510,9 @@
         {
             $this->UpdateMissingProducts();
 
-            if ($this->IsExpired())
-                $this->UpdateDiscountExpiry();
+            // TODO : Legacy code
+            //if ($this->IsExpired())
+            //    $this->UpdateDiscountExpiry();
 
             $this->UpdateSubtotal();
 
