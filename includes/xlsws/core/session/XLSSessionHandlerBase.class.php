@@ -4,8 +4,8 @@
         // Garbage collection variables
         public static $CollectionDefaultProbability = 1;
         public static $CollectionDefaultDivisor = 100;
-        public static $CollectionDefaultLifetime = 1440;
-        public static $CollectionOverridePhp = true;
+        public static $CollectionDefaultLifetime = 3600;
+        public static $CollectionOverridePhp = false;
 
         // Event handlers array
         protected static $Events = array();

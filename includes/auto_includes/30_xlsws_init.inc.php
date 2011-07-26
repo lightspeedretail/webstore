@@ -41,6 +41,8 @@
             QForm::$EncryptionKey = null;
             XLSFormStateHandler::$StatePath = __QCODO__ . '/cache/state';
             XLSFormStateHandler::$FileNamePrefix = 'state_';
+            XLSFormStateHandler::$GarbageCollectionMaxSeconds =
+                XLSSessionHandler::GetSessionLifetime();
         }
 
         QApplication::$EncodingType = _xls_get_conf('ENCODING' , "UTF-8");
