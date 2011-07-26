@@ -223,7 +223,7 @@
         public function UpdateMissingProducts() {
             foreach ($this->GetCartItemArray() as $objItem) {
                 if (!$objItem->Product) { 
-                    QApplication::(E_WARNING, 'cart', 
+                    QApplication::Log(E_WARNING, 'cart', 
                         'Removing missing product code cart : ' . $this->Rowid);
                     $objItem->Delete();
                 }
