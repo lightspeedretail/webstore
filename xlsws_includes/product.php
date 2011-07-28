@@ -116,34 +116,36 @@
          * @param none
          * @return none
          */  				
-		protected function build_slider()
-		{				
-			$related = ProductRelated::LoadArrayByProductId($this->prod->Rowid , QQ::Clause(QQ::OrderBy(QQN::ProductRelated()->Rowid)));
-			
-			
-			foreach($related as $rel){
-				$prod = Product::Load($rel->RelatedId);
-				
-				if(!$prod)
-					continue;
-				
-				if(!$prod->Web)
-					continue;
-				
-				if($rel->Autoadd)
-					$this->arrAutoAddProducts[] = array('prod' => $prod , 'qty' => $rel->Qty?$rel->Qty:1);
+        protected function build_slider($objRelatedArray = false) { 
+            if (!$objRelatedArray) { 
+                $objRelatedArray = ProductRelated::LoadArrayByProductId(
+                    $this->prod->Rowid,
+                    QQ::Clause(QQ::OrderBy(QQN::ProductRelated()->Rowid))
+                );
+            }
+
+            foreach ($objRelatedArray as $objRelated) {
+                $objProduct = Product::Load($objRelated->RelatedId);
+
+                if (!$objProduct)
+                    continue;
+
+                if (!$objProduct->IsAvailable)
+                    continue;
+
+                if ($objRelated->Autoadd)
+                    $this->arrAutoAddProducts[] = 
+                        array('prod' => $objProduct, 
+                       'qty' => $objRelated->Qty?$objRelated->Qty:1);
 				else
-					$this->arrRelatedProducts[] = $prod;
-					
-			
+					$this->arrRelatedProducts[] = $objProduct;
 			}
-			
+
 			$this->sldRelated = new XLSSlider($this);
 			$this->sldRelated->Name = _sp("Related Products");
 			$this->sldRelated->sliderTitle = _sp("Related Products");
 			$this->sldRelated->SetProducts($this->arrRelatedProducts);
 			$this->sldRelated->Template = templateNamed('slider.tpl.php');
-				
 		}	
 
          /**
@@ -562,27 +564,7 @@
             $this->PopulateAdditionalImagesPnl();
 			$related = ProductRelated::LoadArrayByProductId($this->prod->Rowid , QQ::Clause(QQ::OrderBy(QQN::ProductRelated()->Rowid)));
 			
-			
-			foreach($related as $rel){
-				$prod = Product::Load($rel->RelatedId);
-				
-				if(!$prod)
-					continue;
-				
-				if(!$prod->Web)
-					continue;
-				
-				if($rel->Autoadd)
-					$this->arrAutoAddProducts[] = array('prod' => $prod , 'qty' => $rel->Qty?$rel->Qty:1);
-				else
-					$this->arrRelatedProducts[] = $prod;
-					
-			
-			}
-			
-			$this->sldRelated = new XLSSlider($this);
-			$this->sldRelated->Name = _sp("Related Products");
-			$this->sldRelated->SetProducts($this->arrRelatedProducts);
+            $this->build_slider($related);
 		}
 		
 		
