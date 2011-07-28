@@ -199,7 +199,7 @@
          * @param int $strength
          * @return string
          */
-        public static function GenetatePassword($length=9, $strength=0) {
+        public static function GeneratePassword($length=9, $strength=0) {
             $vowels = 'aeuy';
             $consonants = 'bdghjmnpqrstvz';
             if ($strength & 1) {
