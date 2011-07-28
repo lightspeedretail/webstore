@@ -83,7 +83,7 @@
 		
 		<div class="receipt_checkout rounded-bottom" <?php $this->pxyCheckOut->RenderAsEvents(); ?>><?php _xt('Submit Order'); ?></div>
 		
-		<div style="position: relative; top: -53px;">
+		<div class="receipt_checkout_continue rounded-bottom">
 		<a href="#" <?php $this->pxyBackToCart->RenderAsEvents(); ?>>
 			<div class="button_large_right rounded" <?php $this->pxyBackToCart->RenderAsEvents(); ?>><?php _xt('Continue Shopping'); ?></div>
 		</a>		
