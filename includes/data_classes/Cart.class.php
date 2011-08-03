@@ -712,15 +712,19 @@
          * Return link for current cart
          * @return string
          */
-        protected function GetLink() {         
+        protected function GetLink($blnTracking = false) {
             if ($this->Linkid == '') {
                 $this->Linkid = md5(date('U') . "_" . $this->intRowid);
                 $this->Save();
             }
 
-            return _xls_site_dir() . 
-                "/index.php?xlspg=cart&getcart=" . 
-                $this->Linkid;
+            $strUrl = _xls_site_dir() . '/index.php?xlspg=';
+
+            if ($blnTracking) $strUrl = $strUrl . 'order_track&getuid=';
+            else $strUrl = $strUrl . 'cart&getcart=';
+
+            $strUrl = $strUrl . $this->Linkid;
+            return $strUrl;
         }
         
         /**
@@ -878,7 +882,7 @@
 
         public function get_link() {
             QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
-            return $this->GetLink();
+            return $this->GetLink(false);
         }
 
         public static function clear_cart() {
@@ -958,7 +962,7 @@
         public function __get($strName) {
             switch ($strName) {
                 case 'Link':
-                    return $this->GetLink();
+                    return $this->GetLink(true);
 
                 case 'Length':
                     return $this->GetLength();

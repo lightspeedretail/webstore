@@ -1397,9 +1397,9 @@
 			
 			
 		// Show invoice
-		if($forward)
-			_rd("index.php?xlspg=order_track&getuid=" . $cart->Linkid);
-		
+        if($forward)
+            _rd($cart->Link);
+
 	}
 		
 		
