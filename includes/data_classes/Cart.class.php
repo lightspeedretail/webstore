@@ -48,10 +48,10 @@
                 $cart = new Cart();
                 $cart->Type = CartType::cart;
                 
-                $now = QDateTime::Now();
-                $cart->DatetimeCre = $now;
+                $due = QDateTime::Now();
+                $cart->DatetimeCre = QDateTime::Now();
                 $cart->DatetimeDue = 
-                    $now->AddDays(_xls_get_conf('CART_LIFE', 7));
+                    $due->AddDays(_xls_get_conf('CART_LIFE', 7));
                 $cart->FkTaxCodeId = -1;
 
                 if ($cart->FkTaxCodeId == -1)
