@@ -545,8 +545,8 @@
 				$code = $validDest->State;
 
 				if ($code)
-				{
-					$state = State::LoadByCode($code);
+                {
+                    $state = State::LoadByCountryCodeCode($country_code, $code);
 					if ($state){
 						$statesSeen[] = $state;
 						$statesListed++;
