@@ -545,8 +545,8 @@
 				$code = $validDest->State;
 
 				if ($code)
-				{
-					$state = State::LoadByCode($code);
+                {
+                    $state = State::LoadByCountryCodeCode($country_code, $code);
 					if ($state){
 						$statesSeen[] = $state;
 						$statesListed++;
@@ -1397,9 +1397,9 @@
 			
 			
 		// Show invoice
-		if($forward)
-			_rd("index.php?xlspg=order_track&getuid=" . $cart->Linkid);
-		
+        if($forward)
+            _rd($cart->Link);
+
 	}
 		
 		

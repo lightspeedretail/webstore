@@ -48,10 +48,10 @@
                 $cart = new Cart();
                 $cart->Type = CartType::cart;
                 
-                $now = QDateTime::Now();
-                $cart->DatetimeCre = $now;
+                $due = QDateTime::Now();
+                $cart->DatetimeCre = QDateTime::Now();
                 $cart->DatetimeDue = 
-                    $now->AddDays(_xls_get_conf('CART_LIFE', 7));
+                    $due->AddDays(_xls_get_conf('CART_LIFE', 7));
                 $cart->FkTaxCodeId = -1;
 
                 if ($cart->FkTaxCodeId == -1)
@@ -222,8 +222,11 @@
          */
         public function UpdateMissingProducts() {
             foreach ($this->GetCartItemArray() as $objItem) {
-                if (!$objItem->Product)
+                if (!$objItem->Product) { 
+                    QApplication::Log(E_WARNING, 'cart', 
+                        'Removing missing product code cart : ' . $this->Rowid);
                     $objItem->Delete();
+                }
             }
         }
 
@@ -507,8 +510,9 @@
         {
             $this->UpdateMissingProducts();
 
-            if ($this->IsExpired())
-                $this->UpdateDiscountExpiry();
+            // TODO : Legacy code
+            //if ($this->IsExpired())
+            //    $this->UpdateDiscountExpiry();
 
             $this->UpdateSubtotal();
 
@@ -708,15 +712,19 @@
          * Return link for current cart
          * @return string
          */
-        protected function GetLink() {         
-            if ($this->Linkid == '') {
+        protected function GetLink($blnTracking = false) {
+            if ($this->Linkid == '' || is_null($this->Linkid)) {
                 $this->Linkid = md5(date('U') . "_" . $this->intRowid);
                 $this->Save();
             }
 
-            return _xls_site_dir() . 
-                "/index.php?xlspg=cart&getcart=" . 
-                $this->Linkid;
+            $strUrl = _xls_site_dir() . '/index.php?xlspg=';
+
+            if ($blnTracking) $strUrl = $strUrl . 'order_track&getuid=';
+            else $strUrl = $strUrl . 'cart&getcart=';
+
+            $strUrl = $strUrl . $this->Linkid;
+            return $strUrl;
         }
         
         /**
@@ -874,7 +882,7 @@
 
         public function get_link() {
             QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
-            return $this->GetLink();
+            return $this->GetLink(false);
         }
 
         public static function clear_cart() {
@@ -954,7 +962,7 @@
         public function __get($strName) {
             switch ($strName) {
                 case 'Link':
-                    return $this->GetLink();
+                    return $this->GetLink(true);
 
                 case 'Length':
                     return $this->GetLength();

@@ -380,7 +380,9 @@
 
                 if($product->ImageId  && ($image = Images::LoadByRowid($product->ImageId))){ // There is a image already
                     
-                    $image->SetImage($rawImage , $intRowid);
+                    $strName = Images::GetImageName($product->GetSafeProductCode());
+                    $strSubFolder = floor($product->Rowid/100)."00"."/";
+                    $image->SaveImageData($strName, $rawImage,$strSubFolder);
                     $image->ImageData = $rawImage;
                     $image->Width = imagesx ( $im );
                     $image->Height = imagesy ( $im );
@@ -388,7 +390,9 @@
                     
                 }else{
                     $image = new Images();
-                    $image->SetImage($rawImage , $intRowid);
+                    $strName = Images::GetImageName($product->GetSafeProductCode());
+                    $strSubFolder = floor($product->Rowid/100)."00"."/";
+                    $image->SaveImageData($strName, $rawImage,$strSubFolder);
                     $image->Width = imagesx ( $im );
                     $image->Height = imagesy ( $im );
                     $image->Created = new  QDateTime(QDateTime::Now);
@@ -688,7 +692,12 @@ EOS;
                 $im = imagecreatefromstring($rawImage);
                 
                 $image = new Images();
-                $image->SetImage($rawImage , $intRowid . "_" . $image_index . "_add");
+
+                $strName = Images::GetImageName($product->GetSafeProductCode()."_add",0,0,$image_index);
+                $strSubFolder = floor($product->Rowid/100)."00"."/";
+                $image->SaveImageData($strName, $rawImage,$strSubFolder);
+
+
                 $image->Width = imagesx ( $im );
                 $image->Height = imagesy ( $im );
                 $image->Created = new  QDateTime(QDateTime::Now);
@@ -1183,59 +1192,67 @@ EOS;
          * @return string
          */
         public function save_category_with_id(
-                $passkey
-            ,   $intRowId
-            ,   $intParentId
-            ,   $strCategory
-            ,   $strMetaKeywords
-            ,   $strMetaDescription
-            ,   $strCustomPage
-            ,   $intPosition
-            ,   $blbImage
-                ){
-            
-            if(!$this->check_passkey($passkey))
+            $passkey, 
+            $intRowId, 
+            $intParentId,
+            $strCategory,
+            $strMetaKeywords,
+            $strMetaDescription,
+            $strCustomPage,
+            $intPosition,
+            $blbImage
+        ) {
+
+            if (!$this->check_passkey($passkey))
                 return self::FAIL_AUTH;
 
-                    
-            // Save category
+            // Prepare values
             $strCategory = trim($strCategory);
+            $strCustomPage = trim($strCustomPage);
 
-            
-            //_xls_log("Saving category path for $strCategoryPath in product $strCode");
-            if(!$strCategory){
-                _xls_log("Cannot save empty category! Called with ID $intRowId in save_category_with_id");
+            if (!$strCategory) {
+                QApplication::Log(E_USER_ERROR, 'uploader', 
+                    'Could not save empty category');
                 return self::UNKNOWN_ERROR;
             }
-            
-            
-            if(!($category = Category::Load($intRowId))){
-                $category = new Category();
-                $category->Name = $strCategory;
-                $category->Parent = $intParentId;
-                $category->Created = new QDateTime(QDateTime::Now);
-                $category->Position = $intPosition;
-                $category->Save(true);
-                self::changeRowId($category , QQN::Category() , $intRowId);
+
+            $objCategory = false; 
+
+            // If provided a rowid, attempt to load it
+            if ($intRowId)
+                $objCategory = Category::Load($intRowId);
+            else if (!$objCategory and $intParentId)
+                $objCategory = 
+                    Category::LoadByNameParent($strCategory, $intParentId);
+
+            // Failing that, create a new Category
+            if (!$objCategory) { 
+                $objCategory = new Category();
+                $objCategory->Created = new QDateTime(QDateTime::Now);
             }
-                    
-            
+
+            $objCategory->Name = $strCategory;
+            $objCategory->Parent = $intParentId;
+            $objCategory->Position = $intPosition;
+            if ($strCustomPage)
+                $objCategory->CustomPage = $strCustomPage;
+            if ($strMetaKeywords)
+                $objCategory->MetaKeywords = $strMetaKeywords;
+            if ($strMetaDescription)
+                $objCategory->MetaDescription = $strMetaDescription;
+
             $blbImage = trim($blbImage);
-            
-            if($blbImage  &&  ($blbImage = base64_decode($blbImage))){
-                
+            if ($blbImage && ($blbImage = base64_decode($blbImage))) {
                 $im = imagecreatefromstring($blbImage);
-                
-                if($category->ImageId){ // There is a image already
-                    
+
+                if ($objCategory->ImageId){ // There is a image already
                     $image = Images::LoadByRowid($category->ImageId);
-                    
-                    $image->SetImage($blbImage , $intRowid . "_categ");
+                    $image->SetImage($blbImage , $intRowId . "_categ");
                     $image->Width = imagesx ( $im );
                     $image->Height = imagesy ( $im );
                     $image->Save();
-                    
-                }else{
+                }
+                else {
                     $image = new Images();
                     $image->ImageData = $blbImage;
                     $image->Width = imagesx ( $im );
@@ -1243,32 +1260,26 @@ EOS;
                     $image->Created = new  QDateTime(QDateTime::Now);
                     
                     $image->Save(true);
-                    $category->ImageId = $image->Rowid;
+                    $objCategory->ImageId = $image->Rowid;
                 }
-
                 
                 $image->Parent = $image->Rowid;
                 $image->Save();
                 
-                
                 // Free memory
                 unset($image);
                 unset($im);
-            }                   
-            
-            $category->Name = $strCategory;     
-            $category->Parent = $intParentId;
-            $category->CustomPage = trim($strCustomPage);
-            $category->MetaKeywords = $strMetaKeywords;
-            $category->MetaDescription = $strMetaDescription;
-            $category->Position = $intPosition;         
-            $category->Save(false , true);
-            
-            
-            $category->UpdateChildCount();
+            }
+
+            if ($intRowId && $objCategory->Rowid != $intRowId) { 
+                $objCategory->Save(true);
+                self::changeRowId($objCategory , QQN::Category() , $intRowId);
+                $objCategory = Category::Load($intRowId);
+            }
+
+            $objCategory->UpdateChildCount();
             
             return self::OK;
-            
         }       
         
         
@@ -2595,9 +2606,6 @@ EOS;
             $cart->Phone = _xls_number_only($strPhone);
             $cart->ShippingSell = $fltShippingSell;
             $cart->ShippingCost = $fltShippingCost;
-            if (empty($cart->Linkid) || is_null($cart->Linkid))
-				$cart->Linkid = md5(date('U') . "_" . $strId);
-
             
             $cart->Status = $strStatus;
             $cart->Zipcode = $strZipcode;

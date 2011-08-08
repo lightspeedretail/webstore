@@ -231,6 +231,15 @@ EOS;
                     $mixParameterArray);
         }
 
+		public static function LoadByNameParent($strName, $intParentId) {
+            return Category::QuerySingle(
+                QQ::AndCondition(
+    				QQ::Equal(QQN::Category()->Name, $strName),
+    				QQ::Equal(QQN::Category()->Parent, $intParentId)
+                )
+            );
+        }
+
         public function Delete() {
             $this->UnassociateAllProducts();
 

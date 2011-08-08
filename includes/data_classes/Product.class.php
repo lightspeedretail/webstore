@@ -109,6 +109,17 @@
             return str_replace("%2F","/",urlencode($this->strCode));
         }
 
+
+         /**
+         * Gets a stripped version of Product Code minus any spaces and punctuation
+         * for filename purposes
+         * @return string 
+         */
+        public function GetSafeProductCode() {
+		      return trim(strtolower(preg_replace('#[^\p{L}\p{N}]+#u', '', $this->strCode)));
+
+	   }
+
         /**
          * Gets the URL referring to the Product image
          * @param string $type :: Image size constant

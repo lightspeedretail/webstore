@@ -10,11 +10,12 @@
         if (!defined(__PREPEND_QUICKINIT__)) {
 
             // Ensure we load the database session storage object if needed
-            if (_xls_get_conf('SESSION_HANDLER') == 'DB')
+            if (_xls_get_conf('SESSION_HANDLER') == 'DB') { 
                 QApplication::$ClassFile['xlssessionhandler'] =
                     __XLSWS_INCLUDES__ .
                     '/core/session/XLSDBSessionHandler.class.php';
-
+                XLSSessionHandler::$CollectionOverridePhp = true;
+            }
         }
     }
 

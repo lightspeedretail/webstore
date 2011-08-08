@@ -655,39 +655,9 @@ EOS;
      * @return int
      */
     function _xls_page_session_expiry_duration(){
-        $duration = 1800;
-
-        /*Set the timeout to a much larger number if it's the checkout page to prevent lost orders*/
-        if ($_GET['xlspg'] == "checkout") 
-        	return 9000000;
-        
-        /**
-         * Document expires after n minutes.
-         */
-        $temp = intval(ini_get('session.cache_expire')) * 60;
-        
-        if($temp < $duration)
-            $duration = $temp;
-        
-        /*
-         * After this number of seconds, stored data will be seen as 
-         * 'garbage' and cleaned up by the garbage collection process.
-        */
-        $temp = intval(ini_get('session.gc_maxlifetime')) ;
-
-        if($temp && ($temp < $duration))
-            $duration = $temp;
-            
-        /*
-         * Lifetime in seconds of cookie or, if 0, until browser is restarted.
-         */
-        
-        $temp = intval(ini_get('session.cookie_lifetime')) ;
-        
-        if($temp && ($temp < $duration))
-            $duration = $temp;          
-            
-        return $duration;
+        // Synchronize page expiry with session expiry minus 60 seconds 
+        $intLifetime = XLSSessionHandler::GetSessionLifetime() - 60;
+        return $intLifetime;
     }
 
     /**
