@@ -692,8 +692,7 @@ EOS;
                 $im = imagecreatefromstring($rawImage);
                 
                 $image = new Images();
-              //  $image->SetImage($rawImage , $intRowid . "_" . $image_index . "_add");
-                
+
                 $strName = Images::GetImageName($product->GetSafeProductCode()."_add",0,0,$image_index);
                 $strSubFolder = floor($product->Rowid/100)."00"."/";
                 $image->SaveImageData($strName, $rawImage,$strSubFolder);
