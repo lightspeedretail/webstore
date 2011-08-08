@@ -713,7 +713,7 @@
          * @return string
          */
         protected function GetLink($blnTracking = false) {
-            if ($this->Linkid == '') {
+            if ($this->Linkid == '' || is_null($this->Linkid)) {
                 $this->Linkid = md5(date('U') . "_" . $this->intRowid);
                 $this->Save();
             }

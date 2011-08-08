@@ -2595,9 +2595,6 @@ EOS;
             $cart->Phone = _xls_number_only($strPhone);
             $cart->ShippingSell = $fltShippingSell;
             $cart->ShippingCost = $fltShippingCost;
-            if (empty($cart->Linkid) || is_null($cart->Linkid))
-				$cart->Linkid = md5(date('U') . "_" . $strId);
-
             
             $cart->Status = $strStatus;
             $cart->Zipcode = $strZipcode;
