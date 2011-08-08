@@ -16,6 +16,9 @@
         }
 
         public static function TriggerEvent($strEventName, $arrParameters) {
+            if (!in_array($strEventName, self::$Events))
+                return;
+
             foreach (self::$Events[$strEventName] as $mixEvent)
                 if (is_callable($mixEvent))
                     call_user_func($mixEvent, $arrParameters);
