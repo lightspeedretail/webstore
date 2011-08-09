@@ -63,11 +63,7 @@
             return ImagesType::GetSize($intType);
         }
 
-        /**
-         * Return valid filename not already in use based on passed path/filename
-         * and parameters
-         * @return string 
-         */
+        // $strName == intRowid
         public static function GetImageName($strName,
             $intWidth = 0, $intHeight = 0, $intIndex = 0, $strClass = null, 
             $blnIsThumb = false) {
@@ -86,15 +82,8 @@
             return $strName . '.jpg';
         }
 
-        public static function GetImagePath($strFile, $strSubFolder=null) {
-            if ($strSubFolder != null)
-                {
-                    if (!file_exists(__DOCROOT__ . __PHOTOS__ . "/".$strSubFolder))
-                        @mkdir(__DOCROOT__ . __PHOTOS__ . "/".$strSubFolder);
-                    return __DOCROOT__ . __PHOTOS__ . "/".$strSubFolder."${strFile}";
-                }
-            else
-                return __DOCROOT__ . __PHOTOS__ . "/${strFile}";           
+        public static function GetImagePath($strFile) {
+            return __DOCROOT__ . __PHOTOS__ . "/${strFile}";
         }
 
         public static function GetImageFallbackPath() {
@@ -234,12 +223,12 @@
             return $this->SaveImageData($strName, $blbImage);
         }
 
-        public function SaveImageData($strName, $blbImage, $strSubFolders=null) {
+        public function SaveImageData($strName, $blbImage) {
             if ($strName && (_xls_get_conf('IMAGE_STORE' , 'FS') == 'FS')) {
-                $strPath = Images::GetImagePath($strName, $strSubFolders);
+                $strPath = Images::GetImagePath($strName);
 
                 if (file_put_contents($strPath, $blbImage)) { 
-                    $this->strImagePath = ($strSubFolders != null ? $strSubFolders : "").$strName;
+                    $this->strImagePath = $strName;
                     $this->strImageData = null;
                 }
                 else {
@@ -336,22 +325,14 @@
                 return null;
             }
 
-            if (strpos($this->ImagePath,"/") !== false){
-                //Image is in subfolder structure
-                $strFilename=explode("/",$this->ImagePath);
-                $strImageName = Images::GetImageName(
-                    $this->ImagePath, $intNewWidth, $intNewHeight);
-            }
-            else
-                $strImageName = Images::GetImageName(
-                   $this->intRowid, $intNewWidth, $intNewHeight); //Backwards compatibility
-            
-            
+            $strImageName = Images::GetImageName(
+                $this->intRowid, $intNewWidth, $intNewHeight);
+
             $objNew = new Images();
 
             ob_start();
             imagejpeg($rawNewImage, NULL, 100);
-            $objNew->SaveImageData($strImageName, ob_get_contents(),isset($strFilename[0]) ? $strFilename[0]."/" : null);
+            $objNew->SaveImageData($strImageName, ob_get_contents());
             ob_end_clean();
 
             $objNew->Created = QDateTime::Now(true);
