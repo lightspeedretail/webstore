@@ -380,9 +380,7 @@
 
                 if($product->ImageId  && ($image = Images::LoadByRowid($product->ImageId))){ // There is a image already
                     
-                    $strName = Images::GetImageName($product->GetSafeProductCode());
-                    $strSubFolder = floor($product->Rowid/100)."00"."/";
-                    $image->SaveImageData($strName, $rawImage,$strSubFolder);
+                    $image->SetImage($rawImage , $intRowid);
                     $image->ImageData = $rawImage;
                     $image->Width = imagesx ( $im );
                     $image->Height = imagesy ( $im );
@@ -390,9 +388,7 @@
                     
                 }else{
                     $image = new Images();
-                    $strName = Images::GetImageName($product->GetSafeProductCode());
-                    $strSubFolder = floor($product->Rowid/100)."00"."/";
-                    $image->SaveImageData($strName, $rawImage,$strSubFolder);
+                    $image->SetImage($rawImage , $intRowid);
                     $image->Width = imagesx ( $im );
                     $image->Height = imagesy ( $im );
                     $image->Created = new  QDateTime(QDateTime::Now);
@@ -692,12 +688,7 @@ EOS;
                 $im = imagecreatefromstring($rawImage);
                 
                 $image = new Images();
-
-                $strName = Images::GetImageName($product->GetSafeProductCode()."_add",0,0,$image_index);
-                $strSubFolder = floor($product->Rowid/100)."00"."/";
-                $image->SaveImageData($strName, $rawImage,$strSubFolder);
-
-
+                $image->SetImage($rawImage , $intRowid . "_" . $image_index . "_add");
                 $image->Width = imagesx ( $im );
                 $image->Height = imagesy ( $im );
                 $image->Created = new  QDateTime(QDateTime::Now);
