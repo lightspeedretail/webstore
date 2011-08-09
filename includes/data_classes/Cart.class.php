@@ -272,7 +272,10 @@
 
                 if ($objPromoCode->Type == PromoCodeType::Flat) {
                     if ($intDiscount == 0)
-                        break;
+                        {
+                            $objItem->Discount=0;
+                            break;
+                        }
 
                     $intItemPrice = $objItem->Sell;
                     $intTotalPrice = $objItem->Sell * $objItem->Qty;
