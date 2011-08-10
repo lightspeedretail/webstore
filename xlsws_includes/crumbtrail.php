@@ -51,12 +51,14 @@ This script is used to generate an array with each crumb in the crumbtrail set i
 			$category_id = $category_id[count($category_id)-1]; // take the last category index
 
 		do{
-			$category = Category::Load($category_id);
+            $category = Category::Load($category_id);
+
+            $strName = $category->Name;
 			if ($category && strlen($category->Name) > 20)
-				$category->Name = substr($category->Name, 0, 17) . "...";
+				$strName = substr($category->Name, 0, 17) . "...";
 
 			if($category)
-				array_push($tmpcrumbs , array( 'key' => $category_id , 'tag' => 'c' , 'name' => $category->Name , 'link' => $category->Link));
+				array_push($tmpcrumbs , array( 'key' => $category_id , 'tag' => 'c' , 'name' => $strName , 'link' => $category->Link));
 		}while($category && ($category_id = $category->Parent));
 	}
 	
