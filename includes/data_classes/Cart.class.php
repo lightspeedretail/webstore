@@ -967,6 +967,9 @@
                 case 'Link':
                     return $this->GetLink(true);
 
+                case 'Order':
+                    return $this->GetLink(false);
+
                 case 'Length':
                     return $this->GetLength();
 
