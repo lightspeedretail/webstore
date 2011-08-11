@@ -283,8 +283,6 @@
                 $intHeight = $this->Height;
             }
 
-            QApplication::Log(E_WARNING, 'image',
-                "No image data for {$this->intRowid}");
 
             $rawImage = file_get_contents(
                 Images::GetImageFallbackPath());
