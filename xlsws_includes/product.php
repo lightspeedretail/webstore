@@ -594,7 +594,7 @@
 			
 			$qty = $this->get_qty();
 			
-			$this->lblPrice->Text = _xls_currency($this->prod->PriceQtyClacIncTaxIfset($qty));
+			$this->lblPrice->Text = _xls_currency($this->prod->GetPrice($qty));
 			
 			if(!is_numeric($this->txtQty->Text))
 				$this->txtQty->Text = _sp('Qty');
