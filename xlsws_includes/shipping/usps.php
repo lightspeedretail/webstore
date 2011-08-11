@@ -154,12 +154,16 @@ class usps extends xlsws_class_shipping {
 			$this->methods = explode(",", $config['shiptypes']);
 			$this->init_admin_vars($config['username'] , $config['originpostcode'], $config['originpostcode'], "US");
 			$req = $this->buildDomesticRateRequest();
-			$page = $this->sendUSPSRateRequest($req);			
-			$rates = $this->parseAll($page);
+			$page = $this->sendUSPSRateRequest($req);
+			
+			$rates = $this->getRate(true);
 			$this->init_admin_vars($config['username'] , $config['originpostcode'], "H1M 2W4", "Canada");
 			$req = $this->buildInternationalRateRequest();
+			
 			$page = $this->sendUSPSRateRequest($req);			
-			$rates_int = $this->parseAll($page);
+			$rates_int = $this->getRate(true);
+			
+			
 			$rates = array_merge($rates,$rates_int);
 			if (!empty($rates))
 			{
@@ -423,21 +427,52 @@ class usps extends xlsws_class_shipping {
 	 * getRate
 	 * 
 	 * Calling function to get the USPS rate from their website
+	 * param bool - true will return all values (used by Admin panel)
 	 * @return array
 	*/
-	public function getRate(){
+	public function getRate($showall=false){
 		
 		if (($this->ounces + $this->pounds) == 0)
 			return false;
 		
 		$request = ($this->isDomestic()) ? $this->buildDomesticRateRequest() : $this->buildInternationalRateRequest() ;
 		$this->response = $this->sendUSPSRateRequest($request);
-		$rates = $this->parseResponse($this->response);
-
 		
 		
+		
+		// Parse xml for response values
+        $oXML = new SimpleXMLElement($this->response);
 
-		return $rates;
+        if($oXML->Package->Error)
+        {
+            //What we have is ... failure to communicate
+            QApplication::Log(E_ERROR, __CLASS__, 
+                            'Could not get shipping for USPS: '.$oXML->Package->Error->Description); 
+            return false;
+        }  
+        
+
+        $retval = array();
+        if($this->isDomestic()){       
+    		foreach($oXML->Package->Postage as $key=>$val) {
+    		  $strKey=str_replace("&lt;sup&gt;&amp;reg;&lt;/sup&gt;","",$val->MailService);
+    		  $strKey=str_replace("&lt;sup&gt;&amp;trade;&lt;/sup&gt;","",$strKey);
+    		  $retval[''.htmlspecialchars_decode($strKey)] = floatval($val->Rate);
+    		}
+        } else {
+    		foreach($oXML->Package->Service as $key=>$val) {    		  
+    		  $strKey=str_replace("&lt;sup&gt;&amp;reg;&lt;/sup&gt;","",$val->SvcDescription);
+    		  $strKey=str_replace("&lt;sup&gt;&amp;trade;&lt;/sup&gt;","",$strKey);
+    		  $retval[''.htmlspecialchars_decode($strKey)] = floatval($val->Postage);
+    		}      
+        }
+
+    	$arrMethods = array_fill_keys($this->methods, '');	
+
+		if($showall)
+		  return $retval;
+        else
+            return array_intersect_key($retval, $arrMethods);
 	}
 	
 	/**
@@ -519,140 +554,6 @@ class usps extends xlsws_class_shipping {
 		return $page;
 	}
 
-	/**
-	 * parseAll
-	 * 
-	 * cURL string to actually send request
-	 * @return string
-	*/
-	private function parseAll($page){				
-		$dom = new DOMDocument;
-		$dom->loadXML($page);
-		
-		$rates = array();
-		if ($this->isDomestic()){
-			foreach($dom->getElementsByTagname('Package') as $package){
-				foreach($package->getElementsByTagname('Postage') as $postage){
-					$mailService = $postage->getElementsByTagname('MailService');
-					$mailServiceTextValue = $mailService->item(0)->firstChild->nodeValue;
-				
-						$rate = $postage->getElementsByTagname('Rate');
-						$rateTextValue = $rate->item(0)->firstChild->nodeValue;
-						$rateTextValue+=$this->markup;
-						$realMailServiceName = $mailServiceTextValue;
-						$rates[$realMailServiceName] = $rateTextValue;
-				}
-			}
-		} else {
-			foreach($dom->getElementsByTagname('Service') as $postage){
-				$mailService = $postage->getElementsByTagname('SvcDescription');
-				$mailServiceTextValue = $mailService->item(0)->firstChild->nodeValue;
-				$mailServiceTextValue = $mailServiceTextValue;
-
-			
-					$rate = $postage->getElementsByTagname('Postage');
-					$rateTextValue = $rate->item(0)->firstChild->nodeValue;
-					$rateTextValue+=$this->markup;
-					$mailServiceTextValue = $mailServiceTextValue;
-					$rates[$mailServiceTextValue] = $rateTextValue;
-			}			
-		}
-		asort($rates);	
-		return $rates;
-	}
-
-	/**
-	 * parseResponse
-	 * 
-	 * XML Parsing for result
-	 * @param page string
-	 * @return array
-	*/
-	private function parseResponse($page){
-		
-		if(!$this->isDomestic())
-			return $this->parseIntlRateResponse($page);
-			
-		$dom = new DOMDocument;
-		$dom->loadXML($page);
-		
-		$rates = array();
-
-		foreach($dom->getElementsByTagname('Package') as $package){
-			foreach($package->getElementsByTagname('Postage') as $postage){
-				$mailService = $postage->getElementsByTagname('MailService');
-				$mailServiceTextValue = $mailService->item(0)->firstChild->nodeValue;
-				$key = str_replace("reg","",strip_tags(html_entity_decode($mailServiceTextValue)));
-				$key = ereg_replace("[^A-Za-z0-9\-]", " ", $key);
-				
-				if(array_search($key, $this->methods) !== FALSE){
-						$rate = $postage->getElementsByTagname('Rate');
-						$rateTextValue = $rate->item(0)->firstChild->nodeValue;
-						$rateTextValue+=$this->markup;
-						$realMailServiceName = str_replace("&reg;","",strip_tags(html_entity_decode($mailServiceTextValue)));
-						$rates[$realMailServiceName] = $rateTextValue;
-				}
-			}
-		}
-		asort($rates);	
-		return $rates;
-	}
-	
-	/**
-	 * parseIntlRateResponse
-	 * 
-	 * XML Parsing for International result
-	 * @param page string
-	 * @return array
-	*/
-	private function parseIntlRateResponse($page){
-
-		$dom = new DOMDocument;
-		$dom->loadXML($page);
-		
-		$rates = array();
-
-		foreach($dom->getElementsByTagname('Service') as $postage){
-			$mailService = $postage->getElementsByTagname('SvcDescription');
-			$mailServiceTextValue = $mailService->item(0)->firstChild->nodeValue;
-			$mailServiceTextValue = $mailServiceTextValue;
-			$key = str_replace("reg","",strip_tags(html_entity_decode($mailServiceTextValue)));
-			$key = ereg_replace("[^A-Za-z0-9\-]", " ", $key);
-
-			if(array_search($key, $this->methods) !== FALSE){
-					$rate = $postage->getElementsByTagname('Postage');
-					$rateTextValue = $rate->item(0)->firstChild->nodeValue;
-					$rateTextValue+=$this->markup;
-					$mailServiceTextValue = str_replace("&reg;","",strip_tags(html_entity_decode($mailServiceTextValue)));
-					$rates[$mailServiceTextValue] = $rateTextValue;
-			}
-		}
-		
-		asort($rates);
-		return $rates;
-	}
-	
-	/**
-	 * getResponseErrors
-	 * 
-	 * XML Parsing for errors in result
-	 * @param response string
-	 * @return array
-	*/
-	private function getResponseErrors($response){
-			$dom = new DOMDocument;
-			$dom->loadXML($response);
-			
-			$errors = array();
-
-			foreach($dom->getElementsByTagname('Error') as $error){
-				echo 'error';
-			}
-			return $errors;
-	}
-
-	
-	
 	
 	
 	
