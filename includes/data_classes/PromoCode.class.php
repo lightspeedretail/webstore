@@ -28,13 +28,13 @@
         }
         
         protected function IsStarted() {
-            if (time() > strtotime($this->strValidFrom))
+            if (date("Y-m-d")>=date("Y-m-d",strtotime($this->strValidFrom)))
                 return true;
             return false;
         }
 
         protected function IsExpired() {
-            if (time() > strtotime($this->strValidUntil))
+            if (date("Y-m-d",strtotime($this->strValidUntil))<date("Y-m-d"))
                 return true;
             return false;
         }
