@@ -137,7 +137,6 @@
         }	
         
         public function getConfigValues($classname){
-            QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
             return $this->GetConfigurationValues();
         }
 
