@@ -308,7 +308,7 @@
 
    			$cart = Cart::GetCart();
    			$cart->GiftRegistry = $this->objGiftDetail->Rowid;
-   			$cart->ssave();
+   			$cart->SyncSave();
    			
    			
    			$this->build_cart();
