@@ -850,8 +850,8 @@ class xlsws_checkout extends xlsws_index {
 		}
 		
 		$this->cart->FkTaxCodeId = $taxCodeId;
-		$this->cart->UpdateCart();
-		$this->cart->ssave();
+        $this->cart->UpdateCart();
+        $this->cart->SyncSave();
 		
 		if ($this->checktaxonly)
 		{
@@ -1585,7 +1585,7 @@ class xlsws_checkout extends xlsws_index {
 			$this->cart->Currency = _xls_get_conf('CURRENCY_DEFAULT' , 'USD');
 		
 
-		$this->cart->ssave();
+		$this->cart->SyncSave();
 		
 			
 		// show wait panel
