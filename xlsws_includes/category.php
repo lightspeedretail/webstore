@@ -71,9 +71,20 @@
             	// show subcategories 
             	$currentCateg = $XLSWS_VARS['c'];
 				$currentCategs = explode("." , $currentCateg);
-				$currentCateg = end($currentCategs);
-            	$categ = Category::Load($currentCateg); 
-            	$categ->print_category($this->subcategories , $currentCategs , '' );
+                $currentCateg = end($currentCategs);
+
+                $categ = Category::$Manager->GetByKey($currentCateg);
+
+                $objSubcategoryArray = array($categ->PrintCategory($currentCategs));
+                foreach ($categ->Children as $objSubcategory) { 
+                    $strSubcategoryArray = 
+                        $objSubcategory->PrintCategory($currentCategs);
+
+                    if ($strSubcategoryArray)
+                        $objSubcategoryArray[] = $strSubcategoryArray;
+                }
+
+                $this->subcategories = $objSubcategoryArray;
 
             	if($categ->CustomPage){
 	            	$pageR = CustomPage::LoadByKey($categ->CustomPage);
