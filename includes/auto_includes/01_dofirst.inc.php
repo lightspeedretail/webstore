@@ -24,7 +24,5 @@
  
  */
 
-    // Prevent error display for SOAP/Ajax
-    ini_set('display_errors', 0);
-
-?>
+// Prevent error display for SOAP/Ajax
+ini_set('display_errors', 0);
