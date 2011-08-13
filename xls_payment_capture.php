@@ -1,4 +1,4 @@
-<?php 	
+<?php
 /*
   LightSpeed Web Store
  
@@ -24,93 +24,82 @@
  
  */
 
-	/**
-	 * This file captures payment responses from gateways and updates/completes the orders
-	 * Xsilva does not recommend altering this file, alter this file at your own risk
-	 */
+/**
+ * This file captures payment responses from gateways and updates/completes the orders
+ * Xsilva does not recommend altering this file, alter this file at your own risk
+ */
 
-	require_once('includes/prepend.inc.php');
-	ob_start(); // These includes may spit content which we need to ignore
-	require_once(CUSTOM_INCLUDES . 'prepend.inc.php');
-	ob_end_clean();	
-	
-	
-	// find all payment modules
-	$payModules = Modules::QueryArray(QQ::Equal(QQN::Modules()->Type, 'payment' )
-		, QQ::Clause(QQ::OrderBy(QQN::Modules()->SortOrder)));
-	
-		
-	// load the modules
-	foreach($payModules as $module){
-		xlsws_index::loadModule($module->File , 'payment');
-	
-		$class = basename($module->File , ".php");
-		
-		// filename must match module name
-		if(!class_exists($class))
+require_once('includes/prepend.inc.php');
+ob_start(); // These includes may spit content which we need to ignore
+require_once(CUSTOM_INCLUDES . 'prepend.inc.php');
+ob_end_clean();
+
+// find all payment modules
+$payModules = Modules::QueryArray(
+	QQ::Equal(QQN::Modules()->Type, 'payment'),
+	QQ::Clause(QQ::OrderBy(QQN::Modules()->SortOrder))
+);
+
+// load the modules
+foreach($payModules as $module) {
+	xlsws_index::loadModule($module->File , 'payment');
+
+	$class = basename($module->File , ".php");
+
+	// filename must match module name
+	if(!class_exists($class))
+		continue;
+
+	$obj = new $class;
+
+	if(!method_exists($obj , 'gateway_response_process'))
+		continue;
+
+	if($pay_info = $obj->gateway_response_process()) {
+
+		if(!$pay_info) continue;
+		if(!is_array($pay_info)) continue;
+
+		if(!isset($pay_info['order_id'])) {
+			_xls_log("Payment process capture error. $module->File did not return 'order_id' . " . print_r($XLSWS_VARS , true));
 			continue;
-		
-			
-		$obj = new $class;
-		
-		
-		if(!method_exists( $obj , 'gateway_response_process' ))
-			continue;
-			
-			
-		if( $pay_info = $obj->gateway_response_process()){
-			
-			if(!$pay_info) continue;
-			if(!is_array($pay_info)) continue;
-
-			
-			if(!isset($pay_info['order_id'])){
-				_xls_log("Payment process capture error. $module->File did not return 'order_id' . " . print_r($XLSWS_VARS , true));
-				continue;
-			}
-			
-			$order_id = $pay_info['order_id'];
-
-			
-			$cart = Cart::LoadByIdStr($order_id);
-			
-			if(!$cart || ($cart->Type != CartType::awaitpayment)){
-				_xls_log("Payment process capture error. $module->File did not return a valid order id $order_id . " . print_r($XLSWS_VARS , true));
-				continue;
-			}
-			
-			if($cart->PaymentModule != $module->File){
-				_xls_log("Payment process capture error. $module->File tried returning for $order_id when it was actually processed with $cart->PaymentModule . " . print_r($XLSWS_VARS , true));
-				continue;
-			}
-			
-			
-			$cart->PaymentAmount = isset($pay_info['amount'])?$pay_info['amount']:0;
-			
-			if(isset($pay_info['data']))
-				$cart->PaymentData = $pay_info['data'];
-
-			Cart::SaveCart($cart);
-			
-			if(!isset($pay_info['success'])  || ( isset($pay_info['success'])  && $pay_info['success']  ))
-				xlsws_index::completeOrder($cart , false , false);
-				
-			
-			if(isset($pay_info['output']))
-				exit($pay_info['output']);
-			else{
-				$url = _xls_site_dir() . "/index.php?xlspg=order_track&getuid=" . $cart->Linkid;
-				exit("<html><head><meta http-equiv=\"refresh\" content=\"1;url=$url\"></head><body><a href=\"$url\">Click here to confirm your order</a></body></html>");
-			}
 		}
-	
+
+		$order_id = $pay_info['order_id'];
+
+		$cart = Cart::LoadByIdStr($order_id);
+
+		if(!$cart || ($cart->Type != CartType::awaitpayment)) {
+			_xls_log("Payment process capture error. $module->File did not return a valid order id $order_id . " . print_r($XLSWS_VARS , true));
+			continue;
+		}
+
+		if($cart->PaymentModule != $module->File) {
+			_xls_log("Payment process capture error. $module->File tried returning for $order_id when it was actually processed with $cart->PaymentModule . " . print_r($XLSWS_VARS , true));
+			continue;
+		}
+
+		$cart->PaymentAmount = isset($pay_info['amount']) ? $pay_info['amount'] : 0;
+
+		if(isset($pay_info['data']))
+			$cart->PaymentData = $pay_info['data'];
+
+		Cart::SaveCart($cart);
+
+		if(!isset($pay_info['success']) || ( isset($pay_info['success']) && $pay_info['success']))
+			xlsws_index::completeOrder($cart , false , false);
+
+		if(isset($pay_info['output']))
+			exit($pay_info['output']);
+		else {
+			$url = _xls_site_dir() . "/index.php?xlspg=order_track&getuid=" . $cart->Linkid;
+			exit("<html><head><meta http-equiv=\"refresh\" content=\"1;url=$url\"></head><body><a href=\"$url\">Click here to confirm your order</a></body></html>");
+		}
 	}
-	
-	
-	_xls_log("Unprocessed executation of payment_capture script. Passed paramaters " . print_r($XLSWS_VARS , true));
-	
-	_rd("index.php");
-	
-	
-				
+}
+
+_xls_log("Unprocessed executation of payment_capture script. Passed paramaters " . print_r($XLSWS_VARS , true));
+
+_rd("index.php");
+
 ?>
