@@ -24,51 +24,50 @@
  
  */
 
-    /**
-     * XLSZipField
-     * Extension of XLSTextBox which provides custom validation for
-     * zip / postal code fields
-     */
+/**
+ * XLSZipField
+ * Extension of XLSTextBox which provides custom validation for
+ * zip / postal code fields
+ */
 
-    class XLSZipField extends XLSTextBox { 
-        protected $strLabelForInvalid = 'Invalid Zip/Postal Code';
+class XLSZipField extends XLSTextBox {
+	protected $strLabelForInvalid = 'Invalid Zip/Postal Code';
 
-        public function Validate($strRegex = false) {
-            #
-            # Parent performs : 
-            # blnValidateTrimmed ? strText = trim()
-            # intMinLength ?
-            # intMaxLength ?
-            #
-            #
-            if (!parent::Validate())
-                return false;
+	public function Validate($strRegex = false) {
+		//
+		// Parent performs :
+		// blnValidateTrimmed ? strText = trim()
+		// intMinLength ?
+		// intMaxLength ?
+		//
+		//
+		if (!parent::Validate())
+			return false;
 
-            $this->strText = strtoupper($this->strText); 
+		$this->strText = strtoupper($this->strText);
 
-            if ($strRegex)
-                if (preg_match($strRegex, $this->strText)) return true;
-                else { 
-                    $this->strValidationError = _sp($this->strLabelForInvalid);
-                    return false;
-                }
-            
-            return true;
-        }
+		if ($strRegex)
+			if (preg_match($strRegex, $this->strText)) return true;
+			else {
+				$this->strValidationError = _sp($this->strLabelForInvalid);
+				return false;
+			}
 
-        public function __get($strName) {
-            switch ($strName) { 
-                case 'LabelForInvalid': return $this->strLabelForInvalid;
+		return true;
+	}
 
-                default:
-                    try { 
-                        return parent::__get($strName);
-                    }
-                    catch (QCallerException $objExc) {
-                        $objExc->IncrementOffset();
-                        throw $objExc;
-                    }
-            }
-        }
-    }
-?> 
+	public function __get($strName) {
+		switch ($strName) {
+			case 'LabelForInvalid': return $this->strLabelForInvalid;
+
+			default:
+				try {
+					return parent::__get($strName);
+				}
+				catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+}
