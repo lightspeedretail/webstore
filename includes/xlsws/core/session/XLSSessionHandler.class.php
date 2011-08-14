@@ -1,6 +1,5 @@
 <?php
 
-    class XLSSessionHandler extends XLSSessionHandlerBase {
-        public static $SessionHandler;
-    }
-
+class XLSSessionHandler extends XLSSessionHandlerBase {
+	public static $SessionHandler;
+}
