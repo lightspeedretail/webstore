@@ -24,58 +24,45 @@
  
  */
 
-class XLSImagePopup extends QDialogBox{
-		
-		
-		public $prod;
-		public $current_image = false;
-		
-		
-		public $pnlImage;
-		
-		public $btnCancel;
-		
-        public function __construct( $prod , $objParentObject, $strControlId = null) {
-            parent::__construct($objParentObject, $strControlId);
+class XLSImagePopup extends QDialogBox {
+	public $prod;
+	public $current_image = false;
+	public $pnlImage;
+	public $btnCancel;
 
-            $this->strTemplate = templateNamed('product_image_popup.tpl.php');
-                       
-            $this->prod = $prod;
-            $this->pnlImage = new QPanel($this);
-            $this->pnlImage->HtmlEntities = false;
-            
-            $this->btnCancel = new QButton($this);
-            $this->btnCancel->Text = _sp('Close');
-            $this->btnCancel->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'doCancel'));
-            
-            
-        }
-		
-		
-        public function doShow($prod , $imageid = false){
-        	$this->prod = $prod;
-        	
-        	
-        	if($imageid)
-        		$this->current_image = $imageid;
-        	else
-        		$this->current_image = $prod->ImageId;
-        		
-        	$this->pnlImage->Text = '<img src="index.php?image=' . $this->current_image . '" alt="" class="" />';        		
-        	
-        	$img = Images::Load($this->current_image);
-        	
-        	$this->Width = $img->Width + 2;
-        	$this->Height = $img->Height + 2;
-        	
-        	$this->ShowDialogBox();
-        	
-        }
-        
-        
-        public function doCancel($strFormId, $strControlId, $strParameter){
-        	$this->HideDialogBox();
-        }
-        
+	public function __construct( $prod , $objParentObject, $strControlId = null) {
+		parent::__construct($objParentObject, $strControlId);
+
+		$this->strTemplate = templateNamed('product_image_popup.tpl.php');
+
+		$this->prod = $prod;
+		$this->pnlImage = new QPanel($this);
+		$this->pnlImage->HtmlEntities = false;
+
+		$this->btnCancel = new QButton($this);
+		$this->btnCancel->Text = _sp('Close');
+		$this->btnCancel->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'doCancel'));
 	}
-?>
+
+	public function doShow($prod , $imageid = false){
+		$this->prod = $prod;
+
+		if($imageid)
+			$this->current_image = $imageid;
+		else
+			$this->current_image = $prod->ImageId;
+
+		$this->pnlImage->Text = '<img src="index.php?image=' . $this->current_image . '" alt="" class="" />';
+
+		$img = Images::Load($this->current_image);
+
+		$this->Width = $img->Width + 2;
+		$this->Height = $img->Height + 2;
+
+		$this->ShowDialogBox();
+	}
+
+	public function doCancel($strFormId, $strControlId, $strParameter){
+		$this->HideDialogBox();
+	}
+}
