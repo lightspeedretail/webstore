@@ -24,17 +24,16 @@
  
  */
 
-	require(__DATAGEN_CLASSES__ . '/CreditCardGen.class.php');
+require(__DATAGEN_CLASSES__ . '/CreditCardGen.class.php');
 
-	/**
-     * The CreditCard class defined here contains any customized code for the 
-     * CreditCard class in the Object Relational Model.  It represents the 
-     * "xlsws_credit_card" table in the database.
-	 */
-	class CreditCard extends CreditCardGen {
-        // String representation of the object
-        public function __toString() {
-            return sprintf('Country Object %s',  $this->strCode);
-        }   
+/**
+ * The CreditCard class defined here contains any customized code for the
+ * CreditCard class in the Object Relational Model.  It represents the
+ * "xlsws_credit_card" table in the database.
+ */
+class CreditCard extends CreditCardGen {
+	// String representation of the object
+	public function __toString() {
+		return sprintf('Country Object %s',  $this->strCode);
 	}
-?>
+}
