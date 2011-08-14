@@ -24,41 +24,39 @@
  
  */
 
-	require(__DATAGEN_CLASSES__ . '/CustomPageGen.class.php');
+require(__DATAGEN_CLASSES__ . '/CustomPageGen.class.php');
 
-	/**
-     * The CustomPage class defined here contains any customized code for the 
-     * CustomPage class in the Object Relational Model.  It represents the 
-     * "xlsws_custom_page" table in the database.
-	 */
-    class CustomPage extends CustomPageGen {
-        // String representation of the object
-		public function __toString() {
-			return sprintf('CustomPage Object %s',  $this->key);
-		}
-
-        // Return the URL for this object
-        public function GetLink() {
-            if (_xls_get_conf('ENABLE_SEO_URL', false))
-                return $this->strKey . '.html';
-            else
-                return 'index.php?cpage=' . $this->strKey;
-        }
-
-		public function __get($strName) {
-			switch ($strName) {
-                case 'Link': 
-                    return $this->GetLink();
-
-				default:
-					try {
-						return parent::__get($strName);
-					} catch (QCallerException $objExc) {
-						$objExc->IncrementOffset();
-						throw $objExc;
-					}
-			}
-		}
-
+/**
+ * The CustomPage class defined here contains any customized code for the 
+ * CustomPage class in the Object Relational Model.  It represents the 
+ * "xlsws_custom_page" table in the database.
+ */
+class CustomPage extends CustomPageGen {
+	// String representation of the object
+	public function __toString() {
+		return sprintf('CustomPage Object %s', $this->key);
 	}
-?>
+
+	// Return the URL for this object
+	public function GetLink() {
+		if (_xls_get_conf('ENABLE_SEO_URL', false))
+			return $this->strKey . '.html';
+		else
+			return 'index.php?cpage=' . $this->strKey;
+	}
+
+	public function __get($strName) {
+		switch ($strName) {
+			case 'Link': 
+				return $this->GetLink();
+
+			default:
+				try {
+					return parent::__get($strName);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+}
