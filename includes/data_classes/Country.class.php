@@ -24,68 +24,67 @@
  
  */
 
-	require(__DATAGEN_CLASSES__ . '/CountryGen.class.php');
+require(__DATAGEN_CLASSES__ . '/CountryGen.class.php');
 
-	/**
-     * The Country class defined here contains any customized code for the 
-     * Country class in the Object Relational Model.  It represents the 
-     * "xlsws_country" table in the database.
-	 */
-    class Country extends CountryGen {
-        // Define the Object Manager
-        public static $Manager;
+/**
+ * The Country class defined here contains any customized code for the
+ * Country class in the Object Relational Model.  It represents the
+ * "xlsws_country" table in the database.
+ */
+class Country extends CountryGen {
+	// Define the Object Manager
+	public static $Manager;
 
-        // String representation of the object
-		public function __toString() {
-			return sprintf('Country Object %s',  $this->strCode);
+	// String representation of the object
+	public function __toString() {
+		return sprintf('Country Object %s',  $this->strCode);
+	}
+
+	// Initialize the Object Manager on the class
+	public static function InitializeManager() {
+		if (!Country::$Manager)
+			Country::$Manager =
+				XLSObjectManager::Singleton('XLSCountryManager','code');
+	}
+
+	public static function Load($intRowid) {
+		if (Country::$Manager) {
+			$obj = Country::$Manager->GetByUniqueProperty(
+				'Rowid', $intRowid);
+
+			if ($obj)
+				return $obj;
 		}
 
-        // Initialize the Object Manager on the class
-        public static function InitializeManager() {
-            if (!Country::$Manager)
-                Country::$Manager = 
-                    XLSObjectManager::Singleton('XLSCountryManager','code');
-        }
-
-        public static function Load($intRowid) {
-            if (Country::$Manager) {
-                $obj = Country::$Manager->GetByUniqueProperty(
-                    'Rowid', $intRowid);
-
-                if ($obj)
-                    return $obj;
-            }   
-
-            return parent::Load($intRowid);
-        }   
-
-        public static function LoadByCode($strCode) {
-            if (Country::$Manager) {
-                $obj = Country::$Manager->GetByUniqueProperty(
-                    'Code', $strValue);
-
-                if ($obj)
-                    return $obj;
-            }   
-
-            return parent::LoadByCode($strCode);
-        }   
-
-        /**
-         * Return the default sorting order clause
-         * @param boolean $sql :: Return SQL query part or QQ::Clause
-         * @return mix
-         */
-        public static function GetDefaultOrdering($sql = false) {
-            if ($sql)
-                return 'order by `sort_order`,`country`';
-            else
-                return QQ::Clause(
-                    QQ::OrderBy(
-                        QQN::Country()->SortOrder,
-                        QQN::Country()->Country
-                    )
-                );
-        }
+		return parent::Load($intRowid);
 	}
-?>
+
+	public static function LoadByCode($strCode) {
+		if (Country::$Manager) {
+			$obj = Country::$Manager->GetByUniqueProperty(
+				'Code', $strValue);
+
+			if ($obj)
+				return $obj;
+		}
+
+		return parent::LoadByCode($strCode);
+	}
+
+	/**
+	 * Return the default sorting order clause
+	 * @param boolean $sql :: Return SQL query part or QQ::Clause
+	 * @return mix
+	 */
+	public static function GetDefaultOrdering($sql = false) {
+		if ($sql)
+			return 'order by `sort_order`,`country`';
+		else
+			return QQ::Clause(
+				QQ::OrderBy(
+					QQN::Country()->SortOrder,
+					QQN::Country()->Country
+				)
+			);
+	}
+}
