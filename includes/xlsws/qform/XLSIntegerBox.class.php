@@ -24,32 +24,27 @@
  
  */
 
-   /*
-     * XLSIntegerBox
-     * 
-     * Extends class used in Web Admin panel 
-     */
-    
-    
-    class XLSIntegerBox extends QIntegerTextBox  {
-        
-        protected $strCssClass = "textfield";
-        
-        public function __construct($objParentObject , $strControlId = null) {
-            parent::__construct($objParentObject , $strControlId);
-            parent::AddAction(new QEnterKeyEvent() , new QTerminateAction());
-        }
-        
-        private $blnHasNoEnterAction = true;
-        
-        public function AddAction($objEvent , $objAction) {
-            if(($objEvent instanceof QEnterKeyEvent) && 
-                ($this->blnHasNoEnterAction)){
-                    $this->blnHasNoEnterAction = false;
-                    $this->RemoveAllActions('onkeypress');
-            }
-            parent::AddAction($objEvent , $objAction);
-        }
-    }
-    
-?>
+/*
+ * XLSIntegerBox
+ *
+ * Extends class used in Web Admin panel
+ */
+
+class XLSIntegerBox extends QIntegerTextBox {
+	protected $strCssClass = "textfield";
+	private $blnHasNoEnterAction = true;
+
+	public function __construct($objParentObject , $strControlId = null) {
+		parent::__construct($objParentObject , $strControlId);
+		parent::AddAction(new QEnterKeyEvent() , new QTerminateAction());
+	}
+
+	public function AddAction($objEvent , $objAction) {
+		if(($objEvent instanceof QEnterKeyEvent) &&
+			($this->blnHasNoEnterAction)){
+				$this->blnHasNoEnterAction = false;
+				$this->RemoveAllActions('onkeypress');
+		}
+		parent::AddAction($objEvent , $objAction);
+	}
+}
