@@ -24,57 +24,55 @@
  
  */
 
-   /*
-     * XLSContentBox
-     * 
-     * Creates the frame used for returning certain search results
-     * List of orders placed, list of SROs 
-     *             
-     */
+/*
+ * XLSContentBox
+ *
+ * Creates the frame used for returning certain search results
+ * List of orders placed, list of SROs
+ *
+ */
 
-   class XLSContentBox extends QPanel{
-        
-        protected $strCssClass = "border rounded";
-        
-        protected function GetControlHtml() {
-            $this->strText = '';
-            $this->strText .= "\n" . 
-                '<div class="border_header"><p class="left">' . 
-                $this->strName . '</p></div>';
+class XLSContentBox extends QPanel{
+	protected $strCssClass = "border rounded";
 
-            $objs = $this->GetChildControls();
-            
-            foreach($objs as $obj) {
-                if (($obj instanceof QTextBoxBase) || 
-                    ($obj instanceof QCheckBox) || 
-                    ($obj instanceof QListBox) || 
-                    (($obj instanceof QLabel) && 
-                        ($obj->Name != '')) || 
-                    ($obj instanceof QCalendar) || 
-                    ($obj instanceof QFCKeditor)) 
-                {
-                    if($obj->Visible)
-                        $this->strText .= "\n" . 
-"<div class=\"left " . (($obj->DisplayStyle == QDisplayStyle::Inline)?
-    "margin":(($obj->DisplayStyle == QDisplayStyle::None)?"":"clear")) . "\">
-    <dl>
-        <dt><label for=\"" . $obj->Name . "\">" .
-            _sp($obj->Name) . (($obj->Required)?" *":""). "</label></dt>
-        <dd>" . $obj->RenderWithError(false) . "</dd>
-    </dl>
+	protected function GetControlHtml() {
+		$this->strText = '';
+		$this->strText .= "\n" .
+			'<div class="border_header"><p class="left">' .
+			$this->strName . '</p></div>';
+
+		$objs = $this->GetChildControls();
+
+		foreach($objs as $obj) {
+			if (($obj instanceof QTextBoxBase) ||
+				($obj instanceof QCheckBox) ||
+				($obj instanceof QListBox) ||
+				(($obj instanceof QLabel) &&
+					($obj->Name != '')) ||
+				($obj instanceof QCalendar) ||
+				($obj instanceof QFCKeditor))
+			{
+
+				if($obj->Visible)
+					$this->strText .= "\n" .
+"<div class=\"left " . (($obj->DisplayStyle == QDisplayStyle::Inline) ?
+	"margin" : (($obj->DisplayStyle == QDisplayStyle::None) ? "" : "clear")) . "\">
+	<dl>
+		<dt><label for=\"" . $obj->Name . "\">" .
+			_sp($obj->Name) . (($obj->Required) ? " *" : ""). "</label></dt>
+		<dd>" . $obj->RenderWithError(false) . "</dd>
+	</dl>
 </div>";
-                }else{
-                    $this->strText .= "\n" . 
+				}else{
+					$this->strText .= "\n" .
 "<div class=\"left clear\">
-    <dl>
-        <dd>" . $obj->Render(false) . "</dd>
-    </dl>
+	<dl>
+		<dd>" . $obj->Render(false) . "</dd>
+	</dl>
 </div>";
-                }
-            }
-            
-            return parent::GetControlHtml();
-        }
-    }
+			}
+		}
 
-?>
+		return parent::GetControlHtml();
+	}
+}
