@@ -23,58 +23,58 @@
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  
  */
-	require(__DATAGEN_CLASSES__ . '/ProductQtyPricingGen.class.php');
 
-	/**
-	 * The ProductQtyPricing class defined here contains any
-	 * customized code for the ProductQtyPricing class in the
-     * Object Relational Model.
-	 * 
-	 * @package My Application
-	 * @subpackage DataObjects
-	 */
-	class ProductQtyPricing extends ProductQtyPricingGen {
-        // Default "to string" handler
-		public function __toString() {
-			return sprintf('ProductQtyPricing Object %s',  $this->intRowid);
-        }
+require(__DATAGEN_CLASSES__ . '/ProductQtyPricingGen.class.php');
 
-        public function GetPrice($intTaxCode, $intTaxStatus, 
-            $taxExclusive = false) {
-
-            if ($taxExclusive)
-                return $this->fltPrice;
-            else if (_xls_get_conf('TAX_INCLUSIVE_PRICING', '') == '1') {
-                $arrPrice = _xls_calculate_price_tax_price(
-                    $this->fltPrice, $intTaxCode, $intTaxStatus);
-                $intPrice = round($arrPrice[0], 2);
-                return $intPrice;
-            }
-            else
-                return $this->fltPrice;
-        }
-
-        public function __get($strName) {
-            switch ($strName) {
-                case 'Price':
-                    return $this->GetPrice(
-                        _xls_tax_default_taxcode(),
-                        $this->Product->FkTaxStatusId
-                    );
-                case 'PriceExclusive':
-                    return $this->GetPrice(
-                        _xls_tax_default_taxcode(),
-                        $this->Product->FkTaxStatusId,
-                        true
-                    );
-                default:
-                    try {
-                        return parent::__get($strName);
-                    } catch (QCallerException $objExc) {
-                        $objExc->IncrementOffset();
-                        throw $objExc;
-                    }
-            }
-        }
+/**
+ * The ProductQtyPricing class defined here contains any
+ * customized code for the ProductQtyPricing class in the
+ * Object Relational Model.
+ *
+ * @package My Application
+ * @subpackage DataObjects
+ */
+class ProductQtyPricing extends ProductQtyPricingGen {
+	// Default "to string" handler
+	public function __toString() {
+		return sprintf('ProductQtyPricing Object %s',  $this->intRowid);
 	}
-?>
+
+	public function GetPrice($intTaxCode, $intTaxStatus,
+		$taxExclusive = false) {
+
+		if ($taxExclusive)
+			return $this->fltPrice;
+		else if (_xls_get_conf('TAX_INCLUSIVE_PRICING', '') == '1') {
+			$arrPrice = _xls_calculate_price_tax_price(
+				$this->fltPrice, $intTaxCode, $intTaxStatus);
+			$intPrice = round($arrPrice[0], 2);
+			return $intPrice;
+		}
+		else
+			return $this->fltPrice;
+	}
+
+	public function __get($strName) {
+		switch ($strName) {
+			case 'Price':
+				return $this->GetPrice(
+					_xls_tax_default_taxcode(),
+					$this->Product->FkTaxStatusId
+				);
+			case 'PriceExclusive':
+				return $this->GetPrice(
+					_xls_tax_default_taxcode(),
+					$this->Product->FkTaxStatusId,
+					true
+				);
+			default:
+				try {
+					return parent::__get($strName);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+}
