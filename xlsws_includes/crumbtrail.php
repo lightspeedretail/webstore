@@ -75,9 +75,10 @@ foreach($tmpcrumbs as $crumb) {
 	if(isset($crumb['link']))
 		$crumb['key'] = $crumb['link'];
 
-	elseif($crumb['tag'] == 'c'){
+	elseif($crumb['tag'] == 'c') {
 		$last[] = $crumb['key'];
 		$crumb['key'] = "c=" . implode(".",$last);
+	}
 
 	else
 		$crumb['key'] = "c=" . implode(".",$last) . "&product=" . $XLSWS_VARS['product'];
