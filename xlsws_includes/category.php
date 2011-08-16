@@ -71,9 +71,20 @@
             	// show subcategories 
             	$currentCateg = $XLSWS_VARS['c'];
 				$currentCategs = explode("." , $currentCateg);
-				$currentCateg = end($currentCategs);
-            	$categ = Category::Load($currentCateg); 
-            	$categ->print_category($this->subcategories , $currentCategs , '' );
+                $currentCateg = end($currentCategs);
+
+                $categ = Category::$Manager->GetByKey($currentCateg);
+
+                $objSubcategoryArray = array($categ->PrintCategory($currentCategs));
+                foreach ($categ->Children as $objSubcategory) { 
+                    $strSubcategoryArray = 
+                        $objSubcategory->PrintCategory($currentCategs);
+
+                    if ($strSubcategoryArray)
+                        $objSubcategoryArray[] = $strSubcategoryArray;
+                }
+
+                $this->subcategories = $objSubcategoryArray;
 
             	if($categ->CustomPage){
 	            	$pageR = CustomPage::LoadByKey($categ->CustomPage);
@@ -161,13 +172,27 @@
 
         		
         		if(count($category_id) >0 ){  // we are viewing a child category
-	        		$category_id = $category_id[count($category_id)-1]; // take the last category index
-        	        	$category = Category::LoadByRowid($category_id);
-        	        	$child_cond = $category->get_childs_array();
-        	        	$cond = QQ::AndCondition(QQ::Equal(QQN::Product()->Web , 1) , QQ::OrCondition(
-			        		QQ::Equal(QQN::Product()->MasterModel , 1)
-			        		, QQ::AndCondition(QQ::Equal(QQN::Product()->MasterModel , 0) , QQ::Equal(QQN::Product()->FkProductMasterId , 0)   )
-			        		) , QQ::In(QQN::Product()->Category->CategoryId , $child_cond)); 
+                    $category_id = $category_id[count($category_id)-1]; // take the last category index
+                    $category = Category::LoadByRowid($category_id);
+
+                    $intCategoryArray = array($category->Rowid);
+                    $intCategoryArray = array_merge(
+                        $intCategoryArray, 
+                        $category->GetChildIds()
+                    );
+
+                    $cond = QQ::AndCondition(
+                        QQ::Equal(QQN::Product()->Web, 1),
+                        QQ::OrCondition(
+			        		QQ::Equal(QQN::Product()->MasterModel, 1),
+                            QQ::AndCondition(
+                                QQ::Equal(QQN::Product()->MasterModel, 0),
+                                QQ::Equal(QQN::Product()->FkProductMasterId, 0)
+                            )
+                        ),
+                        QQ::In(QQN::Product()->Category->CategoryId, 
+                            $intCategoryArray)
+                    );
         	        	$this->dtrProducts->TotalItemCount = Product::QueryCount($cond);
         	        	$this->bind_result_images(Product::QueryArray($cond , QQ::Clause(QQ::OrderBy(QQN::Product()->$sort_field , (($sort_field == 'InventoryTotal')?false:(QQN::Product()->Name)) ) , $this->dtrProducts->LimitClause)));
         	        	

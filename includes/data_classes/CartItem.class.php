@@ -134,20 +134,21 @@
             try { 
                 switch ($strName) { 
                     case 'Discount':
+                        $mixValue = round($mixValue, 2);
                         parent::__set($strName, $mixValue);
                         $this->SellDiscount = $this->Sell - $mixValue;
                         break;
 
                     case 'Qty':
                         parent::__set($strName, $mixValue);
-
                         $this->Discount = 0;
                         if ($this->Product)
                             $this->Sell = $this->Product->GetPrice($mixValue);
                         break;
 
                     case 'Sell':
-                    case 'SellDiscount':
+                    case 'SellDiscount': 
+                        $mixValue = round($mixValue, 2);
                         parent::__set($strName, $mixValue);
                         $this->SellTotal = $this->GetPriceValue() * $this->Qty;
                         break;

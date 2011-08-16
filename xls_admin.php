@@ -4301,9 +4301,7 @@
   KEY `idxExpires` (`uxtExpires`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8" , '2.1');
 
-			$sql = "alter table xlsws_cart add column (fk_promo_id int(5) default null);";
-			_xls_log($sql);
-			_dbx($sql);
+			$this->add_column('xlsws_cart' , 'fk_promo_id' , "ALTER TABLE  `xlsws_cart` ADD  `fk_promo_id` int(5) DEFAULT  NULL " , '2.1');
 			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.1 patch: Added fk_promo_id to cart table for promo codes";
 			$this->add_config_key('SESSION_HANDLER' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Session storage', 'SESSION_HANDLER', 'FS', 'Store sessions in the database or file system?', 1, 6, NOW(), NOW(), 'STORE_IMAGE_LOCATION');" , '2.1');
 			$this->add_config_key('CHILD_SEARCH' , "INSERT into `xlsws_configuration` VALUES (NULL,'Show child products in search results', 'CHILD_SEARCH', '','If you want child products from a size color matrix to show up in search results, enable this option',8,10,NOW(),NOW(),'BOOL');" , '2.1');

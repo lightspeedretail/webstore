@@ -85,6 +85,8 @@
     // Register sidebar modules
     QApplication::$ClassFile['xlsws_class_sidebar'] = 
         __XLSWS_INCLUDES__ . '/sidebar/xlsws_class_sidebar.class.php';
+    QApplication::$ClassFile['xlsws_class_sidebar_qp'] = 
+        __XLSWS_INCLUDES__ . '/sidebar/xlsws_class_sidebar.class.php';
     QApplication::$ClassFile['sidebar_order_lookup_qp'] =
         XLSWS_INCLUDES . 'sidebar/sidebar_order_lookup.php';
     QApplication::$ClassFile['sidebar_order_lookup'] =
