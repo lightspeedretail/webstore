@@ -106,6 +106,9 @@ class merchantware extends credit_card {
 		//MerchantWARE expects expiry in 4 digit format
 		$card_info_expiry = $fields['ccexpmon']->SelectedValue.substr($fields['ccexpyr']->SelectedValue,2,2);
 
+		//MerchantWARE expects no dashes in WO number
+		$wo = str_replace('-', '', $cart->IdStr);
+
 		// Construct SOAP packet for delivery
 		$xml_data =
 			'<soap:Envelope
@@ -118,7 +121,7 @@ class merchantware extends credit_card {
 						<strName>'.$config['name'].'</strName>
 						<strSiteId>'.$config['site_id'].'</strSiteId>
 						<strKey>'.$config['trans_key'].'</strKey>
-						<strOrderNumber>'.$cart->IdStr.'</strOrderNumber>
+						<strOrderNumber>'.$wo.'</strOrderNumber>
 						<strAmount>'.$cart->Total.'</strAmount>
 						<strPAN>'.$fields['ccnum']->Text.'</strPAN>
 						<strExpDate>'.$card_info_expiry.'</strExpDate>
