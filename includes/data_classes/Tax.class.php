@@ -24,68 +24,66 @@
  
  */
 
-	require(__DATAGEN_CLASSES__ . '/TaxGen.class.php');
+require(__DATAGEN_CLASSES__ . '/TaxGen.class.php');
 
+/**
+ * The Tax class defined here contains any
+ * customized code for the Tax class in the
+ * Object Relational Model.  It represents the "xlsws_tax" table
+ * in the database, and extends from the code generated abstract TaxGen
+ * class, which contains all the basic CRUD-type functionality as well as
+ * basic methods to handle relationships and index-based loading.
+ *
+ * @package My Application
+ * @subpackage DataObjects
+ *
+ */
+class Tax extends TaxGen {
 	/**
-	 * The Tax class defined here contains any
-	 * customized code for the Tax class in the
-	 * Object Relational Model.  It represents the "xlsws_tax" table 
-	 * in the database, and extends from the code generated abstract TaxGen
-	 * class, which contains all the basic CRUD-type functionality as well as
-	 * basic methods to handle relationships and index-based loading.
-	 * 
-	 * @package My Application
-	 * @subpackage DataObjects
-	 * 
+	 * Default "to string" handler
+	 * Allows pages to _p()/echo()/print() this object, and to define the default
+	 * way this object would be outputted.
+	 *
+	 * Can also be called directly via $objTax->__toString().
+	 *
+	 * @return string a nicely formatted string representation of this object
 	 */
-	class Tax extends TaxGen {
-		/**
-		 * Default "to string" handler
-		 * Allows pages to _p()/echo()/print() this object, and to define the default
-		 * way this object would be outputted.
-		 *
-		 * Can also be called directly via $objTax->__toString().
-		 *
-		 * @return string a nicely formatted string representation of this object
-		 */
-		public function __toString() {
-			return sprintf('Tax Object %s',  $this->intRowid);
-		}
-
-		public function __get($strName) {
-            switch ($strName) { 
-                case 'Tax':
-                    return trim(parent::__get($strName));
-
-                default:
-                    try {
-						return (parent::__get($strName));
-					} catch (QCallerException $objExc) {
-						$objExc->IncrementOffset();
-						throw $objExc;
-					}
-            }
-        }
-
-		public function __set($strName, $mixValue) {
-			switch ($strName) {
-				case 'Rowid':
-					try {
-						return ($this->intRowid = $mixValue);
-					} catch (QInvalidCastException $objExc) {
-						$objExc->IncrementOffset();
-						throw $objExc;
-					}
-
-				default:
-					try {
-						return (parent::__set($strName, $mixValue));
-					} catch (QCallerException $objExc) {
-						$objExc->IncrementOffset();
-						throw $objExc;
-					}
-			}
-		}
-
+	public function __toString() {
+		return sprintf('Tax Object %s',  $this->intRowid);
 	}
-?>
+
+	public function __get($strName) {
+		switch ($strName) {
+			case 'Tax':
+				return trim(parent::__get($strName));
+
+			default:
+				try {
+					return (parent::__get($strName));
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+
+	public function __set($strName, $mixValue) {
+		switch ($strName) {
+			case 'Rowid':
+				try {
+					return ($this->intRowid = $mixValue);
+				} catch (QInvalidCastException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+
+			default:
+				try {
+					return (parent::__set($strName, $mixValue));
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+}

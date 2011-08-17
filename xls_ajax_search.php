@@ -24,36 +24,39 @@
  
  */
 
-    define('__PREPEND_QUICKINIT__', true);
+define('__PREPEND_QUICKINIT__', true);
 
-    ob_start(); // These includes may spit content which we need to ignore
-    require('includes/prepend.inc.php');
-    ob_end_clean();
+ob_start(); // These includes may spit content which we need to ignore
+require('includes/prepend.inc.php');
+ob_end_clean();
 
-    $db = Product::GetDatabase();
-	
-    $SQL_FROM = "xlsws_product";
-    $SQL_WHERE = "name";
+$db = Product::GetDatabase();
 
-    $searchq = mysql_real_escape_string(strip_tags($_GET['q']));
-    $matches =	$db->Query(
-        'SELECT ' . $SQL_WHERE . 
-        ' FROM ' . $SQL_FROM . 
-        ' WHERE ' . $SQL_WHERE . ' LIKE "%' .$searchq . '%"' . 
-        ' AND web=1' . 
-        ' AND fk_product_master_id=0');
+$SQL_FROM = 'xlsws_product';
+$SQL_WHERE = 'name';
 
-    if(strlen($searchq) > 0) {
-        echo '<ul class="autocomplete rounded" id="autocompletor">';
+$searchq = _xls_escape(strip_tags($_GET['q']));
+$matches = $db->Query(
+	'SELECT ' . $SQL_WHERE .
+	' FROM ' . $SQL_FROM .
+	' WHERE ' . $SQL_WHERE . ' LIKE "%' .$searchq . '%"' .
+	' AND web=1' .
+	' AND fk_product_master_id=0'
+);
 
-    	while ($row = $matches->FetchArray()) {?>
-            <li class="search_item" onmouseout="clearList()">
-                <a href="javascript:{}"
-                   style="border: none;" 
-                   onclick="document.getElementById('xlsSearch').value = '<?=addslashes(str_replace("\n","",urlencode($row[$SQL_WHERE])))?>';document.getElementById('searchoptions').style.display='none';document.location.href='index.php?search='+ $('#xlsSearch').val(); return false;">
-                     <?php echo $row[$SQL_WHERE]; ?>
-                </a>
-            </li>
-        <?php } }
-        echo '</ul>';
-?>
+// Begin Return Display ?>
+<?php if (strlen($searchq) > 0): ?>
+	<ul class="autocomplete rounded" id="autocompletor">
+
+	<?php while ($row = $matches->FetchArray()): ?>
+		<li class="search_item" onmouseout="clearList()">
+			<a href="javascript:{}"
+			   style="border: none;"
+			   onclick="document.getElementById('xlsSearch').value = '<?=addslashes(str_replace("\n","",urlencode($row[$SQL_WHERE])))?>';document.getElementById('searchoptions').style.display='none';document.location.href='index.php?search='+ $('#xlsSearch').val(); return false;">
+				<?php echo $row[$SQL_WHERE]; ?>
+			</a>
+		</li>
+	<?php endwhile; ?>
+
+	</ul>
+<?php endif; ?>

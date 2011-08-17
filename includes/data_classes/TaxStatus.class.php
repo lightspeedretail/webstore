@@ -24,39 +24,37 @@
  
  */
 
-	require(__DATAGEN_CLASSES__ . '/TaxStatusGen.class.php');
+require(__DATAGEN_CLASSES__ . '/TaxStatusGen.class.php');
 
-	/**
-     * The TaxStatus class defined here contains any customized code for the 
-     * TaxStatus class in the Object Relational Model.  
-	 */
-    class TaxStatus extends TaxStatusGen {
-        // String representation of this object
-		public function __toString() {
-			return sprintf('TaxStatus Object %s',  $this->intRowid);
+/**
+ * The TaxStatus class defined here contains any customized code for the
+ * TaxStatus class in the Object Relational Model.
+ */
+class TaxStatus extends TaxStatusGen {
+	// String representation of this object
+	public function __toString() {
+		return sprintf('TaxStatus Object %s',  $this->intRowid);
+	}
+
+	public static function GetNoTaxStatus() {
+		foreach (TaxStatus::LoadAll() as $objTax)
+			if ($objTax->IsNoTax())
+				return $objTax;
+		return;
+	}
+
+	public function IsNoTax() {
+		if (strtolower($this->Status) == 'no tax' or
+			strtolower($this->Status) == 'exempt')
+				return true;
+
+		for ($i = 1; $i <= 5; $i++) {
+			$strField = 'tax' . $i . '_status';
+
+			if ($this->$strField == '0')
+				return false;
 		}
 
-        public static function GetNoTaxStatus() {
-            foreach (TaxStatus::LoadAll() as $objTax)
-                if ($objTax->IsNoTax())
-                    return $objTax;
-            return;
-        }
-
-        public function IsNoTax() {
-            if (strtolower($this->Status) == 'no tax' or
-                strtolower($this->Status) == 'exempt')
-                    return true;
-
-            for ($i = 1; $i <= 5; $i++) { 
-                $strField = 'tax' . $i . '_status';
-
-                if ($this->$strField == '0')
-                    return false;
-            }
-
-            return true;
-        }
-
+		return true;
 	}
-?>
+}

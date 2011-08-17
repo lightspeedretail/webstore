@@ -24,259 +24,250 @@
  
  */
 
-    require(__DATAGEN_CLASSES__ . '/CustomerGen.class.php');
+require(__DATAGEN_CLASSES__ . '/CustomerGen.class.php');
 
-    /**
-     * The Customer class defined here contains any customized code for the 
-     * Customer class in the Object Relational Model.  It represents the 
-     * "xlsws_customer" table in the database.
-     */
-    class Customer extends CustomerGen {
-        // Define the Object Manager
-        public static $Manager;
+/**
+ * The Customer class defined here contains any customized code for the
+ * Customer class in the Object Relational Model.  It represents the
+ * "xlsws_customer" table in the database.
+ */
+class Customer extends CustomerGen {
+	// Define the Object Manager
+	public static $Manager;
 
-        // String representation of the object
-        public function __toString() {
-            return sprintf('Customer Object %s',  $this->Email);
-        }
+	// String representation of the object
+	public function __toString() {
+		return sprintf('Customer Object %s', $this->Email);
+	}
 
-        // Initialize the Object Manager on the class
-        public static function InitializeManager() {
-            if (!Customer::$Manager)
-                Customer::$Manager = 
-                    XLSCustomerManager::Singleton('XLSCustomerManager');
-        }
+	// Initialize the Object Manager on the class
+	public static function InitializeManager() {
+		if (!Customer::$Manager)
+			Customer::$Manager =
+				XLSCustomerManager::Singleton('XLSCustomerManager');
+	}
 
-        // Overload Load to first fetch from the Manager
-        public static function Load($intRowid, $forceload = false) {
-            if (!$forceload && Customer::$Manager) {
-                $obj = Customer::$Manager->GetByUniqueProperty(
-                    'Rowid', $intRowid);
+	// Overload Load to first fetch from the Manager
+	public static function Load($intRowid, $forceload = false) {
+		if (!$forceload && Customer::$Manager) {
+			$obj = Customer::$Manager->GetByUniqueProperty(
+				'Rowid', $intRowid);
 
-                if ($obj)
-                    return $obj;
-            }
+			if ($obj)
+				return $obj;
+		}
 
-            return parent::Load($intRowid);
-        }
+		return parent::Load($intRowid);
+	}
 
-        // Overload LoadByEmail to first fetch from the Manager
-        public static function LoadByEmail($strEmail, $forceload = false) {
-            if (!$forceload && Customer::$Manager) {
-                $obj = Customer::$Manager->GetByUniqueProperty(
-                    'Email', $strEmail);
+	// Overload LoadByEmail to first fetch from the Manager
+	public static function LoadByEmail($strEmail, $forceload = false) {
+		if (!$forceload && Customer::$Manager) {
+			$obj = Customer::$Manager->GetByUniqueProperty(
+				'Email', $strEmail);
 
-                if ($obj)
-                    return $obj;
-            }
-            return parent::LoadByEmail($strEmail);
-        }
+			if ($obj)
+				return $obj;
+		}
+		return parent::LoadByEmail($strEmail);
+	}
 
-        /**
-         * Get the current customer object
-         * @param boolean $fallbackonStackTemp
-         * @return obj customer
-         */
-        public static function GetCurrent($fallbackOnStackTemp = false) {
-            if (array_key_exists('customer', $_SESSION) &&
-                (!is_null($_SESSION['customer'])))
-                $customer = $_SESSION['customer'];
+	/**
+	 * Get the current customer object
+	 * @param boolean $fallbackonStackTemp
+	 * @return obj customer
+	 */
+	public static function GetCurrent($fallbackOnStackTemp = false) {
+		if (array_key_exists('customer', $_SESSION) &&
+			(!is_null($_SESSION['customer'])))
+			$customer = $_SESSION['customer'];
 
-            if ($customer)
-                return $customer;
+		if ($customer)
+			return $customer;
 
-            if ($fallbackOnStackTemp) {
-                $tempCustomer = _xls_stack_get('xls_temp_customer');
-                if ($tempCustomer)
-                    return $tempCustomer;
-            }
+		if ($fallbackOnStackTemp) {
+			$tempCustomer = _xls_stack_get('xls_temp_customer');
+			if ($tempCustomer)
+				return $tempCustomer;
+		}
 
-            return null;
-        }
+		return null;
+	}
 
-        /**
-         * Verify that the password matches the Customer's
-         * @param object $objCustomer
-         * @param string $strPassword
-         * @return boolean
-         */
-        public function Authenticate($objCustomer, $strPassword) {
-            if (!$objCustomer || empty($strPassword))
-                return false;
+	/**
+	 * Verify that the password matches the Customer's
+	 * @param object $objCustomer
+	 * @param string $strPassword
+	 * @return boolean
+	 */
+	public function Authenticate($objCustomer, $strPassword) {
+		if (!$objCustomer || empty($strPassword))
+			return false;
 
-            // Check that password matches
-            if (md5($strPassword) == $objCustomer->Password)
-                $match = true;
-            elseif ($strPassword ==  $objCustomer->Password)
-                $match = true;
-            elseif (($objCustomer->TempPassword != '') && 
-            ($strPassword == $objCustomer->TempPassword))
-                $match = true;
-            else
-                return false;
+		// Check that password matches
+		if (md5($strPassword) == $objCustomer->Password)
+			$match = true;
+		elseif ($strPassword == $objCustomer->Password)
+			$match = true;
+		elseif (($objCustomer->TempPassword != '') &&
+		($strPassword == $objCustomer->TempPassword))
+			$match = true;
+		else
+			return false;
 
-            // Clear single-use temp password
-            if (!empty($objCustomer->TempPassword)) {
-                $objCustomer->TempPassword = '';
-                $objCustomer->Save();
-            }
+		// Clear single-use temp password
+		if (!empty($objCustomer->TempPassword)) {
+			$objCustomer->TempPassword = '';
+			$objCustomer->Save();
+		}
 
-            return true;
-        }
+		return true;
+	}
 
-        /**
-         * Perform a login operation
-         * @param string $strEmail
-         * @param string $strPassword
-         * @return boolean
-         */
-        public static function Login($strEmail, $strPassword) {
-            error_log(__FUNCTION__);
-            if (empty($strEmail) || empty($strPassword))
-                return false;
+	/**
+	 * Perform a login operation
+	 * @param string $strEmail
+	 * @param string $strPassword
+	 * @return boolean
+	 */
+	public static function Login($strEmail, $strPassword) {
+		if (empty($strEmail) || empty($strPassword))
+			return false;
 
-            error_log(__FUNCTION__);
-            $objCustomer = Customer::LoadByEmail($strEmail);
+		$objCustomer = Customer::LoadByEmail($strEmail);
 
-            // Only existing customers can log in
-            error_log(__FUNCTION__);
-            if (!$objCustomer)
-                return false;
+		// Only existing customers can log in
+		if (!$objCustomer)
+			return false;
 
-            // Verify whether the customer is allowed to log in
-            error_log(__FUNCTION__);
-            error_log($objCustomer);
-            error_log($strEmail);
-            error_log($objCustomer->AllowLogin);
-            if ($objCustomer->AllowLogin == 0)
-                return false;
+		// Verify whether the customer is allowed to log in
+		if ($objCustomer->AllowLogin == 0)
+			return false;
 
-            error_log(__FUNCTION__);
-            if (!$objCustomer->Authenticate($objCustomer, $strPassword))
-                return false;
+		if (!$objCustomer->Authenticate($objCustomer, $strPassword))
+			return false;
 
-            // assign customer to the visitor
-            error_log(__FUNCTION__);
-            Visitor::update_with_customer_id($objCustomer->Rowid);
+		// assign customer to the visitor
+		Visitor::update_with_customer_id($objCustomer->Rowid);
 
-            error_log(__FUNCTION__);
-            $_SESSION['customer'] = $objCustomer;
-            return true;
-        }
+		$_SESSION['customer'] = $objCustomer;
+		return true;
+	}
 
-        /**
-         * Perform a logout operation
-         */
-        // TODO :: This should call session termination
-        public static function Logout() {
-            $objCustomer = Customer::GetCurrent();
+	/**
+	 * Perform a logout operation
+	 */
+	// TODO :: This should call session termination
+	public static function Logout() {
+		$objCustomer = Customer::GetCurrent();
 
-            // clean all stack variables
-            _xls_stack_removeall();
-            
-            unset($_SESSION['customer']);
-            $customer = NULL;
-            Visitor::do_logout();
+		// clean all stack variables
+		_xls_stack_removeall();
 
-            session_unset();
-            session_destroy();
-        }
-        
-        /**
-         * Ensure that a password meets our requirements
-         * Return an error message detailing the failure if applicable.
-         * @param string $password
-         * @return string | false
-         */
-        public static function VerifyPasswordStrength($strPassword) {
-            $intStrLen = strlen($strPassword);
+		unset($_SESSION['customer']);
+		$customer = NULL;
+		Visitor::do_logout();
 
-            if ($intStrLen < _xls_get_conf('MIN_PASSWORD_LEN',0))
-                return sprintf(_sp('Password too short. Must be a minimum %s' . 
-                    ' characters'),_xls_get_conf('MIN_PASSWORD_LEN'));
+		session_unset();
+		session_destroy();
+	}
 
-            if (!(strpos($strPassword, ' ') === false))
-                return _sp('Please do not use spaces in password.');
+	/**
+	 * Ensure that a password meets our requirements
+	 * Return an error message detailing the failure if applicable.
+	 * @param string $password
+	 * @return string | false
+	 */
+	public static function VerifyPasswordStrength($strPassword) {
+		$intStrLen = strlen($strPassword);
 
-            return false;
-        }
+		if ($intStrLen < _xls_get_conf('MIN_PASSWORD_LEN',0))
+			return sprintf(_sp('Password too short. Must be a minimum %s' .
+				' characters'),_xls_get_conf('MIN_PASSWORD_LEN'));
 
-        /**
-         * Generate a random password
-         * Function from http://www.webtoolkit.info/php-random-password-generator.html
-         *
-         * @param int $length
-         * @param int $strength
-         * @return string
-         */
-        public static function GenetatePassword($length=9, $strength=0) {
-            $vowels = 'aeuy';
-            $consonants = 'bdghjmnpqrstvz';
-            if ($strength & 1) {
-                $consonants .= 'BDGHJLMNPQRSTVWXZ';
-            }
-            if ($strength & 2) {
-                $vowels .= "AEUY";
-            }
-            if ($strength & 4) {
-                $consonants .= '23456789';
-            }
-            if ($strength & 8) {
-                $consonants .= '@#$%';
-            }
+		if (!(strpos($strPassword, ' ') === false))
+			return _sp('Please do not use spaces in password.');
 
-            $password = '';
-            $alt = time() % 2;
-            for ($i = 0; $i < $length; $i++) {
-                if ($alt == 1) {
-                    $password .= $consonants[(rand() % strlen($consonants))];
-                    $alt = 0;
-                } else {
-                    $password .= $vowels[(rand() % strlen($vowels))];
-                    $alt = 1;
-                }
-            }
+		return false;
+	}
 
-            if ($password == "" || empty($password))
-                $password = substr(md5(rand()),0,$length);
+	/**
+	 * Generate a random password
+	 * Function from http://www.webtoolkit.info/php-random-password-generator.html
+	 *
+	 * @param int $length
+	 * @param int $strength
+	 * @return string
+	 */
+	public static function GeneratePassword($length=9, $strength=0) {
+		$vowels = 'aeuy';
+		$consonants = 'bdghjmnpqrstvz';
+		if ($strength & 1) {
+			$consonants .= 'BDGHJLMNPQRSTVWXZ';
+		}
+		if ($strength & 2) {
+			$vowels .= "AEUY";
+		}
+		if ($strength & 4) {
+			$consonants .= '23456789';
+		}
+		if ($strength & 8) {
+			$consonants .= '@#$%';
+		}
 
-            return $password;
-        }
+		$password = '';
+		$alt = time() % 2;
+		for ($i = 0; $i < $length; $i++) {
+			if ($alt == 1) {
+				$password .= $consonants[(rand() % strlen($consonants))];
+				$alt = 0;
+			} else {
+				$password .= $vowels[(rand() % strlen($vowels))];
+				$alt = 1;
+			}
+		}
 
-        public static function GarbageCollect() {
-            $intMaxCartAge = _xls_get_conf('CART_LIFE', 7);
-            $strDate = QDateTime::Now();
-            $strDate = $strDate->AddDays(0 - $intMaxCartAge);
-            $strDate = $strDate->__toString('YYYY-MM-DD');
+		if ($password == "" || empty($password))
+			$password = substr(md5(rand()),0,$length);
 
-            $strQuery = 'DELETE FROM xlsws_cart' . 
-                ' WHERE (type=1 OR type=7)' . 
-                ' AND datetime_due IS NOT NULL' . 
-                " AND datetime_due <= $strDate";
+		return $password;
+	}
 
-            $objQuery = _dbx($strQuery, 'NonQuery');
-        }
+	public static function GarbageCollect() {
+		$intMaxCartAge = _xls_get_conf('CART_LIFE', 7);
+		$strDate = QDateTime::Now();
+		$strDate = $strDate->AddDays(0 - $intMaxCartAge);
+		$strDate = $strDate->__toString('YYYY-MM-DD');
 
-        // Generate a temporary password
-        // TODO :: Rename
-        public function GenerateTmpPwd() {
-            $this->TempPassword = 
-                $this->GeneratePassword(
-                    _xls_get_conf('MIN_PASSWORD_LEN' , 6), 4);
-            $this->Save();
-        }
+		$strQuery = 'DELETE FROM xlsws_cart' .
+			' WHERE (type=1 OR type=7)' .
+			' AND datetime_due IS NOT NULL' .
+			" AND datetime_due <= $strDate";
 
-        public static function doLogin($strEmail, $strPassword) {
-            QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
-            return Customer::Login($strEmail, $strPassword);
-        }
-        public static function doLogout() {
-            QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
-            return Customer::Logout();
-        }
-        public static function pwdStrength($strPassword) {
-            QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
-            return Customer::VerifyPasswordStrength($strPassword);
-        }
-    }
-?>
+		$objQuery = _dbx($strQuery, 'NonQuery');
+	}
+
+	// Generate a temporary password
+	// TODO :: Rename
+	public function GenerateTmpPwd() {
+		$this->TempPassword =
+			$this->GeneratePassword(
+				_xls_get_conf('MIN_PASSWORD_LEN' , 6), 4);
+		$this->Save();
+	}
+
+	public static function doLogin($strEmail, $strPassword) {
+		QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
+		return Customer::Login($strEmail, $strPassword);
+	}
+
+	public static function doLogout() {
+		QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
+		return Customer::Logout();
+	}
+
+	public static function pwdStrength($strPassword) {
+		QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
+		return Customer::VerifyPasswordStrength($strPassword);
+	}
+}

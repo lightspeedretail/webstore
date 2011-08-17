@@ -24,78 +24,78 @@
  
  */
 
-    // Versioning Information
-    define('XLSWS_VERSION', '2.1.1');
+// Versioning Information
+define('XLSWS_VERSION', '2.1.2b');
 
-    // Define default values
-    define('XLS_TRUNCATE_PUNCTUATIONS'     , ".!?:;,-");
-    define('XLS_TRUNCATE_SPACE', " ");
-    define('ADVANCED_SEARCH_DEFAULT_OPERATOR', 'and');
+// Define default values
+define('XLS_TRUNCATE_PUNCTUATIONS', ".!?:;,-");
+define('XLS_TRUNCATE_SPACE', " ");
+define('ADVANCED_SEARCH_DEFAULT_OPERATOR', 'and');
 
-    // Load in core functions
-    require(__XLSWS_INCLUDES__ . '/_functions.php');
-    require(__XLSWS_INCLUDES__ . '/_qextend.php');
+// Load in core functions
+require(__XLSWS_INCLUDES__ . '/_functions.php');
+require(__XLSWS_INCLUDES__ . '/_qextend.php');
 
-    // Add xlsws autoload include paths to QApplication
-    QApplication::$ClassPath[] = __XLSWS_INCLUDES__;
-    QApplication::$ClassPath[] = __XLSWS_INCLUDES__ . '/core';
-    QApplication::$ClassPath[] = __XLSWS_INCLUDES__ . '/qform';
-    QApplication::$ClassPath[] = __XLSWS_INCLUDES__ . '/view';
+// Add xlsws autoload include paths to QApplication
+QApplication::$ClassPath[] = __XLSWS_INCLUDES__;
+QApplication::$ClassPath[] = __XLSWS_INCLUDES__ . '/core';
+QApplication::$ClassPath[] = __XLSWS_INCLUDES__ . '/qform';
+QApplication::$ClassPath[] = __XLSWS_INCLUDES__ . '/view';
 
-    // Register custom data classes / types
-    QApplication::$ClassFile['imagestype'] = 
-        __DATA_CLASSES__ . '/ImagesType.class.php';
+// Register custom data classes / types
+QApplication::$ClassFile['imagestype'] =
+	__DATA_CLASSES__ . '/ImagesType.class.php';
 
-    QApplication::$ClassFile['promocodetype'] = 
-        __DATA_CLASSES__ . '/PromoCodeType.class.php';
+QApplication::$ClassFile['promocodetype'] =
+	__DATA_CLASSES__ . '/PromoCodeType.class.php';
 
-    // Register xlsws static class path definitions to QApplication
-    QApplication::$ClassFile['xlssessionhandlerbase'] = 
-        __XLSWS_INCLUDES__ . '/core/session/XLSSessionHandlerBase.class.php';
-    QApplication::$ClassFile['xlssessionhandler'] = 
-        __XLSWS_INCLUDES__ . '/core/session/XLSSessionHandler.class.php';
+// Register xlsws static class path definitions to QApplication
+QApplication::$ClassFile['xlssessionhandlerbase'] =
+	__XLSWS_INCLUDES__ . '/core/session/XLSSessionHandlerBase.class.php';
+QApplication::$ClassFile['xlssessionhandler'] =
+	__XLSWS_INCLUDES__ . '/core/session/XLSSessionHandler.class.php';
 
-    // Register custom Form State Handler
-    QApplication::$ClassFile['xlsformstatehandler'] = 
-        __XLSWS_INCLUDES__ . '/qform/XLSFormStateHandler.class.php';
+// Register custom Form State Handler
+QApplication::$ClassFile['xlsformstatehandler'] =
+	__XLSWS_INCLUDES__ . '/qform/XLSFormStateHandler.class.php';
 
-    // Register Object managers for semi-persistent storage
-    QApplication::$ClassFile['xlsobjectmanager'] = 
-        __XLSWS_INCLUDES__ . '/core/XLSObjectManager.class.php';
-    QApplication::$ClassFile['xlsnestedobjectmanager'] = 
-        __XLSWS_INCLUDES__ . '/core/XLSObjectManager.class.php';
+// Register Object managers for semi-persistent storage
+QApplication::$ClassFile['xlsobjectmanager'] =
+	__XLSWS_INCLUDES__ . '/core/XLSObjectManager.class.php';
+QApplication::$ClassFile['xlsnestedobjectmanager'] =
+	__XLSWS_INCLUDES__ . '/core/XLSObjectManager.class.php';
 
-    QApplication::$ClassFile['xlsconfigurationmanager'] = 
-        __XLSWS_INCLUDES__ . '/core/XLSDataClassManager.class.php';
-    QApplication::$ClassFile['xlscategorymanager'] = 
-        __XLSWS_INCLUDES__ . '/core/XLSDataClassManager.class.php';
-    QApplication::$ClassFile['xlsproductmanager'] = 
-        __XLSWS_INCLUDES__ . '/core/XLSDataClassManager.class.php';
-    QApplication::$ClassFile['xlscartitemmanager'] = 
-        __XLSWS_INCLUDES__ . '/core/XLSDataClassManager.class.php';
+QApplication::$ClassFile['xlsconfigurationmanager'] =
+	__XLSWS_INCLUDES__ . '/core/XLSDataClassManager.class.php';
+QApplication::$ClassFile['xlscategorymanager'] =
+	__XLSWS_INCLUDES__ . '/core/XLSDataClassManager.class.php';
+QApplication::$ClassFile['xlsproductmanager'] =
+	__XLSWS_INCLUDES__ . '/core/XLSDataClassManager.class.php';
+QApplication::$ClassFile['xlscartitemmanager'] =
+	__XLSWS_INCLUDES__ . '/core/XLSDataClassManager.class.php';
 
-    // Register shipping modules
-    QApplication::$ClassFile['xlsws_class_shipping'] = 
-        __XLSWS_INCLUDES__ . '/shipping/xlsws_class_shipping.class.php';
+// Register shipping modules
+QApplication::$ClassFile['xlsws_class_shipping'] =
+	__XLSWS_INCLUDES__ . '/shipping/xlsws_class_shipping.class.php';
 
-    // Register payment modules
-    QApplication::$ClassFile['xlsws_class_payment'] = 
-        __XLSWS_INCLUDES__ . '/payment/xlsws_class_payment.class.php';
+// Register payment modules
+QApplication::$ClassFile['xlsws_class_payment'] =
+	__XLSWS_INCLUDES__ . '/payment/xlsws_class_payment.class.php';
 
-    // Register sidebar modules
-    QApplication::$ClassFile['xlsws_class_sidebar'] = 
-        __XLSWS_INCLUDES__ . '/sidebar/xlsws_class_sidebar.class.php';
-    QApplication::$ClassFile['sidebar_order_lookup_qp'] =
-        XLSWS_INCLUDES . 'sidebar/sidebar_order_lookup.php';
-    QApplication::$ClassFile['sidebar_order_lookup'] =
-        XLSWS_INCLUDES . 'sidebar/sidebar_order_lookup.php';
+// Register sidebar modules
+QApplication::$ClassFile['xlsws_class_sidebar'] =
+	__XLSWS_INCLUDES__ . '/sidebar/xlsws_class_sidebar.class.php';
+QApplication::$ClassFile['xlsws_class_sidebar_qp'] =
+	__XLSWS_INCLUDES__ . '/sidebar/xlsws_class_sidebar.class.php';
+QApplication::$ClassFile['sidebar_order_lookup_qp'] =
+	XLSWS_INCLUDES . 'sidebar/sidebar_order_lookup.php';
+QApplication::$ClassFile['sidebar_order_lookup'] =
+	XLSWS_INCLUDES . 'sidebar/sidebar_order_lookup.php';
 
-    // Register Views
-    QApplication::$ClassFile['xlsws_index'] =
-        XLSWS_INCLUDES . 'skeleton.php';
+// Register Views
+QApplication::$ClassFile['xlsws_index'] =
+	XLSWS_INCLUDES . 'skeleton.php';
 
-    // Register customized widgets
-    QApplication::$ClassFile['xlszipfield'] = 
-        __XLSWS_INCLUDES__ . '/qform/XLSZipField.class.php';
-
-?>
+// Register customized widgets
+QApplication::$ClassFile['xlszipfield'] =
+	__XLSWS_INCLUDES__ . '/qform/XLSZipField.class.php';

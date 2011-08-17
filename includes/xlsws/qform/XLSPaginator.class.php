@@ -24,148 +24,142 @@
  
  */
 
-   /*
-     * XLSPaginator
-     * 
-     * Extends class used to create and navigate multipage display 
-     */
-    
-    class XLSPaginator extends QPaginator{
-        public $url = false;
-        
-        public function GetControlHtml(){
-            $this->intIndexCount = 7;
-    
-            $this->strLabelForPrevious = "<img src=\"" . 
-                templateNamed('css/images/breadcrumbs_arrowleft.png') . 
-                "\" alt=\"" . _sp("Previous") . "\" />";
-            $this->strLabelForNext = "<img src=\"" . 
-                templateNamed('css/images/breadcrumbs_arrowright.png') . 
-                "\" alt=\"" . _sp("Next") . "\" />";
-            
-            if($this->url)
-                $url = $this->url;
-            else
-                $url = "index.php?";
-            
-            $this->objPaginatedControl->DataBind();
+/*
+ * XLSPaginator
+ *
+ * Extends class used to create and navigate multipage display
+ */
 
-            $strStyle = $this->GetStyleAttributes();
-            if ($strStyle)
-                $strStyle = sprintf(' style="%s"', $strStyle);
+class XLSPaginator extends QPaginator {
+	public $url = false;
 
-            $strToReturn = sprintf('<div id="%s"%s%s>', $this->strControlId, 
-                $strStyle, $this->GetAttributes(true, false));
+	public function GetControlHtml() {
+		$this->intIndexCount = 7;
 
-            $strToReturn .= "<ul>\n";
-            
+		$this->strLabelForPrevious = "<img src=\"" .
+			templateNamed('css/images/breadcrumbs_arrowleft.png') .
+			"\" alt=\"" . _sp("Previous") . "\" />";
+		$this->strLabelForNext = "<img src=\"" .
+			templateNamed('css/images/breadcrumbs_arrowright.png') .
+			"\" alt=\"" . _sp("Next") . "\" />";
 
-            if ($this->intPageNumber <= 1)
-                $strToReturn .= sprintf('<li%s>%s</li>', '', 
-                $this->strLabelForPrevious); 
-            else {
-                $this->strActionParameter = $this->intPageNumber - 1;
-                $strToReturn .= sprintf('<li><a href="%s" %s%s>%s</a></li>', 
-                    $url,
-                    $this->GetActionAttributes(),
-                    '',
-                    $this->strLabelForPrevious);
-            }
+		if($this->url)
+			$url = $this->url;
+		else
+			$url = "index.php?";
 
-            
-            if ($this->PageCount <= $this->intIndexCount) {
-                // We have less pages than total indexcount
-                // So just display all page indexes
-                for ($intIndex = 1; $intIndex <= $this->PageCount; 
-                    $intIndex++)
-                {
-                    if ($this->intPageNumber == $intIndex) {
-                        $strToReturn .= sprintf('<li%s>%s</li>', '', $intIndex);
-                    } else {
-                        $this->strActionParameter = $intIndex;
-                        $strToReturn .= 
-                            sprintf('<li><a href="%s" %s%s>%s</a></li>', 
-                                $url . "&page=$intIndex", 
-                                $this->GetActionAttributes(),
-                                '',
-                                $intIndex); 
-                    }
-                }
-            } else {
-               
-                $intMinimumEndOfBunch = $this->intIndexCount - 2;
-                $intMaximumStartOfBunch = $this->PageCount - 
-                    $this->intIndexCount + 3;
-                
-                $intLeftOfBunchCount = floor(($this->intIndexCount - 5) / 2);
-                $intRightOfBunchCount = round(($this->intIndexCount - 5.0) / 
-                    2.0);
+		$this->objPaginatedControl->DataBind();
 
-                $intLeftBunchTrigger = 4 + $intLeftOfBunchCount;
-                $intRightBunchTrigger = $intMaximumStartOfBunch + 
-                    round(($this->intIndexCount - 8.0) / 2.0);
-                
-                if ($this->intPageNumber < $intLeftBunchTrigger) {
-                    $intPageStart = 1;
-                    $strStartElipse = "";
-                } else {
-                    $intPageStart = min($intMaximumStartOfBunch, 
-                        $this->intPageNumber - $intLeftOfBunchCount);
+		$strStyle = $this->GetStyleAttributes();
+		if ($strStyle)
+			$strStyle = sprintf(' style="%s"', $strStyle);
 
-                    $this->strActionParameter = 1;
-                    $strStartElipse = sprintf('<li><a href="" %s%s>%s</a></li>',
-                        $this->GetActionAttributes(), '', 1); 
-                    $strStartElipse .= '<li><b>...</b></li>';
-                }
-                
-                if ($this->intPageNumber > $intRightBunchTrigger) {
-                    $intPageEnd = $this->PageCount;
-                    $strEndElipse = "";
-                } else {
-                    $intPageEnd = max($intMinimumEndOfBunch, 
-                        $this->intPageNumber + $intRightOfBunchCount);
-                    $strEndElipse = '<li><b>...</b></li>';
+		$strToReturn = sprintf('<div id="%s"%s%s>', $this->strControlId,
+			$strStyle, $this->GetAttributes(true, false));
 
-                    $this->strActionParameter = $this->PageCount;
-                    $strEndElipse .= sprintf('<li><a href="" %s%s>%s</a></li>',
-                        $this->GetActionAttributes(), '', $this->PageCount); 
-                }
+		$strToReturn .= "<ul>\n";
 
-                $strToReturn .= $strStartElipse;
-                for ($intIndex = $intPageStart; $intIndex <= $intPageEnd; 
-                    $intIndex++)
-                {
-                    if ($this->intPageNumber == $intIndex) {
-                        $strToReturn .= sprintf('<li><span %s>%s</span></li>', 
-                            '', $intIndex); 
-                    } else {
-                        $this->strActionParameter = $intIndex;
-                        $strToReturn .= 
-                            sprintf('<li><a href="" %s%s>%s</a></li>',
-                                $this->GetActionAttributes(), 
-                                '', 
-                                $intIndex); 
-                    }
-                }
-                $strToReturn .= $strEndElipse;
-            }
-                
-    
-    
-            if ($this->intPageNumber >= $this->PageCount)
-                $strToReturn .= sprintf('<li%s>%s</li>', '', 
-                    $this->strLabelForNext); 
-            else {
-                $this->strActionParameter = $this->intPageNumber + 1;
-                $strToReturn .= sprintf('<li><a href="" %s%s>%s</a></li>',
-                    $this->GetActionAttributes(), '', 
-                    $this->strLabelForNext); 
-            }
+		if ($this->intPageNumber <= 1)
+			$strToReturn .= sprintf('<li%s>%s</li>', '',
+			$this->strLabelForPrevious);
+		else {
+			$this->strActionParameter = $this->intPageNumber - 1;
+			$strToReturn .= sprintf('<li><a href="%s" %s%s>%s</a></li>',
+				$url,
+				$this->GetActionAttributes(),
+				'',
+				$this->strLabelForPrevious);
+		}
 
-            $strToReturn .= "</ul>\n";
-            $strToReturn .= '</div>';
-          
-            return $strToReturn;
-        }
-    }
-?>    
+		if ($this->PageCount <= $this->intIndexCount) {
+			// We have less pages than total indexcount
+			// So just display all page indexes
+			for ($intIndex = 1; $intIndex <= $this->PageCount;
+				$intIndex++)
+			{
+				if ($this->intPageNumber == $intIndex) {
+					$strToReturn .= sprintf('<li%s>%s</li>', '', $intIndex);
+				} else {
+					$this->strActionParameter = $intIndex;
+					$strToReturn .=
+						sprintf('<li><a href="%s" %s%s>%s</a></li>',
+							$url . "&page=$intIndex",
+							$this->GetActionAttributes(),
+							'',
+							$intIndex);
+				}
+			}
+		} else {
+			$intMinimumEndOfBunch = $this->intIndexCount - 2;
+			$intMaximumStartOfBunch = $this->PageCount -
+				$this->intIndexCount + 3;
+
+			$intLeftOfBunchCount = floor(($this->intIndexCount - 5) / 2);
+			$intRightOfBunchCount = round(($this->intIndexCount - 5.0) /
+				2.0);
+
+			$intLeftBunchTrigger = 4 + $intLeftOfBunchCount;
+			$intRightBunchTrigger = $intMaximumStartOfBunch +
+				round(($this->intIndexCount - 8.0) / 2.0);
+
+			if ($this->intPageNumber < $intLeftBunchTrigger) {
+				$intPageStart = 1;
+				$strStartElipse = "";
+			} else {
+				$intPageStart = min($intMaximumStartOfBunch,
+					$this->intPageNumber - $intLeftOfBunchCount);
+
+				$this->strActionParameter = 1;
+				$strStartElipse = sprintf('<li><a href="" %s%s>%s</a></li>',
+					$this->GetActionAttributes(), '', 1);
+				$strStartElipse .= '<li><b>...</b></li>';
+			}
+
+			if ($this->intPageNumber > $intRightBunchTrigger) {
+				$intPageEnd = $this->PageCount;
+				$strEndElipse = "";
+			} else {
+				$intPageEnd = max($intMinimumEndOfBunch,
+					$this->intPageNumber + $intRightOfBunchCount);
+				$strEndElipse = '<li><b>...</b></li>';
+
+				$this->strActionParameter = $this->PageCount;
+				$strEndElipse .= sprintf('<li><a href="" %s%s>%s</a></li>',
+					$this->GetActionAttributes(), '', $this->PageCount);
+			}
+
+			$strToReturn .= $strStartElipse;
+			for ($intIndex = $intPageStart; $intIndex <= $intPageEnd;
+				$intIndex++)
+			{
+				if ($this->intPageNumber == $intIndex) {
+					$strToReturn .= sprintf('<li><span %s>%s</span></li>',
+						'', $intIndex);
+				} else {
+					$this->strActionParameter = $intIndex;
+					$strToReturn .=
+						sprintf('<li><a href="" %s%s>%s</a></li>',
+							$this->GetActionAttributes(),
+							'',
+							$intIndex);
+				}
+			}
+			$strToReturn .= $strEndElipse;
+		}
+
+		if ($this->intPageNumber >= $this->PageCount)
+			$strToReturn .= sprintf('<li%s>%s</li>', '',
+				$this->strLabelForNext);
+		else {
+			$this->strActionParameter = $this->intPageNumber + 1;
+			$strToReturn .= sprintf('<li><a href="" %s%s>%s</a></li>',
+				$this->GetActionAttributes(), '',
+				$this->strLabelForNext);
+		}
+
+		$strToReturn .= "</ul>\n";
+		$strToReturn .= '</div>';
+
+		return $strToReturn;
+	}
+}

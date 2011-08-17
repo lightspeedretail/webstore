@@ -29,40 +29,33 @@
  * or simply redirects back to the thank you page if the order is not paid via credit card
  */
 
-
 include_once('includes/prepend.inc.php');
-
 
 $form = _xls_stack_pop('xls_jumper_form');
 
-
 ?>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=<?php _p(QApplication::$EncodingType); ?>" />
-<?php if (isset($strPageTitle)) { ?>
+<?php if (isset($strPageTitle)): ?>
 		<title><?php _p($strPageTitle); ?></title>
-<?php } ?>
+<?php endif; ?>
 		<link rel="stylesheet" type="text/css" href="<?php _p(__VIRTUAL_DIRECTORY__ . __CSS_ASSETS__); ?>/styles.css"/>
 		<script type="text/javascript" src="assets/js/jquery.min.js"></script>
-		
+
 <script type="text/javascript">
-$(document).ready(function()
-{
-	$("form:first").submit();	
+$(document).ready(function(){
+	$("form:first").submit();
 });
-</script>	
-	
+</script>
+
 </head>
 <body>
 
 <h1 class="jumper" style="text-align: center;"><?php _p("Please wait while your request is processed"); ?> <img src="assets/images/spinner_14.gif"/></h1>
 
-<?php
-echo $form;
-?>
+<?php echo $form; ?>
 
 </body>
 </html>

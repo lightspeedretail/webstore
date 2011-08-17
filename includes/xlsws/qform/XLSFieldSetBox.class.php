@@ -24,60 +24,56 @@
  
  */
 
-   /*
-     * XLSFieldSetBox
-     * 
-     * Creates the frame used for certain checkout boxes 
-     * Payment, shipping
-     */
-    
-    class XLSFieldSetBox extends QPanel {
-        
-        protected $strCssClass = "xlsfset";
+/*
+ * XLSFieldSetBox
+ *
+ * Creates the frame used for certain checkout boxes
+ * Payment, shipping
+ */
 
-        protected function GetControlHtml() {
-            $this->strText = '<fieldset><legend>' . _sp($this->strName) . 
-                '</legend>';
-            $objs = $this->GetChildControls();
-            
-            foreach($objs as $obj) {
-                if (($obj instanceof QTextBoxBase) || 
-                    ($obj instanceof QCheckBox) || 
-                    ($obj instanceof QListBox) || 
-                    (($obj instanceof QLabel) &&  
-                        ($obj->Name != '')
-                    ) || 
-                    ($obj instanceof QCalendar) || 
-                    ($obj instanceof QFCKeditor) 
-                ) {
-                    if($obj->Visible)
-                        $this->strText .= 
-                            "<div class=\"left " . 
-                            (($obj->DisplayStyle == QDisplayStyle::Inline)?
-                                "margin":(($obj->DisplayStyle == 
-                                   QDisplayStyle::None)?"":"clear")) . 
+class XLSFieldSetBox extends QPanel {
+	protected $strCssClass = "xlsfset";
+
+	protected function GetControlHtml() {
+		$this->strText = '<fieldset><legend>' . _sp($this->strName) .
+			'</legend>';
+		$objs = $this->GetChildControls();
+
+		foreach($objs as $obj) {
+			if (($obj instanceof QTextBoxBase) ||
+				($obj instanceof QCheckBox) ||
+				($obj instanceof QListBox) ||
+				(($obj instanceof QLabel) &&
+					($obj->Name != '')
+				) ||
+				($obj instanceof QCalendar) ||
+				($obj instanceof QFCKeditor)
+			) {
+				if($obj->Visible)
+					$this->strText .=
+						"<div class=\"left " .
+						(($obj->DisplayStyle == QDisplayStyle::Inline)?
+							"margin":(($obj->DisplayStyle ==
+							   QDisplayStyle::None)?"":"clear")) .
 "\">
-    <dl>
-        <dt><label for=\"" . $obj->Name . "\">" .
-            _sp($obj->Name) . (($obj->Required)?" *":"") . 
-       "</label></dt>
-        <dd>" . $obj->RenderWithError(false) . "</dd>
-    </dl>
+	<dl>
+		<dt><label for=\"" . $obj->Name . "\">" .
+			_sp($obj->Name) . (($obj->Required)?" *":"") .
+	   "</label></dt>
+		<dd>" . $obj->RenderWithError(false) . "</dd>
+	</dl>
 </div>";
-                }
-                else {
-                    $this->strText .= 
+				} else {
+					$this->strText .=
 "<div class=\"left clear\">
-    <dl>
-        <dd>" . $obj->Render(false) . "</dd>
-    </dl>
+	<dl>
+		<dd>" . $obj->Render(false) . "</dd>
+	</dl>
 </div>";
-                }
-            }
-            
-            $this->strText .= "</fieldset>";
-            return parent::GetControlHtml();
-        }
-    }   
+			}
+		}
 
-?>  
+		$this->strText .= "</fieldset>";
+		return parent::GetControlHtml();
+	}
+}
