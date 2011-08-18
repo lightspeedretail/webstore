@@ -23,99 +23,97 @@
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  
  */
-    /**
-     * xlsws_custom_page class
-     * This is the controller class for any custom page created in the admin panel -> pages
-     * This class is responsible for querying the database for various aspects needed on this page
-     * and assigning template variables to the views related to any web store generated page
-     */
-   class xlsws_custom_page extends xlsws_index {
-        
-   		protected $content; //content of the page
-   		
-   		protected $pnlSlider; //the product slider that shows a listing of items
-   		
-   		protected $productTag = false; //the slideshow product tag used with the product slider
-   		public $sliderName = "pnlSlider";
 
-        /**
-         * build_slider - builds the products slideshow slider
-         * @param none
-         * @return none
-         */  				
-		protected function build_slider()
-		{				
-				global $strPageTitle;
-				$this->pnlSlider = new XLSSlider($this->mainPnl);
-				$this->pnlSlider->Name = $pageR->Title;
-				$sort_by = _xls_get_conf('PRODUCT_SORT_FIELD' , "Name");
-				$search = $this->productTag;
-				
-				$this->pnlSlider->SetProducts(QQ::AndCondition(
-							QQ::OrCondition(
-     	 					  new QQXLike(QQN::Product()->Code , "$search") 
-     	 					, new QQXLike(QQN::Product()->WebKeyword1 , "$search") 
-     	 					, new QQXLike(QQN::Product()->WebKeyword2 , "$search") 
-     	 					, new QQXLike(QQN::Product()->WebKeyword3 , "$search") 
-     	 					) , QQ::OrCondition(
-								QQ::Equal(QQN::Product()->MasterModel , 1)
-								, QQ::AndCondition(QQ::Equal(QQN::Product()->MasterModel , 0) , QQ::Equal(QQN::Product()->FkProductMasterId , 0)   )
-							)
-							, QQ::Equal(QQN::Product()->Web , 1)
-     	 					) ,  QQ::Clause(QQ::OrderBy(QQN::Product()->$sort_by) , QQ::LimitInfo(_xls_get_conf('MAX_PRODUCTS_IN_SLIDER' , 64))) 
-     	 					);
-				
-				$this->pnlSlider->Template = templateNamed('slider.tpl.php');
-				$this->pnlSlider->sliderTitle = $strPageTitle;
-				
-		}	
-		
-        /**
-         * build_main - constructor for this controller
-         * @param none
-         * @return none
-         */   		
-		protected function build_main(){
-			global $XLSWS_VARS , $strPageTitle;
-				
-			
-			if(!isset($XLSWS_VARS['cpage']))
-				$XLSWS_VARS['cpage'] = '404';
-			
-			$pageR = CustomPage::LoadByKey($XLSWS_VARS['cpage']);
-			
-			if(!$pageR){
-				_xls_display_msg(_sp("Page") . " $XLSWS_VARS[cpage] " . _sp("does not exist.") );
-				return;
-			}
-			
-			$this->crumbs[] = array('key'=>"cpage=$XLSWS_VARS[cpage]" , 'case'=> '' , 'name'=> $pageR->Title);
-			
-			$this->mainPnl = new QPanel($this);
-			$strPageTitle = $pageR->Title;
-			
-			$this->content = $pageR->Page;
-			
-			if($pageR->MetaDescription)
-				_xls_add_meta_desc($pageR->MetaDescription);
-			
-			if($pageR->MetaKeywords)
-				_xls_add_meta_keyword($pageR->MetaKeywords);
-			
-			$this->productTag = $pageR->ProductTag;
-					
-			if($pageR->ProductTag != '')
-				$this->build_slider();
-						
-			$this->mainPnl->Template = templateNamed('custom_page.tpl.php');
-			
-			
+/**
+ * xlsws_custom_page class
+ * This is the controller class for any custom page created in the admin panel -> pages
+ * This class is responsible for querying the database for various aspects needed on this page
+ * and assigning template variables to the views related to any web store generated page
+ */
+class xlsws_custom_page extends xlsws_index {
+	protected $content; //content of the page
+	protected $pnlSlider; //the product slider that shows a listing of items
+	protected $productTag = false; //the slideshow product tag used with the product slider
+	public $sliderName = "pnlSlider";
+
+	/**
+	 * build_slider - builds the products slideshow slider
+	 * @param none
+	 * @return none
+	 */
+	protected function build_slider() {
+		global $strPageTitle;
+		$this->pnlSlider = new XLSSlider($this->mainPnl);
+		$this->pnlSlider->Name = $pageR->Title;
+		$sort_by = _xls_get_conf('PRODUCT_SORT_FIELD' , "Name");
+		$search = $this->productTag;
+
+		$this->pnlSlider->SetProducts(
+			QQ::AndCondition(
+				QQ::OrCondition(
+					new QQXLike(QQN::Product()->Code , "$search"),
+					new QQXLike(QQN::Product()->WebKeyword1 , "$search"),
+					new QQXLike(QQN::Product()->WebKeyword2 , "$search"),
+					new QQXLike(QQN::Product()->WebKeyword3 , "$search")
+				),
+				QQ::OrCondition(
+					QQ::Equal(QQN::Product()->MasterModel , 1),
+					QQ::AndCondition(
+						QQ::Equal(QQN::Product()->MasterModel, 0),
+						QQ::Equal(QQN::Product()->FkProductMasterId, 0)
+					)
+				),
+				QQ::Equal(QQN::Product()->Web, 1)
+			),
+			QQ::Clause(
+				QQ::OrderBy(QQN::Product()->$sort_by),
+				QQ::LimitInfo(_xls_get_conf('MAX_PRODUCTS_IN_SLIDER' , 64))
+			)
+		);
+
+		$this->pnlSlider->Template = templateNamed('slider.tpl.php');
+		$this->pnlSlider->sliderTitle = $strPageTitle;
+	}
+
+	/**
+	 * build_main - constructor for this controller
+	 * @param none
+	 * @return none
+	 */
+	protected function build_main() {
+		global $XLSWS_VARS , $strPageTitle;
+
+		if(!isset($XLSWS_VARS['cpage']))
+			$XLSWS_VARS['cpage'] = '404';
+
+		$pageR = CustomPage::LoadByKey($XLSWS_VARS['cpage']);
+
+		if(!$pageR) {
+			_xls_display_msg(_sp("Page") . " $XLSWS_VARS[cpage] " . _sp("does not exist."));
+			return;
 		}
-		
-   }
-   
-   
-   if(!defined('CUSTOM_STOP_XLSWS'))
-   	xlsws_custom_page::Run('xlsws_custom_page', templateNamed('index.tpl.php'));
 
-?>
+		$this->crumbs[] = array('key'=>"cpage=$XLSWS_VARS[cpage]" , 'case'=> '' , 'name'=> $pageR->Title);
+
+		$this->mainPnl = new QPanel($this);
+		$strPageTitle = $pageR->Title;
+
+		$this->content = $pageR->Page;
+
+		if($pageR->MetaDescription)
+			_xls_add_meta_desc($pageR->MetaDescription);
+
+		if($pageR->MetaKeywords)
+			_xls_add_meta_keyword($pageR->MetaKeywords);
+
+		$this->productTag = $pageR->ProductTag;
+
+		if($pageR->ProductTag != '')
+			$this->build_slider();
+
+		$this->mainPnl->Template = templateNamed('custom_page.tpl.php');
+	}
+}
+
+if(!defined('CUSTOM_STOP_XLSWS'))
+	xlsws_custom_page::Run('xlsws_custom_page', templateNamed('index.tpl.php'));

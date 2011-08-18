@@ -24,19 +24,17 @@
  
  */
 
-    QApplication::InitializeContentManagers();
+QApplication::InitializeContentManagers();
 
-    if (!empty(QApplication::$Database)) {
-        //if (!defined(__PREPEND_QUICKINIT__)) {
-        //}
+if (!empty(QApplication::$Database)) {
+	//if (!defined(__PREPEND_QUICKINIT__)) {
+	//}
 
-        foreach (Configuration::LoadAll() as $objConfig)
-            Configuration::$Manager->Add($objConfig);
+	foreach (Configuration::LoadAll() as $objConfig)
+		Configuration::$Manager->Add($objConfig);
 
-        if (strtolower(substr(
-            _xls_get_conf('ENCODING' , "UTF-8") , 0 , 3)) != 'iso')
-                mb_internal_encoding(_xls_get_conf('ENCODING' , "UTF-8"));
+	if (strtolower(substr(
+		_xls_get_conf('ENCODING' , "UTF-8") , 0 , 3)) != 'iso')
+			mb_internal_encoding(_xls_get_conf('ENCODING' , "UTF-8"));
 
-    }
-
-?>
+}

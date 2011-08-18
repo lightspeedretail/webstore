@@ -24,25 +24,23 @@
  
  */
 
-    /*
-     *  QAutoTempDisabledAjaxAction
-     * 
-     * Some actions should pause a bit before allow the user to submit them again--e.g. add to cart was 
-     * being used to overload the server with requests.
-     * 
-     * The QAutoTempDisabledAjaxAction replaces the standard QAjaxAction in any sensitive place where an 
-     * _onclick_ is used, eg:
-     * 
-     *  $add_to_cart->AddAction(new QClickEvent(), new QAjaxAction('prod_add_to_cart'));
-     * becomes
-     *  $add_to_cart->AddAction(new QClickEvent(), new QAutoTempDisabledAjaxAction('prod_add_to_cart'));            
-     */
+/*
+ *  QAutoTempDisabledAjaxAction
+ *
+ * Some actions should pause a bit before allow the user to submit them again--e.g. add to cart was
+ * being used to overload the server with requests.
+ *
+ * The QAutoTempDisabledAjaxAction replaces the standard QAjaxAction in any sensitive place where an
+ * _onclick_ is used, eg:
+ *
+ *  $add_to_cart->AddAction(new QClickEvent(), new QAjaxAction('prod_add_to_cart'));
+ * becomes
+ *  $add_to_cart->AddAction(new QClickEvent(), new QAutoTempDisabledAjaxAction('prod_add_to_cart'));
+ */
 
-    class QAutoTempDisabledAjaxAction extends QAjaxAction {
-        public function RenderScript(QControl $objControl) {
-            $scriptStr = parent::RenderScript($objControl);
-        return "if (tempDisableAjaxClick(this)){return false;} $scriptStr";
-        }
-    }
-    
-?>
+class QAutoTempDisabledAjaxAction extends QAjaxAction {
+	public function RenderScript(QControl $objControl) {
+		$scriptStr = parent::RenderScript($objControl);
+		return "if (tempDisableAjaxClick(this)){return false;} $scriptStr";
+	}
+}

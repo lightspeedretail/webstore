@@ -31,17 +31,11 @@
  *
  */
 
+if(!$this->giftPnl) {
+	$this->giftPnl = new QPanel($this , 'minigift');
+	$this->giftPnl->Template = templateNamed('minigift.tpl.php');
+	$this->giftPnl->CssClass = "rounded-bottom";
 
-
-	if(!$this->giftPnl){
-		$this->giftPnl = new QPanel($this , 'minigift');
-		$this->giftPnl->Template = templateNamed('minigift.tpl.php');
-		$this->giftPnl->CssClass = "rounded-bottom";
-		
-		// Let's have the pnlPanel auto render any and all child controls
-		$this->giftPnl->AutoRenderChildren = true;
-	}
-	
-
-
-?>
+	// Let's have the pnlPanel auto render any and all child controls
+	$this->giftPnl->AutoRenderChildren = true;
+}

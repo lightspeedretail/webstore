@@ -24,47 +24,45 @@
  
  */
 
-	require(__DATAGEN_CLASSES__ . '/FamilyGen.class.php');
+require(__DATAGEN_CLASSES__ . '/FamilyGen.class.php');
 
-	/**
-     * The Family class defined here contains any customized code for the 
-     * Family class in the Object Relational Model. It represents the 
-     * "xlsws_family" table in the database.
-	 */
-    class Family extends FamilyGen {
-        // Define the Category Object Manager
-        public static $Manager;
+/**
+ * The Family class defined here contains any customized code for the
+ * Family class in the Object Relational Model. It represents the
+ * "xlsws_family" table in the database.
+ */
+class Family extends FamilyGen {
+	// Define the Category Object Manager
+	public static $Manager;
 
-        // String representation of the object
-		public function __toString() {
-			return sprintf('Family Object %s',  $this->family);
-		}
-
-        // Initialize the Object Manager on the class
-        public static function InitializeManager() {
-            if (!Family::$Manager)
-                Family::$Manager = 
-                    XLSObjectManager::Singleton('XLSFamilyManager','code');
-        }
-
-        // Override LoadAll to pull from the Products table for performance
-		public static function LoadAll($objOptionalClauses = null) {
-            try {
-                $query = 'SELECT DISTINCT family FROM xlsws_product';
-                $query .= ' WHERE web=1 AND fk_product_master_id=0';
-                $query .= " AND family <> ''";
-                $query .= ' ORDER BY family asc';
-
-				$db = QApplication::$Database[1];
-                $matches = $db->Query($query);
-
-				$families = Product::InstantiateDbResult($matches);
-				return $families;
-			} catch (QCallerException $objExc) {
-				$objExc->IncrementOffset();
-				throw $objExc;
-			}
-		}
-
+	// String representation of the object
+	public function __toString() {
+		return sprintf('Family Object %s',  $this->family);
 	}
-?>
+
+	// Initialize the Object Manager on the class
+	public static function InitializeManager() {
+		if (!Family::$Manager)
+			Family::$Manager =
+				XLSObjectManager::Singleton('XLSFamilyManager','code');
+	}
+
+	// Override LoadAll to pull from the Products table for performance
+	public static function LoadAll($objOptionalClauses = null) {
+		try {
+			$query = 'SELECT DISTINCT family FROM xlsws_product';
+			$query .= ' WHERE web=1 AND fk_product_master_id=0';
+			$query .= " AND family <> ''";
+			$query .= ' ORDER BY family asc';
+
+			$db = QApplication::$Database[1];
+			$matches = $db->Query($query);
+
+			$families = Product::InstantiateDbResult($matches);
+			return $families;
+		} catch (QCallerException $objExc) {
+			$objExc->IncrementOffset();
+			throw $objExc;
+		}
+	}
+}

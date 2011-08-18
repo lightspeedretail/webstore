@@ -1,5 +1,5 @@
 <?php
-  /*
+/*
   LightSpeed Web Store
  
   NOTICE OF LICENSE
@@ -23,32 +23,31 @@
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  
  */
-  
-   /*
-     *  XLSAutocompleteTextBox
-     * 
-     * Auto Complete box used for site Search box to show results as you type
-     * 
-     *             
-     */
-  
-    class XLSAutoCompleteTextBox extends QTextBox{
-    
-        protected function GetControlHtml() {
-            $strStyle = $this->GetStyleAttributes();
 
-            if ($strStyle)
-                $strStyle = sprintf('style="%s"', $strStyle);
+/*
+ *  XLSAutocompleteTextBox
+ *
+ * Auto Complete box used for site Search box to show results as you type
+ *
+ *
+ */
 
-            $strToReturn = sprintf('<input type="search" name="%s" ' .
-                'id="%s" placeholder="Search..." value="%s" %s/>',
-                $this->strControlId,
-                $this->strControlId,
-                QApplication::HtmlEntities($this->strText),
-                $strStyle);
+class XLSAutoCompleteTextBox extends QTextBox {
+	protected function GetControlHtml() {
+		$strStyle = $this->GetStyleAttributes();
 
-            return $strToReturn;
-        }
-    }   
-    
-?>
+		if ($strStyle)
+			$strStyle = sprintf('style="%s"', $strStyle);
+
+		$strToReturn = sprintf(
+			'<input type="search" name="%s" ' .
+			'id="%s" placeholder="Search..." value="%s" %s/>',
+			$this->strControlId,
+			$this->strControlId,
+			QApplication::HtmlEntities($this->strText),
+			$strStyle
+		);
+
+		return $strToReturn;
+	}
+}

@@ -23,74 +23,74 @@
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  
  */
-    require(__DATAGEN_CLASSES__ . '/ConfigurationGen.class.php');
 
-    /**
-     * The Configuration class defined here contains any
-     * customized code for the Configuration table in the
-     * Object Relational Model.  It represents the "xlsws_configuration" table 
-     * in the database, and extends from the code generated abstract ConfigurationGen
-     * class, which contains all the basic CRUD-type functionality as well as
-     * basic methods to handle relationships and index-based loading.
-     * 
-     * @package My Application
-     * @subpackage DataObjects
-     * 
-     */
+require(__DATAGEN_CLASSES__ . '/ConfigurationGen.class.php');
 
-    class Configuration extends ConfigurationGen {
-        // Define the Object Manager for semi-persistent storage
-        public static $Manager;
+/**
+ * The Configuration class defined here contains any
+ * customized code for the Configuration table in the
+ * Object Relational Model.  It represents the "xlsws_configuration" table 
+ * in the database, and extends from the code generated abstract ConfigurationGen
+ * class, which contains all the basic CRUD-type functionality as well as
+ * basic methods to handle relationships and index-based loading.
+ * 
+ * @package My Application
+ * @subpackage DataObjects
+ * 
+ */
 
-        // String representation of this Object
-        public function __toString() {
-            return sprintf('Configuration Object %s',  $this->strName);
-        }
+class Configuration extends ConfigurationGen {
+	// Define the Object Manager for semi-persistent storage
+	public static $Manager;
 
-        // Initialize the Object Manager on the class
-        public static function InitializeManager() {
-            if (!Configuration::$Manager)
-                Configuration::$Manager =
-                    XLSConfigurationManager::Singleton('XLSConfigurationManager');
-        }
+	// String representation of this Object
+	public function __toString() {
+		return sprintf('Configuration Object %s',  $this->strName);
+	}
 
-        public function __get($strName) {
-            switch ($strName) {
-                case 'ConfigType':
-                    return $this->ConfigurationTypeId;
+	// Initialize the Object Manager on the class
+	public static function InitializeManager() {
+		if (!Configuration::$Manager)
+			Configuration::$Manager =
+				XLSConfigurationManager::Singleton('XLSConfigurationManager');
+	}
 
-                case 'Value':
-                    return trim($this->strValue);
+	public function __get($strName) {
+		switch ($strName) {
+			case 'ConfigType':
+				return $this->ConfigurationTypeId;
 
-                default:
-                    try {
-                        return parent::__get($strName);
-                    } catch (QCallerException $objExc) {
-                        $objExc->IncrementOffset();
-                        throw $objExc;
-                    }
-            }
-        }
+			case 'Value':
+				return trim($this->strValue);
 
-        public function __set($strName, $mixValue) {
-            switch ($strName) {
-                case 'ConfigType':
-                    try {
-                        return ($this->ConfigurationTypeId = 
-                            QType::Cast($mixValue, QType::Integer));
-                    } catch (QInvalidCastException $objExc) {
-                        $objExc->IncrementOffset();
-                        throw $objExc;
-                    }
+			default:
+				try {
+					return parent::__get($strName);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
 
-                default:
-                    try {
-                        return (parent::__set($strName, $mixValue));
-                    } catch (QCallerException $objExc) {
-                        $objExc->IncrementOffset();
-                        throw $objExc;
-                    }
-            }
-        }
-    }
-?>
+	public function __set($strName, $mixValue) {
+		switch ($strName) {
+			case 'ConfigType':
+				try {
+					return ($this->ConfigurationTypeId = 
+						QType::Cast($mixValue, QType::Integer));
+				} catch (QInvalidCastException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+
+			default:
+				try {
+					return (parent::__set($strName, $mixValue));
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+}

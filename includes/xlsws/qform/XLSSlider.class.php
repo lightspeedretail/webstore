@@ -24,45 +24,43 @@
  
  */
 
-   /*
-     * XLSSlider
-     * 
-     * Extends class used to create slider display 
-     */
-    
-    class XLSSlider extends QPanel{
-        
-        protected $strCssClass = 'products_slider_theme_bg';
-        public $links;
-        public $sliderCount = 4;
-        public $sliderTitle;
+/*
+ * XLSSlider
+ *
+ * Extends class used to create slider display
+ */
 
-        public function GetEndScript(){
-            $str = parent::GetEndScript();
-            return '$(function() { $( "#' . $this->strControlId . 
-                '" ).productSlider({ speed : "normal", slideBy : ' . 
-                $this->sliderCount .' }); });' . $str;
-        }
-                
-        public function SetProducts($qq, $clause = null){
- 			$products = array();
-            if ($qq instanceof QQCondition)
-                $products = Product::QueryArray($qq, $clause);
-            else if (is_array($qq))
-            {
-                $products = $qq;
-            }
-            else
-                return;
+class XLSSlider extends QPanel {
 
-            $this->links = array();
-            foreach($products as $prod) {
-                $this->links[$prod->Rowid] = array();
-                $this->links[$prod->Rowid]['image'] = $prod->SmallImage;
-                $this->links[$prod->Rowid]['link'] = $prod->Link;
-                $this->links[$prod->Rowid]['title'] = $prod->Name;
-                $this->links[$prod->Rowid]['title2'] = $prod->Code;
-            }
-        }
-    }
-?> 
+	protected $strCssClass = 'products_slider_theme_bg';
+	public $links;
+	public $sliderCount = 4;
+	public $sliderTitle;
+
+	public function GetEndScript() {
+		$str = parent::GetEndScript();
+		return '$(function() { $( "#' . $this->strControlId .
+			'" ).productSlider({ speed : "normal", slideBy : ' .
+			$this->sliderCount .' }); });' . $str;
+	}
+
+	public function SetProducts($qq, $clause = null) {
+		$products = array();
+		if ($qq instanceof QQCondition)
+			$products = Product::QueryArray($qq, $clause);
+		else if (is_array($qq)) {
+			$products = $qq;
+		}
+		else
+			return;
+
+		$this->links = array();
+		foreach($products as $prod) {
+			$this->links[$prod->Rowid] = array();
+			$this->links[$prod->Rowid]['image'] = $prod->SmallImage;
+			$this->links[$prod->Rowid]['link'] = $prod->Link;
+			$this->links[$prod->Rowid]['title'] = $prod->Name;
+			$this->links[$prod->Rowid]['title2'] = $prod->Code;
+		}
+	}
+}

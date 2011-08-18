@@ -23,35 +23,32 @@
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  
  */
-	require(__DATAGEN_CLASSES__ . '/GiftRegistryReceipentsGen.class.php');
 
+require(__DATAGEN_CLASSES__ . '/GiftRegistryReceipentsGen.class.php');
+
+/**
+ * The GiftRegistryReceipents class defined here contains any
+ * customized code for the GiftRegistryReceipents class in the
+ * Object Relational Model.  It represents the "xlsws_gift_registry_receipents" table
+ * in the database, and extends from the code generated abstract GiftRegistryReceipentsGen
+ * class, which contains all the basic CRUD-type functionality as well as
+ * basic methods to handle relationships and index-based loading.
+ *
+ * @package My Application
+ * @subpackage DataObjects
+ *
+ */
+class GiftRegistryReceipents extends GiftRegistryReceipentsGen {
 	/**
-	 * The GiftRegistryReceipents class defined here contains any
-	 * customized code for the GiftRegistryReceipents class in the
-	 * Object Relational Model.  It represents the "xlsws_gift_registry_receipents" table 
-	 * in the database, and extends from the code generated abstract GiftRegistryReceipentsGen
-	 * class, which contains all the basic CRUD-type functionality as well as
-	 * basic methods to handle relationships and index-based loading.
-	 * 
-	 * @package My Application
-	 * @subpackage DataObjects
-	 * 
+	 * Default "to string" handler
+	 * Allows pages to _p()/echo()/print() this object, and to define the default
+	 * way this object would be outputted.
+	 *
+	 * Can also be called directly via $objGiftRegistryReceipents->__toString().
+	 *
+	 * @return string a nicely formatted string representation of this object
 	 */
-	class GiftRegistryReceipents extends GiftRegistryReceipentsGen {
-		/**
-		 * Default "to string" handler
-		 * Allows pages to _p()/echo()/print() this object, and to define the default
-		 * way this object would be outputted.
-		 *
-		 * Can also be called directly via $objGiftRegistryReceipents->__toString().
-		 *
-		 * @return string a nicely formatted string representation of this object
-		 */
-		public function __toString() {
-			return sprintf('GiftRegistryReceipents Object %s',  $this->intRowid);
-		}
-
-
-
+	public function __toString() {
+		return sprintf('GiftRegistryReceipents Object %s',  $this->intRowid);
 	}
-?>
+}

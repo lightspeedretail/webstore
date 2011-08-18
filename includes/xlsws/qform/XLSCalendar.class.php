@@ -23,76 +23,72 @@
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  
  */
-  
+
 /**
- * Creates jQuery style date picker
- */
-    class XLSCalendar extends QTextBox{
-        
-        public $xlsTimestamp;
-        public $intTimestamp;
-        public $DateTime;
-        protected $strJavaScripts = 'jquery-ui.js';
-        protected $strCssScripts = 'datepicker.css';
-        
-        public function __construct($objParent , $strControlId = null) {
-            parent::__construct($objParent , $strControlId);
-            
-            $locale = _xls_get_conf('LOCALE' , 'en_US');
-            $locale = strtolower($locale);
-            $localejs = __JS_ASSETS__ . '/' . 
-                "ui.datepicker-" . $locale . ".js";
+* Creates jQuery style date picker
+*/
+class XLSCalendar extends QTextBox {
+	public $xlsTimestamp;
+	public $intTimestamp;
+	public $DateTime;
+	protected $strJavaScripts = 'jquery-ui.js';
+	protected $strCssScripts = 'datepicker.css';
 
-            // Add locale JS file
-            if (file_exists($localejs))
-                $this->strJavaScripts .= 
-                    ',' . "ui.datepicker-" . $locale . ".js";
-        }
-        
-        public function __get($strName) {
-            if ($strName == "DateTime") {
-                return $this->GetDateFromLabel($this->intTimestamp);
-            }
-            else
-                return parent::__get($strName);
-        }
-        
-        public function GetDateFromLabel($dttPrevDate = null) {
-            $strDate = trim($this->Text);
-            if ($strDate) {
-                $dttDate = new QDateTime($strDate);
-                if ($dttDate->IsNull()) {
-                    return $dttPrevDate; // reset when bad date is entered
-                }
-                return $dttDate;
-            } else {
-                return null;
-            }
-        }       
-        
-        
-        public function __set($strName, $mixValue) {
-            if($strName == "DateTime") {
-                $z = new DateTimeZone(date_default_timezone_get());
-                if($mixValue instanceof QDateTime )
-                    $this->intTimestamp = $mixValue;
-                else
-                    $this->intTimestamp = 
-                        QDateTime::FromTimestamp($mixValue , $z);
-                    
-                $this->Text = 
-                    $this->intTimestamp->PhpDate(_xls_get_conf('DATE_FORMAT'));
-            }else
-                parent::__set($strName , $mixValue);
-        }
+	public function __construct($objParent , $strControlId = null) {
+		parent::__construct($objParent , $strControlId);
 
-        public function GetEndScript(){
-            $str = parent::GetEndScript();
-            if(!QApplication::IsBrowser(QBrowserType::InternetExplorer_6_0))
-                $str .= "$(document).ready(function(){ $('#" . 
-                    $this->strControlId . "').datepicker(); });";
-            return $str;
-        }
-        
-    }
-?> 
+		$locale = _xls_get_conf('LOCALE' , 'en_US');
+		$locale = strtolower($locale);
+		$localejs = __JS_ASSETS__ . '/' .
+			"ui.datepicker-" . $locale . ".js";
+
+		// Add locale JS file
+		if (file_exists($localejs))
+			$this->strJavaScripts .=
+				',' . "ui.datepicker-" . $locale . ".js";
+	}
+
+	public function __get($strName) {
+		if ($strName == "DateTime") {
+			return $this->GetDateFromLabel($this->intTimestamp);
+		}
+		else
+			return parent::__get($strName);
+	}
+
+	public function GetDateFromLabel($dttPrevDate = null) {
+		$strDate = trim($this->Text);
+		if ($strDate) {
+			$dttDate = new QDateTime($strDate);
+			if ($dttDate->IsNull()) {
+				return $dttPrevDate; // reset when bad date is entered
+			}
+			return $dttDate;
+		} else {
+			return null;
+		}
+	}
+
+	public function __set($strName, $mixValue) {
+		if($strName == "DateTime") {
+			$z = new DateTimeZone(date_default_timezone_get());
+			if($mixValue instanceof QDateTime )
+				$this->intTimestamp = $mixValue;
+			else
+				$this->intTimestamp =
+					QDateTime::FromTimestamp($mixValue , $z);
+
+			$this->Text =
+				$this->intTimestamp->PhpDate(_xls_get_conf('DATE_FORMAT'));
+		}else
+			parent::__set($strName , $mixValue);
+	}
+
+	public function GetEndScript() {
+		$str = parent::GetEndScript();
+		if(!QApplication::IsBrowser(QBrowserType::InternetExplorer_6_0))
+			$str .= "$(document).ready(function(){ $('#" .
+				$this->strControlId . "').datepicker(); });";
+		return $str;
+	}
+}

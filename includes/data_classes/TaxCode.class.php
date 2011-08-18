@@ -24,47 +24,46 @@
  
  */
 
-	require(__DATAGEN_CLASSES__ . '/TaxCodeGen.class.php');
+require(__DATAGEN_CLASSES__ . '/TaxCodeGen.class.php');
 
-	/**
-     * The TaxCode class defined here contains any customized code for the 
-     * TaxCode class in the Object Relational Model.
-	 */
-    class TaxCode extends TaxCodeGen {
-        // String representation of the object
-		public function __toString() {
-			return sprintf('TaxCode Object %s',  $this->intRowid);
-		}
-
-        public static function GetDefault() {
-            $objCode = TaxCode::QuerySingle(
-                QQ::AndCondition(QQ::All()),
-                QQ::Clause(QQ::OrderBy(QQN::TaxCode()->ListOrder,
-                    QQN::TaxCode()->Rowid)));
-            return $objCode;
-        }
-
-        public static function GetNoTaxCode() {
-            foreach (TaxCode::LoadAll() as $objTax)
-                if ($objTax->IsNoTax())
-                    return $objTax;
-            return;
-        }
-
-        public function IsNoTax() {
-            if (strtolower($this->Code) == 'no tax') 
-                return true;
-
-            $total = $this->Tax1Rate + 
-                $this->Tax2Rate + 
-                $this->Tax3Rate + 
-                $this->Tax4Rate + 
-                $this->Tax5Rate;
-
-            if ($total == 0)
-                return true;
-
-            return false;
-        }
+/**
+ * The TaxCode class defined here contains any customized code for the
+ * TaxCode class in the Object Relational Model.
+ */
+class TaxCode extends TaxCodeGen {
+	// String representation of the object
+	public function __toString() {
+		return sprintf('TaxCode Object %s',  $this->intRowid);
 	}
-?>
+
+	public static function GetDefault() {
+		$objCode = TaxCode::QuerySingle(
+			QQ::AndCondition(QQ::All()),
+			QQ::Clause(QQ::OrderBy(QQN::TaxCode()->ListOrder,
+				QQN::TaxCode()->Rowid)));
+		return $objCode;
+	}
+
+	public static function GetNoTaxCode() {
+		foreach (TaxCode::LoadAll() as $objTax)
+			if ($objTax->IsNoTax())
+				return $objTax;
+		return;
+	}
+
+	public function IsNoTax() {
+		if (strtolower($this->Code) == 'no tax')
+			return true;
+
+		$total = $this->Tax1Rate +
+			$this->Tax2Rate +
+			$this->Tax3Rate +
+			$this->Tax4Rate +
+			$this->Tax5Rate;
+
+		if ($total == 0)
+			return true;
+
+		return false;
+	}
+}

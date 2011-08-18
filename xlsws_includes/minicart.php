@@ -23,25 +23,21 @@
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  
  */
+
 /*
 This script is used to render the mini shopping cart that floats on the right of each page to drag items into
 */
-	$total = 0; //total number of items
 
-	
-	if(!$this->cartPnl){
-		$this->cartPnl = new QPanel($this , 'shoppingcart');
-		$this->cartPnl->CssClass = "rounded";
-		$this->cartPnl->Template = templateNamed('minicart.tpl.php');
+$total = 0; //total number of items
 
-		// Let's have the pnlPanel auto render any and all child controls
-		$this->cartPnl->AutoRenderChildren = true;
-		
-		if(_xls_get_conf('DISABLE_CART' , false))
-			$this->cartPnl->Visible = false;
-		
-	}
-	
-	
+if(!$this->cartPnl) {
+	$this->cartPnl = new QPanel($this , 'shoppingcart');
+	$this->cartPnl->CssClass = "rounded";
+	$this->cartPnl->Template = templateNamed('minicart.tpl.php');
 
-?>
+	// Let's have the pnlPanel auto render any and all child controls
+	$this->cartPnl->AutoRenderChildren = true;
+
+	if(_xls_get_conf('DISABLE_CART' , false))
+		$this->cartPnl->Visible = false;
+}
