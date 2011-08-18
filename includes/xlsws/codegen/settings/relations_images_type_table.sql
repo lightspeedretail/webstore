@@ -4,7 +4,7 @@ CREATE TABLE xlsws_images_type (
   width int(5) NOT NULL,
   height int(5) NOT NULL,
   PRIMARY KEY(`id`),
-  UNIQUE KEY `name` (`name`)
+  UNIQUE KEY `name` (`name`),
   UNIQUE KEY `size` (`width`,`height`)
 ) ENGINE=MyISAM;
 
