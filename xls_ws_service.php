@@ -680,7 +680,7 @@ EOS;
             $objImage = new Images();
             $objImage->Width = imagesx($blbImage);
             $objImage->Height = imagesy($blbImage);
-            $objImage->Created = new cQDateTime(QDateTime::Now);
+            $objImage->Created = new QDateTime(QDateTime::Now);
             $objImage->SaveImageData(
                 Images::GetImageName($intRowid, 0, 0, $intIndex, 'add'),
                 $blbRawImage
