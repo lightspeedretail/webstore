@@ -7,7 +7,7 @@
  */
 
 if (!empty(QApplication::$Database)) {
-	if (!defined(__PREPEND_QUICKINIT__)) {
+	if (!defined('__PREPEND_QUICKINIT__')) {
 
 		// Ensure we load the database session storage object if needed
 		if (_xls_get_conf('SESSION_HANDLER') == 'DB') { 

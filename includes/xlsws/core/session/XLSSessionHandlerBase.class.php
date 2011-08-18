@@ -50,7 +50,7 @@ abstract class XLSSessionHandlerBase extends QBaseClass {
 
 	// Return a string to use as the session name
 	public static function GetSessionName() {
-		return 'XLSWS_' . substr(md5(__INCLUDES), 0, 7);
+		return 'XLSWS_' . substr(md5(__INCLUDES__), 0, 7);
 	}
 
 	// Return the maximum time a session may exist, in seconds

@@ -25,7 +25,7 @@
  */
 
 if (!empty(QApplication::$Database)) {
-	if (!defined(__PREPEND_QUICKINIT__)) {
+	if (!defined('__PREPEND_QUICKINIT__')) {
 
 		// Register garbage collection events for rich session handlers
 		if (XLSSessionHandler::$SessionHandler) {

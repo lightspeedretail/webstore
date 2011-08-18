@@ -25,7 +25,7 @@
  */
 
 if (!empty(QApplication::$Database)) {
-	if (!defined(__PREPEND_QUICKINIT__)) {
+	if (!defined('__PREPEND_QUICKINIT__')) {
 		global $XLSWS_VARS;
 		$XLSWS_VARS = array_merge($_GET, $_POST);
 
