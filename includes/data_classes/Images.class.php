@@ -228,6 +228,8 @@ class Images extends ImagesGen {
 		if ($strName && (_xls_get_conf('IMAGE_STORE' , 'FS') == 'FS')) {
 			$strPath = Images::GetImagePath($strName);
 
+            $this->DeleteImage();
+
 			if (file_put_contents($strPath, $blbImage)) {
 				$this->strImagePath = $strName;
 				$this->strImageData = null;
