@@ -38,7 +38,7 @@
     // Destination for Code Generated class files
     define ('__DATA_CLASSES__', __INCLUDES__ . '/data_classes');
     define ('__DATAGEN_CLASSES__', __INCLUDES__ . '/data_classes/generated');
-
+    // Define empty constants to prevent Qcodo from generating these
     define ('__FORM_DRAFTS__', '');
     define ('__PANEL_DRAFTS__', '');
     define ('__DATA_META_CONTROLS__', '');
