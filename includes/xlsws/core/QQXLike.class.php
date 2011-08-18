@@ -24,252 +24,251 @@
  
  */
 
-    /*
-     * Qcodo query builder used to generate the search algorithm
-     */
-    class QQXLike extends QQConditionComparison {
-        protected $operator;
+/*
+ * Qcodo query builder used to generate the search algorithm
+ */
+class QQXLike extends QQConditionComparison {
+	protected $operator;
 
-        public function __construct(QQNode $objQueryNode, $strValue, 
-            $strOperator = ADVANCED_SEARCH_DEFAULT_OPERATOR) {
+	public function __construct(QQNode $objQueryNode, $strValue,
+		$strOperator = ADVANCED_SEARCH_DEFAULT_OPERATOR) {
 
-            $this->operator = $strOperator;
-            
-            $this->objQueryNode = $objQueryNode;
-            if (!$objQueryNode->_ParentNode)
-                throw new QInvalidCastException('Unable to cast "' . 
-                    $objQueryNode->_Name . '" table to Column-based QQNode', 3);
+		$this->operator = $strOperator;
 
-            if ($strValue instanceof QQNamedValue)
-            $this->mixOperand = $strValue;
-            else {
-                try {
-                    $this->mixOperand = QType::Cast($strValue, QType::String);
-                } catch (QCallerException $objExc) {
-                    $objExc->IncrementOffset();
-                    $objExc->IncrementOffset();
-                    throw $objExc;
-                }
-            }
-        }
+		$this->objQueryNode = $objQueryNode;
+		if (!$objQueryNode->_ParentNode)
+			throw new QInvalidCastException('Unable to cast "' .
+				$objQueryNode->_Name . '" table to Column-based QQNode', 3);
 
-        public function UpdateQueryBuilder(QQueryBuilder $objBuilder) {
-            if ($this->mixOperand instanceof QQNamedValue)
-                $objBuilder->AddWhereItem("LOWER(" . 
-                    $this->objQueryNode->GetColumnAlias($objBuilder) . 
-                        ') LIKE ' . $this->mixOperand->Parameter()
-                );
-            else
-                $objBuilder->AddWhereItem("(" . 
-                    $this->search_keyword("LOWER(" . 
-                        $this->objQueryNode->GetColumnAlias($objBuilder) . 
-                        ")",
-                    $this->mixOperand,
-                    $this->operator) . ")"
-                );
-        }
-        
-        // Parse search string into indivual objects
-        protected function parse_search_string($search_str = '', 
-            &$objects, $search_operator = ADVANCED_SEARCH_DEFAULT_OPERATOR) {
+		if ($strValue instanceof QQNamedValue)
+		$this->mixOperand = $strValue;
+		else {
+			try {
+				$this->mixOperand = QType::Cast($strValue, QType::String);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
+	}
 
-            $search_str = trim(mb_strtolower($search_str));
+	public function UpdateQueryBuilder(QQueryBuilder $objBuilder) {
+		if ($this->mixOperand instanceof QQNamedValue)
+			$objBuilder->AddWhereItem("LOWER(" .
+				$this->objQueryNode->GetColumnAlias($objBuilder) .
+					') LIKE ' . $this->mixOperand->Parameter()
+			);
+		else
+			$objBuilder->AddWhereItem("(" .
+				$this->search_keyword("LOWER(" .
+					$this->objQueryNode->GetColumnAlias($objBuilder) .
+					")",
+				$this->mixOperand,
+				$this->operator) . ")"
+			);
+	}
 
-            // get rid of brackets
-            $search_str = str_replace("(","",$search_str);
-            $search_str = str_replace(")","",$search_str);
-            
-            // Break up $search_str on whitespace; quoted string will be 
-            // reconstructed later
-            $pieces = preg_split('/\s+/', $search_str);
-            $objects = array();
-            $tmpstring = '';
-            $flag = '';
+	// Parse search string into indivual objects
+	protected function parse_search_string($search_str = '',
+		&$objects, $search_operator = ADVANCED_SEARCH_DEFAULT_OPERATOR) {
 
-            for ($k=0; $k<count($pieces); $k++) {
-                while (substr($pieces[$k], 0, 1) == '(') {
-                    $objects[] = '(';
-                    if (strlen($pieces[$k]) > 1) {
-                        $pieces[$k] = substr($pieces[$k], 1);
-                    } else {
-                        $pieces[$k] = '';
-                    }
-                }
+		$search_str = trim(mb_strtolower($search_str));
 
-                $post_objects = array();
+		// get rid of brackets
+		$search_str = str_replace("(","",$search_str);
+		$search_str = str_replace(")","",$search_str);
 
-                while (substr($pieces[$k], -1) == ')')  {
-                    $post_objects[] = ')';
-                    if (strlen($pieces[$k]) > 1) {
-                        $pieces[$k] = substr($pieces[$k], 0, -1);
-                    } else {
-                        $pieces[$k] = '';
-                    }
-                }
+		// Break up $search_str on whitespace; quoted string will be
+		// reconstructed later
+		$pieces = preg_split('/\s+/', $search_str);
+		$objects = array();
+		$tmpstring = '';
+		$flag = '';
 
-                // Check individual words
-                if ((substr($pieces[$k], -1) != '"') && 
-                    (substr($pieces[$k], 0, 1) != '"')) {
-                    $objects[] = trim($pieces[$k]);
+		for ($k=0; $k<count($pieces); $k++) {
+			while (substr($pieces[$k], 0, 1) == '(') {
+				$objects[] = '(';
+				if (strlen($pieces[$k]) > 1) {
+					$pieces[$k] = substr($pieces[$k], 1);
+				} else {
+					$pieces[$k] = '';
+				}
+			}
 
-                    for ($j=0; $j<count($post_objects); $j++) {
-                        $objects[] = $post_objects[$j];
-                    }
-                } else {
-                    /* This means that the $piece is either the beginning or 
-                     * the end of a string. So, we'll slurp up the $pieces 
-                     * and stick them together until we get to the end of the 
-                     * string or run out of pieces.
-                     */
+			$post_objects = array();
 
-                    // Add this word to the $tmpstring, starting the $tmpstring
-                    $tmpstring = trim(preg_replace('/"/', ' ', $pieces[$k]));
+			while (substr($pieces[$k], -1) == ')') {
+				$post_objects[] = ')';
+				if (strlen($pieces[$k]) > 1) {
+					$pieces[$k] = substr($pieces[$k], 0, -1);
+				} else {
+					$pieces[$k] = '';
+				}
+			}
 
-                    // Check for one possible exception to the rule. 
-                    // That there is a single quoted word.
-                    if (substr($pieces[$k], -1 ) == '"') {
-                        // Turn the flag off for future iterations
-                        $flag = 'off';
+			// Check individual words
+			if ((substr($pieces[$k], -1) != '"') &&
+				(substr($pieces[$k], 0, 1) != '"')) {
+				$objects[] = trim($pieces[$k]);
 
-                        $objects[] = trim($pieces[$k]);
+				for ($j=0; $j<count($post_objects); $j++) {
+					$objects[] = $post_objects[$j];
+				}
+			} else {
+				/* This means that the $piece is either the beginning or
+				 * the end of a string. So, we'll slurp up the $pieces
+				 * and stick them together until we get to the end of the
+				 * string or run out of pieces.
+				 */
 
-                        for ($j=0; $j<count($post_objects); $j++) {
-                            $objects[] = $post_objects[$j];
-                        }
+				// Add this word to the $tmpstring, starting the $tmpstring
+				$tmpstring = trim(preg_replace('/"/', ' ', $pieces[$k]));
 
-                        unset($tmpstring);
+				// Check for one possible exception to the rule.
+				// That there is a single quoted word.
+				if (substr($pieces[$k], -1 ) == '"') {
+					// Turn the flag off for future iterations
+					$flag = 'off';
 
-                        // Stop looking for the end of the string and move 
-                        // onto the next word.
-                        continue;
-                    }
+					$objects[] = trim($pieces[$k]);
 
-                    // Otherwise, turn on the flag to indicate no quotes have 
-                    // been found attached to this word in the string.
-                    $flag = 'on';
+					for ($j=0; $j<count($post_objects); $j++) {
+						$objects[] = $post_objects[$j];
+					}
 
-                    // Move on to the next word
-                    $k++;
+					unset($tmpstring);
 
-                    // Keep reading until the end of the string as long as the 
-                    // $flag is on
+					// Stop looking for the end of the string and move
+					// onto the next word.
+					continue;
+				}
 
-                    while ( ($flag == 'on') && ($k < count($pieces)) ) {
-                        while (substr($pieces[$k], -1) == ')') {
-                            $post_objects[] = ')';
-                            if (strlen($pieces[$k]) > 1) {
-                                $pieces[$k] = substr($pieces[$k], 0, -1);
-                            } else {
-                                $pieces[$k] = '';
-                            }
-                        }
+				// Otherwise, turn on the flag to indicate no quotes have
+				// been found attached to this word in the string.
+				$flag = 'on';
 
-                        // If the word doesn't end in double quotes, append 
-                        // it to the $tmpstring.
-                        if (substr($pieces[$k], -1) != '"') {
-                            // Tack this word onto the current string entity
-                            $tmpstring .= ' ' . $pieces[$k];
+				// Move on to the next word
+				$k++;
 
-                            // Move on to the next word
-                            $k++;
-                            continue;
-                        } else {
-                            /* If the $piece ends in double quotes, strip the 
-                             * double quotes, tack the $piece onto the tail 
-                             * of the string, push the $tmpstring onto the 
-                             * $haves, kill the $tmpstring, turn the $flag 
-                             * "off", and return.
-                             */
-                            $tmpstring .= ' ' . trim(preg_replace('/"/', ' ', 
-                                $pieces[$k]));
+				// Keep reading until the end of the string as long as the
+				// $flag is on
 
-                            // Push the $tmpstring onto the array of stuff 
-                            // to search for
-                            $objects[] = trim($tmpstring);
+				while ( ($flag == 'on') && ($k < count($pieces)) ) {
+					while (substr($pieces[$k], -1) == ')') {
+						$post_objects[] = ')';
+						if (strlen($pieces[$k]) > 1) {
+							$pieces[$k] = substr($pieces[$k], 0, -1);
+						} else {
+							$pieces[$k] = '';
+						}
+					}
 
-                            for ($j=0; $j<count($post_objects); $j++) {
-                                $objects[] = $post_objects[$j];
-                            }
+					// If the word doesn't end in double quotes, append
+					// it to the $tmpstring.
+					if (substr($pieces[$k], -1) != '"') {
+						// Tack this word onto the current string entity
+						$tmpstring .= ' ' . $pieces[$k];
 
-                            unset($tmpstring);
+						// Move on to the next word
+						$k++;
+						continue;
+					} else {
+						/* If the $piece ends in double quotes, strip the
+						 * double quotes, tack the $piece onto the tail
+						 * of the string, push the $tmpstring onto the
+						 * $haves, kill the $tmpstring, turn the $flag
+						 * "off", and return.
+						 */
+						$tmpstring .= ' ' . trim(preg_replace('/"/', ' ',
+							$pieces[$k]));
 
-                            // Turn off the flag to exit the loop
-                            $flag = 'off';
-                        }
-                    }
-                }
-            }
+						// Push the $tmpstring onto the array of stuff
+						// to search for
+						$objects[] = trim($tmpstring);
 
-            // add default logical operators if needed
-            $temp = array();
-            for($i=0; $i<(count($objects)-1); $i++) {
-                $temp[sizeof($temp)] = $objects[$i];
+						for ($j=0; $j<count($post_objects); $j++) {
+							$objects[] = $post_objects[$j];
+						}
 
-                if ( ($objects[$i] != 'and') &&
-                ($objects[$i] != 'or') &&
-                ($objects[$i] != '(') &&
-                ($objects[$i] != ')') &&
-                ($objects[$i+1] != 'and') &&
-                ($objects[$i+1] != 'or') &&
-                ($objects[$i+1] != '(') &&
-                ($objects[$i+1] != ')') ) {
-                    $temp[sizeof($temp)] = $search_operator;
-                }
-            }
-            $temp[sizeof($temp)] = $objects[$i];
-            $objects = $temp;
+						unset($tmpstring);
 
-            $keyword_count = 0;
-            $operator_count = 0;
-            $balance = 0;
-            for($i=0; $i<count($objects); $i++) {
-                if ($objects[$i] == '(') $balance --;
-                if ($objects[$i] == ')') $balance ++;
-                if ( ($objects[$i] == 'and') || ($objects[$i] == 'or') ) {
-                    $operator_count ++;
-                } elseif (($objects[$i]) && (
-                    $objects[$i] != '(') && 
-                    ($objects[$i] != ')') ) {
-                        $keyword_count ++;
-                }
-            }
+						// Turn off the flag to exit the loop
+						$flag = 'off';
+					}
+				}
+			}
+		}
 
-            if ( ($operator_count < $keyword_count) && ($balance == 0) ) {
-                return true;
-            } else {
-                return false;
-            }
-        }
+		// add default logical operators if needed
+		$temp = array();
+		for($i=0; $i<(count($objects)-1); $i++) {
+			$temp[sizeof($temp)] = $objects[$i];
 
-        protected function search_keyword($column_name, $keywords, 
-            $search_operator = ADVANCED_SEARCH_DEFAULT_OPERATOR) {
+			if ( ($objects[$i] != 'and') &&
+			($objects[$i] != 'or') &&
+			($objects[$i] != '(') &&
+			($objects[$i] != ')') &&
+			($objects[$i+1] != 'and') &&
+			($objects[$i+1] != 'or') &&
+			($objects[$i+1] != '(') &&
+			($objects[$i+1] != ')') ) {
+				$temp[sizeof($temp)] = $search_operator;
+			}
+		}
+		$temp[sizeof($temp)] = $objects[$i];
+		$objects = $temp;
 
-            $where_str = " ";
-             
-            if (!empty($keywords)) {
-                if ($this->parse_search_string(stripslashes($keywords), 
-                    $search_keywords, $search_operator)) {
+		$keyword_count = 0;
+		$operator_count = 0;
+		$balance = 0;
+		for($i=0; $i<count($objects); $i++) {
+			if ($objects[$i] == '(') $balance --;
+			if ($objects[$i] == ')') $balance ++;
+			if ( ($objects[$i] == 'and') || ($objects[$i] == 'or') ) {
+				$operator_count ++;
+			} elseif (($objects[$i]) && (
+				$objects[$i] != '(') &&
+				($objects[$i] != ')') ) {
+					$keyword_count ++;
+			}
+		}
 
-                    $where_str .= " (";
-                    for ($i=0, $n=sizeof($search_keywords); $i<$n; $i++ ) {
-                        switch ($search_keywords[$i]) {
-                            case '(':
-                            case ')':
-                            case 'and':
-                            case 'or':
-                                $where_str .= " " . $search_keywords[$i] . " ";
-                                break;
-                            default:
-                                $where_str .= "($column_name like '%" . 
-                                    addslashes($search_keywords[$i]) .  "%') ";
-                                break;
-                        }
-                    }
-                    $where_str .= " )";
-                }
-            } else
-                return "1=1";
-            return $where_str;
-        }
-    }
+		if ( ($operator_count < $keyword_count) && ($balance == 0) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
+	protected function search_keyword($column_name, $keywords,
+		$search_operator = ADVANCED_SEARCH_DEFAULT_OPERATOR) {
+
+		$where_str = " ";
+
+		if (!empty($keywords)) {
+			if ($this->parse_search_string(stripslashes($keywords),
+				$search_keywords, $search_operator)) {
+
+				$where_str .= " (";
+				for ($i=0, $n=sizeof($search_keywords); $i<$n; $i++ ) {
+					switch ($search_keywords[$i]) {
+						case '(':
+						case ')':
+						case 'and':
+						case 'or':
+							$where_str .= " " . $search_keywords[$i] . " ";
+							break;
+						default:
+							$where_str .= "($column_name like '%" .
+								addslashes($search_keywords[$i]) .  "%') ";
+							break;
+					}
+				}
+				$where_str .= " )";
+			}
+		} else
+			return "1=1";
+		return $where_str;
+	}
+}

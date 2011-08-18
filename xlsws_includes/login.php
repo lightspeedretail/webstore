@@ -23,43 +23,30 @@
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  
  */
-    /**
-     * xlsws_login class
-     * This is the controller class for the login modal box
-     * This class is responsible for querying the database for various aspects needed on this page
-     * and assigning template variables to the views related to the login popup
-     */	
-   class xlsws_login extends xlsws_index {
-        
-   		protected $msg; //message to display in modal box
-   		
-        /**
-         * build_main - constructor for this controller
-         * @param none
-         * @return none
-         */          		
-		protected function build_main(){
-			global $XLSWS_VARS;
-			
-			$this->dxLogin->MatteClickable = false;
-            $this->dxLogin->Visible = true;
-            
-            $this->mainPnl = new QPanel($this);
-            
-            
-		}
-		
-		
-		
-		
-		
-		
-		
-		
-   }
-   
-   
-   if(!defined('CUSTOM_STOP_XLSWS'))
-   	xlsws_login::Run('xlsws_login', templateNamed('index.tpl.php'));
 
-?>
+/**
+ * xlsws_login class
+ * This is the controller class for the login modal box
+ * This class is responsible for querying the database for various aspects needed on this page
+ * and assigning template variables to the views related to the login popup
+ */
+class xlsws_login extends xlsws_index {
+	protected $msg; //message to display in modal box
+
+	/**
+	 * build_main - constructor for this controller
+	 * @param none
+	 * @return none
+	 */
+	protected function build_main(){
+		global $XLSWS_VARS;
+
+		$this->dxLogin->MatteClickable = false;
+		$this->dxLogin->Visible = true;
+
+		$this->mainPnl = new QPanel($this);
+	}
+}
+
+if(!defined('CUSTOM_STOP_XLSWS'))
+	xlsws_login::Run('xlsws_login', templateNamed('index.tpl.php'));

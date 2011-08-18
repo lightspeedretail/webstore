@@ -24,27 +24,26 @@
  
  */
 
-   /*
-     * XLSListBox
-     * 
-     * Extends QListBox class 
-     */
-    
-    class XLSListBox extends QListBox{
-        public function __construct($objParentObject , $strControlId = null){
-            parent::__construct($objParentObject , $strControlId);
-            parent::AddAction(new QEnterKeyEvent() , new QTerminateAction());
-        }
-        
-        private $blnHasNoEnterAction = true;
-        
-        public function AddAction($objEvent , $objAction){
-            if (($objEvent instanceof QEnterKeyEvent) && 
-                ($this->blnHasNoEnterAction)) {
-                    $this->blnHasNoEnterAction = false;
-                    $this->RemoveAllActions('onkeypress');
-            }
-            parent::AddAction($objEvent , $objAction);
-        }
-    }
-?> 
+/*
+ * XLSListBox
+ *
+ * Extends QListBox class
+ */
+
+class XLSListBox extends QListBox {
+	public function __construct($objParentObject , $strControlId = null) {
+		parent::__construct($objParentObject , $strControlId);
+		parent::AddAction(new QEnterKeyEvent() , new QTerminateAction());
+	}
+
+	private $blnHasNoEnterAction = true;
+
+	public function AddAction($objEvent , $objAction) {
+		if (($objEvent instanceof QEnterKeyEvent) &&
+			($this->blnHasNoEnterAction)) {
+				$this->blnHasNoEnterAction = false;
+				$this->RemoveAllActions('onkeypress');
+		}
+		parent::AddAction($objEvent , $objAction);
+	}
+}

@@ -24,40 +24,34 @@
  
  */
 
-/* class sidebar_wishlist
-* the wish list lookup sidebar
-*/
-class sidebar_wishlist extends xlsws_class_sidebar{
-
-	 /**
+/**
+ * class sidebar_wishlist
+ * the wish list lookup sidebar
+ */
+class sidebar_wishlist extends xlsws_class_sidebar {
+	/**
 	 * Return the current module's name
 	 *
 	 * @return string
-	 */	
-	public function name(){
+	 */
+	public function name() {
 		return _sp("Wish List");
 	}
-	
+
 	/**
 	 * Return the current module's panel type
 	 * @param Qpanel - parent panel
 	 * @param integer - the id of the parent panel
 	 * @return string
 	 */
-	public function getPanel($parent , $id = null){
+	public function getPanel($parent , $id = null) {
 		$qp = new QPanel($parent , $id);
 		$qp->Template = templateNamed('sidebar_wishlist.tpl.php');
 		return $qp;
 	}
 
-	
-	/**overloaded by extended classes*/	
-	public function check(){
-		return _xls_get_conf('ENABLE_GIFT_REGISTRY' , 1);
+	/**overloaded by extended classes*/
+	public function check() {
+		return _xls_get_conf('ENABLE_GIFT_REGISTRY', 1);
 	}
-	
-	
-	
 }
-
-?>

@@ -23,82 +23,81 @@
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  
  */
-    /**
-     * Pass a string through the Translator and return
-     * @param string $strMsg
-     * @return string
-     */
-    function _sp($strMsg) {
-	    return QApplication::Translate($strMsg);
-    }
 
-    /**
-     * Xsilva safe translator performs _p(_t($strMsg))
-     * This has the effect of first translating and then replacing HTML Entities
-     * @param string $strMsg
-     * @return string
-     */
-    function _xt($strMsg) {
-        if (gettype($strMsg) != 'object')
-            print(QApplication::HtmlEntities(
-                QApplication::Translate($strMsg)
-            ));
-        else
-            print($strMsg);
-    }
+/**
+ * Pass a string through the Translator and return
+ * @param string $strMsg
+ * @return string
+ */
+function _sp($strMsg) {
+	return QApplication::Translate($strMsg);
+}
 
-    /**
-     * Redirect to a given URL
-     * @param string $url
-     */
-    function _rd($url = '') {	
-    	global $_SERVER;
-	
-    	if(empty($url))
-    		$url = $_SERVER["REQUEST_URI"];
-	
-    	QApplicationBase::Redirect($url);
-    }
+/**
+ * Xsilva safe translator performs _p(_t($strMsg))
+ * This has the effect of first translating and then replacing HTML Entities
+ * @param string $strMsg
+ * @return string
+ */
+function _xt($strMsg) {
+	if (gettype($strMsg) != 'object')
+		print(QApplication::HtmlEntities(
+			QApplication::Translate($strMsg)
+		));
+	else
+		print($strMsg);
+}
 
-    /**
-     * Shortcut for a javascript alert
-     * @param string $msg
-     */
-    function _qalert($msg){
-	    $msg = addslashes($msg);
-    	QApplication::ExecuteJavaScript("alert('$msg')");
-    }
+/**
+ * Redirect to a given URL
+ * @param string $url
+ */
+function _rd($url = '') {
+	global $_SERVER;
 
-    /**
-     * Shortcut to perform a database query
-     * May perform either a NonQuery (ex.: update/insert) or a Query (select)
-     * @param string $strQuery
-     * @param string $queryFunc {NonQuery,Query}
-     * @return object $objDbResult
-     */
-    function _dbx($strQuery , $queryFunc = "NonQuery"){
-	    $objDatabase = QApplication::$Database[1];
+	if(empty($url))
+		$url = $_SERVER["REQUEST_URI"];
 
-        // Perform the Query
-        $objDbResult = $objDatabase->$queryFunc($strQuery);
-    
-        return $objDbResult;
-    }
+	QApplicationBase::Redirect($url);
+}
 
-    /**
-     * Shortcut to perform a database query and return the first result item
-     * @param string $strQuery
-     * @param string $queryFunc {NonQuery,Query}
-     * @return object $objDbResult
-     */
-    function _dbx_first_cell($strQuery) {
-	    $res = _dbx($strQuery , "Query");
-		$row = $res->FetchRow();
-		
-		if(!$row)
-		    return false;
-			
-        return $row[0];
-    }
-	
-?>
+/**
+ * Shortcut for a javascript alert
+ * @param string $msg
+ */
+function _qalert($msg) {
+	$msg = addslashes($msg);
+	QApplication::ExecuteJavaScript("alert('$msg')");
+}
+
+/**
+ * Shortcut to perform a database query
+ * May perform either a NonQuery (ex.: update/insert) or a Query (select)
+ * @param string $strQuery
+ * @param string $queryFunc {NonQuery,Query}
+ * @return object $objDbResult
+ */
+function _dbx($strQuery , $queryFunc = "NonQuery") {
+	$objDatabase = QApplication::$Database[1];
+
+	// Perform the Query
+	$objDbResult = $objDatabase->$queryFunc($strQuery);
+
+	return $objDbResult;
+}
+
+/**
+ * Shortcut to perform a database query and return the first result item
+ * @param string $strQuery
+ * @param string $queryFunc {NonQuery,Query}
+ * @return object $objDbResult
+ */
+function _dbx_first_cell($strQuery) {
+	$res = _dbx($strQuery , "Query");
+	$row = $res->FetchRow();
+
+	if(!$row)
+		return false;
+
+	return $row[0];
+}

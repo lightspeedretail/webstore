@@ -24,63 +24,61 @@
  
  */
 
-	require(__DATAGEN_CLASSES__ . '/StateGen.class.php');
+require(__DATAGEN_CLASSES__ . '/StateGen.class.php');
 
-	/**
-     * The State class defined here contains any customized code for the State 
-     * class in the Object Relational Model.  It represents the "xlsws_state" 
-     * table in the database.
-	 */
-    class State extends StateGen {
-        // Define the Object Manager
-        public static $Manager;
+/**
+ * The State class defined here contains any customized code for the State
+ * class in the Object Relational Model.  It represents the "xlsws_state"
+ * table in the database.
+ */
+class State extends StateGen {
+	// Define the Object Manager
+	public static $Manager;
 
-        // String representation of the object
-		public function __toString() {
-			return sprintf('State Object %s',  $this->code);
+	// String representation of the object
+	public function __toString() {
+		return sprintf('State Object %s',  $this->code);
+	}
+
+	// Initialize the Object Manager on the class
+	public static function InitializeManager() {
+		if (!State::$Manager)
+			State::$Manager =
+				XLSObjectManager::Singleton('XLSStateManager','code');
+	}
+
+	public static function Load($intRowid, $forceload = false) {
+		if (!$forceload && State::$Manager) {
+			$obj = State::$Manager->GetByUniqueProperty(
+				'Rowid', $intRowid);
+
+			if ($obj)
+				return $obj;
 		}
 
-        // Initialize the Object Manager on the class
-        public static function InitializeManager() {
-            if (!State::$Manager)
-                State::$Manager =
-                    XLSObjectManager::Singleton('XLSStateManager','code');
-        }
+		return parent::Load($intRowid);
+	}
 
-        public static function Load($intRowid, $forceload = false) {
-            if (!$forceload && State::$Manager) {
-                $obj = State::$Manager->GetByUniqueProperty(
-                    'Rowid', $intRowid);
+	public static function LoadByCode($strCode, $forceload = false) {
+		return State::QuerySingle(
+			QQ::Equal(QQN::State()->Code, $strCode)
+		);
+	}
 
-                if ($obj)
-                    return $obj;
-            }   
-
-            return parent::Load($intRowid);
-        }   
-
-        public static function LoadByCode($strCode, $forceload = false) {
-			return State::QuerySingle(
-				QQ::Equal(QQN::State()->Code, $strCode)
+	/**
+	 * Return the default sorting order clause
+	 * @param boolean $sql :: Return SQL query part or QQ::Clause
+	 * @return mix
+	 */
+	public static function GetDefaultOrdering($sql = false) {
+		if ($sql)
+			return 'order by `sort_order`,`state`';
+		else
+			return QQ::Clause(
+				QQ::OrderBy(
+					QQN::State()->SortOrder,
+					QQN::State()->State
+				)
 			);
-        }   
-
-
-        /** 
-         * Return the default sorting order clause
-         * @param boolean $sql :: Return SQL query part or QQ::Clause
-         * @return mix
-         */
-        public static function GetDefaultOrdering($sql = false) {
-            if ($sql)
-                return 'order by `sort_order`,`state`';
-            else
-                return QQ::Clause(
-                    QQ::OrderBy(
-                        QQN::State()->SortOrder,
-                        QQN::State()->State
-                    )   
-                );  
-        }
-    }
-?>
+	}
+}

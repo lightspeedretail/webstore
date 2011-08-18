@@ -24,22 +24,21 @@
  
  */
 
-	require(__DATAGEN_CLASSES__ . '/CartTypeGen.class.php');
+require(__DATAGEN_CLASSES__ . '/CartTypeGen.class.php');
 
-	/**
-	 * The CartType class defined here contains any
-	 * customized code for the CartType enumerated type. 
-	 * 
-	 * It represents the enumerated values found in the "xlsws_cart_type" table in the database,
-	 * and extends from the code generated abstract CartTypeGen
-	 * class, which contains all the values extracted from the database.
-	 * 
-	 * Type classes which are generally used to attach a type to data object.
-	 * However, they may be used as simple database independent enumerated type.
-	 * 
-	 * @package My Application
-	 * @subpackage DataObjects
-	 */
-	abstract class CartType extends CartTypeGen {
-	}
-?>
+/**
+ * The CartType class defined here contains any
+ * customized code for the CartType enumerated type.
+ *
+ * It represents the enumerated values found in the "xlsws_cart_type" table in the database,
+ * and extends from the code generated abstract CartTypeGen
+ * class, which contains all the values extracted from the database.
+ *
+ * Type classes which are generally used to attach a type to data object.
+ * However, they may be used as simple database independent enumerated type.
+ *
+ * @package My Application
+ * @subpackage DataObjects
+ */
+abstract class CartType extends CartTypeGen {
+}

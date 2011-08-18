@@ -24,47 +24,44 @@
  
  */
 
-	require(__DATAGEN_CLASSES__ . '/GiftRegistryGen.class.php');
+require(__DATAGEN_CLASSES__ . '/GiftRegistryGen.class.php');
 
+/**
+ * The GiftRegistry class defined here contains any
+ * customized code for the GiftRegistry class in the
+ * Object Relational Model.  It represents the "xlsws_gift_registry" table
+ * in the database, and extends from the code generated abstract GiftRegistryGen
+ * class, which contains all the basic CRUD-type functionality as well as
+ * basic methods to handle relationships and index-based loading.
+ *
+ * @package My Application
+ * @subpackage DataObjects
+ *
+ */
+class GiftRegistry extends GiftRegistryGen {
 	/**
-	 * The GiftRegistry class defined here contains any
-	 * customized code for the GiftRegistry class in the
-	 * Object Relational Model.  It represents the "xlsws_gift_registry" table 
-	 * in the database, and extends from the code generated abstract GiftRegistryGen
-	 * class, which contains all the basic CRUD-type functionality as well as
-	 * basic methods to handle relationships and index-based loading.
-	 * 
-	 * @package My Application
-	 * @subpackage DataObjects
-	 * 
+	 * Default "to string" handler
+	 * Allows pages to _p()/echo()/print() this object, and to define the default
+	 * way this object would be outputted.
+	 *
+	 * Can also be called directly via $objGiftRegistry->__toString().
+	 *
+	 * @return string a nicely formatted string representation of this object
 	 */
-	class GiftRegistry extends GiftRegistryGen {
-		/**
-		 * Default "to string" handler
-		 * Allows pages to _p()/echo()/print() this object, and to define the default
-		 * way this object would be outputted.
-		 *
-		 * Can also be called directly via $objGiftRegistry->__toString().
-		 *
-		 * @return string a nicely formatted string representation of this object
-		 */
-		public function __toString() {
-			return sprintf('GiftRegistry Object %s',  $this->intRowid);
-		}
-
-
-		public function __set($strName, $mixValue) {
-			if ($strName == "EventDate")
-			{
-					try {
-						return ($this->dttEventDate = $mixValue);
-					} catch (QCallerException $objExc) {
-						$objExc->IncrementOffset();
-						throw $objExc;
-					}			
-			}
-			else
-				parent::__set($strName,$mixValue);
-		}
+	public function __toString() {
+		return sprintf('GiftRegistry Object %s',  $this->intRowid);
 	}
-?>
+
+	public function __set($strName, $mixValue) {
+		if ($strName == "EventDate") {
+				try {
+					return ($this->dttEventDate = $mixValue);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+		else
+			parent::__set($strName,$mixValue);
+	}
+}
