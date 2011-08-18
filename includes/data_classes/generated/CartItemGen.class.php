@@ -13,7 +13,7 @@
 	 * overriding existing or implementing new methods, properties and variables
 	 * in the CartItem class.
 	 * 
-	 * @package My Application
+	 * @package LightSpeed Web Store
 	 * @subpackage GeneratedDataObjects
 	 * @property integer $Rowid the value for intRowid (Read-Only PK)
 	 * @property integer $CartId the value for intCartId (Not Null)
@@ -806,7 +806,7 @@
 		 * @param bool $blnForceUpdate
 		 * @return int
 		 */
-        public function Save($blnForceInsert = false, $blnForceUpdate = false) {
+		public function Save($blnForceInsert = false, $blnForceUpdate = false) {
 			// Get the Database Object for this Class
 			$objDatabase = CartItem::GetDatabase();
 
@@ -814,7 +814,7 @@
 
 			try {
 				if ((!$this->__blnRestored) || ($blnForceInsert)) {
-                    // Perform an INSERT query
+					// Perform an INSERT query
 					$objDatabase->NonQuery('
 						INSERT INTO `xlsws_cart_item` (
 							`cart_id`,

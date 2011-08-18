@@ -13,7 +13,7 @@
 	 * overriding existing or implementing new methods, properties and variables
 	 * in the Family class.
 	 * 
-	 * @package My Application
+	 * @package LightSpeed Web Store
 	 * @subpackage GeneratedDataObjects
 	 * @property integer $Rowid the value for intRowid (Read-Only PK)
 	 * @property string $Family the value for strFamily (Unique)

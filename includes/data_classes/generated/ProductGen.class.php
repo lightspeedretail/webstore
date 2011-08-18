@@ -13,7 +13,7 @@
 	 * overriding existing or implementing new methods, properties and variables
 	 * in the Product class.
 	 * 
-	 * @package My Application
+	 * @package LightSpeed Web Store
 	 * @subpackage GeneratedDataObjects
 	 * @property integer $Rowid the value for intRowid (Read-Only PK)
 	 * @property string $Name the value for strName (Not Null)
@@ -566,14 +566,6 @@
 			);
 		}
 
-		/*public static function LoadByCode($strCode) {
-			// Use QuerySingle to Perform the Query
-			return Product::QuerySingle(
-				QQ::Equal(QQN::Product()->Code, $strCode)
-			);
-		}*/
-		
-		
 		/**
 		 * Load all Products
 		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
@@ -1411,38 +1403,6 @@
 				QQ::Equal(QQN::Product()->FkTaxStatusId, $intFkTaxStatusId)
 			);
 		}
-			
-		/**
-		 * Load an array of Product objects,
-		 * by Featured Index(es)
-		 * @param boolean $blnFeatured
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return Product[]
-		*/
-		public static function LoadArrayByFeatured($blnFeatured, $objOptionalClauses = null) {
-			// Call Product::QueryArray to perform the LoadArrayByFeatured query
-			try {
-				return Product::QueryArray(
-					QQ::Equal(QQN::Product()->Featured, $blnFeatured),
-					$objOptionalClauses);
-			} catch (QCallerException $objExc) {
-				$objExc->IncrementOffset();
-				throw $objExc;
-			}
-		}
-
-		/**
-		 * Count Products
-		 * by Featured Index(es)
-		 * @param boolean $blnFeatured
-		 * @return int
-		*/
-		public static function CountByFeatured($blnFeatured) {
-			// Call Product::QueryCount to perform the CountByFeatured query
-			return Product::QueryCount(
-				QQ::Equal(QQN::Product()->Featured, $blnFeatured)
-			);
-		}
 
 
 
@@ -1530,9 +1490,10 @@
 			$objDatabase = Product::GetDatabase();
 
 			$mixToReturn = null;
+
 			try {
-				if (((!$this->__blnRestored) || ($blnForceInsert)) && !isset($this->intRowid)) { 
-					// Perform an INSERT query 
+				if ((!$this->__blnRestored) || ($blnForceInsert)) {
+					// Perform an INSERT query
 					$objDatabase->NonQuery('
 						INSERT INTO `xlsws_product` (
 							`name`,

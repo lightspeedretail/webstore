@@ -13,7 +13,7 @@
 	 * overriding existing or implementing new methods, properties and variables
 	 * in the GiftRegistry class.
 	 * 
-	 * @package My Application
+	 * @package LightSpeed Web Store
 	 * @subpackage GeneratedDataObjects
 	 * @property integer $Rowid the value for intRowid (Read-Only PK)
 	 * @property string $RegistryName the value for strRegistryName (Not Null)

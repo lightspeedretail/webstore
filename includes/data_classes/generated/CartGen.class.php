@@ -13,7 +13,7 @@
 	 * overriding existing or implementing new methods, properties and variables
 	 * in the Cart class.
 	 * 
-	 * @package My Application
+	 * @package LightSpeed Web Store
 	 * @subpackage GeneratedDataObjects
 	 * @property integer $Rowid the value for intRowid (Read-Only PK)
 	 * @property string $IdStr the value for strIdStr (Unique)
@@ -77,8 +77,8 @@
 	 * @property QDateTime $Submitted the value for dttSubmitted 
 	 * @property string $Modified the value for strModified (Read-Only Timestamp)
 	 * @property string $Linkid the value for strLinkid 
+	 * @property integer $FkPromoId the value for intFkPromoId 
 	 * @property TaxCode $FkTaxCode the value for the TaxCode object referenced by intFkTaxCodeId 
-	 * @property integer $FkPromoId the value for intFkPromoId 	 
 	 * @property Customer $Customer the value for the Customer object referenced by intCustomerId 
 	 * @property GiftRegistry $GiftRegistryObject the value for the GiftRegistry object referenced by intGiftRegistry 
 	 * @property CartItem $_CartItem the value for the private _objCartItem (Read-Only) if set due to an expansion on the xlsws_cart_item.cart_id reverse relationship
@@ -625,6 +625,14 @@
 
 
 		/**
+		 * Protected member variable that maps to the database column xlsws_cart.fk_promo_id
+		 * @var integer intFkPromoId
+		 */
+		protected $intFkPromoId;
+		const FkPromoIdDefault = null;
+
+
+		/**
 		 * Private member variable that stores a reference to a single CartItem object
 		 * (of type CartItem), if this Cart object was restored with
 		 * an expansion on the xlsws_cart_item association table.
@@ -638,17 +646,8 @@
 		 * an ExpandAsArray on the xlsws_cart_item association table.
 		 * @var CartItem[] _objCartItemArray;
 		 */
-		 
-		 
 		private $_objCartItemArray = array();
 
-		/**
-		 * Protected member variable that maps to the database column xlsws_cart.fk_promo_id
-		 * @var integer intFkPromoId
-		 */
-		protected $intFkPromoId;
-		const FkPromoIdDefault = null;
-		
 		/**
 		 * Private member variable that stores a reference to a single Sro object
 		 * (of type Sro), if this Cart object was restored with
@@ -1042,7 +1041,7 @@
 			$objBuilder->AddSelectItem($strTableName, 'submitted', $strAliasPrefix . 'submitted');
 			$objBuilder->AddSelectItem($strTableName, 'modified', $strAliasPrefix . 'modified');
 			$objBuilder->AddSelectItem($strTableName, 'linkid', $strAliasPrefix . 'linkid');
-			$objBuilder->AddSelectItem($strTableName, 'fk_promo_id', $strAliasPrefix . 'fk_promo_id');			
+			$objBuilder->AddSelectItem($strTableName, 'fk_promo_id', $strAliasPrefix . 'fk_promo_id');
 		}
 
 
@@ -1989,7 +1988,6 @@
 			$this->strModified = $objReloaded->strModified;
 			$this->strLinkid = $objReloaded->strLinkid;
 			$this->intFkPromoId = $objReloaded->intFkPromoId;
-			
 		}
 
 
@@ -2324,6 +2322,7 @@
 					// Gets the value for intFkPromoId 
 					// @return integer
 					return $this->intFkPromoId;
+
 
 				///////////////////
 				// Member Objects
@@ -3094,7 +3093,8 @@
 						$objExc->IncrementOffset();
 						throw $objExc;
 					}
-					
+
+
 				///////////////////
 				// Member Objects
 				///////////////////
@@ -3587,8 +3587,8 @@
 			$strToReturn .= '<element name="Submitted" type="xsd:dateTime"/>';
 			$strToReturn .= '<element name="Modified" type="xsd:string"/>';
 			$strToReturn .= '<element name="Linkid" type="xsd:string"/>';
+			$strToReturn .= '<element name="FkPromoId" type="xsd:int"/>';
 			$strToReturn .= '<element name="__blnRestored" type="xsd:boolean"/>';
-			$strToReturn .= '<element name="FkPromoId" type="xsd:int"/>';			
 			$strToReturn .= '</sequence></complexType>';
 			return $strToReturn;
 		}
@@ -3699,8 +3699,6 @@
 				$objToReturn->strPaymentData = $objSoapObject->PaymentData;
 			if (property_exists($objSoapObject, 'PaymentAmount'))
 				$objToReturn->strPaymentAmount = $objSoapObject->PaymentAmount;
-			if (property_exists($objSoapObject, 'FkPromoId'))
-				$objToReturn->intFkPromoId = $objSoapObject->FkPromoId;				
 			if ((property_exists($objSoapObject, 'FkTaxCode')) &&
 				($objSoapObject->FkTaxCode))
 				$objToReturn->FkTaxCode = TaxCode::GetObjectFromSoapObject($objSoapObject->FkTaxCode);
@@ -3742,6 +3740,8 @@
 				$objToReturn->strModified = $objSoapObject->Modified;
 			if (property_exists($objSoapObject, 'Linkid'))
 				$objToReturn->strLinkid = $objSoapObject->Linkid;
+			if (property_exists($objSoapObject, 'FkPromoId'))
+				$objToReturn->intFkPromoId = $objSoapObject->FkPromoId;
 			if (property_exists($objSoapObject, '__blnRestored'))
 				$objToReturn->__blnRestored = $objSoapObject->__blnRestored;
 			return $objToReturn;
@@ -3931,7 +3931,7 @@
 				case 'Linkid':
 					return new QQNode('linkid', 'Linkid', 'string', $this);
 				case 'FkPromoId':
-					return new QQNode('fk_promo_id', 'FkPromoId', 'integer', $this);					
+					return new QQNode('fk_promo_id', 'FkPromoId', 'integer', $this);
 				case 'CartItem':
 					return new QQReverseReferenceNodeCartItem($this, 'cartitem', 'reverse_reference', 'cart_id');
 				case 'Sro':
@@ -4087,7 +4087,7 @@
 				case 'Linkid':
 					return new QQNode('linkid', 'Linkid', 'string', $this);
 				case 'FkPromoId':
-					return new QQNode('fk_promo_id', 'FkPromoId', 'integer', $this);					
+					return new QQNode('fk_promo_id', 'FkPromoId', 'integer', $this);
 				case 'CartItem':
 					return new QQReverseReferenceNodeCartItem($this, 'cartitem', 'reverse_reference', 'cart_id');
 				case 'Sro':

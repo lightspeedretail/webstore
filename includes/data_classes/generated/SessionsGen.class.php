@@ -13,7 +13,7 @@
 	 * overriding existing or implementing new methods, properties and variables
 	 * in the Sessions class.
 	 * 
-	 * @package My Application
+	 * @package LightSpeed Web Store
 	 * @subpackage GeneratedDataObjects
 	 * @property integer $IntSessionId the value for intIntSessionId (Read-Only PK)
 	 * @property string $VchName the value for strVchName (Not Null)
