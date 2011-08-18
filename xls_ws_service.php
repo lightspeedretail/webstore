@@ -347,8 +347,12 @@
             
         }
 
-        public function save_product_image($strPasskey,
-            $intRowid, $blbRawImage, $objProduct = null) {
+        public function save_product_image($passkey,
+            $intRowid, $rawImage, $product = null) {
+
+            $strPasskey = $passkey;
+            $blbRawImage = $rawImage;
+            $objProduct = $product;
 
             if(!$this->check_passkey($strPasskey))
                 return self::FAIL_AUTH;
@@ -655,8 +659,13 @@ EOS;
          * @param integer $image_index
          * @return string
          */
-        public function add_additional_product_image_at_index($strPassKey,
-            $intRowid, $blbRawImage, $intIndex, $objProduct = null) {
+        public function add_additional_product_image_at_index($passkey,
+            $intRowid, $rawImage, $image_index) {
+
+            $strPasskey = $passkey;
+            $blbRawImage = $rawImage;
+            $intIndex = $image_index;
+            $objProduct = null;
 
             if(!$this->check_passkey($strPassKey))
                 return self::FAIL_AUTH;
