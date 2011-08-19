@@ -26,7 +26,7 @@
 
 // The "Store Pickup" shipping value.
 // This define creates an override during checkout so as to charge taxes.
-define(XLS_STORE_PICKUP_SHIPPINGMETHOD_SELECTVALUE, 'store_pickup.php');
+define('XLS_STORE_PICKUP_SHIPPINGMETHOD_SELECTVALUE', 'store_pickup.php');
 
 /**
  * xlsws_index class
