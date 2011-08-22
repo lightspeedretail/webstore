@@ -149,7 +149,7 @@ class phone_order extends xlsws_class_payment {
 	 * @param $cart[]
 	 * @return decimal
 	 */
-	public function paid_amount($cart) {
+	public function paid_amount(Cart $cart) {
 		return 0;
 	}
 }
