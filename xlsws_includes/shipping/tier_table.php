@@ -70,19 +70,15 @@ class tier_table extends xlsws_class_shipping {
 		$price = 0;
 
 		$db = ShippingTiers::GetDatabase();
-		error_log("select * from xlsws_shipping_tiers where start_price <= " . $cart->Subtotal . " and end_price >= " .$cart->Subtotal);
 		$results = $db->Query("select * from xlsws_shipping_tiers where start_price <= " . $cart->Subtotal . " and end_price >= " .$cart->Subtotal);
 		$rate = ShippingTiers::InstantiateDbResult($results);
-		error_log(print_r($rate,true));
 		$price = $rate[0]->Rate;
 		if (!isset($rate[0])){ //Price falls into a tier table price gap, so tell user we can't calculate and report error.
-		error_log("got error");
 			_xls_log("Tier Shipping: The subtotal ".$cart->Subtotal." does not fall into any defined tier.");
 			$fields['service']->Visible = false;
 			return FALSE;
 		}
 
-		error_log("here");
 		return array('price' => $price, 'product' => $config['product']);
 	}
 
