@@ -150,7 +150,7 @@ class usps extends xlsws_class_shipping {
 			if (!empty($rates)) {
 				foreach ($rates as $key => $val) {
 					$key = str_replace("reg","",strip_tags(html_entity_decode($key)));
-					$key = ereg_replace("[^A-Za-z0-9\-]", " ", $key);
+                    $key = preg_replace("/[^A-Za-z0-9\-]/", " ", $key);
 					$ret[$key] = new XLS_OnOff($objParent);
 					$ret[$key]->AddAction(new QClickEvent(), new QJavaScriptAction("addMethod('" . addslashes($key) . "', '" . $ret['shiptypes']->ControlId . "', '" . $ret[$key]->ControlId . "_a');"));
 					$ret[$key]->Name = $key;
