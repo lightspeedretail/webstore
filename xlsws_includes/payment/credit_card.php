@@ -267,7 +267,7 @@ class credit_card extends xlsws_class_payment {
 		return true;
 	}
 
-	public function process($cart, $fields, &$errortext) {
+	public function process($cart, $fields, $errortext) {
 		return  "";
 	}
 

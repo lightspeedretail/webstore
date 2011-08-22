@@ -119,7 +119,7 @@ class beanstream_aim extends credit_card {
 	 * @param $cart[], $fields[], ref $errortext
 	 * @return string|boolean
 	 */
-	public function process($cart , $fields, &$errortext) {
+	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
 		$config = $this->getConfigValues('beanstream_aim');

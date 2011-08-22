@@ -84,7 +84,7 @@ class axia extends credit_card {
 	}
 
 	// See http://wiki.usaepay.com/developer/phplibrary?DokuWiki=c39cbfafeb3eb97dbc9173da475ed407
-	public function process($cart, $fields, &$errortext) {
+	public function process($cart, $fields, $errortext) {
 
 		$customer = $this->customer();
 

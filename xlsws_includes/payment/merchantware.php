@@ -85,7 +85,7 @@ class merchantware extends credit_card {
 	}
 
 	// See https://ps1.merchantware.net/merchantware/documentation31/
-	public function process($cart , $fields, &$errortext) {
+	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
 		$config = $this->getConfigValues('merchantware');

@@ -126,7 +126,7 @@ class beanstream_sim extends xlsws_class_payment {
 	 * @param $cart[], $fields[], ref $errortext
 	 * @return string|boolean
 	 */
-	public function process($cart , $fields, &$errortext) {
+	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
 		$config = $this->getConfigValues('beanstream_sim');

@@ -194,7 +194,7 @@ class iups extends xlsws_class_shipping {
 		return $ret;
 	}
 
-	public function total($fields, Cart $cart, $country = '', $zipcode = '', $state = '', $city = '', $address2 = '', $address1 = '', $company = '', $lname = '', $fname = '') {
+	public function total($fields, $cart, $country = '', $zipcode = '', $state = '', $city = '', $address2 = '', $address1 = '', $company = '', $lname = '', $fname = '') {
 		$config = $this->getConfigValues('iups');
 
 		if(empty($config['originpostcode']) || empty($config['origincountry']) || empty($config['username']) || empty($config['accesskey']))

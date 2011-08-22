@@ -316,7 +316,7 @@ class fedex extends xlsws_class_shipping {
 	 *
 	 * @return array
 	 */
-	public function total($fields, Cart $cart, $country = '', $zipcode = '', $state = '',
+	public function total($fields, $cart, $country = '', $zipcode = '', $state = '',
 			$city = '', $address2 = '', $address1= '', $company = '', $lname = '', $fname = '') {
 
 		$config = $this->getConfigValues('fedex');

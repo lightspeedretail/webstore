@@ -257,7 +257,7 @@ class xlsws_class_payment extends XLSModule {
 	* @param $errortext
 	* @return string|boolean
 	*/
-	public function process($cart , $fields , &$errortext) {
+	public function process($cart , $fields , $errortext) {
 		return $this->name();
 	}
 
