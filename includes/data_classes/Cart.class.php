@@ -429,8 +429,8 @@ class Cart extends CartGen {
 		// default, otherwise leave it alone.
 		//
 		if ($this->blnStorePickup && $intTaxStatus) {
-			$objTaxStatus = $objShipProduct->FkTaxStatusId;
-			if ($objTaxStatus->IsNoTax())
+			$objTaxStatus = $objShipProduct->FkTaxStatus;
+			if ($objTaxStatus && $objTaxStatus->IsNoTax())
 				$intTaxStatus = 0;
 		}
 
