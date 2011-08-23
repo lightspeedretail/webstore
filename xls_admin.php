@@ -3694,7 +3694,7 @@
 			
 		}
 		
-		protected function beforeSave(Country $objItem){
+		protected function beforeSave($objItem){
 			return $objItem;
 		}
 		

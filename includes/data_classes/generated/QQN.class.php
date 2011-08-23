@@ -121,17 +121,17 @@
 			return new QQNodePromoCode('xlsws_promo_code', null, null);
 		}
 		/**
+		 * @return QQNodeSessions
+		 */
+		static public function Sessions() {
+			return new QQNodeSessions('xlsws_sessions', null, null);
+		}
+		/**
 		 * @return QQNodeShippingTiers
 		 */
 		static public function ShippingTiers() {
 			return new QQNodeShippingTiers('xlsws_shipping_tiers', null, null);
 		}
-		/**
-		 * @return QQNodeSessions
-		 */
-		static public function Sessions() {
-			return new QQNodeSessions('xlsws_sessions', null, null);
-		}		
 		/**
 		 * @return QQNodeSro
 		 */

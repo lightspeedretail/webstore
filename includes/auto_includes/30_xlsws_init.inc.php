@@ -24,32 +24,30 @@
  
  */
 
-    if (!empty(QApplication::$Database)) {
-        if (!defined(__PREPEND_QUICKINIT__)) {
-            global $XLSWS_VARS;
-            $XLSWS_VARS = array_merge($_GET, $_POST);
+if (!empty(QApplication::$Database)) {
+	if (!defined('__PREPEND_QUICKINIT__')) {
+		global $XLSWS_VARS;
+		$XLSWS_VARS = array_merge($_GET, $_POST);
 
-            global $customer;
-            if (isset($_SESSION['customer']))
-                $customer = $_SESSION['customer'];
+		global $customer;
+		if (isset($_SESSION['customer']))
+			$customer = $_SESSION['customer'];
 
-            QApplication::$EnableSession = true;
-            QApplication::InitializeSession();
+		QApplication::$EnableSession = true;
+		QApplication::InitializeSession();
 
-            // Define the Form State handler to save form states
-            QForm::$FormStateHandler = 'XLSFormStateHandler';
-            QForm::$EncryptionKey = null;
-            XLSFormStateHandler::$StatePath = __QCODO__ . '/cache/state';
-            XLSFormStateHandler::$FileNamePrefix = 'state_';
-            XLSFormStateHandler::$GarbageCollectionMaxSeconds =
-                XLSSessionHandler::GetSessionLifetime();
-        }
+		// Define the Form State handler to save form states
+		QForm::$FormStateHandler = 'XLSFormStateHandler';
+		QForm::$EncryptionKey = null;
+		XLSFormStateHandler::$StatePath = __QCODO__ . '/cache/state';
+		XLSFormStateHandler::$FileNamePrefix = 'state_';
+		XLSFormStateHandler::$GarbageCollectionMaxSeconds =
+			XLSSessionHandler::GetSessionLifetime();
+	}
 
-        QApplication::$EncodingType = _xls_get_conf('ENCODING' , "UTF-8");
+	QApplication::$EncodingType = _xls_get_conf('ENCODING' , "UTF-8");
 
-        QApplication::InitializeI18N();
-        QApplication::InitializeTimezone();
-        QApplication::InitializeLocale();
-    }
-
-?>
+	QApplication::InitializeI18N();
+	QApplication::InitializeTimezone();
+	QApplication::InitializeLocale();
+}

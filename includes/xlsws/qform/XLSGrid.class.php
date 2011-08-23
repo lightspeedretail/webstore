@@ -24,164 +24,157 @@
  
  */
 
-    /*
-     * Extends QDataGrid to add header row styles and few others
-     */
-    class XLSGrid extends QDataGrid{
-        
-        protected $arrTotalObjects;
-        
-        
-        protected function GetHeaderRowHtml() {
-            $objHeaderStyle = $this->objRowStyle->ApplyOverride(
-                $this->objHeaderRowStyle);
+/*
+ * Extends QDataGrid to add header row styles and few others
+ */
+class XLSGrid extends QDataGrid {
+	protected $arrTotalObjects;
 
-            $strToReturn = sprintf('<tr %s>', $objHeaderStyle->GetAttributes());
-            $intColumnIndex = 0;
-            if ($this->objColumnArray) 
-            foreach ($this->objColumnArray as $objColumn) {
-                if ($objColumn->OrderByClause) {
-                    // This Column is Sortable
-                    if ($intColumnIndex == $this->intSortColumnIndex)
-                        $strName = $this->GetHeaderSortedHtml($objColumn);
-                    else
-                        $strName = $objColumn->Name;
+	protected function GetHeaderRowHtml() {
+		$objHeaderStyle = $this->objRowStyle->ApplyOverride(
+			$this->objHeaderRowStyle);
 
-                    $this->strActionParameter = $intColumnIndex;
+		$strToReturn = sprintf('<tr %s>', $objHeaderStyle->GetAttributes());
+		$intColumnIndex = 0;
+		if ($this->objColumnArray)
+		foreach ($this->objColumnArray as $objColumn) {
+			if ($objColumn->OrderByClause) {
+				// This Column is Sortable
+				if ($intColumnIndex == $this->intSortColumnIndex)
+					$strName = $this->GetHeaderSortedHtml($objColumn);
+				else
+					$strName = $objColumn->Name;
 
-                    $strToReturn .= 
-                        sprintf('<th %s %s><a href="#" %s%s>%s</a></th>',
-                            $this->objHeaderRowStyle->GetAttributes(),
-                            $objColumn->HeaderCssClass,
-                            $this->GetActionAttributes(),
-                            $this->objHeaderLinkStyle->GetAttributes(),
-                            $strName
-                        );
-                } else
-                    $strToReturn .= 
-                        sprintf('<th %s %s>%s</th>', 
-                        $this->objHeaderRowStyle->GetAttributes(), 
-                        $objColumn->HeaderCssClass,
-                        $objColumn->Name
-                    );
-                $intColumnIndex++;
-            }
+				$this->strActionParameter = $intColumnIndex;
 
-            $strToReturn .= '</tr>';
+				$strToReturn .=
+					sprintf('<th %s %s><a href="#" %s%s>%s</a></th>',
+						$this->objHeaderRowStyle->GetAttributes(),
+						$objColumn->HeaderCssClass,
+						$this->GetActionAttributes(),
+						$this->objHeaderLinkStyle->GetAttributes(),
+						$strName
+					);
+			} else
+				$strToReturn .=
+					sprintf('<th %s %s>%s</th>',
+					$this->objHeaderRowStyle->GetAttributes(),
+					$objColumn->HeaderCssClass,
+					$objColumn->Name
+				);
+			$intColumnIndex++;
+		}
 
-            return $strToReturn;
-        }       
-        
-        public function __get($strName) {
-            switch ($strName) {
-                case 'TotalObjects':
-                    return  $this->arrTotalObjects;
+		$strToReturn .= '</tr>';
 
-                default:
-                    try {
-                        return parent::__get($strName);
-                    } catch (QCallerException $objExc) {
-                        $objExc->IncrementOffset();
-                        throw $objExc;
-                    }
-            }
-        }
+		return $strToReturn;
+	}
 
-        public function add_total_object($label , $obj){
-            $this->arrTotalObjects[$label] = $obj;
-        }
-        
-        public function __set($strName, $mixValue) {
-            switch ($strName) {
-                case 'TotalObjects':
-                    try {
-                        return ($this->arrTotalObjects = $mixValue);
-                    } catch (QInvalidCastException $objExc) {
-                        $objExc->IncrementOffset();
-                        throw $objExc;
-                    }
+	public function __get($strName) {
+		switch ($strName) {
+			case 'TotalObjects':
+				return  $this->arrTotalObjects;
 
-                default:
-                    try {
-                        return (parent::__set($strName, $mixValue));
-                    } catch (QCallerException $objExc) {
-                        $objExc->IncrementOffset();
-                        throw $objExc;
-                    }
-            }
-        }       
-        
-        
-        /**
-         * Print total column at the bottom
-         */
-        protected function GetFooterRowHtml(){
-            if(!$this->arrTotalObjects) return;
+			default:
+				try {
+					return parent::__get($strName);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
 
-            $strToReturn = '';
-            $colspan = count($this->objColumnArray) -1;
-            
-            foreach($this->arrTotalObjects as $label => $obj){
-                if(!$obj->Visible)
-                    continue;
-                
-                $strToReturn .= sprintf('<tr>');
-                $strToReturn .= 
-                    sprintf('<td colspan="%s" class="xls_grid_total">%s</td>',
-                        $colspan, 
-                        $label
-                    );
-                
-                $strToReturn .= sprintf('<td%s>%s</td>', 
-                    (($obj->CssClass != '')?
-                     (" class=\"" . $obj->CssClass . "\"" ):""),
-                    $obj->Render(false)
-                );
-                $strToReturn .= sprintf('</tr>');
-            }
-            
-            return $strToReturn;
-        }
-    }
-    
-    class XLSGridColumn extends QDataGridColumn {
+	public function add_total_object($label , $obj){
+		$this->arrTotalObjects[$label] = $obj;
+	}
 
-        protected $strHeaderCssClass;
+	public function __set($strName, $mixValue) {
+		switch ($strName) {
+			case 'TotalObjects':
+				try {
+					return ($this->arrTotalObjects = $mixValue);
+				} catch (QInvalidCastException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
 
-        public function __get($strName) {
-            switch ($strName) {
-                case 'HeaderCssClass': return ($this->strHeaderCssClass?" class=\"" . $this->strHeaderCssClass  .  "\"":" align=left");
+			default:
+				try {
+					return (parent::__set($strName, $mixValue));
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
 
-                default:
-                    try {
-                        return parent::__get($strName);
-                    } catch (QCallerException $objExc) {
-                        $objExc->IncrementOffset();
-                        throw $objExc;
-                    }
-            }
-        }
+	/**
+	 * Print total column at the bottom
+	 */
+	protected function GetFooterRowHtml(){
+		if(!$this->arrTotalObjects) return;
 
-        public function __set($strName, $mixValue) {
-            switch ($strName) {
-                case 'HeaderCssClass':
-                    try {
-                        return ($this->strHeaderCssClass = QType::Cast($mixValue, QType::String));
-                    } catch (QInvalidCastException $objExc) {
-                        $objExc->IncrementOffset();
-                        throw $objExc;
-                    }
+		$strToReturn = '';
+		$colspan = count($this->objColumnArray) -1;
 
-                default:
-                    try {
-                        return (parent::__set($strName, $mixValue));
-                    } catch (QCallerException $objExc) {
-                        $objExc->IncrementOffset();
-                        throw $objExc;
-                    }
-            }
-        }       
-        
-        
-    }
-    
+		foreach($this->arrTotalObjects as $label => $obj){
+			if(!$obj->Visible)
+				continue;
+
+			$strToReturn .= sprintf('<tr>');
+			$strToReturn .=
+				sprintf('<td colspan="%s" class="xls_grid_total">%s</td>',
+					$colspan,
+					$label
+				);
+
+			$strToReturn .= sprintf('<td%s>%s</td>',
+				(($obj->CssClass != '')?
+				 (" class=\"" . $obj->CssClass . "\"" ):""),
+				$obj->Render(false)
+			);
+			$strToReturn .= sprintf('</tr>');
+		}
+
+		return $strToReturn;
+	}
+}
+
+class XLSGridColumn extends QDataGridColumn {
+	protected $strHeaderCssClass;
+
+	public function __get($strName) {
+		switch ($strName) {
+			case 'HeaderCssClass': return ($this->strHeaderCssClass?" class=\"" . $this->strHeaderCssClass  .  "\"":" align=left");
+
+			default:
+				try {
+					return parent::__get($strName);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+
+	public function __set($strName, $mixValue) {
+		switch ($strName) {
+			case 'HeaderCssClass':
+				try {
+					return ($this->strHeaderCssClass = QType::Cast($mixValue, QType::String));
+				} catch (QInvalidCastException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+
+			default:
+				try {
+					return (parent::__set($strName, $mixValue));
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+}

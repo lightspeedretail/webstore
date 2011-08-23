@@ -38,6 +38,11 @@
     // Destination for Code Generated class files
     define ('__DATA_CLASSES__', __INCLUDES__ . '/data_classes');
     define ('__DATAGEN_CLASSES__', __INCLUDES__ . '/data_classes/generated');
+    // Define empty constants to prevent Qcodo from generating these
+    define ('__FORM_DRAFTS__', '');
+    define ('__PANEL_DRAFTS__', '');
+    define ('__DATA_META_CONTROLS__', '');
+    define ('__DATAGEN_META_CONTROLS__', ''); 
 
     // Xsilva specific
     define ('__CUSTOM_INCLUDES__', 
@@ -49,10 +54,6 @@
     define('SECIMG_DIR', __INCLUDES__ . '/securimage');
 
     define ('__DEVTOOLS_CLI__', __XLSWS_INCLUDES__ . '/codegen');
-    define ('__FORM_DRAFTS__', __DEVTOOLS_CLI__ . '/generated/forms');
-    define ('__PANEL_DRAFTS__', __DEVTOOLS_CLI__ . '/generated/panels');
-    define ('__DATA_META_CONTROLS__', __DEVTOOLS_CLI__ . '/generated/metas');
-
 
     /**
      * Qcodo expects these to be relative from __DOCROOT__

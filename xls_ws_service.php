@@ -346,72 +346,65 @@
             return $this->qobject_to_string($product);
             
         }
-        
-        
-        
-        
-        public function save_product_image(
-                  $passkey 
-                , $intRowid
-                , $rawImage 
-                , $product=null)
-        {
-            
-            $loadedProduct = false;
-            if(!$this->check_passkey($passkey))
+
+        public function save_product_image($passkey,
+            $intRowid, $rawImage, $product = null) {
+
+            $strPasskey = $passkey;
+            $blbRawImage = $rawImage;
+            $objProduct = $product;
+
+            if(!$this->check_passkey($strPasskey))
                 return self::FAIL_AUTH;
-            
-            if (is_null($product))
-            {
-                $product = Product::Load($intRowid);
-                if (! $product)
-                {
-                    QApplication::Log(E_WARNING, 'uploader', 
-                        "Product ID does not exist $intRowid", __FUNCTION__);
-                    return self::UNKNOWN_ERROR;
-                }
-                $loadedProduct = true;
+
+            if (!$blbRawImage) {
+                QApplication::Log(E_ERROR, 'uploader',
+                    'Did not receive image data for ' . $intRowid, __FUNCTION__);                return self::UNKNOWN_ERROR;
+            }    
+
+            if (is_null($objProduct))
+                $objProduct = Product::Load($intRowid);
+
+            if (!$objProduct) {
+                QApplication::Log(E_ERROR, 'uploader',
+                    "Product Id does not exist $intRowid", __FUNCTION__);
+                return self::UNKNOWN_ERROR;
+            }    
+
+            $blbImage = imagecreatefromstring($blbRawImage);
+            $objImage = false;
+
+            if ($objProduct->ImageId)
+                $objImage = Images::LoadByRowid($objProduct->ImageId);
+
+            if (!$objImage)
+                $objImage = new Images();
+
+            $objImage->Width = imagesx($blbImage);
+            $objImage->Height = imagesy($blbImage);
+
+            if (!$objImage->Created)
+                $objImage->Created = new QDateTime(QDateTime::Now);
+
+            $objImage->SaveImageData(
+                Images::GetImageName($intRowid), $blbRawImage
+            );
+            $objImage->Save();
+
+            if ((!$objProduct->ImageId) ||
+                ($objProduct->ImageId != $objImage->Rowid)) {
+                $objProduct->ImageId = $objImage->Rowid;
+                $objProduct->Save();
             }
-            
-            if ($rawImage)
-            { 
-                $im = imagecreatefromstring($rawImage);
-                $image = Images::LoadByRowid($product->ImageId);
 
-                if($product->ImageId  && ($image = Images::LoadByRowid($product->ImageId))){ // There is a image already
-                    
-                    $image->SetImage($rawImage , $intRowid);
-                    $image->ImageData = $rawImage;
-                    $image->Width = imagesx ( $im );
-                    $image->Height = imagesy ( $im );
-                    $image->Save();
-                    
-                }else{
-                    $image = new Images();
-                    $image->SetImage($rawImage , $intRowid);
-                    $image->Width = imagesx ( $im );
-                    $image->Height = imagesy ( $im );
-                    $image->Created = new  QDateTime(QDateTime::Now);
-                    // need to save here in order to have a rowid set...
-                    $image->Save();
-
-                    $product->ImageId = $image->Rowid;
-
-                    if ($loadedProduct)
-                        $product->Save();
-                }
-                $image->Parent = $image->Rowid;
-                $image->Save();
-
-                // Free memory
-                unset($im);
-                
-                unset($image);
+            if (!$objImage->Parent) {
+                $objImage->Parent = $objImage->Rowid;
+                $objImage->Save();
             }
-            
+
             return self::OK;
-            
         }
+
         /**
          * Save a product in the database (Create if need be)
          *
@@ -666,60 +659,59 @@ EOS;
          * @param integer $image_index
          * @return string
          */
-        public function add_additional_product_image_at_index($passkey , $intRowid , $rawImage, $image_index){
-            
-            if(!$this->check_passkey($passkey))
+        public function add_additional_product_image_at_index($passkey,
+            $intRowid, $rawImage, $image_index) {
+
+            $strPasskey = $passkey;
+            $blbRawImage = $rawImage;
+            $intIndex = $image_index;
+            $objProduct = null;
+
+            if(!$this->check_passkey($strPassKey))
                 return self::FAIL_AUTH;
 
-
-            $product = Product::Load($intRowid);
-            
-            if(!$product){
-                /*QApplication::Log(E_WARNING, 'uploader', 
-                    "Product ID does not exist $intRowid", __FUNCTION__);*/
-                return self::UNKNOWN_ERROR;
-            }
-                
-                
-    
-            
-            if($rawImage){
-                
-                $im = imagecreatefromstring($rawImage);
-                
-                $image = new Images();
-                $image->SetImage($rawImage , $intRowid . "_" . $image_index . "_add");
-                $image->Width = imagesx ( $im );
-                $image->Height = imagesy ( $im );
-                $image->Created = new  QDateTime(QDateTime::Now);
-                $image->Save(true);
-                
-                $image->Parent = $image->Rowid;
-                $image->Save();
-                                
-            }else{
-                _xls_log("SOAP ERROR : Image data could not be decoded for product_id $intRowid .");
+            if (!$blbRawImage) {
+                QApplication::Log(E_ERROR, 'uploader',
+                    'Did not receive image data for ' . $intRowid, __FUNCTION__);
                 return self::UNKNOWN_ERROR;
             }
 
-            if($image){
-                try{
-                    $product->AssociateImagesAsImage($image);
-                }catch(Exception $e){
-                    _xls_log("SOAP ERROR : Error associating additional images for Product $intRowid ." . $e);
-                    return self::UNKNOWN_ERROR;
-                }
-                unset($image);
-            }else{
-                _xls_log("SOAP ERROR : could not generate additional image for Product $intRowid ." . $e);
+            if (is_null($objProduct))
+                $objProduct = Product::Load($intRowid);
+
+            if (!$objProduct) {
+                QApplication::Log(E_ERROR, 'uploader',
+                    'Product Id does not exist ' . $intRowid, __FUNCTION__);
                 return self::UNKNOWN_ERROR;
             }
-            
+
+            $blbImage = imagecreatefromstring($blbRawImage);
+            $objImage = new Images();
+            $objImage->Width = imagesx($blbImage);
+            $objImage->Height = imagesy($blbImage);
+            $objImage->Created = new QDateTime(QDateTime::Now);
+            $objImage->SaveImageData(
+                Images::GetImageName($intRowid, 0, 0, $intIndex, 'add'),
+                $blbRawImage
+            );
+            $objImage->Save(true);
+
+            $objImage->Parent = $objImage->Rowid;
+            $objImage->Save();
+
+            try {
+                $objProduct->AssociateImagesAsImage($objImage);
+            }
+            catch (Exception $objExc) {
+                QApplication::Log(E_ERROR, 'uploader',
+                    'Could not associate image for ' . $objProduct->Code . ' : ' .
+                    $objExc, __FUNCTION__);
+                return self::UNKNOWN_ERROR;
+            }
+
             return self::OK;
         }
-        
-        
-        
+
         /**
          * Remove product
          *

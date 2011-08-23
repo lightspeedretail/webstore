@@ -23,34 +23,27 @@
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  
  */
-    /**
-     * xlsws_msg class
-     * This is the controller class for displaying a page that shows a message passed to this script via the stack
-     */
-   class xlsws_msg extends xlsws_index {
 
-        /**
-         * build_main - constructor for this controller
-         * @param none
-         * @return none
-         */                
-   		protected function build_main(){
-			global $XLSWS_VARS;
-				
-			$this->msg = _xls_stack_pop('msg');
+/**
+ * xlsws_msg class
+ * This is the controller class for displaying a page that shows a message passed to this script via the stack
+ */
+class xlsws_msg extends xlsws_index {
 
-			$this->mainPnl = new QPanel($this);
-			
-			$this->mainPnl->Template = templateNamed('msg.tpl.php');
-			
-			
-		}
-		
-		
-   }
-   
-   
-   if(!defined('CUSTOM_STOP_XLSWS'))
-   	xlsws_msg::Run('xlsws_msg', templateNamed('index.tpl.php'));
+	/**
+	 * build_main - constructor for this controller
+	 * @param none
+	 * @return none
+	 */
+	protected function build_main() {
+		global $XLSWS_VARS;
 
-?>
+		$this->msg = _xls_stack_pop('msg');
+
+		$this->mainPnl = new QPanel($this);
+		$this->mainPnl->Template = templateNamed('msg.tpl.php');
+	}
+}
+
+if(!defined('CUSTOM_STOP_XLSWS'))
+	xlsws_msg::Run('xlsws_msg', templateNamed('index.tpl.php'));

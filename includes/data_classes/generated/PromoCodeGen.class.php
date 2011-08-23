@@ -13,7 +13,7 @@
 	 * overriding existing or implementing new methods, properties and variables
 	 * in the PromoCode class.
 	 * 
-	 * @package My Application
+	 * @package LightSpeed Web Store
 	 * @subpackage GeneratedDataObjects
 	 * @property integer $Rowid the value for intRowid (Read-Only PK)
 	 * @property string $Code the value for strCode 
@@ -96,12 +96,14 @@
 		protected $strLscodes;
 		const LscodesDefault = null;
 
+
 		/**
-		 * Protected member variable that maps to the database column xlsws_promo_code.amount
-		 * @var string strAmount
+		 * Protected member variable that maps to the database column xlsws_promo_code.threshold
+		 * @var string strThreshold
 		 */
 		protected $strThreshold;
 		const ThresholdDefault = null;
+
 
 		/**
 		 * Protected array of virtual attributes for this object (e.g. extra/other calculated and/or non-object bound
@@ -587,8 +589,8 @@
 							`valid_from` = ' . $objDatabase->SqlVariable($this->strValidFrom) . ',
 							`qty_remaining` = ' . $objDatabase->SqlVariable($this->intQtyRemaining) . ',
 							`valid_until` = ' . $objDatabase->SqlVariable($this->strValidUntil) . ',
-							`threshold` = ' . $objDatabase->SqlVariable($this->strThreshold) . ',
-							`lscodes` = ' . $objDatabase->SqlVariable($this->strLscodes) . '
+							`lscodes` = ' . $objDatabase->SqlVariable($this->strLscodes) . ',
+							`threshold` = ' . $objDatabase->SqlVariable($this->strThreshold) . '
 						WHERE
 							`rowid` = ' . $objDatabase->SqlVariable($this->intRowid) . '
 					');
@@ -734,7 +736,7 @@
 					// Gets the value for strLscodes (Not Null)
 					// @return string
 					return $this->strLscodes;
-					
+
 				case 'Threshold':
 					// Gets the value for strThreshold (Not Null)
 					// @return string
@@ -853,7 +855,7 @@
 						$objExc->IncrementOffset();
 						throw $objExc;
 					}
-		
+
 				case 'Threshold':
 					// Sets the value for strThreshold (Not Null)
 					// @param string $mixValue
@@ -864,7 +866,7 @@
 						$objExc->IncrementOffset();
 						throw $objExc;
 					}
-					
+
 
 				///////////////////
 				// Member Objects
@@ -954,7 +956,7 @@
 			if (property_exists($objSoapObject, 'Lscodes'))
 				$objToReturn->strLscodes = $objSoapObject->Lscodes;
 			if (property_exists($objSoapObject, 'Threshold'))
-				$objToReturn->strThreshold = $objSoapObject->strThreshold;
+				$objToReturn->strThreshold = $objSoapObject->Threshold;
 			if (property_exists($objSoapObject, '__blnRestored'))
 				$objToReturn->__blnRestored = $objSoapObject->__blnRestored;
 			return $objToReturn;

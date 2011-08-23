@@ -24,33 +24,31 @@
  
  */
 
-	require(__DATAGEN_CLASSES__ . '/LogGen.class.php');
+require(__DATAGEN_CLASSES__ . '/LogGen.class.php');
 
+/**
+ * The Log class defined here contains any
+ * customized code for the Log class in the
+ * Object Relational Model.  It represents the "xlsws_log" table
+ * in the database, and extends from the code generated abstract LogGen
+ * class, which contains all the basic CRUD-type functionality as well as
+ * basic methods to handle relationships and index-based loading.
+ *
+ * @package My Application
+ * @subpackage DataObjects
+ *
+ */
+class Log extends LogGen {
 	/**
-	 * The Log class defined here contains any
-	 * customized code for the Log class in the
-	 * Object Relational Model.  It represents the "xlsws_log" table 
-	 * in the database, and extends from the code generated abstract LogGen
-	 * class, which contains all the basic CRUD-type functionality as well as
-	 * basic methods to handle relationships and index-based loading.
-	 * 
-	 * @package My Application
-	 * @subpackage DataObjects
-	 * 
+	 * Default "to string" handler
+	 * Allows pages to _p()/echo()/print() this object, and to define the default
+	 * way this object would be outputted.
+	 *
+	 * Can also be called directly via $objLog->__toString().
+	 *
+	 * @return string a nicely formatted string representation of this object
 	 */
-	class Log extends LogGen {
-		/**
-		 * Default "to string" handler
-		 * Allows pages to _p()/echo()/print() this object, and to define the default
-		 * way this object would be outputted.
-		 *
-		 * Can also be called directly via $objLog->__toString().
-		 *
-		 * @return string a nicely formatted string representation of this object
-		 */
-		public function __toString() {
-			return sprintf('Log Object %s',  $this->intRowid);
-		}
-
+	public function __toString() {
+		return sprintf('Log Object %s',  $this->intRowid);
 	}
-?>
+}

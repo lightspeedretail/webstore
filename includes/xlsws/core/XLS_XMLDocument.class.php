@@ -24,376 +24,376 @@
  
  */
 
-// TODO : What is the origin of this ? 
+// TODO : What is the origin of this ?
 
-    class XLS_XMLDocument {
-        var $root;
-        var $children;
+class XLS_XMLDocument {
+	var $root;
+	var $children;
 
-        function XLS_XMLDocument() {
-        }
+	function XLS_XMLDocument() {
+	}
 
-        function createElement($name) {
-            $node = new XLS_Node();
-            $node->setName($name);
-            $node->setType(XLS_Node::ELEMENT);
-            return $node;
-        }
+	function createElement($name) {
+		$node = new XLS_Node();
+		$node->setName($name);
+		$node->setType(XLS_Node::ELEMENT);
+		return $node;
+	}
 
-        function createTextElement($text) {
-            $node = new XLS_Node();
-            $node->setType(XLS_Node::TEXTELEMENT);
-            $node->setValue($text);
-            return $node;
-        }
+	function createTextElement($text) {
+		$node = new XLS_Node();
+		$node->setType(XLS_Node::TEXTELEMENT);
+		$node->setValue($text);
+		return $node;
+	}
 
-        function getRoot() {
-            return $this->root;
-        }
+	function getRoot() {
+		return $this->root;
+	}
 
-        function setRoot($node) {
-            $this->root = $node;
-        }
+	function setRoot($node) {
+		$this->root = $node;
+	}
 
-        function toString() {
-            if ($this->root) {
-                return $this->root->toString();
-            } else {
-                return "DOCUMENT ROOT NOT SET";
-            }
-        }
+	function toString() {
+		if ($this->root) {
+			return $this->root->toString();
+		} else {
+			return "DOCUMENT ROOT NOT SET";
+		}
+	}
 
-        function getValueByPath($path) {
-            $pathArray = explode("/", $path);
-            if ($pathArray[0] == $this->root->getName()) {
-                //print_r("Looking for " . $pathArray[0] . "<br>");
-                array_shift($pathArray);
-                $newPath = implode("/", $pathArray);
-                return $this->root->getValueByPath($newPath);
-            }
-        }
-    }
+	function getValueByPath($path) {
+		$pathArray = explode("/", $path);
+		if ($pathArray[0] == $this->root->getName()) {
+			//print_r("Looking for " . $pathArray[0] . "<br>");
+			array_shift($pathArray);
+			$newPath = implode("/", $pathArray);
+			return $this->root->getValueByPath($newPath);
+		}
+	}
+}
 
+class XLS_Node {
+	var $name;
+	var $type;
+	var $text;
+	var $parent;
+	var $children;
+	var $attributes;
 
-    class XLS_Node {
-        var $name;
-        var $type;
-        var $text;
-        var $parent;
-        var $children;
-        var $attributes;
+	const ELEMENT = 0;
+	const TEXTELEMENT = 1;
 
-        const ELEMENT = 0;
-        const TEXTELEMENT = 1;
-    
-        function XLS_Node() {
-            $this->children = array();
-            $this->attributes = array();
-        }
+	function XLS_Node() {
+		$this->children = array();
+		$this->attributes = array();
+	}
 
-        function getName() {
-            return $this->name;
-        }
+	function getName() {
+		return $this->name;
+	}
 
-        function setName($name) {
-            $this->name = $name;
-        }
+	function setName($name) {
+		$this->name = $name;
+	}
 
-        function setParent(&$node) {
-            $this->parent =& $node;
-        }
+	function setParent(&$node) {
+		$this->parent =& $node;
+	}
 
-        function &getParent() {
-            return $this->parent;
-        }
+	function &getParent() {
+		return $this->parent;
+	}
 
-        function &getChildren() {
-            return $this->children;
-        }
+	function &getChildren() {
+		return $this->children;
+	}
 
-        function getType() {
-            return $this->type;
-        }
+	function getType() {
+		return $this->type;
+	}
 
-        function setType($type) {
-            $this->type = $type;
-        }
+	function setType($type) {
+		$this->type = $type;
+	}
 
-        function getElementByName($name) {
-            for ($i = 0; $i < count($this->children); $i++) {
-                if ($this->children[$i]->getType() == XLS_Node::ELEMENT) {
-                    if ($this->children[$i]->getName() == $name) {
-                        return $this->children[$i];
-                    }
-                }
-            }
-            return null;
-        }
+	function getElementByName($name) {
+		for ($i = 0; $i < count($this->children); $i++) {
+			if ($this->children[$i]->getType() == XLS_Node::ELEMENT) {
+				if ($this->children[$i]->getName() == $name) {
+					return $this->children[$i];
+				}
+			}
+		}
+		return null;
+	}
 
-        function getElementByPath($path) {
-            $pathArray = explode('/', $path);
-        
-            $total = count($pathArray);
+	function getElementByPath($path) {
+		$pathArray = explode('/', $path);
 
-            for ($i = 0; $i < $total; $i++) {
-                if (empty($pathArray[$i])) {
-                    unset($pathArray[$i]);
-                    continue;
-                }
+		$total = count($pathArray);
 
-                if (!$this->getChildren()) {
-                    return null;
-                }
+		for ($i = 0; $i < $total; $i++) {
+			if (empty($pathArray[$i])) {
+				unset($pathArray[$i]);
+				continue;
+			}
 
-                $children_total = count($this->children);
-                for ($k = 0; $k < $children_total; $k++) {
-                    // last node
-                    if ($this->children[$k]->getName() == $pathArray[$i] && 
-                        sizeof($pathArray) == 1) {
-                        return $this->children[$k];
-                    } elseif ($this->children[$k]->getName() == 
-                        $pathArray[$i]) {
-                        unset($pathArray[$i]);
-                        return $this->children[$k]->getElementByPath(
-                            implode('/', $pathArray));
-                    }
-                }
-            }
-        
-            return null;
-        }
+			if (!$this->getChildren()) {
+				return null;
+			}
 
-    function getElementsByName($name) {
-        $elements = array();
-        for ($i = 0; $i < count($this->children); $i++) {
-            if ($this->children[$i]->getType() == XLS_Node::ELEMENT) {
-                if ($this->children[$i]->getName() == $name) {
-                    $elements[] = $this->children[$i];
-                }
-            }
-        }
-        return $elements;
-    }
+			$children_total = count($this->children);
+			for ($k = 0; $k < $children_total; $k++) {
+				// last node
+				if ($this->children[$k]->getName() == $pathArray[$i] &&
+					sizeof($pathArray) == 1) {
+					return $this->children[$k];
+				} elseif ($this->children[$k]->getName() ==
+					$pathArray[$i]) {
+					unset($pathArray[$i]);
+					return $this->children[$k]->getElementByPath(
+						implode('/', $pathArray));
+				}
+			}
+		}
 
-    function getValueByPath($path) {
-        $pathArray = explode('/', $path);
-        
-        $total = count($pathArray);
+		return null;
+	}
 
-        for ($i = 0; $i < $total; $i++) {
-            if (empty($pathArray[$i])) {
-                unset($pathArray[$i]);
-                continue;
-            }
+	function getElementsByName($name) {
+		$elements = array();
+		for ($i = 0; $i < count($this->children); $i++) {
+			if ($this->children[$i]->getType() == XLS_Node::ELEMENT) {
+				if ($this->children[$i]->getName() == $name) {
+					$elements[] = $this->children[$i];
+				}
+			}
+		}
+		return $elements;
+	}
 
-            if ($this->getName() == $pathArray[$i]) {
-                unset($pathArray[$i]);
-                return $this->getValueByPath(implode('/', $pathArray));
-            }
-            
-            if (!$this->getChildren()) {
-                return null;
-            }
+	function getValueByPath($path) {
+		$pathArray = explode('/', $path);
 
-            $children_total = count($this->children);
-            for ($k = 0; $k < $children_total; $k++) {
-                // last node
-                if ($this->children[$k]->getName() == $pathArray[$i] && sizeof($pathArray) == 1) {
-                    return $this->children[$k]->getValue();
-                } elseif ($this->children[$k]->getName() == $pathArray[$i]) {
-                    unset($pathArray[$i]);
-                    return $this->children[$k]->getValueByPath(implode('/', $pathArray));
-                }
-            }
-        }
-        
-        return null;
-        
+		$total = count($pathArray);
 
-        /*for ($i = 0; $i < count($pathArray); $i++) {
-            //print_r("Looking for " . $pathArray[$i] ."<br>");
-            if ($node->getChildren()) {
-                for ($j = 0; $j < count($node->getChildren()); $j++) {
-                    if ($node->children[$j]->getType() == ELEMENT) {
-                        if ($node->children[$j]->getName() == $pathArray[$i]) {
-                            //print_r("Found " . $pathArray[$i] ."<br>");
-                            $node = $node->children[$j];
-                        }
-                    }
-                }
-            }
-        }
-        return $node->getValue();
-        
-*/
-        
+		for ($i = 0; $i < $total; $i++) {
+			if (empty($pathArray[$i])) {
+				unset($pathArray[$i]);
+				continue;
+			}
 
-    } 
+			if ($this->getName() == $pathArray[$i]) {
+				unset($pathArray[$i]);
+				return $this->getValueByPath(implode('/', $pathArray));
+			}
 
-    function getText() {
-        return $this->text();
-    }
+			if (!$this->getChildren()) {
+				return null;
+			}
 
-    function setValue($text) {
-        $this->text = $text;
-    }
+			$children_total = count($this->children);
+			for ($k = 0; $k < $children_total; $k++) {
+				// last node
+				if ($this->children[$k]->getName() == $pathArray[$i] && sizeof($pathArray) == 1) {
+					return $this->children[$k]->getValue();
+				} elseif ($this->children[$k]->getName() == $pathArray[$i]) {
+					unset($pathArray[$i]);
+					return $this->children[$k]->getValueByPath(implode('/', $pathArray));
+				}
+			}
+		}
 
-    function getValue() {
-        $value = NULL;
-        if ($this->getType() == XLS_Node::ELEMENT) {
-            for ($i = 0; $i < count($this->children); $i++) {
-                $value .= $this->children[$i]->getValue();
-            }
-        } elseif ($this->getType() == XLS_Node::TEXTELEMENT) {
-            $value .= $this->text;
-        }
-        return $value;
-    }
+		return null;
 
-    function setAttribute($name, $value) {
-        $this->attributes[$name] = $value;
-    }
+		/*for ($i = 0; $i < count($pathArray); $i++) {
+			//print_r("Looking for " . $pathArray[$i] ."<br>");
+			if ($node->getChildren()) {
+				for ($j = 0; $j < count($node->getChildren()); $j++) {
+					if ($node->children[$j]->getType() == ELEMENT) {
+						if ($node->children[$j]->getName() == $pathArray[$i]) {
+							//print_r("Found " . $pathArray[$i] ."<br>");
+							$node = $node->children[$j];
+						}
+					}
+				}
+			}
+		}
+		return $node->getValue();
 
-    function getAttribute($name) {
-        return $this->attributes[$name];
-    }
+		*/
+	}
 
-    function addNode(&$node) {
-        $this->children[] =& $node;
-        $node->parent =& $this;
-    }
+	function getText() {
+		return $this->text();
+	}
 
-    function parentToString($node) {
-        while($node->parent) {
-            //print_r("Node " . $node->name . " has parent<br>");
-            $node = $node->parent;
-        }
-        //print_r("Node contents from root: " . $node->toString() . "<br>");
-    }
+	function setValue($text) {
+		$this->text = $text;
+	}
 
-    function toString() {
-        $string = NULL;    
-        //print_r("toString child count " . $this->name . " contains " . count($this->children) . "<br>");    
-        if ($this->type == XLS_Node::ELEMENT) {
-            $string .= '{' . $this->name . '}';
-            for ($i = 0; $i < count($this->children); $i++) {
-                $string .= $this->children[$i]->toString();
-            }
-            $string .= '{/' . $this->name . '}';
-        } else {
-            $string .= $this->getValue();
-        }
-        return $string;
-    }
+	function getValue() {
+		$value = NULL;
+		if ($this->getType() == XLS_Node::ELEMENT) {
+			for ($i = 0; $i < count($this->children); $i++) {
+				$value .= $this->children[$i]->getValue();
+			}
+		} elseif ($this->getType() == XLS_Node::TEXTELEMENT) {
+			$value .= $this->text;
+		}
+		return $value;
+	}
+
+	function setAttribute($name, $value) {
+		$this->attributes[$name] = $value;
+	}
+
+	function getAttribute($name) {
+		return $this->attributes[$name];
+	}
+
+	function addNode(&$node) {
+		$this->children[] =& $node;
+		$node->parent =& $this;
+	}
+
+	function parentToString($node) {
+		while($node->parent) {
+			//print_r("Node " . $node->name . " has parent<br>");
+			$node = $node->parent;
+		}
+		//print_r("Node contents from root: " . $node->toString() . "<br>");
+	}
+
+	function toString() {
+		$string = NULL;
+		//print_r("toString child count " . $this->name . " contains " . count($this->children) . "<br>");
+		if ($this->type == XLS_Node::ELEMENT) {
+			$string .= '{' . $this->name . '}';
+			for ($i = 0; $i < count($this->children); $i++) {
+				$string .= $this->children[$i]->toString();
+			}
+			$string .= '{/' . $this->name . '}';
+		} else {
+			$string .= $this->getValue();
+		}
+		return $string;
+	}
 }
 
 //**************
 class XLS_XMLParser {
-    var $xp;
-    var $document;
-    var $current;
-    var $error;
+	var $xp;
+	var $document;
+	var $current;
+	var $error;
 
-    function XLS_XMLParser() {
-        $this->document = new XLS_XMLDocument();
-        $this->error = array();
-    }
+	function XLS_XMLParser() {
+		$this->document = new XLS_XMLDocument();
+		$this->error = array();
+	}
 
-    function setDocument($document) {
-        $this->document = $document;
-    }
+	function setDocument($document) {
+		$this->document = $document;
+	}
 
-    function getDocument() {
-        return $this->document;
-    }
+	function getDocument() {
+		return $this->document;
+	}
 
-    function destruct(){
-        xml_parser_free($this->xp);
-    }
+	function destruct(){
+		xml_parser_free($this->xp);
+	}
 
-    // return 1 for an error, 0 for no error
-    function hasErrors() {
-        if (sizeof($this->error) > 0) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
+	// return 1 for an error, 0 for no error
+	function hasErrors() {
+		if (sizeof($this->error) > 0) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
 
-    // return array of error messages
-    function getError() {
-        return $this->error;
-    }
+	// return array of error messages
+	function getError() {
+		return $this->error;
+	}
 
-    // process xml start tag
-    function startElement($xp, $name, $attrs) {
-        //print_r("Found Start Tag: " . $name . "<br>");
-        $node =& $this->document->createElement($name);
-        if (!empty($attrs)) {
-            foreach ($attrs as $k => $v) {
-                $node->setAttribute($k, $v);
-            }
-        }
-        if ($this->document->getRoot()) {
-            $this->current->addNode($node);
-        } else {
-            $this->document->root =& $node;
-        }
-        $this->current =& $node;
-    }
+	// process xml start tag
+	function startElement($xp, $name, $attrs) {
+		//print_r("Found Start Tag: " . $name . "<br>");
+		$node =& $this->document->createElement($name);
+		if (!empty($attrs)) {
+			foreach ($attrs as $k => $v) {
+				$node->setAttribute($k, $v);
+			}
+		}
+		if ($this->document->getRoot()) {
+			$this->current->addNode($node);
+		} else {
+			$this->document->root =& $node;
+		}
+		$this->current =& $node;
+	}
 
-    // process xml end tag
-    function endElement($xp, $name){
-        //print_r("Found End Tag: " . $name . "<br>");
-        if ($this->current->getParent()) {
-            $this->current =& $this->current->getParent();
-        }
-    }
+	// process xml end tag
+	function endElement($xp, $name) {
+		//print_r("Found End Tag: " . $name . "<br>");
+		if ($this->current->getParent()) {
+			$this->current =& $this->current->getParent();
+		}
+	}
 
-    // process data between xml tags
-    function dataHandler($xp, $text) {
-        //print_r("Adding Data: \"" . $text . "\"<br>");
-        $node =& $this->document->createTextElement($text);
-        $this->current->addNode($node);
-    }
+	// process data between xml tags
+	function dataHandler($xp, $text) {
+		//print_r("Adding Data: \"" . $text . "\"<br>");
+		$node =& $this->document->createTextElement($text);
+		$this->current->addNode($node);
+	}
 
-    // parse xml document from string
-    function parse($xmlString) {
-        if(!($this->xp = @xml_parser_create())) {
-            $this->error['description'] = 'Could not create xml parser';
-        }
-        if(!$this->hasErrors()) {
-            if(!@xml_set_object($this->xp, $this)) {
-                $this->error['description'] = 'Could not set xml parser for object';
-            }
-        }
-        if(!$this->hasErrors()) {
-            if(!@xml_set_element_handler($this->xp, 'startElement', 'endElement')) {
-                $this->error['description'] = 'Could not set xml element handler';
-            }
-        }
-        if(!$this->hasErrors()) {
-            if(!@xml_set_character_data_handler($this->xp, 'dataHandler')) {
-                $this->error['description'] = 'Could not set xml character handler';
-            }
-        } 
-        xml_parser_set_option($this->xp, XML_OPTION_CASE_FOLDING, false);
-        if (!$this->hasErrors()) {
-            if(!@xml_parse($this->xp, $xmlString)) {
-                $this->error['description'] = xml_error_string(xml_get_error_code($this->xp));
-                $this->error['line'] = xml_get_current_line_number($this->xp);
-            }
-        }
-    }
+	// parse xml document from string
+	function parse($xmlString) {
+		if(!($this->xp = @xml_parser_create())) {
+			$this->error['description'] = 'Could not create xml parser';
+		}
 
-    function generateDocument($xml)
-    {
-        $this->parse($xml);
+		if(!$this->hasErrors()) {
+			if(!@xml_set_object($this->xp, $this)) {
+				$this->error['description'] = 'Could not set xml parser for object';
+			}
+		}
 
-        if (!empty($this->error)) {
-            return null;
-        }
+		if(!$this->hasErrors()) {
+			if(!@xml_set_element_handler($this->xp, 'startElement', 'endElement')) {
+				$this->error['description'] = 'Could not set xml element handler';
+			}
+		}
 
-        return $this->document->getRoot();
-    }
+		if(!$this->hasErrors()) {
+			if(!@xml_set_character_data_handler($this->xp, 'dataHandler')) {
+				$this->error['description'] = 'Could not set xml character handler';
+			}
+		}
+
+		xml_parser_set_option($this->xp, XML_OPTION_CASE_FOLDING, false);
+
+		if (!$this->hasErrors()) {
+			if(!@xml_parse($this->xp, $xmlString)) {
+				$this->error['description'] = xml_error_string(xml_get_error_code($this->xp));
+				$this->error['line'] = xml_get_current_line_number($this->xp);
+			}
+		}
+	}
+
+	function generateDocument($xml) {
+		$this->parse($xml);
+
+		if (!empty($this->error)) {
+			return null;
+		}
+
+		return $this->document->getRoot();
+	}
 }

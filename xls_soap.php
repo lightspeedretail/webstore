@@ -25,22 +25,19 @@
  */
 
 /*** THIS SCRIPT IS SOLELY USED BY THE LIGHTSPEED SOFTWARE FOR PUSH AND PULL REQUESTS VIA SOAP, DO NOT MODIFY ***/
-	ini_set('soap.wsdl_cache_enabled',false);
-	ob_start();
-	require_once('xls_ws_service.php');
-	ob_end_clean();
-	
-	
-	define('XLSWS_SOAP' , true);
+ini_set('soap.wsdl_cache_enabled',false);
+ob_start();
+require_once('xls_ws_service.php');
+ob_end_clean();
 
-	if(_xls_get_conf('DEBUG_LS_SOAP_CALL' , false)  && isset($GLOBALS['HTTP_RAW_POST_DATA']))
-		_xls_log("SOAP DEBUG : " . print_r($GLOBALS['HTTP_RAW_POST_DATA'] , true));
-	
-	// ENABLE SOAP Debugging by the following SQL:
-	// INSERT INTO `xlsws_configuration` (`rowid`, `title`, `key`, `value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`) VALUES (NULL, 'Debug', 'DEBUG_LS_SOAP_CALL', '1', 'Debug', 0, 1, '2009-06-20 00:48:46', '2009-03-16 16:58:08', NULL);
-		
+define('XLSWS_SOAP' , true);
 
-	
-	XLSWService::Run('XLSWService', isset($_SERVER['HTTPS_HOST'])?('https://' . $_SERVER['HTTPS_HOST']):('http://' . $_SERVER['HTTP_HOST']));
+if(_xls_get_conf('DEBUG_LS_SOAP_CALL' , false)  && isset($GLOBALS['HTTP_RAW_POST_DATA']))
+	_xls_log("SOAP DEBUG : " . print_r($GLOBALS['HTTP_RAW_POST_DATA'] , true));
+
+// ENABLE SOAP Debugging by the following SQL:
+// INSERT INTO `xlsws_configuration` (`rowid`, `title`, `key`, `value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`) VALUES (NULL, 'Debug', 'DEBUG_LS_SOAP_CALL', '1', 'Debug', 0, 1, '2009-06-20 00:48:46', '2009-03-16 16:58:08', NULL);
+
+XLSWService::Run('XLSWService', isset($_SERVER['HTTPS_HOST'])?('https://' . $_SERVER['HTTPS_HOST']):('http://' . $_SERVER['HTTP_HOST']));
 
 ?>

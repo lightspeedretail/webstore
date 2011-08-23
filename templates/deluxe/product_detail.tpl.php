@@ -85,7 +85,7 @@
 				<div class="price"><?php _xt("Price"); ?>: <?php $this->lblPrice->Render(); ?></div>
 		<?php endif; ?>				
 				
-				<p><?php $this->lblDescription->Render() ; ?></p>
+				<p><div id="description_here"><?php $this->lblDescription->Render() ; ?></div></p>
 
 
 				<?php if(count($this->arrAutoAddProducts)>0): ?>

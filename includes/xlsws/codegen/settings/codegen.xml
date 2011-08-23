@@ -6,7 +6,7 @@
 	this one to use.  Feel free to copy, modify, etc.
 -->
 	<!-- General CodeGen Settings -->
-	<name application="Xsilva Web Store"/>
+	<name application="LightSpeed Web Store"/>
 	<templateEscape begin="&lt;%" end="%&gt;"/>
 
 	<!-- Define Data Sources (e.g. Databases, Services, etc.) -->

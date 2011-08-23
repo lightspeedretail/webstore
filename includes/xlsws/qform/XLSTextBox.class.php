@@ -24,71 +24,69 @@
  
  */
 
-   /*
-     * XLSTextBox
-     * 
-     * Extends class used to create text boxes 
-     */
-    
-    class XLSTextBox extends QTextBox {
-        
-        protected $strCssClass = "textfield";
-        
-        public function __construct($objParentObject , $strControlId = null) {
-            parent::__construct($objParentObject , $strControlId);
-            parent::AddAction(new QEnterKeyEvent(), new QTerminateAction());
-        }
-        
-        private $blnHasNoEnterAction = true;
-        
-        public function AddAction($objEvent , $objAction){
-            if(($objEvent instanceof QEnterKeyEvent) && 
-                ($this->blnHasNoEnterAction)) {
-                    $this->blnHasNoEnterAction = false;
-                    $this->RemoveAllActions('onkeypress');
-            }
-            parent::AddAction($objEvent , $objAction);
-        }
-        
-        public function __get($strName) {
-            switch ($strName) {
-                case 'Text':
-                    try {
-                        return stripslashes(trim((parent::__get($strName))));
-                    } catch (QInvalidCastException $objExc) {
-                        $objExc->IncrementOffset();
-                        throw $objExc;
-                    }
+/*
+ * XLSTextBox
+ *
+ * Extends class used to create text boxes
+ */
 
-                default:
-                    try {
-                        return (parent::__get($strName));
-                    } catch (QCallerException $objExc) {
-                        $objExc->IncrementOffset();
-                        throw $objExc;
-                    }
-            }
-        }   
- 
-        public function __set($strName, $mixValue) {
-            switch ($strName) {
-                case 'Text':
-                    try {
-                        return (parent::__set($strName, 
-                            stripslashes($mixValue)));
-                    } catch (QInvalidCastException $objExc) {
-                        $objExc->IncrementOffset();
-                        throw $objExc;
-                    }
+class XLSTextBox extends QTextBox {
+	protected $strCssClass = "textfield";
 
-                default:
-                    try {
-                        return (parent::__set($strName, $mixValue));
-                    } catch (QCallerException $objExc) {
-                        $objExc->IncrementOffset();
-                        throw $objExc;
-                    }
-            }
-        }       
-    }
-?> 
+	public function __construct($objParentObject , $strControlId = null) {
+		parent::__construct($objParentObject , $strControlId);
+		parent::AddAction(new QEnterKeyEvent(), new QTerminateAction());
+	}
+
+	private $blnHasNoEnterAction = true;
+
+	public function AddAction($objEvent , $objAction){
+		if(($objEvent instanceof QEnterKeyEvent) &&
+			($this->blnHasNoEnterAction)) {
+				$this->blnHasNoEnterAction = false;
+				$this->RemoveAllActions('onkeypress');
+		}
+		parent::AddAction($objEvent , $objAction);
+	}
+
+	public function __get($strName) {
+		switch ($strName) {
+			case 'Text':
+				try {
+					return stripslashes(trim((parent::__get($strName))));
+				} catch (QInvalidCastException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+
+			default:
+				try {
+					return (parent::__get($strName));
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+
+	public function __set($strName, $mixValue) {
+		switch ($strName) {
+			case 'Text':
+				try {
+					return (parent::__set($strName,
+						stripslashes($mixValue)));
+				} catch (QInvalidCastException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+
+			default:
+				try {
+					return (parent::__set($strName, $mixValue));
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+}
