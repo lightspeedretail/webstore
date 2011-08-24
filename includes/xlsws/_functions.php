@@ -438,7 +438,7 @@ function _xls_require_login($msg = false) {
  * @return array
  */
 function _xls_mail_name($name , $adde) {
-	return array(trim($adde)=>$name);
+    return $name . ' <' . $adde . '>';
 }
 
 /**
