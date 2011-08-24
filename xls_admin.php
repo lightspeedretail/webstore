@@ -4253,7 +4253,7 @@
 			_dbx($sql);
 			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.0.3 patch: Changed display inventory level helper text";
 
-			$sql = "UPDATE xlsws_configuration SET helper_text='Make your URLs search engine friendly? Please refer to page 23 of our Web Store document before turning on if you are hosting outside of Xsilva' WHERE title='Use SEO-Friendly URL'";
+			$sql = "UPDATE xlsws_configuration SET helper_text='Make your URLs search engine friendly (www.example.com/category.html instead of www.example.com/index.php?id=123)' WHERE title='Use SEO-Friendly URL'";
 			_xls_log($sql);
 			_dbx($sql);
 			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.0.3 patch: Changed SEO friendly URLs helper text";
