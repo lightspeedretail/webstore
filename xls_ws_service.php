@@ -667,7 +667,7 @@ EOS;
             $intIndex = $image_index;
             $objProduct = null;
 
-            if(!$this->check_passkey($strPassKey))
+            if(!$this->check_passkey($strPasskey))
                 return self::FAIL_AUTH;
 
             if (!$blbRawImage) {
