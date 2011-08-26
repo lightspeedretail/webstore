@@ -387,7 +387,7 @@ class usps extends xlsws_class_shipping {
 	public function getRate($showall=false) {
 		if (($this->ounces + $this->pounds) == 0)
 			return false;
-
+        $config = $this->getConfigValues('usps');
 		$request = ($this->isDomestic()) ? $this->buildDomesticRateRequest() : $this->buildInternationalRateRequest() ;
 		$this->response = $this->sendUSPSRateRequest($request);
 
@@ -407,13 +407,13 @@ class usps extends xlsws_class_shipping {
 			foreach($oXML->Package->Postage as $key=>$val) {
 			  $strKey=str_replace("&lt;sup&gt;&amp;reg;&lt;/sup&gt;","",$val->MailService);
 			  $strKey=str_replace("&lt;sup&gt;&amp;trade;&lt;/sup&gt;","",$strKey);
-			  $retval[''.htmlspecialchars_decode($strKey)] = floatval($val->Rate);
+			  $retval[''.htmlspecialchars_decode($strKey)] = floatval($val->Rate) + floatval($config['markup']);
 			}
 		} else {
 			foreach($oXML->Package->Service as $key=>$val) {
 			  $strKey=str_replace("&lt;sup&gt;&amp;reg;&lt;/sup&gt;","",$val->SvcDescription);
 			  $strKey=str_replace("&lt;sup&gt;&amp;trade;&lt;/sup&gt;","",$strKey);
-			  $retval[''.htmlspecialchars_decode($strKey)] = floatval($val->Postage);
+			  $retval[''.htmlspecialchars_decode($strKey)] = floatval($val->Postage) + floatval($config['markup']);
 			}
 		}
 
