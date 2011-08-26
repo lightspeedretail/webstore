@@ -1027,8 +1027,8 @@ class xlsws_index extends QForm {
 
 	// Update widgets to display Shipping cost data
 	protected function update_shippingcost_display($objCart) {
-		if ((strpos($objCart->IdStr,"WO-") === false or $objCart->Status != "Awaiting Processing")
-			&& $_GET['xlspg'] != "checkout")
+		if ((strpos($objCart->IdStr,"WO-") === false || $objCart->Status != "Awaiting Processing")
+			&& $_GET['xlspg'] != "checkout" && $objCart->ShippingSell==0)
 				$this->misc_components['order_shipping_cost']->Text =
 					_sp("(Included Above)");
 		else
