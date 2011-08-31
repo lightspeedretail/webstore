@@ -264,12 +264,14 @@ if(!defined('__DOCROOT__'))
 				$warning_text="<table>";
 				if ($_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?check")
 				{
-					$warning_text .= "<tr><td colspan='2'><b>SYSTEM CHECK</b></td></tr>";
+					$warning_text .= "<tr><td colspan='2'><b>SYSTEM CHECK for "._xls_version()."</b></td></tr>";
 					$warning_text .= "<tr><td colspan='2'>The chart below shows the results of the system check and if upgrades have been performed.</td></td>";
 					
 					//For 2.1.x upgrade, have the upgrades been run?			
-					if ($_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?check")
-						$checkenv = array_merge($checkenv,$this->xls_check_upgrades());
+					if ($_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?check") {
+						  $checkenv = array_merge($checkenv,$this->xls_check_upgrades());
+						  $checkenv = array_merge($checkenv,$this->xls_check_file_signatures());
+				    }
 					
 				}
 				else
@@ -279,7 +281,7 @@ if(!defined('__DOCROOT__'))
 				}
 				$warning_text .= "<tr><td colspan='2'><hr></td></tr>";
 				foreach ($checkenv as $key=>$value)
-				$warning_text .= "<tr><td>$key</td><td>".($value=="fail" ? "<font color='#cc0000'><b>$value</b></font>" : "$value" )."</td>";
+				$warning_text .= "<tr><td>$key</td><td>".(($value=="fail" || $value=="modified") ? "<font color='#cc0000'><b>$value</b></font>" : "$value" )."</td>";
 				
 				
 					
@@ -1126,7 +1128,26 @@ EOT;
              
                 return $checked;
 			}
-			
+			protected function xls_check_file_signatures($complete=false)
+			{ 
+				$checked=array();
+				$checked['<b>--File Signatures Check--</b>']= "pass";
+				
+				include("includes/installer/signatures.php");
+
+
+				$fn=unserialize($signatures);
+				foreach($fn as $key=>$value) {
+				    $hashes=array_reverse(explode(",",$value));
+				    $hashfile=md5_file($key);
+				    if (!in_array($hashfile,$hashes))
+				        $checked[$key] = "modified";
+				    elseif(_xls_version() != $versions[array_search($hashfile,$hashes)] || $complete)
+				        $checked[$key] = $versions[array_search($hashfile,$hashes)];
+				    
+				}         
+                return $checked;
+			}
 
 			protected function connect_db(){
 				// Check that you can connect to db
