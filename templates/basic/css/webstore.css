@@ -748,9 +748,9 @@ text-align:justify;
 }
 
 .product_details .description {
-border:1px solid #555;
-margin:20px 0;
-padding:15px;
+line-height:16px;
+margin:20px 0 25px;
+text-align:justify;
 }
 
 .product_details fieldset {
