@@ -24,40 +24,41 @@
  
  */
 
-if (!empty(QApplication::$Database)) {
-    if (!defined('__PREPEND_QUICKINIT__')) {
-        $strUrl = _xls_get_conf('EMAIL_SMTP_SERVER', false);
-        $strPort = '25';
+    if (!empty(QApplication::$Database)) {
+        if (!defined(__PREPEND_QUICKINIT__)) {
+            $strUrl = _xls_get_conf('EMAIL_SMTP_SERVER', false);
+            $strPort = _xls_get_conf('EMAIL_SMTP_PORT', '25');
 
-        if ($strUrl) {
-            switch (_xls_get_conf('EMAIL_SMTP_SSL_MODE', '0')) {
-                case '0':
-                    $strPort = '25';
-                    break;
-                case '1':
-                    $strUrl = 'ssl://' . $strUrl;
-                    $strPort = '465';
-                    break;
-                case '2':
-                    $strUrl = 'tls://' . $strUrl;
-                    $strPort = '465';
-                    break;
-                default:
-                    QApplication::Log(E_WARNING, 'smtp',
-                        _sp('Invalid SMTP SSL mode defined'));
-                    break;
+            if ($strUrl) { 
+            	switch(_xls_get_conf('EMAIL_SMTP_SECURITY_MODE', '0')) {
+            		case 1: break;
+            		case 2: $strUrl = 'ssl://' . $strUrl; break;
+            		case 3: $strUrl = 'tls://' . $strUrl; break;
+            	
+            		default: 
+	            		switch ($strPort) {
+		                    case '465':
+		                    case '995':
+		                        $strUrl = 'ssl://' . $strUrl;
+		                        break;
+		                    case '587': 
+		                        $strUrl = 'tls://' . $strUrl; 
+		                        break;
+		                }
+		              }
+
+                QEmailServer::$SmtpServer = $strUrl;
+                QEmailServer::$SmtpPort = $strPort;
+
+                if (_xls_get_conf('EMAIL_SMTP_USERNAME',false)) { 
+                    QEmailServer::$AuthLogin = true;
+                    QEmailServer::$SmtpUsername = 
+                        _xls_get_conf('EMAIL_SMTP_USERNAME');
+                    QEmailServer::$SmtpPassword = 
+                        _xls_get_conf('EMAIL_SMTP_PASSWORD');
+                }
             }
         }
-
-        QEmailServer::$SmtpServer = $strUrl;
-        QEmailServer::$SmtpPort = _xls_get_conf('EMAIL_SMTP_PORT', $strPort);
-
-        if (_xls_get_conf('EMAIL_SMTP_USERNAME', false)) {
-            QEmailServer::$AuthLogin = true;
-            QEmailServer::$SmtpUsername = 
-                _xls_get_conf('EMAIL_SMTP_USERNAME');
-            QEmailServer::$SmtpPassword = 
-                _xls_get_conf('EMAIL_SMTP_PASSWORD');
-        }
     }
-}
+
+?>

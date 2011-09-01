@@ -4305,7 +4305,9 @@
 			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.1 patch: Added fk_promo_id to cart table for promo codes";
 			$this->add_config_key('SESSION_HANDLER' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Session storage', 'SESSION_HANDLER', 'FS', 'Store sessions in the database or file system?', 1, 6, NOW(), NOW(), 'STORE_IMAGE_LOCATION');" , '2.1');
 			$this->add_config_key('CHILD_SEARCH' , "INSERT into `xlsws_configuration` VALUES (NULL,'Show child products in search results', 'CHILD_SEARCH', '','If you want child products from a size color matrix to show up in search results, enable this option',8,10,NOW(),NOW(),'BOOL');" , '2.1');
-			
+	
+			$this->add_config_key('EMAIL_SMTP_SECURITY_MODE' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Security mode for outbound SMTP.',  'EMAIL_SMTP_SECURITY_MODE',  '0',  '0=Use Port Detection, 1=Force Open, 2=Force SSL, 3=Force TLS.',  '0',  '0', NOW( ) , NOW( ), '');" , '2.1.2');
+		
 			
 			$this->arrMPnls['UpgradeWS']->Visible = true;
 			$this->arrMPnls['UpgradeWS']->Refresh();			
