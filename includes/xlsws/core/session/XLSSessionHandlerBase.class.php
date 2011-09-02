@@ -40,7 +40,7 @@ abstract class XLSSessionHandlerBase extends QBaseClass {
 	}
 
 	public static function TriggerEvent($strEventName, $arrParameters) {
-		if (!in_array($strEventName, self::$Events))
+		if (!array_key_exists($strEventName, self::$Events))
 			return;
 
 		foreach (self::$Events[$strEventName] as $mixEvent)
