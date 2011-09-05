@@ -37,12 +37,8 @@ if (!empty(QApplication::$Database)) {
 		QApplication::InitializeSession();
 
 		// Define the Form State handler to save form states
-		QForm::$FormStateHandler = 'XLSFormStateHandler';
+		QForm::$FormStateHandler = 'QFormStateHandler';
 		QForm::$EncryptionKey = null;
-		XLSFormStateHandler::$StatePath = __QCODO__ . '/cache/state';
-		XLSFormStateHandler::$FileNamePrefix = 'state_';
-		XLSFormStateHandler::$GarbageCollectionMaxSeconds =
-			XLSSessionHandler::GetSessionLifetime();
 	}
 
 	QApplication::$EncodingType = _xls_get_conf('ENCODING' , "UTF-8");
