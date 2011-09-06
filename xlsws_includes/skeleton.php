@@ -1308,10 +1308,14 @@ class xlsws_index extends QForm {
 
 		if(function_exists('_custom_after_order_complete'))
 			_custom_after_order_complete($cart);
-
+			        
+        //Sending receipts
+        xlsws_index::send_email($cart);	
+         
 		// Show invoice
 		if($forward)
 			_rd($cart->Link);
+
 	}
 
 	public static function send_email($cart) {

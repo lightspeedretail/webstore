@@ -656,6 +656,12 @@ margin:20px 0;
 padding:15px;
 }
 
+.product_details .description {
+line-height:16px;
+margin:20px 0 25px;
+text-align:justify;
+}
+
 .product_details fieldset .checkbox {
 display:block;
 float:left;

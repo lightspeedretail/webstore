@@ -214,8 +214,8 @@ class xlsws_track_order extends xlsws_index {
 		}
 
 		if ($_GET['sendemail'] == "true" && isset($_GET['oid'])) {
-			$order = Cart::QuerySingle(QQ::Equal(QQN::Cart()->Linkid , $_GET['oid']));
-			$this->send_email($order);
+			//$order = Cart::QuerySingle(QQ::Equal(QQN::Cart()->Linkid , $_GET['oid']));
+			//$this->send_email($order);
 			return;
 		}
 

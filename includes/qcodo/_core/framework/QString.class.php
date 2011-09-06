@@ -12,7 +12,7 @@
 		 * @return void
 		 */
 		public final function __construct() {
-			throw new CallerException('String should never be instantiated.  All methods and variables are publically statically accessible.');
+			throw new CallerException('QString class should never be instantiated.  All methods and variables are publically statically accessible.');
 		}
 
 		/**
@@ -174,9 +174,9 @@
 
 		/**
 		 * A better version of strrpos which also allows for the use of RegExp-based matching
-		 * @param $strHaystack the text content to search through
-		 * @param $strNeedle either a plain-text item or a regexp pattern item to search for - if regexp used, this will update as the actual string of the content found
-		 * @param $intOffset optional position offset
+		 * @param string $strHaystack the text content to search through
+		 * @param string $strNeedle either a plain-text item or a regexp pattern item to search for - if regexp used, this will update as the actual string of the content found
+		 * @param integer $intOffset optional position offset
 		 * @return mixed the position number OR false if not found
 		 */
 		public static function StringReversePosition($strHaystack, &$strNeedle, $intOffset = null) {
@@ -197,6 +197,69 @@
 			} else {
 				return strrpos($strHaystack, $strNeedle, $intOffset);
 			}
+		}
+
+		/**
+		 * Checks if text length is between given bounds
+		 * @param string $strString Text to be checked
+		 * @param integer $intMinimumLength Minimum acceptable length
+		 * @param integer $intMaximumLength Maximum acceptable length
+		 * @return boolean
+		 */
+		public static function IsLengthBeetween($strString, $intMinimumLength, $intMaximumLength) {
+			$intStringLength = strlen($strString);
+			if (($intStringLength < $intMinimumLength) || ($intStringLength > $intMaximumLength))
+				return false;
+			else
+				return true;
+		}
+
+		/**
+		 * Given an underscore_separated_string, this will convert the string
+		 * to CamelCaseNotation.  Note that this will ignore any casing in the
+		 * underscore separated string.
+		 * 
+		 * @param string $strString
+		 * @return string
+		 */
+		public static function ConvertToCamelCase($strString) {
+			return str_replace(' ', '', ucwords(str_replace('_', ' ', strtolower($strString))));
+		}
+
+		/**
+		 * Encodes a given 8-bit string into a quoted-printable string,
+		 * @param string $strString the string to encode
+		 * @return string the encoded string
+		 */
+		public static function QuotedPrintableEncode($strString) {
+			if (function_exists('quoted_printable_encode')) {
+				$strText = quoted_printable_encode($strString);
+			} else {
+				$strText = preg_replace( '/[^\x21-\x3C\x3E-\x7E\x09\x20]/e', 'sprintf( "=%02X", ord ( "$0" ) ) ;', $strString );
+				preg_match_all( '/.{1,73}([^=]{0,2})?/', $strText, $arrMatch );
+				$strText = implode( '=' . "\r\n", $arrMatch[0] );
+			}
+
+			return $strText;
+		}
+
+		/**
+		 * Returns whether or not the given string contains any UTF-8 encoded characters.
+		 * Uses regexp pattern as originally defined from http://w3.org/International/questions/qa-forms-utf-8.html
+		 * and modified by chris@w3style.co.uk for efficiency.
+		 * @param string $strString
+		 * @return boolean whether or not the string contains any UTF-8 characters
+		 */
+		public static function IsContainsUtf8($strString) {
+			return preg_match('%(?:
+				[\xC2-\xDF][\x80-\xBF]				# non-overlong 2-byte
+				|\xE0[\xA0-\xBF][\x80-\xBF]			# excluding overlongs
+				|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}	# straight 3-byte
+				|\xED[\x80-\x9F][\x80-\xBF]			# excluding surrogates
+				|\xF0[\x90-\xBF][\x80-\xBF]{2}		# planes 1-3
+				|[\xF1-\xF3][\x80-\xBF]{3}			# planes 4-15
+				|\xF4[\x80-\x8F][\x80-\xBF]{2}		# plane 16
+				)+%xs', $strString);
 		}
 	}
 ?>

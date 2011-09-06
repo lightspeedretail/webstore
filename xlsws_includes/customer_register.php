@@ -436,7 +436,7 @@ class xlsws_cregister extends xlsws_index {
 			// remind old password
 			$objCustomer->Password = trim($this->txtCRPass->Text);
 
-			_xls_mail(_xls_mail_name($objCustomer->Mainname , $objCustomer->Email) , _sp("Welcome to ") . _xls_get_conf('STORE_NAME') , _xls_mail_body_from_template(templatenamed('email_customer_register.tpl.php') , array('cust' =>$objCustomer)));
+			_xls_mail($objCustomer->Email, _sp("Welcome to ") . _xls_get_conf('STORE_NAME') , _xls_mail_body_from_template(templatenamed('email_customer_register.tpl.php') , array('cust' =>$objCustomer)));
 		} else
 			$objCustomer->Save();
 
