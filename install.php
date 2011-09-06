@@ -264,12 +264,14 @@ if(!defined('__DOCROOT__'))
 				$warning_text="<table>";
 				if ($_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?check")
 				{
-					$warning_text .= "<tr><td colspan='2'><b>SYSTEM CHECK</b></td></tr>";
+					$warning_text .= "<tr><td colspan='2'><b>SYSTEM CHECK for "._xls_version()."</b></td></tr>";
 					$warning_text .= "<tr><td colspan='2'>The chart below shows the results of the system check and if upgrades have been performed.</td></td>";
 					
 					//For 2.1.x upgrade, have the upgrades been run?			
-					if ($_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?check")
-						$checkenv = array_merge($checkenv,$this->xls_check_upgrades());
+					if ($_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?check") {
+						  $checkenv = array_merge($checkenv,$this->xls_check_upgrades());
+						  $checkenv = array_merge($checkenv,$this->xls_check_file_signatures());
+				    }
 					
 				}
 				else
@@ -278,8 +280,9 @@ if(!defined('__DOCROOT__'))
 					$warning_text .= "<tr><td colspan='2'>There are issues with your PHP environment which need to be fixed before you can install WebStore. Please check the chart below for missing libraries on your PHP installation which must be installed/compiled into PHP, and subdirectories which you need to make writeable. Remember to restart Apache if you change any php.ini settings.</td></td>";
 				}
 				$warning_text .= "<tr><td colspan='2'><hr></td></tr>";
+				$curver=_xls_version();
 				foreach ($checkenv as $key=>$value)
-				$warning_text .= "<tr><td>$key</td><td>".($value=="fail" ? "<font color='#cc0000'><b>$value</b></font>" : "$value" )."</td>";
+				$warning_text .= "<tr><td>$key</td><td>".(($value=="pass" || $value==$curver) ? "$value" : "<font color='#cc0000'><b>$value</b></font>" )."</td>";
 				
 				
 					
@@ -1126,7 +1129,30 @@ EOT;
              
                 return $checked;
 			}
-			
+			protected function xls_check_file_signatures($complete=false)
+			{ 
+				$checked=array();
+				$checked['<b>--File Signatures Check--</b>']= "pass";
+				
+				include("includes/signatures.php");
+
+
+				$fn=unserialize($signatures);
+				if(!isset($signatures)) $checked['Signature File in /includes']="fail";
+				foreach($fn as $key=>$value) {
+					if(!file_exists($key))
+						$checked[$key] = "MISSING";
+					else {
+				    $hashes=array_reverse(explode(",",$value));
+				    $hashfile=md5_file($key);
+				    if (!in_array($hashfile,$hashes))
+				        $checked[$key] = "modified";
+				    elseif(_xls_version() != $versions[array_search($hashfile,$hashes)] || $complete)
+				        $checked[$key] = $versions[array_search($hashfile,$hashes)];
+				   } 
+				}         
+                return $checked;
+			}
 
 			protected function connect_db(){
 				// Check that you can connect to db
