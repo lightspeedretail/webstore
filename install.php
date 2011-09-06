@@ -280,8 +280,9 @@ if(!defined('__DOCROOT__'))
 					$warning_text .= "<tr><td colspan='2'>There are issues with your PHP environment which need to be fixed before you can install WebStore. Please check the chart below for missing libraries on your PHP installation which must be installed/compiled into PHP, and subdirectories which you need to make writeable. Remember to restart Apache if you change any php.ini settings.</td></td>";
 				}
 				$warning_text .= "<tr><td colspan='2'><hr></td></tr>";
+				$curver=_xls_version();
 				foreach ($checkenv as $key=>$value)
-				$warning_text .= "<tr><td>$key</td><td>".(($value=="fail" || $value=="modified" || $value=="MISSING") ? "<font color='#cc0000'><b>$value</b></font>" : "$value" )."</td>";
+				$warning_text .= "<tr><td>$key</td><td>".(($value=="pass" || $value==$curver) ? "$value" : "<font color='#cc0000'><b>$value</b></font>" )."</td>";
 				
 				
 					
@@ -1128,7 +1129,7 @@ EOT;
              
                 return $checked;
 			}
-			protected function xls_check_file_signatures($complete=true)
+			protected function xls_check_file_signatures($complete=false)
 			{ 
 				$checked=array();
 				$checked['<b>--File Signatures Check--</b>']= "pass";
