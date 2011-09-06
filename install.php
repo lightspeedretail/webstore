@@ -281,7 +281,7 @@ if(!defined('__DOCROOT__'))
 				}
 				$warning_text .= "<tr><td colspan='2'><hr></td></tr>";
 				foreach ($checkenv as $key=>$value)
-				$warning_text .= "<tr><td>$key</td><td>".(($value=="fail" || $value=="modified") ? "<font color='#cc0000'><b>$value</b></font>" : "$value" )."</td>";
+				$warning_text .= "<tr><td>$key</td><td>".(($value=="fail" || $value=="modified" || $value=="MISSING") ? "<font color='#cc0000'><b>$value</b></font>" : "$value" )."</td>";
 				
 				
 					
@@ -1128,23 +1128,27 @@ EOT;
              
                 return $checked;
 			}
-			protected function xls_check_file_signatures($complete=false)
+			protected function xls_check_file_signatures($complete=true)
 			{ 
 				$checked=array();
 				$checked['<b>--File Signatures Check--</b>']= "pass";
 				
-				include("includes/installer/signatures.php");
+				include("includes/signatures.php");
 
 
 				$fn=unserialize($signatures);
+				if(!isset($signatures)) $checked['Signature File in /includes']="fail";
 				foreach($fn as $key=>$value) {
+					if(!file_exists($key))
+						$checked[$key] = "MISSING";
+					else {
 				    $hashes=array_reverse(explode(",",$value));
 				    $hashfile=md5_file($key);
 				    if (!in_array($hashfile,$hashes))
 				        $checked[$key] = "modified";
 				    elseif(_xls_version() != $versions[array_search($hashfile,$hashes)] || $complete)
 				        $checked[$key] = $versions[array_search($hashfile,$hashes)];
-				    
+				   } 
 				}         
                 return $checked;
 			}
