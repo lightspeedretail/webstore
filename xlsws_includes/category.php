@@ -38,200 +38,282 @@ class xlsws_category extends xlsws_index {
 
 	protected $custom_page_content = ''; //custom page content to appear above the category listing
 
-	/**
-	 * build_main - constructor for this controller, refrain from modifying this function
-	 * it is best practice to style the category tree from menu.tpl.php and webstore.css with the list
-	 * this function generates
+    /**
+     * Bind the currently selected Category to the form
+	 * @param none
+	 * @return none
+     */
+    protected function LoadCategory() {
+        global $XLSWS_VARS;
+
+        if (isset($XLSWS_VARS['c'])) {
+            if ($XLSWS_VARS['c'] == 'root')
+                unset($XLSWS_VARS['c']);
+            else if (empty($XLSWS_VARS['c']))
+                unset($XLSWS_VARS['c']);
+        }
+
+        if (isset($XLSWS_VARS['c'])) {
+            $strCategory = end(explode('.', $XLSWS_VARS['c']));
+            $objCategory = Category::$Manager->GetByKey($strCategory);
+
+            if ($objCategory)
+                $this->category = $objCategory;
+            else
+                _xls_display_msg(_sp('Sorry! The category was not found.'));
+        }
+
+        if (!$this->category)
+            return false;
+    }
+
+    /**
+     * Bind the currently selected SubCategories to the form
+	 * @param none
+	 * @return none
+     */
+    protected function LoadSubCategories() {
+        global $XLSWS_VARS;
+
+        if (!$this->category)
+            return false;
+
+        $intIdArray = explode('.', $XLSWS_VARS['c']);
+        $objSubcategoryArray = array();
+
+		foreach ($this->category->Children as $objSubcategory) {
+		    $strSubcategoryArray = $objSubcategory->PrintCategory($intIdArray);
+
+    		if ($strSubcategoryArray)
+				$objSubcategoryArray[] = $strSubcategoryArray;
+		}
+
+		$this->subcategories = $objSubcategoryArray;
+    }
+
+    /**
+     * Bind the category Custom Page to the form
+	 * @param none
+	 * @return none
+     */
+    protected function LoadCustomPage() {
+        if (!$this->category)
+            return false;
+
+        if (!$this->category->CustomPage)
+            return false;
+
+        $objPage = CustomPage::LoadByKey($this->category->CustomPage);
+
+        if (!$objPage)
+            return false;
+
+        $this->custom_page_content = $objPage->Page;
+
+        if ($this->category->MetaDescription == '')
+            $this->category->MetaDescription = $objPage->MetaDescription;
+
+        if ($this->category->MetaKeywords == '')
+            $this->category->MetaKeywords = $objPage->MetaKeywords;
+    }
+
+    /**
+     * Bind the category Image to the form
+	 * @param none
+	 * @return none
+     */
+    protected function LoadImage() {
+        if (!$this->category)
+            return false;
+
+        if (!$this->category->HasImage)
+            return false;
+
+        $this->image = $this->category->SmallImage;
+    }
+
+    /**
+     * Return a QCondition to filter currently selected category products
+	 * @param none
+	 * @return QCondition
+     */
+    protected function GetCategoryCondition() {
+        global $XLSWS_VARS;
+
+        if (!$this->category)
+            return false;
+
+        $intIdArray = array($this->category->Rowid);
+        $intIdArray = array_merge($intIdArray, $this->category->GetChildIds());
+
+        $objCondition = QQ::In(QQN::Product()->Category->CategoryId, $intIdArray);
+
+        return $objCondition;
+    }
+
+    /**
+     * Return a QCondition to filter desired Producs
+     * - Web enabled
+     * - Either Master or Independant
+	 * @param none
+	 * @return QCondition
+     */
+    protected function GetProductCondition() {
+        $objCondition = QQ::AndCondition(
+            QQ::Equal(QQN::Product()->Web, 1), 
+            QQ::OrCondition(
+                QQ::Equal(QQN::Product()->MasterModel, 1), 
+                QQ::AndCondition(
+                    QQ::Equal(QQN::Product()->MasterModel, 0), 
+                    QQ::Equal(QQN::Product()->FkProductMasterId, 0)
+                )
+            )
+        );
+
+        return $objCondition;
+    }
+
+    /**
+     * Return a QCondition to further filter by Featured Products
+	 * @param none
+	 * @return QCondition
+     */
+    protected function GetFeaturedCondition() {
+        $objCondition = QQ::Equal(QQN::Product()->Featured, 1);
+
+        return $objCondition;
+    }
+
+    /**
+     * Return a QClause to order Products based on field
+	 * @param none
+	 * @return QClause
+     */
+    protected function GetSortOrder() {
+        $strProperty = _xls_get_conf('PRODUCT_SORT_FIELD' , 'Name');
+        $blnAscend = true;
+
+        if ($strProperty[0] == '-') { 
+            $strProperty = substr($strProperty,1);
+            $blnAscend = false;
+        }
+
+        return QQ::OrderBy(QQN::Product()->$strProperty, $blnAscend);
+    }
+
+    /**
+     * Return the view's Product querying QCondition
+	 * @param none
+	 * @return QCondition
+     */
+    protected function GetCondition() {
+        $objCondition = false;
+
+        $objCategoryCondition = $this->GetCategoryCondition();
+        $objProductCondition = $this->GetProductCondition();
+        $objFeaturedCondition = $this->GetFeaturedCondition();
+
+        if ($objCategoryCondition)
+            $objCondition = QQ::AndCondition(
+                $objCategoryCondition, 
+                $objProductCondition
+            );
+        else { 
+            $intFeaturedCount = Product::QueryCount($objFeaturedCondition);
+
+            if ($intFeaturedCount > 0)
+                $objCondition = QQ::AndCondition(
+                    $objProductCondition, 
+                    $objFeaturedCondition
+                );
+            else 
+                $objCondition = $objProductCondition;
+        }
+
+        return $objCondition;
+    }
+
+    /**
+     * Query the database for Products and bind them to the QDataRepeater
 	 * @param none
 	 * @return none
 	 */
-	protected function build_main() {
-		global $XLSWS_VARS;
+    protected function dtrProducts_Bind() {
+        $objCondition = $this->GetCondition();
+        $objSortOrder = $this->GetSortOrder();
 
-		$this->mainPnl = new QPanel($this);
+        $this->dtrProducts->TotalItemCount = Product::QueryCount($objCondition);
 
-		if(isset($XLSWS_VARS['c']) && ($XLSWS_VARS['c'] == 'root'))
-			unset($XLSWS_VARS['c']);
+        $objProductArray = Product::QueryArray(
+            $this->GetCondition(), 
+            QQ::Clause(
+                $objSortOrder,
+                $this->dtrProducts->LimitClause
+            )
+        );
 
-		$this->dtrProducts = new QDataRepeater($this->mainPnl);
-
-		$this->dtrProducts->CssClass = "product_list rounded";
-
-		$this->dtrProducts->Paginator = new XLSPaginator($this->mainPnl , "pagination");
-		$this->dtrProducts->ItemsPerPage =  _xls_get_conf('PRODUCTS_PER_PAGE' , 8);
-
-		if(!empty($XLSWS_VARS['c'])) {
-			// show subcategories
-			$currentCateg = $XLSWS_VARS['c'];
-			$currentCategs = explode("." , $currentCateg);
-			$currentCateg = end($currentCategs);
-
-			$categ = Category::$Manager->GetByKey($currentCateg);
-
-			$objSubcategoryArray = array($categ->PrintCategory($currentCategs));
-			foreach ($categ->Children as $objSubcategory) {
-				$strSubcategoryArray = $objSubcategory->PrintCategory($currentCategs);
-
-				if ($strSubcategoryArray)
-					$objSubcategoryArray[] = $strSubcategoryArray;
-			}
-
-			$this->subcategories = $objSubcategoryArray;
-
-			if($categ->CustomPage) {
-				$pageR = CustomPage::LoadByKey($categ->CustomPage);
-
-				if($pageR)
-					$this->custom_page_content = $pageR->Page;
-
-				if(trim($categ->MetaDescription) == '')
-					$categ->MetaDescription = $pageR->MetaDescription;
-
-				if(trim($categ->MetaKeywords) == '')
-					$categ->MetaKeywords = $pageR->MetaKeywords;
-			}
-
-			// pop the first one off!
-			if(is_array($this->subcategories))
-				array_shift($this->subcategories);
-
-			if($categ->ImageExist)
-				$this->image = $categ->SmallImage;
-
-			$this->category = $categ;
-
-			// add desc
-			if($categ->MetaDescription != '')
-				_xls_add_meta_desc($categ->MetaDescription);
-			else
-				_xls_add_meta_desc($categ->Name);
-
-			if($categ->MetaKeywords != '')
-				_xls_add_meta_keyword($categ->MetaKeywords);
-			else
-				_xls_add_meta_keyword($categ->Name);
-
-			_xls_add_page_title($categ->Name);
-
-			$this->dtrProducts->Paginator->url = $categ->Link;
-
-			Visitor::add_view_log($currentCateg, ViewLogType::categoryview);
-		}
-
-		if(!$this->dtrProducts->Paginator->url)
-			$this->dtrProducts->Paginator->url = "index.php?";
-
-		if(isset($XLSWS_VARS['page']))
-			$this->dtrProducts->PageNumber = intval($XLSWS_VARS['page']);
-
-		// Enable AJAX-based rerendering for the QDataRepeater
-		$this->dtrProducts->UseAjax = true;
-
-		// DataRepeaters use Templates to define how the repeated
-		// item is rendered
-		$this->mainPnl->Template = templateNamed('product_list.tpl.php');  // TODO Cleverappz list products
-		$this->dtrProducts->Template = templateNamed('product_list_item.tpl.php');
-
-		// Finally, we define the method that we run to bind the data source to the datarepeater
-		$this->dtrProducts->SetDataBinder('dtrProducts_Bind');
-	}
+        $this->bind_result_images($objProductArray);
+    }
 
 	/**
-	 * dtrProducts_Bind - Binds a listing of products to the current category
+     * build_main - constructor for this controller, refrain from modifying this 
+     * function. It is best practice to style the category tree from menu.tpl.php 
+     * and webstore.css with the list this function generates
 	 * @param none
 	 * @return none
 	 */
-	protected function dtrProducts_Bind() {
-		global $XLSWS_VARS;
+    protected function build_main() {
+        global $XLSWS_VARS;
 
-		$sort_field = _xls_get_conf('PRODUCT_SORT_FIELD' , 'Name');
+        $this->LoadCategory();
+        $this->LoadSubCategories();
+        $this->LoadCustomPage();
+        $this->LoadImage();
 
-		// which category are we viewing?
-		if(!empty($XLSWS_VARS['c'])) {
-			$category_id = $XLSWS_VARS['c'];
+        $this->mainPnl = new QPanel($this);
+        $this->mainPnl->Template = templateNamed('product_list.tpl.php');
 
-			$category_id = explode("." , $category_id);
+        $this->dtrProducts = $objRepeater = new QDataRepeater($this->mainPnl);
+        $objRepeater->Paginator = new XLSPaginator($this->mainPnl , "pagination");
+        $objRepeater->ItemsPerPage =  _xls_get_conf('PRODUCTS_PER_PAGE' , 8);
+		$objRepeater->CssClass = "product_list rounded";
+		$objRepeater->Template = templateNamed('product_list_item.tpl.php');
+		$objRepeater->Paginator->url = "index.php?";
+		$objRepeater->UseAjax = true;
+        
+        // TODO :: Move pager number to a hidden QControl
+		if (isset($XLSWS_VARS['page']))
+			$objRepeater->PageNumber = intval($XLSWS_VARS['page']);
+        
+        // Bind the method providing Products to the Repater
+		$objRepeater->SetDataBinder('dtrProducts_Bind');
 
-			if(count($category_id) > 0) { // we are viewing a child category
-				$category_id = $category_id[count($category_id)-1]; // take the last category index
-				$category = Category::LoadByRowid($category_id);
+        if ($this->category) {
+            $objCategory = $this->category;
 
-				$intCategoryArray = array($category->Rowid);
-				$intCategoryArray = array_merge(
-					$intCategoryArray,
-					$category->GetChildIds()
-				);
+            // Set Meta Description
+			if($objCategory->MetaDescription != '')
+				_xls_add_meta_desc($objCategory->MetaDescription);
+			else
+				_xls_add_meta_desc($objCategory->Name);
 
-				$cond = QQ::AndCondition(
-					QQ::Equal(QQN::Product()->Web, 1),
-					QQ::OrCondition(
-						QQ::Equal(QQN::Product()->MasterModel, 1),
-						QQ::AndCondition(
-							QQ::Equal(QQN::Product()->MasterModel, 0),
-							QQ::Equal(QQN::Product()->FkProductMasterId, 0)
-						)
-					),
-					QQ::In(
-						QQN::Product()->Category->CategoryId,
-						$intCategoryArray
-					)
-				);
+            // Set Meta Keywords
+			if($objCategory->MetaKeywords != '')
+				_xls_add_meta_keyword($objCategory->MetaKeywords);
+			else
+				_xls_add_meta_keyword($objCategory->Name);
 
-				$this->dtrProducts->TotalItemCount = Product::QueryCount($cond);
-				$this->bind_result_images(
-					Product::QueryArray(
-						$cond,
-						QQ::Clause(
-							QQ::OrderBy(
-								QQN::Product()->$sort_field,
-								(($sort_field == 'InventoryTotal') ? false : (QQN::Product()->Name))
-							),
-							$this->dtrProducts->LimitClause
-						)
-					)
-				);
+            // Set Title
+			_xls_add_page_title($objCategory->Name);
 
-				return;
-			}
+			$objRepeater->Paginator->url = $objCategory->Link;
+
+			Visitor::add_view_log($XLSWS_VARS['c'], ViewLogType::categoryview);
 		}
-
-		// Featured Products
-		$cond = QQ::AndCondition(
-			QQ::Equal(QQN::Product()->Web, 1),
-			QQ::Equal(QQN::Product()->Featured, 1)
-		);
-
-		$this->dtrProducts->TotalItemCount = Product::QueryCount($cond);
-
-		// If no featured products selected, show all products.
-		if($this->dtrProducts->TotalItemCount == 0) {
-			$cond = QQ::AndCondition(
-				QQ::Equal(QQN::Product()->Web , 1),
-				QQ::OrCondition(
-					QQ::Equal(QQN::Product()->MasterModel, 1),
-					QQ::AndCondition(
-						QQ::Equal(QQN::Product()->MasterModel, 0),
-						QQ::Equal(QQN::Product()->FkProductMasterId, 0)
-					)
-				)
-			);
-			$this->dtrProducts->TotalItemCount = Product::QueryCount($cond);
-		}
-
-		$prods = Product::QueryArray(
-			$cond,
-			QQ::Clause(
-				QQ::OrderBy(
-					QQN::Product()->$sort_field,
-					(($sort_field == 'InventoryTotal') ? false : (QQN::Product()->Name))
-				),
-				$this->dtrProducts->LimitClause
-			)
-		);
-
-		$this->bind_result_images($prods);
 	}
+
 }
 
 if(!defined('CUSTOM_STOP_XLSWS'))
-	xlsws_category::Run('xlsws_category', templateNamed('index.tpl.php'));
+    xlsws_category::Run('xlsws_category', templateNamed('index.tpl.php'));
+
