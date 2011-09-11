@@ -133,6 +133,44 @@ class xlsws_category extends xlsws_index {
     }
 
     /**
+     * Create the view's DataRepeater control
+     */
+    protected function CreateDataRepeater() {
+        $this->dtrProducts = $objRepeater = new QDataRepeater($this->mainPnl);
+        $this->CreatePaginator();
+        #$this->CreatePaginator(true);
+
+        $objRepeater->ItemsPerPage =  _xls_get_conf('PRODUCTS_PER_PAGE' , 8);
+		$objRepeater->Template = templateNamed('product_list_item.tpl.php');
+		$objRepeater->CssClass = "product_list rounded";
+        $objRepeater->UseAjax = true;
+
+        // TODO :: Move pager number to a hidden QControl
+		if (isset($XLSWS_VARS['page']))
+			$objRepeater->PageNumber = intval($XLSWS_VARS['page']);
+        
+        // Bind the method providing Products to the Repater
+		$objRepeater->SetDataBinder('dtrProducts_Bind');
+    }
+
+    /**
+     * Create the paginator(s) for the DataRepeater
+     */
+    protected function CreatePaginator($blnAlternate = false) {
+        $objRepeater = $this->dtrProducts;
+        $strProperty = 'Paginator';
+        $strName = 'pagination';
+
+        if ($blnAlternate) {
+            $strProperty = 'PaginatorAlternate';
+            $strName = 'paginationalt';
+        }
+
+        $objRepeater->$strProperty = new XLSPaginator($this->mainPnl , $strName);
+		$objRepeater->$strProperty->url = "index.php?";
+    }
+
+    /**
      * Return a QCondition to filter currently selected category products
 	 * @param none
 	 * @return QCondition
@@ -273,20 +311,7 @@ class xlsws_category extends xlsws_index {
         $this->mainPnl = new QPanel($this);
         $this->mainPnl->Template = templateNamed('product_list.tpl.php');
 
-        $this->dtrProducts = $objRepeater = new QDataRepeater($this->mainPnl);
-        $objRepeater->Paginator = new XLSPaginator($this->mainPnl , "pagination");
-        $objRepeater->ItemsPerPage =  _xls_get_conf('PRODUCTS_PER_PAGE' , 8);
-		$objRepeater->CssClass = "product_list rounded";
-		$objRepeater->Template = templateNamed('product_list_item.tpl.php');
-		$objRepeater->Paginator->url = "index.php?";
-		$objRepeater->UseAjax = true;
-        
-        // TODO :: Move pager number to a hidden QControl
-		if (isset($XLSWS_VARS['page']))
-			$objRepeater->PageNumber = intval($XLSWS_VARS['page']);
-        
-        // Bind the method providing Products to the Repater
-		$objRepeater->SetDataBinder('dtrProducts_Bind');
+        $this->CreateDataRepeater();
 
         if ($this->category) {
             $objCategory = $this->category;
