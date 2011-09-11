@@ -39,9 +39,6 @@ if (!empty(QApplication::$Database)) {
 		// Define the Form State handler to save form states
 		QForm::$FormStateHandler = 'QFormStateHandler';
         QForm::$EncryptionKey = null;
-
-        // Define amount of pages to view in pagination
-        XLSPaginator::$intIndexCount = 7;
 	}
 
 	QApplication::$EncodingType = _xls_get_conf('ENCODING' , "UTF-8");
