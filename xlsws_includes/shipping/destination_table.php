@@ -137,7 +137,6 @@ class destination_table extends xlsws_class_shipping {
 			return false;
 		}
 
-
 		if($config['per'] == 'item') {
 			$unit = $cart->Count;
 		} elseif($config['per'] == 'weight') {
@@ -148,6 +147,10 @@ class destination_table extends xlsws_class_shipping {
 
 		if($unit>$dest->ShipFree)
 			$unit -= $dest->ShipFree;
+
+        // If the Base Charge is unset or lesser than 0, don't apply this module
+        if ($dest-BaseCharge == '' or $dest->BaseCharge < 0)
+            return false;
 
 		return array('price' => $dest->BaseCharge + ($unit*$dest->ShipRate)  ,  'product' =>  $config['product']);
 	}
