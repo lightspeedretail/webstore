@@ -150,7 +150,8 @@ class xlsws_category extends xlsws_index {
 			$objRepeater->PageNumber = intval($XLSWS_VARS['page']);
         
         // Bind the method providing Products to the Repater
-		$objRepeater->SetDataBinder('dtrProducts_Bind');
+        $objRepeater->SetDataBinder('dtrProducts_Bind');
+        $objRepeater->DataBind();
     }
 
     /**
