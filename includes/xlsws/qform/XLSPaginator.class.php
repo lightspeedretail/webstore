@@ -34,8 +34,6 @@ class XLSPaginator extends QPaginator {
 	public $url = false;
 
 	public function GetControlHtml() {
-		$this->intIndexCount = 7;
-
 		$this->strLabelForPrevious = "<img src=\"" .
 			templateNamed('css/images/breadcrumbs_arrowleft.png') .
 			"\" alt=\"" . _sp("Previous") . "\" />";
