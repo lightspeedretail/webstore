@@ -52,7 +52,7 @@ class XLSPaginator extends QPaginator {
 		if ($strStyle)
 			$strStyle = sprintf(' style="%s"', $strStyle);
 
-		$strToReturn = sprintf('<div id="%s"%s%s>', $this->strControlId,
+		$strToReturn = sprintf('<div id="%s" %s%s>', $this->strControlId,
 			$strStyle, $this->GetAttributes(true, false));
 
 		$strToReturn .= "<ul>\n";
