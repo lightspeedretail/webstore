@@ -776,6 +776,12 @@ margin:20px 0 25px;
 text-align:justify;
 }
 
+.product_details .description {
+line-height:16px;
+margin:20px 0 25px;
+text-align:justify;
+}
+
 .product_details fieldset {
 border:1px solid #bfbfbf;
 margin:20px 0;

@@ -31,6 +31,15 @@ $SECIMG_DIR='includes/securimage';
 
 define('__PREPEND_QUICKINIT__', true);
 require('includes/prepend.inc.php');
+
+// Ensure we load the database session storage object if needed
+if (_xls_get_conf('SESSION_HANDLER') == 'DB') {
+	QApplication::$ClassFile['xlssessionhandler'] =
+		__XLSWS_INCLUDES__ .
+		'/core/session/XLSDBSessionHandler.class.php';
+	XLSSessionHandler::$CollectionOverridePhp = true;
+}
+
 QApplication::$EnableSession = true;
 QApplication::InitializeSession();
 $sessname = QApplication::$SessionName;

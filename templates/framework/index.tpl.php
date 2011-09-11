@@ -60,7 +60,7 @@
 	
 	<meta name="Author" content="<?= _xls_get_conf('STORE_NAME' , 'Web Store.') ?>" />
 	<meta name="Copyright" content="<?= _xls_get_conf('COPYRIGHT_MSG' , 'Xsilva Inc.') ?>" />
-	<meta name="Generator" content="Xilva Lightspeed Webstore <?= _xls_version(); ?>" />
+	<meta name="Generator" content="LightSpeed Webstore <?= _xls_version(); ?>" />
 	<meta http-equiv="imagetoolbar" content="false" />
 	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
 	<base href="<?= _xls_site_dir(); ?>/"/>

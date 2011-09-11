@@ -301,7 +301,7 @@ class xlsws_cart extends xlsws_index {
 	 * @return none
 	 */
 	protected function clearCart($strFormId, $strControlId, $strParameter) {
-			Cart::clear_cart();
+			Cart::ClearCart();
 			_xls_display_msg(_sp("Your cart content has been cleared"));
 			return;
 	}

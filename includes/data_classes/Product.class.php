@@ -639,7 +639,11 @@ EOS;
 	 * may be triggered to update related Products.
 	 */
 	public function Save($blnForceInsert = false, $blnForceUpdate = false, $blnSoapSave = false) {
-		$this->PreSaveHandler();
+        $this->PreSaveHandler();
+
+        if (!$this->Created)
+            $this->Created = new QDatetime(QDateTime::Now);
+
 		if ($blnForceInsert)
 			$this->InsertWithRowid();
 		else

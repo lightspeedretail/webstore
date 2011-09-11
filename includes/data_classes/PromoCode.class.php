@@ -80,7 +80,7 @@ class PromoCode extends PromoCodeGen {
 	 * @param string $strCode
 	 * @return PromoCode
 	 */
-	public function LoadByCode($strCode) {
+	public static function LoadByCode($strCode) {
 		return PromoCode::QuerySingle(
 			QQ::Equal(QQN::PromoCode()->Code, $strCode)
 		);
@@ -91,7 +91,7 @@ class PromoCode extends PromoCodeGen {
 	 * @param string $intCart
 	 * @return PromoCode
 	 */
-	public function LoadByFkCartId($intCart) {
+	public static function LoadByFkCartId($intCart) {
 		return PromoCode::QuerySingle(
 			QQ::Equal(QQN::PromoCode()->FkCartId, $intCart)
 		);
