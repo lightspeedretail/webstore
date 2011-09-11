@@ -593,7 +593,7 @@ class xlsws_product extends xlsws_index {
 	 * @return none
 	 */
 	protected function prod_add_to_cart($strFormId, $strControlId, $strParameter) {
-		$objProduct = $this->prod;
+		$objProduct = $objOriginal = $this->prod;
 		$objProduct = $this->ValidateMatrix();
 
 		if (!$objProduct)
