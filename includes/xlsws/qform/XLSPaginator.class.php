@@ -31,65 +31,115 @@
  */
 
 class XLSPaginator extends QPaginator {
-	public $url = false;
+    public $url = false;
 
-	public function GetControlHtml() {
-		$this->intIndexCount = 7;
+    public function __construct($objParentObject, $strControlId = null) {
+        try {
+            parent::__construct($objParentObject, $strControlId);
+        }
+        catch (QCallerException $objExc) {
+            $objExc->IncrementOffset;
+            throw $objExc;
+        }
 
+        // Define amount of pages to view in pagination
+        $this->IndexCount = 7;
+
+        // Todo :: This deserves further cleanup
+		if($this->url)
+			$url = $this->url;
+		else
+			$url = "index.php?";
+
+        // Define left and right button content
 		$this->strLabelForPrevious = "<img src=\"" .
 			templateNamed('css/images/breadcrumbs_arrowleft.png') .
 			"\" alt=\"" . _sp("Previous") . "\" />";
 		$this->strLabelForNext = "<img src=\"" .
 			templateNamed('css/images/breadcrumbs_arrowright.png') .
 			"\" alt=\"" . _sp("Next") . "\" />";
+    }
 
-		if($this->url)
-			$url = $this->url;
-		else
-			$url = "index.php?";
+    public function GetControlHtmlPreviousPage() {
+        $strLabel = $this->LabelForPrevious;
+        $strClass = 'previous';
+        $intPageId = '';
 
-		$this->objPaginatedControl->DataBind();
+        if ($this->intPageNumber > 1) {
+            $intPageId = $this->intPageNumber - 1;
+            $strLabel = $this->GetControlHtmlPage($intPageId, $strLabel, true);
+        }
 
-		$strStyle = $this->GetStyleAttributes();
-		if ($strStyle)
-			$strStyle = sprintf(' style="%s"', $strStyle);
+        return $this->GetControlHtmlItem($strLabel, $strClass);
+    }
 
-		$strToReturn = sprintf('<div id="%s"%s%s>', $this->strControlId,
-			$strStyle, $this->GetAttributes(true, false));
+    public function GetControlHtmlNextPage() {
+        $strLabel = $this->LabelForNext;
+        $strClass = 'next';
+        $intPageId = '';
 
-		$strToReturn .= "<ul>\n";
+        if ($this->intPageNumber < $this->PageCount) {
+            $intPageId = $this->intPageNumber + 1;
+            $strLabel = $this->GetControlHtmlPage($intPageId, $strLabel, true);
+        }
 
-		if ($this->intPageNumber <= 1)
-			$strToReturn .= sprintf('<li%s>%s</li>', '',
-			$this->strLabelForPrevious);
-		else {
-			$this->strActionParameter = $this->intPageNumber - 1;
-			$strToReturn .= sprintf('<li><a href="%s" %s%s>%s</a></li>',
-				$url,
-				$this->GetActionAttributes(),
-				'',
-				$this->strLabelForPrevious);
-		}
+        return $this->GetControlHtmlItem($strLabel, $strClass);
+    }
 
-		if ($this->PageCount <= $this->intIndexCount) {
-			// We have less pages than total indexcount
-			// So just display all page indexes
-			for ($intIndex = 1; $intIndex <= $this->PageCount;
-				$intIndex++)
-			{
-				if ($this->intPageNumber == $intIndex) {
-					$strToReturn .= sprintf('<li%s>%s</li>', '', $intIndex);
-				} else {
-					$this->strActionParameter = $intIndex;
-					$strToReturn .=
-						sprintf('<li><a href="%s" %s%s>%s</a></li>',
-							$url . "&page=$intIndex",
-							$this->GetActionAttributes(),
-							'',
-							$intIndex);
-				}
-			}
-		} else {
+    public function GetControlHtmlPage($intPageId, $strLabel = '', 
+        $blnInner = false) {
+
+        if (!$strLabel)
+            $strLabel = $intPageId;
+        $strClass = '';
+
+        $this->strActionParameter = $intPageId;
+
+        if ($intPageId != $this->intPageNumber)
+            $strLabel = sprintf('<a page="%s" href="%s" %s>%s</a>',
+                $intPageId, 
+                $this->url . "&page={$intPageId}",
+                $this->GetActionAttributes(),
+                $strLabel
+            );
+        else $strClass = 'current';
+
+        if ($blnInner) return $strLabel;
+        else return $this->GetControlHtmlItem($strLabel, $strClass);
+    }
+
+    public function GetControlHtmlItem($strLabel, $strClass = '') {
+        if ($strClass)
+            $strClass = ' class="' . $strClass . '"';
+
+        return sprintf('<li%s>%s</li>' . PHP_EOL, $strClass, $strLabel);
+    }
+
+
+	public function GetControlHtml() {
+        $this->objPaginatedControl->DataBind();
+
+        // Define the container
+        $strStyle = $this->GetStyleAttributes();
+        if ($strStyle)
+            $strStyle = sprintf(' style="%s"', $strStyle);
+
+        $strToReturn = sprintf('<div id="%s" %s%s>' . PHP_EOL, 
+            $this->strControlId, 
+            $strStyle,
+            $this->GetAttributes(true, false)
+        );
+
+        $strToReturn .= '  <ul>' . PHP_EOL;
+        $strToReturn .= $this->GetControlHtmlPreviousPage();
+
+        if ($this->PageCount <= $this->intIndexCount) {
+            // Display all pages when we have fewer pages than IndexCount
+            for ($intIndex = 1; $intIndex <= $this->PageCount; $intIndex++)
+                $strToReturn .= $this->GetControlHtmlPage($intIndex);
+        } 
+        else {
+            // We have more pages than we have IndexCount
 			$intMinimumEndOfBunch = $this->intIndexCount - 2;
 			$intMaximumStartOfBunch = $this->PageCount -
 				$this->intIndexCount + 3;
@@ -109,10 +159,8 @@ class XLSPaginator extends QPaginator {
 				$intPageStart = min($intMaximumStartOfBunch,
 					$this->intPageNumber - $intLeftOfBunchCount);
 
-				$this->strActionParameter = 1;
-				$strStartElipse = sprintf('<li><a href="" %s%s>%s</a></li>',
-					$this->GetActionAttributes(), '', 1);
-				$strStartElipse .= '<li><b>...</b></li>';
+                $strStartElipse = $this->GetControlHtmlPage(1);
+				$strStartElipse .= '<li><b>...</b></li>' . PHP_EOL;
 			}
 
 			if ($this->intPageNumber > $intRightBunchTrigger) {
@@ -121,45 +169,20 @@ class XLSPaginator extends QPaginator {
 			} else {
 				$intPageEnd = max($intMinimumEndOfBunch,
 					$this->intPageNumber + $intRightOfBunchCount);
-				$strEndElipse = '<li><b>...</b></li>';
-
-				$this->strActionParameter = $this->PageCount;
-				$strEndElipse .= sprintf('<li><a href="" %s%s>%s</a></li>',
-					$this->GetActionAttributes(), '', $this->PageCount);
+				$strEndElipse = '<li><b>...</b></li>' . PHP_EOL;
+                $strEndElipse .= $this->GetControlHtmlPage($this->PageCount);
 			}
 
 			$strToReturn .= $strStartElipse;
-			for ($intIndex = $intPageStart; $intIndex <= $intPageEnd;
-				$intIndex++)
-			{
-				if ($this->intPageNumber == $intIndex) {
-					$strToReturn .= sprintf('<li><span %s>%s</span></li>',
-						'', $intIndex);
-				} else {
-					$this->strActionParameter = $intIndex;
-					$strToReturn .=
-						sprintf('<li><a href="" %s%s>%s</a></li>',
-							$this->GetActionAttributes(),
-							'',
-							$intIndex);
-				}
-			}
+            for ($intIndex = $intPageStart; $intIndex <= $intPageEnd; $intIndex++)
+                $strToReturn .= $this->GetControlHtmlPage($intIndex);
 			$strToReturn .= $strEndElipse;
 		}
 
-		if ($this->intPageNumber >= $this->PageCount)
-			$strToReturn .= sprintf('<li%s>%s</li>', '',
-				$this->strLabelForNext);
-		else {
-			$this->strActionParameter = $this->intPageNumber + 1;
-			$strToReturn .= sprintf('<li><a href="" %s%s>%s</a></li>',
-				$this->GetActionAttributes(), '',
-				$this->strLabelForNext);
-		}
-
-		$strToReturn .= "</ul>\n";
-		$strToReturn .= '</div>';
+        $strToReturn .= $this->GetControlHtmlNextPage();
+		$strToReturn .= '  </ul>' . PHP_EOL;
+		$strToReturn .= '</div>' . PHP_EOL;
 
 		return $strToReturn;
-	}
+    }
 }

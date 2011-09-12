@@ -363,6 +363,16 @@ EOS;
 			case 'categ_childs': // LEGACY
 				return $this->GetChildren();
 
+            case 'MetaDescription':
+            case 'MetaKeywords':
+                try { 
+                    return trim(parent::__get($strName));
+                }
+                catch (QCallerException $objExc) {
+                    $objExc->IncrementOffset();
+                    throw $objExc;
+                }
+
 			default:
 				try {
 					return parent::__get($strName);

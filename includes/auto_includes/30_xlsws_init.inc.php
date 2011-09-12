@@ -38,7 +38,7 @@ if (!empty(QApplication::$Database)) {
 
 		// Define the Form State handler to save form states
 		QForm::$FormStateHandler = 'QFormStateHandler';
-		QForm::$EncryptionKey = null;
+        QForm::$EncryptionKey = null;
 	}
 
 	QApplication::$EncodingType = _xls_get_conf('ENCODING' , "UTF-8");
