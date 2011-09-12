@@ -176,6 +176,53 @@ class Cart extends CartGen {
 		}
 	}
 
+    public static function GetCartLastIdStr() {
+        $strQuery = 'SELECT id_str FROM xlsws_cart ORDER BY id_str DESC LIMIT 1';
+        $strIdStr = _dbx_first_cell($strQuery);
+
+        if (empty($strIdStr))
+            return false;
+        else
+            return $strIdStr;
+    }
+
+    public function GetCartNextIdStr() {
+        $strNextId = _xls_get_conf('NEXT_ORDER_ID', false);
+        $strLastId = Cart::GetCartLastIdStr();
+
+        if ($strLastId) {
+            $intLastId = preg_replace("/[^0-9]/", "", Cart::GetCartLastIdStr());
+            $intNextId = intval($intLastId) + 1;
+            $strNextId = 'WO-' . $intNextId;
+            return $strNextId;
+        }
+        else {
+            $intNextId = preg_replace("/[^0-9]/", "", $strNextId);
+            return 'WO-' . $intNextId;
+        }
+    }
+
+    public function SetIdStr() {
+        $strQueryFormat = 'SELECT COUNT(rowid) FROM xlsws_cart WHERE '.
+            '`id_str` = "%s" AND `rowid` != "%s";';
+
+        $strQuery = sprintf($strQueryFormat, $this->IdStr, $this->Rowid);
+
+        if (!$this->IdStr)
+            $this->IdStr = Cart::GetCartNextIdStr();
+
+        while(_dbx_first_cell($strQuery) != '0') {
+            $this->IdStr = Cart::GetCartNextIdStr();
+            $strQuery = sprintf($strQueryFormat, $this->IdStr, $this->Rowid);
+        }
+
+        $this->Save();
+
+        $objConf = Configuration::LoadByKey('NEXT_ORDER_ID');
+        $objConf->Value = pre_replace("/[^0-9]/", "", $this->IdStr);
+        $objConf->Save();
+    }
+
 	/**
 	 * Update the Quantity of an Item in the cart
 	 * Then force recalculation of Cart values
@@ -711,10 +758,19 @@ class Cart extends CartGen {
 	/**
 	 * Return link for current cart
 	 * @return string
-	 */
+     */
+    protected function GetLinkid() {
+        if ($this->strLinkid == '' || is_null($this->strLinkid)) {
+            $this->Linkid = md5(date('U') . '_' . $this->intRowid);
+            return $this->strLinkid;
+        }
+        else
+            return $this->strLinkid;
+    }
+
 	protected function GetLink($blnTracking = false) {
-		if ($this->Linkid == '' || is_null($this->Linkid)) {
-			$this->Linkid = md5(date('U') . "_" . $this->intRowid);
+        if ($this->Linkid == '' || is_null($this->Linkid)) {
+            $this->LinkId = $this->GetLinkid();
 			$this->Save();
 		}
 
@@ -962,6 +1018,9 @@ class Cart extends CartGen {
 		switch ($strName) {
 			case 'Link':
 				return $this->GetLink(true);
+
+            case 'Linkid':
+                return $this->GetLinkid();
 
 			case 'Order':
 				return $this->GetLink(false);
