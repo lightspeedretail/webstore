@@ -219,7 +219,7 @@ class Cart extends CartGen {
         $this->Save();
 
         $objConf = Configuration::LoadByKey('NEXT_ORDER_ID');
-        $objConf->Value = pre_replace("/[^0-9]/", "", $this->IdStr);
+        $objConf->Value = intval(preg_replace("/[^0-9]/", "", $this->IdStr))+1;
         $objConf->Save();
     }
 
