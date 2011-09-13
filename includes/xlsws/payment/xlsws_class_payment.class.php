@@ -43,7 +43,7 @@ class xlsws_class_payment extends XLSModule {
 	 * @return string
 	 */
 	public function name() {
-		$config = $this-Config;
+		$config = $this->Config;
 
 		if(isset($config['label']))
 			return $config['label'];
