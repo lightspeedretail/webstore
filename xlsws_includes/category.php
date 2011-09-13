@@ -54,7 +54,8 @@ class xlsws_category extends xlsws_index {
         }
 
         if (isset($XLSWS_VARS['c'])) {
-            $strCategory = end(explode('.', $XLSWS_VARS['c']));
+            $arrCategories = explode('.', $XLSWS_VARS['c']);
+            $strCategory = array_pop($arrCategories);
             $objCategory = Category::$Manager->GetByKey($strCategory);
 
             if ($objCategory)
