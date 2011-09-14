@@ -2,6 +2,43 @@ Changelog
 
 Please see https://github.com/lightspeedretail/webstore/issues for technical details of these issues
 
+
+# 2.1.2
+
+* Corrected an SSL error that prevented Gmail from being used as outbound SMTP
+* Corrected a rare issue where the same Web Order number could be used for two orders
+* Resolved an issue where pagination would generate extra blank pages on large product searches
+* Corrected a rounding error using percentage discounts on Promo Codes
+* Fixed an issue that prevented duplicating paginator bar
+
+* Resolved an issue where MerchantWare Online did not allow dashes in Web Order numbers
+* Improved calculation of master product inventory during product uploads
+* Improved handling of subcategories in a product list
+* Corrected an issue where a trailing slash in a URL would not search properly
+* Corrected an issue where Product Description using bullet points would cause description to display twice
+
+* Removed products_sliber_theme_bg misspelling from CSS files
+* Improved display in Edit Cart to not display "Shipping Included Above" when shipping was not yet calculated
+* Fixed an issue where an uploaded product photos of exactly 512x512 pixels may not generate thumbnail correctly
+* Corrected an issue with crumbtrail display on product details
+* Fixed an issue where Emailing Cart would send an incorrect link
+
+* Resolved a rare issue where Flush Category Tree may count child products incorrectly
+* Improved XML parsing to correct an issue in iUPS and USPS shipping erroring with certain countries
+* Resolved an issue with the iUPS Shipping module to correct an AJAX error
+* Fixed an issue where Markup was not being added to USPS shipping
+* Improved handling of defined tiers where ship cost was set to zero
+
+* Resolved an issue where a session may timeout prematurely during checkout
+* Corrected an issue where Duplicate Product Code warnings were not being displayed in System Log
+* Changed behavior of session state handler to use hidden fields instead of /state folder
+* Fixed an issue with incorrect timestamp in the xlsws_products table
+* Fixed an issue where DateTimeCreated was not correctly set in the xlsws_cart table
+* Migrated ereg_replace to preg_replace in functions to conform to newer PHP standards and eliminate errors
+* Corrected misdefined function calls that would generate errors when using an E_STRICT environment
+* Removed closing PHP tags where no longer required
+
+
 # 2.1.1
 
 * Added troubleshooting system check for current and future upgrades
