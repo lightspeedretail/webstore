@@ -1132,7 +1132,7 @@ EOT;
 			protected function xls_check_file_signatures($complete=false)
 			{ 
 				$checked=array();
-				$checked['<b>--File Signatures Check--</b>']= "pass";
+				$checked['<b>--File Signatures Check for '._xls_version().'--</b>']= "pass";
 				
 				include("includes/signatures.php");
 
@@ -1143,7 +1143,7 @@ EOT;
 					if(!file_exists($key))
 						$checked[$key] = "MISSING";
 					else {
-				    $hashes=array_reverse(explode(",",$value));
+				    $hashes=explode(",",$value);
 				    $hashfile=md5_file($key);
 				    if (!in_array($hashfile,$hashes))
 				        $checked[$key] = "modified";
