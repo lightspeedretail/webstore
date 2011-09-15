@@ -54,7 +54,8 @@ class xlsws_category extends xlsws_index {
         }
 
         if (isset($XLSWS_VARS['c'])) {
-            $strCategory = end(explode('.', $XLSWS_VARS['c']));
+            $arrCategories = explode('.', $XLSWS_VARS['c']);
+            $strCategory = array_pop($arrCategories);
             $objCategory = Category::$Manager->GetByKey($strCategory);
 
             if ($objCategory)
@@ -167,7 +168,8 @@ class xlsws_category extends xlsws_index {
         }
 
         $objRepeater->$strProperty = new XLSPaginator($this->mainPnl , $strName);
-		$objRepeater->$strProperty->url = "index.php?";
+        if ($this->category) $objRepeater->$strProperty->url = $this->category->Link;
+
     }
 
     /**
@@ -330,8 +332,6 @@ class xlsws_category extends xlsws_index {
 
             // Set Title
 			_xls_add_page_title($objCategory->Name);
-
-			$objRepeater->Paginator->url = $objCategory->Link;
 
 			Visitor::add_view_log($XLSWS_VARS['c'], ViewLogType::categoryview);
 		}
