@@ -72,7 +72,7 @@ abstract class XLSSessionHandlerBase extends QBaseClass {
 			$intDivisor = self::$CollectionDefaultDivisor;
 		}
 
-		if (!(rand(0, $intDivisor) < $intProbability)) return false;
+		if (!(rand(0, $intDivisor) <= $intProbability)) return false;
 		return true;
 	}
 
