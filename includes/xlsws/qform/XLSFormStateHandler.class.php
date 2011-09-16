@@ -91,13 +91,21 @@ class XLSFormStateHandler extends QBaseClass {
 
         $intTimeInterval = time() - self::$GarbageCollectionMaxSeconds;
         $intDay = date('d', $intTimeInterval);
+        $intHour = date('H');
 
         while (($strHashDir = $objStateDir->read()) !== false) { 
             if (($strHashDir == '.') || ($strHashDir == '..')) continue;
 
             $intHashDay = substr($strHashDir,0,2);
+            $intHashHour = substr($strHashDir,2,4);
             $strHashDir = $strStateDir . '/' . $strHashDir;
             $objHashDir = dir($strHashDir);
+
+            if ($intDay > $intHashDay)
+                continue;
+
+            if ($intHour > $intHashHour)
+                continue;
 
             while (($strFile = $objHashDir->read()) !== false) {
                 $intPosition = strpos($strFile, self::$FileNamePrefix);
