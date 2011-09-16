@@ -47,11 +47,6 @@ class XLSFormStateHandler extends QBaseClass {
 	public static $FileNamePrefix = 'state';
 
 	/**
-	 * Maximum duration to keep FormState files
-	 */
-    public static $GarbageCollectionMaxSeconds = 86400;
-
-	/**
 	 * If PHP SESSION is enabled, then this method will delete all
 	 * formstate files specifically for this SESSION user (and no one else)
 	 * This can be used in lieu of or in addition to the standard
@@ -89,7 +84,7 @@ class XLSFormStateHandler extends QBaseClass {
         $strStateDir = self::$StatePath;
         $objStateDir = dir($strStateDir);
 
-        $intTimeInterval = time() - self::$GarbageCollectionMaxSeconds;
+        $intTimeInterval = time() - XLSSession::GetSessionLifetime() + 60;
         $intDay = date('d', $intTimeInterval);
         $intHour = date('H');
 
