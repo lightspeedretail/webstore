@@ -119,7 +119,7 @@ class XLSFormStateHandler extends QBaseClass {
                 }
             }
 
-            if (count(scandir($strStateDir)) > 2)
+            if (count(scandir($strStateDir)) == 2)
                 rmdir($strStateDir);
         }
 	}
