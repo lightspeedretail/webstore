@@ -84,23 +84,25 @@ class XLSFormStateHandler extends QBaseClass {
         $strStateDir = self::$StatePath;
         $objStateDir = dir($strStateDir);
 
-        $intTimeInterval = time() - XLSSession::GetSessionLifetime() + 60;
-        $intDay = date('d', $intTimeInterval);
-        $intHour = date('H');
+        $intLifeTime = time() - XLSSessionHandler::GetSessionLifetime();
 
         while (($strHashDir = $objStateDir->read()) !== false) { 
             if (($strHashDir == '.') || ($strHashDir == '..')) continue;
 
-            $intHashDay = substr($strHashDir,0,2);
-            $intHashHour = substr($strHashDir,2,4);
+            $intHashTime = mktime(
+                substr($strHashDir,8,2),
+                substr($strHashDir,10,2),
+                0,
+                substr($strHashDir,4,2),
+                substr($strHashDir,6,2),
+                substr($strHashDir,0,4)
+            );
+
+            if ($intHashTime > $intLifeTime)
+                continue;
+
             $strHashDir = $strStateDir . '/' . $strHashDir;
             $objHashDir = dir($strHashDir);
-
-            if ($intDay > $intHashDay)
-                continue;
-
-            if ($intHour > $intHashHour)
-                continue;
 
             while (($strFile = $objHashDir->read()) !== false) {
                 $intPosition = strpos($strFile, self::$FileNamePrefix);
@@ -108,19 +110,13 @@ class XLSFormStateHandler extends QBaseClass {
 
                 $strFile = $strHashDir . '/' . $strFile;
 
-                if ($intDay < $intHashDay) { 
+                $intModifiedTime = filemtime($strFile);
+                if ($intModifiedTime < $intLifeTime)
                     unlink($strFile);
-                    continue;
-                }
-                else { 
-                    $intModifiedTime = filemtime($strFile);
-    				if ($intModifiedTime < $intTimeInterval)
-                        unlink($strFile);
-                }
             }
 
-            if (count(scandir($strStateDir)) == 2)
-                rmdir($strStateDir);
+            if (count(scandir($strHashDir)) == 2)
+                rmdir($strHashDir);
         }
 	}
 
@@ -129,7 +125,7 @@ class XLSFormStateHandler extends QBaseClass {
 		if (function_exists('gzcompress'))
 			$strFormState = gzcompress($strFormState, 9);
 
-        $strDate = date('dHi');
+        $strDate = date('YmdHi');
         $strStateId = md5(microtime());
 
         $strFilePath = sprintf('%s/%s/%s.%s.%s',
