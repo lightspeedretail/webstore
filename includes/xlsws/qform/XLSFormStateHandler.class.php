@@ -142,14 +142,13 @@ class XLSFormStateHandler extends QBaseClass {
         $strDirPath = dirname($strFilePath);
 
         if (!is_dir($strDirPath))
-            if (!mkdir($strDirPath, 0777, true)) {
-                QApplication::Log(E_USER_ERROR, 'core', 
-                    'Failed to create the state path : ' . $strDirPath);
-                return false;
-            }
+            mkdir($strDirPath, 0777, true);
 
-        // Save the Form State
-        file_put_contents($strFilePath, $strFormState);
+        if (!file_put_contents($strFilePath, $strFormState)) {
+            QApplication::Log(E_USER_ERROR, 'core', 
+               'Failed to save state path : ' . $strFilePath);
+            return false;
+        }
 
 		// Return the Page Id
 		return $strPageId;
