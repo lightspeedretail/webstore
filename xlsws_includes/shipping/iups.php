@@ -32,6 +32,129 @@
 
 class iups extends xlsws_class_shipping {
 	public $service_types;
+		//US ORIGIN
+	protected $ups_service_us = array (
+		'01' => 'UPS Next Day Air',
+		'02' => 'UPS 2nd Day Air',
+		'03' => 'UPS Ground',
+		'07' => 'UPS Worldwide Express',
+		'08' => 'UPS Worldwide Expedited',
+		'11' => 'UPS Standard',
+		'12' => 'UPS 3 Day Select',
+		'13' => 'UPS Next Day Air Saver',
+		'14' => 'UPS Next Day Air Early A.M.',
+		'54' => 'UPS Worldwide Express Plus',
+		'59' => 'UPS 2nd Day Air A.M.',
+		'65' => 'UPS Express Saver',
+		'82' => 'UPS Today Standard',
+		'83' => 'UPS Today Dedicated',
+		'84' => 'UPS Today Intercity',
+		'85' => 'UPS Today Express'
+	);
+
+
+	protected $ups_service_eu = array (
+		'01' => 'UPS Next Day Air',
+		'02' => 'UPS 2nd Day Air',
+		'03' => 'UPS Ground',
+		'07' => 'UPS Worldwide Express',
+		'08' => 'UPS Worldwide Expedited',
+		'11' => 'UPS Standard',
+		'12' => 'UPS 3 Day Select',
+		'13' => 'UPS Next Day Air Saver',
+		'14' => 'UPS Next Day Air Early A.M.',
+		'54' => 'UPS Worldwide Express Plus',
+		'59' => 'UPS 2nd Day Air A.M.',
+		'65' => 'UPS Express Saver',
+		'82' => 'UPS Today Standard',
+		'83' => 'UPS Today Dedicated',
+		'84' => 'UPS Today Intercity',
+		'85' => 'UPS Today Express'
+	);
+
+	protected $ups_service_ca = array (
+		'01' => 'UPS Next Day Air',
+		'02' => 'UPS 2nd Day Air',
+		'03' => 'UPS Ground',
+		'07' => 'UPS Worldwide Express',
+		'08' => 'UPS Worldwide Expedited',
+		'11' => 'UPS Standard',
+		'12' => 'UPS 3 Day Select',
+		'13' => 'UPS Next Day Air Saver',
+		'14' => 'UPS Next Day Air Early A.M.',
+		'54' => 'UPS Worldwide Express Plus',
+		'59' => 'UPS 2nd Day Air A.M.',
+		'65' => 'UPS Express Saver',
+		'82' => 'UPS Today Standard',
+		'83' => 'UPS Today Dedicated',
+		'84' => 'UPS Today Intercity',
+		'85' => 'UPS Today Express'
+	);
+
+	//From Other origin
+	protected $ups_service_other = array (
+		'07' => 'UPS Express',
+		'08' => 'UPS Worldwide Expedited',
+		'11' => 'UPS Standard',
+		'54' => 'UPS Worldwide Express Plus',
+		'65' => 'UPS Saver'
+	);
+
+	var $userid;
+	var $passwd;
+	var $accesskey;
+	var $currency;
+	var $upstool='https://www.ups.com/ups.app/xml/Rate';
+	var $request;
+	var $service;
+	var $pickuptype='01'; // 01 daily pickup
+	  /* Pickup Type
+		01- Daily Pickup
+		03- Customer Counter
+		06- One Time Pickup
+		07- On Call Air
+		11- Suggested Retail Rates
+		19- Letter Center
+		20- Air Service Center
+	  */
+	var $residential;
+	var $value;
+
+	//ship from location or shipper
+	var $s_zip;
+	var $s_state;
+	var $s_country;
+
+	//ship to location
+	var $t_zip;
+	var $t_state;
+	var $t_country;
+
+	//package info
+	var $package_type = '02';  // 02 customer supplied package
+
+	var $weight;
+	var $l;
+	var $w;
+	var $h;
+
+	//measurement inches or cm, lbs or kg
+	var $measurement_type = "IN";
+	var $weight_type = "LBS";
+
+	var $error=0;
+	var $errormsg;
+
+	var $xmlarray = array();
+
+	var $xmlreturndata = "";
+
+	function dimensions($len,$wid,$hgt){
+		$this->l =$len;
+		$this->w =$wid;
+		$this->h = $hgt;
+	}
+	
 
 	/**
 	 * The name of the shipping module that will be displayed in the checkout page
@@ -357,128 +480,7 @@ class iups extends xlsws_class_shipping {
 		}
 	}
 
-	//US ORIGIN
-	protected $ups_service_us = array (
-		'01' => 'UPS Next Day Air',
-		'02' => 'UPS 2nd Day Air',
-		'03' => 'UPS Ground',
-		'07' => 'UPS Worldwide Express',
-		'08' => 'UPS Worldwide Expedited',
-		'11' => 'UPS Standard',
-		'12' => 'UPS 3 Day Select',
-		'13' => 'UPS Next Day Air Saver',
-		'14' => 'UPS Next Day Air Early A.M.',
-		'54' => 'UPS Worldwide Express Plus',
-		'59' => 'UPS 2nd Day Air A.M.',
-		'65' => 'UPS Express Saver',
-		'82' => 'UPS Today Standard',
-		'83' => 'UPS Today Dedicated',
-		'84' => 'UPS Today Intercity',
-		'85' => 'UPS Today Express'
-	);
 
-
-	protected $ups_service_eu = array (
-		'01' => 'UPS Next Day Air',
-		'02' => 'UPS 2nd Day Air',
-		'03' => 'UPS Ground',
-		'07' => 'UPS Worldwide Express',
-		'08' => 'UPS Worldwide Expedited',
-		'11' => 'UPS Standard',
-		'12' => 'UPS 3 Day Select',
-		'13' => 'UPS Next Day Air Saver',
-		'14' => 'UPS Next Day Air Early A.M.',
-		'54' => 'UPS Worldwide Express Plus',
-		'59' => 'UPS 2nd Day Air A.M.',
-		'65' => 'UPS Express Saver',
-		'82' => 'UPS Today Standard',
-		'83' => 'UPS Today Dedicated',
-		'84' => 'UPS Today Intercity',
-		'85' => 'UPS Today Express'
-	);
-
-	protected $ups_service_ca = array (
-		'01' => 'UPS Next Day Air',
-		'02' => 'UPS 2nd Day Air',
-		'03' => 'UPS Ground',
-		'07' => 'UPS Worldwide Express',
-		'08' => 'UPS Worldwide Expedited',
-		'11' => 'UPS Standard',
-		'12' => 'UPS 3 Day Select',
-		'13' => 'UPS Next Day Air Saver',
-		'14' => 'UPS Next Day Air Early A.M.',
-		'54' => 'UPS Worldwide Express Plus',
-		'59' => 'UPS 2nd Day Air A.M.',
-		'65' => 'UPS Express Saver',
-		'82' => 'UPS Today Standard',
-		'83' => 'UPS Today Dedicated',
-		'84' => 'UPS Today Intercity',
-		'85' => 'UPS Today Express'
-	);
-
-	//From Other origin
-	protected $ups_service_other = array (
-		'07' => 'UPS Express',
-		'08' => 'UPS Worldwide Expedited',
-		'11' => 'UPS Standard',
-		'54' => 'UPS Worldwide Express Plus',
-		'65' => 'UPS Saver'
-	);
-
-	var $userid;
-	var $passwd;
-	var $accesskey;
-	var $currency;
-	var $upstool='https://www.ups.com/ups.app/xml/Rate';
-	var $request;
-	var $service;
-	var $pickuptype='01'; // 01 daily pickup
-	  /* Pickup Type
-		01- Daily Pickup
-		03- Customer Counter
-		06- One Time Pickup
-		07- On Call Air
-		11- Suggested Retail Rates
-		19- Letter Center
-		20- Air Service Center
-	  */
-	var $residential;
-	var $value;
-
-	//ship from location or shipper
-	var $s_zip;
-	var $s_state;
-	var $s_country;
-
-	//ship to location
-	var $t_zip;
-	var $t_state;
-	var $t_country;
-
-	//package info
-	var $package_type = '02';  // 02 customer supplied package
-
-	var $weight;
-	var $l;
-	var $w;
-	var $h;
-
-	//measurement inches or cm, lbs or kg
-	var $measurement_type = "IN";
-	var $weight_type = "LBS";
-
-	var $error=0;
-	var $errormsg;
-
-	var $xmlarray = array();
-
-	var $xmlreturndata = "";
-
-	function dimensions($len,$wid,$hgt){
-		$this->l =$len;
-		$this->w =$wid;
-		$this->h = $hgt;
-	}
 
 	/**
 	 * construct_request_xml

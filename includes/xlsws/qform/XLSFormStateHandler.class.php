@@ -40,16 +40,11 @@ class XLSFormStateHandler extends QBaseClass {
 	public static $StatePath = '/tmp';
 
 	/**
-	 * The filename prefix to be used by all FormState files
+     * The filename prefix to be used by all FormState files
 	 *
 	 * @var string FileNamePrefix
 	 */
-	public static $FileNamePrefix = 'state_';
-
-	/**
-	 * Maximum duration to keep FormState files
-	 */
-	public static $GarbageCollectionMaxSeconds = 86400;
+	public static $FileNamePrefix = 'state';
 
 	/**
 	 * If PHP SESSION is enabled, then this method will delete all
@@ -60,37 +55,69 @@ class XLSFormStateHandler extends QBaseClass {
 	 * When using XLSSessionHandler, this is automatically tied into
 	 * the session handler.
 	 */
-	public static function Destroy($strName) {
-		$strSessionId = session_id();
-		$strPrefix = self::$FileNamePrefix . $strSessionId;
+    public static function Destroy($strName) {
+        $strPrefix = self::$FileNamePrefix . '.' . session_id();
+        $strStateDir = self::$StatePath;
+        $objStateDir = dir($strStateDir);
 
-		// Go through all the files
-		if (strlen($strSessionId)) {
-			$objDirectory = dir(self::$StatePath);
-			while (($strFile = $objDirectory->read()) !== false) {
-				$intPosition = strpos($strFile, $strPrefix);
-				if (($intPosition !== false) && ($intPosition == 0))
-					unlink(sprintf('%s/%s', self::$StatePath, $strFile));
-			}
+        while (($strHashDir = $objDirectory->read()) !== false) {
+            if (($strHashDir == '.') || ($strHashDir == '..')) continue;
+
+            $strHashDir = $strStateDir . '/' . $strHashDir;
+            $objHashDir = dir($strHashDir);
+
+            while (($strFile = $objHashDir->read()) !== false) {
+                $intPosition = strpos($strFile, $strPrefix);
+                if ($intPosition === false) continue;
+
+                $strFile = $strHashDir . '/' . $strFile;
+                unlink($strFile);
+            }
 		}
 	}
 
-	public static function GarbageCollect() {
-		// Go through all the files
-		$objDirectory = dir(self::$StatePath);
-		while (($strFile = $objDirectory->read()) !== false) {
-			$intPosition = strpos($strFile, self::$FileNamePrefix);
+    /**
+     * Iterate through all subfolders and all state files to delete 
+     * those which have expired. 
+     */
+    public static function GarbageCollect() {
+        $strStateDir = self::$StatePath;
+        $objStateDir = dir($strStateDir);
 
-			if (($intPosition !== false) && ($intPosition == 0)) {
-				$strFile = sprintf('%s/%s', self::$StatePath, $strFile);
-				$intTimeInterval =
-					time() - self::$GarbageCollectionMaxSeconds;
-				$intModifiedTime = filemtime($strFile);
+        $intLifeTime = time() - XLSSessionHandler::GetSessionLifetime();
 
-				if ($intModifiedTime < $intTimeInterval)
-					unlink($strFile);
-			}
-		}
+        while (($strHashDir = $objStateDir->read()) !== false) { 
+            if (($strHashDir == '.') || ($strHashDir == '..')) continue;
+
+            $intHashTime = mktime(
+                substr($strHashDir,8,2),
+                substr($strHashDir,10,2),
+                0,
+                substr($strHashDir,4,2),
+                substr($strHashDir,6,2),
+                substr($strHashDir,0,4)
+            );
+
+            if ($intHashTime > $intLifeTime)
+                continue;
+
+            $strHashDir = $strStateDir . '/' . $strHashDir;
+            $objHashDir = dir($strHashDir);
+
+            while (($strFile = $objHashDir->read()) !== false) {
+                $intPosition = strpos($strFile, self::$FileNamePrefix);
+                if ($intPosition === false) continue;
+
+                $strFile = $strHashDir . '/' . $strFile;
+
+                $intModifiedTime = filemtime($strFile);
+                if ($intModifiedTime < $intLifeTime)
+                    unlink($strFile);
+            }
+
+            if (count(scandir($strHashDir)) == 2)
+                rmdir($strHashDir);
+        }
 	}
 
 	public static function Save($strFormState, $blnBackButtonFlag) {
@@ -98,49 +125,50 @@ class XLSFormStateHandler extends QBaseClass {
 		if (function_exists('gzcompress'))
 			$strFormState = gzcompress($strFormState, 9);
 
-		// Figure Out Session Id (if applicable)
-		$strSessionId = session_id();
+        $strDate = date('YmdHi');
+        $strStateId = md5(microtime());
 
-		// Calculate a new unique Page Id
-		$strPageId = md5(microtime());
+        $strFilePath = sprintf('%s/%s/%s.%s.%s',
+            self::$StatePath, 
+            $strDate, 
+            self::$FileNamePrefix,
+            session_id(),
+            $strStateId
+        );
 
-		// Figure Out FilePath
-		$strFilePath = sprintf('%s/%s%s_%s',
-			self::$StatePath,
-			self::$FileNamePrefix,
-			$strSessionId,
-			$strPageId);
+        $strPageId = $strDate . '/' . $strStateId;
 
-		// Save THIS formstate to the file system
-		// NOTE: if gzcompress is used, we are saving the *BINARY* data stream of the compressed formstate
-		// In theory, this SHOULD work.  But if there is a webserver/os/php version that doesn't like
-		// binary session streams, you can first base64_encode before saving to session (see note below).
-		file_put_contents($strFilePath, $strFormState);
+        // Get the State file path
+        $strDirPath = dirname($strFilePath);
+
+        if (!is_dir($strDirPath))
+            mkdir($strDirPath, 0777, true);
+
+        if (!file_put_contents($strFilePath, $strFormState)) {
+            QApplication::Log(E_USER_ERROR, 'core', 
+               'Failed to save state path : ' . $strFilePath);
+            return false;
+        }
 
 		// Return the Page Id
-		// Because of the MD5-random nature of the Page ID, there is no need/reason to encrypt it
 		return $strPageId;
 	}
 
 	public static function Load($strPostDataState) {
 		// Pull Out strPageId
-		$strPageId = $strPostDataState;
+        $strPageId = $strPostDataState;
+        $strDate = dirname($strPageId);
+        $strStateId = basename($strPageId);
 
-		// Figure Out Session Id (if applicable)
-		$strSessionId = session_id();
-
-		// Figure Out FilePath
-		$strFilePath = sprintf('%s/%s%s_%s',
-			self::$StatePath,
-			self::$FileNamePrefix,
-			$strSessionId,
-			$strPageId);
+        $strFilePath = sprintf('%s/%s/%s.%s.%s',
+            self::$StatePath, 
+            $strDate, 
+            self::$FileNamePrefix,
+            session_id(),
+            $strStateId
+        );
 
 		if (file_exists($strFilePath)) {
-			// Pull FormState from file system
-			// NOTE: if gzcompress is used, we are restoring the *BINARY* data stream of the compressed formstate
-			// In theory, this SHOULD work.  But if there is a webserver/os/php version that doesn't like
-			// binary session streams, you can first base64_decode before restoring from session (see note above).
 			$strSerializedForm = file_get_contents($strFilePath);
 
 			// Uncompress (if available)
@@ -148,7 +176,7 @@ class XLSFormStateHandler extends QBaseClass {
 				$strSerializedForm = gzuncompress($strSerializedForm);
 
 			return $strSerializedForm;
-		} else
-			return null;
+        }
+        else return null;
 	}
 }
