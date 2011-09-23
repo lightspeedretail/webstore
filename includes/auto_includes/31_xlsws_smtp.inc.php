@@ -47,6 +47,7 @@
 		                }
 		              }
 
+                QEmailServer::$OriginatingServerIp = $_SERVER["HTTP_HOST"];
                 QEmailServer::$SmtpServer = $strUrl;
                 QEmailServer::$SmtpPort = $strPort;
 
