@@ -177,42 +177,48 @@ class Cart extends CartGen {
 	}
 
     public static function GetCartLastIdStr() {
-        $strQuery = 'SELECT id_str FROM xlsws_cart ORDER BY id_str DESC LIMIT 1';
-        $strIdStr = _dbx_first_cell($strQuery);
-
-        if (empty($strIdStr))
-            return false;
+        //Since id_str is a text field, we have to read in and strip out nonnumeric
+        $objDbResult = _dbx("SELECT id_str FROM xlsws_cart where id_str is not null" , "Query");
+        $arrIdStr = array();
+    				
+    	while($res = $objDbResult->GetNextRow())
+    		$arrIdStr[] = preg_replace("/[^0-9]/", "", $res->GetColumn('id_str' , 'VarChar'));
+        
+        rsort($arrIdStr);
+    		    					
+        if (empty($arrIdStr))
+            return 0;
         else
-            return $strIdStr;
+            return $arrIdStr[0];
     }
 
     public function GetCartNextIdStr() {
         $strNextId = _xls_get_conf('NEXT_ORDER_ID', false);
-        $strLastId = Cart::GetCartLastIdStr();
-
-        if ($strLastId) {
-            $intLastId = preg_replace("/[^0-9]/", "", Cart::GetCartLastIdStr());
+        
+        if ($strNextId) {
+            $intNextId = preg_replace("/[^0-9]/", "", $strNextId);
+            return 'WO-' . $intNextId;
+        }
+        else {
+            $intLastId = preg_replace("/[^0-9]/", "", Cart::GetCartLastIdStr()); 
             $intNextId = intval($intLastId) + 1;
             $strNextId = 'WO-' . $intNextId;
             return $strNextId;
         }
-        else {
-            $intNextId = preg_replace("/[^0-9]/", "", $strNextId);
-            return 'WO-' . $intNextId;
-        }
+         
     }
 
     public function SetIdStr() {
         $strQueryFormat = 'SELECT COUNT(rowid) FROM xlsws_cart WHERE '.
             '`id_str` = "%s" AND `rowid` != "%s";';
 
-        $strQuery = sprintf($strQueryFormat, $this->IdStr, $this->Rowid);
-
         if (!$this->IdStr)
             $this->IdStr = Cart::GetCartNextIdStr();
-
+        
+        $strQuery = sprintf($strQueryFormat, $this->IdStr, $this->Rowid);
+         
         while(_dbx_first_cell($strQuery) != '0') {
-            $this->IdStr = Cart::GetCartNextIdStr();
+            $this->IdStr++;
             $strQuery = sprintf($strQueryFormat, $this->IdStr, $this->Rowid);
         }
 
