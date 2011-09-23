@@ -70,21 +70,24 @@ class PromoCode extends PromoCodeGen {
 			return true;
 
         foreach($arrCode as $strCode) {
-            if (substr_compare($strCode, "family:", 0 ,7, true)==0 && 
-                substr_compare($strCode, $objItem->Product->Family,7,255, true)==0)
+            $strCode=strtolower($strCode);
+            
+            if (substr($strCode, 0,7) == "family:" && 
+                substr($strCode,7,255) == strtolower($objItem->Product->Family)) 
             return true;
             
-            if (substr_compare($strCode, "class:", 0 ,6, true)==0 && 
-                substr_compare($strCode, $objItem->Product->ClassName,6,255, true)==0)
+            if (substr($strCode, 0,6) == "class:" && 
+                substr($strCode,6,255) == strtolower($objItem->Product->ClassName)) 
             return true;
             
-            if (substr_compare($strCode, "keyword:", 0 ,8, true)==0 && (
-                    substr_compare($strCode, $objItem->Product->WebKeyword1,8,255, true)==0 ||
-                    substr_compare($strCode, $objItem->Product->WebKeyword2,8,255, true)==0 ||
-                    substr_compare($strCode, $objItem->Product->WebKeyword3,8,255, true)==0
-                ))
+            if (substr($strCode, 0,8) == "keyword:" && (
+                substr($strCode,8,255) == strtolower($objItem->Product->WebKeyword1,8,255) ||
+                substr($strCode,8,255) == strtolower($objItem->Product->WebKeyword2,8,255) ||
+                substr($strCode,8,255) == strtolower($objItem->Product->WebKeyword3,8,255) )              
+                ) 
             return true;
-        }       
+           
+        }  
 		  
 		  if (_xls_array_search_begin($objItem->Code, $arrCode))
 			return true;
