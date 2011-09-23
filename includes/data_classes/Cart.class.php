@@ -177,19 +177,22 @@ class Cart extends CartGen {
 	}
 
     public static function GetCartLastIdStr() {
-        //Since id_str is a text field, we have to read in and strip out nonnumeric
-        $objDbResult = _dbx("SELECT id_str FROM xlsws_cart where id_str is not null" , "Query");
-        $arrIdStr = array();
-    				
-    	while($res = $objDbResult->GetNextRow())
-    		$arrIdStr[] = preg_replace("/[^0-9]/", "", $res->GetColumn('id_str' , 'VarChar'));
-        
-        rsort($arrIdStr);
-    		    					
-        if (empty($arrIdStr))
+        // Since id_str is a text field, we have to read in and strip out nonnumeric
+        try { 
+            $intIdStr = _dbx('SELECT SUBSTRING(id_str, 4) AS id_num FROM xlsws_cart 
+                WHERE id_str LIKE "WO-%"
+                ORDER BY (id_num + 0) DESC 
+                LIMIT 1;');
+        }
+        catch (Exception $objExc) {
+            QApplication::Log(E_USER_ERROR, 'checkout', 
+                'Failed to lookup previous id string');
+        }
+
+        if (empty($intIdStr))
             return 0;
         else
-            return $arrIdStr[0];
+            return $intIdStr;
     }
 
     public function GetCartNextIdStr() {
@@ -222,7 +225,13 @@ class Cart extends CartGen {
             $strQuery = sprintf($strQueryFormat, $this->IdStr, $this->Rowid);
         }
 
-        $this->Save();
+        try { 
+            $this->Save();
+        }
+        catch (Exception $objExc) {
+            QApplicaiton::Log(E_USER_ERROR, 'checkout', 
+                'Failed to save cart with : ' . $objExc);
+        }
 
         $objConf = Configuration::LoadByKey('NEXT_ORDER_ID');
         $objConf->Value = intval(preg_replace("/[^0-9]/", "", $this->IdStr))+1;
