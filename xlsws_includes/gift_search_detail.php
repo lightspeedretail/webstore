@@ -268,7 +268,7 @@ class xlsws_glist extends xlsws_index {
 
 		$this->cartPnl->RemoveChildControls(true);
 
-		$item->PurchaseStatus = Cart::add_to_cart($prod , $qty , FALSE , FALSE , 0 , CartType::giftregistry , $strParameter);
+		$item->PurchaseStatus = Cart::AddToCart ($prod , $qty , FALSE , FALSE , 0 , CartType::giftregistry , $strParameter);
 		$item->Save();
 
 		$cart = Cart::GetCart();
