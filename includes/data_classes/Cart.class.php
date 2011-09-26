@@ -179,10 +179,13 @@ class Cart extends CartGen {
     public static function GetCartLastIdStr() {
         // Since id_str is a text field, we have to read in and strip out nonnumeric
         try { 
-            $intIdStr = _dbx('SELECT SUBSTRING(id_str, 4) AS id_num FROM xlsws_cart 
+            $intIdStr = _dbx_first_cell('SELECT SUBSTRING(id_str, 4) 
+                AS id_num 
+                FROM xlsws_cart 
                 WHERE id_str LIKE "WO-%"
                 ORDER BY (id_num + 0) DESC 
-                LIMIT 1;');
+                LIMIT 1;'
+            );
         }
         catch (Exception $objExc) {
             QApplication::Log(E_USER_ERROR, 'checkout', 
