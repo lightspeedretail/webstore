@@ -646,7 +646,7 @@ class Cart extends CartGen {
 	}
 
 	public function AddProduct($objProduct,
-		$intQuantity, $mixCartType = false) {
+		$intQuantity, $mixCartType = false, $intGiftItemId = 0) {
 
 		if (!$mixCartType)
 			$mixCartType = CartType::cart;
@@ -699,6 +699,7 @@ class Cart extends CartGen {
 		$objItem->SellBase = $objProduct->GetPrice(1);
 		$objItem->Description = $objProduct->Name;
 		$objItem->Sell = $objProduct->GetPrice($objItem->Qty);
+		if ($intGiftItemId>0) $objItem->GiftRegistryItem = $intGiftItemId;
 
 		// If cart unsaved, Save it to get Rowid
 		if (!$this->Rowid)
@@ -740,7 +741,7 @@ class Cart extends CartGen {
 				$fltSell = false, $fltDiscount = 0,
 				$mixCartType = false, $intGiftItemId = 0);
 
-		return $objCart->AddProduct($objProduct, $intQty, $mixCartType);
+		return $objCart->AddProduct($objProduct, $intQty, $mixCartType, $intGiftItemId);
 	}
 
 	/**
