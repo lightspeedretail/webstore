@@ -104,6 +104,8 @@ class XLSFormStateHandler extends QBaseClass {
             $strHashDir = $strStateDir . '/' . $strHashDir;
             $objHashDir = dir($strHashDir);
 
+            if (!$objHashDir) continue;
+
             while (($strFile = $objHashDir->read()) !== false) {
                 $intPosition = strpos($strFile, self::$FileNamePrefix);
                 if ($intPosition === false) continue;
