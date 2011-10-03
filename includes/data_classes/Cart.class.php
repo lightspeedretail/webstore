@@ -309,6 +309,15 @@ class Cart extends CartGen {
 
 		if (!$objPromoCode->Active)
 			return;
+			
+				
+		if ($objPromoCode->Threshold > $this->Subtotal) {
+				$this->UpdateDiscountExpiry();
+				$this->FkPromoId = NULL;
+				QApplication::ExecuteJavaScript("alert('Promo Code \"" .$objPromoCode->Code .  _sp("\" no longer applies to your cart and has been removed.")  . "')");				
+			return;
+		}
+			
 
 		$intDiscount = 0;
 		if ($objPromoCode->Type == PromoCodeType::Flat)

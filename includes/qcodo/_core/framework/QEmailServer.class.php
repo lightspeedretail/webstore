@@ -567,7 +567,7 @@
 			$this->SetHeader('From', $this->From);
 			$this->SetHeader('To', $this->To);
 
-			$this->SetHeader('Date', date('DDD, DD MMM YYYY hhhh:mm:ss ttttt'));
+			$this->SetHeader('Date', date('r'));
 
 			// Setup Encoding Type (default to QApplication's if not specified)
 			if (!$strEncodingType) $strEncodingType = QApplication::$EncodingType;
