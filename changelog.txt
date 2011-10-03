@@ -2,6 +2,19 @@ Changelog
 
 Please see https://github.com/lightspeedretail/webstore/issues for technical details of these issues
 
+# 2.1.3
+
+* General: Added missing configuration key to determine maximum products in a slider
+* General: Improved state file handling to avoid large numbers of leftover state files for heavily-trafficked sites
+* Checkout: Improved checks for duplicate Web Order numbers being assigned during processing
+* Email: Corrected an issue where receipts would have improperly formatted date in email header
+* Email: Corrected an issue where From address would not be set properly
+
+* Payments: Promo Code now removed from a cart when a minimum cart value is no longer met by customer deleting items
+* Payments: Promo Codes now properly handle family, class and web keyword filtering
+* Templates: Fixed an issue where empty categories may be displayed even when set to be hidden
+* Templates: Resolved an issue where Web Store would error with white page when customer logs out
+* Wish List: Corrected an issue where Wish List purchases would not be marked as purchased
 
 # 2.1.2
 
