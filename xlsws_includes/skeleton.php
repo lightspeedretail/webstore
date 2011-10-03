@@ -708,7 +708,7 @@ class xlsws_index extends QForm {
 		Customer::Logout();
 		Cart::ClearCart();
 
-		_rd("$_SERVER[REQUEST_URI]");
+		_rd($_SERVER['REQUEST_URI']);
 	}
 
 	/*overloaded in extended classes as the view contructor*/

@@ -55,25 +55,28 @@ class XLSFormStateHandler extends QBaseClass {
 	 * When using XLSSessionHandler, this is automatically tied into
 	 * the session handler.
 	 */
-    public static function Destroy($strName) {
-        $strPrefix = self::$FileNamePrefix . '.' . session_id();
+    public static function Destroy($arrValues) {
+        $strSessionId = session_id();
+
         $strStateDir = self::$StatePath;
         $objStateDir = dir($strStateDir);
 
-        while (($strHashDir = $objDirectory->read()) !== false) {
+        while (($strHashDir = $objStateDir->read()) !== false) { 
             if (($strHashDir == '.') || ($strHashDir == '..')) continue;
 
             $strHashDir = $strStateDir . '/' . $strHashDir;
             $objHashDir = dir($strHashDir);
 
+            if (!$objHashDir) continue;
+
             while (($strFile = $objHashDir->read()) !== false) {
-                $intPosition = strpos($strFile, $strPrefix);
+                $intPosition = strpos($strFile, $strSessionId);
                 if ($intPosition === false) continue;
 
                 $strFile = $strHashDir . '/' . $strFile;
                 unlink($strFile);
             }
-		}
+        }
 	}
 
     /**
