@@ -511,6 +511,11 @@ function _xls_mail($strAddTo, $strSubject, $strBody, $strAddFrom = false) {
             $objExc->getMessage());
         return false;
     }
+    catch (QEmailException $objExc) {
+        QApplication::Log(E_ERROR, 'smtp', 
+            $objExc->getMessage());
+        return false;
+    }
 
 	return true;
 }
