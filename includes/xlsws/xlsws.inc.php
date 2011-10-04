@@ -95,6 +95,8 @@ QApplication::$ClassFile['sidebar_order_lookup'] =
 // Register Views
 QApplication::$ClassFile['xlsws_index'] =
 	XLSWS_INCLUDES . 'skeleton.php';
+QApplication::$ClassFile['xlsws_product_listing'] =
+	XLSWS_INCLUDES . 'product_listing.php';
 
 // Register customized widgets
 QApplication::$ClassFile['xlszipfield'] =

@@ -31,10 +31,251 @@
  * and assigning template variables to the views related to the search results pages
  */
 
-class xlsws_searchresult extends xlsws_index {
-	protected $subcategories = null;
+class xlsws_searchresult extends xlsws_product_listing {
 	protected $search_array;
+    protected $category = null;
+    protected $subcategories = null;
+    protected $search_method = 'OrCondition';
 	protected $default_search_param = 'and';
+
+    /**
+     * Bind the currently selected Category to the form
+     * @param none
+     * @return none
+     */
+    protected function LoadCategory() {
+        global $XLSWS_VARS;
+
+        $objCategory = false;
+
+        if (!isset($XLSWS_VARS['filter']) || $XLSWS_VARS['filter'] != 1)
+            return false;
+
+        if (isset($XLSWS_VARS['c'])) {
+            if ($XLSWS_VARS['c'] == 'root')
+                unset($XLSWS_VARS['c']);
+            else if (empty($XLSWS_VARS['c']))
+                unset($XLSWS_VARS['c']);
+        }           
+
+        if (isset($XLSWS_VARS['c'])) {
+            $arrCategories = explode('.', $XLSWS_VARS['c']);
+            $strCategory = array_pop($arrCategories);
+            $objCategory = Category::$Manager->GetByKey($strCategory);
+        }
+
+        if (!$objCategory)
+            return false;
+
+        $this->category = $objCategory;
+    }
+
+    /**
+     * Prepare the search criteria from the environment for searching
+     * @param none
+     * @return string
+     */
+    protected function GetSearchCriteria() {
+        global $XLSWS_VARS;
+
+        $strCriteria = $XLSWS_VARS['search'];
+        $strCriteria = strip_tags($strCriteria);
+        $strCriteria = trim($strCriteria);
+        $strCriteria = addslashes($strCriteria);
+
+        return $strCriteria;
+    }
+
+    /**
+     * Return a QCondition to filter desired Products
+     * The condition will be based on the search words enterd by the user
+     * @param none
+     * @return QCondition
+     */
+    protected function GetCriteriaCondition() {
+        $strCriteria = $this->GetSearchCriteria();
+        $strCondition =$this->search_method;
+
+        if (empty($strCriteria))
+            return false;
+
+        $strCriteria = "%{$strCriteria}%";
+
+        $objCondition = QQ::$strCondition(
+            QQ::Like(QQN::Product()->Code, $strCriteria),
+            QQ::Like(QQN::Product()->Name, $strCriteria), 
+            QQ::Like(QQN::Product()->DescriptionShort, $strCriteria),
+            QQ::Like(QQN::Product()->Description, $strCriteria),
+            QQ::Like(QQN::Product()->WebKeyword1, $strCriteria),
+            QQ::Like(QQN::Product()->WebKeyword2, $strCriteria),
+            QQ::Like(QQN::Product()->WebKeyword3, $strCriteria)
+        );
+
+        return $objCondition;
+    }
+
+    /**
+     * Return a QCondition to filter results based on the last access Category
+     * @param none
+     * @return QCondition
+     */
+    protected function GetCategoryCondition() {
+        global $XLSWS_VARS;
+
+        if (!$this->category)
+            return false;
+
+        $intIdArray = array($this->category->Rowid);
+        $intIdArray = array_merge(
+            $intIdArray, 
+            $this->category->GetChildIds()
+        );
+
+        $objCondition = QQ::In(
+            QQN::Product()->Category->CategoryId, 
+            $intIdArray
+        );
+
+        return $objCondition;
+    }
+
+    /**
+     * Return a QCondition to filter desired Products
+     * - Web Enabled
+     * - Extended from xlsws_product_listing to provide a facility to return
+     * child Product as well
+     * @param none
+     * @return QCondition
+     */
+    protected function GetProductCondition() {
+        $objCondition = false;
+
+        if (_xls_get_conf('CHILD_SEARCH') == 1)
+            $objCondition = QQ::AndCondition(
+                QQ::Equal(QQN::Product()->Web, 1), 
+                QQ::Equal(QQN::Product()->MasterModel, 0)
+            );
+        else
+            $objCondition = parent::GetProductCondition();
+
+        return $objCondition;
+    }
+
+    /**
+     * Return a QCondition to filter products based on Price range
+     * @param none
+     * @return QCondition
+     */
+    protected function GetPriceCondition() {
+        global $XLSWS_VARS;
+
+        $strPriceField = 'SellWeb';
+        $fltStartPrice = false;
+        $fltEndPrice = false;
+        $objCondition = false;
+
+        if (_xls_get_conf('TAX_INCLUSIVE_PRICING') == '1')
+            $strPriceField = 'SellTaxInclusive';
+
+        if (isset($XLSWS_VARS['startprice'])) {
+            $XLSWS_VARS['startprice'] = trim($XLSWS_VARS['startprice']);
+
+            if ($XLSWS_VARS['startprice'] != '')
+                $fltStartPrice = $XLSWS_VARS['startprice'];
+        }
+
+        if (isset($XLSWS_VARS['endprice'])) {
+            $XLSWS_VARS['endprice'] = trim($XLSWS_VARS['endprice']);
+
+            if ($XLSWS_VARS['endprice'] != '')
+                $fltEndPrice = $XLSWS_VARS['endprice'];
+        }
+
+        if ($fltStartPrice !== false && $fltEndPrice !== false)
+            $objCondition = QQ::Between(
+                QQN::Product()->$strPriceField,
+                $fltStartPrice,
+                $fltEndPrice
+            );
+        else if ($fltStartPrice !== false)
+            $objCondition = QQ::GreaterOrEqual(
+                QQN::Product()->$strPriceField,
+                $XLSWS_VARS['startprice']
+            );
+        else if ($fltEndPrice !== false)
+            $objCondition = QQ::LesserOrEqual(
+                QQN::Product()->$strPriceField,
+                $XLSWS_VARS['endprice']
+            );
+
+        return $objCondition;
+    }
+
+    /**
+     * Return a QCondition integrating all search parameters (if applicable): 
+     * - CategoryCondition
+     * - CriteriaCondition
+     * - PriceCondition
+     * @param none
+     * @return QCondition
+     */
+    protected function GetSearchCondition() {
+        $objCondition = false;
+        $objConditionArray = array();
+
+        $objCategoryCondition = $this->GetCategoryCondition();
+        $objCriteriaCondition = $this->GetCriteriaCondition();
+        $objPriceCondition = $this->GetPriceCondition();
+
+        if ($objCategoryCondition)
+            $objConditionArray[] = $objCategoryCondition;
+
+        if ($objCriteriaCondition)
+            $objConditionArray[] = $objCriteriaCondition;
+
+        if ($objPriceCondition)
+            $objConditionArray[] = $objPriceCondition;
+
+        if (count($objConditionArray) > 0)
+            $objCondition = QQ::AndCondition($objConditionArray);
+        else if (count($objConditionArray) == 0)
+            $objCondition = $objConditionArray[0];
+
+        return $objCondition;
+    }
+
+    /**
+     * Return the view's Product querying QCondition
+     * @param none
+     * @return QCondition
+     */
+    protected function GetCondition() {
+        $objProductCondition = $this->GetProductCondition();
+        $objSearchCondition = $this->GetSearchCondition();
+
+        if (!$objSearchCondition)
+            _xls_display_msg(_sp('Please specify search criteria'));
+
+        $objCondition = QQ::AndCondition(
+            $objProductCondition, 
+            $objSearchCondition
+        );
+
+        return $objCondition;
+    }
+
+    /**
+     * Return the ordering and limiting clauses
+     * - Extended to ensure we return a Distinct
+     * @param none
+     * @return QClause
+     */
+    protected function GetClause() {
+        $objClause = parent::GetClause();
+        $objClause[] = QQ::Distinct();
+
+        return $objClause;
+    }
 
 	/**
 	 * build_main - constructor for this controller
@@ -42,139 +283,38 @@ class xlsws_searchresult extends xlsws_index {
 	 * @return none
 	 */
 	protected function build_main(){
-		global $XLSWS_VARS, $config_products_per_page;
-
-		$XLSWS_VARS['search'] = strip_tags($XLSWS_VARS['search']);
-
-		$this->crumbs[] = array('key'=>'search=' . $XLSWS_VARS['search'] , 'case'=> '' , 'name'=>_sp('Search Results'));
-
-		$this->mainPnl = new QPanel($this);
-
-		$this->dtrProducts = new QDataRepeater($this->mainPnl);
-		$this->dtrProducts->CssClass = "product_list rounded";
-		// Let's set up pagination -- note that the form is the parent
-		// of the paginator here, because it's on the form where we
-		// make the call to $this->dtrProducts->Paginator->Render()
-
-		$this->dtrProducts->Paginator = new XLSPaginator($this->mainPnl , "pagination");
-		$this->dtrProducts->ItemsPerPage = _xls_get_conf('PRODUCTS_PER_PAGE' , 8);
-
-		// Enable AJAX-based rerendering for the QDataRepeater
-		$this->dtrProducts->UseAjax = true;
-
-		// DataRepeaters use Templates to define how the repeated
-		// item is rendered
-		$this->mainPnl->Template = templateNamed('product_list.tpl.php');
-		$this->dtrProducts->Template = templateNamed('product_list_item.tpl.php');
-
-		// Finally, we define the method that we run to bind the data source to the datarepeater
-		$this->dtrProducts->SetDataBinder('dtrProducts_Bind');
-		Visitor::add_view_log(0, ViewLogType::search , '' , $XLSWS_VARS['search']);
-	}
-
-	/**
-	 * dtrProducts_Bind - Binds a listing of products to the current list of search results
-	 * @param none
-	 * @return none
-	 */
-	protected function dtrProducts_Bind() {
 		global $XLSWS_VARS;
 
-		static $try;
+        $this->LoadCategory();
 
-		$search = trim($XLSWS_VARS['search']);
-		$prods = array();
-		$total = 0;
+        parent::build_main();
 
-		if(($search != null && $search != "") || $XLSWS_VARS['advsearch'] == "true") {
-			if($search == null || $search == "")
-				$search = " ";
+        $this->crumbs[] = array(
+            'key'=>'search=' . $XLSWS_VARS['search'],
+            'case'=> '',
+            'name'=>_sp('Search Results')
+        );
 
-			$search = addslashes($search);
-			$catQ = "";
-			$matrixQ = "";
+        Visitor::add_view_log(
+            0, 
+            ViewLogType::search,
+            '',
+            $XLSWS_VARS['search']
+        );
+    }
 
-			if ($XLSWS_VARS['filter'] == "1" && !empty($XLSWS_VARS['c'])) {
-				$searchcat = end($this->menu_categories); //no need to do a query to get the current category object, array is already set
-				$results = $searchcat->GetChildIds();
-				$results[] = $XLSWS_VARS['c'];
+    /**
+     * Query the database for Products and bind them to the QDataRepeater
+     * - Extend xlsws_product_listing to provide a 0 result facility
+     * @param none
+     * @return none
+     */
+    protected function dtrProducts_Bind() {
+        parent::dtrProducts_Bind();
 
-				$catQ = " AND xlsws_product_category_assn.category_id in (" . implode(",",$results) . ")";
-			}
-
-			if (!_xls_get_conf("CHILD_SEARCH"))
-				$matrixQ = " AND xlsws_product.fk_product_master_id=0";
-
-			$db = Product::GetDatabase();
-
-			$qFull = 'SELECT distinct xlsws_product.* FROM xlsws_product LEFT JOIN xlsws_product_category_assn on xlsws_product.rowid = xlsws_product_category_assn.product_id WHERE (xlsws_product.name LIKE "%'.$search.'%" OR xlsws_product.web_keyword1 LIKE "%'.$search.'%" OR xlsws_product.web_keyword1 LIKE "%'.$search.'%" OR xlsws_product.description LIKE "%'.$search.'%" OR xlsws_product.web_keyword2 LIKE "%'.$search.'%" OR web_keyword3 LIKE "%'.$search.'%" OR xlsws_product.code LIKE "%'.$search.'%")  AND xlsws_product.web=1' . $matrixQ. $catQ;
-			$q = 'SELECT COUNT(distinct xlsws_product.rowid) as total_matches FROM xlsws_product LEFT JOIN xlsws_product_category_assn on xlsws_product.rowid = xlsws_product_category_assn.product_id WHERE (xlsws_product.name LIKE "%'.$search.'%" OR xlsws_product.web_keyword1 LIKE "%'.$search.'%" OR xlsws_product.web_keyword1 LIKE "%'.$search.'%" OR xlsws_product.description LIKE "%'.$search.'%" OR xlsws_product.web_keyword2 LIKE "%'.$search.'%" OR xlsws_product.web_keyword3 LIKE "%'.$search.'%" OR xlsws_product.code LIKE "%'.$search.'%")  AND xlsws_product.web=1' . $matrixQ . $catQ;
-
-			if (!empty($XLSWS_VARS['startprice'])) {
-				if (_xls_get_conf('TAX_INCLUSIVE_PRICING') == "1") {
-					$q .= " AND xlsws_product.sell_tax_inclusive >= " . $XLSWS_VARS['startprice'];
-					$qFull .= " AND xlsws_product.sell_tax_inclusive >= " . $XLSWS_VARS['startprice'];
-				} else {
-					$q .= " AND xlsws_product.sell_web >= " . $XLSWS_VARS['startprice'];
-					$qFull .= " AND xlsws_product.sell_web >= " . $XLSWS_VARS['startprice'];
-				}
-			}
-
-			if (!empty($XLSWS_VARS['endprice'])) {
-				if (_xls_get_conf('TAX_INCLUSIVE_PRICING') == "1") {
-					$q .= " AND xlsws_product.sell_tax_inclusive <= " . $XLSWS_VARS['endprice'];
-					$qFull .= " AND xlsws_product.sell_tax_inclusive <= " . $XLSWS_VARS['endprice'];
-				} else {
-					$q .= " AND xlsws_product.sell_web <= " . $XLSWS_VARS['endprice'];
-					$qFull .= " AND xlsws_product.sell_web <= " . $XLSWS_VARS['endprice'];
-				}
-			}
-
-			$sort_order = _xls_convert_camel(_xls_get_conf('PRODUCT_SORT_FIELD' , 'Name'));
-			$sort_type = "asc";
-
-			if ($sort_order == "inventory_total")
-				$sort_type = "desc";
-
-			$qFull .= " ORDER BY " . $sort_order . " " . $sort_type;
-			$qFull .= ' LIMIT ' . $this->dtrProducts->LimitClause->Offset . ', '. $this->dtrProducts->LimitClause->MaxRowCount;
-
-			$matches = $db->Query($qFull);
-			$total_query = $db->Query($q);
-
-			$prods = Product::InstantiateDbResult($matches);
-			$total_arr = $total_query->FetchArray();
-			$total = $total_arr['total_matches'];
-		} else {
-			// if no search parameter given ??
-			$this->mainPnl->RemoveChildControls(true);
-			$this->mainPnl->Template = templateNamed('msg.tpl.php');
-			$this->msg = _sp("No search keywords specified.");
-			return;
-		}
-
-		$this->dtrProducts->TotalItemCount = $total;
-
-		if($this->dtrProducts->TotalItemCount <= 0) {
-			$this->mainPnl->RemoveChildControls(true);
-			$this->mainPnl->Template = templateNamed('msg.tpl.php');
-			$this->msg = _sp("Sorry no product was found");
-		} else {
-			$this->clear_prod_images();
-			//create images
-			foreach($prods as $prod) {
-				$this->create_prod_img(
-					$this->dtrProducts,
-					$prod,
-					'ListingImage',
-					_xls_get_conf('LISTING_IMAGE_WIDTH',50),
-					_xls_get_conf('LISTING_IMAGE_HEIGHT',40)
-				);
-			}
-
-			$this->dtrProducts->DataSource = $prods;
-		}
-	}
+        if ($this->dtrProducts->TotalItemCount == 0)
+            _xls_display_msg(_sp('Sorry no product was found'));
+    }
 }
 
 if(!defined('CUSTOM_STOP_XLSWS'))
