@@ -30,9 +30,73 @@
  * This class is responsible for querying the database for various aspects needed on this page
  * and assigning template variables to the views related to the listing pages that show a listing of products in a family
  */
-class xlsws_family extends xlsws_index {
-	protected $dtrProducts; //list of products in the family
+class xlsws_family extends xlsws_product_listing {
+    protected $family = null; //the instantiation of a Family databsae object
 	protected $subcategories = null; //not used with families, ignore
+
+    /**
+     * Bind the currently selected Family to the form
+     * @param none
+     * @return none
+     */
+    protected function LoadFamily() {
+        global $XLSWS_VARS;
+
+        if (isset($XLSWS_VARS['family'])) { 
+            $objFamily = Family::LoadByFamily($XLSWS_VARS['family']);
+
+            if ($objFamily)
+                $this->family = $objFamily;
+            else
+                _xls_display_msg(_sp('Sorry! The family was not found.'));
+        }
+
+        if (!$this->family)
+            return false;
+    }
+
+    /**
+     * Return a QCondition to filter currently selected family products
+     * @param none
+     * @return QCondition
+     */
+    protected function GetFamilyCondition() {
+        global $XLSWS_VARS;
+
+        if (!$this->family)
+            return false;
+
+        $objCondition = QQ::Equal(
+            QQN::Product()->Family, 
+            $this->family->Family
+        );
+
+        return $objCondition;
+    }
+
+    /** 
+     * Return the view's Product querying QCondition
+     * - Extended from xlsws_product_listing
+     * @param none
+     * @return QCondition
+     */
+    protected function GetCondition() {
+        $objCondition = false;
+
+        $objFamilyCondition = $this->GetFamilyCondition();
+        $objProductCondition = $this->GetProductCondition();
+
+        if ($objFamilyCondition) 
+            $objCondition = QQ::AndCondition(
+                $objFamilyCondition,
+                $objProductCondition
+            );      
+        else        
+            $objCondition = parent::GetCondition();
+
+        return $objCondition; 
+    }
+
 
 	/**
 	 * build_main - constructor for this controller
@@ -42,84 +106,19 @@ class xlsws_family extends xlsws_index {
 	protected function build_main(){
 		global $XLSWS_VARS;
 
-		$this->mainPnl = new QPanel($this);
+        $this->LoadFamily();
 
-		$this->dtrProducts = new QDataRepeater($this->mainPnl);
-		$this->dtrProducts->CssClass = "product_list rounded";
+        parent::build_main();
 
-		if(!empty($XLSWS_VARS['family'])){
-			$this->dtrProducts->Paginator = new XLSPaginator($this->mainPnl , "pagination");
-			$this->dtrProducts->ItemsPerPage =  _xls_get_conf('PRODUCTS_PER_PAGE' , 8);
+        // Set crumbtrail for Family
+		$this->crumbs[] = array(
+            'key'=>'family=' . $XLSWS_VARS['family'], 
+            'case'=> '' ,
+            'name'=>$this->family->Family
+        );
 
-			$family = Family::LoadByFamily($XLSWS_VARS['family']);
-
-			$this->crumbs[] = array('key'=>'family=' . $XLSWS_VARS['family'] , 'case'=> '' , 'name'=>$family->Family);
-
-			Visitor::add_view_log($family->Rowid, ViewLogType::familyview);
-		}
-
-		// Enable AJAX-based rerendering for the QDataRepeater
-		$this->dtrProducts->UseAjax = true;
-
-		// DataRepeaters use Templates to define how the repeated
-		// item is rendered
-		$this->mainPnl->Template = templateNamed('product_list.tpl.php');  // TODO Cleverappz list products
-		$this->dtrProducts->Template = templateNamed('product_list_item.tpl.php');
-
-		// Finally, we define the method that we run to bind the data source to the datarepeater
-		$this->dtrProducts->SetDataBinder('dtrProducts_Bind');
-	}
-
-	/**
-	 * dtrProducts_Bind - Binds a listing of products to the current category
-	 * @param none
-	 * @return none
-	 */
-	protected function dtrProducts_Bind() {
-		global $XLSWS_VARS;
-
-		// which category are we viewing?
-		if(!empty($XLSWS_VARS['family'])) {
-			$family = $XLSWS_VARS['family'];
-
-			$this->dtrProducts->TotalItemCount = Product::QueryCount(
-				QQ::AndCondition(
-					QQ::Equal(QQN::Product()->Web, 1),
-					QQ::OrCondition(
-						QQ::Equal(QQN::Product()->MasterModel, 1),
-						QQ::AndCondition(
-							QQ::Equal(QQN::Product()->MasterModel, 0),
-							QQ::Equal(QQN::Product()->FkProductMasterId, 0)
-						)
-					),
-					QQ::Equal(QQN::Product()->Family, $family)
-				)
-			);
-			// _xls_log("Displaying family $family");
-
-			$this->dtrProducts->DataSource = Product::QueryArray(
-				QQ::AndCondition(
-					QQ::Equal(QQN::Product()->Web, 1),
-					QQ::OrCondition(
-						QQ::Equal(QQN::Product()->MasterModel, 1),
-						QQ::AndCondition(
-							QQ::Equal(QQN::Product()->MasterModel, 0),
-							QQ::Equal(QQN::Product()->FkProductMasterId, 0)
-						)
-					),
-					QQ::Equal(QQN::Product()->Family , $family)
-				),
-				QQ::Clause(
-					QQ::OrderBy(QQN::Product()->Name),
-					$this->dtrProducts->LimitClause
-				)
-			);
-
-			$this->bind_result_images($this->dtrProducts->DataSource);
-			return;
-		}
-
-		_rd('index.php');
+        // Add the viewlog entry
+    	Visitor::add_view_log($this->family->Rowid, ViewLogType::familyview);
 	}
 }
 

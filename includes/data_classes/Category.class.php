@@ -77,9 +77,16 @@ class Category extends CategoryGen {
 	/**
 	 * Convenience methods accessed as properties
 	 */
-	protected function HasChildren() {
-		if (count($this->GetChildren()) > 0)
-			return true;
+    protected function HasChildren() {
+        $objSubCategories = $this->GetChildren();
+        if (count($objSubCategories) > 0) { 
+            if (_xls_get_conf('DISPLAY_EMPTY_CATEGORY', '1'))
+                return true;
+
+            foreach ($objSubCategories as $objCategory)
+                if ($objCategory->HasChildrenOrProduct())
+                    return true;
+        }
 		return false;
 	}
 

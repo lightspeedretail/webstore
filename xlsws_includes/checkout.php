@@ -1482,32 +1482,8 @@ class xlsws_checkout extends xlsws_index {
 		// Add log for processing checkout
 		Visitor::add_view_log('',ViewLogType::checkoutpayment);
 
-		$cart = Cart::GetCart();
-
-		// WS2.0.2 Use system config next order id
-		$order_id = intval(_xls_get_conf( 'NEXT_ORDER_ID', _dbx_first_cell("SELECT IFNULL(MAX(rowid)+1,1) FROM xlsws_cart")));
-
-		if(!$order_id ) // if none given choose maximum order id
-			$order_id = _dbx_first_cell("SELECT IFNULL(MAX(rowid)+1,1) FROM xlsws_cart");
-
-		$id = "WO-" . ($order_id);
-
-		// check if there is a order allocated in this id already.
-		while($tmp = _dbx_first_cell("SELECT rowid FROM xlsws_cart WHERE id_str = '$id' AND rowid <> '$cart->Rowid'")) {
-			$order_id++; // keep finding the next order id
-			$id = "WO-" .  ($order_id);
-		}
-
-		// Update the next order ID
-		if($config = Configuration::LoadByKey('NEXT_ORDER_ID')) {
-			$config->Value = $order_id++;
-			$config->Save();
-		} else {
-			_xls_log("Configuration key 'NEXT_ORDER_ID' not found! Please upgrade webstore from Admin panel.");
-		}
-		// WS2.0.2 Use system config next order id END
-
-		$cart->IdStr = $id;
+        $cart = Cart::GetCart();
+        $cart->SetIdStr();
 
 		$cart->Type = CartType::awaitpayment;
 
@@ -1554,8 +1530,8 @@ class xlsws_checkout extends xlsws_index {
 		$cart->Company = $this->txtCRCompany->Text;
 		$cart->Email = $this->txtCREmail->Text;
 		$cart->Phone = $this->txtCRMPhone->Text;
-		$cart->IpHost = _xls_get_ip();
-		$cart->Linkid = md5(date('U') . "_" . $cart->Rowid);
+        $cart->IpHost = _xls_get_ip();
+        $cart->Linkid = $cart->Linkid;
 
 		$cart->PrintedNotes = $this->txtNotes->Text;
 

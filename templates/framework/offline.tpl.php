@@ -34,6 +34,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=<?= _xls_get_conf('CHARSET' , 'utf-8') ?>" />
 	<meta name="Author" content="<?= _xls_get_conf('STORE_NAME' , 'Xsilva Inc.') ?>" />
 	<meta name="Copyright" content="<?= _xls_get_conf('COPYRIGHT_MSG' , 'Xsilva Inc.') ?>" />
+	<meta name="Generator" content="LightSpeed Webstore <?= _xls_version(); ?>" />
 
 	<base href="<?= _xls_site_dir(); ?>/"/>
 

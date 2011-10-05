@@ -30,8 +30,7 @@
  * This class is responsible for querying the database for various aspects needed on this page
  * and assigning template variables to the views related to the category pages
  */
-class xlsws_category extends xlsws_index {
-	protected $dtrProducts; //list of products in the category
+class xlsws_category extends xlsws_product_listing {
 	protected $subcategories = null; //array of subcategories
 	protected $image = null; //image related to category
 	protected $category = null; //the instantiation of a Category database object
@@ -54,7 +53,8 @@ class xlsws_category extends xlsws_index {
         }
 
         if (isset($XLSWS_VARS['c'])) {
-            $strCategory = end(explode('.', $XLSWS_VARS['c']));
+            $arrCategories = explode('.', $XLSWS_VARS['c']);
+            $strCategory = array_pop($arrCategories);
             $objCategory = Category::$Manager->GetByKey($strCategory);
 
             if ($objCategory)
@@ -133,42 +133,14 @@ class xlsws_category extends xlsws_index {
     }
 
     /**
-     * Create the view's DataRepeater control
-     */
-    protected function CreateDataRepeater() {
-        $this->dtrProducts = $objRepeater = new QDataRepeater($this->mainPnl);
-        $this->CreatePaginator();
-        #$this->CreatePaginator(true);
-
-        $objRepeater->ItemsPerPage =  _xls_get_conf('PRODUCTS_PER_PAGE' , 8);
-		$objRepeater->Template = templateNamed('product_list_item.tpl.php');
-		$objRepeater->CssClass = "product_list rounded";
-        $objRepeater->UseAjax = true;
-
-        // TODO :: Move pager number to a hidden QControl
-		if (isset($XLSWS_VARS['page']))
-			$objRepeater->PageNumber = intval($XLSWS_VARS['page']);
-        
-        // Bind the method providing Products to the Repater
-        $objRepeater->SetDataBinder('dtrProducts_Bind');
-        $objRepeater->DataBind();
-    }
-
-    /**
      * Create the paginator(s) for the DataRepeater
+     * - Extended from xlsws_product_listing
      */
     protected function CreatePaginator($blnAlternate = false) {
-        $objRepeater = $this->dtrProducts;
-        $strProperty = 'Paginator';
-        $strName = 'pagination';
-
-        if ($blnAlternate) {
-            $strProperty = 'PaginatorAlternate';
-            $strName = 'paginationalt';
-        }
-
-        $objRepeater->$strProperty = new XLSPaginator($this->mainPnl , $strName);
-		$objRepeater->$strProperty->url = "index.php?";
+        $objPaginator = parent::CreatePaginator($blnAlternate);
+        
+        if ($this->category) 
+            $objPaginator->url = $this->category->Link;
     }
 
     /**
@@ -185,63 +157,17 @@ class xlsws_category extends xlsws_index {
         $intIdArray = array($this->category->Rowid);
         $intIdArray = array_merge($intIdArray, $this->category->GetChildIds());
 
-        $objCondition = QQ::In(QQN::Product()->Category->CategoryId, $intIdArray);
-
-        return $objCondition;
-    }
-
-    /**
-     * Return a QCondition to filter desired Producs
-     * - Web enabled
-     * - Either Master or Independant
-	 * @param none
-	 * @return QCondition
-     */
-    protected function GetProductCondition() {
-        $objCondition = QQ::AndCondition(
-            QQ::Equal(QQN::Product()->Web, 1), 
-            QQ::OrCondition(
-                QQ::Equal(QQN::Product()->MasterModel, 1), 
-                QQ::AndCondition(
-                    QQ::Equal(QQN::Product()->MasterModel, 0), 
-                    QQ::Equal(QQN::Product()->FkProductMasterId, 0)
-                )
-            )
+        $objCondition = QQ::In(
+            QQN::Product()->Category->CategoryId, 
+            $intIdArray
         );
 
         return $objCondition;
     }
 
     /**
-     * Return a QCondition to further filter by Featured Products
-	 * @param none
-	 * @return QCondition
-     */
-    protected function GetFeaturedCondition() {
-        $objCondition = QQ::Equal(QQN::Product()->Featured, 1);
-
-        return $objCondition;
-    }
-
-    /**
-     * Return a QClause to order Products based on field
-	 * @param none
-	 * @return QClause
-     */
-    protected function GetSortOrder() {
-        $strProperty = _xls_get_conf('PRODUCT_SORT_FIELD' , 'Name');
-        $blnAscend = true;
-
-        if ($strProperty[0] == '-') { 
-            $strProperty = substr($strProperty,1);
-            $blnAscend = false;
-        }
-
-        return QQ::OrderBy(QQN::Product()->$strProperty, $blnAscend);
-    }
-
-    /**
      * Return the view's Product querying QCondition
+     * - Extended from xlsws_product_listing
 	 * @param none
 	 * @return QCondition
      */
@@ -250,48 +176,16 @@ class xlsws_category extends xlsws_index {
 
         $objCategoryCondition = $this->GetCategoryCondition();
         $objProductCondition = $this->GetProductCondition();
-        $objFeaturedCondition = $this->GetFeaturedCondition();
 
         if ($objCategoryCondition)
             $objCondition = QQ::AndCondition(
                 $objCategoryCondition, 
                 $objProductCondition
             );
-        else { 
-            $intFeaturedCount = Product::QueryCount($objFeaturedCondition);
-
-            if ($intFeaturedCount > 0)
-                $objCondition = QQ::AndCondition(
-                    $objProductCondition, 
-                    $objFeaturedCondition
-                );
-            else 
-                $objCondition = $objProductCondition;
-        }
+        else
+            $objCondition = parent::GetCondition();
 
         return $objCondition;
-    }
-
-    /**
-     * Query the database for Products and bind them to the QDataRepeater
-	 * @param none
-	 * @return none
-	 */
-    protected function dtrProducts_Bind() {
-        $objCondition = $this->GetCondition();
-        $objSortOrder = $this->GetSortOrder();
-
-        $this->dtrProducts->TotalItemCount = Product::QueryCount($objCondition);
-
-        $objProductArray = Product::QueryArray(
-            $this->GetCondition(), 
-            QQ::Clause(
-                $objSortOrder,
-                $this->dtrProducts->LimitClause
-            )
-        );
-
-        $this->bind_result_images($objProductArray);
     }
 
 	/**
@@ -309,10 +203,7 @@ class xlsws_category extends xlsws_index {
         $this->LoadCustomPage();
         $this->LoadImage();
 
-        $this->mainPnl = new QPanel($this);
-        $this->mainPnl->Template = templateNamed('product_list.tpl.php');
-
-        $this->CreateDataRepeater();
+        parent::build_main();
 
         if ($this->category) {
             $objCategory = $this->category;
@@ -331,8 +222,6 @@ class xlsws_category extends xlsws_index {
 
             // Set Title
 			_xls_add_page_title($objCategory->Name);
-
-			$objRepeater->Paginator->url = $objCategory->Link;
 
 			Visitor::add_view_log($XLSWS_VARS['c'], ViewLogType::categoryview);
 		}

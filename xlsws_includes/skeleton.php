@@ -708,7 +708,7 @@ class xlsws_index extends QForm {
 		Customer::Logout();
 		Cart::ClearCart();
 
-		_rd("$_SERVER[REQUEST_URI]");
+		_rd($_SERVER['REQUEST_URI']);
 	}
 
 	/*overloaded in extended classes as the view contructor*/
@@ -1004,13 +1004,14 @@ class xlsws_index extends QForm {
 		$this->misc_components['order_subtotal']->CssClass =
 			"cart_line_selltotal";
 
-		$this->misc_components['order_total']->Text =
-			_xls_currency($objCart->Total);
-		$this->misc_components['order_total']->CssClass =
-			"cart_line_selltotal";
 
-		if ($this->misc_components['order_total'] instanceof QControl)
+		if ($this->misc_components['order_total'] instanceof QControl) {
+			$this->misc_components['order_total']->Text =
+			_xls_currency($objCart->Total);
+			$this->misc_components['order_total']->CssClass =
+			"cart_line_selltotal";
 			$this->misc_components['order_total']->Refresh();
+		}
 	}
 
 	// Create widgets to display Shipping cost data
@@ -1027,6 +1028,8 @@ class xlsws_index extends QForm {
 
 	// Update widgets to display Shipping cost data
 	protected function update_shippingcost_display($objCart) {
+		if (!isset($this->misc_components['order_shipping_cost']))
+			return false;
 		if ((strpos($objCart->IdStr,"WO-") === false || $objCart->Status != "Awaiting Processing")
 			&& $_GET['xlspg'] != "checkout" && $objCart->ShippingSell==0)
 				$this->misc_components['order_shipping_cost']->Text =

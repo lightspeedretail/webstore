@@ -35,6 +35,33 @@ abstract class XLSSessionHandlerBase extends QBaseClass {
 	protected static $Events = array();
 	protected $uxtLifetime;
 
+    public static function GetProbability() {
+        $intProbability = ini_get('session.gc_probability');
+
+        if (self::$CollectionOverridePhp)
+            $intProbability = self::$CollectionDefaultProbability;
+
+        return $intProbability;
+    }
+
+    public static function GetDivisor() {
+        $intDivisor = ini_get('session.gc_divisor');
+
+        if (self::$CollectionOverridePhp)
+            $intDivisor = self::$CollectionDefaultDivisor;
+
+        return $intDivisor;
+    }
+
+    public static function GetLifetime() {
+        $intLifetime = ini_get('session.gc_maxlifetime');
+
+        if (self::$CollectionOverridePhp)
+            $intLifetime = self::$CollectionDefaultLifetime;
+
+        return $intLifetime;
+    }
+
 	public static function RegisterEvent($strEventName, $mixEvent) {
 	  self::$Events[$strEventName][] = $mixEvent;
 	}
@@ -54,25 +81,16 @@ abstract class XLSSessionHandlerBase extends QBaseClass {
 	}
 
 	// Return the maximum time a session may exist, in seconds
-	public static function GetSessionLifetime() {
-		$intLifetime = ini_get('session.gc_maxlifetime');
-
-		if (self::$CollectionOverridePhp || $intLifetime == 0)
-			$intLifetime = self::$CollectionDefaultLifetime;
-
+    public static function GetSessionLifetime() {
+        $intLifetime = self::GetLifetime();
 		return $intLifetime;
 	}
 
 	public static function GetGarbageCollection() {
-		$intProbability = ini_get('session.gc_probability');
-		$intDivisor = ini_get('session.gc_divisor');
+		$intProbability = self::GetProbability();
+		$intDivisor = self::GetDivisor();
 
-		if (self::$CollectionOverridePhp || $intProbability == 0) {
-			$intProbability = self::$CollectionDefaultProbability;
-			$intDivisor = self::$CollectionDefaultDivisor;
-		}
-
-		if (!(rand(0, $intDivisor) < $intProbability)) return false;
+		if (!(rand(0, $intDivisor) <= $intProbability)) return false;
 		return true;
 	}
 

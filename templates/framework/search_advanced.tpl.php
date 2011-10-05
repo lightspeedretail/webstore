@@ -1,4 +1,4 @@
-<div class="rounded" style="margin-left: 20px; border:1px sold #eee;">
+<div class="rounded" style="margin-left: 20px; border:1px solid #eee;">
 <h1>Advanced Search</h1>
 </div><br />
 

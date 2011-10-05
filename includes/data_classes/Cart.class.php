@@ -176,6 +176,71 @@ class Cart extends CartGen {
 		}
 	}
 
+    public static function GetCartLastIdStr() {
+        // Since id_str is a text field, we have to read in and strip out nonnumeric
+        try { 
+            $intIdStr = _dbx_first_cell('SELECT SUBSTRING(id_str, 4) 
+                AS id_num 
+                FROM xlsws_cart 
+                WHERE id_str LIKE "WO-%"
+                ORDER BY (id_num + 0) DESC 
+                LIMIT 1;'
+            );
+        }
+        catch (Exception $objExc) {
+            QApplication::Log(E_USER_ERROR, 'checkout', 
+                'Failed to lookup previous id string');
+        }
+
+        if (empty($intIdStr))
+            return 0;
+        else
+            return $intIdStr;
+    }
+
+    public function GetCartNextIdStr() {
+        $strNextId = _xls_get_conf('NEXT_ORDER_ID', false);
+        
+        if ($strNextId) {
+            $intNextId = preg_replace("/[^0-9]/", "", $strNextId);
+            return 'WO-' . $intNextId;
+        }
+        else {
+            $intLastId = preg_replace("/[^0-9]/", "", Cart::GetCartLastIdStr()); 
+            $intNextId = intval($intLastId) + 1;
+            $strNextId = 'WO-' . $intNextId;
+            return $strNextId;
+        }
+         
+    }
+
+    public function SetIdStr() {
+        $strQueryFormat = 'SELECT COUNT(rowid) FROM xlsws_cart WHERE '.
+            '`id_str` = "%s" AND `rowid` != "%s";';
+
+        if (!$this->IdStr)
+            $this->IdStr = Cart::GetCartNextIdStr();
+        
+        $strQuery = sprintf($strQueryFormat, $this->IdStr, $this->Rowid);
+         
+        while(_dbx_first_cell($strQuery) != '0') {
+            $this->IdStr++;
+            $strQuery = sprintf($strQueryFormat, $this->IdStr, $this->Rowid);
+        }
+
+        try { 
+            $this->Save();
+        }
+        catch (Exception $objExc) {
+            QApplicaiton::Log(E_USER_ERROR, 'checkout', 
+                'Failed to save cart with : ' . $objExc);
+        }
+
+        $objConf = Configuration::LoadByKey('NEXT_ORDER_ID');
+        $objConf->Value = intval(preg_replace("/[^0-9]/", "", $this->IdStr))+1;
+        $objConf->Save();
+    }
+
 	/**
 	 * Update the Quantity of an Item in the cart
 	 * Then force recalculation of Cart values
@@ -244,6 +309,15 @@ class Cart extends CartGen {
 
 		if (!$objPromoCode->Active)
 			return;
+			
+				
+		if ($objPromoCode->Threshold > $this->Subtotal) {
+				$this->UpdateDiscountExpiry();
+				$this->FkPromoId = NULL;
+				QApplication::ExecuteJavaScript("alert('Promo Code \"" .$objPromoCode->Code .  _sp("\" no longer applies to your cart and has been removed.")  . "')");				
+			return;
+		}
+			
 
 		$intDiscount = 0;
 		if ($objPromoCode->Type == PromoCodeType::Flat)
@@ -581,7 +655,7 @@ class Cart extends CartGen {
 	}
 
 	public function AddProduct($objProduct,
-		$intQuantity, $mixCartType = false) {
+		$intQuantity, $mixCartType = false, $intGiftItemId = 0) {
 
 		if (!$mixCartType)
 			$mixCartType = CartType::cart;
@@ -634,6 +708,7 @@ class Cart extends CartGen {
 		$objItem->SellBase = $objProduct->GetPrice(1);
 		$objItem->Description = $objProduct->Name;
 		$objItem->Sell = $objProduct->GetPrice($objItem->Qty);
+		if ($intGiftItemId>0) $objItem->GiftRegistryItem = $intGiftItemId;
 
 		// If cart unsaved, Save it to get Rowid
 		if (!$this->Rowid)
@@ -675,7 +750,7 @@ class Cart extends CartGen {
 				$fltSell = false, $fltDiscount = 0,
 				$mixCartType = false, $intGiftItemId = 0);
 
-		return $objCart->AddProduct($objProduct, $intQty, $mixCartType);
+		return $objCart->AddProduct($objProduct, $intQty, $mixCartType, $intGiftItemId);
 	}
 
 	/**
@@ -711,10 +786,19 @@ class Cart extends CartGen {
 	/**
 	 * Return link for current cart
 	 * @return string
-	 */
+     */
+    protected function GetLinkid() {
+        if ($this->strLinkid == '' || is_null($this->strLinkid)) {
+            $this->Linkid = md5(date('U') . '_' . $this->intRowid);
+            return $this->strLinkid;
+        }
+        else
+            return $this->strLinkid;
+    }
+
 	protected function GetLink($blnTracking = false) {
-		if ($this->Linkid == '' || is_null($this->Linkid)) {
-			$this->Linkid = md5(date('U') . "_" . $this->intRowid);
+        if ($this->Linkid == '' || is_null($this->Linkid)) {
+            $this->LinkId = $this->GetLinkid();
 			$this->Save();
 		}
 
@@ -962,6 +1046,9 @@ class Cart extends CartGen {
 		switch ($strName) {
 			case 'Link':
 				return $this->GetLink(true);
+
+            case 'Linkid':
+                return $this->GetLinkid();
 
 			case 'Order':
 				return $this->GetLink(false);

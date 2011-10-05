@@ -64,12 +64,32 @@ class PromoCode extends PromoCodeGen {
 		return false;
 	}
 
-	public function IsProductAffected($objProduct) {
+	public function IsProductAffected($objItem) {
 		$arrCode = $this->LsCodeArray;
 		if (empty($arrCode))
 			return true;
 
-		if (_xls_array_search_begin($objProduct->Code, $arrCode))
+        foreach($arrCode as $strCode) {
+            $strCode=strtolower($strCode);
+            
+            if (substr($strCode, 0,7) == "family:" && 
+                substr($strCode,7,255) == strtolower($objItem->Product->Family)) 
+            return true;
+            
+            if (substr($strCode, 0,6) == "class:" && 
+                substr($strCode,6,255) == strtolower($objItem->Product->ClassName)) 
+            return true;
+            
+            if (substr($strCode, 0,8) == "keyword:" && (
+                substr($strCode,8,255) == strtolower($objItem->Product->WebKeyword1,8,255) ||
+                substr($strCode,8,255) == strtolower($objItem->Product->WebKeyword2,8,255) ||
+                substr($strCode,8,255) == strtolower($objItem->Product->WebKeyword3,8,255) )              
+                ) 
+            return true;
+           
+        }  
+		  
+		  if (_xls_array_search_begin($objItem->Code, $arrCode))
 			return true;
 
 		return false;
