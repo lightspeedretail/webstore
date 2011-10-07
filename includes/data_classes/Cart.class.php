@@ -108,14 +108,6 @@ class Cart extends CartGen {
 	 * @return
 	 */
 	public static function ClearCart(){
-		$objCart = Cart::GetCart();
-
-		// if it is a cart then delete it..
-		if ($objCart->Type == CartType::cart  ||
-			$objCart->Type == CartType::giftregistry) {
-			$objCart->FullDelete();
-		}
-
 		unset($_SESSION['XLSWS_CART']);
 	}
 
