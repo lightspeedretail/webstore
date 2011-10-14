@@ -698,7 +698,8 @@ class Cart extends CartGen {
         }
 
 		$intTotalQty = $intQuantity + ($objItem->Qty?$objItem->Qty:0);
-        $this->UpdateItemQuantity($objItem, $intTotalQty);
+        if (!$this->UpdateItemQuantity($objItem, $intTotalQty))
+            return false;
 
 		// If cart unsaved, Save it to get Rowid
 		if (!$this->Rowid)
