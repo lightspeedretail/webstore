@@ -108,14 +108,6 @@ class Cart extends CartGen {
 	 * @return
 	 */
 	public static function ClearCart(){
-		$objCart = Cart::GetCart();
-
-		// if it is a cart then delete it..
-		if ($objCart->Type == CartType::cart  ||
-			$objCart->Type == CartType::giftregistry) {
-			$objCart->FullDelete();
-		}
-
 		unset($_SESSION['XLSWS_CART']);
 	}
 
@@ -787,21 +779,17 @@ class Cart extends CartGen {
 	 * Return link for current cart
 	 * @return string
      */
-    protected function GetLinkid() {
+    protected function GetLinkid() { 
         if ($this->strLinkid == '' || is_null($this->strLinkid)) {
             $this->Linkid = md5(date('U') . '_' . $this->intRowid);
+            $this->Save();
             return $this->strLinkid;
         }
         else
             return $this->strLinkid;
     }
 
-	protected function GetLink($blnTracking = false) {
-        if ($this->Linkid == '' || is_null($this->Linkid)) {
-            $this->LinkId = $this->GetLinkid();
-			$this->Save();
-		}
-
+	protected function GetLink($blnTracking = false) { 
 		$strUrl = _xls_site_dir() . '/index.php?xlspg=';
 
 		if ($blnTracking) $strUrl = $strUrl . 'order_track&getuid=';
