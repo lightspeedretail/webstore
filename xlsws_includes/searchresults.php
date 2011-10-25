@@ -162,6 +162,30 @@ class xlsws_searchresult extends xlsws_product_listing {
     }
 
     /**
+     * Return a QCondition to filter results based on Family
+     * @param none
+     * @return QCondition
+     */
+    protected function GetFamilyCondition() {
+        global $XLSWS_VARS;
+
+        $strFamily = false;
+        $objCondition = false;
+
+        if (isset($XLSWS_VARS['family'])) { 
+            $strFamily = trim($XLSWS_VARS['family']);
+        }
+
+        if ($strFamily) { 
+            $objCondition = QQ::Condition(
+                QQ::Equal(QQN::Product()->Family, $strFamily)
+            );
+        }
+
+        return $objCondition;
+    }
+
+    /**
      * Return a QCondition to filter products based on Price range
      * @param none
      * @return QCondition
@@ -226,6 +250,7 @@ class xlsws_searchresult extends xlsws_product_listing {
         $objCategoryCondition = $this->GetCategoryCondition();
         $objCriteriaCondition = $this->GetCriteriaCondition();
         $objPriceCondition = $this->GetPriceCondition();
+        $objFamilyCondition = $this->GetFamilyCondition();
 
         if ($objCategoryCondition)
             $objConditionArray[] = $objCategoryCondition;
@@ -235,6 +260,9 @@ class xlsws_searchresult extends xlsws_product_listing {
 
         if ($objPriceCondition)
             $objConditionArray[] = $objPriceCondition;
+
+        if ($objFamilyCondition)
+            $objConditionArray[] = $objFamilyCondition;
 
         if (count($objConditionArray) > 0)
             $objCondition = QQ::AndCondition($objConditionArray);
