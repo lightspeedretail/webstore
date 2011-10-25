@@ -177,9 +177,7 @@ class xlsws_searchresult extends xlsws_product_listing {
         }
 
         if ($strFamily) { 
-            $objCondition = QQ::Condition(
-                QQ::Equal(QQN::Product()->Family, $strFamily)
-            );
+            $objCondition = QQ::Equal(QQN::Product()->Family, $strFamily);
         }
 
         return $objCondition;
