@@ -528,6 +528,7 @@ class xlsws_product extends xlsws_index {
 			else $objProduct = false;
 
         if (!$objProduct) { 
+            $this->lstColor->SelectedIndex = 0;
             _qalert(sprintf(
                 _sp('Selected %s/%s option does not exist. Please choose a ' .
                     'different option.'),
