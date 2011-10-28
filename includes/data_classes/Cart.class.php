@@ -301,7 +301,15 @@ class Cart extends CartGen {
 
 		if (!$objPromoCode->Active)
 			return;
-			
+		
+		
+		// Sort array by High Price to Low Price, reset discount to 0 to evaluate from the beginning
+		$arrSorted = array();
+		foreach ($this->GetCartItemArray() as $objItem) {
+			if (!$dryRun)
+				$objItem->Discount = 0;
+			$arrSorted[] = $objItem;
+        }	
 				
 		if ($objPromoCode->Threshold > $this->Subtotal) {
 				$this->UpdateDiscountExpiry();
@@ -324,13 +332,7 @@ class Cart extends CartGen {
 
 		$bolApplied = false;
 
-		// Sort array by High Price to Low Price, reset discount to 0 to evaluate from the beginning
-		$arrSorted = array();
-		foreach ($this->GetCartItemArray() as $objItem) {
-			if (!$dryRun)
-				$objItem->Discount = 0;
-			$arrSorted[] = $objItem;
-        }			
+					
 			
 			
 		usort($arrSorted, array('XLSCartItemManager', 'CompareByPrice'));
