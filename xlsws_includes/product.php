@@ -572,15 +572,17 @@ class xlsws_product extends xlsws_index {
 	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
 	 * @return none
 	 */
-	protected function color_size_change($strFormId, $strControlId, $strParameter) {
-        $prod = $this->GetMatrixSelection();
-        if (!$prod) {
-            if (_xls_get_conf('ENABLE_COLOR_FILTER', 1))
-                if ($this->lstSize->SelectedIndex > 0)
-                    $this->PopulateMatrixColor($this->lstSize->SelectedValue);
-            return;
+    protected function color_size_change($strFormId, $strControlId, 
+        $strParameter)
+    {
+
+        if (_xls_get_conf('ENABLE_COLOR_FILTER', 1)) { 
+            if ($strControlId == $this->lstSize->ControlId) {
+                $this->PopulateMatrixColor($this->lstSize->SelectedValue);
+                $this->lstColor->SelectedIndex = 0;
+            }
         }
-        
+
         $prod = $this->ValidateMatrixSelection();
         if (!$prod)
             return;
