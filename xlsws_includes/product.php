@@ -43,6 +43,7 @@ class xlsws_product extends xlsws_index {
 	protected $arrOptionProds; //an array of sizes and colors if its a matrixed item
 	protected $lstSize; //the listbox for selecting sizes
 	protected $lstColor; //the listbox for selecting colors
+    protected $strMatrixPlaceholder = "Select %s ...";
 
 	protected $masterProductId; //the rowid of the master product if applicable
 
@@ -149,24 +150,7 @@ class xlsws_product extends xlsws_index {
 	 */
 	protected function build_size_widget() {
 		$this->lstSize  = new XLSListBox($this->mainPnl);
-		$this->lstSize->AddItem(
-			sprintf(_sp("Select %s ..."), $this->prod->SizeLabel),
-			NULL
-		);
-
-		$arrSizesAdded = array();
-
-		foreach ($this->arrOptionProds as $objProduct) {
-			if (($objProduct->ProductSize) != '' &&
-			 !in_array($objProduct->ProductSize, $arrSizesAdded) &&
-			 $objProduct->IsAvailable) {
-
-				$arrSizesAdded[] = $objProduct->ProductSize;
-				$this->lstSize->AddItem(
-					$objProduct->ProductSize,
-					$objProduct->ProductSize);
-			}
-		}
+        $this->PopulateMatrixSize();
 	}
 
 	/**
@@ -175,25 +159,8 @@ class xlsws_product extends xlsws_index {
 	 * @return none
 	 */
 	protected function build_color_widget() {
-		$this->lstColor  = new XLSListBox($this->mainPnl);
-		$this->lstColor->AddItem(
-			sprintf(_sp("Select %s ..."), $this->prod->ColorLabel),
-			NULL
-		);
-
-		$arrColorsAdded = array();
-		foreach ($this->arrOptionProds as $objProduct) {
-			if ($objProduct->ProductColor != '' &&
-			 !in_array($objProduct->ProductColor, $arrColorsAdded) &&
-			 $objProduct->IsAvailable) {
-
-				$arrColorsAdded[] = $objProduct->ProductColor;
-				$this->lstColor->AddItem(
-					$objProduct->ProductColor,
-					$objProduct->ProductColor
-				);
-			}
-		}
+        $this->lstColor  = new XLSListBox($this->mainPnl);
+        $this->PopulateMatrixColor();
 	}
 
 	protected function update_matrix_widgets() {
@@ -463,6 +430,70 @@ class xlsws_product extends xlsws_index {
 		return $objProduct;
 	}
 
+    protected function PopulateMatrixSize($strColor = false) {
+        $this->lstSize->RemoveAllItems();
+
+        $this->lstSize->AddItem(
+            sprintf(
+                _sp($this->strMatrixPlaceholder), 
+                $this->origin_prod->SizeLabel
+            ), null
+        );
+
+        $strOptionsArray = array();
+
+        foreach ($this->arrOptionProds as $objProduct) {
+            $strSize = $objProduct->ProductSize;
+
+            if ($strSize == '')
+                continue;
+
+            if ($strColor && $objProduct->ProductColor != $strColor)
+                continue;
+
+            if (in_array($strSize, $strOptionsArray))
+                continue;
+
+            if (!$objProduct->IsAvailable) 
+                continue;
+
+            $strOptionsArray[] = $strSize;
+            $this->lstSize->AddItem($strSize, $strSize);
+        }
+    }
+
+    protected function PopulateMatrixColor($strSize = false) {
+        $this->lstColor->RemoveAllItems();
+
+        $this->lstColor->AddItem(
+            sprintf(
+                _sp($this->strMatrixPlaceholder), 
+                $this->origin_prod->ColorLabel
+            ), null
+        );
+
+        $strOptionsArray = array();
+
+        foreach ($this->arrOptionProds as $objProduct) {
+            $strColor = $objProduct->ProductColor;
+
+            if ($strColor == '')
+                continue;
+
+            if ($strSize && $objProduct->ProductSize != $strSize)
+                continue;
+
+            if (in_array($strColor, $strOptionsArray))
+                continue;
+
+            if (!$objProduct->IsAvailable) 
+                continue;
+
+            $strOptionsArray[] = $strColor;
+            $this->lstColor->AddItem($strColor, $strColor);
+        }
+    }
+
 	/**
 	 * valid_option - checks if a selected size color option is a valid option in the matrix
 	 * @param none
@@ -543,6 +574,14 @@ class xlsws_product extends xlsws_index {
 	 * @return none
 	 */
 	protected function color_size_change($strFormId, $strControlId, $strParameter) {
+        $prod = $this->GetMatrixSelection();
+        if (!$prod) {
+            if (_xls_get_conf('ENABLE_COLOR_FILTER', 1))
+                if ($this->lstSize->SelectedIndex > 0)
+                    $this->PopulateMatrixColor($this->lstSize->SelectedValue);
+            return;
+        }
+        
         $prod = $this->ValidateMatrixSelection();
         if (!$prod)
             return;
