@@ -721,6 +721,7 @@ class xlsws_checkout extends xlsws_index {
 
 			$this->update_order_display($this->cart);
 			$this->pnlCart->Refresh();
+			$this->setupShipping();
 		} else {
 			$this->DisplayPromoErrWidget(_sp('Promo Code does not apply' .
 				' to your cart.'));
