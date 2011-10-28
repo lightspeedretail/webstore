@@ -496,7 +496,9 @@ class xlsws_product extends xlsws_index {
     				break;
 			else $objProduct = false;
 
-        if (!$objProduct) { 
+        if (!$objProduct) {
+            $this->lstColor->SelectedIndex = 0;
+
             _qalert(sprintf(
                 _sp('Selected %s/%s option does not exist. Please choose a ' .
                     'different option.'),
@@ -598,38 +600,45 @@ class xlsws_product extends xlsws_index {
 	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
 	 * @return none
 	 */
-	protected function prod_add_to_cart($strFormId, $strControlId, $strParameter) {
+    public function prod_add_to_cart($strFormId, $strControlId, $strParameter) {
+        return $this->add_to_cart($strFormId, $strControlId, $strParameter);
+	}
+
+    protected function AddAutoRelatedToCart($mixProduct) {
+        foreach($this->autoAddCheckIDs as $id=>$qty) {
+            $ctl = $this->GetControl($id);
+
+            if($ctl->Checked){
+                $prod = Product::Load($ctl->ActionParameter);
+                if($prod)
+                    Cart::AddToCart($prod , $qty);
+            }
+        }
+    }
+
+    public function add_to_cart($strFormId, $strControlId, $strParameter) {
 		$objProduct = $objOriginal = $this->prod;
 		$objProduct = $this->ValidateMatrix();
 
-		if (!$objProduct)
-			return;
-		else
-			$this->prod = $objProduct;
+		if (!$objProduct) return;
+		else $this->prod = $objProduct;
 
 		// Remove the existing control before adding new
 		$this->RemoveControl($this->pnlImg->ControlId);
 		$this->create_prod_image();
 		$this->pnlImgHolder->Refresh();
 
-		if (Cart::AddToCart($this->prod, $this->get_qty())) {
-			// add auto products - only if parent can be added
-			foreach($this->autoAddCheckIDs as $id=>$qty) {
-				$ctl = $this->GetControl($id);
+        $objProduct = $this->AddProductToCart($objProduct, $this->get_qty());
+        if (!$objProduct)
+            return false;
 
-				if($ctl->Checked){
-					$prod = Product::Load($ctl->ActionParameter);
-					if($prod)
-						Cart::AddToCart($prod , $qty);
-				}
-			}
-		}
+        $this->AddAutoRelatedToCart($objProduct);
 
 		$this->cartPnl->RemoveChildControls(true);
 		$this->build_cart();
 		$this->cartPnl->Refresh();
 		$this->prod = $objOriginal;
-	}
+    }
 
 	/**
 	 * AutoAddCheckBox - create auto add classes with tickmakrs for a line item
