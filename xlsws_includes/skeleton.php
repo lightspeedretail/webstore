@@ -1202,105 +1202,23 @@ class xlsws_index extends QForm {
 		return false;
 	}
 
-    protected function AddProductToCart($mixProduct, $intQuantity = 1) {
-        $objProduct = false;
-
-        if (is_string($mixProduct))
-            $objProduct = Product::LoadByCode($mixProduct);
-        elseif ($mixProduct instanceof Product)
-            $objProduct = $mixProduct;
-
-        if (!$objProduct || !$objProduct->Web) {
-            _qalert(_sp('Selected product is no longer available' .
-               ' for ordering. Thank you for your understanding.'));
-            return false;
-        }
-
-        if ($objProduct->IsMaster) {
-            _qalert(sprintf(_sp('Please choose a valid %s/%s option.'),
-                $objProduct->SizeLabel, 
-                $objProduct->ColorLabel
-            ));
-            return false;
-        }
-
-        if (!$objProduct->HasInventory(true)) {
-            _qalert(_sp(
-                _xls_get_conf('INVENTORY_ZERO_NEG_TITLE', 'Please Call')
-            ));
-            return false;
-        }
-
-        if (Cart::AddToCart($objProduct, $intQuantity))
-            return $objProduct;
-
-        return false;
-    }
-
-    protected function AddAutoRelatedToCart($mixProduct) {
-        $objProduct = false;
-
-        if (is_string($mixProduct))
-            $objProduct = Product::LoadByCode($mixProduct);
-        elseif ($mixProduct instanceof Product)
-            $objProduct = $mixProduct;
-
-        if (!$objProduct)
-            return false;
-
-        $objRelatedArray = ProductRelated::LoadArrayByProductId(
-            $objProduct->Rowid, 
-            QQ::Clause(QQ::OrderBy(QQN::ProductRelated()->Rowid))
-        );
-
-        foreach ($objRelatedArray as $objRelated) { 
-            if (!$objRelated->Autoadd)
-                continue;
-
-            $objRelatedProduct = Product::Load($objRelated->RelatedId);
-
-            if (!$objRelatedProduct)
-                continue;
-
-            if (!$objRelatedProduct->IsAvailable)
-                continue;
-
-            Cart::AddToCart(
-                $objRelatedProduct, 
-                $objRelated->Qty ? $objRelated->Qty : 1
-            );
-        }
-
-        return $objProduct;
-    }
-
 	/**
 	 * add_to_cart - adds an item to the shopping cart
 	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
 	 * @return none
 	 */
-    public function add_to_cart($strFormId, $strControlId, $strParameter) {
-        $objProduct = Product::LoadByCode($strParameter);
-
-        if (!$objProduct) {
-            _qalert(_sp('Selected product is no longer available' .
-               ' for ordering. Thank you for your understanding.'));
-            return false;
-        }
+	public function add_to_cart($strFormId, $strControlId, $strParameter) {
+		$prod = Product::LoadByCode($strParameter);
 
 		// If Master has Children, redirect to Product Detail page.
-		if ($objProduct->IsMaster) {
-            _rd("index.php?product=" . $objProd->OriginalCode);
-            return false;
-        }
+		if ($prod->IsMaster) {
+			$prods = Product::LoadArrayByFkProductMasterId($prod->Rowid);
 
-        // Add Product to cart
-        $objProduct = $this->AddProductToCart($objProduct);
-        if (!$objProduct)
-            return false;
-
-        // Add AutoAdd to cart
-        $this->AddAutoRelatedToCart($objProduct);
+			if(count($prods)>0) {
+				_rd("index.php?product=" . $prod->Code);
+				return;
+			}
+		}
 
 		// Was this control created as drag and drop?
 		if(isset($this->arrProdDragImages[$prod->Rowid])) {
@@ -1320,9 +1238,35 @@ class xlsws_index extends QForm {
 			}
 		}
 
-        $this->cartPnl->RemoveChildControls(true);
-        $this->build_cart();
-        $this->cartPnl->Refresh();
+
+		if($prod) {
+			$this->cartPnl->RemoveChildControls(true);
+			$objCart = Cart::GetCart();
+
+			if ($objCart->AddProduct($prod, 1)) {
+				$related = ProductRelated::LoadArrayByProductId($prod->Rowid , QQ::Clause(QQ::OrderBy(QQN::ProductRelated()->Rowid)));
+
+				foreach($related as $rel) {
+					$relProd = Product::Load($rel->RelatedId);
+
+					if(!$relProd)
+						continue;
+
+					if(!$relProd->Web)
+						continue;
+
+					if($rel->Autoadd) {
+						$objCart->AddProduct(
+							$relProd,
+							$rel->Qty ? $rel->Qty : 1
+						);
+					}
+				}
+			}
+
+			$this->build_cart();
+			$this->cartPnl->Refresh();
+		}
 	}
 
 	/**
