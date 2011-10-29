@@ -301,7 +301,15 @@ class Cart extends CartGen {
 
 		if (!$objPromoCode->Active)
 			return;
-			
+		
+		
+		// Sort array by High Price to Low Price, reset discount to 0 to evaluate from the beginning
+		$arrSorted = array();
+		foreach ($this->GetCartItemArray() as $objItem) {
+			if (!$dryRun)
+				$objItem->Discount = 0;
+			$arrSorted[] = $objItem;
+        }	
 				
 		if ($objPromoCode->Threshold > $this->Subtotal) {
 				$this->UpdateDiscountExpiry();
@@ -324,10 +332,9 @@ class Cart extends CartGen {
 
 		$bolApplied = false;
 
-		// Sort array by High Price to Low Price
-		$arrSorted = array();
-		foreach ($this->GetCartItemArray() as $objItem)
-			$arrSorted[] = $objItem;
+					
+			
+			
 		usort($arrSorted, array('XLSCartItemManager', 'CompareByPrice'));
 
 		foreach ($arrSorted as $objItem) {
@@ -647,15 +654,17 @@ class Cart extends CartGen {
 	}
 
 	public function AddProduct($objProduct,
-		$intQuantity, $mixCartType = false, $intGiftItemId = 0) {
+		$intQuantity = 0, $mixCartType = false, $intGiftItemId = 0) {
 
 		if (!$mixCartType)
 			$mixCartType = CartType::cart;
 
 		// Verify inventory
 		if (!$objProduct->HasInventory(true)) {
-			_qalert(_sp(_xls_get_conf('INVENTORY_ZERO_NEG_TITLE', 'Please Call')));
-				return null;
+            _qalert(_sp(
+                _xls_get_conf('INVENTORY_ZERO_NEG_TITLE', 'Please Call')
+            ));
+    		return null;
 		}
 
 		// Ensure product is Sellable
@@ -680,27 +689,24 @@ class Cart extends CartGen {
 			}
 		}
 
-		if ($objItem) {
-			$intTotalQty = $intQuantity + ($objItem->Qty?$objItem->Qty:0);
+        if (!$objItem) { 
+    		$objItem = new CartItem();
 
-			if ($this->UpdateItemQuantity($objItem, $intTotalQty))
-				$this->UpdateCart(false,true,false,true);
+	    	if ($objProduct->Rowid)
+		    	$objItem->ProductId = $objProduct->Rowid;
 
-			return $objItem->Rowid;
-		}
-		$objItem = new CartItem();
+    		$objItem->Code = $objProduct->OriginalCode;
+		    $objItem->CartType = $mixCartType;
+    		$objItem->DatetimeAdded = QDateTime::Now();
+    		$objItem->SellBase = $objProduct->GetPrice(1);
+    		$objItem->Description = $objProduct->Name;
+		    if ($intGiftItemId > 0)
+                $objItem->GiftRegistryItem = $intGiftItemId;
+        }
 
-		if ($objProduct->Rowid)
-			$objItem->ProductId = $objProduct->Rowid;
-
-		$objItem->Code = $objProduct->OriginalCode;
-		$objItem->Qty = $intQuantity;
-		$objItem->CartType = $mixCartType;
-		$objItem->DatetimeAdded = QDateTime::Now();
-		$objItem->SellBase = $objProduct->GetPrice(1);
-		$objItem->Description = $objProduct->Name;
-		$objItem->Sell = $objProduct->GetPrice($objItem->Qty);
-		if ($intGiftItemId>0) $objItem->GiftRegistryItem = $intGiftItemId;
+		$intTotalQty = $intQuantity + ($objItem->Qty?$objItem->Qty:0);
+        if (!$this->UpdateItemQuantity($objItem, $intTotalQty))
+            return false;
 
 		// If cart unsaved, Save it to get Rowid
 		if (!$this->Rowid)

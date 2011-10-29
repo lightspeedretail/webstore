@@ -1522,6 +1522,7 @@ $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Session storage', 'SES
 $sql[]= "INSERT into `xlsws_configuration` VALUES (NULL,'Show child products in search results', 'CHILD_SEARCH', '','If you want child products from a size color matrix to show up in search results, enable this option',8,10,NOW(),NOW(),'BOOL');";
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Security mode for outbound SMTP',  'EMAIL_SMTP_SECURITY_MODE',  '0',  'Automatic based on SMTP Port, or force security.',  '5',  '8', NOW() , NOW(), 'EMAIL_SMTP_SECURITY_MODE');";
 $sql[]= "INSERT into `xlsws_configuration` VALUES (NULL,'Maximum Products in Slider', 'MAX_PRODUCTS_IN_SLIDER', '64','For a custom page, max products in slider',8,11,NOW(),NOW(),'PINT');";
+$sql[]= "insert into xlsws_configuration values (null,'Update color options', 'ENABLE_COLOR_FILTER', 0, 'Enable this option to have the color drop-down menu populated on each size change',8,5,now(),now(),'BOOL');";
 
 //$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug LightSpeed Soap Call', 'DEBUG_LS_SOAP_CALL', '1', 'If selected, all soap calls will be logged in the database. It is advised that you do not enable this unless advised by XSilva', 1, 16, NOW(), NOW(), 'BOOL');";
 				

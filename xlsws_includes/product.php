@@ -43,6 +43,7 @@ class xlsws_product extends xlsws_index {
 	protected $arrOptionProds; //an array of sizes and colors if its a matrixed item
 	protected $lstSize; //the listbox for selecting sizes
 	protected $lstColor; //the listbox for selecting colors
+    protected $strMatrixPlaceholder = "Select %s ...";
 
 	protected $masterProductId; //the rowid of the master product if applicable
 
@@ -149,24 +150,7 @@ class xlsws_product extends xlsws_index {
 	 */
 	protected function build_size_widget() {
 		$this->lstSize  = new XLSListBox($this->mainPnl);
-		$this->lstSize->AddItem(
-			sprintf(_sp("Select %s ..."), $this->prod->SizeLabel),
-			NULL
-		);
-
-		$arrSizesAdded = array();
-
-		foreach ($this->arrOptionProds as $objProduct) {
-			if (($objProduct->ProductSize) != '' &&
-			 !in_array($objProduct->ProductSize, $arrSizesAdded) &&
-			 $objProduct->IsAvailable) {
-
-				$arrSizesAdded[] = $objProduct->ProductSize;
-				$this->lstSize->AddItem(
-					$objProduct->ProductSize,
-					$objProduct->ProductSize);
-			}
-		}
+        $this->PopulateMatrixSize();
 	}
 
 	/**
@@ -175,25 +159,8 @@ class xlsws_product extends xlsws_index {
 	 * @return none
 	 */
 	protected function build_color_widget() {
-		$this->lstColor  = new XLSListBox($this->mainPnl);
-		$this->lstColor->AddItem(
-			sprintf(_sp("Select %s ..."), $this->prod->ColorLabel),
-			NULL
-		);
-
-		$arrColorsAdded = array();
-		foreach ($this->arrOptionProds as $objProduct) {
-			if ($objProduct->ProductColor != '' &&
-			 !in_array($objProduct->ProductColor, $arrColorsAdded) &&
-			 $objProduct->IsAvailable) {
-
-				$arrColorsAdded[] = $objProduct->ProductColor;
-				$this->lstColor->AddItem(
-					$objProduct->ProductColor,
-					$objProduct->ProductColor
-				);
-			}
-		}
+        $this->lstColor  = new XLSListBox($this->mainPnl);
+        $this->PopulateMatrixColor();
 	}
 
 	protected function update_matrix_widgets() {
@@ -463,19 +430,82 @@ class xlsws_product extends xlsws_index {
 		return $objProduct;
 	}
 
+    protected function PopulateMatrixSize($strColor = false) {
+        $this->lstSize->RemoveAllItems();
+
+        $this->lstSize->AddItem(
+            sprintf(
+                _sp($this->strMatrixPlaceholder), 
+                $this->origin_prod->SizeLabel
+            ), null
+        );
+
+        $strOptionsArray = array();
+
+        foreach ($this->arrOptionProds as $objProduct) {
+            $strSize = $objProduct->ProductSize;
+
+            if ($strSize == '')
+                continue;
+
+            if ($strColor && $objProduct->ProductColor != $strColor)
+                continue;
+
+            if (in_array($strSize, $strOptionsArray))
+                continue;
+
+            if (!$objProduct->IsAvailable) 
+                continue;
+
+            $strOptionsArray[] = $strSize;
+            $this->lstSize->AddItem($strSize, $strSize);
+        }
+    }
+
+    protected function PopulateMatrixColor($strSize = false) {
+        $this->lstColor->RemoveAllItems();
+
+        $this->lstColor->AddItem(
+            sprintf(
+                _sp($this->strMatrixPlaceholder), 
+                $this->origin_prod->ColorLabel
+            ), null
+        );
+
+        $strOptionsArray = array();
+
+        foreach ($this->arrOptionProds as $objProduct) {
+            $strColor = $objProduct->ProductColor;
+
+            if ($strColor == '')
+                continue;
+
+            if ($strSize && $objProduct->ProductSize != $strSize)
+                continue;
+
+            if (in_array($strColor, $strOptionsArray))
+                continue;
+
+            if (!$objProduct->IsAvailable) 
+                continue;
+
+            $strOptionsArray[] = $strColor;
+            $this->lstColor->AddItem($strColor, $strColor);
+        }
+    }
+
 	/**
 	 * valid_option - checks if a selected size color option is a valid option in the matrix
 	 * @param none
 	 * @return none
 	 */
-	protected function valid_option() {
+	protected function ValidateMatrixSelection () {
 		if($this->lstColor->ItemCount <= 1 && $this->lstSize->ItemCount <= 1)
 			return false;
 
-		$size = $this->lstSize->SelectedValue;
-		$color = $this->lstColor->SelectedValue;
+		$strSize = $this->lstSize->SelectedValue;
+		$strColor = $this->lstColor->SelectedValue;
 
-		// is there options? then force option
 		if (($this->lstColor->ItemCount > 1)) {
 			if ($this->lstColor->SelectedIndex <= 0) {
 				return false;
@@ -488,26 +518,33 @@ class xlsws_product extends xlsws_index {
 			}
 		}
 
-		$prod = false;
+        $objProduct = false;
+
 		// validate  color-size exist
-		foreach($this->arrOptionProds as $prod)
-			if($size == $prod->ProductSize && $color == $prod->ProductColor)
-				break;
-			else
-				$prod = false;
+		foreach ($this->arrOptionProds as $objProduct)
+            if ($strSize == $objProduct->ProductSize && 
+                $strColor == $objProduct->ProductColor)
+    				break;
+			else $objProduct = false;
 
-		if(!$prod) {
-			QApplication::ExecuteJavaScript("alert('" . sprintf(_sp('Selected %s/%s option does not exist. Please choose a different option.') , _xls_get_conf('PRODUCT_SIZE_LABEL' , 'Size') , _xls_get_conf('PRODUCT_COLOR_LABEL' , 'Color')) . "');");
-			$this->lstColor->SetFocus();
-			return false;
-		}
+        if (!$objProduct) { 
+            $this->lstColor->SelectedIndex = 0;
+            _qalert(sprintf(
+                _sp('Selected %s/%s option does not exist. Please choose a ' .
+                    'different option.'),
+                _xls_get_conf('PRODUCT_SIZE_LABEL' , 'Size'),
+                _xls_get_conf('PRODUCT_COLOR_LABEL' , 'Color')
+            ));
+            return false;
+        }
 
-		// do we have an image for this product?
-		if(!$prod->ImageId)
-			$prod->ImageId = $this->origin_prod->ImageId;
-
-		return $prod;
+		return $objProduct;
 	}
+
+    protected function valid_option () {
+        QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
+        return $this->ValidateMatrixSelection();
+    }
 
 	/**
 	 * PopulateAdditionalImagesPnl - populates additional images for this product
@@ -535,11 +572,20 @@ class xlsws_product extends xlsws_index {
 	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
 	 * @return none
 	 */
-	protected function color_size_change($strFormId, $strControlId, $strParameter) {
-		$prod = $this->GetMatrixSelection();
+    protected function color_size_change($strFormId, $strControlId, 
+        $strParameter)
+    {
 
-		if(!$prod)
-			return;
+        if (_xls_get_conf('ENABLE_COLOR_FILTER', 1)) { 
+            if ($strControlId == $this->lstSize->ControlId) {
+                $this->PopulateMatrixColor($this->lstSize->SelectedValue);
+                $this->lstColor->SelectedIndex = 0;
+            }
+        }
+
+        $prod = $this->ValidateMatrixSelection();
+        if (!$prod)
+            return;
 
 		$this->prod = $prod;
 		$this->update_qty_price($strFormId, $strControlId, $strParameter);
@@ -558,6 +604,8 @@ class xlsws_product extends xlsws_index {
 
 		$this->build_slider($related);
 	}
+
+
 
 	/**
 	 * get_qty - get the current quantity to be added to cart
