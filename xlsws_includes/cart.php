@@ -315,12 +315,14 @@ class xlsws_cart extends xlsws_index {
 	 */
 	protected function cartUpdate($strFormId, $strControlId, $strParameter) {
 		$this->cart = Cart::GetCart();
+				//if($this->cart->FkTaxCodeId)
+		$bolPromoApplied = $this->cart->UpdatePromoCode(true);
+		if (!$bolPromoApplied) $this->cart->FkPromoId=0;
+		$this->update_order_display($this->cart , true);
+
 		if($this->cart->Count == 0){
 			_xls_display_msg(_sp("Your cart is empty. Please add items into this cart."));
 		}
-		//if($this->cart->FkTaxCodeId)
-
-		$this->update_order_display($this->cart , true);
 
 		return;
 	}
