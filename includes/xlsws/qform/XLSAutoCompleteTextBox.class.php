@@ -41,7 +41,7 @@ class XLSAutoCompleteTextBox extends QTextBox {
 
 		$strToReturn = sprintf(
 			'<input type="search" name="%s" ' .
-			'id="%s" placeholder="Search..." value="%s" %s/>',
+			'id="%s" placeholder="'._sp("Search").'..." value="%s" %s/>',
 			$this->strControlId,
 			$this->strControlId,
 			QApplication::HtmlEntities($this->strText),

@@ -54,7 +54,7 @@
 		<div class="left margin clear">
 			<dl>
 				<dd><?php $this->chkAgree->Render(); ?><label for="cConfirm"
-       class="opt"><?php printf(_sp("I hereby agree to the <a href=\"%s\" target=\"_new\">Terms and Conditions</a> of shopping with %s") , _xls_site_dir() . "/index.php?cpage=tc" , _xls_get_conf('STORE_NAME' , $_SERVER['HTTP_HOST']) ); ?>
+       class="opt"><?php printf(_sp("I hereby agree to the")." <a href=\"%s\" target=\"_new\">"._sp("Terms and Conditions")."</a> "._sp("of shopping with")." %s" , _xls_site_dir() . "/index.php?cpage=tc" , _xls_get_conf('STORE_NAME' , $_SERVER['HTTP_HOST']) ); ?>
        			</label></dd>
 			</dl>
 		</div>
