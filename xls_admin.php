@@ -4314,7 +4314,13 @@
 		
 			$this->add_config_key('MAX_PRODUCTS_IN_SLIDER' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Maximum Products in Slider',  'MAX_PRODUCTS_IN_SLIDER',  '64',  'For a custom page, max products in slider.',  '8',  '11', NOW() , NOW(), 'PINT');" , '2.1.3');
 		
-			
+			_dbx("ALTER TABLE xlsws_family MODIFY COLUMN family varchar (255)");
+			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.1.4 patch: Changed family column to 255 characters in xlsws_family";
+
+			_dbx("ALTER TABLE xlsws_product MODIFY COLUMN family varchar (255)");
+			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.1.4 patch: Changed family column to 255 characters in xlsws_product";
+
+
 			$this->arrMPnls['UpgradeWS']->Visible = true;
 			$this->arrMPnls['UpgradeWS']->Refresh();			
 

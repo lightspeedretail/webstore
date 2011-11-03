@@ -1989,7 +1989,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
 				
 				$sql = "CREATE TABLE `xlsws_family` (
   `rowid` int(11) NOT NULL auto_increment,
-  `family` varchar(32) NOT NULL,
+  `family` varchar(255) NOT NULL,
   PRIMARY KEY  (`rowid`),
   UNIQUE KEY `Family` (`family`)
 ) ENGINE=MyISAM DEFAULT CHARSET=$charset";
@@ -2152,7 +2152,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
   `current` tinyint(1) default NULL,
   `description` mediumtext,
   `description_short` mediumtext,
-  `family` varchar(32) default NULL,
+  `family` varchar(255) default NULL,
   `gift_card` tinyint(1) default NULL,
   `inventoried` tinyint(1) default NULL,
   `inventory` float default NULL,
