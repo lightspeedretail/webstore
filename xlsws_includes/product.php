@@ -555,14 +555,11 @@ class xlsws_product extends xlsws_index {
 		// Additional images
 		$images = Images::LoadArrayByProductAsImage($this->prod->Rowid , QQ::Clause(QQ::OrderBy(QQN::Images()->Rowid)));
 
-		if(!$images)
-			return;
-
 		$this->arrAdditionalProdImages = $images;
 
 		// Show the main image as well
 		if(count($this->arrAdditionalProdImages) > 0)
-			$this->arrAdditionalProdImages[] = Images::Load($this->origin_prod->ImageId);
+			$this->arrAdditionalProdImages[] = Images::Load($this->prod->ImageId);
 
 		$this->pnlAdditionalProdImages->Refresh();
 	}
