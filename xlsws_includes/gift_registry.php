@@ -922,6 +922,9 @@ class xlsws_gregistry extends xlsws_index {
 			return;
 		}
 
+		$this->txtGRDate->DateTime = QDateTime::FromTimestamp(strtotime(
+						$this->txtGRDate->Text));
+				
 		if($this->txtGRDate->DateTime == NULL) {
 			$this->txtGRDate->Warning='Required';
 			return;
