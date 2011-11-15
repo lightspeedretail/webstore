@@ -568,7 +568,9 @@
 				case 'EMAIL_SMTP_SECURITY_MODE':
 					return array(0 => _sp("Autodetect") , 1 => _sp("Force No Security") , 2 => _sp("Force SSL") , 3 => _sp("Force TLS"));
 
-					
+				case 'INVENTORY_DISPLAY_LEVEL':
+					return array('1' => _sp("With Messages Defined Below") , '' => _sp("Showing Actual Numbers Remaining"));
+	
 				case 'STORE_IMAGE_LOCATION':
 					return array('DB'=>'Database' , 'FS' => 'File System');
 				default:
@@ -4319,6 +4321,12 @@
 
 			_dbx("ALTER TABLE xlsws_product MODIFY COLUMN family varchar (255)");
 			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.1.4 patch: Changed family column to 255 characters in xlsws_product";
+
+
+			$sql = "UPDATE xlsws_configuration SET `options`='INVENTORY_DISPLAY_LEVEL' WHERE `key`='INVENTORY_DISPLAY_LEVEL'";
+			_xls_log($sql);
+			_dbx($sql);
+			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.1.4 patch: Clarified label for Display Inventory Level";
 
 
 			$this->arrMPnls['UpgradeWS']->Visible = true;
