@@ -35,6 +35,7 @@ if (!empty(QApplication::$Database)) {
     catch (QMySqliDatabaseException $objExc) {
         $strMessage = _sp('Could not established database connection. ' .
             'Received error : ' . $objExc->getMessage());
+        error_log($strMessage);
         die($strMessage);
     }
 }
