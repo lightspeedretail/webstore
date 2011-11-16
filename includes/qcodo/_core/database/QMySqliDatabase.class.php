@@ -46,11 +46,18 @@
 
 		public function Connect() {
 			// Connect to the Database Server
-			$this->objMySqli = new MySqli($this->Server, $this->Username, $this->Password, $this->Database, $this->Port);
+            $this->objMySqli = new MySqli($this->Server, $this->Username, $this->Password, $this->Database, $this->Port);
 
 			if (!$this->objMySqli)
 				throw new QMySqliDatabaseException("Unable to connect to Database", -1, null);
-			
+
+            if ($this->objMySqli->connect_error)
+                throw new QMySqliDatabaseException(
+                    $this->objMySqli->connect_error, 
+                    $this->objMySqli->errno, 
+                    null
+                );
+
 			if ($this->objMySqli->error)
 				throw new QMySqliDatabaseException($this->objMySqli->error, $this->objMySqli->errno, null);
 
@@ -104,7 +111,7 @@
 			$this->LogQuery($strNonQuery);
 
 			// Perform the Query
-			$this->objMySqli->query($strNonQuery);
+            $this->objMySqli->query($strNonQuery);
 			if ($this->objMySqli->error)
 				throw new QMySqliDatabaseException($this->objMySqli->error, $this->objMySqli->errno, $strNonQuery);
 		}

@@ -26,3 +26,16 @@
 
 // Prevent error display for SOAP/Ajax
 ini_set('display_errors', 0);
+
+if (!empty(QApplication::$Database)) {
+    try { 
+        $objDB = QApplication::GetDatabase();
+        $objDB->Connect();
+    }
+    catch (QMySqliDatabaseException $objExc) {
+        $strMessage = _sp('Could not established database connection. ' .
+            'Received error : ' . $objExc->getMessage());
+        die($strMessage);
+    }
+}
+
