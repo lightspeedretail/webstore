@@ -148,9 +148,8 @@ class usps extends xlsws_class_shipping {
 
 			$rates = array_merge($rates,$rates_int);
 			if (!empty($rates)) {
-				foreach ($rates as $key => $val) {
-					$key = str_replace("reg","",strip_tags(html_entity_decode($key)));
-                    $key = preg_replace("/[^A-Za-z0-9\-]/", " ", $key);
+                foreach ($rates as $key => $val) {
+                    $key = $this->cleanMethodName($key);
 					$ret[$key] = new XLS_OnOff($objParent);
 					$ret[$key]->AddAction(new QClickEvent(), new QJavaScriptAction("addMethod('" . addslashes($key) . "', '" . $ret['shiptypes']->ControlId . "', '" . $ret[$key]->ControlId . "_a');"));
 					$ret[$key]->Name = $key;
@@ -374,8 +373,17 @@ class usps extends xlsws_class_shipping {
 	}
 
 	public function setDestination($d) {
-		$this->zipDestination =$d;
+		$this->zipDestination = $d;
 	}
+
+    public function cleanMethodName($strName) {
+        $strName = html_entity_decode($strName);
+        $strName = strip_tags($strName);
+        $strName = str_replace('reg', '', $strName);
+        $strName = preg_replace("/[^A-Za-z0-9\-\ ]/", '', $strName);
+        $strName = trim($strName);
+        return $strName;
+    }
 
 	/**
 	 * getRate
@@ -404,20 +412,23 @@ class usps extends xlsws_class_shipping {
 		$retval = array();
 
 		if($this->isDomestic()) {
-			foreach($oXML->Package->Postage as $key=>$val) {
-			  $strKey=str_replace("&lt;sup&gt;&amp;reg;&lt;/sup&gt;","",$val->MailService);
-			  $strKey=str_replace("&lt;sup&gt;&amp;trade;&lt;/sup&gt;","",$strKey);
-			  $retval[''.htmlspecialchars_decode($strKey)] = floatval($val->Rate) + floatval($config['markup']);
+            foreach($oXML->Package->Postage as $key=>$val) {
+              $strKey = $val->MailService;
+              $strRate = $val->Rate;
+              $strKey = $this->cleanMethodName($strKey);
+			  $retval[$strKey] = floatval($strRate) + floatval($config['markup']);
 			}
 		} else {
 			foreach($oXML->Package->Service as $key=>$val) {
-			  $strKey=str_replace("&lt;sup&gt;&amp;reg;&lt;/sup&gt;","",$val->SvcDescription);
-			  $strKey=str_replace("&lt;sup&gt;&amp;trade;&lt;/sup&gt;","",$strKey);
-			  $retval[''.htmlspecialchars_decode($strKey)] = floatval($val->Postage) + floatval($config['markup']);
+              $strKey = $val->SvcDescription;
+              $strRate = $val->Postage;
+              $strKey = $this->cleanMethodName($strKey);
+			  $retval[$strKey] = floatval($strRate) + floatval($config['markup']);
 			}
 		}
 
 		$arrMethods = array_fill_keys($this->methods, '');
+
 
 		if($showall)
 		  return $retval;
