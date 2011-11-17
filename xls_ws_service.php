@@ -1515,7 +1515,7 @@ EOS;
                 return self::OK;
             $new = false;
             // Loads tax
-            $tax = TaxCode::Load($intRowid);
+            $tax = TaxCode::LoadByCode($strCode);
             
             if(!$tax){
                 $tax = new TaxCode();
