@@ -4328,6 +4328,7 @@
 			_dbx($sql);
 			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.1.4 patch: Clarified label for Display Inventory Level";
 
+			$this->add_config_key('DATABASE_SCHEMA_VERSION' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Database Schema Version',  'DATABASE_SCHEMA_VERSION',  '214',  'Used for tracking schema changes',  '',  '', NOW() , NOW(), NULL);" , '2.1.4');
 
 			$this->arrMPnls['UpgradeWS']->Visible = true;
 			$this->arrMPnls['UpgradeWS']->Refresh();			
