@@ -282,7 +282,7 @@ class ups extends xlsws_class_shipping {
 		}
 
 		$fields['service']->Visible = true;
-
+		asort($ret);
 		$arr = array(
 			'price' => false,
 			'msg' => '',

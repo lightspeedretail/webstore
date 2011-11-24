@@ -512,7 +512,7 @@ class fedex extends xlsws_class_shipping {
 		}
 
 		$fields['service']->Visible = true;
-
+		asort($ret);
 		foreach($ret as $service => $rate) {
 			$desc = strtolower(str_replace("_" , " " , $service ));
 			$desc = ucfirst($desc);

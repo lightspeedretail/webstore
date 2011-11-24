@@ -253,11 +253,11 @@ class usps extends xlsws_class_shipping {
 			_xls_log("USPS: Could not get rates. " . print_r($this , true));
 			return FALSE;
 		}
-
+		
 		$fields['service']->Visible = true;
 
 		$fields['service']->RemoveAllItems();
-
+		asort($rates);
 		foreach($rates as $service=>$rate) {
 			$fields['service']->AddItem($service . " " . _xls_currency($rate)  ,  $service);
 		}
