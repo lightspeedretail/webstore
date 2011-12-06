@@ -461,8 +461,8 @@ class usps extends xlsws_class_shipping {
 		$r.= '<RateV3Request USERID="'.$this->uspsID.'">';
 		$r.='<Package ID="0">';
 		$r.='<Service>ALL</Service>';
-		$r.='<ZipOrigination>'.$this->zipOrigination.'</ZipOrigination>';
-		$r.='<ZipDestination>'.$this->zipDestination.'</ZipDestination>';
+		$r.='<ZipOrigination>'.substr($this->zipOrigination,0,5).'</ZipOrigination>';
+		$r.='<ZipDestination>'.substr($this->zipDestination,0,5).'</ZipDestination>';
 		$r.='<Pounds>'.$this->pounds.'</Pounds>';
 		$r.='<Ounces>'.$this->ounces.'</Ounces>';
 		$r.='<Size>Regular</Size>';
