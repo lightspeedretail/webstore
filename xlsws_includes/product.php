@@ -573,10 +573,13 @@ class xlsws_product extends xlsws_index {
         $strParameter)
     {
 
-        if (_xls_get_conf('ENABLE_COLOR_FILTER', 1)) { 
+        if (_xls_get_conf('ENABLE_COLOR_FILTER', 0)) { 
             if ($strControlId == $this->lstSize->ControlId) {
-                $this->PopulateMatrixColor($this->lstSize->SelectedValue);
-                $this->lstColor->SelectedIndex = 0;
+                $this->PopulateMatrixColor($this->lstSize->SelectedValue);                
+                 if ($this->lstColor->ItemCount == 2)
+					$this->lstColor->SelectedIndex = 1;
+				 else
+				 	$this->lstColor->SelectedIndex = 0;
             }
         }
 
