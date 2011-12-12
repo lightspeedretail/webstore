@@ -371,7 +371,7 @@ class Product extends ProductGen {
 	 * @return array([1] => .... [5]=>))  all the tax components
 	 */
 	public function CalculateTax($taxCode, $fltPrice = false) {
-		if (!$fltPrice)
+		if ($fltPrice === false)
 			$fltPrice = $this->GetPrice();
 
 		list($fltTaxedPrice, $arrTaxes) = _xls_calculate_price_tax_price(
