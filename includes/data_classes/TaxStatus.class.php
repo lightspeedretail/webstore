@@ -49,7 +49,7 @@ class TaxStatus extends TaxStatusGen {
 				return true;
 
 		for ($i = 1; $i <= 5; $i++) {
-			$strField = 'tax' . $i . '_status';
+			$strField = 'Tax' . $i . 'Status';
 
 			if ($this->$strField == '0')
 				return false;
