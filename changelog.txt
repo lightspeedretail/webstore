@@ -2,6 +2,38 @@ Changelog
 
 Please see https://github.com/lightspeedretail/webstore/issues for technical details of these issues
 
+# 2.1.5
+
+* Shipping: Resolved an issue where ZIP+4 extended Zip codes would not function in USPS or UPS modules
+* Templates: Corrected an issue where Size/Color matrix was not properly showing available options
+* Templates: Photos on product grid now center correctly (credit to Git User "mymacbusiness" for code change)
+* Quote to Cart: Improved handling of taxes when using Quote to Cart
+
+# 2.1.4
+
+* Admin Panel: Improved labels for display options available through Admin Panel
+* Database: Resolved a family name truncating error, field now properly stores to 255 characters
+
+* General: Web Store now provides error message if database connection fails instead of white screen
+* General: Corrected an issue where an invalid matrix combination could be chosen and error
+* General: Corrected a matrix picture display issue where child photos would not refresh properly when choosing dropdown options
+* General: Improved handling for certain strings not using the Web Store translator functions
+* General: Corrected an error when using Contact Us with STRICT PHP settings turned on
+
+* Mail: Improved SMTP handling to catch certain SMTP server errors on sending email
+* Promo Codes: Removing a product having a product-specific promo code applied now removes code from cart properly
+* Promo Codes: Resolved a rare issue where a promo code would not be removed when deleting all items in cart
+* Promo Codes: Improved handling when a promo code drops cart value below a Free Shipping threshold
+* Quote to Cart: Corrected an issue where LinkID was not being properly generated
+
+* Search: Improved PHP search code to properly use framework
+* Shipping: Corrected an issue with FedEx where 3-digit state/province codes would cause module to fail
+* Uploader: Corrected an issue where duplicate identical Tax Codes would cause failure
+* Uploader: Web Store now properly populates family table based on both the product card families field and Family setup list
+* Uploader: Corrected a rare issue where Quote to Cart would use an incorrect field in pricing
+
+* Wish List: Fixed an error where an expired Wish List could not be reactivated with a new expiry date
+
 # 2.1.3
 
 * General: Added missing configuration key to determine maximum products in a slider
@@ -49,7 +81,7 @@ Please see https://github.com/lightspeedretail/webstore/issues for technical det
 * Fixed an issue where DateTimeCreated was not correctly set in the xlsws_cart table
 * Migrated ereg_replace to preg_replace in functions to conform to newer PHP standards and eliminate errors
 * Corrected misdefined function calls that would generate errors when using an E_STRICT environment
-* Removed closing PHP tags where no longer required
+* Removed closing PHP tags where no longer required (credit to Git user "JaredKazimir" for code change)
 
 
 # 2.1.1
