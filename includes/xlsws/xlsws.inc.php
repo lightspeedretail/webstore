@@ -25,7 +25,7 @@
  */
 
 // Versioning Information
-define('XLSWS_VERSION', '2.1.4');
+define('XLSWS_VERSION', '2.1.5');
 
 // Define default values
 define('XLS_TRUNCATE_PUNCTUATIONS', ".!?:;,-");
