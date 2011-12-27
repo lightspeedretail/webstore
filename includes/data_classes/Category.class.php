@@ -152,6 +152,34 @@ class Category extends CategoryGen {
 	}
 
 	/**
+	 * GetTrail - return array of Category Trail for product
+	 * @param $intRowid RowID of Product
+	 * @return $arrPath[]
+	 */
+	public static function GetTrail($intRowid) {
+		$arrPath=array();
+		
+		$objCategory = parent::LoadArrayByProduct($intRowid); 
+		if($objCategory && (count($objCategory) > 0))
+			$category_id = current($objCategory)->Rowid;
+		else
+			return $arrPath;
+
+		do {
+			$objCategory = parent::Load($category_id);
+	
+			$strName = $objCategory->Name; 
+			if($objCategory)
+				array_push($arrPath , array( 'key' => $category_id , 'tag' => 'c' , 'name' => $strName , 'link' => $objCategory->Link));
+	
+		} while ($objCategory && ($category_id = $objCategory->Parent));
+		
+		$arrPath = array_reverse($arrPath);			
+
+		return $arrPath;
+	}
+
+	/**
 	 * Additional functionality
 	 */
 	public function PrintCategory($arrSelected, $strPrefix = '') {
