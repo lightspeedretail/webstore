@@ -538,6 +538,9 @@ class xlsws_product extends xlsws_index {
             return false;
         }
 
+        if (!$objProduct->ImageId)
+            $objProduct->ImageId = $this->origin_prod->ImageId;
+
 		return $objProduct;
 	}
 
