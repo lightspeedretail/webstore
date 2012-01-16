@@ -464,6 +464,8 @@ class xlsws_index extends QForm {
         $strCountryArray = array();
         $objCountries = false;
 
+		$listbox->RemoveAllItems();
+
         // Restrict Countries to defined Destinations
 		if (_xls_get_conf('SHIP_RESTRICT_DESTINATION')) {
             $strQuery = <<<EOS
@@ -512,49 +514,60 @@ EOS;
 	 * @param string $country_code :: 2 letter country code
 	 * @return integer $statesListed :: number of listed states
 	 */
-	protected function add_states_to_listbox_for_country($listbox, $country_code) {
-		$statesListed = 0;
-		$statesSeen = array();
+    protected function add_states_to_listbox_for_country($listbox, $strCountry) {
+        $strStateArray = array();
+        $objStates = array();
 
 		$listbox->RemoveAllItems();
 
-		if ($country_code) {
-			$statesSeen = $this->states_for_country_code($country_code);
-			$statesListed = count($statesSeen);
-			if (_xls_get_conf('SHIP_RESTRICT_DESTINATION')) {
-				$statesSeen = array();
-				$statesListed = 0;
-				// we are restricting destinations
-				$validDestStates = Destination::LoadByCountry($country_code,true);
+        if (!$strCountry) {
+            $listbox->AddItem('--', null);
+            return false;
+        }
 
-				if ($validDestStates) foreach ($validDestStates as $validDest) {
-					// for each valid destination, attempt to retreive the country and add the item to the listbox
-					$code = $validDest->State;
+        if (_xls_get_conf('SHIP_RESTRICT_DESTINATION')) {
+            $strQuery = <<< EOS
+SELECT DISTINCT `state` AS state
+FROM `xlsws_destination`
+WHERE `country` = "{$strCountry}"
+EOS;
 
-					if ($code) {
-						$state = State::LoadByCountryCodeCode($country_code, $code);
+            $objQuery = _dbx($strQuery, 'Query');
+            while ($arrRow = $objQuery->FetchArray())
+                $strStateArray[] = $arrRow['state'];
 
-						if ($state) {
-							$statesSeen[] = $state;
-							$statesListed++;
-						}
-					} // end if the destination had a code set
-				} // end loop over valid destinations
-			} // end if we are restricting destinations.
+            if (in_array('*', $strStateArray))
+                $strStateArray = array();
+        }
 
-			if ($statesListed) {
-				$listbox->AddItem(_sp('-- Select One --'), null);
+        if (!count($strStateArray)) {
+            $objStates = State::QueryArray(
+                QQ::AndCondition(
+                    QQ::Equal(QQN::State()->Avail, 'Y'),
+                    QQ::Equal(QQN::State()->CountryCode, $strCountry)
+                ),
+                State::GetDefaultOrdering()
+            );
+        }
+        else {
+            $objStates = State::QueryArray(
+                QQ::AndCondition(
+                    QQ::Equal(QQN::State()->Avail, 'Y'),
+                    QQ::Equal(QQN::State()->CountryCode, $strCountry),
+                    QQ::In(QQN::State()->Code, $strStateArray)
+                ),
+                State::GetDefaultOrdering()
+            );
+        }
 
-				foreach($statesSeen as $state) {
-					$listbox->AddItem($state->State, $state->Code);
-				}
-			}
-		}
+        if (count($objStates)) {
+            $listbox->AddItem(_sp('-- Select One --'), null);
+            foreach ($objStates as $objState)
+                $listbox->AddItem($objState->State, $objState->Code);
+        }
+        else $listbox->AddItem('--', null);
 
-		if (! $statesListed)
-			$listbox->AddItem('--', null);
-
-		return $statesListed;
+		return $objStates;
 	}
 
 	/**
