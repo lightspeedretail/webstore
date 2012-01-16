@@ -460,40 +460,40 @@ class xlsws_index extends QForm {
 	 * @param XLSListBox $listbox :: The ListBox widget you wish to add countries to
 	 * @return none
 	 */
-	protected function add_countries_to_listbox($listbox) {
-		$countriesSeen = array();
+    protected function add_countries_to_listbox($listbox) {
+        $strCountryArray = array();
+        $objCountries = false;
 
+        // Restrict Countries to defined Destinations
 		if (_xls_get_conf('SHIP_RESTRICT_DESTINATION')) {
-			// we are restricting destinations
+            $strQuery = <<<EOS
+SELECT DISTINCT `country` AS country
+FROM `xlsws_destination`
+WHERE `country` != "*";
+EOS;
 
-			$validDestCountries = Destination::LoadAll();
+            $objQuery = _dbx($strQuery, 'Query');
+            while ($arrRow = $objQuery->FetchArray())
+                $strCountryArray[] = $arrRow['country'];
+        }
 
-			if ($validDestCountries) foreach ($validDestCountries as $validDest) {
-				// for each valid destination, attempt to retreive the country and add the item to the listbox
-				$code = $validDest->Country;
+        if (!count($strCountryArray)) {
+            $objCountries = Country::LoadArrayByAvail(
+                'Y', Country::GetDefaultOrdering()
+            );
+        }
+        else {
+            $objCountries = Country::QueryArray(
+                QQ::AndCondition(
+                    QQ::Equal(QQN::Country()->Avail, 'Y'),
+                    QQ::In(QQN::Country()->Code, $strCountryArray)
+                ),
+                Country::GetDefaultOrdering()
+            );
+        }
 
-				if ($code && ! array_key_exists($code, $countriesSeen)) {
-					$countriesSeen[$code] = true;
-
-					$country = Country::LoadByCode($code);
-
-					if ($country) {
-						$listbox->AddItem($country->Country, $code);
-					} // end if we got a country
-				} // end if the destination had a code set
-			} // end loop over valid destinations
-		} // end if we are restricting destinations.
-
-
-		if (! count(array_keys($countriesSeen))) {
-			// either we aren't restricting destinations, or no destinations were found.
-
-			$objCountries = Country::LoadArrayByAvail('Y', QQ::Clause(QQ::OrderBy(QQN::Country()->SortOrder, QQN::Country()->Country)));
-
-			if ($objCountries) foreach ($objCountries as $objCountry) {
-				$listbox->AddItem($objCountry->Country, $objCountry->Code);
-			}
-		}
+        foreach ($objCountries as $objCountry)
+            $listbox->AddItem($objCountry->Country, $objCountry->Code);
 	}
 
 	/**
