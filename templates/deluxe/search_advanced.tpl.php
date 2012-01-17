@@ -1,5 +1,5 @@
 <div class="rounded" style="margin-left: 20px; border:1px solid #eee;">
-<h1>Advanced Search</h1>
+<h1><?php _xt('Advanced Search') ?></h1>
 </div><br />
 
 	<fieldset class="contact">

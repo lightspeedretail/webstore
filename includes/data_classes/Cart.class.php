@@ -635,8 +635,8 @@ class Cart extends CartGen {
 		$objItem->Description = $strDescription;
 		$objItem->GiftRegistryItem = $intGiftItemId;
 		$objItem->Sell = $fltSell;
-		$objItem->SellDiscount = $fltDiscount;
-		$objItem->SellBase = $objProduct->SellWeb;
+		$objItem->SellDiscount = $fltSell; //Discount comes in as 0 from LS, but we use this field for override price
+		$objItem->SellBase = $fltSell;
 		$objItem->Code = $objProduct->OriginalCode;
 		$objItem->Discount = "";
 		$objItem->DatetimeAdded = QDateTime::Now();

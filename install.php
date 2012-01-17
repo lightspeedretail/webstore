@@ -1469,7 +1469,7 @@ $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Low Inventory Threshol
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Available Inventory Message', 'INVENTORY_AVAILABLE', 'Available', 'This text will be shown when product is available for shipping. This value will only be shown if you choose Display Inventory Level in place of actual inventory value', 11, 5, NOW(), NOW(), NULL);";
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Zero or Negative Inventory Message', 'INVENTORY_ZERO_NEG_TITLE', 'This item is not currently available', 'This text will be shown in place of showing 0 or negative inventory when you choose Display Inventory Level', 11, 4, NOW(), NOW(), NULL);";
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Display Empty Categories?', 'DISPLAY_EMPTY_CATEGORY', '', 'Show categories that have no child category or images?', 8, 6, NOW(), NOW(), 'BOOL');";
-$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Display Inventory Level', 'INVENTORY_DISPLAY_LEVEL', '1', 'Display inventory messages (see below) in place of actual inventory amounts', 11, 2, NOW(), NOW(), 'BOOL');";
+$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Display Inventory Level', 'INVENTORY_DISPLAY_LEVEL', '1', 'Display inventory messages (see below) in place of actual inventory amounts', 11, 2, NOW(), NOW(), 'INVENTORY_DISPLAY_LEVEL');";
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Display Inventory', 'INVENTORY_DISPLAY', '1', 'Display the total number of items in inventory?', 11, 1, NOW(), NOW(), 'BOOL');";
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Low Inventory Message', 'INVENTORY_LOW_TITLE', 'There is low inventory for this item', 'If inventory of a product is below the low threshold, this text will be shown.', 11, 6, NOW(), NOW(), NULL);";
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Total Inventory Count', 'INVENTORY_FIELD_TOTAL', '1', 'If selected yes, the inventory figure shown will be that of  available, reserved and inventory in warehouses. If no, only that of available in store will be shown', 11, 3, NOW(), NOW(), 'BOOL');";
@@ -1523,6 +1523,7 @@ $sql[]= "INSERT into `xlsws_configuration` VALUES (NULL,'Show child products in 
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Security mode for outbound SMTP',  'EMAIL_SMTP_SECURITY_MODE',  '0',  'Automatic based on SMTP Port, or force security.',  '5',  '8', NOW() , NOW(), 'EMAIL_SMTP_SECURITY_MODE');";
 $sql[]= "INSERT into `xlsws_configuration` VALUES (NULL,'Maximum Products in Slider', 'MAX_PRODUCTS_IN_SLIDER', '64','For a custom page, max products in slider',8,11,NOW(),NOW(),'PINT');";
 $sql[]= "insert into xlsws_configuration values (null,'Update color options', 'ENABLE_COLOR_FILTER', 0, 'Enable this option to have the color drop-down menu populated on each size change',8,5,now(),now(),'BOOL');";
+$sql[]= "INSERT into `xlsws_configuration` VALUES (NULL,'Database Schema Version', 'DATABASE_SCHEMA_VERSION', '214','Used for tracking schema changes',0,0,NOW(),NOW(),NULL);";
 
 //$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug LightSpeed Soap Call', 'DEBUG_LS_SOAP_CALL', '1', 'If selected, all soap calls will be logged in the database. It is advised that you do not enable this unless advised by XSilva', 1, 16, NOW(), NOW(), 'BOOL');";
 				
@@ -1989,7 +1990,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
 				
 				$sql = "CREATE TABLE `xlsws_family` (
   `rowid` int(11) NOT NULL auto_increment,
-  `family` varchar(32) NOT NULL,
+  `family` varchar(255) NOT NULL,
   PRIMARY KEY  (`rowid`),
   UNIQUE KEY `Family` (`family`)
 ) ENGINE=MyISAM DEFAULT CHARSET=$charset";
@@ -2152,7 +2153,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
   `current` tinyint(1) default NULL,
   `description` mediumtext,
   `description_short` mediumtext,
-  `family` varchar(32) default NULL,
+  `family` varchar(255) default NULL,
   `gift_card` tinyint(1) default NULL,
   `inventoried` tinyint(1) default NULL,
   `inventory` float default NULL,

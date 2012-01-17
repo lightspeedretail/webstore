@@ -109,6 +109,19 @@ class xlsws_family extends xlsws_product_listing {
         $this->LoadFamily();
 
         parent::build_main();
+        
+		if ($this->family) {
+			$objFamily = $this->family;
+			
+			// Set Meta Description
+			_xls_add_meta_desc($objFamily->Family);
+			_xls_add_meta_keyword($objFamily->Family);
+			
+			// Set Title
+			_xls_add_page_title($objFamily->Family);
+		
+		}
+		
 
         // Set crumbtrail for Family
 		$this->crumbs[] = array(

@@ -182,8 +182,8 @@ class Customer extends CustomerGen {
 		$intStrLen = strlen($strPassword);
 
 		if ($intStrLen < _xls_get_conf('MIN_PASSWORD_LEN',0))
-			return sprintf(_sp('Password too short. Must be a minimum %s' .
-				' characters'),_xls_get_conf('MIN_PASSWORD_LEN'));
+			return sprintf(_sp('Password too short. Must be a minimum of ').' %s ' .
+				_sp('characters.'),_xls_get_conf('MIN_PASSWORD_LEN'));
 
 		if (!(strpos($strPassword, ' ') === false))
 			return _sp('Please do not use spaces in password.');

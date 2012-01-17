@@ -379,6 +379,7 @@ class fedex extends xlsws_class_shipping {
 		//$request['RequestedShipment']['SpecialServicesRequested'] = array( 'SpecialServiceTypes' => array('SIGNATURE_OPTION'), 'SignatureOptionDetail' => array('OptionType' => 'ADULT'));
 		//$request['RequestedShipment']['SignatureOptionDetail']['OptionType'] = 'ADULT';
 		//$request['RequestedShipment']['ServiceType'] = 'PRIORITY_OVERNIGHT'; // valid values STANDARD_OVERNIGHT, PRIORITY_OVERNIGHT, FEDEX_GROUND, ...
+		if ($config['origincountry'] != "CA" && $config['origincountry'] != "US") $config['originstate']=""; //Only required for these countries
 
 		$request['RequestedShipment']['PackagingType'] = $config['packaging'];
 		$request['RequestedShipment']['Shipper'] = array(
@@ -391,6 +392,8 @@ class fedex extends xlsws_class_shipping {
 			)
 		);
 
+		if ($country != "CA" && $country != "US") $state=""; //Only required for these countries
+		
 		$request['RequestedShipment']['Recipient'] = array(
 			'Address' => array(
 				'StreetLines' => array($address1 , $address2), // Destination details
@@ -509,7 +512,7 @@ class fedex extends xlsws_class_shipping {
 		}
 
 		$fields['service']->Visible = true;
-
+		asort($ret);
 		foreach($ret as $service => $rate) {
 			$desc = strtolower(str_replace("_" , " " , $service ));
 			$desc = ucfirst($desc);

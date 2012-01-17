@@ -57,7 +57,7 @@ class xlsws_contact_us extends xlsws_index {
 	 * @param none
 	 * @return none
 	 */
-	protected function build_email_widget() {
+	protected function build_email_widget($qpanel) {
 		$this->txtEmail = new XLSTextBox($this->mainPnl);
 		$this->txtEmail->Required = true;
 	}
@@ -67,7 +67,7 @@ class xlsws_contact_us extends xlsws_index {
 	 * @param none
 	 * @return none
 	 */
-	protected function build_phone_widget() {
+	protected function build_phone_widget($qpanel,$name) {
 		$this->txtPhone = new XLSTextBox($this->mainPnl);
 	}
 

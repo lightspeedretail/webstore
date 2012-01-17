@@ -148,9 +148,8 @@ class usps extends xlsws_class_shipping {
 
 			$rates = array_merge($rates,$rates_int);
 			if (!empty($rates)) {
-				foreach ($rates as $key => $val) {
-					$key = str_replace("reg","",strip_tags(html_entity_decode($key)));
-                    $key = preg_replace("/[^A-Za-z0-9\-]/", " ", $key);
+                foreach ($rates as $key => $val) {
+                    $key = $this->cleanMethodName($key);
 					$ret[$key] = new XLS_OnOff($objParent);
 					$ret[$key]->AddAction(new QClickEvent(), new QJavaScriptAction("addMethod('" . addslashes($key) . "', '" . $ret['shiptypes']->ControlId . "', '" . $ret[$key]->ControlId . "_a');"));
 					$ret[$key]->Name = $key;
@@ -254,11 +253,11 @@ class usps extends xlsws_class_shipping {
 			_xls_log("USPS: Could not get rates. " . print_r($this , true));
 			return FALSE;
 		}
-
+		
 		$fields['service']->Visible = true;
 
 		$fields['service']->RemoveAllItems();
-
+		asort($rates);
 		foreach($rates as $service=>$rate) {
 			$fields['service']->AddItem($service . " " . _xls_currency($rate)  ,  $service);
 		}
@@ -374,8 +373,17 @@ class usps extends xlsws_class_shipping {
 	}
 
 	public function setDestination($d) {
-		$this->zipDestination =$d;
+		$this->zipDestination = $d;
 	}
+
+    public function cleanMethodName($strName) {
+        $strName = html_entity_decode($strName);
+        $strName = strip_tags($strName);
+        $strName = str_replace('reg', '', $strName);
+        $strName = preg_replace("/[^A-Za-z0-9\-\ ]/", '', $strName);
+        $strName = trim($strName);
+        return $strName;
+    }
 
 	/**
 	 * getRate
@@ -404,20 +412,23 @@ class usps extends xlsws_class_shipping {
 		$retval = array();
 
 		if($this->isDomestic()) {
-			foreach($oXML->Package->Postage as $key=>$val) {
-			  $strKey=str_replace("&lt;sup&gt;&amp;reg;&lt;/sup&gt;","",$val->MailService);
-			  $strKey=str_replace("&lt;sup&gt;&amp;trade;&lt;/sup&gt;","",$strKey);
-			  $retval[''.htmlspecialchars_decode($strKey)] = floatval($val->Rate) + floatval($config['markup']);
+            foreach($oXML->Package->Postage as $key=>$val) {
+              $strKey = $val->MailService;
+              $strRate = $val->Rate;
+              $strKey = $this->cleanMethodName($strKey);
+			  $retval[$strKey] = floatval($strRate) + floatval($config['markup']);
 			}
 		} else {
 			foreach($oXML->Package->Service as $key=>$val) {
-			  $strKey=str_replace("&lt;sup&gt;&amp;reg;&lt;/sup&gt;","",$val->SvcDescription);
-			  $strKey=str_replace("&lt;sup&gt;&amp;trade;&lt;/sup&gt;","",$strKey);
-			  $retval[''.htmlspecialchars_decode($strKey)] = floatval($val->Postage) + floatval($config['markup']);
+              $strKey = $val->SvcDescription;
+              $strRate = $val->Postage;
+              $strKey = $this->cleanMethodName($strKey);
+			  $retval[$strKey] = floatval($strRate) + floatval($config['markup']);
 			}
 		}
 
 		$arrMethods = array_fill_keys($this->methods, '');
+
 
 		if($showall)
 		  return $retval;
@@ -450,8 +461,8 @@ class usps extends xlsws_class_shipping {
 		$r.= '<RateV3Request USERID="'.$this->uspsID.'">';
 		$r.='<Package ID="0">';
 		$r.='<Service>ALL</Service>';
-		$r.='<ZipOrigination>'.$this->zipOrigination.'</ZipOrigination>';
-		$r.='<ZipDestination>'.$this->zipDestination.'</ZipDestination>';
+		$r.='<ZipOrigination>'.substr($this->zipOrigination,0,5).'</ZipOrigination>';
+		$r.='<ZipDestination>'.substr($this->zipDestination,0,5).'</ZipDestination>';
 		$r.='<Pounds>'.$this->pounds.'</Pounds>';
 		$r.='<Ounces>'.$this->ounces.'</Ounces>';
 		$r.='<Size>Regular</Size>';

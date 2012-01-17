@@ -538,6 +538,9 @@ class xlsws_product extends xlsws_index {
             return false;
         }
 
+        if (!$objProduct->ImageId)
+            $objProduct->ImageId = $this->origin_prod->ImageId;
+
 		return $objProduct;
 	}
 
@@ -555,14 +558,11 @@ class xlsws_product extends xlsws_index {
 		// Additional images
 		$images = Images::LoadArrayByProductAsImage($this->prod->Rowid , QQ::Clause(QQ::OrderBy(QQN::Images()->Rowid)));
 
-		if(!$images)
-			return;
-
 		$this->arrAdditionalProdImages = $images;
 
 		// Show the main image as well
 		if(count($this->arrAdditionalProdImages) > 0)
-			$this->arrAdditionalProdImages[] = Images::Load($this->origin_prod->ImageId);
+			$this->arrAdditionalProdImages[] = Images::Load($this->prod->ImageId);
 
 		$this->pnlAdditionalProdImages->Refresh();
 	}
@@ -576,10 +576,13 @@ class xlsws_product extends xlsws_index {
         $strParameter)
     {
 
-        if (_xls_get_conf('ENABLE_COLOR_FILTER', 1)) { 
+        if (_xls_get_conf('ENABLE_COLOR_FILTER', 0)) { 
             if ($strControlId == $this->lstSize->ControlId) {
-                $this->PopulateMatrixColor($this->lstSize->SelectedValue);
-                $this->lstColor->SelectedIndex = 0;
+                $this->PopulateMatrixColor($this->lstSize->SelectedValue);                
+                 if ($this->lstColor->ItemCount == 2)
+					$this->lstColor->SelectedIndex = 1;
+				 else
+				 	$this->lstColor->SelectedIndex = 0;
             }
         }
 

@@ -568,7 +568,9 @@
 				case 'EMAIL_SMTP_SECURITY_MODE':
 					return array(0 => _sp("Autodetect") , 1 => _sp("Force No Security") , 2 => _sp("Force SSL") , 3 => _sp("Force TLS"));
 
-					
+				case 'INVENTORY_DISPLAY_LEVEL':
+					return array('1' => _sp("With Messages Defined Below") , '' => _sp("Showing Actual Numbers Remaining"));
+	
 				case 'STORE_IMAGE_LOCATION':
 					return array('DB'=>'Database' , 'FS' => 'File System');
 				default:
@@ -4313,8 +4315,23 @@
 			$this->add_config_key('EMAIL_SMTP_SECURITY_MODE' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Security mode for outbound SMTP',  'EMAIL_SMTP_SECURITY_MODE',  '0',  'Automatic based on SMTP Port, or force security.',  '5',  '8', NOW() , NOW(), 'EMAIL_SMTP_SECURITY_MODE');" , '2.1.2');
 		
 			$this->add_config_key('MAX_PRODUCTS_IN_SLIDER' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Maximum Products in Slider',  'MAX_PRODUCTS_IN_SLIDER',  '64',  'For a custom page, max products in slider.',  '8',  '11', NOW() , NOW(), 'PINT');" , '2.1.3');
+			$this->add_config_key('ENABLE_COLOR_FILTER' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Update color options',  'ENABLE_COLOR_FILTER',  '0',  'Enable this option to have the color drop-down menu populated on each size change.',  '8',  '5', NOW() , NOW(), 'BOOL');" , '2.1.4');
 		
-			
+		
+			_dbx("ALTER TABLE xlsws_family MODIFY COLUMN family varchar (255)");
+			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.1.4 patch: Changed family column to 255 characters in xlsws_family";
+
+			_dbx("ALTER TABLE xlsws_product MODIFY COLUMN family varchar (255)");
+			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.1.4 patch: Changed family column to 255 characters in xlsws_product";
+
+
+			$sql = "UPDATE xlsws_configuration SET `options`='INVENTORY_DISPLAY_LEVEL' WHERE `key`='INVENTORY_DISPLAY_LEVEL'";
+			_xls_log($sql);
+			_dbx($sql);
+			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.1.4 patch: Clarified label for Display Inventory Level";
+
+			$this->add_config_key('DATABASE_SCHEMA_VERSION' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Database Schema Version',  'DATABASE_SCHEMA_VERSION',  '214',  'Used for tracking schema changes',  '',  '', NOW() , NOW(), NULL);" , '2.1.4');
+
 			$this->arrMPnls['UpgradeWS']->Visible = true;
 			$this->arrMPnls['UpgradeWS']->Refresh();			
 

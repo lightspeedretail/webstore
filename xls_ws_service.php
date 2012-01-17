@@ -609,6 +609,18 @@ EOS;
                     }
                 }
             }
+            
+            
+            // Save family if doesn't already exist
+	        if (strlen($strFamily)>0) {
+	            $objFamily = Family::LoadByFamily($strFamily);
+	            if (!$objFamily) {
+	            	$objFamily = new Family();
+	            	$objFamily->Family = $strFamily;
+	            	$objFamily->Save();
+	            }
+            }        
+            
             return self::OK;
         }
         
@@ -1503,7 +1515,7 @@ EOS;
                 return self::OK;
             $new = false;
             // Loads tax
-            $tax = TaxCode::Load($intRowid);
+            $tax = TaxCode::LoadByCode($strCode);
             
             if(!$tax){
                 $tax = new TaxCode();
@@ -2840,12 +2852,14 @@ EOS;
             $cart = Cart::Load($intId);
             $items = CartItem::LoadArrayByCartId( $intId );
             $field = "SellBase";
-            if (_xls_get_conf('TAX_INCLUSIVE_PRICING'))
+           	if (_xls_get_conf('TAX_INCLUSIVE_PRICING'))
             	$field = "Sell";
             foreach ($items as $item)
             {
                 if ($item->SellDiscount > 0)
                     $item->$field = $item->SellDiscount;
+                    
+                
             }
             
             return $this->qobjects_to_string($items);

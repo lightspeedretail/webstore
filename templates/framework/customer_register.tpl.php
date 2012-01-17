@@ -85,14 +85,14 @@
     
 		<div class="left margin">
 	        <dl>
-	        	<dt><label for="Email"><span class="red">*</span> Email</label></dt>
+	        	<dt><label for="Email"><span class="red">*</span> <?php _xt("Email"); ?></label></dt>
 	            <dd><?php $this->txtCREmail->RenderWithError(true) ?></dd>
 	        </dl>
 		</div>
 
 		<div class="left margin">
 			<dl class="left">
-	        	<dt><label for="Confirm Email"><span class="red">*</span> Confirm Email</label></dt>
+	        	<dt><label for="Confirm Email"><span class="red">*</span> <?php _xt("Confirm Email"); ?></label></dt>
 	            <dd><?php $this->txtCRConfEmail->RenderWithError(true) ?></dd>
 			</dl>
 		</div>
@@ -100,14 +100,14 @@
     
 		<div class="left margin clear">
 	        <dl>
-	        	<dt><label for="Password"><span class="red">*</span> Password</label></dt>
+	        	<dt><label for="Password"><span class="red">*</span> <?php _xt("Password"); ?></label></dt>
 	            <dd><?php $this->txtCRPass->RenderWithError() ?></dd>
 	        </dl>
 		</div>
 
 		<div class="left margin">
 			<dl class="left">
-	        	<dt><label for="cPassword"><span class="red">*</span> Confirm Password</label></dt>
+	        	<dt><label for="cPassword"><span class="red">*</span> <?php _xt("Confirm Password"); ?></label></dt>
 	            <dd><?php $this->txtCRConfPass->RenderWithError() ?></dd>
 			</dl>
 		</div><br />
