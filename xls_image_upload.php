@@ -66,11 +66,18 @@ function errorInImport($msg, $errCode) {
 	exit(0);
 }
 
-function sucessResponse($msg='Success!') {
+function successResponse($msg='Success!') {
 	header('HTTP/1.0 200 OK');
 	header('Content-type: text/plain');
 	echo $msg;
 
+	exit(0);
+}
+
+function errorConflict($msg, $errCode) {
+	header('HTTP/1.0 409 Conflict');
+	echo $msg;
+	echo $errCode;
 	exit(0);
 }
 
@@ -124,7 +131,7 @@ function handlePost() {
 		$additionalImgIdx = $destination['image_index'] - 1;
 		$resp = $Importer->add_additional_product_image_at_index($PassKey, $destination['product_id'], $imageData, $additionalImgIdx);
 		if ($resp != XLSWService::OK) {
-			return errorInImport(
+			return errorConflict(
 				'Problem adding additional image ' . $destination['image_index'] . ' to product ' . $destination['product_id'],
 				$resp
 			);
@@ -135,7 +142,7 @@ function handlePost() {
 		$resp = $Importer->save_product_image($PassKey, $destination['product_id'], $imageData);
 
 		if ($resp != XLSWService::OK)
-			return errorInImport('Problem saving image for product ' . $destination['product_id'], $resp);
+			return errorConflict('Problem saving image for product ' . $destination['product_id'], $resp);
 
 	} else {
 		return errorInParams("Image index specified is neither > 0 nor == 0 ??");
@@ -143,7 +150,7 @@ function handlePost() {
 
 	unset($imageData);
 
-	return sucessResponse("Image saved for product " . $destination['product_id']);
+	return successResponse("Image saved for product " . $destination['product_id']);
 }
 
 handlePost();
