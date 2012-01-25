@@ -81,11 +81,11 @@ class PromoCode extends PromoCodeGen {
             return true;
             
             if (substr($strCode, 0,8) == "keyword:" && (
-                substr($strCode,8,255) == strtolower($objItem->Product->WebKeyword1,8,255) ||
-                substr($strCode,8,255) == strtolower($objItem->Product->WebKeyword2,8,255) ||
-                substr($strCode,8,255) == strtolower($objItem->Product->WebKeyword3,8,255) )              
+                trim(substr($strCode,8,255)) == strtolower($objItem->Product->WebKeyword1) ||
+                trim(substr($strCode,8,255)) == strtolower($objItem->Product->WebKeyword2) ||
+                trim(substr($strCode,8,255)) == strtolower($objItem->Product->WebKeyword3) )              
                 ) 
-            return true;
+            return true; 
            
         }  
 		  
