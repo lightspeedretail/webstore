@@ -97,7 +97,7 @@
 			</dl>
 		</div>
 
-    
+ 		<div style="clear: both;"></div>  
 		<div class="left margin clear">
 	        <dl>
 	        	<dt><label for="Password"><span class="red">*</span><?php _xt("Password"); ?></label></dt>
@@ -112,7 +112,7 @@
 			</dl>
 		</div><br />
 
-<div style="clear: both;"></div>
+
 
 			<div class="cbhtml">
         	<dl>
