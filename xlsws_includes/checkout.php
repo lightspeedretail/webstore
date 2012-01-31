@@ -230,7 +230,6 @@ class xlsws_checkout extends xlsws_index {
 	protected function build_calcshipping() {
 		$this->butCalcShipping = new QButton($this->pnlShippingAdde , 'btnCalcShipping');
 		$this->butCalcShipping->Text = _sp("Calculate shipping");
-		$this->butCalcShipping->AddAction(new QClickEvent() , new QAjaxAction('setupShipping'));
 		$this->butCalcShipping->CssClass = "button rounded";
 	}
 
@@ -755,10 +754,27 @@ class xlsws_checkout extends xlsws_index {
 	 * @return none
 	 */
 	public function setupShipping(){
-		// shipping influences the taxcode used, because this is country/state dependant.
-		// however, there is a special case when using store pickup -- in these cases, no matter the ship address, local ("default") taxcode applies...
-		// check for this first:
+        $strCountry = trim($this->txtCRShipCountry->SelectedValue);
+        $strZip = trim($this->txtCRShipZip->Text);
 
+        /**
+         * Clear out shipping fields and add placeholder
+         */
+		$this->pnlShipping->RemoveChildControls(true);
+        $this->lblShippingCost = new QLabel($this->pnlShipping);
+
+        if ($strCountry == '' || $strZip == '') { 
+            $this->lblShippingCost->Text = 
+                _sp('Please provide shipping address (Country, State,' .
+                    ' Zip/Postal Code) to receive a shipping quote.');
+			$this->blnShippingShown = false;
+			$this->shipping_fields = array();
+			return;
+		}
+
+        /**
+         * Define tax code
+         */
 		$taxCodeId = -1; // the default/indicates failure to lookup.
 		if ($this->lstShippingMethod) {
 			// we seem to have a selected shipping method.
@@ -799,17 +815,10 @@ class xlsws_checkout extends xlsws_index {
 			return;
 		}
 		$select = false;
-		$this->pnlShipping->RemoveChildControls(true);
-		$this->lblShippingCost = new QLabel($this->pnlShipping);
 
-		// do I at least have country and postcode?
-		if(trim($this->txtCRShipCountry->SelectedValue) == '' || trim($this->txtCRShipZip->Text) == '' ){
-			$this->lblShippingCost->Text = _sp('Please provide shipping address (Country, State , Zip/Postal Code) to receive a shipping quote.');
-
-			$this->blnShippingShown = false;
-			$this->shipping_fields = array();
-			return;
-		}
+        /**
+         * Define shipping methods
+         */
 
 		$this->pnlShipping->RemoveChildControls(true);
 
