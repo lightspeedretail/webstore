@@ -555,7 +555,11 @@ EOS;
             $product->WebKeyword2 = $strWebKeyword2;
             $product->WebKeyword3 = $strWebKeyword3;
             $product->Featured = $blnFeatured;
-
+	        $strFeatured = _xls_get_conf('FEATURED_KEYWORD','notset');
+	        if ($strFeatured != 'notset' && $product->Web && (
+            	$strWebKeyword1==$strFeatured || $strWebKeyword2==$strFeatured || $strWebKeyword2==$strFeatured))
+            $product->Featured=1;
+            
             // Now save the product
             try {
                 $product->Save($blnForceInsert, $blnForceUpdate, true);
