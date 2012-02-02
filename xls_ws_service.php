@@ -2874,13 +2874,14 @@ EOS;
         
         /**
          * Flush categories (But not the associations to products!)
+         * This gets called on every Update Store. We defeat the erasing if cache categorie is turned on
          * @param string $passkey
          * @return string
          */
         public function flush_category($passkey){
             $obj = new Category();
-            
-            if (_xls_get_conf('CACHE_CATEGORY','0') == '0'){
+ 
+            if (_xls_get_conf('CACHE_CATEGORY',0) != 1){ 
             try{
                 $obj->Truncate();
             }catch(Exception $e){
@@ -2896,6 +2897,8 @@ EOS;
         
         /**
          * Flushes a DB Table
+         * This gets called during a Reset Store Products for the following tables in sequence:
+         * Product, Category, Tax, TaxCode, TaxStatus, Family, ProductRelated, ProductQtyPricing, Images
          *
          * @param string $passkey
          * @param string $strObj
@@ -2904,7 +2907,7 @@ EOS;
         public function db_flush(
             $passkey
             , $strObj
-        ){
+        ){ 
             if(!$this->check_passkey($passkey))
                 return self::FAIL_AUTH;
                 
@@ -2933,8 +2936,7 @@ EOS;
             $obj = new $strObj();
             
             try{
-                _xls_log("SOAP FLUSH : $strObj ");
-                
+                QApplication::Log(E_NOTICE, 'str', "SOAP FLUSH : $strObj");
                 //For certain tables, we flush related data as well
                 switch ($strObj)
                 {
