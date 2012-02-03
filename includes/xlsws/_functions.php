@@ -677,26 +677,19 @@ function _xls_remove_leading_slash($path) {
 }
 
 /**
- * Return the Base URL for the site
- * Also perform http/https conversion if need be.
- *
- * @param boolean ssl_attempt
- * @return string url
- */
+* Return the Base URL for the site
+* Also perform http/https conversion if need be.
+*
+* @param boolean ssl_attempt
+* @return string url
+*/
 function _xls_site_dir($ssl_attempt = true) {
-	$strUrlPfx = '';
-	if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on'))
-		$strUrlPfx = 'https://';
-	else
-		$strUrlPfx = 'http://';
-
-	$strUrlPath = '';
-	if (dirname($_SERVER['PHP_SELF']) == '/')
-		$strUrlPath = '';
-	else
-		$strUrlPath = dirname($_SERVER['PHP_SELF']);
-
-	return $strUrlPfx . $_SERVER['HTTP_HOST'] . $strUrlPath;
+	$strSsl = 'http://';
+	$strHost = $_SERVER['HTTP_HOST'] . dirname(QApplication::$ScriptName);
+	
+	if ($ssl_attempt && isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on'))
+		$strSsl = 'https://';
+	return $strSsl . $strHost;
 }
 
 /**
