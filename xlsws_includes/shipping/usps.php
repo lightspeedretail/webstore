@@ -394,7 +394,7 @@ class usps extends xlsws_class_shipping {
 	*/
 	public function getRate($showall=false) {
 		if (($this->ounces + $this->pounds) == 0)
-			return false;
+			$this->pounds=1;
         $config = $this->getConfigValues('usps');
 		$request = ($this->isDomestic()) ? $this->buildDomesticRateRequest() : $this->buildInternationalRateRequest() ;
 		$this->response = $this->sendUSPSRateRequest($request);
