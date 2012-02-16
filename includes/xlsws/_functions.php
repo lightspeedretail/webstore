@@ -684,6 +684,7 @@ function _xls_remove_leading_slash($path) {
  * @return string url
  */
 function _xls_site_dir($ssl_attempt = true) {
+<<<<<<< HEAD
 	$strUrlPfx = '';
 	if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on'))
 		$strUrlPfx = 'https://';
@@ -697,6 +698,16 @@ function _xls_site_dir($ssl_attempt = true) {
 		$strUrlPath = dirname($_SERVER['PHP_SELF']);
 
 	return $strUrlPfx . $_SERVER['HTTP_HOST'] . $strUrlPath;
+=======
+	$strSsl = 'http://';
+	$strHost = $_SERVER['HTTP_HOST'] . dirname(QApplication::$ScriptName);
+	
+	if ($ssl_attempt && isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on'))
+		$strSsl = 'https://';
+	if (substr($strHost,-1)=="/") $strHost = substr($strHost, 0, -1);
+
+	return $strSsl . $strHost;
+>>>>>>> dea1096... #210 Removed trailing backslash
 }
 
 /**
