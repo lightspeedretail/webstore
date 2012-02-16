@@ -689,6 +689,8 @@ function _xls_site_dir($ssl_attempt = true) {
 	
 	if ($ssl_attempt && isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on'))
 		$strSsl = 'https://';
+	if (substr($strHost,-1)=="/") $strHost = substr($strHost, 0, -1);
+
 	return $strSsl . $strHost;
 }
 
