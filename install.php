@@ -1526,7 +1526,8 @@ $sql[]= "insert into xlsws_configuration values (null,'Update color options', 'E
 $sql[]= "INSERT into `xlsws_configuration` VALUES (NULL,'Database Schema Version', 'DATABASE_SCHEMA_VERSION', '214','Used for tracking schema changes',0,0,NOW(),NOW(),NULL);";
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Featured Keyword', 'FEATURED_KEYWORD', 'featured', 'If this keyword is one of your product keywords, the product will be featured on the Web Store homepage.', 8, 6, NOW(), NOW(), NULL);";
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug Payment Methods', 'DEBUG_PAYMENTS', '', 'If selected, WS log all activity for credit card processing and other payment methods.', 1, 18, NOW(), NOW(), 'BOOL');";
-$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug Shipping Methods', 'DEBUG_SHIPPING', '', 'If selected, WS log all activity for shipping methods.', 1, 19, NOW(), NOW(), 'BOOL');";
+$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug Payment Methods', 'DEBUG_PAYMENTS', '', 'If selected, WS log all activity for credit card processing and other payment methods.', 1, 18, NOW(), NOW(), 'BOOL');";
+$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Reset Without Flush', 'DEBUG_RESET', '', 'If selected, WS will not perform a flush on content tables when doing a Reset Store Products.', 1, 20, NOW(), NOW(), 'BOOL');";
 
 //$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug LightSpeed Soap Call', 'DEBUG_LS_SOAP_CALL', '1', 'If selected, all soap calls will be logged in the database. It is advised that you do not enable this unless advised by XSilva', 1, 16, NOW(), NOW(), 'BOOL');";
 				
