@@ -2878,18 +2878,33 @@ EOS;
          * @param string $passkey
          * @return string
          */
-        public function flush_category($passkey){
+        public function flush_category($passkey) {
+            if (!$this->check_passkey($passkey))
+                return self::FAIL_AUTH;
+
+            if (_xls_get_conf('CACHE_CATEGORY', 0) == 1)
+                return self::OK;
+
+            if (_xls_get_conf('DEBUG_RESET', 0) == 1) {
+                QApplication::Log(
+                    E_NOTICE, 'uploader',
+                    "Skipped Category flush operation due to DEBUG mode"
+                );
+                return self::OK;
+            }
+
             $obj = new Category();
- 
-            if (_xls_get_conf('CACHE_CATEGORY',0) != 1){ 
-            try{
+
+            try {
                 $obj->Truncate();
-            }catch(Exception $e){
-                _xls_log("SOAP ERROR : In flushing  Category from flush_category : " . $e);
+            }
+            catch(Exception $objExc) {
+                QApplication::Log(E_ERROR, 'uploader', 
+                    'Error flushing Category : ' . $objExc
+                );
                 return self::UNKNOWN_ERROR;
             }
-            }
-            
+
             return self::OK;
         }
         
@@ -2904,13 +2919,18 @@ EOS;
          * @param string $strObj
          * @return string
          */
-        public function db_flush(
-            $passkey
-            , $strObj
-        ){ 
-            if(!$this->check_passkey($passkey))
+        public function db_flush($passkey, $strObj) { 
+            if (!$this->check_passkey($passkey))
                 return self::FAIL_AUTH;
                 
+            if (_xls_get_conf('DEBUG_RESET', 0) == 1) {
+                QApplication::Log(
+                    E_NOTICE, 'uploader',
+                    "Skipped {$strObj} flush operation due to DEBUG mode"
+                );
+                return self::OK;
+            }
+
             if(!class_exists($strObj)){
                 _xls_log("SOAP ERROR : There is no object type of $strObj" );
                 return self::NOT_FOUND;
@@ -2990,7 +3010,14 @@ EOS;
         ){
             if(!$this->check_passkey($passkey))
                 return self::FAIL_AUTH;
-                
+            
+            if (_xls_get_conf('DEBUG_RESET', 0) == 1) {
+                QApplication::Log(
+                    E_NOTICE, 'uploader',
+                    'Skipped document flush operation due to DEBUG mode'
+                );
+                return self::OK;
+            }
 
             try{
                 _dbx("TRUNCATE `xlsws_sro`");
