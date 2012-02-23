@@ -138,7 +138,8 @@
 		class QDownArrowKeyEvent extends QKeyPressEvent {
 			protected $strCondition = 'event.keyCode == 40';
 		}
-	} else {
+	}
+	if (!QApplication::IsBrowser(QBrowserType::Macintosh)) {
 		class QEnterKeyEvent extends QKeyDownEvent {
 			protected $strCondition = 'event.keyCode == 13';
 		}
