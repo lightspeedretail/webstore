@@ -31,24 +31,9 @@
  */
 
 class destination_table extends xlsws_class_shipping {
-	public $strModuleName = "Destination Shipping";
+	protected $strModuleName = "Destination Shipping";
 	
-	public function name(){
-		$config = $this->getConfigValues(get_class($this));
-
-		if(isset($config['label']))
-			return $config['label'];
-
-		return $this->strModuleName;
-	}
-
-	public function admin_name() {
-		$config = $this->getConfigValues(get_class($this));
-		if ($config['label']!=$this->strModuleName && isset($config['label']))
-		return _sp($config['label']." (\"".$this->strModuleName."\" module)");
-		else return $this->strModuleName;
-	}
-
+	
 	/**
 	 * The Web Admin panel for configuring this shipping option
 	 *
