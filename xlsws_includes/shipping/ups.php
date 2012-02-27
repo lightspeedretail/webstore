@@ -208,6 +208,12 @@ class ups extends xlsws_class_shipping {
 		$found = 0;
 		$ret = array();
 
+		$zipcode=str_replace(" ","",$zipcode); //Remove spaces i.e. canada Z1Z 1Z1 to Z1Z1Z1
+		if (strtoupper($country)=="US")
+			$zipcode=substr($zipcode,0,5); //UPS module doesn't support Zip+4 in US
+
+
+
 		foreach($this->service_types as $type=>$desc) {
 			$upsAction =  "3";  // You want 3.  Don't change - reference API library if you want. // CleverAppz - Make this a user config?
 			$url = join(
@@ -218,7 +224,7 @@ class ups extends xlsws_class_shipping {
 					"13_product=" . $type,
 					"14_origCountry=$config[origincountry]",
 					"15_origPostal=".substr($config[originpostcode],0,5),
-					"19_destPostal=".substr($zipcode,0,5),
+					"19_destPostal=".$zipcode,
 					"22_destCountry=$country",
 					"23_weight=" . $weight,
 					"24_value=" . $cart->Total,
