@@ -31,19 +31,8 @@
  */
 
 class tier_table extends xlsws_class_shipping {
-	public function admin_name() {
-		return _sp("Tier Based Shipping");
-	}
-
-	public function name() {
-		$config = $this->getConfigValues('tier_table');
-
-		if(isset($config['label']))
-			return $config['label'];
-
-		return _sp("Tier Based Shipping");
-	}
-
+	protected $strModuleName = "Tier Based Shipping";
+	
 	// return the keys for this module
 	public function config_fields($objParent) {
 		$ret= array();

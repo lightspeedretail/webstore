@@ -33,30 +33,8 @@
 class ups extends xlsws_class_shipping {
 	public $service_types;
 
-	/**
-	 * The name of the shipping module that will be displayed in the checkout page
-	 * @return string
-	 *
-	 *
-	 */
-	public function name() {
-		$config = $this->getConfigValues(get_class($this));
-
-		if(isset($config['label']))
-			return $config['label'];
-
-		return $this->admin_name();
-	}
-
-	/**
-	 * The name of the shipping module that will be displayed in Web Admin payments
-	 * @return string
-	 *
-	 *
-	 */
-	public function admin_name() {
-		return _sp("UPS");
-	}
+	protected $strModuleName = "UPS";
+	
 
 	/**
 	 * make_ups_products populates with shipping options available through shipper

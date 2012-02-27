@@ -2,6 +2,14 @@ Changelog
 
 Please see https://github.com/lightspeedretail/webstore/issues for technical details of these issues
 
+# 2.1.6
+
+* Checkout: Corrected an issue where a state/province would be displayed multiple times on checkout when using zip codes in Destinations
+* Checkout: Improved state/province sorting order on checkout
+* Payments: Resolved a rare issue where a PayPal check payment failure may incorrectly be applied as successful
+* Uploader: Implemented new image upload error checking for LightSpeed 3.6.5
+
+
 # 2.1.5
 
 * Shipping: Resolved an issue where ZIP+4 extended Zip codes would not function in USPS or UPS modules

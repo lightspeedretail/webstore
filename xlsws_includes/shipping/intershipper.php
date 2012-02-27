@@ -38,30 +38,8 @@ class intershipper extends xlsws_class_shipping {
 	public $package_id;
 	public $boxID;
 
-	/**
-	 * The name of the shipping module that will be displayed in the checkout page
-	 * @return string
-	 *
-	 *
-	 */
-	public function name() {
-		$config = $this->getConfigValues('intershipper');
-
-		if(isset($config['label']))
-			return $config['label'];
-
-		return _sp("InterShipper");
-	}
-
-	/**
-	 * The name of the shipping module that will be displayed in Web Admin payments
-	 * @return string
-	 *
-	 *
-	 */
-	public function admin_name() {
-		return _sp("InterShipper");
-	}
+	protected $strModuleName = "InterShipper";
+	
 
 	// return the keys for this module
 	public function config_fields($objParent) {

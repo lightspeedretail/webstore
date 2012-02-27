@@ -38,26 +38,9 @@ class fedex extends xlsws_class_shipping {
 	 *
 	 *
 	 */
-	public function name() {
-		$config = $this->getConfigValues(get_class($this));
+	protected $strModuleName = "FedEx";
 
-		if(isset($config['label']))
-			return $config['label'];
-
-		return $this->admin_name();
-	}
-
-	/**
-	 * The name of the shipping module that will be displayed in Web Admin payments
-	 * @return string
-	 *
-	 *
-	 */
-	public function admin_name() {
-		return _sp("FedEx");
-	}
-
-	/**
+		/**
 	 * check() verifies nothing has changed in the configuration since initial load
 	 * @return boolean
 	 *

@@ -84,7 +84,7 @@ class Category extends CategoryGen {
                 return true;
 
             foreach ($objSubCategories as $objCategory)
-                if ($objCategory->HasChildrenOrProduct())
+                if ($objCategory->HasChildOrProduct())
                     return true;
         }
 		return false;
@@ -206,17 +206,6 @@ EOS;
 		$intCount = $arrTotal['total_matches'];
 
 		$this->intChildCount = $intCount;
-
-		$strQuery = <<<EOS
-SELECT SUM(child_count) AS total_matches
-FROM xlsws_category
-WHERE parent='{$this->intRowid}';
-EOS;
-		$objQuery = _dbx($strQuery, 'Query');
-		$arrTotal = $objQuery->FetchArray();
-		$intCount = $arrTotal['total_matches'];
-
-		$this->intChildCount += $intCount;
 
 		$strQuery = <<<EOS
 UPDATE xlsws_category

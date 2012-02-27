@@ -37,24 +37,9 @@ class flat_rate extends xlsws_class_shipping {
 	 *
 	 *
 	 */
-	public function name() {
-		$config = $this->getConfigValues(get_class($this));
+	protected $strModuleName = "Flat rate shipping";
+	
 
-		if(isset($config['label']))
-			return $config['label'];
-
-		return $this->admin_name();
-	}
-
-	/**
-	 * The name of the shipping module that will be displayed in Web Admin payments
-	 * @return string
-	 *
-	 *
-	 */
-	public function admin_name() {
-		return _sp("Flat rate shipping");
-	}
 
 	/**
 	 * The Web Admin panel for configuring this shipping option

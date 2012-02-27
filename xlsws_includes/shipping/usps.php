@@ -42,30 +42,8 @@ class usps extends xlsws_class_shipping {
 	private $methods;
 	private $response;
 
-	/**
-	 * The name of the shipping module that will be displayed in the checkout page
-	 * @return string
-	 *
-	 *
-	 */
-	public function name() {
-		$config = $this->getConfigValues(get_class($this));
-
-		if(isset($config['label']))
-			return $config['label'];
-
-		return $this->admin_name();
-	}
-
-	/**
-	 * The name of the shipping module that will be displayed in Web Admin payments
-	 * @return string
-	 *
-	 *
-	 */
-	public function admin_name() {
-		return _sp("USPS");
-	}
+	protected $strModuleName = "USPS";
+	
 
 	/**
 	 * check() verifies nothing has changed in the configuration since initial load
@@ -394,11 +372,12 @@ class usps extends xlsws_class_shipping {
 	*/
 	public function getRate($showall=false) {
 		if (($this->ounces + $this->pounds) == 0)
-			return false;
+			$this->pounds=1;
         $config = $this->getConfigValues('usps');
 		$request = ($this->isDomestic()) ? $this->buildDomesticRateRequest() : $this->buildInternationalRateRequest() ;
 		$this->response = $this->sendUSPSRateRequest($request);
-
+		if(_xls_get_conf('DEBUG_SHIPPING' , false))
+			QApplication::Log(E_ERROR, get_class($this), $this->response);
 		// Parse xml for response values
 		$oXML = new SimpleXMLElement($this->response);
 

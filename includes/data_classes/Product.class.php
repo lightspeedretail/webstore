@@ -556,7 +556,8 @@ EOS;
 		if (!$objProduct)
 			return false;
 
-		list($intInv, $intInvTotal) = $this->GetAggregateInventory();
+        list($intInv, $intInvTotal) = 
+            $this->GetAggregateInventory($objProduct->Rowid);
 
 		$objProduct->Inventory = $intInv;
 		$objProduct->InventoryTotal = $intInvTotal;

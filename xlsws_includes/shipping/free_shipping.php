@@ -31,18 +31,10 @@
  */
 
 class free_shipping extends xlsws_class_shipping {
-	public function name(){
-		$config = $this->getConfigValues(get_class($this));
 
-		if(isset($config['label']))
-			return $config['label'];
+	protected $strModuleName = "Free shipping";
+	
 
-		return $this->admin_name();
-	}
-
-	public function admin_name() {
-		return _sp("Free shipping");
-	}
 
 	// return the keys for this module
 	public function config_fields($objParent) {
