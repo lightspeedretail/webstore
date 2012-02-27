@@ -399,6 +399,14 @@ class usps extends xlsws_class_shipping {
 		$request = ($this->isDomestic()) ? $this->buildDomesticRateRequest() : $this->buildInternationalRateRequest() ;
 		$this->response = $this->sendUSPSRateRequest($request);
 
+<<<<<<< HEAD
+=======
+		if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
+			QApplication::Log(E_ERROR, get_class($this), "sending ".print_r($request,true));
+			QApplication::Log(E_ERROR, get_class($this), "receiving ".$this->response);
+		}
+
+>>>>>>> e6018b7... #206 USPS debug statements
 		// Parse xml for response values
 		$oXML = new SimpleXMLElement($this->response);
 
