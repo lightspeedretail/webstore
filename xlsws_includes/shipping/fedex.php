@@ -476,6 +476,11 @@ class fedex extends xlsws_class_shipping {
 		try {
 			$response = $client->getRates($request);
 
+			if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
+				QApplication::Log(E_ERROR, get_class($this), "sending ".print_r($request,true));
+				QApplication::Log(E_ERROR, get_class($this), "receiving ".$response);
+			}
+
 			if ($response->HighestSeverity != 'FAILURE' && $response -> HighestSeverity != 'ERROR') {
 				if ($response->RateReplyDetails) {
 					foreach ($response -> RateReplyDetails as $rateReply) {

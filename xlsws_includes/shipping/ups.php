@@ -268,6 +268,10 @@ class ups extends xlsws_class_shipping {
 			curl_close($c);
 
 			$result=explode("%",$result);
+			if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
+				QApplication::Log(E_ERROR, get_class($this), "sending ".$url);
+				QApplication::Log(E_ERROR, get_class($this), "receiving ".print_r($result,true));
+			}
 
 			if(count($result) < 9)
 				continue;
