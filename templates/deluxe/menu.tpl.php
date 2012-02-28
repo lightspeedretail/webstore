@@ -51,28 +51,38 @@ function print_childs($categ){
 	
 }
 
-?>
+function print_families(){
 
+	$strLabel=_xls_get_conf('ENABLE_FAMILIES_MENU_LABEL' , 'By Manufacturer');
+	echo '<li><a href="#">'.$strLabel;
+	echo '<img src="'.templateNamed('css').'/images/arrow-right.gif" class="arrow" style="margin: 1px 0 0 10px;" alt="'.$strLabel.'" /></a>';
+	echo '<ul>';
+	$families = Family::LoadAll();
+	foreach($families as $family) {
+		echo '<li><a href="index.php?family='.urlencode($family->Family).'">'.$family->Family.'</a></li>';
+	}
+	echo '</ul></li>';	
+
+}
+?>
+		
 		<div id="nav_products">
 			<ul>
 				<li><a href="javascript:{}"><?php _xt('Products'); ?></a>
 					<ul>
+						<?php if(_xls_get_conf('ENABLE_FAMILIES', 0)==2)
+							print_families();
+						?>
 						<?php foreach($this->menu_categories as $category):  ?>	
 							<li><a href="<?= $category->Link; ?>"><?= $category->Name; ?><?php print_childs($category); ?></li>
 						<?php endforeach; ?>
 					
-						<?php if(_xls_get_conf('ENABLE_FAMILIES', 1)): ?>
-							<li>
-								<a href="#"><?php _xt('By Manufacturer'); ?><img src="<?php echo templateNamed('css'); ?>/images/arrow-right.gif" class="arrow" style="margin: 1px 0 0 10px;" alt="Submenu" /></a>
-								<ul>
-									<?php $families = Family::LoadAll();?>
-									<?php foreach($families as $family): ?>
-										<li><a href="index.php?family=<?= urlencode($family->Family) ?>"><?= $family->Family ?></a></li>
-									<?php endforeach; ?>
-								</ul>
-							</li>	
-						<?php endif; ?>
+						<?php if(_xls_get_conf('ENABLE_FAMILIES', 0)==1)
+							print_families();
+						?>
+
 					</ul>
 				</li>
 			</ul>
 		</div>
+

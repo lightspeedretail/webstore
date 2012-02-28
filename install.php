@@ -1528,6 +1528,10 @@ $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Featured Keyword', 'FE
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug Payment Methods', 'DEBUG_PAYMENTS', '', 'If selected, WS log all activity for credit card processing and other payment methods.', 1, 18, NOW(), NOW(), 'BOOL');";
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug Payment Methods', 'DEBUG_PAYMENTS', '', 'If selected, WS log all activity for credit card processing and other payment methods.', 1, 18, NOW(), NOW(), 'BOOL');";
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Reset Without Flush', 'DEBUG_RESET', '', 'If selected, WS will not perform a flush on content tables when doing a Reset Store Products.', 1, 20, NOW(), NOW(), 'BOOL');";
+$sql[]= "UPDATE `xlsws_configuration` SET `title`='Show Families on Product Menu?',`options`='ENABLE_FAMILIES' where `key`='ENABLE_FAMILIES'";
+$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Show Families Menu label', 'ENABLE_FAMILIES_MENU_LABEL', 'By Manufacturer', '', 8, 6, NOW(), NOW(), NULL);";
+
+
 
 //$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug LightSpeed Soap Call', 'DEBUG_LS_SOAP_CALL', '1', 'If selected, all soap calls will be logged in the database. It is advised that you do not enable this unless advised by XSilva', 1, 16, NOW(), NOW(), 'BOOL');";
 				
