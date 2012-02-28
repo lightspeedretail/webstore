@@ -39,7 +39,7 @@
 		<div class="block margin">
 			<dl class="left">
 				<dt><label for="Verify"><?php _xt("Enter the text from the above image"); ?></label></dt>
-				<dd><?php $this->txtCRVerify->RenderWithError() ?></dd>
+				<dd><?php $this->txtCRVerify->Text=""; $this->txtCRVerify->RenderWithError() ?></dd>
 			</dl>
 		</div>
 
