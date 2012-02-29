@@ -243,6 +243,32 @@ class xlsws_db_maintenance extends xlsws_index {
 				"ALTER TABLE xlsws_promo_code ADD COLUMN except tinyint (1) NOT NULL DEFAULT 0 AFTER enabled "))
 				_dbx("UPDATE xlsws_promo_code SET except=0");
 			
+
+			$this->add_config_key('ENABLE_SLASHED_PRICES' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Enabled Slashed \"Original\" Prices', 'ENABLE_SLASHED_PRICES', '',
+				'If selected, will display original price slashed out and Web Price as a Sale Price.', 
+				8, 20, NOW(), NOW(), 'BOOL');");
+
+
+			//Fix some sequencing problems for Product options
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=1 where `key`='PRODUCT_COLOR_LABEL'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=2 where `key`='PRODUCT_SIZE_LABEL'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=3 where `key`='PRODUCTS_PER_PAGE'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=4 where `key`='PRODUCT_SORT_FIELD'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=5 where `key`='ENABLE_FAMILIES'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=6 where `key`='ENABLE_FAMILIES_MENU_LABEL'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=7 where `key`='ENABLE_COLOR_FILTER'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=8 where `key`='MATRIX_PRICE'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=9 where `key`='ENABLE_SLASHED_PRICES'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=10 where `key`='CHILD_SEARCH'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=11 where `key`='CACHE_CATEGORY'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=12 where `key`='DISPLAY_EMPTY_CATEGORY'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=13 where `key`='FEATURED_KEYWORD'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=14 where `key`='SITEMAP_SHOW_PRODUCTS'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=15 where `key`='HTML_DESCRIPTION'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=16 where `key`='MAX_PRODUCTS_IN_SLIDER'");
+
+
 			
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
