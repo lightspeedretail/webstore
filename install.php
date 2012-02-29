@@ -1254,6 +1254,8 @@ EOT;
 					
 				$charset = "utf8";
 				
+				//ToDo: Check for existance of tables and if they exist, skip this and go to the end. 
+				//This way we can run an install in a new folder with an existing db without destroying everything
 				
 				echo "<html>";
 				echo "<body>";
@@ -1524,10 +1526,8 @@ $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Security mode for outb
 $sql[]= "INSERT into `xlsws_configuration` VALUES (NULL,'Maximum Products in Slider', 'MAX_PRODUCTS_IN_SLIDER', '64','For a custom page, max products in slider',8,11,NOW(),NOW(),'PINT');";
 $sql[]= "insert into xlsws_configuration values (null,'Update color options', 'ENABLE_COLOR_FILTER', 0, 'Enable this option to have the color drop-down menu populated on each size change',8,5,now(),now(),'BOOL');";
 $sql[]= "INSERT into `xlsws_configuration` VALUES (NULL,'Database Schema Version', 'DATABASE_SCHEMA_VERSION', '214','Used for tracking schema changes',0,0,NOW(),NOW(),NULL);";
-$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Featured Keyword', 'FEATURED_KEYWORD', 'featured', 'If this keyword is one of your product keywords, the product will be featured on the Web Store homepage.', 8, 6, NOW(), NOW(), NULL);";
-$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug Payment Methods', 'DEBUG_PAYMENTS', '', 'If selected, WS log all activity for credit card processing and other payment methods.', 1, 18, NOW(), NOW(), 'BOOL');";
-$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug Payment Methods', 'DEBUG_PAYMENTS', '', 'If selected, WS log all activity for credit card processing and other payment methods.', 1, 18, NOW(), NOW(), 'BOOL');";
-$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Reset Without Flush', 'DEBUG_RESET', '', 'If selected, WS will not perform a flush on content tables when doing a Reset Store Products.', 1, 20, NOW(), NOW(), 'BOOL');";
+//Do not add any more statements here, upgrade db lines should be in xlsws_includes/db_maintenance.php
+
 
 //$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug LightSpeed Soap Call', 'DEBUG_LS_SOAP_CALL', '1', 'If selected, all soap calls will be logged in the database. It is advised that you do not enable this unless advised by XSilva', 1, 16, NOW(), NOW(), 'BOOL');";
 				
@@ -2828,6 +2828,14 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 				
 				
 				if($db_ok){
+				
+				
+					//Run database upgrade beyond what is included in install
+					include(XLSWS_INCLUDES . 'db_maintenance.php');
+					$objDbMaint = new xlsws_db_maintenance;
+					$objDbMaint->RunUpdateSchema();
+
+				
 					echo "<BR/><b>Don't forget to change permissions on your /includes folder back to read only, and specifically set the file includes/configuration.inc.php to 644 or world readable only! Your /includes/qcodo/cache folders need to remain writable.</b><BR/><BR/>";
 					
 					echo "Done!<BR/><BR/>";
