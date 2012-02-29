@@ -85,6 +85,27 @@ abstract class QControl extends QControlBase {
 		return $this->RenderOutput($strToReturn, $blnDisplayOutput);
     }
 
+    protected function RenderChildren($blnDisplayOutput = true) {
+        $strToReturn = '';
+
+        foreach ($this->GetChildControls() as $objControl) {
+            $strRenderMethod = $objControl->RenderMethod;
+            if (!$strRenderMethod)
+                $strRenderMethod = 'Render';
+
+            if (!$objControl->Rendered)
+                $strToReturn .= 
+                    $objControl->$strRenderMethod($blnDisplayOutput);
+        }
+
+        if ($blnDisplayOutput) {
+            print ($strToReturn);
+            return null;
+        }
+        else
+            return $strToReturn;
+    }
+
     public function __set($strName, $mixValue) {
         switch ($strName) {
             case 'RenderMethod':
