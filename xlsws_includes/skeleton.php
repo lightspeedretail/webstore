@@ -70,7 +70,8 @@ class xlsws_index extends QForm {
 	public $blnGetScreenRes = false; //true or false, get the current shopper's screen resolution
 
 	/*Shared widgets by customer register and checkout*/
-	protected $txtCREmail; //input textbox for email address
+    /*
+    protected $txtCREmail; //input textbox for email address
 	protected $txtCRFName; //input textbox for first name
 	protected $txtCRLName; //input textbox for last name
 	protected $txtCRCompany; //input textbox for company name
@@ -94,6 +95,7 @@ class xlsws_index extends QForm {
 	protected $txtCRBillCity; //input text box for billing city
 	protected $txtCRBillZip; //input text box for billing zip or postal code
 	protected $txtCRVerify; //input text box for entering the captcha image
+    */
 
 	protected $objShipStateWait; //object to hold wait icon for when a shipping state changes
 	protected $objBillStateWait; //object to hold wait icon for when a billing state changes
@@ -101,10 +103,12 @@ class xlsws_index extends QForm {
 	protected $objSameWait; //object to hold wait icon for when someone chooses shipping address is the same as billing
 	protected $saveWrap; //wrapper that goes around the save
 
+    /*
 	protected $pnlBillingAdde; //The QPanel that shows the input fields for the customer billing address
 	protected $pnlShippingAdde; //The QPanel that shows the input fields for the customer shipping address
+    */
 
-	/**
+    /**
 	 * build_menu - builds the category tree
 	 * @param none
 	 * @return none

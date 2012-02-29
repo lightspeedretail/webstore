@@ -46,6 +46,7 @@
 
 <br style="clear: both;"/>
 <?php if(isset($this->pnlPromoCode) && ($this->pnlPromoCode->Visible)): ?>
+
 <?php $this->pnlPromoCode->Render() ?>
 <?php endif; ?>
 
@@ -63,7 +64,7 @@
 <br style="clear: both;"/>
 
 			
-<?php $this->pnlVerify->Render(); ?>		  			
+<?php //$this->pnlVerify->Render(); ?>		  			
 
 
 </div>			

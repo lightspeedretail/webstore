@@ -31,6 +31,307 @@
  * and assigning template variables to the views related to the checkout page
  */
 class xlsws_checkout extends xlsws_index {
+
+    // NEW
+    protected $CustomerControl;
+
+    protected $BillingContactControl;
+    protected $ShippingContactControl;
+    protected $CalculateShippingControl;
+
+    protected $ShippingControl;
+    protected $PaymentControl;
+
+    protected $objDestination;
+    protected $objTaxCode;
+
+    // TODO
+    protected function Form_PreRender() {
+		$this->order_display($this->cart , $this->pnlCart);
+        
+        parent::Form_PreRender();
+	}
+
+    protected function BuildCustomerControl() {
+        $this->CustomerControl = $objControl = 
+            new XLSCustomerControl($this, 'CustomerContact');
+        $this->BillingContactControl = 
+            $this->CustomerControl->Billing;
+        $this->ShippingContactControl = 
+            $this->CustomerControl->Shipping;
+
+        return $objControl;
+    }
+
+    protected function UpdateCustomerControl() {
+
+    }
+
+    protected function BindCustomerControl() {
+        $this->ShippingContactControl->Address->State->AddAction(
+            new QChangeEvent(),new QAjaxAction('DoCalculateShippingClick')
+        );
+        $this->ShippingContactControl->Address->Zip->AddAction(
+            new QChangeEvent(),new QAjaxAction('DoCalculateShippingClick')
+        );
+        $this->CustomerControl->CheckSame->AddAction(
+            new QChangeEvent(),new QAjaxAction('DoCalculateShippingClick')
+        );
+    }
+
+    protected function BuildCalculateShippingControl() {
+        $this->CalculateShippingControl = $objControl = 
+            new QButton($this, 'CalculateShippingCtrl');
+        $objControl->Text = _sp('Calculate shipping');
+        $objControl->CssClass = 'button rounded';
+    }
+
+    protected function UpdateCalculateShippingControl() {
+        return $this->CalculateShippingControl;
+    }
+
+    protected function BindCalculateShippingControl() {
+        $objControl = $this->CalculateShippingControl;
+        $objControl->AddAction(
+            new QClickEvent(),
+            new QAjaxAction('DoCalculateShippingClick')
+        );
+    }
+
+    public function DoCalculateShippingClick($strFormId, $strControlId, 
+        $strParameter) {
+
+        return $this->UpdateAfterShippingAddressChange();
+    }
+
+    protected function BuildShippingControl() {
+        $this->ShippingControl = $objControl = 
+            new XLSShippingControl($this, 'Shipping');
+        $objControl->Name = 'Shipping';
+        $objControl->Template = templateNamed('checkout_shipping.tpl.php');
+        
+        return $objControl;
+    }
+
+    protected function UpdateShippingControl() {
+        $this->ShippingControl->Update();
+    }
+
+    protected function BindShippingControl() {
+    }
+
+    protected function BuildPaymentControl() {
+        $this->PaymentControl = $objControl = 
+            new XLSPaymentControl($this, 'Payment');
+        $objControl->Name = 'Payment';
+        $objControl->Template = templateNamed('checkout_payment.tpl.php');
+        
+        return $objControl;
+    }
+
+    protected function UpdatePaymentControl() {
+        $this->PaymentControl->Update();
+    }
+
+    protected function BindPaymentControl() {
+    }
+
+    public function UpdateAfterShippingAddressChange() {
+        $blnValid = $this->ValidateControlAndChildren($this->CustomerControl);
+
+        $this->ShippingControl->Enabled = $blnValid;
+        $this->PaymentControl->Enabled = $blnValid;
+
+        $this->SetDestination($blnValid);
+        $this->SetTaxCode($blnValid);
+        
+        $this->UpdateShippingControl();
+        $this->UpdatePaymentControl();
+    }
+
+    public function UpdateAfterShippingMethodChange() {
+        
+    }
+
+    protected function SetDestination($blnValid = false) {
+        if (!$blnValid) {
+            $this->objDestination = null;
+            return;
+        }
+
+        $objShippingControl = $this->ShippingContactControl;
+
+        if (!$objShippingControl) 
+            return;
+
+        $strCountry = $objShippingControl->Address->Country->Value;
+        $strState = $objShippingControl->Address->State->Value;
+        $strZip = $objShippingControl->Address->Zip->Value;
+
+        if (!$strCountry || !$strState || !$strZip)
+            return;
+
+        $objDestination = Destination::LoadMatching(
+            $strCountry, $strState, $strZip
+        );
+
+        if ($objDestination)
+            return $this->objDestination = $objDestination;
+    }
+
+    protected function SetTaxCode($blnValid = false) {
+        if (!$blnValid) {
+            $this->objTaxCode = null;
+            return;
+        }
+
+
+        if ($this->objDestination)
+            return $this->objTaxCode = $this->objDestination->Taxcode;
+        else {
+            // TODO define default Tax Code
+            // TODO condition to verify shipping method
+            return;
+        }
+    }
+
+    protected function BuildForm() {
+        $this->BuildCustomerControl();
+        $this->BuildCalculateShippingControl();
+        $this->BuildShippingControl();
+        $this->BuildPaymentControl();
+    }
+
+    protected function UpdateForm() {
+        $this->UpdateCustomerControl();
+        $this->UpdateCalculateShippingControl();
+        $this->UpdateShippingControl();
+        $this->UpdatePaymentControl();
+    }
+
+    protected function BindForm() {
+        $this->BindCustomerControl();
+        $this->BindCalculateShippingControl();
+        $this->BindShippingControl();
+        $this->BindPaymentControl();
+    }
+
+    public function __isset($strName) {
+        switch ($strName) {
+            case 'butCalcShipping':
+                if ($this->CalculateShippingControl) return true;
+                else return false;
+            case 'chkSame':
+                if ($this->CustomerControl->CheckSame) return true;
+                else return false;
+        }
+
+    }
+
+    public function __get($strName) {
+        switch ($strName) {
+            case 'txtCRFName':
+                return $this->BillingContactControl->FirstName;
+
+            case 'txtCRLName': 
+                return $this->BillingContactControl->LastName;
+
+            case 'txtCRCompany': 
+                return $this->BillingContactControl->Company;
+
+            case 'txtCRMPhone': 
+                return $this->BillingContactControl->Phone;
+
+            case 'txtCREmail': 
+                return $this->BillingContactControl->Email;
+
+            case 'txtCRBillAddr1':
+                return $this->BillingContactControl->Street1;
+            
+            case 'txtCRBillAddr2':
+                return $this->BillingContactControl->Street2;
+
+            case 'txtCRBillCity':
+                return $this->BillingContactControl->City;
+
+            case 'txtCRBillCountry':
+                return $this->BillingContactControl->Country;
+
+            case 'txtCRBillState':
+                return $this->BillingContactControl->State;
+
+            case 'txtCRBillZip':
+                return $this->BillingContactControl->Zip;
+
+            case 'txtCRShipFirstname': 
+                return $this->ShippingContactControl->FirstName;
+
+            case 'txtCRShipLastname': 
+                return $this->ShippingContactControl->LastName;
+
+            case 'txtCRShipCompany': 
+                return $this->ShippingContactControl->Company;
+
+            case 'txtCRShipPhone': 
+                return $this->ShippingContactControl->Phone;
+
+            case 'txtCRShipAddr1':
+                return $this->ShippingContactControl->Street1;
+            
+            case 'txtCRShipAddr2':
+                return $this->ShippingContactControl->Street2;
+
+            case 'txtCRShipCity':
+                return $this->ShippingContactControl->City;
+
+            case 'txtCRShipCountry':
+                return $this->ShippingContactControl->Country;
+
+            case 'txtCRShipState':
+                return $this->ShippingContactControl->State;
+
+            case 'txtCRShipZip':
+                return $this->ShippingContactControl->Zip;
+
+            case 'chkSame':
+                return $this->CustomerControl->CheckSame;
+
+            case 'butCalcShipping':
+                return $this->CalculateShippingControl;
+
+            case 'pnlCustomer':
+                return $this->BillingContactControl->Info;
+
+            case 'pnlBillingAdde':
+                return $this->BillingContactControl->Address;
+
+            case 'pnlShippingAdde':
+                return $this->ShippingContactControl;
+
+            case 'pnlShipping':
+                return $this->ShippingControl;
+
+            case 'pnlPayment':
+                return $this->PaymentControl;
+
+            case 'customer':
+                return Customer::GetCurrent();
+
+            case 'cart':
+                return Cart::GetCart();
+
+            default:
+                try { 
+                    return parent::__get($strName);
+                }
+                catch (QCallerException $objExc) {
+                    $objExc->IncrementOffset();
+                    throw $objExc;
+                }
+        }
+    }
+
+
 	/*see xlsws_index for shared widgets*/
 	protected $lstCRShipPrevious; //input select box for previously shipped addresses
 
@@ -39,8 +340,6 @@ class xlsws_checkout extends xlsws_index {
 	protected $btnSubmit; //input submit for the submit button on the bottom
 
 	protected $chkAgree; //input checkbox to agree to terms and conditions
-
-	protected $chkSame; //input checkbox for shipping is the same as billing address
 
 	protected $errSpan; //span block that displays an error on top of the checkout form if any
 
@@ -54,9 +353,6 @@ class xlsws_checkout extends xlsws_index {
 	protected $lstPaymentMethod; //input select box that shows applicable payment methods to pick from
 
 	protected $pnlCart; //The QPanel that shows the minicart at the bottom of the checkout page
-	protected $pnlCustomer; //The QPanel that shows the input fields for the customer details (name, phone email)
-	protected $pnlShipping; //The QPanel that shows the shipping options or the select shipping message when no address is entered
-	protected $pnlPayment; //The QPanel that shows the payment options or the select payment message when no address is entered
 	protected $pnlVerify; //The QPanel that shows the verification catpcha image
 
 	protected $pnlLoginRegister; //The QPanel that shows login and register buttons on the checkout page solely
@@ -68,41 +364,16 @@ class xlsws_checkout extends xlsws_index {
 	protected $cart; //Instantiated Cart object of the current shopper's cart
 	protected $giftRegistry; //Instantiated WishList object of the current shopper's cart relating to a registry (if purchased from there)
 
-	protected $blnShippingShown = false; //Boolean for whether shipping is presently shown or not
-
-	public $shipping_fields = array(); //the various fields needed for generating the shipping choice listbox
-	protected $lblShippingCost; //the label that shows the cost of shipping on the checkout page
-	protected $fltShippingCost = FALSE; //the amount of shipping, but default none
-	protected $strShippingLastMethod = false; //the last shipping method used, by default none
-
-	public $fltPaymentTotal; //the total payment amount
-	protected $lblPaymentTotal; //the label that shows total of the order
-	protected $blnPaymentShown = false; //is the total payment amount shown?
-	public $payment_fields = array(); //the various fields required to generate the payment options list box
 	protected $checktaxonly; //used in the shipping cost function to just do a recalculation of taxes and not every other aspect like shipping
 
-	public $customer; //Instantiated Customer object of the current shopper's cart
 
 	protected $butLogin; //The login button solely on the checkout page
 	protected $butRegister; //The register button solely on the checkout page
-
-	protected $butCalcShipping; //The calculate shipping button
 
 	protected $pnlPromoCode; //the Qpanel for the promo code widget
 	protected $txtPromoCode; //the textbox to enter the promo code
 	protected $btnPromoVerify; //the button that applies the promo code
 	protected $lblPromoErr; //the area where promo code return messages show
-
-	/**
-	 * Form_PreRender - Preloads important details needed before this checkout form can be rendered
-	 * @param none
-	 * @return none
-	 */
-	protected function Form_PreRender() {
-		$this->cart = Cart::GetCart();
-		$this->order_display($this->cart , $this->pnlCart);
-		parent::Form_PreRender();
-	}
 
 	/**
 	 * handle_order - handles an order if the complete_order parameter has been passed via GET or POST
@@ -200,37 +471,6 @@ class xlsws_checkout extends xlsws_index {
 				}
 			}
 		}
-	}
-
-	/**
-	 * build_shipping_panel - builds the panel that holds shipping options on checkout
-	 * @param none
-	 * @return none
-	 */
-	protected function build_shipping_panel() {
-		$this->pnlShipping = new XLSFieldSetBox($this);
-		$this->pnlShipping->Name = _sp("Shipping");
-	}
-
-	/**
-	 * build_payment_panel - builds the panel that holds payment options on checkout
-	 * @param none
-	 * @return none
-	 */
-	protected function build_payment_panel() {
-		$this->pnlPayment = new XLSFieldSetBox($this);
-		$this->pnlPayment->Name = _sp('Payment');
-	}
-
-	/**
-	 * build_calcshiping - builds the calculate shipping button on checkout
-	 * @param none
-	 * @return none
-	 */
-	protected function build_calcshipping() {
-		$this->butCalcShipping = new QButton($this->pnlShippingAdde , 'btnCalcShipping');
-		$this->butCalcShipping->Text = _sp("Calculate shipping");
-		$this->butCalcShipping->CssClass = "button rounded";
 	}
 
 	/**
@@ -345,32 +585,6 @@ class xlsws_checkout extends xlsws_index {
 	 * @return none
 	 */
 	protected function build_widgets() {
-		$this->build_email_widget($this->pnlCustomer);
-
-		//billing details
-		$this->build_fname_widget($this->pnlCustomer , 'firstname');
-		$this->build_lname_widget($this->pnlCustomer , 'lastname');
-		$this->build_company_widget($this->pnlCustomer , 'company');
-		$this->build_phone_widget($this->pnlCustomer , 'phone');
-		$this->build_add1_widget($this->pnlBillingAdde , 'billstreet1');
-		$this->build_add2_widget($this->pnlBillingAdde , 'billstreet2');
-		$this->build_country_widget($this->pnlBillingAdde , 'billcountry');
-		$this->build_state_widget($this->pnlBillingAdde , 'billstate');
-		$this->build_city_widget($this->pnlBillingAdde , 'billcity');
-		$this->build_zip_widget($this->pnlBillingAdde , 'billzip');
-		$this->build_shipsame_widget();
-
-		//shipping details
-		$this->build_fname_widget($this->pnlShippingAdde  , 'shipfirstname');
-		$this->build_lname_widget($this->pnlShippingAdde  , 'shiplastname');
-		$this->build_company_widget($this->pnlShippingAdde  , 'shipcompany');
-		$this->build_phone_widget($this->pnlShippingAdde , 'shipphone');
-		$this->build_add1_widget($this->pnlShippingAdde , 'shipstreet1');
-		$this->build_add2_widget($this->pnlShippingAdde , 'shipstreet2');
-		$this->build_country_widget($this->pnlShippingAdde , 'shipcountry');
-		$this->build_state_widget($this->pnlShippingAdde , 'shipstate');
-		$this->build_city_widget($this->pnlShippingAdde , 'shipcity');
-		$this->build_zip_widget($this->pnlShippingAdde , 'shipzip');
 		$this->build_promocode_widget();
 		$this->build_captcha_widget($this->mainPnl);
 		$this->build_notes();
@@ -383,29 +597,6 @@ class xlsws_checkout extends xlsws_index {
 	 * @return none
 	 */
 	protected function bind_widgets() {
-		$this->txtCRBillCountry->AddAction(new QChangeEvent(), new QAjaxAction('txtBillCountry_Change'));
-
-		$this->txtCRBillAddr1->AddAction(new QChangeEvent(), new QAjaxAction('BillAddrChange'));
-		$this->txtCRBillAddr2->AddAction(new QChangeEvent(), new QAjaxAction('BillAddrChange'));
-		$this->txtCRBillState->AddAction(new QChangeEvent(), new QAjaxAction('BillAddrChange'));
-		$this->txtCRBillCity->AddAction(new QChangeEvent(), new QAjaxAction('BillAddrChange'));
-		$this->txtCRBillZip->AddAction(new QChangeEvent(), new QAjaxAction('BillAddrChange'));
-		$this->txtCRBillCountry->AddAction(new QChangeEvent(), new QAjaxAction('BillAddrChange'));
-		$this->txtCRFName->AddAction(new QChangeEvent(), new QAjaxAction('BillAddrChange'));
-		$this->txtCRLName->AddAction(new QChangeEvent(), new QAjaxAction('BillAddrChange'));
-		$this->txtCRCompany->AddAction(new QChangeEvent(), new QAjaxAction('BillAddrChange'));
-
-		$this->txtCRShipAddr1->AddAction(new QChangeEvent(), new QAjaxAction('setupShipping'));
-		$this->txtCRShipAddr2->AddAction(new QChangeEvent(), new QAjaxAction('setupShipping'));
-		$this->txtCRShipState->AddAction(new QChangeEvent(), new QAjaxAction('setupShipping'));
-		$this->txtCRShipCity->AddAction(new QChangeEvent(), new QAjaxAction('setupShipping'));
-		$this->txtCRShipZip->AddAction(new QChangeEvent(), new QAjaxAction('setupShipping'));
-		$this->txtCRShipCountry->AddAction(new QChangeEvent(), new QAjaxAction('setupShipping'));
-		$this->txtCRShipFirstname->AddAction(new QChangeEvent(), new QAjaxAction('setupShipping'));
-		$this->txtCRShipLastname->AddAction(new QChangeEvent(), new QAjaxAction('setupShipping'));
-		$this->txtCRShipCompany->AddAction(new QChangeEvent(), new QAjaxAction('setupShipping'));
-		$this->txtCRShipCountry->AddAction(new QChangeEvent() , new QAjaxAction('shipCountry_Change'));
-
 		$this->butCalcShipping->AddAction(new QClickEvent() , new QAjaxAction('setupShipping'));
 		$this->btnPromoVerify->AddAction(new QClickEvent() , new QAjaxAction('validatePromoCode'));
 		$this->btnPromoVerify->AddAction(new QClickEvent() , new QToggleEnableAction($this->btnPromoVerify, false));
@@ -488,17 +679,15 @@ class xlsws_checkout extends xlsws_index {
 	 */
 	protected function build_main() {
 		global $XLSWS_VARS;
+        
+        $customer = Customer::GetCurrent();
+        $cart = Cart::GetCart();
 
-		$customer = Customer::GetCurrent();
+        $this->BuildForm();
+        $this->UpdateForm();
+        $this->BindForm();
 
 		$this->checktaxonly = false;
-
-		if(!$customer)
-			$this->customer = null;
-		else{
-			$this->customer = $customer;
-			Cart::UpdateCartCustomer(); // load the customer tax in!
-		}
 
 		if(isset($XLSWS_VARS['complete_order'])) {
 			$this->handle_order();
@@ -511,17 +700,16 @@ class xlsws_checkout extends xlsws_index {
 		// setup the cart
 		$this->pnlCart = new QPanel($this->mainPnl);
 		$this->pnlCart->Name = _sp("Cart");
-		$this->cart = Cart::GetCart();
 
-		$this->order_display($this->cart , $this->pnlCart);
+		$this->order_display($cart , $this->pnlCart);
 
-		if($this->cart->Count == 0)
+		if($cart->Count == 0)
 			_xls_display_msg(_sp("Your cart is empty. Please add items to your cart before you check out."));
 
 		$this->check_guest_checkout();
 
 		// Wait icon
-		$this->objDefaultWaitIcon = new QWaitIcon($this);
+        $this->objDefaultWaitIcon = new QWaitIcon($this);
 
 		$this->crumbs[] = array('key'=>'xlspg=cart' , 'case'=> '' , 'name'=> _sp('Cart'));
 		$this->crumbs[] = array('key'=>'xlspg=checkout' , 'case'=> '' , 'name'=> _sp('Check Out'));
@@ -532,23 +720,8 @@ class xlsws_checkout extends xlsws_index {
 		$this->errSpan = new QPanel($this);
 		$this->errSpan->CssClass='customer_reg_err_msg';
 
-		$this->pnlCustomer = new QPanel($this->mainPnl);
-		$this->pnlCustomer->Template = templateNamed("checkout_reg_account_info.tpl.php");
-
-		$this->build_shipping_panel();
-		$this->build_payment_panel();
-
-		$this->pnlBillingAdde = new QPanel($this->mainPnl);
-		$this->pnlBillingAdde->Template = templateNamed('reg_billing_address.tpl.php');
-		$this->pnlBillingAdde->CssClass = "c1";
-
-		$this->pnlShippingAdde = new QPanel($this->mainPnl);
-		$this->pnlShippingAdde->Template = templateNamed('reg_shipping_address.tpl.php');
-		$this->pnlShippingAdde->CssClass = "c2";
-
+        /*
 		$this->build_widgets();
-
-		$this->build_calcshipping();
 
 		//************ Shipping info
 		$this->checkLoginShippingFields();
@@ -562,7 +735,7 @@ class xlsws_checkout extends xlsws_index {
 		// Gift Registry check!
 		$this->check_registry();
 
-		/*The below attributes are not intended to be directly overloaded or modified*/
+		//The below attributes are not intended to be directly overloaded or modified
 		// Checkout agree
 		$this->chkAgree = new QCheckBox($this->pnlVerify);
 
@@ -573,6 +746,7 @@ class xlsws_checkout extends xlsws_index {
 		$this->btnSubmit->PrimaryButton = true;
 
 		$this->btnSubmit->AddAction(new QClickEvent(), new QServerAction('btnSubmit_Click'));
+        */
 
 		// Wait
 		$this->pnlWait = new QPanel($this->mainPnl);
@@ -589,10 +763,6 @@ class xlsws_checkout extends xlsws_index {
 		$this->pxyCheckout->CssClass = "xlshidden";
 		$this->pxyCheckout->AddAction(new QClickEvent(500) , new QServerAction('processCheckout'));
 		$this->build_login_register();
-
-		$this->setupShipping();
-
-		$this->setupPayment(true);
 	}
 
 	/**
@@ -746,22 +916,13 @@ class xlsws_checkout extends xlsws_index {
 
 		if($this->lstCRShipPrevious)
 			$this->lstCRShipPrevious->Enabled = $enable;
-	}
-
-	/**
-	 * setupShipping - Sets up the shipping cost based on the information the client has entered
-	 * @param none
-	 * @return none
-	 */
-	public function setupShipping(){
-        $strCountry = trim($this->txtCRShipCountry->SelectedValue);
-        $strZip = trim($this->txtCRShipZip->Text);
-
+        
         /**
          * Clear out shipping fields and add placeholder
          */
-		$this->pnlShipping->RemoveChildControls(true);
-        $this->lblShippingCost = new QLabel($this->pnlShipping);
+		//$this->pnlShipping->RemoveChildControls(true);
+        //$this->lblShippingCost = new QLabel($this->pnlShipping);
+        //$this->lblShippingCost = $this->ShippingControl->LabelCtrl;
 
         if ($strCountry == '' || $strZip == '') { 
             $this->lblShippingCost->Text = 
@@ -808,7 +969,7 @@ class xlsws_checkout extends xlsws_index {
 
 		$this->cart->FkTaxCodeId = $taxCodeId;
 		$this->cart->UpdateCart();
-		$this->cart->SyncSave();
+		//$this->cart->SyncSave();
 
 		if ($this->checktaxonly) {
 			$this->checktaxonly = false;
@@ -819,20 +980,22 @@ class xlsws_checkout extends xlsws_index {
         /**
          * Define shipping methods
          */
+        return;
 
-		$this->pnlShipping->RemoveChildControls(true);
+		//$this->pnlShipping->RemoveChildControls(true);
 
-		$this->lstShippingMethod = new XLSListBox($this->pnlShipping);
-		$this->lstShippingMethod->Name = _sp('Choose Shipping Method');
-		$this->lstShippingMethod->CssClass = "checkout_shipping_select";
+		//$this->lstShippingMethod = new XLSListBox($this->pnlShipping);
+		//$this->lstShippingMethod->Name = _sp('Choose Shipping Method');
+		//$this->lstShippingMethod->CssClass = "checkout_shipping_select";
 
-		$this->objDefaultWaitIcon = new QWaitIcon($this->pnlShipping);
-		$objSubmitListItemActions = array(
-			new QToggleEnableAction($this->lstShippingMethod),
-			new QAjaxAction('shippingMethod_Change'),
-		);
+		//$this->objDefaultWaitIcon = new QWaitIcon($this->pnlShipping);
+		//$objSubmitListItemActions = array(
+		//	new QToggleEnableAction($this->lstShippingMethod),
+		//	new QAjaxAction('shippingMethod_Change'),
+		//);
 
-		$this->lstShippingMethod->AddActionArray(new QChangeEvent(), $objSubmitListItemActions);
+		//$this->lstShippingMethod->AddActionArray(new QChangeEvent(), $objSubmitListItemActions);
+
 
 		// get shipping methods - sorted!
 		$shippingModules = Modules::QueryArray(
@@ -895,7 +1058,7 @@ class xlsws_checkout extends xlsws_index {
 		$this->strShippingLastMethod = $this->lstShippingMethod->SelectedValue;
 		//}
 
-		$this->lblShippingCost = new QLabel($this->pnlShipping);
+		//$this->lblShippingCost = new QLabel($this->pnlShipping);
 
 
 		$this->pnlShipping->Refresh();
@@ -906,7 +1069,7 @@ class xlsws_checkout extends xlsws_index {
 
 		$this->shippingCost();
 
-		$this->setupPayment(true);
+		//$this->setupPayment(true);
 	}
 
 	/**
@@ -1178,7 +1341,7 @@ class xlsws_checkout extends xlsws_index {
 		// save the currently selected shipping method
 		_xls_stack_add('xlsws_payment_method' , $selected);
 
-		$this->setupPayment(false);
+		//$this->setupPayment(false);
 	}
 
 	/**
@@ -1426,7 +1589,6 @@ class xlsws_checkout extends xlsws_index {
 		// hide all panels
 		$this->pnlBillingAdde->Visible = false;
 		$this->pnlCart->Visible = false;
-		$this->pnlCustomer->Visible = false;
 		$this->pnlPayment->Visible = false;
 		$this->pnlShipping->Visible = false;
 		$this->pnlShippingAdde->Visible = false;
@@ -1465,7 +1627,6 @@ class xlsws_checkout extends xlsws_index {
 	public function showFieldPanels() {
 		$this->pnlBillingAdde->Visible = true;
 		$this->pnlCart->Visible = true;
-		$this->pnlCustomer->Visible = true;
 		$this->pnlPayment->Visible = true;
 		$this->pnlShipping->Visible = true;
 		$this->pnlPromoCode->Visible = true;

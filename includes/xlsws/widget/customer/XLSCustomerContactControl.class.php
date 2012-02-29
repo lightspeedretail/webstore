@@ -5,8 +5,11 @@ class XLSCustomerContactControl extends XLSCustomerComposite {
         'Info', 'Address'
     );
 
+    protected $objInfoControl;
+    protected $objAddressControl;
+
     protected function BuildInfoControl() {
-        $objControl =  
+        $objControl = $this->objInfoControl = 
             new CustomerInfoControl($this, $this->GetChildName('Info'));
 
         $this->UpdateInfoControl();
@@ -27,7 +30,7 @@ class XLSCustomerContactControl extends XLSCustomerComposite {
     }
 
     protected function BuildAddressControl() {
-        $objControl = 
+        $objControl = $this->objAddressControl = 
             new CustomerAddressControl($this, 
             $this->GetChildName('Address'));
 
@@ -44,15 +47,18 @@ class XLSCustomerContactControl extends XLSCustomerComposite {
     }
     
     public function __get($strName) {
-        $objInfo = $this->GetChildByName('Info');
+        if (in_array($strName, $this->arrRegisteredChildren))
+            return $this->GetChildByName($strName);
+
+        $objInfo = $this->objInfoControl;
         if ($objInfo)
             if (in_array($strName, $objInfo->RegisteredChildren))
-                return $objInfo->$strName;
+                return $objInfo->GetChildByName($strName);
 
-        $objAddress = $this->GetChildByName('Address');
+        $objAddress = $this->objAddressControl;
         if ($objAddress)
             if (in_array($strName, $objAddress->RegisteredChildren))
-                return $objAddress->$strName;
+                return $objAddress->GetChildByName($strName);
 
         try {
             return parent::__get($strName);

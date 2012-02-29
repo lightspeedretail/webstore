@@ -84,6 +84,32 @@ abstract class QControl extends QControlBase {
 
 		return $this->RenderOutput($strToReturn, $blnDisplayOutput);
     }
+
+    public function __set($strName, $mixValue) {
+        switch ($strName) {
+            case 'RenderMethod':
+                try { 
+                    $this->blnModified = true;
+                    $this->strRenderMethod = QType::Cast(
+                        $mixValue, QType::String
+                    );
+                    break;
+                }
+                catch (QInvalidCastException $objExc) {
+                    $objExc->IncrementOffset();
+                    throw $objExc;
+                }
+            default:
+                try { 
+                    parent::__set($strName, $mixValue);
+                    break;
+                }
+                catch (QCallerException $objExc) { 
+                    $objExc->IncrementOffset();
+                    throw $objExc;
+                }
+        }
+    }
 }
 
 ?>

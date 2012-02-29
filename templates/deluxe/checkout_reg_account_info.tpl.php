@@ -33,21 +33,21 @@
 		<div class="left margin">
 			<dl>
 				<dt><label for="Name"><span class="red">*</span> <?php _xt("First Name"); ?></label></dt>
-				<dd><?php $this->txtCRFName->RenderWithError() ?></dd>
+				<dd><?php $this->txtCRFName->RenderWithError(); ?></dd>
 			</dl>
 		</div>
 
 		<div class="left margin">
 			<dl class="left">
 				<dt><label for="Name"><span class="red">*</span> <?php _xt("Last Name"); ?></label></dt>
-				<dd><?php $this->txtCRLName->RenderWithError() ?></dd>
+				<dd><?php $this->txtCRLName->RenderWithError(); ?></dd>
 			</dl>
 		</div>
 
 		<div class="left margin clear">
 			<dl>
 				<dt><label for="Company"><?php _xt("Company"); ?></label></dt>
-				<dd><?php $this->txtCRCompany->Render() ?></dd>
+				<dd><?php $this->txtCRCompany->Render(); ?></dd>
 			</dl><br />
 		</div>
 
