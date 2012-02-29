@@ -1,5 +1,5 @@
 
-<fieldset>
+<fieldset class="xlsfset">
     <legend> <?= _sp($_CONTROL->Name) ?> </legend>
 
     <div class="left">

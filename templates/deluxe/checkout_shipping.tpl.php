@@ -1,5 +1,5 @@
 
-<fieldset>
+<fieldset class="xlsfset">
     <legend> <?= _sp($_CONTROL->Name) ?> </legend>
 
     <div class="left">
@@ -25,7 +25,8 @@
                 $_CONTROL->Label->Render();
                 ?>
                 <?php if ($_CONTROL->ValidationError): ?>
-                <br><span class="warning">
+                <br>
+                <span class="warning">
                     <?= $_CONTROL->ValidationError ?>
                 </span>
                 <?php
