@@ -135,7 +135,7 @@ class Cart extends CartGen {
 		$customer = Customer::GetCurrent();
 		$cart = Cart::GetCart();
 
-		if($customer){
+		if ($customer && $customer->Rowid) {
 			$cart->Customer = $customer;
 			$dest = Destination::LoadMatching(
 				$customer->Country2,
