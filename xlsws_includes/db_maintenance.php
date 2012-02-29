@@ -31,17 +31,17 @@
  */
 class xlsws_db_maintenance extends xlsws_index {
 
-	
-	public static function UpdateSchema() {
-		
+	public function RunUpdateSchema() {		
 
-			self::perform_schema_changes();
-
-	
-		}
+		return $this->perform_schema_changes();
+ 
+	}
 
 	
 	private function perform_schema_changes() {
+	
+		$strUpgradeText = "";
+		
 		$this->check_column_type('xlsws_cart_item' , 'qty' , 'float' , 'NOT NULL' , '2.0.1');
 			$this->check_column_type('xlsws_product_related' , 'qty' , 'float' , 'NULL DEFAULT NULL' , '2.0.1');
 			$this->add_config_key('QTY_FRACTION_PURCHASE' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Allow Qty-purchase in fraction', 'QTY_FRACTION_PURCHASE', '0', 'If enabled, customers will be able to purchase items in fractions. E.g. 0.5 of an item can ordered by a customer.', 0, 10, NOW(), NOW(), 'BOOL');" , '2.0.1');
@@ -104,38 +104,34 @@ class xlsws_db_maintenance extends xlsws_index {
 			
 			$this->add_column('xlsws_category' , 'child_count' , "ALTER TABLE  `xlsws_category` ADD  `child_count` INT NULL DEFAULT  '1' AFTER  `position` " , '2.0.2');
 			
-			$sql = "UPDATE xlsws_cart SET downloaded=1";
-			_dbx($sql);
-			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.0.2 patch: Set all previous orders as downloaded";
-
 			$sql = "DELETE FROM xlsws_configuration where title='Moderate Customer Registration'";
 			_dbx($sql);
-			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.0.3 patch: Removed 'Moderate Customer Registration' Option";
+			$strUpgradeText .= "<br/>2.0.3 patch: Removed 'Moderate Customer Registration' Option";
 
 			$sql = "DELETE FROM xlsws_configuration where title='Newsletter'";
 			_dbx($sql);
-			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.0.3 patch: Removed 'Newsletter' Option";
+			$strUpgradeText .= "<br/>2.0.3 patch: Removed 'Newsletter' Option";
 
 
 			$sql = "UPDATE xlsws_configuration SET helper_text='Show the number of items in inventory?' WHERE title='Display Inventory'";
 			_dbx($sql);
-			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.0.3 patch: Changed display inventory helper text";
+			$strUpgradeText .= "<br/>2.0.3 patch: Changed display inventory helper text";
 
 			$sql = "UPDATE xlsws_configuration SET helper_text='Show the messages below instead of the amounts in inventory' WHERE title='Display Inventory Level'";
 			_dbx($sql);
-			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.0.3 patch: Changed display inventory level helper text";
+			$strUpgradeText .= "<br/>2.0.3 patch: Changed display inventory level helper text";
 
 			$sql = "UPDATE xlsws_configuration SET helper_text='Make your URLs search engine friendly (www.example.com/category.html instead of www.example.com/index.php?id=123)' WHERE title='Use SEO-Friendly URL'";
 			_dbx($sql);
-			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.0.3 patch: Changed SEO friendly URLs helper text";
+			$strUpgradeText .= "<br/>2.0.3 patch: Changed SEO friendly URLs helper text";
 
 			$sql = "UPDATE xlsws_configuration SET helper_text='Authorized IPs for Admin Panel (comma seperated) - DO NOT USE WITH DYNAMIC IP ADDRESSES' WHERE title='Authorized IPs For Web Store Admin'";
 			_dbx($sql);
-			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.0.3 patch: Changed SEO friendly URLs helper text";
+			$strUpgradeText .= "<br/>2.0.3 patch: Changed SEO friendly URLs helper text";
 
 			$sql = "DELETE FROM xlsws_configuration where title='Newsletter'";
 			_dbx($sql);
-			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.0.3 patch: Removed 'Newsletter' Option";
+			$strUpgradeText .= "<br/>2.0.3 patch: Removed 'Newsletter' Option";
 			$this->add_config_key('HTML_DESCRIPTION' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Ignore line breaks in long description', 'HTML_DESCRIPTION', '0', 'If you are utilizing HTML primarily within your web long descriptions, you may want this option on', 8,8 , NOW(), NOW(), 'BOOL');" , '2.0.7');
 			$this->add_config_key('MATRIX_PRICE' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Hide price of matrix master product', 'MATRIX_PRICE', '0', 'If you do not want to show the price of your master product in a size/color matrix, turn this option on', 8,9 , NOW(), NOW(), 'BOOL');" , '2.0.7');
 
@@ -171,7 +167,7 @@ class xlsws_db_maintenance extends xlsws_index {
 				) ENGINE=MyISAM  DEFAULT CHARSET=utf8" , '2.1');
 
 			$this->add_column('xlsws_cart' , 'fk_promo_id' , "ALTER TABLE  `xlsws_cart` ADD  `fk_promo_id` int(5) DEFAULT  NULL " , '2.1');
-			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.1 patch: Added fk_promo_id to cart table for promo codes";
+			$strUpgradeText .= "<br/>2.1 patch: Added fk_promo_id to cart table for promo codes";
 			$this->add_config_key('SESSION_HANDLER' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Session storage', 'SESSION_HANDLER', 'FS', 'Store sessions in the database or file system?', 1, 6, NOW(), NOW(), 'STORE_IMAGE_LOCATION');" , '2.1');
 			$this->add_config_key('CHILD_SEARCH' , "INSERT into `xlsws_configuration` VALUES (NULL,'Show child products in search results', 'CHILD_SEARCH', '','If you want child products from a size color matrix to show up in search results, enable this option',8,10,NOW(),NOW(),'BOOL');" , '2.1');
 	
@@ -182,19 +178,20 @@ class xlsws_db_maintenance extends xlsws_index {
 		
 		
 			_dbx("ALTER TABLE xlsws_family MODIFY COLUMN family varchar (255)");
-			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.1.4 patch: Changed family column to 255 characters in xlsws_family";
+			$strUpgradeText .= "<br/>2.1.4 patch: Changed family column to 255 characters in xlsws_family";
 
 			_dbx("ALTER TABLE xlsws_product MODIFY COLUMN family varchar (255)");
-			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.1.4 patch: Changed family column to 255 characters in xlsws_product";
+			$strUpgradeText .= "<br/>2.1.4 patch: Changed family column to 255 characters in xlsws_product";
 
 
 			$sql = "UPDATE xlsws_configuration SET `options`='INVENTORY_DISPLAY_LEVEL' WHERE `key`='INVENTORY_DISPLAY_LEVEL'";
 			_dbx($sql);
-			$this->arrMPnls['UpgradeWS']->Text .= "<br/>2.1.4 patch: Clarified label for Display Inventory Level";
+			$strUpgradeText .= "<br/>2.1.4 patch: Clarified label for Display Inventory Level";
 
 			$this->add_config_key('DATABASE_SCHEMA_VERSION' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Database Schema Version',  'DATABASE_SCHEMA_VERSION',  '214',  'Used for tracking schema changes',  '',  '', NOW() , NOW(), NULL);" , '2.1.4');
 
 
+			return $strUpgradeText;
 	}
 	
 	
@@ -207,12 +204,12 @@ class xlsws_db_maintenance extends xlsws_index {
 			
 			
 			if($res && ($row = $res->GetNextRow())){
-				$this->arrMPnls['UpgradeWS']->Text .= "<br/>" . sprintf(_sp("%s patch: %s already exists in table %s"), $version , $column , $table);
+				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s already exists in table %s"), $version , $column , $table);
 				return;
 			}
 						
 			_dbx($create_sql);	
-			$this->arrMPnls['UpgradeWS']->Text .= "<br/>" . sprintf(_sp("%s patch: %s.%s added.") , $version , $table , $column);
+			$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s.%s added.") , $version , $table , $column);
 			
 		}
 		
@@ -224,24 +221,24 @@ class xlsws_db_maintenance extends xlsws_index {
 				$version = _xls_version();
 			
 			if(!$res){
-				$this->arrMPnls['UpgradeWS']->Text .= "<br/>" . sprintf(_sp("Fatal Error: %s not found in table %s. Contact xsilva support") , $column , $table);
+				$strUpgradeText .= "<br/>" . sprintf(_sp("Fatal Error: %s not found in table %s. Contact xsilva support") , $column , $table);
 				return;
 			}
 			
 			$row = $res->GetNextRow();
 			
 			if(!$row){
-				$this->arrMPnls['UpgradeWS']->Text .= "<br/>" . sprintf(_sp("Fatal Error: %s not found in table %s. Contact xsilva support") , $column , $table);
+				$strUpgradeText .= "<br/>" . sprintf(_sp("Fatal Error: %s not found in table %s. Contact xsilva support") , $column , $table);
 				return;
 			}
 			
 			$ctype = $row->GetColumn('Type');
 			
 			if($ctype == $type){
-				$this->arrMPnls['UpgradeWS']->Text .= "<br/>" . sprintf(_sp("%s patch: %s already exists in table %s of type %s."), $version , $column , $table , $type);
+				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s already exists in table %s of type %s."), $version , $column , $table , $type);
 			}else{
 				_dbx("ALTER TABLE  `$table` CHANGE  `$column`  `$column` $type  $misc ;");
-				$this->arrMPnls['UpgradeWS']->Text .= "<br/>" . sprintf(_sp("%s patch: %s.%s changed to type %s.") , $version , $table , $column , $type);
+				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s.%s changed to type %s.") , $version , $table , $column , $type);
 			}
 		}
 
@@ -271,9 +268,9 @@ class xlsws_db_maintenance extends xlsws_index {
 			
 			if($apply){
 				_dbx("ALTER TABLE  `$table` ADD INDEX (  `$column` )");	
-				$this->arrMPnls['UpgradeWS']->Text .= "<br/>" . sprintf(_sp("%s patch: %s.%s indexed.") , $version , $table , $column);
+				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s.%s indexed.") , $version , $table , $column);
 			}else{
-				$this->arrMPnls['UpgradeWS']->Text .= "<br/>" . sprintf(_sp("%s patch: %s.%s index already exists."), $version , $table  , $column);
+				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s.%s index already exists."), $version , $table  , $column);
 			}
 			
 		}
@@ -288,9 +285,9 @@ class xlsws_db_maintenance extends xlsws_index {
 			
 			if(!$conf){
 				_dbx($sql);
-				$this->arrMPnls['UpgradeWS']->Text .= "<br/>" . sprintf(_sp("%s patch: Added configuration key %s.") , $version , $key);
+				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: Added configuration key %s.") , $version , $key);
 			}else{
-				$this->arrMPnls['UpgradeWS']->Text .= "<br/>" . sprintf(_sp("%s patch: Configuration key %s already exists."), $version , $key);
+				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: Configuration key %s already exists."), $version , $key);
 			}
 			
 			
@@ -320,9 +317,9 @@ class xlsws_db_maintenance extends xlsws_index {
 			
 			if($apply){
 				_dbx($create_sql);	
-				$this->arrMPnls['UpgradeWS']->Text .= "<br/>" . sprintf(_sp("%s patch: %s created.") , $version , $table );
+				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s created.") , $version , $table );
 			}else{
-				$this->arrMPnls['UpgradeWS']->Text .= "<br/>" . sprintf(_sp("%s patch: %s already exists."), $version , $table );
+				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s already exists."), $version , $table );
 			}
 		}
 		
@@ -356,13 +353,13 @@ class xlsws_db_maintenance extends xlsws_index {
 				try{
 					_dbx($sql);
 				}catch(Exception $c){
-					$this->arrMPnls['UpgradeWS']->Text .= "<br/>" . sprintf(_sp("%s patch: !!!FAILED!!!! %s created row %s.") , $version , $table , print_r($columns , true));
+					$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: !!!FAILED!!!! %s created row %s.") , $version , $table , print_r($columns , true));
 					return;
 				}	
 				
-				$this->arrMPnls['UpgradeWS']->Text .= "<br/>" . sprintf(_sp("%s patch: %s created row %s.") , $version , $table , print_r($columns , true));
+				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s created row %s.") , $version , $table , print_r($columns , true));
 			}else{
-				$this->arrMPnls['UpgradeWS']->Text .= "<br/>" . sprintf(_sp("%s patch: %s already contains %s."), $version , $table , print_r($columns , true) );
+				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s already contains %s."), $version , $table , print_r($columns , true) );
 			}
 		}
 		
@@ -376,7 +373,7 @@ class xlsws_db_maintenance extends xlsws_index {
 			$sql = "UPDATE $table SET $value_column = $value WHERE $key_column =  $key ";
 			_xls_log($sql);
 			_dbx($sql);
-			$this->arrMPnls['UpgradeWS']->Text .= "<br/>" . sprintf(_sp("%s patch: %s updated record %s with value %s.") , $version , $table , $key , $value);
+			$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s updated record %s with value %s.") , $version , $table , $key , $value);
 		}
 		
 		

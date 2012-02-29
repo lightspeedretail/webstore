@@ -3997,7 +3997,8 @@
 			
 			//Include db_maint class to access update functions
 			include(XLSWS_INCLUDES . 'db_maintenance.php');
-			//xlsws_db_maintenance::UpdateSchema();
+			$objDbMaint = new xlsws_db_maintenance;
+			$this->arrMPnls['UpgradeWS']->Text = $objDbMaint->RunUpdateSchema();
 						
 			$this->arrMPnls['UpgradeWS']->Visible = true;
 			$this->arrMPnls['UpgradeWS']->Refresh();			
