@@ -42,7 +42,12 @@ class xlsws_db_maintenance extends xlsws_index {
 	
 		$strUpgradeText = "";
 		
-		$this->check_column_type('xlsws_cart_item' , 'qty' , 'float' , 'NOT NULL' , '2.0.1');
+		//Prior to 2.1.4, we didn't have a schema version number so we still have to go from the beginning
+		$intCurrentSchema = _xls_get_conf('DATABASE_SCHEMA_VERSION', '0');
+		if ($intCurrentSchema<214)
+		{
+			
+			$this->check_column_type('xlsws_cart_item' , 'qty' , 'float' , 'NOT NULL' , '2.0.1');
 			$this->check_column_type('xlsws_product_related' , 'qty' , 'float' , 'NULL DEFAULT NULL' , '2.0.1');
 			$this->add_config_key('QTY_FRACTION_PURCHASE' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Allow Qty-purchase in fraction', 'QTY_FRACTION_PURCHASE', '0', 'If enabled, customers will be able to purchase items in fractions. E.g. 0.5 of an item can ordered by a customer.', 0, 10, NOW(), NOW(), 'BOOL');" , '2.0.1');
 			$this->add_config_key('CACHE_CATEGORY' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Cache category', 'CACHE_CATEGORY', '0', 'If you have a large category tree and large product database, you may gain performance by caching the category tree parsing. ', 8,6 , NOW(), NOW(), 'BOOL');" , '2.0.1');
@@ -50,11 +55,11 @@ class xlsws_db_maintenance extends xlsws_index {
 
 			$this->check_index_exists('xlsws_product','featured','2.0.1');
 			$this->add_table('xlsws_view_log_type' , "CREATE TABLE `xlsws_view_log_type` (
-  `rowid` bigint(20) NOT NULL auto_increment,
-  `name` varchar(32) NOT NULL,
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1" , '2.0.1');
+			  `rowid` bigint(20) NOT NULL auto_increment,
+			  `name` varchar(32) NOT NULL,
+			  PRIMARY KEY  (`rowid`),
+			  UNIQUE KEY `name` (`name`)
+			) ENGINE=MyISAM DEFAULT CHARSET=latin1" , '2.0.1');
 
 			$this->insert_row('xlsws_view_log_type' , array('rowid' => 1 , 'name' =>  'index') , '2.0.1');
 			$this->insert_row('xlsws_view_log_type' , array('rowid' => 2 , 'name' =>  'categoryview') , '2.0.1');
@@ -106,32 +111,26 @@ class xlsws_db_maintenance extends xlsws_index {
 			
 			$sql = "DELETE FROM xlsws_configuration where title='Moderate Customer Registration'";
 			_dbx($sql);
-			$strUpgradeText .= "<br/>2.0.3 patch: Removed 'Moderate Customer Registration' Option";
 
 			$sql = "DELETE FROM xlsws_configuration where title='Newsletter'";
 			_dbx($sql);
-			$strUpgradeText .= "<br/>2.0.3 patch: Removed 'Newsletter' Option";
 
 
 			$sql = "UPDATE xlsws_configuration SET helper_text='Show the number of items in inventory?' WHERE title='Display Inventory'";
 			_dbx($sql);
-			$strUpgradeText .= "<br/>2.0.3 patch: Changed display inventory helper text";
 
 			$sql = "UPDATE xlsws_configuration SET helper_text='Show the messages below instead of the amounts in inventory' WHERE title='Display Inventory Level'";
 			_dbx($sql);
-			$strUpgradeText .= "<br/>2.0.3 patch: Changed display inventory level helper text";
 
 			$sql = "UPDATE xlsws_configuration SET helper_text='Make your URLs search engine friendly (www.example.com/category.html instead of www.example.com/index.php?id=123)' WHERE title='Use SEO-Friendly URL'";
 			_dbx($sql);
-			$strUpgradeText .= "<br/>2.0.3 patch: Changed SEO friendly URLs helper text";
 
 			$sql = "UPDATE xlsws_configuration SET helper_text='Authorized IPs for Admin Panel (comma seperated) - DO NOT USE WITH DYNAMIC IP ADDRESSES' WHERE title='Authorized IPs For Web Store Admin'";
 			_dbx($sql);
-			$strUpgradeText .= "<br/>2.0.3 patch: Changed SEO friendly URLs helper text";
 
 			$sql = "DELETE FROM xlsws_configuration where title='Newsletter'";
 			_dbx($sql);
-			$strUpgradeText .= "<br/>2.0.3 patch: Removed 'Newsletter' Option";
+
 			$this->add_config_key('HTML_DESCRIPTION' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Ignore line breaks in long description', 'HTML_DESCRIPTION', '0', 'If you are utilizing HTML primarily within your web long descriptions, you may want this option on', 8,8 , NOW(), NOW(), 'BOOL');" , '2.0.7');
 			$this->add_config_key('MATRIX_PRICE' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Hide price of matrix master product', 'MATRIX_PRICE', '0', 'If you do not want to show the price of your master product in a size/color matrix, turn this option on', 8,9 , NOW(), NOW(), 'BOOL');" , '2.0.7');
 
@@ -167,7 +166,7 @@ class xlsws_db_maintenance extends xlsws_index {
 				) ENGINE=MyISAM  DEFAULT CHARSET=utf8" , '2.1');
 
 			$this->add_column('xlsws_cart' , 'fk_promo_id' , "ALTER TABLE  `xlsws_cart` ADD  `fk_promo_id` int(5) DEFAULT  NULL " , '2.1');
-			$strUpgradeText .= "<br/>2.1 patch: Added fk_promo_id to cart table for promo codes";
+
 			$this->add_config_key('SESSION_HANDLER' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Session storage', 'SESSION_HANDLER', 'FS', 'Store sessions in the database or file system?', 1, 6, NOW(), NOW(), 'STORE_IMAGE_LOCATION');" , '2.1');
 			$this->add_config_key('CHILD_SEARCH' , "INSERT into `xlsws_configuration` VALUES (NULL,'Show child products in search results', 'CHILD_SEARCH', '','If you want child products from a size color matrix to show up in search results, enable this option',8,10,NOW(),NOW(),'BOOL');" , '2.1');
 	
@@ -186,31 +185,89 @@ class xlsws_db_maintenance extends xlsws_index {
 
 			$sql = "UPDATE xlsws_configuration SET `options`='INVENTORY_DISPLAY_LEVEL' WHERE `key`='INVENTORY_DISPLAY_LEVEL'";
 			_dbx($sql);
-			$strUpgradeText .= "<br/>2.1.4 patch: Clarified label for Display Inventory Level";
+			
+			$this->add_config_key('DATABASE_SCHEMA_VERSION' , 
+			"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Database Schema Version',  
+			'DATABASE_SCHEMA_VERSION',  '214',  'Used for tracking schema changes',  '',  '', NOW() , NOW(), NULL);" , '2.1.4');
 
-			$this->add_config_key('DATABASE_SCHEMA_VERSION' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Database Schema Version',  'DATABASE_SCHEMA_VERSION',  '214',  'Used for tracking schema changes',  '',  '', NOW() , NOW(), NULL);" , '2.1.4');
+			$strUpgradeText .= "<br/>Upgrading to Database schema 214";
+
+			$intCurrentSchema=214;
+		}
+		
+		//ToDO: REMOVE BEFORE RELEASE
+		$intCurrentSchema=214; //This is just to let the following code run while we're testing	
+
+		//Upgrade to 220 schema for WS2.2
+		if ($intCurrentSchema==214)
+		{
+		
+			//@Todo: Add any 2.2 changes here
+			
+			$this->add_config_key('FEATURED_KEYWORD' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Featured Keyword', 'FEATURED_KEYWORD', 'featured',
+				'If this keyword is one of your product keywords, the product will be featured on the Web Store homepage.', 
+				8, 6, NOW(), NOW(), NULL);" , '2.2.0');
 
 
-			return $strUpgradeText;
+			//Add debug keys
+			$this->add_config_key('DEBUG_PAYMENTS' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug Payment Methods', 'DEBUG_PAYMENTS', '',
+				'If selected, WS logs all activity for credit card processing and other payment methods.', 
+				1, 18, NOW(), NOW(), 'BOOL');");
+			$this->add_config_key('DEBUG_SHIPPING' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug Shipping Methods', 'DEBUG_SHIPPING', '',
+				'If selected, WS logs all activity for shipping processing.', 
+				1, 19, NOW(), NOW(), 'BOOL');");
+			$this->add_config_key('DEBUG_RESET' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Reset Without Flush', 'DEBUG_RESET', '',
+				'If selected, WS will not perform a flush on content tables when doing a Reset Store Products.', 
+				1, 20, NOW(), NOW(), 'BOOL');");
+
+
+			//Families menu labeling
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Show Families on Product Menu?',
+				`options`='ENABLE_FAMILIES' where `key`='ENABLE_FAMILIES'");
+			
+			$this->add_config_key('ENABLE_FAMILIES_MENU_LABEL' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Show Families Menu label', 
+				'ENABLE_FAMILIES_MENU_LABEL', 'By Manufacturer', '', 8, 6, NOW(), NOW(), NULL);");
+
+
+			//Promo code table changes
+			if ($this->add_column('xlsws_promo_code' , 'enabled' ,
+				"ALTER TABLE xlsws_promo_code ADD COLUMN enabled tinyint (1) NOT NULL DEFAULT 1 AFTER rowid "))
+			_dbx("UPDATE xlsws_promo_code SET enabled=1");
+			
+			if ($this->add_column('xlsws_promo_code' , 'except' ,
+				"ALTER TABLE xlsws_promo_code ADD COLUMN except tinyint (1) NOT NULL DEFAULT 0 AFTER enabled "))
+				_dbx("UPDATE xlsws_promo_code SET except=0");
+			
+			
+			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
+			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
+			$config->Value="220";
+			$config->Save();
+		
+		
+		}
+		
+		
+
+		return $strUpgradeText;
 	}
 	
 	
 	
-	private function add_column($table , $column , $create_sql , $version = false){
+	private function add_column($table , $column , $create_sql , $version = false) {
+
 			$res = _dbx("SHOW COLUMNS FROM $table WHERE Field='$column'" , 'Query');
-			
-			if(!$version)
-				$version = _xls_version();
-			
-			
-			if($res && ($row = $res->GetNextRow())){
-				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s already exists in table %s"), $version , $column , $table);
-				return;
-			}
+						
+			if($res && ($row = $res->GetNextRow()))
+				return false;
 						
 			_dbx($create_sql);	
-			$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s.%s added.") , $version , $table , $column);
-			
+			return true;
 		}
 		
 		
@@ -275,22 +332,13 @@ class xlsws_db_maintenance extends xlsws_index {
 			
 		}
 		
-		private function add_config_key($key , $sql , $version = false){
-			
-			
-			if(!$version)
-				$version = _xls_version();
+		private function add_config_key($key , $sql, $version = false) {
 
 			$conf = Configuration::LoadByKey($key);
 			
-			if(!$conf){
+			if(!$conf)
 				_dbx($sql);
-				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: Added configuration key %s.") , $version , $key);
-			}else{
-				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: Configuration key %s already exists."), $version , $key);
-			}
-			
-			
+						
 		}
 		
 		private function add_table($table , $create_sql ,  $version = false){

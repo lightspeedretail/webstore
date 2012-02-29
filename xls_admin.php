@@ -3999,7 +3999,11 @@
 			include(XLSWS_INCLUDES . 'db_maintenance.php');
 			$objDbMaint = new xlsws_db_maintenance;
 			$this->arrMPnls['UpgradeWS']->Text = $objDbMaint->RunUpdateSchema();
-						
+			
+			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
+			$this->arrMPnls['UpgradeWS']->Text .= "<br/><P><b>All database upgrades done! Database on version ".$config->Value.".</b></p>";
+
+			
 			$this->arrMPnls['UpgradeWS']->Visible = true;
 			$this->arrMPnls['UpgradeWS']->Refresh();			
 
