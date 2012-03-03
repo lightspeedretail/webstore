@@ -43,6 +43,8 @@ class xlsws_checkout extends xlsws_index {
     protected $PaymentControl;
     protected $PromoControl;
 
+    protected $CartControl;
+
     protected $VerifyControl;
     protected $CaptchaControl;
     protected $CommentControl;
@@ -53,8 +55,8 @@ class xlsws_checkout extends xlsws_index {
 
     // TODO
     protected function Form_PreRender() {
-		$this->order_display($this->cart , $this->pnlCart);
-        
+        // Todo ... inefficient
+        $this->UpdateCartControl();
         parent::Form_PreRender();
 	}
 
@@ -140,6 +142,34 @@ class xlsws_checkout extends xlsws_index {
     }
 
     protected function BindPaymentControl() {
+    }
+
+    protected function BuildCartControl() {
+        $this->CartControl = $objControl = 
+            new QPanel($this, 'Cart');
+        $objControl->Name = _sp('Cart');
+ 
+        return $objControl;
+    }
+
+    protected function UpdateCartControl() {
+        $objControl = $this->CartControl;
+        $objCart = Cart::GetCart();
+
+        if ($objCart->Count == 0)
+            _xls_display_msg(_sp('Your cart is empty. Please add items' . 
+            ' to your cart before you check out.'));
+
+        $objCart->UpdateCart(true, true, true, false);
+
+        $this->order_display($objCart, $objControl);
+        $this->update_order_display($objCart);
+
+        return $this->CartControl;
+    }
+
+    protected function BindCartControl() {
+        return $this->CartControl;
     }
 
     protected function BuildPromoControl() {
@@ -242,6 +272,8 @@ class xlsws_checkout extends xlsws_index {
 
         $this->UpdateShippingControl();
         $this->UpdatePaymentControl();
+        
+        $this->UpdateCartControl();
     }
 
     public function UpdateAfterShippingMethodChange() {
@@ -325,6 +357,7 @@ class xlsws_checkout extends xlsws_index {
         $this->BuildCalculateShippingControl();
         $this->BuildShippingControl();
         $this->BuildPaymentControl();
+        $this->BuildCartControl();
         $this->BuildPromoControl();
         $this->BuildVerifyControl();
         $this->BuildCaptchaControl();
@@ -337,6 +370,7 @@ class xlsws_checkout extends xlsws_index {
         $this->UpdateCalculateShippingControl();
         $this->UpdateShippingControl();
         $this->UpdatePaymentControl();
+        $this->UpdateCartControl();
         $this->UpdatePromoControl();
         $this->UpdateVerifyControl();
         $this->UpdateCaptchaControl();
@@ -349,6 +383,7 @@ class xlsws_checkout extends xlsws_index {
         $this->BindCalculateShippingControl();
         $this->BindShippingControl();
         $this->BindPaymentControl();
+        $this->BindCartControl();
         $this->BindPromoControl();
         $this->BindVerifyControl();
         $this->BindCaptchaControl();
@@ -457,6 +492,9 @@ class xlsws_checkout extends xlsws_index {
             case 'pnlPayment':
                 return $this->PaymentControl;
 
+            case 'pnlCart':
+                return $this->CartControl;
+
             case 'pnlPromoCode':
                 return $this->PromoControl;
 
@@ -515,8 +553,6 @@ class xlsws_checkout extends xlsws_index {
 	protected $lstShippingMethod; //input select box that shows applicable shipping methods to pick from
 
 	protected $lstPaymentMethod; //input select box that shows applicable payment methods to pick from
-
-	protected $pnlCart; //The QPanel that shows the minicart at the bottom of the checkout page
 
 	protected $pnlLoginRegister; //The QPanel that shows login and register buttons on the checkout page solely
 
@@ -655,28 +691,6 @@ class xlsws_checkout extends xlsws_index {
 	}
 
 	/**
-	 * build_promocode_widget - builds the widget to enter a promo code
-	 * @param none
-	 * @return none
-     */
-    /* LEGACY // OLD // TODO //
-	protected function build_promocode_widget() {
-		$this->pnlPromoCode = new QPanel($this->mainPnl);
-		$this->pnlPromoCode->Name = _sp("Promotional Code");
-		$this->pnlPromoCode->Template = templateNamed('promo_code.tpl.php');
-
-		$this->lblPromoErr = new QLabel($this->pnlPromoCode);
-		$this->lblPromoErr->Display = false;
-		$this->lblPromoErr->HtmlEntities = false;
-		$this->lblPromoErr->SetCustomStyle('color','red');
-
-		$this->txtPromoCode = new XLSTextBox($this->pnlPromoCode , 'txtPromoCode');
-		$this->btnPromoVerify = new QButton($this->pnlPromoCode , 'btnPromoVerify');
-
-		$this->btnPromoVerify->CssClass = "button rounded";
-	}
-    */
-	/**
 	 * check_registry - checks if the purchase was made with gift registry and sets options appropriately
 	 * @param none
 	 * @return none
@@ -729,96 +743,6 @@ class xlsws_checkout extends xlsws_index {
 	}
 
 	/**
-	 * build_widgets - builds the widgets needed for the template
-	 * @param none
-	 * @return none
-	 */
-	protected function build_widgets() {
-		$this->build_promocode_widget();
-	}
-
-
-	/**
-	 * bind_widgets - binds callback actions for the widgets
-	 * @param none
-	 * @return none
-	 */
-	protected function bind_widgets() {
-		$this->btnPromoVerify->AddAction(new QClickEvent() , new QAjaxAction('validatePromoCode'));
-		$this->btnPromoVerify->AddAction(new QClickEvent() , new QToggleEnableAction($this->btnPromoVerify, false));
-
-		$this->btnPromoVerify->AddAction(new QClickEvent() , new QToggleEnableAction($this->txtPromoCode, false));
-	}
-
-	/**
-	 * checkLoginShippingFields - checks and populates shipping address fields for if a client
-	 * has an already entered shipping address
-	 * @param none
-	 * @return none
-	 */
-	private function checkLoginShippingFields() {
-		if($this->cart->ShipFirstname != '')
-			$this->txtCRShipFirstname->Text=$this->cart->ShipFirstname;
-		elseif($this->customer)
-			$this->txtCRShipFirstname->Text=$this->customer->Firstname;
-
-		if($this->cart->ShipLastname != '')
-			$this->txtCRShipLastname->Text=$this->cart->ShipLastname;
-		elseif($this->customer)
-			$this->txtCRShipLastname->Text=$this->customer->Lastname;
-
-		if($this->cart->ShipPhone != '')
-			$this->txtCRShipPhone->Text=$this->cart->ShipPhone;
-		elseif($this->customer)
-			$this->txtCRShipPhone->Text=$this->customer->Mainphone;
-
-		if($this->cart->ShipCompany != '')
-			$this->txtCRShipCompany->Text=$this->cart->ShipCompany;
-		elseif($this->customer)
-			$this->txtCRShipCompany->Text=$this->customer->Company;
-
-		//Address1
-		if($this->cart->ShipAddress1 != '')
-			$this->txtCRShipAddr1->Text=$this->cart->ShipAddress1;
-		elseif($this->customer)
-			$this->txtCRShipAddr1->Text=$this->customer->Address21;
-
-		//Address2
-		if($this->cart->ShipAddress2 != '')
-			$this->txtCRShipAddr2->Text=$this->cart->ShipAddress2;
-		elseif($this->customer)
-			$this->txtCRShipAddr2->Text=$this->customer->Address22;
-
-		//Country
-		if($this->cart->ShipCountry != '')
-			$this->txtCRShipCountry->SelectedValue=$this->cart->ShipCountry;
-		elseif($this->customer)
-			$this->txtCRShipCountry->SelectedValue=$this->customer->Country2;
-		else
-			$this->txtCRShipCountry->SelectedValue=_xls_get_conf('DEFAULT_COUNTRY');
-
-		if($this->customer || $this->cart->ShipState){
-			if($this->cart->ShipState)
-				$this->txtCRShipState->SelectedValue=$this->cart->ShipState;
-			else
-				$this->txtCRShipState->SelectedValue=$this->customer->State2;
-		}
-		$this->txtCRShipState->Name = _sp('State');
-
-		//City
-		if($this->cart->ShipCity != '')
-			$this->txtCRShipCity->Text=$this->cart->ShipCity;
-		elseif($this->customer)
-			$this->txtCRShipCity->Text=$this->customer->City2;
-
-		// Postal/Zip Code
-		if($this->cart->ShipZip != '')
-			$this->txtCRShipZip->Text=$this->cart->ShipZip;
-		elseif($this->customer)
-			$this->txtCRShipZip->Text=$this->customer->Zip2;
-	}
-
-	/**
 	 * build_main - constructor for this controller
 	 * @param none
 	 * @return none
@@ -853,15 +777,6 @@ class xlsws_checkout extends xlsws_index {
 		$this->mainPnl = new QPanel($this);
 		$this->mainPnl->Template = templateNamed('checkout.tpl.php');
 
-		// setup the cart
-		$this->pnlCart = new QPanel($this->mainPnl);
-		$this->pnlCart->Name = _sp("Cart");
-
-		$this->order_display($cart , $this->pnlCart);
-
-		if($cart->Count == 0)
-			_xls_display_msg(_sp("Your cart is empty. Please add items to your cart before you check out."));
-
 		$this->check_guest_checkout();
 
 		// Wait icon
@@ -871,30 +786,12 @@ class xlsws_checkout extends xlsws_index {
 		$this->crumbs[] = array('key'=>'xlspg=checkout' , 'case'=> '' , 'name'=> _sp('Check Out'));
 
 		// Define the layout
+        $this->check_registry();
 
 		//error msg
 		$this->errSpan = new QPanel($this);
 		$this->errSpan->CssClass='customer_reg_err_msg';
 
-        /*
-		$this->build_widgets();
-
-		//************ Shipping info
-		$this->checkLoginShippingFields();
-
-		//************ Change events
-		$this->bind_widgets();
-
-		// Previously shipped addresses
-		$this->populate_previously_shipped();
-
-		// Gift Registry check!
-		$this->check_registry();
-
-		//The below attributes are not intended to be directly overloaded or modified
-		// Checkout agree
-		$this->chkAgree = new QCheckBox($this->pnlVerify);
-        */
 		//submit order button
 		$this->btnSubmit = new QButton($this->pnlVerify);
 		$this->btnSubmit->Text = _sp('Submit Order');
@@ -917,7 +814,8 @@ class xlsws_checkout extends xlsws_index {
 		$this->pxyCheckout = new QButton($this->mainPnl , 'pxyCheckout');
 		$this->pxyCheckout->CssClass = "xlshidden";
 		$this->pxyCheckout->AddAction(new QClickEvent(500) , new QServerAction('processCheckout'));
-		$this->build_login_register();
+        
+        $this->build_login_register();
 	}
 
 	/**
@@ -980,526 +878,6 @@ class xlsws_checkout extends xlsws_index {
 	}
 
 	/**
-	 * validatePromoCode - Validates and applies an entered promo code if applicable
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	protected function DisplayPromoErrWidget($strMessage) {
-		$this->lblPromoErr->Text = $strMessage;
-		$this->lblPromoErr->Display = true;
-		$this->btnPromoVerify->Enabled = true;
-		$this->txtPromoCode->Enabled = true;
-	}
-
-	protected function validatePromoCode(
-		$strFormId, $strControlId, $strParameter) {
-
-		$bolPromoApplied = false;
-		$objPromoCode = PromoCode::LoadByCode($this->txtPromoCode->Text);
-		$discountType = PromoCodeType::Flat;
-
-		if (!$objPromoCode) {
-			$this->DisplayPromoErrWidget(_sp('Invalid Promo Code'));
-			return;
-		}
-
-		if ($this->cart->FkPromoId > 0) {
-			$this->DisplayPromoErrWidget(_sp('A Promo Code has already' .
-				' been applied to this order'));
-			return;
-		}
-
-		if (!$objPromoCode->Started) {
-			$this->DisplayPromoErrWidget(_sp('Promo Code is not ' .
-				'active yet'));
-			return;
-		}
-
-		if ($objPromoCode->Expired || !$objPromoCode->HasRemaining) {
-			$this->DisplayPromoErrWidget(_sp('Promo Code has expired' .
-				' or has been used up.'));
-			return;
-		}
-
-		if ($objPromoCode->Threshold > $this->cart->Subtotal) {
-			$this->DisplayPromoErrWidget(_sp(
-				'Promo Code only valid when cart exceeds ' .
-				_xls_currency($objPromoCode->Threshold) . '.'));
-			return;
-		}
-
-		$this->cart->FkPromoId = $objPromoCode->Rowid;
-		$bolPromoApplied = $this->cart->UpdatePromoCode(true);
-
-		if ($bolPromoApplied) {
-			$this->cart->UpdateCart();
-
-			if($this->lblPaymentTotal instanceof QLabel)
-				$this->lblPaymentTotal->Text =
-					_xls_currency($this->cart->Total);
-
-			$this->DisplayPromoErrWidget(sprintf(
-				_sp('Promo Code applied at') . " %s",
-				PromoCodeType::Display($objPromoCode->Type,
-				$objPromoCode->Amount)));
-
-			$this->update_order_display($this->cart);
-			$this->pnlCart->Refresh();
-			$this->setupShipping();
-		} else {
-			$this->DisplayPromoErrWidget(_sp('Promo Code does not apply' .
-				' to your cart.'));
-		}
-	}
-
-	/**
-	 * shipping_elements - Enable or disable shipping address fields on the checkout form dynamically
-	 * @param boolean true or false to enable or disable an element
-	 * @return none
-	 */
-	protected function shipping_elements($enable) {
-		$this->txtCRShipFirstname->Enabled=$enable;
-		$this->txtCRShipLastname->Enabled = $enable;
-		$this->txtCRShipCompany->Enabled=$enable;
-		$this->txtCRShipPhone->Enabled=$enable;
-		$this->txtCRShipAddr1->Enabled = $enable;
-		$this->txtCRShipAddr2->Enabled = $enable;
-		$this->txtCRShipCountry->Enabled = $enable;
-		$this->txtCRShipState->Enabled = $enable;
-		$this->txtCRShipCity->Enabled = $enable;
-		$this->txtCRShipZip->Enabled = $enable;
-
-		if($this->lstCRShipPrevious)
-			$this->lstCRShipPrevious->Enabled = $enable;
-        
-        /**
-         * Clear out shipping fields and add placeholder
-         */
-		//$this->pnlShipping->RemoveChildControls(true);
-        //$this->lblShippingCost = new QLabel($this->pnlShipping);
-        //$this->lblShippingCost = $this->ShippingControl->LabelCtrl;
-
-        if ($strCountry == '' || $strZip == '') { 
-            $this->lblShippingCost->Text = 
-                _sp('Please provide shipping address (Country, State,' .
-                    ' Zip/Postal Code) to receive a shipping quote.');
-			$this->blnShippingShown = false;
-			$this->shipping_fields = array();
-			return;
-		}
-
-        /**
-         * Define tax code
-         */
-		$taxCodeId = -1; // the default/indicates failure to lookup.
-		if ($this->lstShippingMethod) {
-			// we seem to have a selected shipping method.
-			if ($this->lstShippingMethod->SelectedValue == XLS_STORE_PICKUP_SHIPPINGMETHOD_SELECTVALUE) {
-				// it *is* the store pickup method, so our default tax code will apply
-				$defTaxCode = _xls_tax_default_taxcode();
-				$this->cart->blnStorePickup = true;
-				if ($defTaxCode) {
-					$taxCodeId = $defTaxCode->Rowid;
-				}
-			}
-		}
-
-		$country = Country::LoadByCode($this->txtCRShipCountry->SelectedValue);
-		if ($country) {
-			$this->txtCRShipZip->Validate($country->ZipValidatePreg);
-			$this->txtCRShipZip->Refresh();
-		}
-
-		if ($taxCodeId < 0) {
-			// taxCodeId was _not_ set by selecting store_pickup so we use the destination if we can...
-
-			$dest = Destination::LoadMatching(
-				$this->txtCRShipCountry->SelectedValue,
-				$this->txtCRShipState->SelectedValue,
-				$this->txtCRShipZip->Text);
-
-			if($dest)
-				$taxCodeId = $dest->Taxcode;
-		}
-
-		$this->cart->FkTaxCodeId = $taxCodeId;
-		$this->cart->UpdateCart();
-		//$this->cart->SyncSave();
-
-		if ($this->checktaxonly) {
-			$this->checktaxonly = false;
-			return;
-		}
-		$select = false;
-
-        /**
-         * Define shipping methods
-         */
-        return;
-
-		//$this->pnlShipping->RemoveChildControls(true);
-
-		//$this->lstShippingMethod = new XLSListBox($this->pnlShipping);
-		//$this->lstShippingMethod->Name = _sp('Choose Shipping Method');
-		//$this->lstShippingMethod->CssClass = "checkout_shipping_select";
-
-		//$this->objDefaultWaitIcon = new QWaitIcon($this->pnlShipping);
-		//$objSubmitListItemActions = array(
-		//	new QToggleEnableAction($this->lstShippingMethod),
-		//	new QAjaxAction('shippingMethod_Change'),
-		//);
-
-		//$this->lstShippingMethod->AddActionArray(new QChangeEvent(), $objSubmitListItemActions);
-
-
-		// get shipping methods - sorted!
-		$shippingModules = Modules::QueryArray(
-			QQ::Equal(QQN::Modules()->Type, 'shipping'),
-			QQ::Clause(
-				QQ::OrderBy(QQN::Modules()->SortOrder)
-			)
-		);
-
-		if(count($shippingModules) ==  0)
-			return;
-
-		$current = current($shippingModules);
-
-		foreach($shippingModules as $s) {
-			$obj = $this->loadModule($s->File , 'shipping');
-
-			if(!$obj) // could not load class
-				continue;
-
-			if(!$obj->check())
-				continue;
-
-			$msg = $obj->name();
-
-			$this->lstShippingMethod->AddItem($msg , $s->File);
-		}
-
-		$select = _xls_stack_get('xlsws_shipping_method');
-
-		if(!$select) {
-			$this->lstShippingMethod->SelectedIndex = 0;
-		} else
-			$this->lstShippingMethod->SelectedValue = $select;
-
-		if(!$this->lstShippingMethod->SelectedValue)
-			return;
-
-		$obj = $this->loadModule($this->lstShippingMethod->SelectedValue, 'shipping');
-
-		// only add fields if this shipping module is being drawn fresh!
-		//if(!$this->shipping_fields || (count($this->shipping_fields) == 0) || ($this->lstShippingMethod->SelectedValue != $this->strShippingLastMethod)){
-		$this->shipping_fields = $obj->customer_fields($this->pnlShipping);
-
-		foreach($this->shipping_fields as $field) {
-			$field->AddAction(new QChangeEvent() , new QAjaxAction('shippingCost'));
-			$key = "SHIPPING " . $this->lstShippingMethod->SelectedValue . " " . $field->Name;
-
-			if($val = _xls_stack_get($key)) {
-
-				if($field instanceof QListBoxBase )
-					$field->SelectedValue = $val;
-				elseif($field instanceof QTextBoxBase )
-					$field->Text = $val;
-
-			}
-
-		}
-
-		$this->strShippingLastMethod = $this->lstShippingMethod->SelectedValue;
-		//}
-
-		//$this->lblShippingCost = new QLabel($this->pnlShipping);
-
-
-		$this->pnlShipping->Refresh();
-
-		$this->blnShippingShown = true;
-
-		// load up saved up field values
-
-		$this->shippingCost();
-
-		//$this->setupPayment(true);
-	}
-
-	/**
-	 * shippingCost - Fetch the cost of shipping based on the method/choice chosen
-	 * @param none
-	 * @return none
-	 */
-	protected function shippingCost() {
-		$obj = $this->loadModule($this->lstShippingMethod->SelectedValue , 'shipping');
-
-		if(!$obj) // could not load class
-			return;
-
-		if(!$obj->check())
-			return;
-
-		// remember the fields for holding
-		foreach($this->shipping_fields as $field) {
-			$key = "SHIPPING " . $this->lstShippingMethod->SelectedValue . " " . $field->Name;
-			_xls_stack_pop($key);
-
-			if($field instanceof QListBoxBase)
-				_xls_stack_add( $key ,  $field->SelectedValue);
-			elseif($field instanceof QTextBoxBase )
-				_xls_stack_add( $key ,  $field->Text);
-		}
-
-		$cart = Cart::GetCart();
-
-		// Cost for shipping?
-		$total = $obj->total(
-			$this->shipping_fields,
-			$cart,
-			$this->txtCRShipCountry->SelectedValue,
-			$this->txtCRShipZip->Text,
-			$this->txtCRShipState->SelectedValue,
-			$this->txtCRShipCity->Text,
-			$this->txtCRShipAddr2->Text,
-			$this->txtCRShipAddr1->Text,
-			$this->txtCRShipCompany->Text,
-			$this->txtCRShipLastname->Text,
-			$this->txtCRShipFirstname->Text
-		);
-
-		$sproduct = '';
-		$markup = 0;
-
-		if($total === FALSE) { // no shipping available..
-
-			$this->fltShippingCost = FALSE;
-			$this->lblShippingCost->Text = _sp('Error: Unable to get shipping rates');
-
-		} elseif(is_numeric($total)) {
-			$this->fltShippingCost = $total;
-			$this->lblShippingCost->Text = _xls_currency($total);
-		} elseif(is_array($total)) {
-			if(isset($total['price']))
-				$this->fltShippingCost = $total['price'];
-			else
-				$this->fltShippingCost = FALSE;
-
-			if(isset($total['msg']) && $total['msg']  && !($this->fltShippingCost === FALSE))
-				$this->lblShippingCost->Text =_xls_currency($this->fltShippingCost) . " - " . $total['msg'];
-			elseif(isset($total['msg']) && $total['msg']) // probably an error message
-				$this->lblShippingCost->Text = $total['msg'];
-			elseif($this->fltShippingCost)
-				$this->lblShippingCost->Text = _xls_currency($total['price']);
-			else
-				$this->lblShippingCost->Text = '';
-
-			if(isset($total['product']))
-				$sproduct = $total['product'];
-
-			if(isset($total['markup']))
-				$markup = $total['markup'];
-		} else {
-			$this->fltShippingCost = FALSE;
-			$this->lblShippingCost->Text = _sp('Error: Unable to get shipping rates');
-			_xls_log(
-				"ERROR: Could not determine return type for module " .
-				$this->lstShippingMethod->SelectedValue .
-				". Expected either number OR array('price' => ,  'msg' =>). Return given : " .
-				print_r($total , true)
-			);
-		}
-
-		$this->addShippingToPaymentTotal($sproduct , $markup);
-	}
-
-	/**
-	 * shippingMethod_Change - Event that fetches the cost of shipping dynamically based on the method/choice chosen
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	public function shippingMethod_Change($strFormId, $strControlId, $strParameter) {
-		$selected = $this->lstShippingMethod->SelectedValue;
-
-		// save the currently selected shipping method
-		_xls_stack_add('xlsws_shipping_method' , $selected);
-
-		$this->setupShipping();
-	}
-
-	/**
-	 * shipCountry_Change - Event that fetches the cost of shipping and populates appropriate states for the shipping
-	 * country based on country chosen
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	public function shipCountry_Change($strFormId, $strControlId, $strParameter) {
-		$country_code = $this->txtCRShipCountry->SelectedValue;
-
-		if ($country_code) {
-			$this->add_states_to_listbox_for_country($this->txtCRShipState, $country_code);
-
-			if($this->chkSame->Checked) {
-				$this->txtCRBillCountry->SelectedValue=$this->txtCRShipCountry->SelectedValue;
-				$country_code = $this->txtCRShipCountry->SelectedValue;
-				$this->add_states_to_listbox_for_country($this->txtCRBillState, $country_code);
-			}
-
-			$this->txtCRShipZip->Text = '';
-		}
-	}
-
-	/**
-	 * txtBillCountry_Change - Event that fetches the cost of shipping and populates appropriate states for the billing
-	 * country based on country chosen
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	public function txtBillCountry_Change($strFormId, $strControlId, $strParameter) {
-		$country_code = $this->txtCRBillCountry->SelectedValue;
-
-		if ($country_code) {
-			if ($this->add_states_to_listbox_for_country($this->txtCRBillState, $country_code))
-				$this->txtCRBillState->focus();
-
-			if($this->chkSame->Checked) {
-				$this->txtCRShipCountry->SelectedValue = $this->txtCRBillCountry->SelectedValue;
-				$this->add_states_to_listbox_for_country($this->txtCRShipState, $country_code);
-			}
-		}
-
-		$this->txtCRBillZip->Text = '';
-	}
-
-	/**
-	 * addShippingToPaymentTotal - Adds the current shipping cost to the subtotal
-	 * @param Product obj shipping product
-	 * @param float markup to add to shipping cost
-	 * @return none
-	 */
-	public function addShippingToPaymentTotal($sproduct = FALSE, $markup = FALSE) {
-		$this->cart->ShippingSell = ($this->fltShippingCost === FALSE)?0:$this->fltShippingCost;
-
-		if(!($markup === FALSE))
-			$this->cart->ShippingCost = $this->cart->ShippingSell - $markup;
-		elseif($this->cart->ShippingCost > 0)
-			$this->cart->ShippingCost = $this->cart->ShippingCost;
-		else
-			$this->cart->ShippingCost = $this->cart->ShippingSell;
-
-		if(!($sproduct === FALSE))
-			$this->cart->ShippingMethod = $sproduct;
-
-		$this->cart->UpdateCart();
-
-		Cart::SaveCart($this->cart);
-
-		$this->update_order_display($this->cart);
-
-		$this->pnlCart->Refresh();
-
-		if($this->lblPaymentTotal instanceof QLabel)
-			$this->lblPaymentTotal->Text = _xls_currency($this->cart->Total);
-	}
-
-	/**
-	 * setupPayment - Sets up the payment options available
-	 * @param boolean remove - not used, ignore
-	 * @return none
-	 */
-	public function setupPayment($remove = false) {
-		// without shipping no payment thankyou
-
-		if(!$this->blnShippingShown) {
-			$this->blnPaymentShown = false;
-			$this->pnlPayment->Visible = false;
-			return;
-		}
-
-		if($remove)
-			$this->pnlPayment->RemoveChildControls(true);
-
-		$this->pnlPayment->Visible =  true;
-
-		$this->lblPaymentTotal = new QLabel($this->pnlPayment);
-		$this->lblPaymentTotal->Name = _sp('Total Payable');
-
-		$this->addShippingToPaymentTotal();
-
-		$this->lstPaymentMethod = new XLSListBox($this->pnlPayment);
-		$this->lstPaymentMethod->Name = _sp('Choose Payment Method');
-		$this->lstPaymentMethod->CssClass = "checkout_payment_select";
-
-		$this->lstPaymentMethod->AddAction(new QChangeEvent() , new QJavaScriptAction("this.disabled = true"));
-
-		$this->lstPaymentMethod->AddAction(new QChangeEvent() , new QAjaxAction('paymentMethod_Change'));
-
-		// get payment methods - sorted!
-		$paymentModules = Modules::QueryArray(
-			QQ::Equal(QQN::Modules()->Type, 'payment'),
-			QQ::Clause(
-				QQ::OrderBy(QQN::Modules()->SortOrder)
-			)
-		);
-
-		if(count($paymentModules) ==  0)
-			return;
-
-		$current = current($paymentModules);
-
-		foreach($paymentModules as $p) {
-			$obj = $this->loadModule($p->File , 'payment');
-
-			if(!$obj) // could not load class
-				continue;
-
-			$msg = $obj->name() ;
-
-			if(!$obj->check())
-				continue;
-
-			$this->lstPaymentMethod->AddItem($msg , $p->File);
-		}
-
-		$select = _xls_stack_get('xlsws_payment_method');
-
-		if(!$select)
-			$this->lstPaymentMethod->SelectedValue = $current->File;
-		else
-			$this->lstPaymentMethod->SelectedValue = $select;
-
-		$obj = $this->loadModule($this->lstPaymentMethod->SelectedValue, 'payment');
-
-		if($obj) {
-			$this->payment_fields = $obj->customer_fields($this->pnlPayment);
-		}
-
-		$this->pnlPayment->Refresh();
-		$this->blnPaymentShown = true;
-
-		if ($this->customer) {
-			$this->checktaxonly = true;
-			$this->setupShipping();
-		}
-	}
-
-	/**
-	 * paymentMethod_Change - Sets up fields needed to accept a particular payment method dynamically
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	public function paymentMethod_Change($strFormId, $strControlId, $strParameter) {
-		$selected = $this->lstPaymentMethod->SelectedValue;
-		$this->pnlPayment->RemoveChildControls(true);
-
-		// save the currently selected shipping method
-		_xls_stack_add('xlsws_payment_method' , $selected);
-
-		//$this->setupPayment(false);
-	}
-
-	/**
 	 * moduleActionProxy - General function to load particular modules for payment and shipping to be used dynamically
 	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
 	 * @return none
@@ -1540,74 +918,6 @@ class xlsws_checkout extends xlsws_index {
 			$objModule->$strParameter($strFormId, $strControlId, $strParameter);
 		} catch(Exception $e) {
 			_xls_log("ERROR catching action $strParameter on module");
-		}
-
-	}
-
-	/**
-	 * chkSame_Click - Event handler for when someone checks shipping address is the same as billing address
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	public function chkSame_Click($strFormId, $strControlId, $strParameter) {
-		if(($this->giftRegistry) && ($this->giftRegistry->ShipOption != 'Ship to buyer')) {
-			return;
-		}
-
-		if($this->chkSame->Checked) {
-			if($this->lstCRShipPrevious)
-				$this->lstCRShipPrevious->SelectedIndex = 0;
-
-			$this->txtCRShipFirstname->Text=$this->txtCRFName->Text;
-			$this->txtCRShipLastname->Text = $this->txtCRLName->Text;
-			$this->txtCRShipCompany->Text=$this->txtCRCompany->Text;
-			$this->txtCRShipPhone->Text=$this->txtCRMPhone->Text;
-
-			$this->txtCRShipAddr1->Text = $this->txtCRBillAddr1->Text;
-			$this->txtCRShipAddr2->Text = $this->txtCRBillAddr2->Text;
-			$this->txtCRShipCountry->SelectedValue = $this->txtCRBillCountry->SelectedValue;
-
-			$country_code = $this->txtCRShipCountry->SelectedValue;
-			$this->add_states_to_listbox_for_country($this->txtCRShipState, $country_code);
-
-			$this->txtCRShipState->SelectedValue = $this->txtCRBillState->SelectedValue;
-			$this->txtCRShipCity->Text = $this->txtCRBillCity->Text;
-			$this->txtCRShipZip->Text = $this->txtCRBillZip->Text;
-
-			$this->shipping_elements(false);
-			$this->pnlShippingAdde->Opacity = 50;
-
-			$this->setupShipping();
-		} else {
-			$this->shipping_elements(true);
-
-			$this->pnlShippingAdde->Opacity = 100;
-		}
-	}
-
-	/**
-	 * BillAddrChange - Event handler for when someone changes information about their billing address
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	public function BillAddrChange($strFormId, $strControlId, $strParameter) {
-		if($this->chkSame->Checked) {
-			$this->txtCRShipFirstname->Text=$this->txtCRFName->Text;
-			$this->txtCRShipLastname->Text = $this->txtCRLName->Text;
-			$this->txtCRShipCompany->Text=$this->txtCRCompany->Text;
-			$this->txtCRShipPhone->Text=$this->txtCRMPhone->Text;
-
-			$this->txtCRShipAddr1->Text=$this->txtCRBillAddr1->Text;
-			$this->txtCRShipAddr2->Text=$this->txtCRBillAddr2->Text;
-			$this->txtCRShipCity->Text=$this->txtCRBillCity->Text;
-			$this->txtCRShipZip->Text=$this->txtCRBillZip->Text;
-			$this->txtCRShipState->SelectedValue=$this->txtCRBillState->SelectedValue;
-			$this->txtCRShipCountry->SelectedValue=$this->txtCRBillCountry->SelectedValue;
-
-			$this->setupShipping();
-
-			//if(!$this->blnPaymentShown)
-			//	$this->setupPayment();
 		}
 
 	}
@@ -1780,7 +1090,7 @@ class xlsws_checkout extends xlsws_index {
 	 * @return none
 	 */
 	public function showFieldPanels() {
-		$this->pnlBillingAdde->Visible = true;
+        $this->pnlBillingAdde->Visible = true;
 		$this->pnlCart->Visible = true;
 		$this->pnlPayment->Visible = true;
 		$this->pnlShipping->Visible = true;
@@ -1791,8 +1101,7 @@ class xlsws_checkout extends xlsws_index {
 		if(!$this->customer)
 			$this->pnlLoginRegister->Visible = true;
 
-		$this->cart = Cart::GetCart();
-		$this->order_display($this->cart , $this->pnlCart);
+        $this->UpdateCartControl();
 
 		$this->pnlWait->Visible = false;
 	}
