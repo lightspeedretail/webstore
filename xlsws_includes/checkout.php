@@ -560,7 +560,6 @@ class xlsws_checkout extends xlsws_index {
 
 	protected $pxyCheckout; //Handler for checkout
 
-	protected $cart; //Instantiated Cart object of the current shopper's cart
 	protected $giftRegistry; //Instantiated WishList object of the current shopper's cart relating to a registry (if purchased from there)
 
 	protected $checktaxonly; //used in the shipping cost function to just do a recalculation of taxes and not every other aspect like shipping
@@ -933,107 +932,21 @@ class xlsws_checkout extends xlsws_index {
 
 		$errors = array();
 
-		if(_xls_verify_img_txt() != (($this->txtCRVerify->Text)))
+        if (!$this->CaptchaControl->Validate())
 			$errors[] = _sp("Wrong Verification Code.");
 
-		if (
-			$this->txtCREmail->Text == "" ||
-			$this->txtCRMPhone->Text == "" ||
-			$this->txtCRFName->Text == "" ||
-			$this->txtCRLName->Text == "" ||
-			$this->txtCRBillAddr1->Text == "" ||
-			$this->txtCRBillCountry->SelectedValue == "" ||
-			$this->txtCRBillCity->Text == "" ||
-			$this->txtCRBillZip->Text == ""
-		) {
+        if (!$this->CustomerControl->Validate())
 			$errors[] = _sp('Please complete the required fields marked with an asterisk *');
-		}
-
-		if(!isValidEmail($this->txtCREmail->Text )) {
-			$email=$this->txtCREmail->Text;
-			$errors[] = $email . _sp(" - Is Not A Correct E-mail Address");
-		}
-
-		// validate zip code
-		$country = Country::LoadByCode($this->txtCRBillCountry->SelectedValue);
-		if ($country)
-			if (!$this->txtCRBillZip->Validate($country->ZipValidatePreg))
-				$errors[] = _sp($this->txtCRBillZip->LabelForInvalid);
-
-		if ($this->txtCRBillCountry->SelectedValue !=
-			$this->txtCRShipCountry->SelectedValue)
-		$country = Country::LoadByCode($this->txtCRShipCountry->SelectedValue);
-
-		if ($country)
-			if (!$this->txtCRShipZip->Validate($country->ZipValidatePreg))
-				$errors[] = _sp($this->txtCRShipZip->LabelForInvalid);
-
-		// Can we ship to given address?
-		if(_xls_get_conf('SHIP_RESTRICT_DESTINATION' , 0) == 1){
-
-			$dest = Destination::LoadMatching(
-				$this->txtCRShipCountry->SelectedValue,
-				$this->txtCRShipState->SelectedValue,
-				$this->txtCRShipZip->Text
-			);
-
-			if(!$dest) {
-				$errors[] = sprintf(
-					_sp("Sorry, we cannot ship to %s %s %s"),
-					$this->txtCRShipState->SelectedName,
-					$this->txtCRShipZip->Text,
-					$this->txtCRShipCountry->SelectedName
-				);
-			}
-
-		}
-
-		if ($country) {
-			# means we have a country code set in txtCRShipCountry
-			$states = $this->states_for_country_code($this->txtCRShipCountry->SelectedValue);
-
-			if (count($states)) {
-				if (!$this->txtCRShipState->SelectedValue) {
-					$errors[] = _sp("Must select a state/province for this shipping destination country");
-				}
-			}
-		}
-
-		if($this->fltShippingCost === FALSE) {
+        
+        
+        if (!$this->ShippingControl->Validate())
 			$errors[] =  _sp("Shipping error. Please choose a valid shipping method.");
-		}
 
-		// validate shipping fields
-		$shipModule = $this->lstShippingMethod->SelectedValue;
+        if (!$this->PaymentControl->Validate())
+            $errors[] =  _sp("Payment error");
 
-		if(!$shipModule) {
-			$errors[] =  _sp("No shipping method selected");
-		} else {
-			$shipObj = $this->loadModule($shipModule , 'shipping');
-
-			if (! $shipObj) {
-				$errors[] = _sp("No shipping method selected");
-			} elseif (! $shipObj->check_customer_fields($this->shipping_fields)) {
-				$errors[] =  _sp("Shipping error");
-			}
-		}
-
-		// validate payment fields
-		$paymentModule = $this->lstPaymentMethod->SelectedValue;
-
-		if(!$paymentModule) {
-			$errors[] =  _sp("No payment method available");
-		} else {
-			$paymentObj = $this->loadModule($paymentModule , 'payment');
-
-			if(!$paymentObj->check_customer_fields($this->payment_fields)) {
-				$errors[] =  _sp("Payment error");
-			}
-		}
-
-		if(!$this->chkAgree->Checked) {
+        if (!$this->TermsControl->Checked)
 			$errors[] =  _sp("You must agree to terms and conditions to place an order");
-		}
 
 		if (count($errors)) {
 			$this->errSpan->Text = join('<br />', $errors);
@@ -1051,29 +964,20 @@ class xlsws_checkout extends xlsws_index {
 	 * @return none
 	 */
 	public function btnSubmit_Click($strFormId, $strControlId, $strParameter) {
-		// hide all panels
-		$this->pnlBillingAdde->Visible = false;
-		$this->pnlCart->Visible = false;
-		$this->pnlPayment->Visible = false;
-		$this->pnlShipping->Visible = false;
-		$this->pnlShippingAdde->Visible = false;
-		$this->pnlVerify->Visible = false;
+        if (!$this->Validate())
+            return;
+        
+        $this->CustomerControl->Visible = false;
+        $this->ShippingControl->Visible = false;
+        $this->CartControl->Visible = false;
+        $this->PromoControl->Visible = false;
+        $this->VerifyControl->Visible = false;
+        $this->PaymentControl->Visible = false;
 		$this->pnlLoginRegister->Visible = false;
-		$this->pnlPromoCode->Visible = false;
 
-		$this->cart->ShipFirstname = $this->txtCRShipFirstname->Text;
-		$this->cart->ShipLastname = $this->txtCRShipLastname->Text;
-		$this->cart->ShipCompany = $this->txtCRShipCompany->Text;
-		$this->cart->ShipAddress1 = $this->txtCRShipAddr1->Text;
-		$this->cart->ShipAddress2 = $this->txtCRShipAddr2->Text;
-		$this->cart->ShipCity = $this->txtCRShipCity->Text;
-		$this->cart->ShipZip = $this->txtCRShipZip->Text;
-		$this->cart->ShipState = $this->txtCRShipState->SelectedValue;
-		$this->cart->ShipCountry = $this->txtCRShipCountry->SelectedValue;
-		$this->cart->ShipPhone = $this->txtCRShipPhone->Text;
-		$this->cart->PrintedNotes = $this->txtNotes->Text;
+        $objCart = Cart::GetCurrent();
 
-		if(trim($this->cart->Currency) == '')
+		if(trim($objCart->Currency) == '')
 			$this->cart->Currency = _xls_get_conf('CURRENCY_DEFAULT' , 'USD');
 
 		$this->cart->SyncSave();
@@ -1090,13 +994,12 @@ class xlsws_checkout extends xlsws_index {
 	 * @return none
 	 */
 	public function showFieldPanels() {
-        $this->pnlBillingAdde->Visible = true;
-		$this->pnlCart->Visible = true;
-		$this->pnlPayment->Visible = true;
-		$this->pnlShipping->Visible = true;
-		$this->pnlPromoCode->Visible = true;
-		$this->pnlShippingAdde->Visible = true;
-		$this->pnlVerify->Visible = true;
+        $this->CustomerControl->Visible = true;
+        $this->ShippingControl->Visible = true;
+        $this->CartControl->Visible = true;
+        $this->PromoControl->Visible = true;
+        $this->VerifyControl->Visible = true;
+        $this->PaymentControl->Visible = true;
 
 		if(!$this->customer)
 			$this->pnlLoginRegister->Visible = true;
