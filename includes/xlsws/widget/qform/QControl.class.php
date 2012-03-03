@@ -2,6 +2,17 @@
 
 abstract class QControl extends QControlBase {
 
+    public function GetTemplatePath($strPath) {
+        if (!file_exists($strPath)) {
+            $strPath = sprintf('templates/%s/%s', 
+                _xls_get_conf('DEFAULT_TEMPLATE', 'framework'), 
+                $strPath
+            );
+        }
+
+        return $strPath;
+    }
+
     public function RenderAsDefinition($blnDisplayOutput = true) {
         /*
          * <dl>
@@ -122,6 +133,21 @@ abstract class QControl extends QControlBase {
                 if ($this->blnDisplay != $mixValue)
                     return parent::__set($strName, $mixValue);
                 else break;
+
+            case 'Template':
+                $mixValue = $this->GetTemplatePath($mixValue);
+
+                if (!file_exists($strPath) && stristr($strPath, '.tpl')) { 
+                    QApplication::Log(
+                        E_ERROR, 
+                        'core',
+                        _sp('Template file not found : ' . $strPath)
+                    );
+                    die (_sp('Template file not found : ' . $strPath));
+                }
+                
+                $this->strTemplate = $mixValue;
+                break;
 
             case 'RenderMethod':
                 try { 

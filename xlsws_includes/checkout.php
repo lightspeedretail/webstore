@@ -42,6 +42,11 @@ class xlsws_checkout extends xlsws_index {
     protected $ShippingControl;
     protected $PaymentControl;
 
+    protected $VerifyControl;
+    protected $CaptchaControl;
+    protected $CommentControl;
+    protected $TermsControl;
+
     protected $objDestination;
     protected $objTaxCode;
 
@@ -136,6 +141,73 @@ class xlsws_checkout extends xlsws_index {
     protected function BindPaymentControl() {
     }
 
+    protected function BuildVerifyControl() {
+        $objControl = $this->VerifyControl = 
+            new QPanel($this, 'Verify');
+        $objControl->Name = 'Submit your order';
+        $objControl->Template = 
+            $objControl->GetTemplatePath('checkout_verify.tpl.php');
+    }
+
+    protected function UpdateVerifyControl() {
+        return $this->VerifyControl;
+    }
+
+    protected function BindVerifyControl() {
+        return $this->VerifyControl;
+    }
+
+    protected function BuildCaptchaControl() {
+        $objParent = $this->VerifyControl;
+        if (!$objParent)
+            $objParent = $this;
+
+        $objControl = $this->CaptchaControl = 
+            new XLSCaptchaControl($objParent, 'Captcha');
+
+        return $objControl;
+    }
+
+    protected function UpdateCaptchaControl() {
+        return $this->CaptchaControl;
+    }
+    
+    protected function BindCaptchaControl() {
+        return $this->CaptchaControl;
+    }
+
+    protected function BuildCommentControl() {
+        $objControl = $this->CommentControl = 
+            new XLSTextControl($this, 'Comment');
+        $objControl->TextMode = QTextMode::MultiLine;
+        
+        return $objControl;
+    }
+
+    protected function UpdateCommentControl() {
+        return $this->CommentControl;
+    }
+
+    protected function BindCommentControl() {
+        return $this->CommentControl;
+    }
+
+    protected function BuildTermsControl() {
+        $objControl = $this->TermsControl = 
+            new QCheckBox($this, 'Terms');
+        $objControl->Required = true;
+ 
+        return $objControl;
+    }
+
+    protected function UpdateTermsControl() {
+        return $this->TermsControl;
+    }
+
+    protected function BindTermsControl() {
+        return $this->TermsControl;
+    }
+
     public function UpdateAfterShippingAddressChange() {
         $blnValid = $this->ValidateControlAndChildren($this->CustomerControl);
 
@@ -200,6 +272,10 @@ class xlsws_checkout extends xlsws_index {
         $this->BuildCalculateShippingControl();
         $this->BuildShippingControl();
         $this->BuildPaymentControl();
+        $this->BuildVerifyControl();
+        $this->BuildCaptchaControl();
+        $this->BuildCommentControl();
+        $this->BuildTermsControl();
     }
 
     protected function UpdateForm() {
@@ -207,6 +283,10 @@ class xlsws_checkout extends xlsws_index {
         $this->UpdateCalculateShippingControl();
         $this->UpdateShippingControl();
         $this->UpdatePaymentControl();
+        $this->UpdateVerifyControl();
+        $this->UpdateCaptchaControl();
+        $this->UpdateCommentControl();
+        $this->UpdateTermsControl();
     }
 
     protected function BindForm() {
@@ -214,6 +294,10 @@ class xlsws_checkout extends xlsws_index {
         $this->BindCalculateShippingControl();
         $this->BindShippingControl();
         $this->BindPaymentControl();
+        $this->BindVerifyControl();
+        $this->BindCaptchaControl();
+        $this->BindCommentControl();
+        $this->BindTermsControl();
     }
 
     public function __isset($strName) {
@@ -314,6 +398,21 @@ class xlsws_checkout extends xlsws_index {
             case 'pnlPayment':
                 return $this->PaymentControl;
 
+            case 'pnlVerify':
+                return $this->VerifyControl;
+
+            case 'lblVerifyImage':
+                return $this->CaptchaControl->Code;
+
+            case 'txtCRVerify':
+                return $this->CaptchaControl->Input;
+
+            case 'txtNotes':
+                return $this->CommentControl;
+
+            case 'chkAgree':
+                return $this->TermsControl;
+
             case 'customer':
                 return Customer::GetCurrent();
 
@@ -335,15 +434,9 @@ class xlsws_checkout extends xlsws_index {
 	/*see xlsws_index for shared widgets*/
 	protected $lstCRShipPrevious; //input select box for previously shipped addresses
 
-	protected $txtNotes; //input textarea for notes and comments
-
 	protected $btnSubmit; //input submit for the submit button on the bottom
 
-	protected $chkAgree; //input checkbox to agree to terms and conditions
-
 	protected $errSpan; //span block that displays an error on top of the checkout form if any
-
-	protected $lblVerifyImage; //the label where the verification catpcha image loads
 
 	protected $lblWait; //the label for the wait icon (optional)
 	protected $icoWait; //the actual wait icon
@@ -353,7 +446,6 @@ class xlsws_checkout extends xlsws_index {
 	protected $lstPaymentMethod; //input select box that shows applicable payment methods to pick from
 
 	protected $pnlCart; //The QPanel that shows the minicart at the bottom of the checkout page
-	protected $pnlVerify; //The QPanel that shows the verification catpcha image
 
 	protected $pnlLoginRegister; //The QPanel that shows login and register buttons on the checkout page solely
 
@@ -748,7 +840,7 @@ class xlsws_checkout extends xlsws_index {
 		//The below attributes are not intended to be directly overloaded or modified
 		// Checkout agree
 		$this->chkAgree = new QCheckBox($this->pnlVerify);
-
+        */
 		//submit order button
 		$this->btnSubmit = new QButton($this->pnlVerify);
 		$this->btnSubmit->Text = _sp('Submit Order');
@@ -756,7 +848,6 @@ class xlsws_checkout extends xlsws_index {
 		$this->btnSubmit->PrimaryButton = true;
 
 		$this->btnSubmit->AddAction(new QClickEvent(), new QServerAction('btnSubmit_Click'));
-        */
 
 		// Wait
 		$this->pnlWait = new QPanel($this->mainPnl);
