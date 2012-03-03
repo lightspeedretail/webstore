@@ -64,7 +64,7 @@
 <br style="clear: both;"/>
 
 			
-<?php //$this->pnlVerify->Render(); ?>		  			
+<?php $this->pnlVerify->Render(); ?>		  			
 
 
 </div>			
