@@ -134,6 +134,13 @@ abstract class QControl extends QControlBase {
                     return parent::__set($strName, $mixValue);
                 else break;
 
+            case 'ValidationError':
+                $this->strValidationError = QType::Cast(
+                    $mixValue, Qtype::String
+                );
+                $this->blnModified = true;
+                break;
+
             case 'Template':
                 $mixValue = $this->GetTemplatePath($mixValue);
 

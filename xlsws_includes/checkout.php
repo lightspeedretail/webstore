@@ -41,6 +41,7 @@ class xlsws_checkout extends xlsws_index {
 
     protected $ShippingControl;
     protected $PaymentControl;
+    protected $PromoControl;
 
     protected $VerifyControl;
     protected $CaptchaControl;
@@ -139,6 +140,22 @@ class xlsws_checkout extends xlsws_index {
     }
 
     protected function BindPaymentControl() {
+    }
+
+    protected function BuildPromoControl() {
+        $objControl = $this->PromoControl = 
+            new XLSPromoControl($this, 'Promo');
+		$objControl->Template = templateNamed('promo_code.tpl.php');
+
+        return $objControl;
+    }
+
+    protected function UpdatePromoControl() {
+        return $this->PromoControl;
+    }
+    
+    protected function BindPromoControl() {
+        return $this->PromoControl;
     }
 
     protected function BuildVerifyControl() {
@@ -272,6 +289,7 @@ class xlsws_checkout extends xlsws_index {
         $this->BuildCalculateShippingControl();
         $this->BuildShippingControl();
         $this->BuildPaymentControl();
+        $this->BuildPromoControl();
         $this->BuildVerifyControl();
         $this->BuildCaptchaControl();
         $this->BuildCommentControl();
@@ -283,6 +301,7 @@ class xlsws_checkout extends xlsws_index {
         $this->UpdateCalculateShippingControl();
         $this->UpdateShippingControl();
         $this->UpdatePaymentControl();
+        $this->UpdatePromoControl();
         $this->UpdateVerifyControl();
         $this->UpdateCaptchaControl();
         $this->UpdateCommentControl();
@@ -294,6 +313,7 @@ class xlsws_checkout extends xlsws_index {
         $this->BindCalculateShippingControl();
         $this->BindShippingControl();
         $this->BindPaymentControl();
+        $this->BindPromoControl();
         $this->BindVerifyControl();
         $this->BindCaptchaControl();
         $this->BindCommentControl();
@@ -302,6 +322,9 @@ class xlsws_checkout extends xlsws_index {
 
     public function __isset($strName) {
         switch ($strName) {
+            case 'pnlPromoCode':
+                if ($this->PromoControl) return true;
+                else return false;
             case 'butCalcShipping':
                 if ($this->CalculateShippingControl) return true;
                 else return false;
@@ -398,6 +421,18 @@ class xlsws_checkout extends xlsws_index {
             case 'pnlPayment':
                 return $this->PaymentControl;
 
+            case 'pnlPromoCode':
+                return $this->PromoControl;
+
+            case 'txtPromoCode':
+                return $this->PromoControl->Input;
+
+            case 'btnPromoVerify':
+                return $this->PromoControl->Submit;
+
+            case 'lblPromoErr':
+                return $this->PromoControl->Label;
+
             case 'pnlVerify':
                 return $this->VerifyControl;
 
@@ -461,11 +496,6 @@ class xlsws_checkout extends xlsws_index {
 
 	protected $butLogin; //The login button solely on the checkout page
 	protected $butRegister; //The register button solely on the checkout page
-
-	protected $pnlPromoCode; //the Qpanel for the promo code widget
-	protected $txtPromoCode; //the textbox to enter the promo code
-	protected $btnPromoVerify; //the button that applies the promo code
-	protected $lblPromoErr; //the area where promo code return messages show
 
 	/**
 	 * handle_order - handles an order if the complete_order parameter has been passed via GET or POST
@@ -592,7 +622,8 @@ class xlsws_checkout extends xlsws_index {
 	 * build_promocode_widget - builds the widget to enter a promo code
 	 * @param none
 	 * @return none
-	 */
+     */
+    /* LEGACY // OLD // TODO //
 	protected function build_promocode_widget() {
 		$this->pnlPromoCode = new QPanel($this->mainPnl);
 		$this->pnlPromoCode->Name = _sp("Promotional Code");
@@ -608,7 +639,7 @@ class xlsws_checkout extends xlsws_index {
 
 		$this->btnPromoVerify->CssClass = "button rounded";
 	}
-
+    */
 	/**
 	 * check_registry - checks if the purchase was made with gift registry and sets options appropriately
 	 * @param none
