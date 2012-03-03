@@ -566,16 +566,6 @@ class xlsws_checkout extends xlsws_index {
 	}
 
 	/**
-	 * build_notes - builds the notes textarea
-	 * @param none
-	 * @return none
-	 */
-	protected function build_notes() {
-		$this->txtNotes = new XLSTextBox($this->pnlVerify);
-		$this->txtNotes->TextMode = QTextMode::MultiLine;
-	}
-
-	/**
 	 * build_login_register - builds the two login and register buttons panel
 	 * @param none
 	 * @return none
@@ -678,8 +668,6 @@ class xlsws_checkout extends xlsws_index {
 	 */
 	protected function build_widgets() {
 		$this->build_promocode_widget();
-		$this->build_captcha_widget($this->mainPnl);
-		$this->build_notes();
 	}
 
 
@@ -689,7 +677,6 @@ class xlsws_checkout extends xlsws_index {
 	 * @return none
 	 */
 	protected function bind_widgets() {
-		$this->butCalcShipping->AddAction(new QClickEvent() , new QAjaxAction('setupShipping'));
 		$this->btnPromoVerify->AddAction(new QClickEvent() , new QAjaxAction('validatePromoCode'));
 		$this->btnPromoVerify->AddAction(new QClickEvent() , new QToggleEnableAction($this->btnPromoVerify, false));
 
