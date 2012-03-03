@@ -133,6 +133,15 @@ class XLSCompositeControl extends QPanel {
         return $this->RenderOutput($strToReturn, $blnDisplayOutput);
     }
 
+    public function ValidationReset() {
+        foreach ($this->RegisteredChildren as $strName) {
+            $objControl = $this->GetChildByName($strName);
+            $objControl->ValidationReset();
+        }
+
+        parent::ValidationReset();
+    }
+
     public function __construct($objParentControl, $strControlId) {
         try { 
             parent::__construct($objParentControl, $strControlId);

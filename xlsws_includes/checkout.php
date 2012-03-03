@@ -687,6 +687,16 @@ class xlsws_checkout extends xlsws_index {
         $this->UpdateForm();
         $this->BindForm();
 
+        #
+        # Provide support for activating the shipping and payment modules
+        # when the customer contact informatin is adequately pre-populated. 
+        #
+        # Then, since this is on the initial page load, reset the validation
+        # errors that may be.  
+        #
+        $this->UpdateAfterShippingAddressChange();
+        $this->CustomerControl->ValidationReset();
+
 		$this->checktaxonly = false;
 
 		if(isset($XLSWS_VARS['complete_order'])) {

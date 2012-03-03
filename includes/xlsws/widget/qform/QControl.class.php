@@ -108,6 +108,21 @@ abstract class QControl extends QControlBase {
 
     public function __set($strName, $mixValue) {
         switch ($strName) {
+            case 'Visible':
+                if ($this->blnVisible != $mixValue)
+                    return parent::__set($strName, $mixValue);
+                else break;
+
+            case 'Enabled':
+                if ($this->blnEnabled != $mixValue)
+                    return parent::__set($strName, $mixValue);
+                else break;
+
+            case 'Display':
+                if ($this->blnDisplay != $mixValue)
+                    return parent::__set($strName, $mixValue);
+                else break;
+
             case 'RenderMethod':
                 try { 
                     $this->blnModified = true;
@@ -120,6 +135,7 @@ abstract class QControl extends QControlBase {
                     $objExc->IncrementOffset();
                     throw $objExc;
                 }
+
             default:
                 try { 
                     parent::__set($strName, $mixValue);

@@ -46,15 +46,13 @@ class XLSShippingControl extends XLSCompositeControl {
         if ($strMessage) {
             $strMessage = _sp($strMessage);
             
-            if (!$objControl->Visible)
-                $objControl->Visible = true;
+            $objControl->Visible = true;
             
             if ($objControl->Text != $strMessage)
                 $objControl->Text = $strMessage;
         }
         else {
-            if ($objControl->Visible)    
-                $objControl->Visible = false;
+            $objControl->Visible = false;
         }
 
         return $objControl;
@@ -85,14 +83,12 @@ class XLSShippingControl extends XLSCompositeControl {
             $objCart->ShippingSell = null;
             $objCart->ShippingCost = null;
             
-            if ($objControl->Visible)
-                $objControl->Visible = false;
+            $objControl->Visible = false;
             
             return $objControl;
         }
         else {
-            if (!$objControl->Visible)
-                $objControl->Visible = true;
+            $objControl->Visible = true;
         }
 
         if (!is_null($fltPrice)) { 
@@ -173,13 +169,13 @@ class XLSShippingControl extends XLSCompositeControl {
 
         if ($this->blnEnabled) {
             $objCart->ShippingModule = $objControl->SelectedValue;
-            if (!$objControl->Visible) $objControl->Visible = true;
-            if (!$objControl->Enabled) $objControl->Enabled = true;
+            $objControl->Visible = true;
+            $objControl->Enabled = true;
         }
         else {
             $objCart->ShippingModule = null;
-            if ($objControl->Visible) $objControl->Visible = false;
-            if ($objControl->Enabled) $objControl->Enabled = false;
+            $objControl->Visible = false;
+            $objControl->Enabled = false;
         }
 
         return $objControl;
@@ -259,17 +255,16 @@ class XLSShippingControl extends XLSCompositeControl {
 
         if ($this->blnEnabled) {
             #$objCart->ShippingModule = $objControl->SelectedValue;
-            if (!$objControl->Visible) $objControl->Visible = true;
-            if (!$objControl->Enabled) $objControl->Enabled = true;
+            $objControl->Visible = true;
+            $objControl->Enabled = true;
 
             foreach ($this->objMethodFields as $objChildControl)
-                if (!$objChildControl->Enabled)
-                    $objChildControl->Enabled = true;
+                $objChildControl->Enabled = true;
         }
         else {
             $objCart->ShippingMethod = null;
-            if ($objControl->Visible) $objControl->Visible = true;
-            if ($objControl->Enabled) $objControl->Enabled = true;
+            $objControl->Visible = false;
+            $objControl->Enabled = false;
         }
 
         return $objControl;

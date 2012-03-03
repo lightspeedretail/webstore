@@ -280,6 +280,8 @@ class XLSPaymentControl extends XLSCompositeControl {
 
     protected function UpdateControl() {
         if ($this->blnEnabled) {
+            $this->Enabled = true;
+            $this->Visible = true;
             $this->objPriceControl->Enabled = true;
             $this->objPriceControl->Visible = true;
             $this->objModuleControl->Enabled = true;
@@ -288,6 +290,8 @@ class XLSPaymentControl extends XLSCompositeControl {
             $this->objMethodControl->Visible = true;
         }
         else {
+            $this->Enabled = false;
+            $this->Visible = false;
             $this->objPriceControl->Enabled = false;
             $this->objPriceControl->Visible = false;
             $this->objModuleControl->Enabled = false;
