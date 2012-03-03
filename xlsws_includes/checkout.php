@@ -231,9 +231,15 @@ class xlsws_checkout extends xlsws_index {
         $this->ShippingControl->Enabled = $blnValid;
         $this->PaymentControl->Enabled = $blnValid;
 
-        $this->SetDestination($blnValid);
-        $this->SetTaxCode($blnValid);
-        
+        if ($blnValid) { 
+            $this->SetDestination();
+            $this->SetTaxCode();
+        }
+        else { 
+            $this->ResetDestination();
+            $this->ResetTaxCode();
+        }
+
         $this->UpdateShippingControl();
         $this->UpdatePaymentControl();
     }
@@ -242,46 +248,76 @@ class xlsws_checkout extends xlsws_index {
         
     }
 
-    protected function SetDestination($blnValid = false) {
-        if (!$blnValid) {
-            $this->objDestination = null;
-            return;
-        }
+    protected function ResetDestination() {
+        $this->objDestination = null;
 
+        return $this->objDestination;
+    }
+
+    protected function SetDestination() {
         $objShippingControl = $this->ShippingContactControl;
 
         if (!$objShippingControl) 
-            return;
+            return false;
 
         $strCountry = $objShippingControl->Address->Country->Value;
         $strState = $objShippingControl->Address->State->Value;
         $strZip = $objShippingControl->Address->Zip->Value;
 
-        if (!$strCountry || !$strState || !$strZip)
-            return;
+        if (!$strCountry || !$strZip)
+            return $this->ResetDestination();
 
         $objDestination = Destination::LoadMatching(
             $strCountry, $strState, $strZip
         );
 
+        if (!$objDestination)
+            $objDestination = Destination::LoadDefault();
+
         if ($objDestination)
             return $this->objDestination = $objDestination;
+        else
+            return $this->ResetDestination();
     }
 
-    protected function SetTaxCode($blnValid = false) {
-        if (!$blnValid) {
-            $this->objTaxCode = null;
-            return;
-        }
+    protected function ResetTaxCode() {
+        $objCart = Cart::GetCart();
+        $objCart->FkTaxCodeId = -1;
 
+        $this->objTaxCode = null;
+
+        return $this->objTaxCode;
+    }
+
+    protected function SetTaxCode() {
+        $objCart = Cart::GetCart();
+        $objTaxCode = null;
 
         if ($this->objDestination)
-            return $this->objTaxCode = $this->objDestination->Taxcode;
+            $objTaxCode = $this->objDestination->Taxcode;
         else {
-            // TODO define default Tax Code
-            // TODO condition to verify shipping method
-            return;
+            $objTaxCodes = TaxCode::LoadAll(
+                QQ::Clause(
+                    QQ::OrderBy(QQN::TaxCode()->ListOrder)
+                )
+            );
+
+            if ($objTaxCodes && count($objTaxCodes) > 0)
+                $objTaxCode = $objTaxCodes[0];
         }
+
+        if (!is_null($objTaxCode) && !($objTaxCode instanceof TaxCode))
+            $objTaxCode = TaxCode::Load($objTaxCode);
+        
+        if (is_null($objTaxCode))
+            return $this->ResetTaxCode();
+
+        if ($objTaxCode != $this->objTaxCode) {
+            $objCart->FkTaxCodeId = $objTaxCode->Rowid;
+            $this->objTaxCode = $objTaxCode;
+        }
+
+        return $this->objTaxCode;
     }
 
     protected function BuildForm() {
