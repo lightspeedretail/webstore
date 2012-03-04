@@ -21,7 +21,7 @@
                                 $blnToReturn = false;
                 }
 
-                $objControl->ValidationReset();
+                $objControl->ValidationReset(false);
                 if (!$objControl->Validate()) {
                     $objControl->MarkAsModified();
                     $blnToReturn = false;
