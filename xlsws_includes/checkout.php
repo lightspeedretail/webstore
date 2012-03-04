@@ -932,17 +932,16 @@ class xlsws_checkout extends xlsws_index {
 
 		$errors = array();
 
-        if (!$this->CaptchaControl->Validate())
+        if (!$this->ValidateControlAndChildren($this->CaptchaControl))
 			$errors[] = _sp("Wrong Verification Code.");
 
-        if (!$this->CustomerControl->Validate())
+        if (!$this->ValidateControlAndChildren($this->CustomerControl))
 			$errors[] = _sp('Please complete the required fields marked with an asterisk *');
-        
-        
-        if (!$this->ShippingControl->Validate())
+
+        if (!$this->ValidateControlAndChildren($this->ShippingControl));
 			$errors[] =  _sp("Shipping error. Please choose a valid shipping method.");
 
-        if (!$this->PaymentControl->Validate())
+        if (!$this->ValidateControlAndChildren($this->PaymentControl));
             $errors[] =  _sp("Payment error");
 
         if (!$this->TermsControl->Checked)
@@ -964,7 +963,7 @@ class xlsws_checkout extends xlsws_index {
 	 * @return none
 	 */
 	public function btnSubmit_Click($strFormId, $strControlId, $strParameter) {
-        if (!$this->Validate())
+        if (!$this->Form_Validate())
             return;
         
         $this->CustomerControl->Visible = false;

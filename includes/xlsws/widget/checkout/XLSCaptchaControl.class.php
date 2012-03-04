@@ -1,9 +1,6 @@
 <?php
 
 class XLSCaptchaControl extends XLSCompositeControl {
-    // Behavior
-	protected $blnEnabled = false;
-
     protected $arrRegisteredChildren = array(
         'Code', 'Input'
     );
@@ -105,15 +102,12 @@ class XLSCaptchaControl extends XLSCompositeControl {
         $objSecurimage = new Securimage();
 
         if ($objSecurimage->getCode() != $objInput->Text) {
-            $objInput->strValidationError = $this->strLabelForValidationError;
-            $objInput->blnModified = true;
+            $objInput->ValidationError = $this->strLabelForValidationError;
             return false;
         }
 
-        if ($objInput->strValidationError) {
-            $objInput->strValidationError = null;
-            $objInput->blnModified = true;
-        }
+        $objInput->ValidationReset();
+        $this->ValidationReset(false);
 
         return true;
     }
