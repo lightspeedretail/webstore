@@ -135,10 +135,12 @@ abstract class QControl extends QControlBase {
                 else break;
 
             case 'ValidationError':
+                if ($this->strValidationError != $mixValue)
+                    $this->blnModified = true;
+
                 $this->strValidationError = QType::Cast(
                     $mixValue, Qtype::String
                 );
-                $this->blnModified = true;
                 break;
 
             case 'Template':

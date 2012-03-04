@@ -66,7 +66,7 @@
 	<dl>
 	<dt><label for="Zip" class="zip"><?php _xt("Zip/Postal Code") ?></label></dt>
 	
-	<dd><?php $this->txtCRBillZip->Render() ?></dd>
+	<dd><?php $this->txtCRBillZip->RenderWithError() ?></dd>
 	</dl>
 	</div>
 	

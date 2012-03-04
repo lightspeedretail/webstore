@@ -124,7 +124,7 @@
 		<dl>
 			<dt><label for="Zip" class="zip"><?php _xt("Zip/Postal Code") ?></label></dt>
 		
-			<dd><?php $this->txtCRShipZip->Render() ?></dd>
+			<dd><?php $this->txtCRShipZip->RenderWithError() ?></dd>
 		</dl>
 		</div>
 		

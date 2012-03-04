@@ -34,12 +34,12 @@ class XLSListControl extends QListBox {
 
         if (empty($strSelectedValue) || is_null($strSelectedValue)) {
             if ($this->strName)
-                $this->strValidationError = sprintf(
+                $this->ValidationError = sprintf(
                     $this->strLabelForRequired, 
                     $this->strName
                 );
             else
-                $this->strValidationError = 
+                $this->ValidationError = 
                     $this->strLabelForRequiredUnnamed;
 
             return false;
@@ -55,7 +55,7 @@ class XLSListControl extends QListBox {
         if (!$this->ValidateRequired())
             return false;
 
-        $this->strValidationError = false;
+        $this->ValidationError = false;
         return true;
     }
 

@@ -43,7 +43,7 @@ class XLSZipFieldControl extends XLSTextControl {
 
         if ($this->strRegex)
             if (!preg_match($this->strRegex, $this->strText)) { 
-                $this->strValidationError = _sp($this->strLabelForInvalid);
+                $this->ValidationError = _sp($this->strLabelForInvalid);
                 return false;
             }
 

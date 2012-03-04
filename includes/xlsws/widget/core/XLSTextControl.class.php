@@ -32,12 +32,12 @@ class XLSTextControl extends QTextBox {
 
         if ($this->Text == '') {
             if ($this->strName)
-                $this->strValidationError = sprintf(
+                $this->ValidationError = sprintf(
                     $this->strLabelForRequired,
                     $this->strName
                 );
             else
-                $this->strValidationError = 
+                $this->ValidationError = 
                     $this->strLabelForRequiredUnnamed;
 
             return false;
@@ -50,7 +50,7 @@ class XLSTextControl extends QTextBox {
         if (!$this->ValidateRequired()) return false;
         if (!$this->ValidateValue()) return false;
 
-        $this->strValidationError = false;
+        $this->ValidationError = false;
         return true;
     }
 

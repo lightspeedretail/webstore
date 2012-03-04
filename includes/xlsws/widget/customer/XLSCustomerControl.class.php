@@ -173,6 +173,7 @@ class XLSCustomerControl extends XLSCompositeControl {
 
     public function DoBillingFieldUpdate($strFormId, $strControlId, $strParam) {
         $objControl = $this->GetChildByName('CheckSame');
+        
         if (!$objControl)
             return;
 
@@ -181,6 +182,9 @@ class XLSCustomerControl extends XLSCompositeControl {
 
         if (!$objBilling || !$objShipping)
             return;
+
+        $objField = $this->Form->GetControl($strControlId);
+        $objField->Validate();
 
         $objBilling->SaveFieldsToCustomer();
 
