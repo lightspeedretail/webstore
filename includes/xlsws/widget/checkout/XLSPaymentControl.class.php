@@ -132,9 +132,9 @@ class XLSPaymentControl extends XLSCompositeControl {
         $objCart = Cart::GetCart();
 
         if ($objControl->ItemCount > 0) {
-            #if ($objCart->ShippingModule)
-            #    $objControl->SelectedValue = $objCart->PaymentModule;
-            #else
+            if ($objCart->PaymentModule)
+                $objControl->SelectedValue = $objCart->PaymentModule;
+            else
                 $objControl->SelectedIndex = 0;
         }
 

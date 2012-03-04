@@ -50,15 +50,11 @@ class xlsws_checkout extends xlsws_index {
     protected $CommentControl;
     protected $TermsControl;
 
+    protected $SubmitControl;
+
+    protected $objRegistry;
     protected $objDestination;
     protected $objTaxCode;
-
-    // TODO
-    protected function Form_PreRender() {
-        // Todo ... inefficient
-        $this->UpdateCartControl();
-        parent::Form_PreRender();
-	}
 
     protected function BuildCustomerControl() {
         $this->CustomerControl = $objControl = 
@@ -71,8 +67,46 @@ class xlsws_checkout extends xlsws_index {
         return $objControl;
     }
 
-    protected function UpdateCustomerControl() {
+    protected function UpdateCustomerFromRegistry() {
+        $objCart = Cart::GetCart();
+        $objRegistry = $objCart->GiftRegistryObject;
 
+        $this->objRegistry = null;
+
+        if (!$objRegistry)
+            return $objRegistry;
+
+        $this->objRegistry = $objRegistry;
+
+        if ($objRegistry->ShipOption == 'Ship to buyer')
+            return $objRegistry;
+
+        // TODO :: Posible security / privacy risk
+        $objRecipient = Customer::Load($objRegistry->CustomerId);
+        if (!$objRecipient)
+            return $objRegistry;
+
+        if (!$this->ShippingContactControl)
+            return $objRegistry;
+
+        $this->ShippingContactControl->UpdateFieldsFromCustomer($objRecipient);
+
+        if ($this->CustomerControl->CheckSame) {
+            $this->CustomerControl->CheckSame->Visible = false;
+            $this->CustomerControl->CheckSame->Checked = false;
+        }
+
+        $this->ShippingContactControl->Visible = false;
+
+        return $objRegistry;
+    }
+
+    protected function UpdateCustomerControl() {
+        $objControl = $this->CustomerControl;
+
+        $this->UpdateCustomerFromRegistry();
+
+        return $objControl;
     }
 
     protected function BindCustomerControl() {
@@ -255,6 +289,46 @@ class xlsws_checkout extends xlsws_index {
         return $this->TermsControl;
     }
 
+    protected function BuildSubmitControl() {
+        $objControl = $this->SubmitControl = 
+            new QButton($this, 'Submit');
+        $objControl->Text = _sp('Submit Order');
+        $objControl->CausesValidation = true;
+        $objControl->PrimaryButton = true;
+        $objControl->Required = true;
+ 
+        return $objControl;
+    }
+
+    protected function UpdateSubmitControl() {
+        return $this->SubmitControl;
+    }
+
+    protected function BindSubmitControl() {
+        $objControl = $this->SubmitControl;
+
+        if (!$objControl)
+            return;
+
+        $objControl->AddAction(
+            new QClickEvent(), 
+            new QServerAction('DoSubmitControlClick')
+        );
+
+        return $objControl;
+    }
+
+	public function DoSubmitControlClick($strFormId, $strControlId, $strParam) {
+        $this->ToggleCheckoutControls(false);
+
+        $objCart = Cart::GetCurrent();
+		if(trim($objCart->Currency) == '')
+			$this->cart->Currency = _xls_get_conf('CURRENCY_DEFAULT' , 'USD');
+		$objCart->SyncSave();
+
+		QApplication::ExecuteJavaScript("document.getElementById('pxyCheckout').click();");
+	}
+
     public function UpdateAfterShippingAddressChange() {
         $blnValid = $this->ValidateControlAndChildren($this->CustomerControl);
 
@@ -352,6 +426,169 @@ class xlsws_checkout extends xlsws_index {
         return $this->objTaxCode;
     }
 
+    protected function ToggleCheckoutControls($blnVisibility) {
+		$this->pnlLoginRegister->Visible = $blnVisibility;
+		$this->pnlWait->Visible = true;
+        
+        $this->CustomerControl->Visible = $blnVisibility;
+        $this->ShippingControl->Visible = $blnVisibility;
+        $this->CartControl->Visible = $blnVisibility;
+        $this->PromoControl->Visible = $blnVisibility;
+        $this->VerifyControl->Visible = $blnVisibility;
+        $this->PaymentControl->Visible = $blnVisibility;
+    }
+
+    public function DoProcessCheckout($strFormId, $strControlId, $strParam) {
+
+    }
+
+    protected function CompleteUpdateCart() {
+        $objCart = Cart::GetCart();
+
+        $objCart->SetIdStr();
+        
+        $objCart->Type = CartType::awaitpayment;
+        $objCart->State = 'Awaiting Processing';
+        $objCart->DatetimePosted = QDateTime::Now();
+        $objCart->Downloaded = 0;
+        $objCart->IpHost = _xls_get_ip();
+
+        $objCart->Contact = $objCart->FirstName . ' ' . $objCart->LastName;
+        $objCart->Name = 
+            (($objCart->Company) ? ($objCart->Company) : $objCart->Contact);
+
+        $objCart->AddressBill = implode("\n", array(
+            $objCustomer->Address11, 
+            $objCustomer->Address12,
+            $objCustomer->City1,
+            $objCustomer->State1,
+            $objCustomer->Zip1,
+            $objCustomer->Country1
+        ));
+
+        $objCart->AddressShip = implode("\n", array(
+            $objCart->ShipFirstname, 
+            $objCart->ShipLastname,
+            (($objCart->ShipCompany) ? ($objCart->ShipCompany) : ''),
+            $objCart->ShipAddress1,
+            $objCart->ShipAddress2,
+            $objCart->City, 
+            $objCart->State . ' ' . $objCart->ShipZip,
+            $objCart->ShipCountry
+        ));
+
+        $objCart->Zipcode = $objCart->ShipZip;
+        $objCart->PrintedNotes = $this->CommentControl->Text;
+    
+        return $objCart;
+    }
+
+    protected function CompleteUpdatePromoCode() {
+        $objCart = Cart::GetCart();
+        $objPromo = null;
+
+        if ($objCart->FkPromoId > 0) {
+            $objPromo = PromoCode::Load($objCart->FkPromoId);
+
+            $objCart->PrintedNotes = implode("\n", array(
+                $objCart->PrintedNotes,
+                sprintf("%s: %s", _sp('Promo Code'), $objPromo->Code)
+            ));
+
+			foreach ($cart->GetCartItemArray() as $objItem)
+                if ($objItem->Discount > 0)
+                    $objCart->PrintedNotes = implode("\n", array(
+                        $objCart->PrintedNotes, 
+                        sprintf("%s discount: %.2f\n", 
+                            $objItem->Code, 
+                            $objItem->Discount
+                        )
+                    ));
+
+			if ($objPromo->QtyRemaining > 0) {
+				$objPromo->QtyRemaining--;
+				$objPromo->Save();
+			}
+		}
+
+        return $objPromo;
+    }
+
+    protected function CompleteUpdateCustomer() {
+        $objCustomer = Customer::GetCurrent();
+        
+        return $objCustomer;
+    }
+
+    // TODO :: Required ? 
+    protected function PrePaymentHooks() {
+		if (function_exists('_custom_before_order_process'))
+			_custom_before_order_process($cart);
+    
+        return true;
+    }
+
+    // TODO :: Required ? 
+    protected function PostPaymentHooks() {
+		if (function_exists('_custom_after_order_process'))
+			_custom_before_after_process($cart);
+    
+        return true;
+    }
+
+    protected function CompleteCheckout() {
+        Visitor::add_view_log('',ViewLogType::checkoutpayment);
+
+        $objCart = $this->CompleteUpdateCart();
+        $objPromo = $this->CompleteUpdatePromoCode();
+        $objCustomer = $this->CompleteUpdateCustomer();
+
+        $objCart->Save();
+        $objCustomer->Save();
+
+        if (!$this->PrePaymentHooks())
+            return false;
+
+        $objPaymentModule = $this->loadModule(
+            $objCart->PaymentModule,
+            'payment'
+        );
+
+        $strError = '';
+        $mixResponse = $objPaymentModule->process(
+            $objCart, $this->PaymentControl->objMethodFields, $strError
+        );
+
+        if ($mixResponse === FALSE) {
+            $this->errSpan->Text = $strError ? $strError : _sp('Error in processing payment');
+            $this->ToggleCheckoutControls(true);
+            return false;
+        }
+
+        $objCart->PaymentMethod = $objPaymentModule->payment_method($objCart);
+        $objCart->PaymentData = $mixResponse;
+
+        if (!$objPaymentModule->uses_jumper())
+            $objCart->PaymentAmount = $objPaymentModule->paid_amount($objCart);
+
+        if (!$this->PostPaymentHooks())
+            return false;
+
+		Visitor::add_view_log('',ViewLogType::checkoutfinal);
+
+        if ($objPaymentModule->uses_jumper()) { 
+            _xls_stack_add('xls_jumper_form', $mixResponse);
+            $objCart->PaymentData = '';
+            $objCart->Save();
+            _rd('xls_jumper.php');
+            return;
+        }
+
+        $objCart->Save();
+
+        $this->completeOrder($objCart, $objCustomer);
+    }
+
     protected function BuildForm() {
         $this->BuildCustomerControl();
         $this->BuildCalculateShippingControl();
@@ -363,6 +600,7 @@ class xlsws_checkout extends xlsws_index {
         $this->BuildCaptchaControl();
         $this->BuildCommentControl();
         $this->BuildTermsControl();
+        $this->BuildSubmitControl();
     }
 
     protected function UpdateForm() {
@@ -376,6 +614,7 @@ class xlsws_checkout extends xlsws_index {
         $this->UpdateCaptchaControl();
         $this->UpdateCommentControl();
         $this->UpdateTermsControl();
+        $this->UpdateSubmitControl();
     }
 
     protected function BindForm() {
@@ -389,7 +628,46 @@ class xlsws_checkout extends xlsws_index {
         $this->BindCaptchaControl();
         $this->BindCommentControl();
         $this->BindTermsControl();
+        $this->BindSubmitControl();
     }
+
+    // TODO
+    protected function Form_PreRender() {
+        // Todo ... inefficient
+        $this->UpdateCartControl();
+        parent::Form_PreRender();
+	}
+
+	protected function Form_Validate() {
+		$this->errSpan->Text='';
+		$this->errSpan->CssClass='customer_reg_err_msg';
+
+		$errors = array();
+
+        if (!$this->ValidateControlAndChildren($this->CaptchaControl))
+			$errors[] = _sp("Wrong Verification Code.");
+
+        if (!$this->ValidateControlAndChildren($this->CustomerControl))
+			$errors[] = _sp('Please complete the required fields marked with an asterisk *');
+
+        if (!$this->ValidateControlAndChildren($this->ShippingControl));
+			$errors[] =  _sp("Shipping error. Please choose a valid shipping method.");
+
+        if (!$this->ValidateControlAndChildren($this->PaymentControl));
+            $errors[] =  _sp("Payment error");
+
+        if (!$this->TermsControl->Checked)
+			$errors[] =  _sp("You must agree to terms and conditions to place an order");
+
+		if (count($errors)) {
+			$this->errSpan->Text = join('<br />', $errors);
+
+			return false;
+		}
+
+		$this->errSpan->Text='';
+		return true;
+	}
 
     public function __isset($strName) {
         switch ($strName) {
@@ -522,6 +800,9 @@ class xlsws_checkout extends xlsws_index {
             case 'chkAgree':
                 return $this->TermsControl;
 
+            case 'btnSubmit':
+                return $this->SubmitControl;
+                    
             case 'customer':
                 return Customer::GetCurrent();
 
@@ -543,27 +824,16 @@ class xlsws_checkout extends xlsws_index {
 	/*see xlsws_index for shared widgets*/
 	protected $lstCRShipPrevious; //input select box for previously shipped addresses
 
-	protected $btnSubmit; //input submit for the submit button on the bottom
-
 	protected $errSpan; //span block that displays an error on top of the checkout form if any
 
 	protected $lblWait; //the label for the wait icon (optional)
 	protected $icoWait; //the actual wait icon
-
-	protected $lstShippingMethod; //input select box that shows applicable shipping methods to pick from
-
-	protected $lstPaymentMethod; //input select box that shows applicable payment methods to pick from
 
 	protected $pnlLoginRegister; //The QPanel that shows login and register buttons on the checkout page solely
 
 	protected $pnlWait; //The QPanel that shows the wait icon(s)
 
 	protected $pxyCheckout; //Handler for checkout
-
-	protected $giftRegistry; //Instantiated WishList object of the current shopper's cart relating to a registry (if purchased from there)
-
-	protected $checktaxonly; //used in the shipping cost function to just do a recalculation of taxes and not every other aspect like shipping
-
 
 	protected $butLogin; //The login button solely on the checkout page
 	protected $butRegister; //The register button solely on the checkout page
@@ -574,7 +844,8 @@ class xlsws_checkout extends xlsws_index {
 	 * @param none
 	 * @return none
 	 */
-	protected function handle_order() {
+    // TODO :: This doesn't seem to be used
+    protected function handle_order() {
 		global $XLSWS_VARS;
 
 		try {
@@ -599,19 +870,6 @@ class xlsws_checkout extends xlsws_index {
 		$this->completeOrder($cart , $this->customer );
 
 		return;
-	}
-
-	/**
-	 * check_guest_checkout - check if the store is configured to allow guest checkout and
-	 * whether the current client is a guest
-	 * @param none
-	 * @return none
-	 */
-	protected function check_guest_checkout() {
-		$customer = Customer::GetCurrent();
-		// check guest checkout
-		if(!$customer && !_xls_get_conf('ALLOW_GUEST_CHECKOUT', 1))
-			_xls_display_msg(_sp("You have to login to check out"), "index.php?xlspg=checkout");
 	}
 
 	/**
@@ -690,58 +948,6 @@ class xlsws_checkout extends xlsws_index {
 	}
 
 	/**
-	 * check_registry - checks if the purchase was made with gift registry and sets options appropriately
-	 * @param none
-	 * @return none
-	 */
-	protected function check_registry() {
-		$this->giftRegistry = $this->cart->GiftRegistryObject;
-
-		if($this->giftRegistry instanceof GiftRegistry){
-
-			//is it ship to me?
-			if($this->giftRegistry->ShipOption != 'Ship to buyer'){
-
-				$cust = Customer::Load($this->giftRegistry->CustomerId);
-
-				// TODO is this a security risk if the gift registry owner's address is shown?
-
-				$this->txtCRShipAddr1->Text = $cust->Address21;
-				$this->txtCRShipAddr1->ReadOnly = true;
-				$this->txtCRShipAddr2->Text = $cust->Address22;
-				$this->txtCRShipAddr2->ReadOnly = true;
-				$this->txtCRShipCity->Text = $cust->City2;
-				$this->txtCRShipCity->ReadOnly = true;
-				$this->txtCRShipZip->Text  = $cust->Zip2;
-				$this->txtCRShipZip->ReadOnly = true;
-				// there is no readonly for select items so adding only a single item
-				$this->txtCRShipCountry->RemoveAllItems();
-				$this->txtCRShipCountry->AddItem(Country::LoadByCode($cust->Country2)->Country , $cust->Country2);
-				$this->txtCRShipCountry->SelectedValue = $cust->Country2;
-
-				$this->txtCRShipState->RemoveAllItems();
-				$this->txtCRShipState->AddItem(State::LoadByCountryCodeCode( $cust->Country2, $cust->State2)->State , $cust->State2);
-				$this->txtCRShipState->SelectedValue = $cust->State2;
-
-
-				$this->txtCRShipFirstname->Text  = $cust->Firstname;
-				$this->txtCRShipFirstname->ReadOnly = true;
-				$this->txtCRShipLastname->Text  = $cust->Lastname;
-				$this->txtCRShipLastname->ReadOnly = true;
-				$this->txtCRShipCompany->Text  = $cust->Company;
-				$this->txtCRShipCompany->ReadOnly = true;
-
-				$this->txtCRShipPhone->Text = $cust->Mainphone;
-				$this->txtCRShipPhone->ReadOnly = true;
-
-				$this->chkSame->Checked = false;
-				$this->chkSame->Visible = false;
-				$this->pnlShippingAdde->Visible = true;
-			}
-		}
-	}
-
-	/**
 	 * build_main - constructor for this controller
 	 * @param none
 	 * @return none
@@ -749,9 +955,26 @@ class xlsws_checkout extends xlsws_index {
 	protected function build_main() {
 		global $XLSWS_VARS;
         
-        $customer = Customer::GetCurrent();
-        $cart = Cart::GetCart();
+        $objCustomer = Customer::GetCurrent();
+        $objCart = Cart::GetCart();
 
+        if (!$objCustomer)
+            if (_xls_get_conf('ALLOW_GUEST_CHECKOUT', 1) != 1)
+                _xls_display_msg(
+                    _sp('You have to login to check out'),
+                    'index.php?xlspg=checkout'
+                );
+
+		$this->mainPnl = new QPanel($this);
+		$this->mainPnl->Template = templateNamed('checkout.tpl.php');
+        $this->objDefaultWaitIcon = new QWaitIcon($this);
+
+        $this->crumbs[] = array(
+            'key' => 'xlspg=checkout',
+            'case' => '',
+            'name' => _sp('Check Out')
+        );
+        
         $this->BuildForm();
         $this->UpdateForm();
         $this->BindForm();
@@ -766,38 +989,9 @@ class xlsws_checkout extends xlsws_index {
         $this->UpdateAfterShippingAddressChange();
         $this->CustomerControl->ValidationReset();
 
-		$this->checktaxonly = false;
-
-		if(isset($XLSWS_VARS['complete_order'])) {
-			$this->handle_order();
-			return;
-		}
-
-		$this->mainPnl = new QPanel($this);
-		$this->mainPnl->Template = templateNamed('checkout.tpl.php');
-
-		$this->check_guest_checkout();
-
-		// Wait icon
-        $this->objDefaultWaitIcon = new QWaitIcon($this);
-
-		$this->crumbs[] = array('key'=>'xlspg=cart' , 'case'=> '' , 'name'=> _sp('Cart'));
-		$this->crumbs[] = array('key'=>'xlspg=checkout' , 'case'=> '' , 'name'=> _sp('Check Out'));
-
-		// Define the layout
-        $this->check_registry();
-
 		//error msg
 		$this->errSpan = new QPanel($this);
 		$this->errSpan->CssClass='customer_reg_err_msg';
-
-		//submit order button
-		$this->btnSubmit = new QButton($this->pnlVerify);
-		$this->btnSubmit->Text = _sp('Submit Order');
-		$this->btnSubmit->CausesValidation = true;
-		$this->btnSubmit->PrimaryButton = true;
-
-		$this->btnSubmit->AddAction(new QClickEvent(), new QServerAction('btnSubmit_Click'));
 
 		// Wait
 		$this->pnlWait = new QPanel($this->mainPnl);
@@ -921,263 +1115,6 @@ class xlsws_checkout extends xlsws_index {
 
 	}
 
-	/**
-	 * Form_Validate - Validates all form fields for valid input
-	 * @param none
-	 * @return none
-	 */
-	protected function Form_Validate() {
-		$this->errSpan->Text='';
-		$this->errSpan->CssClass='customer_reg_err_msg';
-
-		$errors = array();
-
-        if (!$this->ValidateControlAndChildren($this->CaptchaControl))
-			$errors[] = _sp("Wrong Verification Code.");
-
-        if (!$this->ValidateControlAndChildren($this->CustomerControl))
-			$errors[] = _sp('Please complete the required fields marked with an asterisk *');
-
-        if (!$this->ValidateControlAndChildren($this->ShippingControl));
-			$errors[] =  _sp("Shipping error. Please choose a valid shipping method.");
-
-        if (!$this->ValidateControlAndChildren($this->PaymentControl));
-            $errors[] =  _sp("Payment error");
-
-        if (!$this->TermsControl->Checked)
-			$errors[] =  _sp("You must agree to terms and conditions to place an order");
-
-		if (count($errors)) {
-			$this->errSpan->Text = join('<br />', $errors);
-
-			return false;
-		}
-
-		$this->errSpan->Text='';
-		return true;
-	}
-
-	/**
-	 * btnSubmit_Click - Submits the checkout form
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	public function btnSubmit_Click($strFormId, $strControlId, $strParameter) {
-        if (!$this->Form_Validate())
-            return;
-        
-        $this->CustomerControl->Visible = false;
-        $this->ShippingControl->Visible = false;
-        $this->CartControl->Visible = false;
-        $this->PromoControl->Visible = false;
-        $this->VerifyControl->Visible = false;
-        $this->PaymentControl->Visible = false;
-		$this->pnlLoginRegister->Visible = false;
-
-        $objCart = Cart::GetCurrent();
-
-		if(trim($objCart->Currency) == '')
-			$this->cart->Currency = _xls_get_conf('CURRENCY_DEFAULT' , 'USD');
-
-		$this->cart->SyncSave();
-
-		// show wait panel
-		$this->pnlWait->Visible = true;
-
-		QApplication::ExecuteJavaScript("document.getElementById('pxyCheckout').click();");
-	}
-
-	/**
-	 * showFieldPanels - Makes all checkout form fields visible
-	 * @param none
-	 * @return none
-	 */
-	public function showFieldPanels() {
-        $this->CustomerControl->Visible = true;
-        $this->ShippingControl->Visible = true;
-        $this->CartControl->Visible = true;
-        $this->PromoControl->Visible = true;
-        $this->VerifyControl->Visible = true;
-        $this->PaymentControl->Visible = true;
-
-		if(!$this->customer)
-			$this->pnlLoginRegister->Visible = true;
-
-        $this->UpdateCartControl();
-
-		$this->pnlWait->Visible = false;
-	}
-
-	/**
-	 * processCheckout - Process the checkout form with all details to save into the database
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	public function processCheckout($strFormId, $strControlId, $strParameter) {
-		$customer = Customer::GetCurrent();
-
-		// Add log for processing checkout
-		Visitor::add_view_log('',ViewLogType::checkoutpayment);
-
-        $cart = Cart::GetCart();
-        $cart->SetIdStr();
-
-		$cart->Type = CartType::awaitpayment;
-
-		$cart->AddressBill =
-			$this->txtCRBillAddr1->Text . "\n" .
-			$this->txtCRBillAddr2->Text . "\n" .
-			$this->txtCRBillCity->Text . "\n" .
-			$this->txtCRBillState->SelectedValue . " " .
-			$this->txtCRBillZip->Text . "\n" . // TODO for countries that doesn't have state?
-			$this->txtCRBillCountry->SelectedValue
-		;
-
-		$cart->ShipFirstname = $this->txtCRShipFirstname->Text;
-		$cart->ShipLastname = $this->txtCRShipLastname->Text;
-		$cart->ShipCompany = $this->txtCRShipCompany->Text;
-		$cart->ShipAddress1 = $this->txtCRShipAddr1->Text;
-		$cart->ShipAddress2 = $this->txtCRShipAddr2->Text;
-		$cart->ShipCity = $this->txtCRShipCity->Text;
-		$cart->ShipZip = $this->txtCRShipZip->Text;
-		$cart->ShipState = $this->txtCRShipState->SelectedValue;
-		$cart->ShipCountry = $this->txtCRShipCountry->SelectedValue;
-		$cart->ShipPhone = $this->txtCRShipPhone->Text;
-		$cart->DatetimePosted = QDateTime::Now();
-		$cart->Downloaded = 0;
-		$cart->Status = "Awaiting Processing";
-
-		$cart->AddressShip =
-			$cart->ShipFirstname . " " .
-			$cart->ShipLastname . 
-			(($cart->ShipCompany != '') ? ("\n" . $cart->ShipCompany ) : "") . "\n" .
-			$cart->ShipAddress1 . "\n" .
-			$cart->ShipAddress2 . "\n" .
-			$cart->ShipCity . "\n" .
-			$cart->ShipState . " " . $cart->ShipZip . "\n" .
-			$cart->ShipCountry
-		;
-
-		$cart->Zipcode = $cart->ShipZip;
-
-		$cart->Name = (($this->txtCRCompany->Text != '')?($this->txtCRCompany->Text ):($this->txtCRFName->Text . " " . $this->txtCRLName->Text));
-		$cart->Contact = ($this->txtCRFName->Text . " " . $this->txtCRLName->Text);
-		$cart->Firstname = $this->txtCRFName->Text;
-		$cart->Lastname = $this->txtCRLName->Text;
-		$cart->Company = $this->txtCRCompany->Text;
-		$cart->Email = $this->txtCREmail->Text;
-		$cart->Phone = $this->txtCRMPhone->Text;
-        $cart->IpHost = _xls_get_ip();
-        $cart->Linkid = $cart->Linkid;
-
-		$cart->PrintedNotes = $this->txtNotes->Text;
-
-		if ($cart->FkPromoId > 0) {
-			$pcode = PromoCode::Load($cart->FkPromoId);
-			$cart->PrintedNotes .= sprintf("\n%s: %s\n", _sp("Promo Code"), $pcode->Code);
-			foreach ($cart->GetCartItemArray() as $objItem)
-				if ($objItem->Discount>0)
-					$cart->PrintedNotes .= sprintf("%s discount: %.2f\n", $objItem->Code, $objItem->Discount);
-			if ($pcode->QtyRemaining>0) {
-				$pcode->QtyRemaining--;
-				$pcode->Save();
-			}
-		}
-
-		if(function_exists('_custom_before_order_process'))
-			_custom_before_order_process($cart);
-
-		// save with all customer data..
-		Cart::SaveCart($cart);
-
-		// If Guest checkout then setup a dummy customer which may be used by payment checkout modules..
-		if(!$this->customer)
-			$customer = new Customer();
-
-		$customer->Company = $this->txtCRCompany->Text;
-		$customer->Firstname = $this->txtCRFName->Text;
-		$customer->Lastname = $this->txtCRLName->Text;
-		$customer->Address11 = $this->txtCRBillAddr1->Text;
-		$customer->Address12 = $this->txtCRBillAddr2->Text;
-		$customer->City1 = $this->txtCRBillCity->Text;
-		$customer->Zip1 = $this->txtCRBillZip->Text;
-		$customer->State1 = $this->txtCRBillState->SelectedValue;
-		$customer->Country1 = $this->txtCRBillCountry->SelectedValue;
-		$customer->Mainphone = $this->txtCRMPhone->Text;
-		$customer->Email = $this->txtCREmail->Text;
-
-		if(!$this->customer)
-			_xls_stack_add('xls_temp_customer' , $customer);
-
-		$errtext = "";
-
-		$ship_obj = $this->loadModule($this->lstShippingMethod->SelectedValue , 'shipping');
-
-		$resp = $ship_obj->process($cart , $this->shipping_fields , $this->fltShippingCost);
-
-		if($resp === FALSE) {
-			$this->errSpan->Text = $errtext?$errtext:_sp('Error in processing shipping option');
-			$this->showFieldPanels();
-			return;
-		}
-
-		// Shipping may add the shipping product to cart so reload cart!
-		$cart = Cart::GetCart();
-
-		$cart->ShippingModule = $this->lstShippingMethod->SelectedValue;
-		$cart->ShippingData = trim($resp)?$resp:$this->lblShippingCost->Text;
-		$cart->ShippingData = trim(str_replace("-" , "" , str_replace("(" . _xls_currency($this->fltShippingCost) . ")" , " " , $cart->ShippingData)));
-		$cart->ShippingData = trim(str_replace("-" , "" , str_replace(_xls_currency($this->fltShippingCost) , " " , $cart->ShippingData)));
-
-		$errtext = "";
-		$payment_obj = $this->loadModule($this->lstPaymentMethod->SelectedValue , 'payment');
-
-		$resp = $payment_obj->process($cart , $this->payment_fields , $errtext);
-
-		if($payment_obj->uses_jumper())
-			_xls_stack_add('xls_jumper_form' , $resp);
-
-		if($resp === FALSE) {
-			$this->errSpan->Text = $errtext?$errtext:_sp('Error in processing payment');
-			$this->showFieldPanels();
-			return;
-		}
-
-		$cart->PaymentModule = $this->lstPaymentMethod->SelectedValue;
-		$cart->PaymentMethod = $payment_obj->payment_method($cart);
-		$cart->PaymentData = $resp;
-
-		if($resp &&  !$payment_obj->uses_jumper())
-			$cart->PaymentAmount = $payment_obj->paid_amount($cart);
-
-		// otherwise ALL OK.
-		if(function_exists('_custom_after_order_process'))
-				_custom_after_order_process($cart);
-
-		// Add log for checkout -- ALL OK
-		Visitor::add_view_log('',ViewLogType::checkoutfinal);
-
-		// forward to jumper
-		if($payment_obj->uses_jumper()) {
-			$cart->Type = CartType::awaitpayment; // set it to await payment for jumping..
-			// jumper must return to index.php?xlspg=checkout&complete_order=linkid
-			$cart->PaymentData = "";  // unset payment data field for jumper payments
-			Cart::SaveCart($cart);
-			_rd('xls_jumper.php');
-			return;
-		}
-
-		Cart::SaveCart($cart);
-
-		if(!$this->customer) {
-			if(!($customer = _xls_stack_get('xls_temp_customer')))
-				$customer = false;
-		} else
-			$customer = $this->customer;
-
-		$this->completeOrder( $cart , $customer);
-	}
-
 	/*Functions below are overloaded in extended versions only, defaults set below*/
 	public function showCart() {
 		return false;
@@ -1194,3 +1131,4 @@ class xlsws_checkout extends xlsws_index {
 
 if(!defined('CUSTOM_STOP_XLSWS'))
 	xlsws_checkout::Run('xlsws_checkout', templateNamed('index.tpl.php'));
+
