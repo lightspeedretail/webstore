@@ -565,6 +565,8 @@
 				case 'PRODUCT_SORT':
 					return array("Name" => _sp("Product Name") , "-Rowid" => _sp("Most Recently Created") , "-Modified" => _sp("Most Recently Updated") ,"Code" => _sp("Product Code") , "SellWeb" => _sp("Price") , "InventoryTotal" => _sp("Inventory"));
 
+				case 'ENABLE_SLASHED_PRICES':
+					return array(0 => _sp("Off") , 1 => _sp("Only on Details Page") , 2 => _sp("On Grid and Details Pages"));											
 				case 'ENABLE_FAMILIES':
 					return array(0 => _sp("Off") , 1 => _sp("Bottom of Products Menu") , 2 => _sp("Top of Products Menu"));
 

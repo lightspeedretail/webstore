@@ -353,9 +353,8 @@ display:table-cell;
 float:left;
 height:auto;
 margin:0 -2px -1px 0;
-max-height:190px;
-height:190px;
-min-height:190px;
+max-height:193px;
+height:193px;
 overflow:hidden;
 text-align:center;
 width:25.12%;
@@ -398,6 +397,10 @@ padding:15px;
 .product_cell p {
 font-style:italic;
 margin:15px 0 25px;
+}
+
+.product_cell .price_reg {
+padding-bottom: 6px;
 }
 
 /** Related products ***/
@@ -731,13 +734,14 @@ width:410px;
 color:#000;
 font-size:16px;
 margin:15px 0 -5px;
+line-height:1.5;
 text-shadow:#ccc 1px 1px 1px;
 }
 
 .product_details .price_reg {
 color:#666;
 font-size:12px;
-margin:15px 0 -10px;
+margin:15px 0 10px;
 text-shadow:#ccc 1px 1px 1px;
 }
 

@@ -71,18 +71,9 @@
 					
 				<?php $this->lstSize->Render(); ?>
 				<?php $this->lstColor->Render(); ?>
-
-
 					
-				
-		<?php  if(($this->prod->SellWeb != 0) && ($this->prod->SellWeb < $this->prod->Sell)): ?>
-				<!--  
-				<div class="price_reg"><?php _xt("Regular Price"); ?> : <strike><?= _xls_currency($this->prod->Sell) ; ?></strike></div>
-				-->
-				<div class="price"><?php _xt("Price"); ?>: <?php $this->lblPrice->Render(); ?></div>
-		<?php else: ?>
-				<div class="price"><?php _xt("Price"); ?>: <?php $this->lblPrice->Render(); ?></div>
-		<?php endif; ?>				
+				<div class="price_reg"><?php $this->lblOriginalPrice->Render(); ?></div>
+				<div class="price"><?php _xt("Price"); ?>: <?php $this->lblPrice->Render(); ?></div>		
 				
 				<div class="description"><?php $this->lblDescription->Render() ; ?></div>
 

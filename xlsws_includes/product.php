@@ -37,6 +37,7 @@ class xlsws_product extends xlsws_index {
 
 	protected $lblTitle; //the label for the product title
 	protected $lblPrice; //the label for the product price
+	protected $lblOriginalPrice; //the label for the product price
 	protected $lblStock; //the label for the product stock levels
 	protected $lblDescription; //the label for the product description
 
@@ -354,6 +355,16 @@ class xlsws_product extends xlsws_index {
 		else
 			$this->lblPrice->Text = _xls_currency($this->prod->Price);
 
+		//price
+		$this->lblOriginalPrice = new QLabel($this->mainPnl);
+		if(_xls_get_conf('ENABLE_SLASHED_PRICES' , 0)>0 ) {
+			if ($this->prod->MasterModel && _xls_get_conf('MATRIX_PRICE') == 1)
+				$this->lblOriginalPrice->Text = '';
+			elseif ($this->prod->SellWeb != 0 && $this->prod->SellWeb < $this->prod->Sell)
+				$this->lblOriginalPrice->Text = _sp("Regular Price").": <strike>"._xls_currency($this->prod->Sell)."</strike>";
+		}
+		$this->lblOriginalPrice->HtmlEntities = false;	
+
 		// Load Options
 		$this->arrOptionProds = Product::LoadArrayByFkProductMasterId($this->prod->Rowid);
 
@@ -592,6 +603,13 @@ class xlsws_product extends xlsws_index {
 
 		$this->prod = $prod;
 		$this->update_qty_price($strFormId, $strControlId, $strParameter);
+		if(_xls_get_conf('ENABLE_SLASHED_PRICES' , 0)>0 )
+			if ($this->prod->SellWeb != 0 && $this->prod->SellWeb < $this->prod->Sell)
+				$this->lblOriginalPrice->Text = _sp("Regular Price").": <strike>"._xls_currency($this->prod->Sell)."</strike>";
+				else $this->lblOriginalPrice->Text='';
+		else $this->lblOriginalPrice->Text='';
+	
+		
 		$this->lblStock->Text = $this->prod->InventoryDisplay();
 		$this->lblTitle->Text = $this->prod->Name;
 		if (_xls_get_conf('HTML_DESCRIPTION') == 0)

@@ -68,7 +68,7 @@ function print_families(){
 		
 		<div id="nav_products">
 			<ul>
-				<li><a href="javascript:{}"><?php _xt('Products'); ?></a>
+				<li><a href="javascript:{}" style="border:0px"><?php _xt('Products'); ?></a>
 					<ul>
 						<?php if(_xls_get_conf('ENABLE_FAMILIES', 0)==2)
 							print_families();
