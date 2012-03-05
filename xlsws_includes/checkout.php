@@ -415,23 +415,19 @@ class xlsws_checkout extends xlsws_index {
         if (!$objControl)
             return;
 
-        $objControl->AddAction(
-            new QClickEvent(), 
-            new QServerAction('DoSubmitControlClick')
+        $objControl->AddActionArray(
+            new QClickEvent(),
+            array(
+                new QAjaxAction('ToggleCheckoutControls'),
+                new QServerAction('DoSubmitControlClick')
+            )
         );
 
         return $objControl;
     }
 
 	public function DoSubmitControlClick($strFormId, $strControlId, $strParam) {
-        $this->ToggleCheckoutControls(false);
-
-        $objCart = Cart::GetCurrent();
-		if(trim($objCart->Currency) == '')
-			$this->cart->Currency = _xls_get_conf('CURRENCY_DEFAULT' , 'USD');
-		$objCart->SyncSave();
-
-		QApplication::ExecuteJavaScript("document.getElementById('pxyCheckout').click();");
+        $this->ProcessCheckout();
 	}
 
     public function UpdateAfterShippingAddressChange() {
@@ -531,9 +527,9 @@ class xlsws_checkout extends xlsws_index {
         return $this->objTaxCode;
     }
 
-    protected function ToggleCheckoutControls($blnVisibility) {
+    protected function ToggleCheckoutControls($blnVisibility = false) {
 		$this->pnlLoginRegister->Visible = $blnVisibility;
-		$this->pnlWait->Visible = true;
+		$this->pnlWait->Visible = $blnVisibility;
         
         $this->CustomerControl->Visible = $blnVisibility;
         $this->ShippingControl->Visible = $blnVisibility;
@@ -543,15 +539,14 @@ class xlsws_checkout extends xlsws_index {
         $this->PaymentControl->Visible = $blnVisibility;
     }
 
-    public function DoProcessCheckout($strFormId, $strControlId, $strParam) {
-
-    }
-
     protected function CompleteUpdateCart() {
         $objCart = Cart::GetCart();
 
         $objCart->SetIdStr();
-        
+
+		if (trim($objCart->Currency) == '')
+			$objCart->Currency = _xls_get_conf('CURRENCY_DEFAULT' , 'USD');
+
         $objCart->Type = CartType::awaitpayment;
         $objCart->State = 'Awaiting Processing';
         $objCart->DatetimePosted = QDateTime::Now();
