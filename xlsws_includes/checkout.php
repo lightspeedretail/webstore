@@ -39,6 +39,8 @@ class xlsws_checkout extends xlsws_index {
     protected $ShippingContactControl;
     protected $CalculateShippingControl;
 
+    protected $PreviousAddressControl;
+
     protected $ShippingControl;
     protected $PaymentControl;
     protected $PromoControl;
@@ -146,6 +148,104 @@ class xlsws_checkout extends xlsws_index {
         return $this->UpdateAfterShippingAddressChange();
     }
 
+    protected function BuildPreviousAddressControl() {
+        $objControl = $this->PreviousAddressControl = 
+            new XLSListControl($this, 'PreviewAddress');
+        $objControl->Width = '300px';
+        $objControl->DisplayStyle = 'block';
+        $objControl->SetCustomStyle('clear', 'both');
+
+        return $objControl;
+    }
+
+    protected function UpdatePreviousAddressControl() {
+        $objControl = $this->PreviousAddressControl;
+
+        if (!$objControl)
+            return $objControl;
+
+        $objCustomer = Customer::GetCurrent();
+
+        if (!$objCustomer->Rowid) { 
+            $objControl->Visible = false;
+            $objControl->Enabled = false;
+            return $objControl;
+        }
+
+        $objControl->RemoveAllItems();
+        $objControl->AddPlaceholder();
+
+        $objCartArray = Cart::QueryArray(
+            QQ::AndCondition(
+                QQ::Equal(QQN::Cart()->CustomerId, $objCustomer->Rowid),
+                QQ::Equal(QQN::Cart()->Type, CartType::order)
+            ),
+            QQ::Clause(
+                QQ::OrderBy(QQN::Cart()->Rowid, false)
+            )
+        );
+        $strAddedCartArray = array();
+
+        foreach ($objCartArray as $objCart) { 
+            $strLabel = sprintf('%s %s %s %s, %s', 
+                $objCart->ShipFirstname, 
+                $objCart->ShipLastname, 
+                $objCart->ShipCompany, 
+                $objCart->ShipAddress1, 
+                $objCart->ShipCity
+            );
+
+            if (in_array($strLabel, $strAddedCartArray))
+                continue;
+
+            $objControl->AddItem($strLabel, $objCart->Rowid);
+
+            $strAddedCartArray[] = $strLabel;
+        }
+
+        if ($objControl->ItemCount <= 1) {
+            $objControl->Visible = false;
+            $objControl->Enabled = false;
+        }
+
+        return $objControl;
+    }
+
+    protected function BindPreviousAddressControl() {
+        $objControl = $this->PreviousAddressControl;
+
+        if (!$objControl)
+            return $objControl;
+        
+        $objControl->AddAction(
+            new QChangeEvent(), 
+            new QAjaxAction('DoPreviousAddressChange')
+        );
+    }
+
+    public function DoPreviousAddressChange($strFormId, $strControlId, $strPar){
+        $objControl = $this->PreviousAddressControl;
+
+        if (!$objControl)
+            return $objControl;
+
+        if (!$objControl->SelectedValue)
+            return $objControl;
+
+        $objCart = Cart::Load($objControl->SelectedValue);
+
+        if (!$objCart)
+            return $objControl;
+
+        if (!$this->ShippingContactControl)
+            return $objControl;
+
+        $this->ShippingContactControl->UpdateFieldsFromCart($objCart);
+        $this->UpdateAfterShippingAddressChange();
+
+        return $objControl;
+    }
+
     protected function BuildShippingControl() {
         $this->ShippingControl = $objControl = 
             new XLSShippingControl($this, 'Shipping');
@@ -156,10 +256,15 @@ class xlsws_checkout extends xlsws_index {
     }
 
     protected function UpdateShippingControl() {
-        $this->ShippingControl->Update();
     }
 
     protected function BindShippingControl() {
+        $objControl = $this->ShippingControl;
+
+        if (!$objControl)
+            return $objControl;
+
+        return $objControl;
     }
 
     protected function BuildPaymentControl() {
@@ -764,6 +869,9 @@ class xlsws_checkout extends xlsws_index {
             case 'pnlShippingAdde':
                 return $this->ShippingContactControl;
 
+            case 'lstCRShipPrevious':
+                return $this->PreviousAddressControl;
+
             case 'pnlShipping':
                 return $this->ShippingControl;
 
@@ -870,58 +978,6 @@ class xlsws_checkout extends xlsws_index {
 		$this->completeOrder($cart , $this->customer );
 
 		return;
-	}
-
-	/**
-	 * populate_previously_shipped - if the customer is logged in, populate dropdown with previously shipped addresses
-	 * @param none
-	 * @return none
-	 */
-	protected function populate_previously_shipped() {
-		if($this->customer) {
-			$cart_addes = Cart::QueryArray(
-				QQ::AndCondition(
-					QQ::Equal(QQN::Cart()->CustomerId, $this->customer->Rowid),
-					QQ::Equal(QQN::Cart()->Type, CartType::order)
-				),
-				QQ::Clause(
-					QQ::OrderBy(QQN::Cart()->Rowid, false)
-				)
-			);
-
-			if($cart_addes && (count($cart_addes) > 0)) {
-				$this->lstCRShipPrevious = new XLSListBox($this->pnlShippingAdde);
-				$this->lstCRShipPrevious->Width = "300px";
-				$this->lstCRShipPrevious->SetCustomStyle("clear","both");
-				$this->lstCRShipPrevious->DisplayStyle = "block";
-
-				$this->lstCRShipPrevious->AddItem(_sp(" - Please Select - ") , 0);
-
-				$adde_prev = array();
-
-				foreach($cart_addes as $adde) {
-					$a = sprintf(
-						"%s %s %s %s, %s",
-						$adde->ShipFirstname,
-						$adde->ShipLastname,
-						$adde->ShipCompany,
-						$adde->ShipAddress1,
-						$adde->ShipCity
-					);
-
-					if(in_array($a , $adde_prev))
-						continue;
-
-					$this->lstCRShipPrevious->AddItem($a , $adde->Rowid);
-					$adde_prev[] = $a;
-				}
-
-				$this->lstCRShipPrevious->AddAction(new QChangeEvent() , new QAjaxAction('prevAdde'));
-				if($this->lstCRShipPrevious->ItemCount <= 1){
-					$this->lstCRShipPrevious->Visible = false;
-				}
-			}
-		}
 	}
 
 	/**
@@ -1032,45 +1088,8 @@ class xlsws_checkout extends xlsws_index {
 
 		_rd("index.php?xlspg=customer_register");
 	}
-
-	/**
-	 * prevAdde - Event that gets fired when someone selects a previously shipped address, populating shipping input fields
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	protected function prevAdde($strFormId, $strControlId, $strParameter) {
-		if(!$this->lstCRShipPrevious)
-			return;
-
-		if(!$this->lstCRShipPrevious->SelectedValue)
-			return;
-
-		$cart_adde = Cart::Load($this->lstCRShipPrevious->SelectedValue);
-
-		if(!$cart_adde)
-			return;
-
-		if($cart_adde->CustomerId != $this->customer->Rowid)
-			return;
-
-		$this->txtCRShipFirstname->Text = $cart_adde->ShipFirstname;
-		$this->txtCRShipLastname->Text = $cart_adde->ShipLastname;
-		$this->txtCRShipCompany->Text = $cart_adde->ShipCompany;
-		$this->txtCRShipAddr1->Text = $cart_adde->ShipAddress1;
-		$this->txtCRShipAddr2->Text = $cart_adde->ShipAddress2;
-		$this->txtCRShipCity->Text = $cart_adde->ShipCity;
-		$this->txtCRShipPhone->Text  = $cart_adde->ShipPhone;
-		$this->txtCRShipCountry->SelectedValue = $cart_adde->ShipCountry;
-
-		$this->shipCountry_Change($strFormId, $strControlId, $strParameter); // this will load the appropriate states
-
-		$this->txtCRShipState->SelectedValue = $cart_adde->ShipState;
-		$this->txtCRShipZip->Text = $cart_adde->ShipZip;
-
-		$this->setupShipping();
-	}
-
-	/**
+    
+    /**
 	 * moduleActionProxy - General function to load particular modules for payment and shipping to be used dynamically
 	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
 	 * @return none

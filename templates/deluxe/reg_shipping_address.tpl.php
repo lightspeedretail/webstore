@@ -33,15 +33,15 @@
 
 
 
-<?php  //if(isset($this->lstCRShipPrevious) && $this->lstCRShipPrevious->Visible):   ?>
+<?php  if(isset($this->lstCRShipPrevious) && $this->lstCRShipPrevious->Visible):   ?>
 
 		<div class="left margin">
 			<dl>
 				<dt><label for="Previously shipped to"><?php _xt("Previous shipped address") ?></label></dt>
-				<dd><?php //$this->lstCRShipPrevious->Render(); ?></dd>
+				<dd><?php $this->lstCRShipPrevious->Render(); ?></dd>
 			</dl>
 		</div>
-<?php  //endif; ?>
+<?php  endif; ?>
 
 
 <?php  if(isset($this->txtCRShipFirstname)):   ?>
