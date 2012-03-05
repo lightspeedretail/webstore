@@ -930,8 +930,6 @@ class xlsws_checkout extends xlsws_index {
 
 
 	/*see xlsws_index for shared widgets*/
-	protected $lstCRShipPrevious; //input select box for previously shipped addresses
-
 	protected $errSpan; //span block that displays an error on top of the checkout form if any
 
 	protected $lblWait; //the label for the wait icon (optional)
