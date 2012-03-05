@@ -247,7 +247,7 @@ class xlsws_db_maintenance extends xlsws_index {
 			$this->add_config_key('ENABLE_SLASHED_PRICES' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Enabled Slashed \"Original\" Prices', 'ENABLE_SLASHED_PRICES', '',
 				'If selected, will display original price slashed out and Web Price as a Sale Price.', 
-				8, 20, NOW(), NOW(), 'BOOL');");
+				8, 20, NOW(), NOW(), 'ENABLE_SLASHED_PRICES');");
 
 
 			//Fix some sequencing problems for Product options
