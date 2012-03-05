@@ -332,15 +332,15 @@ class xlsws_product extends xlsws_index {
 		_xls_add_page_title($this->prod->Name . " - " .  $this->prod->Code);
 
 		// Stock
-		$this->lblStock = new QLabel($this->mainPnl);
+		$this->lblStock = new QLabel($this->mainPnl,'lblStock');
 		$this->lblStock->Text = $this->prod->InventoryDisplay();
 
 		//Title
-		$this->lblTitle = new QLabel($this->mainPnl);
+		$this->lblTitle = new QLabel($this->mainPnl,'lblTitle');
 		$this->lblTitle->Text = $this->prod->Name;
 
 		// Description
-		$this->lblDescription = new QLabel($this->mainPnl);
+		$this->lblDescription = new QLabel($this->mainPnl,'lblDescription');
 		if (_xls_get_conf('HTML_DESCRIPTION') == 0)
 			$this->lblDescription->Text = nl2br($this->prod->Description);
 		else
@@ -349,14 +349,14 @@ class xlsws_product extends xlsws_index {
 		$this->lblDescription->HtmlEntities = false;
 
 		//price
-		$this->lblPrice = new QLabel($this->mainPnl);
+		$this->lblPrice = new QLabel($this->mainPnl,'lblPrice');
 		if ($this->prod->MasterModel && _xls_get_conf('MATRIX_PRICE') == 1)
 			$this->lblPrice->Text = _sp("choose options for pricing");
 		else
 			$this->lblPrice->Text = _xls_currency($this->prod->Price);
 
 		//price
-		$this->lblOriginalPrice = new QLabel($this->mainPnl);
+		$this->lblOriginalPrice = new QLabel($this->mainPnl,'lblOriginalPrice');
 		if(_xls_get_conf('ENABLE_SLASHED_PRICES' , 0)>0 ) {
 			if ($this->prod->MasterModel && _xls_get_conf('MATRIX_PRICE') == 1)
 				$this->lblOriginalPrice->Text = '';
@@ -377,7 +377,7 @@ class xlsws_product extends xlsws_index {
 		$this->build_widgets();
 
 		// Qty (UNUSED ON PRODUCT DETAIL PRESENTLY)
-		$this->txtQty = new QTextBox($this->mainPnl);
+		$this->txtQty = new QTextBox($this->mainPnl,'lblQty');
 		$this->txtQty->Text = _sp('Qty');
 
 		if(!_xls_get_conf('DISABLE_CART' , false))
