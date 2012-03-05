@@ -665,10 +665,10 @@ EOS;
 	 * @return boolean true or false
 	 */
 	public static function isLoggedIn() {
-		$customer = Customer::GetCurrent();
+        $objCustomer = Customer::GetCurrent();
 
-		if ($customer && !is_null($customer))
-			return true;
+        if ($objCustomer && $objCustomer->Rowid)
+            return true;
 
 		return false;
 	}
