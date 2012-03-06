@@ -54,6 +54,9 @@ class xlsws_index extends QForm {
 	protected $menu_categories; //the list of categories in the form of an array in a tree format
 	protected $dummy_drag_drop; //a drag n drop placeholder
 
+	protected $arrTopTabs; //Top tabs for index page
+	protected $arrBottomTabs; //Bottom tabs for index page
+		
 	protected $crumbs; //the array of crumbs in the crumbtrail
 	protected $txtSearchBox; //the input textbox for the search field
 	protected $lblLogout; //the label for the word logout
@@ -757,6 +760,30 @@ EOS;
 	}
 
 	/**
+	 * build_tabs - reads array for the tabs for the template
+	 * @param none
+	 * @return none
+	 */
+	protected function build_tabs() {
+	
+	
+		$this->arrTopTabs = CustomPage::QueryArray(
+		        QQ::AndCondition(
+		            QQ::GreaterOrEqual(QQN::CustomPage()->TabPosition,10),
+		            QQ::LessOrEqual(QQN::CustomPage()->TabPosition,19)
+		        )
+		    );
+		$this->arrBottomTabs = CustomPage::QueryArray(
+		        QQ::AndCondition(
+		            QQ::GreaterOrEqual(QQN::CustomPage()->TabPosition,20),
+		            QQ::LessOrEqual(QQN::CustomPage()->TabPosition,29)
+		        )
+		    );
+		
+	
+	}
+	
+	/**
 	 * continue_shopping - takes the customer back to the last page they were from the cart page
 	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
 	 * @return none
@@ -884,6 +911,7 @@ EOS;
 		$this->build_crumb();
 		$this->build_login();
 		$this->build_side_bar();
+		$this->build_tabs();
 
 		$this->build_main();
 

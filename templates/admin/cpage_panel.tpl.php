@@ -48,9 +48,14 @@
 										</span> 
 									</p>
 									<p>
-										<span class="label"><?php _xt('Page Title') ?>:</span> 
+										<span class="label"><?php _xt('Page Title/Tab Label') ?>:</span> 
 										<?php $_CONTROL->txtPageTitle->RenderWithError(); ?>
-										<a href="#" class="tooltip" title="<?php _xt('Page title used for browser page title.') ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" class="info_right" /></a></span>
+										<a href="#" class="tooltip" title="<?php _xt('Page title used for browser page title and the tab label.') ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" class="info_right" /></a></span>
+									</p>
+									<p>
+										<span class="label"><?php _xt('Tab Position') ?>:</span> 
+										<?php $_CONTROL->txtTabPosition->RenderWithError(); ?>
+										<a href="#" class="tooltip" title="<?php _xt('Tab position on templates.') ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" class="info_right" /></a></span>
 									</p>
 									<p>
 										<span class="label"><?php _xt('Text') ?>:</span> 
@@ -63,10 +68,10 @@
 									
 									
 									<p>
-										<span class="label"><?php _xt('Slideshow Product Tag') ?>:</span> 
+										<span class="label"><?php _xt('Slideshow Web Keyword') ?>:</span> 
 										<span class="field">
 											<?php $_CONTROL->txtProductTag->RenderWithError(); ?>
-											<a href="#" class="tooltip" title="<?php _xt('Custom page can show slideshow of products similar to iTunes. Please type in product keywords or product codes to display here.') ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" class="info_right" /></a>
+											<a href="#" class="tooltip" title="<?php _xt('Create a keyword and enter it here. Enter the same keyword in any products you wish (in one of the Web Keyword blanks) to display in this slider.') ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" class="info_right" /></a>
 										</span> 
 									</p>
 									
@@ -74,7 +79,7 @@
 										<span class="label"><?php _xt('Meta Keywords') ?>:</span> 
 										<span class="field">
 											<?php $_CONTROL->txtPageKeywords->RenderWithError(); ?>
-											<a href="#" class="tooltip" title="<?php _xt('Meta keywords for search engine optimisation.') ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" class="info_right" /></a>
+											<a href="#" class="tooltip" title="<?php _xt('Meta keywords for search engine optimization.') ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" class="info_right" /></a>
 										</span> 
 									</p>
 									
@@ -82,7 +87,7 @@
 										<span class="label"><?php _xt('Meta Description') ?>:</span> 
 										<span class="field">
 											<?php $_CONTROL->txtPageDescription->RenderWithError(); ?>
-											<a href="#" class="tooltip" title="<?php _xt('Meta description for search engine optimisation.') ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" class="info_right" /></a>
+											<a href="#" class="tooltip" title="<?php _xt('Meta description for search engine optimization.') ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" class="info_right" /></a>
 										</span> 
 									</p>
 									<p><span class="label">&nbsp;</span> <span class="field"></span></p>

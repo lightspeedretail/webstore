@@ -170,6 +170,57 @@ left:-999em;
 left:auto;
 }
 
+/* Formatting for automated tabs. Note these do NOT refer to 1st, 2nd, 3rd and 4th tabs */
+/* Instead, these are used WHEN there are 4 tabs, or 3 tabs, etc. So #tab4 is used for all */
+/* tabs when four are turned on, since width is proportional to the count() */
+
+#tab1 a {
+display:block;
+float:left;
+height:24px;
+width:180px;
+}
+
+#tab2 a {
+display:block;
+float:left;
+height:24px;
+width:170px;
+}
+
+
+#tab3 a {
+display:block;
+float:left;
+height:24px;
+width:150px;
+}
+
+#tab4 a {
+display:block;
+float:left;
+height:24px;
+width:112px;
+}
+
+#searchedge {
+border-left:1px solid #fff;
+clear:both;
+height:30px;
+padding:6px 10px 0 18px;
+position:absolute;
+margin-left:557px;
+width:1px;
+}
+#searchentry {
+clear:both;
+height:33px;
+padding:12px 10px 0 20px;
+position:absolute;
+margin-left:550px;
+width:199px;
+}
+
 #newProducts a {
 display:block;
 float:left;
@@ -228,8 +279,8 @@ border-right: 1px solid #111;
 border-left: 1px solid #111;
 }
 
-li.search_item {background: #FFFFFF;}
-li.search_item:hover, ul.autocomplete li.search_selected {background: #48E507}
+search_item {background: #FFFFFF;}
+search_item:hover, autocomplete search_selected {background: #48E507}
 
 /***** Crumbtrail *****/
 #breadcrumbs {

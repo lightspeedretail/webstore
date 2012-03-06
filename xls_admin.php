@@ -1715,6 +1715,7 @@
 		public $txtPageDescription;
 		public $txtPageText;
 		public $txtProductTag;
+		public $txtTabPosition;
         
         
 		public $pxyAddNewPage;
@@ -1755,10 +1756,25 @@
 	        $this->txtPageTitle->AddAction(new QEscapeKeyEvent() ,new QServerControlAction($this , 'btnCancel_click'));
 	        $this->txtPageTitle->Height = 20;
 	        
+	        $this->txtTabPosition  = new XLSListBox($this);
+			$this->txtTabPosition->AddItem('Not Shown' , '0');
+			$this->txtTabPosition->AddItem('Top 1st Position' , '11');
+			$this->txtTabPosition->AddItem('Top 2nd Position' , '12');
+			$this->txtTabPosition->AddItem('Top 3rd Position' , '13');
+			$this->txtTabPosition->AddItem('Top 4th Position' , '14');
+			$this->txtTabPosition->AddItem('Top 5th Position' , '15');
+			$this->txtTabPosition->AddItem('Top 6th Position' , '16');
+			$this->txtTabPosition->AddItem('Bottom 1st Position' , '21');
+			$this->txtTabPosition->AddItem('Bottom 2nd Position' , '22');
+			$this->txtTabPosition->AddItem('Bottom 3rd Position' , '23');
+			$this->txtTabPosition->AddItem('Bottom 4th Position' , '24');
+			$this->txtTabPosition->AddItem('Bottom 5th Position' , '25');
+			$this->txtTabPosition->AddItem('Bottom 6th Position' , '26');
+	        
 
 			$this->txtPageText = new QFCKeditor($this);
 			$this->txtPageText->BasePath = __VIRTUAL_DIRECTORY__ . __JS_ASSETS__ . '/fckeditor/' ;
-            $this->txtPageText->Required = true;
+            //$this->txtPageText->Required = true;
             $this->txtPageText->Width = 550;
             $this->txtPageText->Height = 450;
 //			$this->txtPageText->ToolbarSet = "XLSWS";
@@ -1836,6 +1852,7 @@
 		 	
 
 			$this->txtPageKey->Text = $this->page->Key;
+			$this->txtTabPosition->SelectedValue = $this->page->TabPosition;
 			$this->txtPageTitle->Text = ($this->page->Title == _sp('+ Add new page'))?'':$this->page->Title;
 			$this->txtPageText->Text = $this->page->Page;
 			$this->txtProductTag->Text = $this->page->ProductTag;
@@ -1864,6 +1881,7 @@
 			
 			$this->page->Key = $this->txtPageKey->Text;
 			$this->page->Title = stripslashes($this->txtPageTitle->Text);
+			$this->page->TabPosition = $this->txtTabPosition->SelectedValue;
 			//error_log($this->txtPageText->Text);
 			$this->page->Page = stripslashes($this->txtPageText->Text);
 			$this->page->ProductTag = $this->txtProductTag->Text;

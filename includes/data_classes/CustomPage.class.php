@@ -39,6 +39,8 @@ class CustomPage extends CustomPageGen {
 
 	// Return the URL for this object
 	public function GetLink() {
+		if (substr(strip_tags($this->strPage),0,7)=="http://")
+			return strip_tags($this->strPage);	
 		if (_xls_get_conf('ENABLE_SEO_URL', false))
 			return $this->strKey . '.html';
 		else
