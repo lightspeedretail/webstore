@@ -555,7 +555,11 @@ EOS;
             $product->WebKeyword2 = $strWebKeyword2;
             $product->WebKeyword3 = $strWebKeyword3;
             $product->Featured = $blnFeatured;
-
+	        $strFeatured = _xls_get_conf('FEATURED_KEYWORD','notset');
+	        if ($strFeatured != 'notset' && $product->Web && (
+            	$strWebKeyword1==$strFeatured || $strWebKeyword2==$strFeatured || $strWebKeyword2==$strFeatured))
+            $product->Featured=1;
+            
             // Now save the product
             try {
                 $product->Save($blnForceInsert, $blnForceUpdate, true);
@@ -2870,6 +2874,7 @@ EOS;
         
         /**
          * Flush categories (But not the associations to products!)
+         * This gets called on every Update Store. We defeat the erasing if cache categorie is turned on
          * @param string $passkey
          * @return string
          */
@@ -2889,14 +2894,8 @@ EOS;
             }
 
             $obj = new Category();
-<<<<<<< HEAD
-            
-            if (_xls_get_conf('CACHE_CATEGORY','0') == '0'){
-            try{
-=======
 
             try {
->>>>>>> 1b6174d... #206 Provide a debug option to bypass flush on reset
                 $obj->Truncate();
             }
             catch(Exception $objExc) {
@@ -2913,21 +2912,15 @@ EOS;
         
         /**
          * Flushes a DB Table
+         * This gets called during a Reset Store Products for the following tables in sequence:
+         * Product, Category, Tax, TaxCode, TaxStatus, Family, ProductRelated, ProductQtyPricing, Images
          *
          * @param string $passkey
          * @param string $strObj
          * @return string
          */
-<<<<<<< HEAD
-        public function db_flush(
-            $passkey
-            , $strObj
-        ){
-            if(!$this->check_passkey($passkey))
-=======
         public function db_flush($passkey, $strObj) { 
             if (!$this->check_passkey($passkey))
->>>>>>> 1b6174d... #206 Provide a debug option to bypass flush on reset
                 return self::FAIL_AUTH;
                 
             if (_xls_get_conf('DEBUG_RESET', 0) == 1) {
@@ -2963,8 +2956,7 @@ EOS;
             $obj = new $strObj();
             
             try{
-                _xls_log("SOAP FLUSH : $strObj ");
-                
+                QApplication::Log(E_NOTICE, 'str', "SOAP FLUSH : $strObj");
                 //For certain tables, we flush related data as well
                 switch ($strObj)
                 {
