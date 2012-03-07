@@ -42,30 +42,8 @@ class usps extends xlsws_class_shipping {
 	private $methods;
 	private $response;
 
-	/**
-	 * The name of the shipping module that will be displayed in the checkout page
-	 * @return string
-	 *
-	 *
-	 */
-	public function name() {
-		$config = $this->getConfigValues(get_class($this));
-
-		if(isset($config['label']))
-			return $config['label'];
-
-		return $this->admin_name();
-	}
-
-	/**
-	 * The name of the shipping module that will be displayed in Web Admin payments
-	 * @return string
-	 *
-	 *
-	 */
-	public function admin_name() {
-		return _sp("USPS");
-	}
+	protected $strModuleName = "USPS";
+	
 
 	/**
 	 * check() verifies nothing has changed in the configuration since initial load
@@ -399,14 +377,11 @@ class usps extends xlsws_class_shipping {
 		$request = ($this->isDomestic()) ? $this->buildDomesticRateRequest() : $this->buildInternationalRateRequest() ;
 		$this->response = $this->sendUSPSRateRequest($request);
 
-<<<<<<< HEAD
-=======
 		if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
 			QApplication::Log(E_ERROR, get_class($this), "sending ".print_r($request,true));
 			QApplication::Log(E_ERROR, get_class($this), "receiving ".$this->response);
 		}
 
->>>>>>> e6018b7... #206 USPS debug statements
 		// Parse xml for response values
 		$oXML = new SimpleXMLElement($this->response);
 
