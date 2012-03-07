@@ -2,6 +2,18 @@ Changelog
 
 Please see https://github.com/lightspeedretail/webstore/issues for technical details of these issues
 
+# 2.1.7
+
+* Checkout: Resolved an issue where the Captcha entry blank would not clear properly when submitting
+* General: Corrected a Cross-Site Scripting (XSS) vulnerability to now properly handle HTML encoded strings
+* General: Fixed an extremely rare issue in qCodo event handlers with certain Mac browsers
+* Payments: Added additional logging of Payment error messages returned by processors
+
+* Shipping: Improved logging of Shipping module error messages returned by calculators
+* Shipping: Corrected an issue where the UPS module may truncate a Canadian postal code
+* Templates: Corrected a rare product sorting error when using Sliders in custom pages
+* Uploader: Corrected an issue where inventory from virtual warehouses would not be included in some calculations
+
 # 2.1.6
 
 * Checkout: Corrected an issue where a state/province would be displayed multiple times on checkout when using zip codes in Destinations
