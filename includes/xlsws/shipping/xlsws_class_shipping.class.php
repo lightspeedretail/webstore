@@ -30,35 +30,42 @@
 class xlsws_class_shipping extends XLSModule {
 	protected $strModuleType = 'shipping';
 
-	/**
-	 * Return a name we can rely on to remain constant, for internal use
-	*/
-	public function internal_name() {
-	}
+	protected $strModuleName = "Store Pickup - Sample";
+	
 
+	/**
+	 * The name of the module that will be displayed in the checkout page
+	 * @return string
+	 */
+	 public function name(){
+		$config = $this->getConfigValues(get_class($this));
+
+		if(isset($config['label']))
+			return $config['label'];
+
+		return $this->strModuleName;
+	}
+	
 	/**
 	 * Return the administrative name of the module for WS Admin Panel.
 	 * It is different than the module name returned in front of the customer.
 	 * @return string
 	 */
 	public function admin_name() {
-		return _sp("Store Pickup - Sample");
+		$config = $this->getConfigValues(get_class($this));
+		if ($config['label']!=$this->strModuleName && isset($config['label']))
+		return _sp($this->strModuleName." (labeled \"".$config['label']."\")");
+		else return $this->strModuleName;
+	}
+	
+	/**
+	 * Return a name we can rely on to remain constant, for internal use
+	*/
+	public function internal_name() {
 	}
 
-	/**
-	 * The name of the module that will be displayed in the checkout page
-	 * @return string
-	 */
-	public function name() {
-		$config = $this->Config;
 
-		if(isset($config['label'])) //if there is a label defined
-			return $config['label']; // return the label
-
-		return $this->admin_name(); //otherwise return administrative name
-	}
-
-	/**
+		/**
 	 * Return config fields (as array) for user configuration.
 	 * The array key is the variable value holder
 	 * For example if you wanted to have an admin-editable field called Message which is a textbox
