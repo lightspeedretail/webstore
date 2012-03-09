@@ -285,7 +285,13 @@ class canadapost extends xlsws_class_shipping {
 		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
 		$result = curl_exec ($ch);
-
+		
+		if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
+			QApplication::Log(E_ERROR, get_class($this), "sending ".$xml);
+			QApplication::Log(E_ERROR, get_class($this), "receiving ".$result);
+		}
+		
+		
 		$values = array();
 		$index = array();
 		$array = array();
