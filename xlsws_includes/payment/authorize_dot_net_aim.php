@@ -96,7 +96,7 @@ class authorize_dot_net_aim extends credit_card {
 		$ret['ls_payment_method'] = new XLSTextBox($objParent);
 		$ret['ls_payment_method']->Name = _sp('LightSpeed Payment Method');
 		$ret['ls_payment_method']->Required = true;
-		$ret['ls_payment_method']->Text = 'Web Credit Card';
+		$ret['ls_payment_method']->Text = 'Credit Card';
 		$ret['ls_payment_method']->ToolTip = "Please enter the payment method (from LightSpeed) you would like the payment amount to import into";
 
 		return $ret;
@@ -197,11 +197,15 @@ class authorize_dot_net_aim extends credit_card {
 		### curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE); // uncomment this line if you get no gateway response. ###
 		$resp = curl_exec($ch); //execute post and get results
 		curl_close ($ch);
-		if(_xls_get_conf('DEBUG_PAYMENTS' , false))
-			QApplication::Log(E_ERROR, get_class($this), $resp);		
+
+		if(_xls_get_conf('DEBUG_PAYMENTS' , false)) {
+			QApplication::Log(E_ERROR, get_class($this), "sending ".$cart->IdStr." for amt ".$cart->Total);
+			QApplication::Log(E_ERROR, get_class($this), "receiving ".$resp);
+		}
+		
 		$resp_vals = _xls_delim_to_array($resp , self::x_delim_char);
 		$resp_vals = array_values($resp_vals);
-		
+
 		if($resp_vals[0] != '1' ) {
 			$this->paid_amount = 0;
 			$errortext = _sp("Your credit card has been declined");

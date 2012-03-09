@@ -167,6 +167,11 @@ class beanstream_aim extends credit_card {
 		if(_xls_get_conf('DEBUG_PAYMENTS' , false))
 			QApplication::Log(E_ERROR, get_class($this), $resp);		
 
+		if(_xls_get_conf('DEBUG_PAYMENTS' , false)) {
+			QApplication::Log(E_ERROR, get_class($this), "sending ".$cart->IdStr." for amt ".$cart->Total);
+			QApplication::Log(E_ERROR, get_class($this), "receiving ".$resp);
+		}
+
 		parse_str($resp, $resp_vals);
 
 		if ($resp_vals['trnApproved'] != "1") {
