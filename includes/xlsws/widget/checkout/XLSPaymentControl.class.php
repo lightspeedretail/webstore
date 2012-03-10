@@ -265,39 +265,27 @@ class XLSPaymentControl extends XLSCompositeControl {
         parent::BuildControl();    
     
         if ($this->blnEnabled) {
-            $this->objModuleControl->Enabled = true;
-            $this->objModuleControl->Visible = true;
-            $this->objMethodControl->Enabled = true;
-            $this->objMethodControl->Visible = true;
+            $this->objModuleControl->Active = true;
+            $this->objMethodControl->Active = true;
         }
         else {
-            $this->objModuleControl->Enabled = false;
-            $this->objModuleControl->Visible = false;
-            $this->objMethodControl->Enabled = false;
-            $this->objMethodControl->Visible = false;
+            $this->objModuleControl->Active = false;
+            $this->objMethodControl->Active = false;
         }
     }
 
     protected function UpdateControl() {
         if ($this->blnEnabled) {
-            $this->Enabled = true;
-            $this->Visible = true;
-            $this->objPriceControl->Enabled = true;
-            $this->objPriceControl->Visible = true;
-            $this->objModuleControl->Enabled = true;
-            $this->objModuleControl->Visible = true;
-            $this->objMethodControl->Enabled = true;
-            $this->objMethodControl->Visible = true;
+            $this->Active = true;
+            $this->objPriceControl->Active = true;
+            $this->objModuleControl->Active = true;
+            $this->objMethodControl->Active = true;
         }
         else {
-            $this->Enabled = false;
-            $this->Visible = false;
-            $this->objPriceControl->Enabled = false;
-            $this->objPriceControl->Visible = false;
-            $this->objModuleControl->Enabled = false;
-            $this->objModuleControl->Visible = false;
-            $this->objMethodControl->Enabled = false;
-            $this->objMethodControl->Visible = false;
+            $this->Active = false;
+            $this->objPriceControl->Active = false;
+            $this->objModuleControl->Active = false;
+            $this->objMethodControl->Active = false;
         }
         
         parent::UpdateControl();

@@ -117,8 +117,31 @@ abstract class QControl extends QControlBase {
             return $strToReturn;
     }
 
+    public function __get($strName) {
+        switch ($strName) {
+            case 'Active':
+                if ($this->blnVisible && $this->blnEnabled)
+                    return true;
+                return false;
+
+            default:
+                try { 
+                    return parent::__get($strName);
+                }
+                catch (QCallerException $objExc) { 
+                    $objExc->IncrementOffset();
+                    throw $objExc;
+                }
+        }
+    }
+
     public function __set($strName, $mixValue) {
         switch ($strName) {
+            case 'Active':
+                $this->Visible = $mixValue;
+                $this->Enabled = $mixValue;
+                break;
+
             case 'Visible':
                 if ($this->blnVisible != $mixValue)
                     return parent::__set($strName, $mixValue);
