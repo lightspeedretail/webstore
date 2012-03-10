@@ -20,8 +20,13 @@
         <dl>
             <dt>
                 <?php
-                if ($_CONTROL->Enabled)
+                if ($_CONTROL->Enabled) {
                     $_CONTROL->Price->Render();
+
+                    if ($_CONTROL->Label->Visible)
+                        print("&nbsp;&ndash;&nbsp;");
+                }
+    
                 $_CONTROL->Label->Render();
                 ?>
                 <?php if ($_CONTROL->ValidationError): ?>

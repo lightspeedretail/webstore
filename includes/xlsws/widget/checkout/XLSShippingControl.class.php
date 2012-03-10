@@ -108,6 +108,9 @@ class XLSShippingControl extends XLSCompositeControl {
             if ($objControl->Text != $fltPrice)
                 $objControl->Text = $fltPrice;
         }
+        else { 
+            $objControl->Visible = false;
+        }
 
         return $objControl;
     }
@@ -364,8 +367,7 @@ class XLSShippingControl extends XLSCompositeControl {
         }
 
         if ($mixTotal === false) {
-            $this->strValidationError = _sp($this->strLabelForError);
-            $this->Refresh();
+            $this->ValidationError = _sp($this->strLabelForError);
         }
         else if (is_numeric($mixTotal)) {
             $fltShippingPrice = $mixTotal; 
@@ -384,8 +386,7 @@ class XLSShippingControl extends XLSCompositeControl {
                 $fltShippingMarkup = $mixTotal['markup'];
         }
         else { 
-            $this->strValidationError = $this->strLabelForError;
-            $this->Refresh();
+            $this->ValidationError = _sp($this->strLabelForError);
             QApplication::Log(E_ERROR, 'shipping', 
                 sprintf(
                     _sp('Could not determine return type for module %s'),
@@ -408,9 +409,26 @@ class XLSShippingControl extends XLSCompositeControl {
         );
     }
 
+    protected function ResetShippingSelection() {
+        $objCart = Cart::GetCart();
+
+        $objCart->ShippingModule = $strModule;
+        $objCart->ShippingMethod = null;
+        $objCart->ShippingData = null;
+        $objCart->ShippingSell = null;
+        $objCart->ShippingCost = null;
+
+        return null;
+    }
+
     protected function SetShippingSelection(
         $strModule, $strMethod, $strData, $fltPrice, $fltCost = null
     ) {
+        
+        if (is_null($fltPrice)) {
+            return $this->ResetShippingSelection();
+        }
+
         if (is_numeric($fltPrice) && $fltPrice < 0)
             $fltPrice = 0;
 
@@ -420,8 +438,12 @@ class XLSShippingControl extends XLSCompositeControl {
         if (is_null($strMethod))
             $strMethod = $this->strDefaultMethod;
 
-        if (is_null($strData))
-            $strData = _sp('Shipping rate');
+        if (is_null($strData)) {
+            if ($this->Module)
+                $strData = _sp($this->Module->SelectedName);
+            else
+                $strData = _sp('Shipping rate');
+        }
 
         // TODO :: Verify if this is still required ?!
         $strData = str_replace(
