@@ -54,6 +54,8 @@ class xlsws_checkout extends xlsws_index {
 
     protected $SubmitControl;
 
+    protected $LoadActionProxy;
+
     protected $objRegistry;
     protected $objDestination;
     protected $objTaxCode;
@@ -256,6 +258,14 @@ class xlsws_checkout extends xlsws_index {
     }
 
     protected function UpdateShippingControl() {
+        $objControl = $this->ShippingControl;
+
+        if (!$objControl)
+            return $objControl;
+
+        $objControl->Update();
+
+        return $objControl;
     }
 
     protected function BindShippingControl() {
@@ -429,6 +439,38 @@ class xlsws_checkout extends xlsws_index {
 	public function DoSubmitControlClick($strFormId, $strControlId, $strParam) {
         $this->ProcessCheckout();
 	}
+
+    protected function BuildLoadActionProxy() {
+        $objControl = $this->LoadActionProxy = 
+            new QButton($this, 'LoadActionProxy');
+        $objControl->CssClass = 'xlshidden';
+            
+        return $objControl;
+    }
+
+    protected function UpdateLoadActionProxy() {
+        return $this->LoadActionProxy;
+    }
+
+    protected function BindLoadActionProxy() {
+        $objControl = $this->LoadActionProxy;
+        
+        if (!$objControl)
+            return $objControl;
+
+        $objControl->AddAction(
+            new QClickEvent(500),
+            new QAjaxAction('DoLoadActionProxyClick')
+        );
+
+        return $objControl;
+    }
+
+    public function DoLoadActionProxyClick($strFormId, $strControlId, $strParam) {
+        $this->UpdateAfterShippingAddressChange();
+        $this->CustomerControl->ValidationReset(true);
+
+    }
 
     public function UpdateAfterShippingAddressChange() {
         $blnValid = $this->ValidateControlAndChildren($this->CustomerControl);
@@ -701,6 +743,7 @@ class xlsws_checkout extends xlsws_index {
         $this->BuildCommentControl();
         $this->BuildTermsControl();
         $this->BuildSubmitControl();
+        $this->BuildLoadActionProxy();
     }
 
     protected function UpdateForm() {
@@ -715,6 +758,7 @@ class xlsws_checkout extends xlsws_index {
         $this->UpdateCommentControl();
         $this->UpdateTermsControl();
         $this->UpdateSubmitControl();
+        $this->UpdateLoadActionProxy();
     }
 
     protected function BindForm() {
@@ -729,6 +773,7 @@ class xlsws_checkout extends xlsws_index {
         $this->BindCommentControl();
         $this->BindTermsControl();
         $this->BindSubmitControl();
+        $this->BindLoadActionProxy();
     }
 
     // TODO
@@ -905,7 +950,10 @@ class xlsws_checkout extends xlsws_index {
 
             case 'btnSubmit':
                 return $this->SubmitControl;
-                    
+
+            case 'pxyCheckout':
+                return $this->LoadActionProxy;
+
             case 'customer':
                 return Customer::GetCurrent();
 
@@ -1028,16 +1076,6 @@ class xlsws_checkout extends xlsws_index {
         $this->UpdateForm();
         $this->BindForm();
 
-        #
-        # Provide support for activating the shipping and payment modules
-        # when the customer contact informatin is adequately pre-populated. 
-        #
-        # Then, since this is on the initial page load, reset the validation
-        # errors that may be.  
-        #
-        $this->UpdateAfterShippingAddressChange();
-        $this->CustomerControl->ValidationReset();
-
 		//error msg
 		$this->errSpan = new QPanel($this);
 		$this->errSpan->CssClass='customer_reg_err_msg';
@@ -1053,12 +1091,11 @@ class xlsws_checkout extends xlsws_index {
 
 		$this->icoWait = new QWaitIcon($this->pnlWait);
 
-		$this->pxyCheckout = new QButton($this->mainPnl , 'pxyCheckout');
-		$this->pxyCheckout->CssClass = "xlshidden";
-		$this->pxyCheckout->AddAction(new QClickEvent(500) , new QServerAction('processCheckout'));
-        
         $this->build_login_register();
-	}
+    
+        QApplication::ExecuteJavaScript("document.getElementById('LoadActionProxy').click();");
+
+    }
 
 	/**
 	 * butLogin_Click - Event that gets fired when someone presses login on the checkout page, shows the login modal box

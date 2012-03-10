@@ -66,5 +66,5 @@
 			
 <?php $this->pnlVerify->Render(); ?>		  			
 
-
+<?php $this->LoadActionProxy->Render(); ?>
 </div>			

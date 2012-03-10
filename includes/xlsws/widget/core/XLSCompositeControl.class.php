@@ -137,7 +137,7 @@ class XLSCompositeControl extends QPanel {
         if ($blnRecurse)
             foreach ($this->RegisteredChildren as $strName) {
                 $objControl = $this->GetChildByName($strName);
-                $objControl->ValidationReset();
+                $objControl->ValidationReset($blnRecurse);
             }
         parent::ValidationReset();
     }
