@@ -50,9 +50,9 @@ function _xls_fopen_w($filename) {
  * @return string :: Converted path relative to __SITEROOT__
  */
 function templateNamed($name) {
-	if(_xls_get_conf('DEBUG_TEMPLATE' , false) && stristr($name , ".tpl")) {
-		_xls_stack_add('template_used' , $name);
-	}
+    if (_xls_get_conf('DEBUG_TEMPLATE', 0) == 1)
+        if (stristr($name, '.tpl'))
+            xls_stack_add('template_used', $name);
 
 	$file = 'templates/' . _xls_get_conf('DEFAULT_TEMPLATE' , 'xsilva') . '/'.$name;
 	if(!file_exists($file) && stristr($name , ".tpl")) {
