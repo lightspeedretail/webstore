@@ -41,6 +41,10 @@ class xlsws_checkout extends xlsws_index {
 
     protected $PreviousAddressControl;
 
+    protected $LoginRegisterControl;
+    protected $LoginControl;
+    protected $RegisterControl;
+
     protected $ShippingControl;
     protected $PaymentControl;
     protected $PromoControl;
@@ -402,6 +406,96 @@ class xlsws_checkout extends xlsws_index {
 
     protected function BindTermsControl() {
         return $this->TermsControl;
+    }
+
+    protected function BuildLoginRegisterControl() {
+        $objControl = $this->LoginRegisterControl = 
+            new QPanel($this, 'LoginRegister');
+        $objControl->Template = templateNamed('checkout_login_register.tpl.php');
+
+        return $objControl;
+    }
+
+    protected function UpdateLoginRegisterControl() {
+        $objControl = $this->LoginRegisterControl;
+
+        if (!$objControl)
+            return $objControl;
+
+        $objCustomer = Customer::GetCurrent();
+        if ($objCustomer->Rowid)
+            $objControl->Visible = false;
+        else
+            $objControl->Visible = true;
+
+        return $objControl;
+    }
+
+    protected function BindLoginRegisterControl() {
+        return $this->LoginRegisterControl;
+    }
+
+    protected function BuildLoginControl() {
+        $objControl = $this->LoginControl = 
+            new QButton($this->LoginRegisterControl, 'Login');
+        $objControl->Text = _sp('Login');
+
+        return $objControl;
+    }
+
+    protected function UpdateLoginControl() {
+        return $this->LoginControl;
+    }
+
+    protected function BindLoginControl() {
+        $objControl = $this->LoginControl;
+
+        if (!$objControl)
+            return $objControl;
+
+        $objControl->AddAction(
+            new QClickEvent(), 
+            new QAjaxAction('DoLoginControlClick')
+        );
+
+        return $objControl;
+    }
+
+    public function DoLoginControlClick($strFormId, $strControlId, $strParam) {
+        _xls_stack_add('login_redirect_uri', 'index.php?xlspg=checkout');
+       
+        $this->dxLogin->doShow();
+    }
+
+    protected function BuildRegisterControl() {
+        $objControl = $this->RegisterControl = 
+            new QButton($this->LoginRegisterControl, 'Register');
+        $objControl->Text = _sp('Register');
+ 
+        return $objControl;
+    }
+
+    protected function UpdateRegisterControl() {
+        return $this->RegisterControl;
+    }
+
+    protected function BindRegisterControl() {
+        $objControl = $this->RegisterControl;
+
+        if (!$objControl)
+            return $objControl;
+
+        $objControl->AddAction(
+            new QClickEvent(), 
+            new QServerAction('DoRegisterControlClick')
+        );
+
+        return $objControl;
+    }
+
+    public function DoRegisterControlClick($strFormId, $strControlId, $strParam) {
+        _xls_stack_add('register_redirect_uri' , "index.php?xlspg=checkout");
+        _rd("index.php?xlspg=customer_register");
     }
 
     protected function BuildSubmitControl() {
@@ -792,7 +886,7 @@ class xlsws_checkout extends xlsws_index {
                 templateNamed('email_order_notification.tpl.php'),
                 array(
                     'cart' => $objCart, 
-                    'customer' = $objCustomer
+                    'customer' => $objCustomer
                 )
             ),
             _xls_get_conf('ORDER_FROM')
@@ -811,7 +905,7 @@ class xlsws_checkout extends xlsws_index {
                 templateNamed('email_order_notification_owner.tpl.php'),
                 array(
                     'cart' => $objCart, 
-                    'customer' = $objCustomer
+                    'customer' => $objCustomer
                 )
             ),
             _xls_get_conf('ORDER_FROM')
@@ -829,6 +923,9 @@ class xlsws_checkout extends xlsws_index {
         $this->BuildCaptchaControl();
         $this->BuildCommentControl();
         $this->BuildTermsControl();
+        $this->BuildLoginRegisterControl();
+        $this->BuildLoginControl();
+        $this->BuildRegisterControl();
         $this->BuildSubmitControl();
         $this->BuildLoadActionProxy();
     }
@@ -844,6 +941,9 @@ class xlsws_checkout extends xlsws_index {
         $this->UpdateCaptchaControl();
         $this->UpdateCommentControl();
         $this->UpdateTermsControl();
+        $this->UpdateLoginRegisterControl();
+        $this->UpdateLoginControl();
+        $this->UpdateRegisterControl();
         $this->UpdateSubmitControl();
         $this->UpdateLoadActionProxy();
     }
@@ -859,6 +959,9 @@ class xlsws_checkout extends xlsws_index {
         $this->BindCaptchaControl();
         $this->BindCommentControl();
         $this->BindTermsControl();
+        $this->BindLoginRegisterControl();
+        $this->BindLoginControl();
+        $this->BindRegisterControl();
         $this->BindSubmitControl();
         $this->BindLoadActionProxy();
     }
@@ -1059,9 +1162,13 @@ class xlsws_checkout extends xlsws_index {
                 return $this->LoadActionProxy;
 
             case 'pnlLoginRegister':
+                return $this->LoginRegisterControl;
+
             case 'butLogin':
+                return $this->LoginControl;
+
             case 'butRegister':
-                return null;
+                return $this->RegisterControl;
 
             case 'customer':
                 return Customer::GetCurrent();

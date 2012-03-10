@@ -37,7 +37,6 @@
 
 <?php $this->pnlLoginRegister->Render(); ?>
 
-
 <?php $this->pnlCustomer->Render(); ?>
 
 <?php $this->pnlBillingAdde->Render(); ?>
