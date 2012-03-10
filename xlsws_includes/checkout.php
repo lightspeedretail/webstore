@@ -496,6 +496,7 @@ class xlsws_checkout extends xlsws_index {
         $this->UpdatePaymentControl();
         
         $this->UpdateCartControl();
+        
     }
 
     public function UpdateAfterShippingMethodChange() {
@@ -588,7 +589,6 @@ class xlsws_checkout extends xlsws_index {
 
     protected function CompleteUpdateCart() {
         $objCart = Cart::GetCart();
-        $objCustomer = Customer::GetCurrent();
 
         if (!$objCart->IdStr)
             $objCart->SetIdStr();
@@ -618,9 +618,9 @@ class xlsws_checkout extends xlsws_index {
         ));
 
         $objCart->AddressShip = implode("\n", array(
-            $objCart->ShipFirstname, 
-            $objCart->ShipLastname,
-            (($objCart->ShipCompany) ? ($objCart->ShipCompany) : ''),
+            $objCart->ShipFirstname . ' ' . 
+                $objCart->Lastname .
+                (($objCart->ShipCompany) ? ("\n" . $objCart->ShipCompany) : ''),
             $objCart->ShipAddress1,
             $objCart->ShipAddress2,
             $objCart->ShipCity, 
@@ -1042,8 +1042,6 @@ class xlsws_checkout extends xlsws_index {
 	 */
 	protected function build_main() {
 		global $XLSWS_VARS;
-
-        error_log(print_r($_SESSION, true));
 
         $objCustomer = Customer::GetCurrent();
         $objCart = Cart::GetCart();

@@ -72,6 +72,7 @@ class XLSBillingContactControl extends XLSCustomerContactControl {
             $objCart->Lastname = $objInfo->LastName->Value;
             $objCart->Company = $objInfo->Company->Value;
             $objCart->Phone = $objInfo->Phone->Value;
+            $objCart->Email = $objInfo->Email->Value;
         }
 
         return $objCart;

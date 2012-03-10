@@ -53,6 +53,7 @@ class XLSCustomerControl extends XLSCompositeControl {
 
         $objControl->UpdateFieldsFromCart();
         $objControl->UpdateFieldsFromCustomer();
+        $objControl->SaveFieldsToCart();
 
         return $objControl;
     }
@@ -95,6 +96,7 @@ class XLSCustomerControl extends XLSCompositeControl {
 
         $objControl->UpdateFieldsFromCart();
         $objControl->UpdateFieldsFromCustomer();
+        $objControl->SaveFieldsToCart();
 
         return $objControl;
     }
