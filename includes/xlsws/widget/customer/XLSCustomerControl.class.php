@@ -187,6 +187,7 @@ class XLSCustomerControl extends XLSCompositeControl {
         $objField->Validate();
 
         $objBilling->SaveFieldsToCustomer();
+        $objBilling->SaveFieldsToCart();
 
         if (!$objControl || !$objControl->Checked)
             return;

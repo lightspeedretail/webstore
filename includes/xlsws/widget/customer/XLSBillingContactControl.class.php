@@ -61,6 +61,21 @@ class XLSBillingContactControl extends XLSCustomerContactControl {
         return $objCustomer;
     }
 
+    public function SaveFieldsToCart($objCart = null) {
+        if (is_null($objCart))
+            $objCart = Cart::GetCart();
+
+        $objInfo = $this->GetChildByName('Info');
+
+        if ($objInfo) {
+            $objCart->Firstname = $objInfo->FirstName->Value;
+            $objCart->Lastname = $objInfo->LastName->Value;
+            $objCart->Company = $objInfo->Company->Value;
+            $objCart->Phone = $objInfo->Phone->Value;
+        }
+
+        return $objCart;
+    }
     public function UpdateFieldsFromCart($objCart = null) {
         if (is_null($objCart))
             $objCart = Cart::GetCart();
