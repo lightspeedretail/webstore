@@ -437,7 +437,12 @@ class xlsws_checkout extends xlsws_index {
     }
 
 	public function DoSubmitControlClick($strFormId, $strControlId, $strParam) {
-        $this->ProcessCheckout();
+        $objCart = Cart::GetCart();
+
+        if ($objCart->IdStr && $objCart->Status == CartType::order)
+            _rd($objCart->Link);
+
+        $this->CompleteCheckout();
 	}
 
     protected function BuildLoadActionProxy() {
@@ -583,19 +588,23 @@ class xlsws_checkout extends xlsws_index {
 
     protected function CompleteUpdateCart() {
         $objCart = Cart::GetCart();
+        $objCustomer = Customer::GetCurrent();
 
-        $objCart->SetIdStr();
+        if (!$objCart->IdStr)
+            $objCart->SetIdStr();
 
 		if (trim($objCart->Currency) == '')
 			$objCart->Currency = _xls_get_conf('CURRENCY_DEFAULT' , 'USD');
 
+        $objCart->CustomerId = $objCustomer->Rowid;
+
         $objCart->Type = CartType::awaitpayment;
-        $objCart->State = 'Awaiting Processing';
+        $objCart->Status = 'Awaiting Processing';
         $objCart->DatetimePosted = QDateTime::Now();
         $objCart->Downloaded = 0;
         $objCart->IpHost = _xls_get_ip();
 
-        $objCart->Contact = $objCart->FirstName . ' ' . $objCart->LastName;
+        $objCart->Contact = $objCart->Firstname . ' ' . $objCart->Lastname;
         $objCart->Name = 
             (($objCart->Company) ? ($objCart->Company) : $objCart->Contact);
 
@@ -614,8 +623,8 @@ class xlsws_checkout extends xlsws_index {
             (($objCart->ShipCompany) ? ($objCart->ShipCompany) : ''),
             $objCart->ShipAddress1,
             $objCart->ShipAddress2,
-            $objCart->City, 
-            $objCart->State . ' ' . $objCart->ShipZip,
+            $objCart->ShipCity, 
+            $objCart->ShipState . ' ' . $objCart->ShipZip,
             $objCart->ShipCountry
         ));
 
@@ -659,11 +668,6 @@ class xlsws_checkout extends xlsws_index {
     protected function CompleteUpdateCustomer() {
         $objCustomer = Customer::GetCurrent();
 
-        if (!$objCustomer->Rowid) {
-            $_SESSION['xls_temp_customer'] = true;
-            $objCustomer->Save();
-        }
-
         return $objCustomer;
     }
 
@@ -686,20 +690,17 @@ class xlsws_checkout extends xlsws_index {
     protected function CompleteCheckout() {
         Visitor::add_view_log('',ViewLogType::checkoutpayment);
 
-        $objCart = $this->CompleteUpdateCart();
-        $objPromo = $this->CompleteUpdatePromoCode();
         $objCustomer = $this->CompleteUpdateCustomer();
+        $objPromo = $this->CompleteUpdatePromoCode();
+        $objCart = $this->CompleteUpdateCart();
 
         $objCart->Save();
-        
-        if (isset($_SESSION['xls_temp_customer']))
-            $objCustomer->Save();
 
         if (!$this->PrePaymentHooks())
             return false;
 
         $objPaymentModule = $this->loadModule(
-            $objCart->PaymentModule,
+            $objCart->PaymentModule . '.php',
             'payment'
         );
 
@@ -790,6 +791,23 @@ class xlsws_checkout extends xlsws_index {
         parent::Form_PreRender();
 	}
 
+    protected function Form_PreLoad() {
+        parent::Form_PreLoad();
+
+        $objCustomer = Customer::GetCurrent();
+        $objCart = Cart::GetCart();
+
+        if ($objCart->Rowid)
+            $objCart = $_SESSION['XLSWS_CART'] = Cart::Load($objCart->Rowid);
+
+        if (!$objCustomer->Rowid)
+            if (_xls_get_conf('ALLOW_GUEST_CHECKOUT', 1) != 1)
+                _xls_display_msg(
+                    _sp('You have to login to check out'),
+                    'index.php?xlspg=checkout'
+                );
+    }
+
 	protected function Form_Validate() {
 		$this->errSpan->Text='';
 		$this->errSpan->CssClass='customer_reg_err_msg';
@@ -802,10 +820,10 @@ class xlsws_checkout extends xlsws_index {
         if (!$this->ValidateControlAndChildren($this->CustomerControl))
 			$errors[] = _sp('Please complete the required fields marked with an asterisk *');
 
-        if (!$this->ValidateControlAndChildren($this->ShippingControl));
+        if (!$this->ValidateControlAndChildren($this->ShippingControl))
 			$errors[] =  _sp("Shipping error. Please choose a valid shipping method.");
 
-        if (!$this->ValidateControlAndChildren($this->PaymentControl));
+        if (!$this->ValidateControlAndChildren($this->PaymentControl))
             $errors[] =  _sp("Payment error");
 
         if (!$this->TermsControl->Checked)
@@ -1024,16 +1042,11 @@ class xlsws_checkout extends xlsws_index {
 	 */
 	protected function build_main() {
 		global $XLSWS_VARS;
-        
+
+        error_log(print_r($_SESSION, true));
+
         $objCustomer = Customer::GetCurrent();
         $objCart = Cart::GetCart();
-
-        if (!$objCustomer)
-            if (_xls_get_conf('ALLOW_GUEST_CHECKOUT', 1) != 1)
-                _xls_display_msg(
-                    _sp('You have to login to check out'),
-                    'index.php?xlspg=checkout'
-                );
 
 		$this->mainPnl = new QPanel($this);
 		$this->mainPnl->Template = templateNamed('checkout.tpl.php');

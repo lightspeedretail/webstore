@@ -868,6 +868,12 @@ EOS;
 		exit();
 	}
 
+    protected function Form_Preload() {
+		$visitor = Visitor::get_visitor();
+		if($visitor->ScreenRes == '')
+			$this->blnGetScreenRes = true;
+    }
+
 	/**
 	 * Form_Create - takes all panels and builds them into a page with a form
 	 * @param none
@@ -876,10 +882,7 @@ EOS;
 	protected function Form_Create() {
 		global $XLSWS_VARS;
 
-		$visitor = Visitor::get_visitor();
-
-		if($visitor->ScreenRes == '')
-			$this->blnGetScreenRes = true;
+        $this->Form_PreLoad();
 
 		// manage SSL forwarding
 		if($this->require_ssl() && _xls_get_conf( 'ENABLE_SSL' , false)) {
