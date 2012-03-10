@@ -220,11 +220,6 @@ elseif (isset($_GET['cpage'])) {
 		include('xlsws_includes/custom_page.php');
 }
 
-// TODO :: This doesn't seem to be used
-elseif (isset($_GET['completeorder'])) {
-	_rd("index.php?xlspg=checkout&complete_order=" . $_GET['completeorder']);
-}
-
 elseif ((!isset($XLSWS_VARS['c'])) &&
 	($page = CustomPage::LoadByKey('index'))) {
 
