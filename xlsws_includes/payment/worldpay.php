@@ -55,7 +55,7 @@ class worldpay extends xlsws_class_payment {
 	 *
 	 */
 	public function admin_name() {
-		return "WorldPay";
+		return "WorldPay Simple Integration";
 	}
 
 	/**
@@ -192,7 +192,7 @@ class worldpay extends xlsws_class_payment {
 
 		if(empty($XLSWS_VARS['transId'])) {
 			// failed order
-			_xls_log("WorldPay failed order payment recieved " . print_r($XLSWS_VARS , true)) ;
+			_xls_log("WorldPay failed order payment received " . print_r($XLSWS_VARS , true)) ;
 
 			return false;
 		}

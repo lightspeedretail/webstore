@@ -157,6 +157,11 @@ class merchantware extends credit_card {
 		if(_xls_get_conf('DEBUG_PAYMENTS' , false))
 			QApplication::Log(E_ERROR, get_class($this), $resp);		
 
+		if(_xls_get_conf('DEBUG_PAYMENTS' , false)) {
+			QApplication::Log(E_ERROR, get_class($this), "sending ".$cart->IdStr." for amt ".$cart->Total);
+			QApplication::Log(E_ERROR, get_class($this), "receiving ".$resp);
+		}
+		
 		// Parse xml for response values
 		$oXML = new SimpleXMLElement($resp);
 

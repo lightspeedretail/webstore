@@ -697,5 +697,12 @@ EOT;
 		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
 		$this->xmlreturndata = curl_exec ($ch);
 		curl_close ($ch);
+		
+
+		if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
+			QApplication::Log(E_ERROR, get_class($this), "sending ".$y);
+			QApplication::Log(E_ERROR, get_class($this), "receiving ".$this->xmlreturndata);
+		}
+			
 	}
 }

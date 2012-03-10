@@ -229,7 +229,12 @@ class australiapost extends xlsws_class_shipping {
 			curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
 			$result = curl_exec($c);
 			curl_close($c);
-
+			
+			if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
+				QApplication::Log(E_ERROR, get_class($this), "sending ".$url);
+				QApplication::Log(E_ERROR, get_class($this), "receiving ".$result);
+			}
+		
 			/*
 			  Output sample:
 			  charge=4.2

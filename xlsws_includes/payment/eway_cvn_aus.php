@@ -55,7 +55,7 @@ class eway_cvn_aus extends credit_card {
 	 *
 	 */
 	public function admin_name() {
-		return "eWAY CVN (Australia)";
+		return "eWAY CVN (Australia) Advanced Integration";
 	}
 
 	/**
