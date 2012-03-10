@@ -1325,66 +1325,13 @@ EOS;
 	 * @return none
 	 */
 	public static function completeOrder($cart = false , $customer = false , $forward = true) {
-		if(!$cart)
-			$cart = Cart::GetCart();
-
-		if(function_exists('_custom_before_order_complete'))
-				_custom_before_order_complete($cart);
-
-		if(!$customer) {
-			$customer = new Customer();
-			$customer->Company = $cart->ShipCompany;
-			$customer->Firstname = $cart->ShipFirstname;
-			$customer->Lastname = $cart->ShipLastname;
-			$customer->Address11 = $cart->ShipAddress1;
-			$customer->Address12 = $cart->ShipAddress2;
-			$customer->City1 = $cart->ShipCity;
-			$customer->Email = $cart->Email;
-			$customer->State1 = $cart->ShipState;
-			$customer->Country1 = $cart->ShipCountry;
-			$customer->Mainphone = $cart->Phone;
-		}
-
-		$cart->Type = CartType::order;
-		$cart->Submitted = QDateTime::Now(true);
-
-		Cart::SaveCart($cart);
-		$order_id = $cart->IdStr;
-		$zipcode = $cart->Zipcode;
-
-		// clear out the cart from session
-		Cart::ClearCart();
-
-		_xls_stack_add('xls_submit_order', true);
-
-		if(function_exists('_custom_after_order_complete'))
-			_custom_after_order_complete($cart);
-			        
-        //Sending receipts
-        xlsws_index::send_email($cart);	
-         
-		// Show invoice
-		if($forward)
-			_rd($cart->Link);
-
+        QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
+        return xlsws_checkout::FinalizeCheckout($cart, $customer, $forwarD);
 	}
 
 	public static function send_email($cart) {
-		$order_id = $cart->IdStr;
-		$zipcode = $cart->Zipcode;
-
-		_xls_mail(
-			$cart->Email,
-			_xls_get_conf('STORE_NAME', 'Web') . " " . _sp("Order Notification") . " " . $order_id,
-			_xls_mail_body_from_template(templateNamed('email_order_notification.tpl.php'), array('cart' => $cart, 'customer' =>$customer)),
-			_xls_get_conf('ORDER_FROM')
-		);
-
-		_xls_mail(
-			_xls_get_conf('ORDER_FROM'),
-			_xls_get_conf('STORE_NAME' , 'Web') . " " . _sp("Order Notification") . " " . $order_id,
-			_xls_mail_body_from_template(templateNamed('email_order_notification_owner.tpl.php') , array('cart' => $cart , 'customer' =>$customer)),
-			_xls_get_conf('ORDER_FROM')
-		);
+        QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
+        xlsws_checkout::SendCustomerEmail($cart, null);
+        xlsws_checkout::SendOwnerEmail($cart, null);
 	}
 }

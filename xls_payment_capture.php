@@ -86,8 +86,8 @@ foreach($payModules as $module) {
 
 		Cart::SaveCart($cart);
 
-		if(!isset($pay_info['success']) || ( isset($pay_info['success']) && $pay_info['success']))
-			xlsws_index::completeOrder($cart , false , false);
+        if(!isset($pay_info['success']) || ( isset($pay_info['success']) && $pay_info['success']))
+            xlsws_checkout::FinalizeCheckout($cart, null, false);
 
 		if(isset($pay_info['output']))
 			exit($pay_info['output']);

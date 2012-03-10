@@ -736,7 +736,86 @@ class xlsws_checkout extends xlsws_index {
 
         $objCart->Save();
 
-        $this->completeOrder($objCart, $objCustomer);
+        $this->FinalizeCheckout($objCart, $objCustomer);
+    }
+
+    public static function FinalizeCheckout(
+        $objCart = null, $objCustomer = null, $blnForward = true
+    ) {
+        if (!$objCart)
+            $objCart = Cart::GetCart();
+
+        if (!$objCustomer)
+            $objCustomer = Customer::GetCurrent();
+
+        self::PreFinalizeHooks($objCart, $objCustomer);
+
+        $objCart->Type = CartType::order;
+        $objCart->Submitted = QDateTime::Now(true);
+        $objCart->Save();
+
+        _xls_stack_add('xls_submit_order', true);
+
+        Cart::ClearCart();
+
+        self::PostFinalizeHooks($objCart, $objCustomer);
+
+        if ($blnForward)
+            _rd($objCart->Link);
+    }
+
+    // TODO :: Required ? 
+    protected static function PreFinalizeHooks($objCart, $objCustomer) {
+		if (function_exists('_custom_before_order_complete'))
+			_custom_before_order_process($objCart, $objCustomer);
+    
+        return $objCart;
+    }
+
+    // TODO :: Required ? 
+    protected static function PostFinalizeHooks($objCart, $objCustomer) {
+		if (function_exists('_custom_after_order_complete'))
+			_custom_before_after_process($objCart, $objCustomer);
+    
+        return $objCart;
+    }
+
+    protected static function SendCustomerEmail($objCart, $objCustomer) {
+        _xls_mail(
+            $objCart->Email,
+            sprintf('%s %s %s', 
+                _xls_get_conf('STORE_NAME', 'Web'),
+                _sp('Order Notification'),
+                $objCart->IdStr
+            ),
+            _xls_mail_body_from_template(
+                templateNamed('email_order_notification.tpl.php'),
+                array(
+                    'cart' => $objCart, 
+                    'customer' = $objCustomer
+                )
+            ),
+            _xls_get_conf('ORDER_FROM')
+        );
+    }
+
+    protected static function SendOwnerEmail($objCart, $objCustomer) {
+        _xls_mail(
+            _xls_get_conf('ORDER_FROM'),
+            sprintf('%s %s %s', 
+                _xls_get_conf('STORE_NAME', 'Web'),
+                _sp('Order Notification'),
+                $objCart->IdStr
+            ),
+            _xls_mail_body_from_template(
+                templateNamed('email_order_notification_owner.tpl.php'),
+                array(
+                    'cart' => $objCart, 
+                    'customer' = $objCustomer
+                )
+            ),
+            _xls_get_conf('ORDER_FROM')
+        );
     }
 
     protected function BuildForm() {
@@ -979,6 +1058,11 @@ class xlsws_checkout extends xlsws_index {
             case 'pxyCheckout':
                 return $this->LoadActionProxy;
 
+            case 'pnlLoginRegister':
+            case 'butLogin':
+            case 'butRegister':
+                return null;
+
             case 'customer':
                 return Customer::GetCurrent();
 
@@ -1003,43 +1087,11 @@ class xlsws_checkout extends xlsws_index {
 	protected $lblWait; //the label for the wait icon (optional)
 	protected $icoWait; //the actual wait icon
 
-	protected $pnlLoginRegister; //The QPanel that shows login and register buttons on the checkout page solely
 
 	protected $pnlWait; //The QPanel that shows the wait icon(s)
 
 	protected $pxyCheckout; //Handler for checkout
 
-	protected $butLogin; //The login button solely on the checkout page
-	protected $butRegister; //The register button solely on the checkout page
-
-	/**
-	 * build_login_register - builds the two login and register buttons panel
-	 * @param none
-	 * @return none
-	 */
-	protected function build_login_register() {
-		$this->pnlLoginRegister = new QPanel($this->mainPnl);
-
-		$this->butLogin = new QButton($this->pnlLoginRegister);
-		$this->butLogin->Text = _sp('Login');
-		$this->butLogin->AddAction(new QClickEvent() , new QAjaxAction('butLogin_Click'));
-
-
-		$this->butRegister = new QButton($this->pnlLoginRegister);
-		$this->butRegister->Text = _sp("Register");
-		$this->butRegister->AddAction(new QClickEvent() , new QServerAction('butRegister_Click'));
-
-		$this->pnlLoginRegister->Template = templateNamed('checkout_login_register.tpl.php');
-
-		if($this->customer)
-			$this->pnlLoginRegister->Visible = false;
-	}
-
-	/**
-	 * build_main - constructor for this controller
-	 * @param none
-	 * @return none
-	 */
 	protected function build_main() {
 		global $XLSWS_VARS;
 
@@ -1075,33 +1127,9 @@ class xlsws_checkout extends xlsws_index {
 
 		$this->icoWait = new QWaitIcon($this->pnlWait);
 
-        $this->build_login_register();
-    
         QApplication::ExecuteJavaScript("document.getElementById('LoadActionProxy').click();");
     }
 
-	/**
-	 * butLogin_Click - Event that gets fired when someone presses login on the checkout page, shows the login modal box
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	protected function butLogin_Click($strFormId, $strControlId, $strParameter) {
-		_xls_stack_add('login_redirect_uri' , "index.php?xlspg=checkout");
-
-		$this->dxLogin->Visible = true;
-	}
-
-	/**
-	 * butRegister_Click - Event that gets fired when someone presses register on the checkout page, redirects to customer register if not logged in
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	protected function butRegister_Click($strFormId, $strControlId, $strParameter) {
-		_xls_stack_add('register_redirect_uri' , "index.php?xlspg=checkout");
-
-		_rd("index.php?xlspg=customer_register");
-	}
-    
     /**
 	 * moduleActionProxy - General function to load particular modules for payment and shipping to be used dynamically
 	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
