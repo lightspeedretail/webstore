@@ -145,15 +145,14 @@
 		
 		<?php $this->menuPnl->Render() ?>
 		
-		<div id="nav" class="rounded">
+		<div id="nav" class="rounded-top">
 			<ul>
-				<li id="products"><a href="index.php" style="border-left: none;"></a></li>
-				<li id="newProducts"><a href="<?= _xls_custom_page_url('new') ?>"><?php _xt('New Products'); ?></a></li>
-				<li id="topProducts"><a href="<?= _xls_custom_page_url('top') ?>"><?php _xt('Top Products'); ?></a></li>
-				<li id="promotions"><a href="<?= _xls_custom_page_url('promo') ?>"><?php _xt('Promotions'); ?></a></li>
-				<li id="contact"><a href="index.php?xlspg=contact_us"><?php _xt('Contact'); ?></a></li>
-				<li id="search"><?php $this->searchPnl->Render(); ?></li>
-			</ul>				
+				<li id="products"><a href="index.php"></a></li>
+				<?php
+				foreach ($this->arrTopTabs as $arrTab)
+					echo '<li id="tab'.count($this->arrTopTabs).'"><a href="'.$arrTab->Link.'">'._sp($arrTab->Title).'</a></li>';
+				?>				
+			</ul><div id="searchedge"></div><div id="searchentry"><?php $this->searchPnl->Render(); ?></div>				
 		</div>
 
 			<?php $this->crumbTrail->Render(); ?>
@@ -183,10 +182,10 @@
 	<div id="footer" class="rounded">    	
 			<div class="left">&copy; <?php _xt('Copyright'); ?> <?= date("Y"); ?> <?= _xls_get_conf('STORE_NAME' , 'Your Store') ?>. <?php _xt('All Rights Reserved'); ?>.</div>
 			<div class="right">
-					<a href="<?= _xls_custom_page_url('about') ?>"><?php _xt('About Us'); ?></a> 
-					| <a href="<?= _xls_custom_page_url('tc') ?>"><?php _xt('Terms & Conditions'); ?></a> 
-					| <a href="<?= _xls_custom_page_url('privacy') ?>"><?php _xt('Privacy Policy'); ?></a>
-					| <a href="index.php?xlspg=sitemap"><?php _xt('Sitemap'); ?></a>
+			<?php
+				foreach ($this->arrBottomTabs as $arrTab)
+					echo '<a href="'.$arrTab->Link.'">'._sp($arrTab->Title).'</a> |';
+				?><a href="index.php?xlspg=sitemap"><?php _xt('Sitemap'); ?></a>
 			</div>
 	</div>
 

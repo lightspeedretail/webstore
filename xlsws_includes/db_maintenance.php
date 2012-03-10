@@ -247,7 +247,7 @@ class xlsws_db_maintenance extends xlsws_index {
 			$this->add_config_key('ENABLE_SLASHED_PRICES' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Enabled Slashed \"Original\" Prices', 'ENABLE_SLASHED_PRICES', '',
 				'If selected, will display original price slashed out and Web Price as a Sale Price.', 
-				8, 20, NOW(), NOW(), 'BOOL');");
+				8, 20, NOW(), NOW(), 'ENABLE_SLASHED_PRICES');");
 
 
 			//Fix some sequencing problems for Product options
@@ -268,6 +268,18 @@ class xlsws_db_maintenance extends xlsws_index {
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=15 where `key`='HTML_DESCRIPTION'");
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=16 where `key`='MAX_PRODUCTS_IN_SLIDER'");
 
+
+			if ($this->add_column('xlsws_custom_page' , 'tab_position' ,
+				"ALTER TABLE xlsws_custom_page ADD COLUMN tab_position int NULL"))
+			{
+					_dbx("UPDATE xlsws_custom_page SET tab_position=11 where `key`='new'");
+					_dbx("UPDATE xlsws_custom_page SET tab_position=12 where `key`='top'");
+					_dbx("UPDATE xlsws_custom_page SET tab_position=13 where `key`='promo'");
+					_dbx("UPDATE xlsws_custom_page SET tab_position=14 where `key`='contactus'");
+					_dbx("UPDATE xlsws_custom_page SET tab_position=21 where `key`='about'");
+					_dbx("UPDATE xlsws_custom_page SET tab_position=22 where `key`='tc'");
+					_dbx("UPDATE xlsws_custom_page SET tab_position=23 where `key`='privacy'");
+			}
 
 			
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";

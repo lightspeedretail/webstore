@@ -170,6 +170,57 @@ left:-999em;
 left:auto;
 }
 
+/* Formatting for automated tabs. Note these do NOT refer to 1st, 2nd, 3rd and 4th tabs */
+/* Instead, these are used WHEN there are 4 tabs, or 3 tabs, etc. So #tab4 is used for all */
+/* tabs when four are turned on, since width is proportional to the count() */
+
+#tab1 a {
+display:block;
+float:left;
+height:24px;
+width:180px;
+}
+
+#tab2 a {
+display:block;
+float:left;
+height:24px;
+width:170px;
+}
+
+
+#tab3 a {
+display:block;
+float:left;
+height:24px;
+width:150px;
+}
+
+#tab4 a {
+display:block;
+float:left;
+height:24px;
+width:112px;
+}
+
+#searchedge {
+border-left:1px solid #fff;
+clear:both;
+height:30px;
+padding:6px 10px 0 18px;
+position:absolute;
+margin-left:557px;
+width:1px;
+}
+#searchentry {
+clear:both;
+height:33px;
+padding:12px 10px 0 20px;
+position:absolute;
+margin-left:550px;
+width:199px;
+}
+
 #newProducts a {
 display:block;
 float:left;
@@ -228,8 +279,8 @@ border-right: 1px solid #111;
 border-left: 1px solid #111;
 }
 
-li.search_item {background: #FFFFFF;}
-li.search_item:hover, ul.autocomplete li.search_selected {background: #48E507}
+search_item {background: #FFFFFF;}
+search_item:hover, autocomplete search_selected {background: #48E507}
 
 /***** Crumbtrail *****/
 #breadcrumbs {
@@ -311,9 +362,8 @@ display:table-cell;
 float:left;
 height:auto;
 margin:0 -2px -1px 0;
-max-height:190px;
-height:190px;
-min-height:190px;
+max-height:193px;
+height:193px;
 overflow:hidden;
 text-align:center;
 width:25.12%;
@@ -350,6 +400,10 @@ padding:15px;
 .product_cell p {
 font-style:italic;
 margin:15px 0 25px;
+}
+
+.product_cell .price_reg {
+padding-bottom: 6px;
 }
 
 /** Related products ***/
@@ -636,12 +690,13 @@ width:410px;
 
 .product_details .price {
 font-size:16px;
+line-height:1.5;
 margin:15px 0 -5px;
 }
 
 .product_details .price_reg {
 font-size:12px;
-margin:15px 0 -10px;
+margin:15px 0 10px;
 }
 
 .product_details p {

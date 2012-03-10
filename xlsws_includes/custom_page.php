@@ -45,7 +45,6 @@ class xlsws_custom_page extends xlsws_index {
 		global $strPageTitle;
 		$this->pnlSlider = new XLSSlider($this->mainPnl);
 		$this->pnlSlider->Name = $pageR->Title;
-		$sort_by = _xls_get_conf('PRODUCT_SORT_FIELD' , "Name");
 		$search = $this->productTag;
 
 		$this->pnlSlider->SetProducts(
@@ -66,7 +65,7 @@ class xlsws_custom_page extends xlsws_index {
 				QQ::Equal(QQN::Product()->Web, 1)
 			),
 			QQ::Clause(
-				QQ::OrderBy(QQN::Product()->$sort_by),
+				$this->GetSortOrder(),
 				QQ::LimitInfo(_xls_get_conf('MAX_PRODUCTS_IN_SLIDER' , 64))
 			)
 		);
@@ -75,6 +74,23 @@ class xlsws_custom_page extends xlsws_index {
 		$this->pnlSlider->sliderTitle = $strPageTitle;
 	}
 
+	/**
+     * Return a QClause to order Products based on field
+	 * @param none
+	 * @return QClause
+     */
+    protected function GetSortOrder() {
+        $strProperty = _xls_get_conf('PRODUCT_SORT_FIELD' , 'Name');
+        $blnAscend = true;
+
+        if ($strProperty[0] == '-') { 
+            $strProperty = substr($strProperty,1);
+            $blnAscend = false;
+        }
+
+        return QQ::OrderBy(QQN::Product()->$strProperty, $blnAscend);
+    }
+    
 	/**
 	 * build_main - constructor for this controller
 	 * @param none

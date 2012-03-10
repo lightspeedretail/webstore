@@ -1147,11 +1147,16 @@ function _xls_build_query($array, $query = '', $prefix = '') {
  * @return string
  */
 function _xls_custom_page_url($page) {
+//Best workaround until Contact Us forms can be refactored
+//This will change with the SEO changes a bit later anyway
+//ToDo:
+	if ($page=="contactus") return "index.php?xlspg=contact_us";
 	if(!_xls_get_conf('ENABLE_SEO_URL' , false))
 		return "index.php?cpage=$page";
 
 	$cpage = CustomPage::LoadByKey($page);
 
+	
 	if($cpage)
 		return $cpage->Link;
 

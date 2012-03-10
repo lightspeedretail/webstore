@@ -24,6 +24,7 @@
 	 * @property string $Modified the value for strModified (Read-Only Timestamp)
 	 * @property QDateTime $Created the value for dttCreated 
 	 * @property string $ProductTag the value for strProductTag 
+	 * @property integer $TabPosition the value for intTabPosition 
 	 * @property boolean $__Restored whether or not this object was restored from the database (as opposed to created new)
 	 */
 	class CustomPageGen extends QBaseClass {
@@ -108,6 +109,12 @@
 		const ProductTagMaxLength = 255;
 		const ProductTagDefault = null;
 
+		/**
+		 * Protected member variable that maps to the database column xlsws_custom_page.tab_position
+		 * @var integer intTabPosition
+		 */
+		protected $intTabPosition;
+		const TabPosition = null;
 
 		/**
 		 * Protected array of virtual attributes for this object (e.g. extra/other calculated and/or non-object bound
@@ -403,6 +410,7 @@
 			$objBuilder->AddSelectItem($strTableName, 'modified', $strAliasPrefix . 'modified');
 			$objBuilder->AddSelectItem($strTableName, 'created', $strAliasPrefix . 'created');
 			$objBuilder->AddSelectItem($strTableName, 'product_tag', $strAliasPrefix . 'product_tag');
+			$objBuilder->AddSelectItem($strTableName, 'tab_position', $strAliasPrefix . 'tab_position');
 		}
 
 
@@ -452,6 +460,8 @@
 			$objToReturn->dttCreated = $objDbRow->GetColumn($strAliasName, 'DateTime');
 			$strAliasName = array_key_exists($strAliasPrefix . 'product_tag', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'product_tag'] : $strAliasPrefix . 'product_tag';
 			$objToReturn->strProductTag = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'tab_position', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'tab_position'] : $strAliasPrefix . 'tab_position';
+			$objToReturn->intTabPosition = $objDbRow->GetColumn($strAliasName, 'Integer');
 
 			// Instantiate Virtual Attributes
 			foreach ($objDbRow->GetColumnNameArray() as $strColumnName => $mixValue) {
@@ -573,7 +583,8 @@
 							`meta_keywords`,
 							`meta_description`,
 							`created`,
-							`product_tag`
+							`product_tag`,
+							`tab_position`
 						) VALUES (
 							' . $objDatabase->SqlVariable($this->strKey) . ',
 							' . $objDatabase->SqlVariable($this->strTitle) . ',
@@ -581,7 +592,8 @@
 							' . $objDatabase->SqlVariable($this->strMetaKeywords) . ',
 							' . $objDatabase->SqlVariable($this->strMetaDescription) . ',
 							' . $objDatabase->SqlVariable($this->dttCreated) . ',
-							' . $objDatabase->SqlVariable($this->strProductTag) . '
+							' . $objDatabase->SqlVariable($this->strProductTag) . ',
+							' . $objDatabase->SqlVariable($this->intTabPosition) . '
 						)
 					');
 
@@ -618,7 +630,8 @@
 							`meta_keywords` = ' . $objDatabase->SqlVariable($this->strMetaKeywords) . ',
 							`meta_description` = ' . $objDatabase->SqlVariable($this->strMetaDescription) . ',
 							`created` = ' . $objDatabase->SqlVariable($this->dttCreated) . ',
-							`product_tag` = ' . $objDatabase->SqlVariable($this->strProductTag) . '
+							`product_tag` = ' . $objDatabase->SqlVariable($this->strProductTag) . ',
+							`tab_position` = ' . $objDatabase->SqlVariable($this->intTabPosition) . '
 						WHERE
 							`rowid` = ' . $objDatabase->SqlVariable($this->intRowid) . '
 					');
@@ -717,6 +730,7 @@
 			$this->strModified = $objReloaded->strModified;
 			$this->dttCreated = $objReloaded->dttCreated;
 			$this->strProductTag = $objReloaded->strProductTag;
+			$this->intTabPosition = $objReloaded->intTabPosition;
 		}
 
 
@@ -782,6 +796,10 @@
 					// @return string
 					return $this->strProductTag;
 
+				case 'TabPosition':
+					// Gets the value for intTabPosition 
+					// @return integer
+					return $this->intTabPosition;
 
 				///////////////////
 				// Member Objects
@@ -896,6 +914,17 @@
 						throw $objExc;
 					}
 
+				case 'TabPosition':
+					// Sets the value for intTabPosition 
+					// @param integer $mixValue
+					// @return integer
+					try {
+						return ($this->intTabPosition = QType::Cast($mixValue, QType::Integer));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
 
 				///////////////////
 				// Member Objects
@@ -946,6 +975,7 @@
 			$strToReturn .= '<element name="Modified" type="xsd:string"/>';
 			$strToReturn .= '<element name="Created" type="xsd:dateTime"/>';
 			$strToReturn .= '<element name="ProductTag" type="xsd:string"/>';
+			$strToReturn .= '<element name="TabPosition" type="xsd:int"/>';
 			$strToReturn .= '<element name="__blnRestored" type="xsd:boolean"/>';
 			$strToReturn .= '</sequence></complexType>';
 			return $strToReturn;
@@ -986,6 +1016,8 @@
 				$objToReturn->dttCreated = new QDateTime($objSoapObject->Created);
 			if (property_exists($objSoapObject, 'ProductTag'))
 				$objToReturn->strProductTag = $objSoapObject->ProductTag;
+			if (property_exists($objSoapObject, 'TabPosition'))
+				$objToReturn->intTabPosition = $objSoapObject->tabPosition;
 			if (property_exists($objSoapObject, '__blnRestored'))
 				$objToReturn->__blnRestored = $objSoapObject->__blnRestored;
 			return $objToReturn;
@@ -1044,7 +1076,9 @@
 					return new QQNode('created', 'Created', 'QDateTime', $this);
 				case 'ProductTag':
 					return new QQNode('product_tag', 'ProductTag', 'string', $this);
-
+				case 'TabPosition':
+					return new QQNode('tab_position', 'TabPosition', 'integer', $this);
+					
 				case '_PrimaryKeyNode':
 					return new QQNode('rowid', 'Rowid', 'integer', $this);
 				default:
@@ -1082,6 +1116,8 @@
 					return new QQNode('created', 'Created', 'QDateTime', $this);
 				case 'ProductTag':
 					return new QQNode('product_tag', 'ProductTag', 'string', $this);
+				case 'TabPosition':
+					return new QQNode('tab_position', 'TabPosition', 'integer', $this);
 
 				case '_PrimaryKeyNode':
 					return new QQNode('rowid', 'Rowid', 'integer', $this);

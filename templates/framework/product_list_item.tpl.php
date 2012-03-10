@@ -31,7 +31,14 @@
 						<h2><a href="<?php _xt($_ITEM->Link); ?>"><?= _xls_truncate(_sp($_ITEM->Name) , 50); ?></a></h2>
 					
 						<?php $_FORM->render_prod_drag_image($_ITEM) ?>	
-
+						<?php
+						if(_xls_get_conf('ENABLE_SLASHED_PRICES' , 0)==2 && 
+							$_ITEM->SellWeb != 0 && 
+							$_ITEM->SellWeb < $_ITEM->Sell)
+							echo '<div class="price_reg">'._sp("Regular Price").' : <strike>'.
+								_xls_currency($_ITEM->Sell).'</strike></div>';
+							else echo '<div class="price_reg">&nbsp;</div>';
+							?>
 						<div class="product_cell_price rounded"><a href="<?php _xt($_ITEM->Link); ?>"><?= _xls_currency($_ITEM->Price); ?></a></div>
 						<p> <!--<a href="<?php _xt($_ITEM->Link); ?>"><?php _xt($_ITEM->Code); ?></a --></p>
 
