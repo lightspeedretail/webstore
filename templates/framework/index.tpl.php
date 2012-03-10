@@ -215,7 +215,7 @@
 		//done
 	</script>
 
-<?php if(_xls_get_conf('DEBUG_TEMPLATE' , false)):  ?>
+<?php if (_xls_get_conf('DEBUG_TEMPLATE', 0) == 1):  ?>
  	<?php $files = array();  ?>
 <!-- 
 	Template files used
