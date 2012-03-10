@@ -658,7 +658,12 @@ class xlsws_checkout extends xlsws_index {
 
     protected function CompleteUpdateCustomer() {
         $objCustomer = Customer::GetCurrent();
-        
+
+        if (!$objCustomer->Rowid) {
+            $_SESSION['xls_temp_customer'] = true;
+            $objCustomer->Save();
+        }
+
         return $objCustomer;
     }
 
@@ -686,7 +691,9 @@ class xlsws_checkout extends xlsws_index {
         $objCustomer = $this->CompleteUpdateCustomer();
 
         $objCart->Save();
-        $objCustomer->Save();
+        
+        if (isset($_SESSION['xls_temp_customer']))
+            $objCustomer->Save();
 
         if (!$this->PrePaymentHooks())
             return false;
@@ -988,40 +995,6 @@ class xlsws_checkout extends xlsws_index {
 	protected $butRegister; //The register button solely on the checkout page
 
 	/**
-	 * handle_order - handles an order if the complete_order parameter has been passed via GET or POST
-	 * and completes the transaction if valid
-	 * @param none
-	 * @return none
-	 */
-    // TODO :: This doesn't seem to be used
-    protected function handle_order() {
-		global $XLSWS_VARS;
-
-		try {
-			Cart::LoadCartByLink($XLSWS_VARS['complete_order'] , false);
-		} catch(Exception $e) {
-			_xls_display_msg(_sp('Cart not be found for this order'));
-			return;
-		}
-
-		$cart = Cart::GetCart();
-
-		if($cart->Type != CartType::awaitpayment) {
-			_xls_display_msg(_sp('Selected cart is not waiting for payment'));
-			return;
-		}
-
-		if(isset($XLSWS_VARS['payment_data_store'])) {
-			$cart->PaymentData = $XLSWS_VARS['payment_data_store'];
-			Cart::SaveCart($cart);
-		}
-
-		$this->completeOrder($cart , $this->customer );
-
-		return;
-	}
-
-	/**
 	 * build_login_register - builds the two login and register buttons panel
 	 * @param none
 	 * @return none
@@ -1094,7 +1067,6 @@ class xlsws_checkout extends xlsws_index {
         $this->build_login_register();
     
         QApplication::ExecuteJavaScript("document.getElementById('LoadActionProxy').click();");
-
     }
 
 	/**
