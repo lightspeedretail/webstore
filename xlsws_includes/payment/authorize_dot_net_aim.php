@@ -43,7 +43,7 @@ class authorize_dot_net_aim extends credit_card {
 	 *
 	 */
 	public function name() {
-		$config = $this->getConfigValues('authorize_dot_net_aim');
+		$config = $this->getConfigValues(get_class($this));
 
 		if(isset($config['label']))
 			return $config['label'];

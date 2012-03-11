@@ -798,19 +798,38 @@ class xlsws_checkout extends xlsws_index {
             'payment'
         );
 
+		$objCart->PaymentMethod = $objPaymentModule->payment_method($objCart);
+		
         $strError = '';
         $mixResponse = $objPaymentModule->process(
             $objCart, $this->PaymentControl->objMethodFields, $strError
         );
 
-        if ($mixResponse === FALSE) {
-            $this->errSpan->Text = $strError ? $strError : _sp('Error in processing payment');
+		if (is_array($mixResponse))
+		{
+			if ($mixResponse[0]==true) { //Successful Transaction
+            	$objCart->PaymentData = $mixResponse[1];
+            } else {
+				$this->errSpan->Text = ($mixResponse[1] != '' ? $mixResponse[1] : _sp('Error in processing payment'));
+			 	$this->ToggleCheckoutControls(true);
+			 	$objCart->PaymentData = $this->errSpan->Text; //Save error as part of cart in case of abandon
+			 	//ToDo: verify this isn't an overwrite as a result of a duplicate
+			 	$objCart->Save();
+            	return false;
+            }
+		
+		}
+		elseif ($mixResponse === FALSE) { //Backwards compatibility for any custom modules that just return t/f
+            $this->errSpan->Text = ($strError != '' ? $strError : _sp('Error in processing payment'));
             $this->ToggleCheckoutControls(true);
+            $objCart->PaymentData = $this->errSpan->Text; //Save error as part of cart in case of abandon
+			$objCart->Save();
             return false;
-        }
+        } 
+        else $objCart->PaymentData = $mixResponse;
 
-        $objCart->PaymentMethod = $objPaymentModule->payment_method($objCart);
-        $objCart->PaymentData = $mixResponse;
+        
+        
 
         if (!$objPaymentModule->uses_jumper())
             $objCart->PaymentAmount = $objPaymentModule->paid_amount($objCart);

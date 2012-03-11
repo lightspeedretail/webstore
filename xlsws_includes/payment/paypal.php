@@ -55,7 +55,7 @@ class Paypal extends xlsws_class_payment {
 	 *
 	 */
 	public function admin_name() {
-		return _sp('PayPal');
+		return _sp('PayPal (Simple Integration)');
 	}
 
 	/**
