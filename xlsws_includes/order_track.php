@@ -55,6 +55,8 @@ class xlsws_track_order extends xlsws_index {
 	protected $lblPrintedNotes; //the label for the printed notes
 	protected $lblOrderStatus; //the label for order status
 	protected $lblOrderDate; //the label for order date
+	protected $lblOrderPaymentType; //the label for the payment type
+	protected $lblOrderPaymentData; //the label for the payment data
 
 	protected $butBack; //the "go back" button
 
@@ -190,6 +192,7 @@ class xlsws_track_order extends xlsws_index {
 		$this->lblIdStr = new QLabel($this->orderViewPnl);
 		$this->lblOrderDate = new QLabel($this->orderViewPnl);
 		$this->lblOrderStatus = new QLabel($this->orderViewPnl);
+		$this->lblOrderPaymentData = new QLabel($this->orderViewPnl);
 
 		$this->orderViewItemsPnl = new QPanel($this->orderViewPnl);
 
@@ -284,6 +287,7 @@ class xlsws_track_order extends xlsws_index {
 
 		$this->lblIdStr->Text = $this->order->IdStr;
 		$this->lblOrderStatus->Text = _sp($this->order->Status);
+		$this->lblOrderPaymentData->Text = $this->order->PaymentData;
 
 		// Color the Orders
 		$this->lblOrderStatus->CssClass = $this->order_status_css($this->order->Status);

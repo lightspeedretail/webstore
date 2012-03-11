@@ -40,7 +40,8 @@ if($this->order): ?>
 		<p class="borderp">
 		<?php _xt('Order ID') ?>: <?php $this->lblIdStr->Render() ?><br />
 		<?php _xt('Date') ?>: <?php $this->lblOrderDate->Render() ?><br />
-		<?php _xt('Status') ?>: <?php $this->lblOrderStatus->Render() ?>
+		<?php _xt('Status') ?>: <?php $this->lblOrderStatus->Render() ?><br />
+		<?php _xt('Payment Transaction #') ?>: <?php $this->lblOrderPaymentData->Render() ?>
 		</p>
 	</div>
 	
