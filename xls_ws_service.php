@@ -507,13 +507,22 @@
     WHERE code = {$strSqlCode};
 EOS;
 
-            $intDuplicateId = _dbx_first_cell($strQuery);
+           $intDuplicateId = _dbx_first_cell($strQuery);
             if ($intDuplicateId)
                 if ($intDuplicateId != $intRowid) { 
-                    QApplication::Log(E_ERROR, 'uploader', 
+                    
+                     if(_xls_get_conf('DEBUG_DELETE_DUPES' , false)) {
+                     QApplication::Log(E_ERROR, 'uploader', 
+                        'Deleting duplicate product code found : ' . $strCode, 
+                        __FUNCTION__); 
+                     	$this->remove_product($passkey,$intDuplicateId);
+                     } else {
+                     	
+                     	QApplication::Log(E_ERROR, 'uploader', 
                         'Duplicate product code found : ' . $strCode, 
-                        __FUNCTION__);
-                    return false;
+                        __FUNCTION__); 
+                       return false;
+                     }
                 }
 
             if (!$product) { 
