@@ -150,6 +150,10 @@ class eway_cvn_aus extends credit_card {
 			$xmlRequest .= "<$key>$value</$key>";
 		$xmlRequest .= "</ewaygateway>";
 
+		if(_xls_get_conf('DEBUG_PAYMENTS' , false)) {
+			QApplication::Log(E_ERROR, get_class($this), "sending ".$cart->IdStr." for amt ".$cart->Total);
+		}
+
 		$xmlResponse = $this->sendTransactionToEway($xmlRequest);
 
 		$ewayResponseFields = $this->parseResponse($xmlResponse);
@@ -186,6 +190,10 @@ class eway_cvn_aus extends credit_card {
 
 		$xmlResponse = curl_exec($ch);
 
+		if(_xls_get_conf('DEBUG_PAYMENTS' , false)) {
+			QApplication::Log(E_ERROR, get_class($this), "receiving ".$xmlResponse);
+		}
+		
 		if(curl_errno( $ch ) == CURLE_OK)
 			return $xmlResponse;
 	}
