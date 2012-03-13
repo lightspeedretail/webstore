@@ -281,6 +281,9 @@ class xlsws_db_maintenance extends xlsws_index {
 					_dbx("UPDATE xlsws_custom_page SET tab_position=23 where `key`='privacy'");
 			}
 
+
+			_dbx("UPDATE `xlsws_country` SET `country`='Russia' where `code`='RU'");
+
 			
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
