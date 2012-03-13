@@ -40,6 +40,7 @@
 		session_id($_GET[session_name()]);
 		
 	
+
 	
  	function adminTemplate($name)
 	{
@@ -207,9 +208,12 @@
 	
 	
 	//THE VARIOUS ITEMS IN THE ADMIN DROPDOWN PANEL - CONFIGURATION, SHIPPING, PAYMENT, STATS AND SYSTEM
-	$arrShipTabs = array('shipping' => _sp('Shipping') , 'methods' => _sp('Methods') , 'destinations' =>_sp('Destinations') ,'tier' =>_sp('Shipping Tiers') , 'countries' =>_sp('Countries') , 'states' =>_sp('States/Regions') );
+	$arrShipTabs = array('shipping' => _sp('Shipping') , 'methods' => _sp('Methods') , 
+		'destinations' =>_sp('Destinations') ,'shippingtasks' =>_sp('Shipping Tasks') ,
+		'countries' =>_sp('Countries') , 'states' =>_sp('States/Regions') );
 	$arrConfigTabs = array('store' => _sp('Store') , 'appear' => _sp('Appearance') , 'sidebars' =>_sp('Sidebars'));
-	$arrPaymentTabs = array('methods' => _sp('Methods') , 'cc' => _sp('Credit Card Types'), 'promo' => _sp('Promo Codes'));
+	$arrPaymentTabs = array('methods' => _sp('Methods') , 'cc' => _sp('Credit Card Types'), 
+		'promo' => _sp('Promo Codes'),'promotasks' => _sp('Promo Code Tasks'));
 	$arrStatTabs = array('chart' => _sp('Charts') , 'vlog' => _sp('Visitor Log'));
 	$arrSystemTabs = array('config' => _sp('Configuration') , 'task' => _sp('Tasks')  , 'slog' => _sp('System Log'));
 	
@@ -227,6 +231,7 @@
 		protected $pxyTabClick;
 		protected $pxyPanelClick;
 		
+		public $HelperRibbon = ""; //top ribbon for additional information
 		
 		protected $arrTabs;
 		protected $arrPanels;
@@ -862,8 +867,6 @@
 			$this->configPnls['taxship']->Info = _sp('This is used to enable tax calculations on shipping charges.');
 			
 
-
-
 		}
 		
 		
@@ -1227,6 +1230,10 @@
 			
             $this->build_list();
 			
+			if ($this->currentModuleType != "sidebar")
+				$this->HelperRibbon = "To activate a new ".$this->currentModuleType." module, turn it to ON, then click the Gear icon to configure options. You must click Save to fully activate a module.";
+				
+
 		}
 		
 		
@@ -1407,55 +1414,48 @@
 			// file has to be included for object initiation
 			$this->loadModules();
 			
+
+			$classname = basename($module['filelocation'] , '.php');
 			
-//			if($module['classobj']){
-//				$class = $module['classobj'];
-//			}else{
-				$classname = basename($module['filelocation'] , '.php');
-				
-				if(!class_exists($classname))
-					return;
-				
-					try{
-						$class = new $classname($this);
-					}catch(Exception $e){
-						$class = new $classname;
-					}
-								
-//			}
-				
+			if(!class_exists($classname))
+				return;
 			
-
-
-				if($module['enabled'] == false){
-						
-					$mod = new Modules();
-					$mod->File = $module['file'];
-					$mod->Type = $type;
-					$mod->SortOrder = _dbx_first_cell("SELECT IFNULL(MAX(sort_order),0)+1 FROM xlsws_modules WHERE type = '$type'");
-					$mod->Save();
-						
-					try{
-						$class->install();	// install the module
-					}catch(Exception $e){
-						_xls_log("Error installing module $module[file] . Error Desc: " . $e);
-					}
-						
-						
-				}elseif($module['enabled'] == true){
-					try{
-						$class->remove();	// install the module
-					}catch(Exception $e){
-						_xls_log("Error removing module $module[file] . Error Desc: " . $e);
-					}
-											
-					$mod = Modules::LoadByFileType($module['file'] , $type);
-						
-					if($mod)
-						$mod->Delete();
-						
-
+				try{
+					$class = new $classname($this);
+				}catch(Exception $e){
+					$class = new $classname;
 				}
+							
+
+			if($module['enabled'] == false){
+					
+				$mod = new Modules();
+				$mod->File = $module['file'];
+				$mod->Type = $type;
+				$mod->SortOrder = _dbx_first_cell("SELECT IFNULL(MAX(sort_order),0)+1 FROM xlsws_modules WHERE type = '$type'");
+				$mod->Save();
+					
+				try{
+					$class->install();	// run any pre-install function to set it up before turning on
+				}catch(Exception $e){
+					_xls_log("Error installing module $module[file] . Error Desc: " . $e);
+				}
+					
+					
+			}elseif($module['enabled'] == true){
+				try{
+					$class->remove();	// run a pre-remove function to do any cleanup before turning off
+				}catch(Exception $e){
+					_xls_log("Error removing module $module[file] . Error Desc: " . $e);
+				}
+										
+				$mod = Modules::LoadByFileType($module['file'] , $type);
+					
+				if($mod)
+					$mod->Delete(); //delete the record in xlsws_modules
+					
+
+			}
 
 				
 			_rd();
@@ -1553,8 +1553,7 @@
 						continue;
 					}
 					
-					if(!$class->check())
-						continue;
+					
 					
 					if(method_exists($class , 'admin_name'))
 						$name = $class->admin_name();
@@ -1742,8 +1741,8 @@
 		 	
 		 	// Let's record the reference to the form's MethodCallBack
 		 	$this->strMethodCallBack = $strMethodCallBack;
-	
-
+			     
+     
 			$this->txtPageKey = new XLSTextBox($this);
 			$this->txtPageKey->Required = true;
 	        $this->txtPageKey->AddAction(new QEnterKeyEvent() , new QServerControlAction($this , 'btnSave_click'));
@@ -1756,25 +1755,10 @@
 	        $this->txtPageTitle->AddAction(new QEscapeKeyEvent() ,new QServerControlAction($this , 'btnCancel_click'));
 	        $this->txtPageTitle->Height = 20;
 	        
-	        $this->txtTabPosition  = new XLSListBox($this);
-			$this->txtTabPosition->AddItem('Not Shown' , '0');
-			$this->txtTabPosition->AddItem('Top 1st Position' , '11');
-			$this->txtTabPosition->AddItem('Top 2nd Position' , '12');
-			$this->txtTabPosition->AddItem('Top 3rd Position' , '13');
-			$this->txtTabPosition->AddItem('Top 4th Position' , '14');
-			$this->txtTabPosition->AddItem('Top 5th Position' , '15');
-			$this->txtTabPosition->AddItem('Top 6th Position' , '16');
-			$this->txtTabPosition->AddItem('Bottom 1st Position' , '21');
-			$this->txtTabPosition->AddItem('Bottom 2nd Position' , '22');
-			$this->txtTabPosition->AddItem('Bottom 3rd Position' , '23');
-			$this->txtTabPosition->AddItem('Bottom 4th Position' , '24');
-			$this->txtTabPosition->AddItem('Bottom 5th Position' , '25');
-			$this->txtTabPosition->AddItem('Bottom 6th Position' , '26');
-	        
 
 			$this->txtPageText = new QFCKeditor($this);
 			$this->txtPageText->BasePath = __VIRTUAL_DIRECTORY__ . __JS_ASSETS__ . '/fckeditor/' ;
-            //$this->txtPageText->Required = true;
+            $this->txtPageText->Required = true;
             $this->txtPageText->Width = 550;
             $this->txtPageText->Height = 450;
 //			$this->txtPageText->ToolbarSet = "XLSWS";
@@ -1938,11 +1922,1237 @@
 		 
 		 
 	}
+
+	class xlsws_admin_edittiers_panel extends QPanel {
+		
+	
+		protected $strMethodCallBack;
+		
+		public $fields;
+		public $helpers = array();
+		
+		public $dtgGrid;
+		protected $objParentObject;
+
+		public $page;
+		
+		public $btnSave;
+		public $btnEdit;
+		public $btnCancel;
+		public $btnDelete;
+		public $btnDeleteConfirm;
+		
+        public $Info = "";
+		
+        
+		public $txtPageKey;
+		public $txtPageTitle;
+		public $txtPageKeywords;
+		public $txtPageDescription;
+		public $txtPageText;
+		public $txtProductTag;
+		
+		public $txtStartPrice;
+		public $txtEndPrice;
+		public $txtRate;
+		
+		public $ctlPromoCode;
+ 		public $ctlExcept;
+        public $ctlCategories;
+        public $ctlFamilies;
+        public $ctlProductCodes;
+        public $ctlClasses;
+        public $ctlKeywords;
+        
+		public $pxyAddNewPage;
+		
+        
+        public $EditMode = false;
+        public $NewMode = false;
+        public $IsShipping = false;
+        public $intShippingRowID = false;
+			
+        
+		public $pxyGRCreate; //the callback for when the create button is pressed
+		public $pxyGRView; //the callback for when the view button is pressed
+        
+		public function __construct($objParentControl, $objParentObject, $page , $strMethodCallBack, $strControlId = null) {
+		 	// First, let's call the Parent's __constructor
+		 	try {
+		 		parent::__construct($objParentControl, $strControlId);
+		 	} catch (QCallerException $objExc) {
+		 		$objExc->IncrementOffset();
+		 		throw $objExc;
+		 	}
+	
+		 	// Next, we set the local module object
+		 	$this->objParentObject = $objParentObject;
+		 	$this->page = $page;
+
+		 	
+		 	// Let's record the reference to the form's MethodCallBack
+		 	$this->strMethodCallBack = $strMethodCallBack;
+	
+			
+			
+			$this->dtgGrid = new QDataGrid($this);
+			$this->dtgGrid->CellPadding = 5;
+			$this->dtgGrid->CellSpacing = 0;
+			$this->dtgGrid->CssClass = "datagrid";
+
+			
+			 $this->dtgGrid->AddColumn(new QDataGridColumn('Start Price', '<?= $_FORM->FieldColumn_Render($_ITEM , \'' . 'StartPrice'  . '\') ?>'
+							, 'CssClass=dtg_column'
+							, 'Width=200'
+							, 'HtmlEntities=false'
+							)
+							);
+							
+							
+			$this->dtgGrid->AddColumn(new QDataGridColumn('End Price', '<?= $_ITEM->EndPrice ?>', 'Width=200', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+		    $this->dtgGrid->AddColumn(new QDataGridColumn('Rate', '<?= $_ITEM->Rate ?>', 'Width=100','CssClass=dtg_column'));
+		    
+		    $this->dtgGrid->SetParentControl($this);
+		   
+		
+			//Change the fields parent
+			//
+	    
+		    
+		    
+		    // Make the DataGrid look nice
+			$objStyle = $this->dtgGrid->RowStyle;
+			$objStyle->CssClass = "row";
+
+			$objStyle = $this->dtgGrid->HeaderRowStyle;
+			$objStyle->CssClass = "dtg_header";
+			
+			$this->dtgGrid->DataSource = ShippingTiers::QueryArray(
+					QQ::NotEqual(QQN::ShippingTiers()->Rowid, 0),
+					QQ::Clause(QQ::OrderBy(QQN::ShippingTiers()->StartPrice))
+				);
+		    
+		    // Create the other textboxes and buttons -- make sure we specify
+            // the datagrid as the parent.  If they hit the escape key, let's perform a Cancel.
+            // Note that we need to terminate the action on the escape key event, too, b/c
+            // many browsers will perform additional processing that we won't not want.
+            $this->txtStartPrice = new QTextBox($this->dtgGrid,$this);
+            $this->txtStartPrice->Required = true;
+            $this->txtStartPrice->MaxLength = 50;
+            $this->txtStartPrice->Width = 200;
+            $this->txtStartPrice->AddAction(new QEscapeKeyEvent(), new QAjaxAction('btnCancel_Click'));
+            $this->txtStartPrice->AddAction(new QEscapeKeyEvent(), new QTerminateAction());
+            $this->txtStartPrice->SetParentControl($this);
+			
+			
+		 	$this->btnSave = new QButton($this);
+		 	$this->btnSave->Text = _sp('Save');
+		 	$this->btnSave->CssClass = 'button';
+		 	$this->btnSave->Visible = false;
+		 	$this->btnSave->AddAction(new QClickEvent() , new QServerControlAction($this , 'btnSave_click'));
+		 	$this->btnSave->CausesValidation = true;
+			
+		 	$this->btnCancel = new QButton($this);
+		 	$this->btnCancel->Text = _sp('Cancel');
+		 	$this->btnCancel->Visible = false;
+		 	$this->btnCancel->AddAction(new QClickEvent() , new QServerControlAction($this , 'btnCancel_click'));
+
+		 	$this->btnEdit = new QButton($this);
+		 	$this->btnEdit->Text = _sp('Begin');
+		 	$this->btnEdit->CssClass = 'button admin_edit';
+		 	$this->btnEdit->AddAction(new QClickEvent() , new QAjaxControlAction($this , 'btnEdit_click'));
+
+		 	$this->pxyAddNewPage = new QControlProxy($this);
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QAjaxControlAction($this , 'btnEdit_click'));
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QTerminateAction());
+		 	
+		 	
+		 	$this->pxyGRCreate = new QControlProxy($this);
+			$this->pxyGRView = new QControlProxy($this);
+
+
+		 	/*$this->dtgGrid = new QDataRepeater($this);
+            
+            // Let's set up pagination -- note that the form is the parent
+            // of the paginator here, because it's on the form where we
+            // make the call toe $this->dtrPersons->Paginator->Render()
+            $this->dtgGrid->Paginator = new QPaginator($this);
+            $this->dtgGrid->ItemsPerPage = 6;
+
+            // Let's create a second paginator
+            $this->dtgGrid->PaginatorAlternate = new QPaginator($this);
+
+            // Enable AJAX-based rerendering for the QDataRepeater
+            $this->dtgGrid->UseAjax = true;
+
+            // DataRepeaters use Templates to define how the repeated
+            // item is rendered
+            $this->dtgGrid->Template = adminTemplate('ship_define_tiers_row.tpl.php');
+            
+            // Finally, we define the method that we run to bind the data source to the datarepeater
+            $this->dtgGrid->SetDataBinder('dtgItems_Bind',$this);
+            
+ 		 	
+		 				
+			$this->txtStartPrice = new QTextBox($this);
+			$this->txtStartPrice->Required = true;
+			$this->txtStartPrice->Height = 20;
+ 			$this->txtStartPrice->SetParentControl($this);
+		*/
+				 
+			$this->strTemplate = adminTemplate($page->Key.'.tpl.php');
+
+	
+		 }
+		 
+		 public function dtgItems_Bind()
+		 {
+		 
+		 	$objItemsArray = ShippingTiers::LoadAll();
+    		        
+
+			//$this->dtgGrid->TotalItemCount = count($objItemsArray);
+			
+			
+			// If we are editing someone new, we need to add a new (blank) person to the data source
+			//if ($this->intEditRowid == -1)
+			//	array_push($objItemsArray, new $className);
+
+			// Bind the datasource to the datagrid
+			//$this->dtgGrid->DataSource = $objItemsArray;
+ 			
+ 			$this->dtgGrid->DataSource = $objItemsArray;
+ 			$this->dtgGrid->TotalItemCount = count($objItemsArray);
+            
+		 
+		 
+		 }
+		 
+		    // If the person for the row we are rendering is currently being edited,
+        // show the textbox.  Otherwise, display the contents as is.
+        public function StartColumn_Render(Person $objPerson) {
+            
+              return $this->txtFirstName->RenderWithError(false);
+            
+        }
+        
+        // If the person for the row we are rendering is currently being edited,
+		// show the textbox.  Otherwise, display the contents as is.
+		public function FieldColumn_Render($objItem , $field) {
+			
+			//error_log("sfield is ".$field);
+			error_log("here");
+			return $this->txtFirstName->RenderWithError(false);	
+			}
+
+		 
+		 public function btnChange_click()
+		 {
+		 	
+		 	$intPromoCode = $this->ctlPromoCode->SelectedValue;
+			if ($intPromoCode<1)
+			{
+				$this->ctlExcept->Enabled = false;
+				$this->ctlCategories->Enabled = false;
+				$this->ctlFamilies->Enabled = false;
+				$this->ctlClasses->Enabled = false;
+				$this->ctlKeywords->Enabled = false;
+				$this->ctlProductCodes->Enabled = false;
+				
+				$this->ctlExcept->SelectedValue=0;
+				$this->ctlCategories->SelectedValues=null;
+				$this->ctlFamilies->SelectedValues=null;
+				$this->ctlClasses->SelectedValues=null;
+				$this->ctlKeywords->SelectedValues=null;
+				$this->ctlProductCodes->SelectedValues=null;
+				return false;
+			}
+			
+			$objPromoCode = PromoCode::Load($intPromoCode);
+			$strRestrictions =  $objPromoCode->Lscodes;
+			
+			$arrRestrictions = explode(",",$strRestrictions);
+			
+			$arrCategories = array();
+			$arrFamilies= array();
+			$arrClasses = array();
+			$arrKeywords = array();
+			$arrProducts = array();
+			
+			foreach ($arrRestrictions as $strCode) {
+  
+				if (substr($strCode, 0,7) == "family:") $arrFamilies[] = trim(substr($strCode,7,255));
+				elseif (substr($strCode, 0,6) == "class:") $arrClasses[] = trim(substr($strCode,6,255));
+				elseif (substr($strCode, 0,8) == "keyword:") $arrKeywords[] = trim(substr($strCode,8,255));
+				elseif (substr($strCode, 0,9) == "category:") $arrCategories[] = trim(substr($strCode,9,255));
+				else $arrProducts[] = $strCode;
+           
+        	}  
+        
+			$this->ctlExcept->Enabled = true;
+			$this->ctlCategories->Enabled = true;
+			$this->ctlFamilies->Enabled = true;
+			$this->ctlClasses->Enabled = true;
+			$this->ctlKeywords->Enabled = true;
+			$this->ctlProductCodes->Enabled = true;
+			
+			$this->ctlCategories->SelectedValues=$arrCategories;
+			$this->ctlFamilies->SelectedValues=$arrFamilies;
+			$this->ctlClasses->SelectedValues=$arrClasses;
+			$this->ctlKeywords->SelectedValues=$arrKeywords;
+			$this->ctlProductCodes->SelectedValues=$arrProducts;
+
+			$this->ctlExcept->SelectedValue=$objPromoCode->Except;
+
+			$this->Refresh();
+		 
+		 }
+		 
+		 public function btnEdit_click(){
+		 	
+		 	$this->btnEdit->Visible = false;
+		 	$this->btnSave->Visible = true;
+		 	$this->btnCancel->Visible = true;
+		 	$this->EditMode = true;
+		 	
+
+			/*$this->txtPageKey->Text = $this->page->Key;
+			$this->txtPageTitle->Text = ($this->page->Title == _sp('+ Add new page'))?'':$this->page->Title;
+			$this->txtPageText->Text = $this->page->Page;
+			$this->txtProductTag->Text = $this->page->ProductTag;
+			$this->txtPageKeywords->Text = $this->page->MetaKeywords;
+			$this->txtPageDescription->Text = $this->page->MetaDescription;
+		*/
+		 	$this->Refresh();
+			
+			
+		 	QApplication::ExecuteJavaScript("doRefresh();");
+		 	
+		 }
+		 
+		 
+		 
+		 
+		public function btnSave_click($strFormId, $strControlId, $strParameter){
+			
+			$intPromoCode = $this->ctlPromoCode->SelectedValue;
+			if ($intPromoCode<1) return false;
+			
+			//Build restriction string
+			$strRestrictions="";
+			
+			foreach($this->ctlProductCodes->SelectedValues as $strVal)
+				$strRestrictions .= ",".$strVal;
+			foreach($this->ctlCategories->SelectedValues as $strVal)
+				$strRestrictions .= ",category:".$strVal;
+			foreach($this->ctlFamilies->SelectedValues as $strVal)
+				$strRestrictions .= ",family:".$strVal;
+			foreach($this->ctlClasses->SelectedValues as $strVal)
+				$strRestrictions .= ",class:".$strVal;
+			foreach($this->ctlKeywords->SelectedValues as $strVal)
+				$strRestrictions .= ",keyword:".$strVal;
+				
+			$strRestrictions=substr($strRestrictions,1); //Our built string starts with a comma, so remove it
+			
+
+			$objPromoCode = PromoCode::Load($intPromoCode);
+
+			//Apply our selections
+			$objPromoCode->Lscodes=$strRestrictions;	
+			$objPromoCode->Except = $this->ctlExcept->SelectedValue;
+			
+			if ($this->intShippingRowID == $objPromoCode->Rowid) {
+				$objPromoCode->Lscodes="shipping:,".$strRestrictions;	
+				$this->intShippingRowID = false;
+			}
+				
+			$objPromoCode->Save();
+			
+			
+			$this->btnEdit->Visible = true;
+		 	$this->btnSave->Visible = false;
+		 	$this->btnCancel->Visible = false;
+		 	$this->EditMode = false;
+		 	
+		 	$this->resetForm();
+
+		 	
+		 	$this->Refresh();
+			
+		}
+		 
+		public function btnCancel_click($strFormId, $strControlId, $strParameter){
+		 	$this->btnEdit->Visible = true;
+		 	$this->btnSave->Visible = false;
+		 	$this->btnCancel->Visible = false;
+		 	$this->EditMode = false;
+		 	
+		 	$this->resetForm();
+				
+		 	//$this->Refresh();
+						
+		}
+		
+
+		public function btnDeleteConfirm_click($strFormId, $strControlId, $strParameter){
+			$this->page->Delete();
+		 	//$this->btnCancel->Visible = false;
+		 	QApplication::ExecuteJavaScript("window.location.reload()");
+			
+		}
+		
+		
+		public function btnDelete_click($strFormId, $strControlId, $strParameter){	
+			$this->btnEdit->Visible = false;
+			$this->btnDelete->Visible = false;	
+			$this->btnDeleteConfirm->SetCustomStyle('padding','0 5px 3px 5px');		
+			$this->btnCancel->SetCustomStyle('padding','0 5px 3px 5px');													
+			$this->btnDeleteConfirm->Visible = true;
+			$this->btnCancel->Visible = true;
+		}
+		 
+		public function resetForm()
+		{
+			$this->ctlExcept->Enabled = false;
+			$this->ctlCategories->Enabled = false;
+			$this->ctlFamilies->Enabled = false;
+			$this->ctlClasses->Enabled = false;
+			$this->ctlKeywords->Enabled = false;
+			$this->ctlProductCodes->Enabled = false;
+			
+			$this->ctlPromoCode->SelectedValue=0;
+			$this->ctlExcept->SelectedValue=0;
+			$this->ctlCategories->SelectedValues=null;
+			$this->ctlFamilies->SelectedValues=null;
+			$this->ctlClasses->SelectedValues=null;
+			$this->ctlKeywords->SelectedValues=null;
+			$this->ctlProductCodes->SelectedValues=null;
+		}
+		 
+	}
 	
 	
+	/* underpinning panel for tasks that require criteria to run
+	*/					
+	class xlsws_admin_task_panel extends QPanel {
+		
 	
+		protected $strMethodCallBack;
+		
+		public $fields;
+		public $helpers = array();
+		
+		
+		protected $objParentObject;
+
+		public $page;
+		
+		public $btnSave;
+		public $btnEdit;
+		public $btnCancel;
+		public $btnDelete;
+		public $btnDeleteConfirm;
+		public $btnGo1;
+		public $btnGo2;
+		public $btnGo3;
+		public $btnGo4;
+		
+		public $btnGo1Id;
+		public $btnGo2Id;
+		public $btnGo3Id;
+		public $btnGo4Id;
+		
+		
+        public $Info = "";
+		
+        
+		public $txtPageKey;
+		public $txtPageTitle;
+		public $txtPageKeywords;
+		public $txtPageDescription;
+		public $txtPageText;
+		public $txtProductTag;
+        
+        public $ctlPromoCodeCopy;
+        
+        
+		public $pxyAddNewPage;
+		
+        
+        public $EditMode = false;
+        public $NewMode = false;
+			
+        
+        
+		public function __construct($objParentControl, $objParentObject, $page , $strMethodCallBack, $strControlId = null) {
+		 	// First, let's call the Parent's __constructor
+		 	try {
+		 		parent::__construct($objParentControl, $strControlId);
+		 	} catch (QCallerException $objExc) {
+		 		$objExc->IncrementOffset();
+		 		throw $objExc;
+		 	}
 	
+		 	// Next, we set the local module object
+		 	$this->objParentObject = $objParentObject;
+		 	$this->page = $page;
+		 	
+		 	// Let's record the reference to the form's MethodCallBack
+		 	$this->strMethodCallBack = $strMethodCallBack;
 	
+
+			$this->txtPageKey = new XLSTextBox($this);
+			$this->txtPageKey->Required = true;
+	        $this->txtPageKey->AddAction(new QEnterKeyEvent() , new QServerControlAction($this , 'btnSave_click'));
+	        $this->txtPageKey->AddAction(new QEscapeKeyEvent() , new QServerControlAction($this , 'btnCancel_click'));
+			$this->txtPageKey->Height = 20;
+
+	        $this->txtPageTitle = new XLSTextBox($this);
+			$this->txtPageTitle->Required = true;
+	        $this->txtPageTitle->AddAction(new QEnterKeyEvent() , new QServerControlAction($this , 'btnSave_click'));
+	        $this->txtPageTitle->AddAction(new QEscapeKeyEvent() ,new QServerControlAction($this , 'btnCancel_click'));
+	        $this->txtPageTitle->Height = 20;
+	        
+
+			$this->txtPageText = new QFCKeditor($this);
+			$this->txtPageText->BasePath = __VIRTUAL_DIRECTORY__ . __JS_ASSETS__ . '/fckeditor/' ;
+            $this->txtPageText->Required = true;
+            $this->txtPageText->Width = 550;
+            $this->txtPageText->Height = 450;
+//			$this->txtPageText->ToolbarSet = "XLSWS";
+			$this->txtPageText->Name=_sp("Page content");
+	        $this->txtPageText->CrossScripting = QCrossScripting::Allow;        
+	        
+			
+			$this->txtProductTag = new XLSTextBox($this);
+	        $this->txtProductTag->AddAction(new QEnterKeyEvent() , new QServerControlAction($this , 'btnSave_click'));
+	        $this->txtProductTag->AddAction(new QEscapeKeyEvent() , new QServerControlAction($this , 'btnCancel_click'));
+			$this->txtProductTag->Height = 20;
+			
+	        
+			$this->txtPageKeywords = new XLSTextBox($this);
+	        $this->txtPageKeywords->AddAction(new QEnterKeyEvent() , new QServerControlAction($this , 'btnSave_click'));
+	        $this->txtPageKeywords->AddAction(new QEscapeKeyEvent() , new QServerControlAction($this , 'btnCancel_click'));
+	        $this->txtPageKeywords->Height = 20;
+
+	        
+			$this->txtPageDescription = new XLSTextBox($this);
+	        $this->txtPageDescription->AddAction(new QEnterKeyEvent() , new QServerControlAction($this , 'btnSave_click'));
+	        $this->txtPageDescription->AddAction(new QEscapeKeyEvent() , new QServerControlAction($this , 'btnCancel_click'));
+			$this->txtPageDescription->Height = 20;
+		 	
+		 	
+		 	$this->btnSave = new QButton($this);
+		 	$this->btnSave->Text = _sp('Save');
+		 	$this->btnSave->CssClass = 'button rounded';
+		 	$this->btnSave->Visible = false;
+		 	$this->btnSave->AddAction(new QClickEvent() , new QServerControlAction($this , 'btnSave_click'));
+		 	$this->btnSave->CausesValidation = true;
+			
+		 	$this->btnCancel = new QButton($this);
+		 	$this->btnCancel->Text = _sp('Cancel');
+		 	$this->btnCancel->CssClass = 'button rounded';
+		 	$this->btnCancel->Visible = false;
+		 	$this->btnCancel->AddAction(new QClickEvent() , new QServerControlAction($this , 'btnCancel_click'));
+
+		 	$this->btnGo1 = new QButton($this);
+		 	$this->btnGo1->Text = _sp('Perform');
+		 	$this->btnGo1->CssClass = 'button rounded whitebutton';
+		 	$this->btnGo1->Visible = true;
+		 	$this->btnGo1->AddAction(new QClickEvent() , new QServerControlAction($this , 'btnGo_click'));	
+			$this->btnGo1Id = $this->btnGo1->ControlId;
+			
+		 	$this->btnGo2 = new QButton($this);
+		 	$this->btnGo2->Text = _sp('Perform');
+		 	$this->btnGo2->CssClass = 'button rounded whitebutton';
+		 	$this->btnGo2->Visible = true;
+		 	$this->btnGo2->AddAction(new QClickEvent() , new QServerControlAction($this , 'btnGo_click'));
+			$this->btnGo2Id = $this->btnGo2->ControlId;
+
+		 	$this->btnGo3 = new QButton($this);
+		 	$this->btnGo3->Text = _sp('Perform');
+		 	$this->btnGo3->CssClass = 'button rounded whitebutton';
+		 	$this->btnGo3->Visible = true;
+		 	$this->btnGo3->AddAction(new QClickEvent() , new QServerControlAction($this , 'btnGo_click'));
+			$this->btnGo3Id = $this->btnGo3->ControlId;
+
+		 	$this->btnGo4 = new QButton($this);
+		 	$this->btnGo4->Text = _sp('Perform');
+		 	$this->btnGo4->CssClass = 'button rounded whitebutton';
+		 	$this->btnGo4->Visible = true;
+		 	$this->btnGo4->AddAction(new QClickEvent() , new QServerControlAction($this , 'btnGo_click'));
+			$this->btnGo4Id = $this->btnGo4->ControlId;
+
+
+		 	$this->btnEdit = new QButton($this);
+		 	$this->btnEdit->Text = _sp('Begin');
+		 	$this->btnEdit->CssClass = 'button rounded admin_edit';
+		 	$this->btnEdit->AddAction(new QClickEvent() , new QAjaxControlAction($this , 'btnEdit_click'));
+
+		 	$this->pxyAddNewPage = new QControlProxy($this);
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QAjaxControlAction($this , 'btnEdit_click'));
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QTerminateAction());
+		 	
+		 	
+		 	
+		 	//Make some items available for specific tasks
+		 	$this->ctlPromoCodeCopy = new QListBox($this);
+		    $this->ctlPromoCodeCopy->Name = "PromoCode";
+		    $this->ctlPromoCodeCopy->CssClass = 'selectone';
+			$this->ctlPromoCodeCopy->AddItem(" -- Select Code --",0);
+		 	 $objItems= PromoCode::QueryArray(
+					QQ::AndCondition(QQ::NotLike(QQN::PromoCode()->Lscodes, 'shipping:,%')),
+					QQ::Clause(QQ::OrderBy(QQN::PromoCode()->Code)));
+				if ($objItems) foreach ($objItems as $objItem)
+					$this->ctlPromoCodeCopy->AddItem($objItem->Code, $objItem->Rowid);
+		 	
+		 	$this->txtPageText = new QTextBox($this);
+		 	
+		 	$this->txtPageText->Name = _sp('PromoBatchCreate');
+		 	$this->txtPageText->TextMode = QTextMode::MultiLine;
+		 	$this->txtPageText->Width = 400;
+			$this->txtPageText->Height = 90;
+		 	
+		 	
+		 	$this->strTemplate = adminTemplate($page->Key.'.tpl.php');
+		 	
+						
+	
+		 	
+		 }
+		 
+		 
+		 public function btnEdit_click(){
+		 	
+		 	$this->btnEdit->Visible = false;
+		 	$this->btnSave->Visible = true;
+		 	$this->btnCancel->Visible = true;
+		 	$this->EditMode = true;
+		 	
+		 	$this->Refresh();
+			
+			
+		 	QApplication::ExecuteJavaScript("doRefresh();");
+		 	
+		 }
+		 
+		 
+		public function btnGo_click($strFormId, $strControlId, $strParameter){
+		
+
+		 	switch ($this->page->Key) {
+		 	
+		 		case "promo_create_batch":
+		 		
+		 			$strCodes = $this->txtPageText->Text;
+		 			if (strlen($strCodes)==0) {
+		 				QApplication::ExecuteJavaScript(
+		 					"alert('You must paste in your desired codes. This form does not auto-generate codes.');");	
+		 				return;
+		 			} 
+		 			
+		 			$intCodeToCopy = $this->ctlPromoCodeCopy->SelectedValue;
+		 			error_log("copying ".$intCodeToCopy);
+		 			if ($intCodeToCopy==0) {
+		 				QApplication::ExecuteJavaScript(
+		 					"alert('You must choose an existing promo code to use as a template for the settings.');");	
+		 				return;
+		 			} 
+		 			
+		 			$strCodes = str_replace(",","\n",$strCodes);
+		 			$strCodes = str_replace("\t","\n",$strCodes);
+		 			$strCodes = str_replace("\r","",$strCodes);
+		 			$arrCodes = explode("\n",$strCodes);
+		 			
+		 			$objCodeTemplate = PromoCode::Load($intCodeToCopy);
+
+		 			$intFailures=0;
+		 			$intSuccesses=0;
+		 			
+		 			foreach($arrCodes as $strCodeToCreate) {
+		 			
+		 				$strCodeToCreate = trim($strCodeToCreate);
+		 				
+		 				if (strlen($strCodeToCreate)>0) { //Since we may have blank lines, verify the code is legitimate
+			 				$objNewCode = new PromoCode;
+			 				$objNewCode->Code = $strCodeToCreate;
+			 				$objNewCode->QtyRemaining = 1;
+			 				$objNewCode->Enabled = 1;
+			 				$objNewCode->Except = $objCodeTemplate->Except;
+			 				$objNewCode->Type = $objCodeTemplate->Type;
+			 				$objNewCode->Amount = $objCodeTemplate->Amount;
+			 				$objNewCode->ValidFrom = $objCodeTemplate->ValidFrom;
+			 				$objNewCode->ValidUntil = $objCodeTemplate->ValidUntil;
+			 				$objNewCode->Lscodes = $objCodeTemplate->Lscodes;
+			 				$objNewCode->Threshold = $objCodeTemplate->Threshold;
+
+		 					if ($objNewCode->Save())
+		 						$intSuccesses++;
+		 					else 
+		 						$intFailures++;
+		 				}
+		 			}
+		 			
+		 			QApplication::ExecuteJavaScript(
+		 					"alert('".$intSuccesses." codes created successfully.".
+		 						($intFailures>0 ? " ".$intFailures." codes failed to save." : "")."');");	
+		 			$this->ctlPromoCodeCopy->SelectedValue=0;
+		 			$this->txtPageText->Text="";
+		 			
+		 		break;
+		 		
+		 	
+		 		case "promo_delete_batch":
+		 		
+		 			$objDatabase = PromoCode::GetDatabase();
+		 			
+		 			if ($this->btnGo1Id==$strControlId) { //First perform button clicked
+		 				QApplication::Log(E_ERROR, 'PromoTasks', "User clicked Delete all Used Promo Codes");
+						$objDatabase->NonQuery('DELETE FROM `xlsws_promo_code` WHERE `qty_remaining` = 0');
+						QApplication::ExecuteJavaScript("alert('Used promo codes deleted.');");
+		 			
+		 			}
+		 			if ($this->btnGo2Id==$strControlId) { //Second perform button clicked
+		 				QApplication::Log(E_ERROR, 'PromoTasks', "User clicked Delete all Expired Promo Codes");
+						$objDatabase->NonQuery('DELETE FROM `xlsws_promo_code` WHERE 
+							date_format(coalesce(valid_until,\'2099-12-31\'),\'%Y-%m-%d\')<\''.date("Y-m-d").'\'');
+						QApplication::ExecuteJavaScript("alert('Expired promo codes deleted.');");
+		 			
+		 			}
+		 			if ($this->btnGo3Id==$strControlId) { //Third perform button clicked
+		 				QApplication::Log(E_ERROR, 'PromoTasks', "User clicked Delete all Single Use Promo Codes");
+						$objDatabase->NonQuery('DELETE FROM `xlsws_promo_code` WHERE `qty_remaining` = 0 or `qty_remaining` = 1');
+						QApplication::ExecuteJavaScript("alert('Single Use promo codes deleted.');");
+		 			
+		 			}
+		 			if ($this->btnGo4Id==$strControlId) { //Fourth perform button clicked
+		 				QApplication::Log(E_ERROR, 'PromoTasks', "User clicked Delete ALL Promo Codes");
+						$objDatabase->NonQuery('DELETE FROM `xlsws_promo_code`');
+						QApplication::ExecuteJavaScript("alert('All promo codes deleted.');");
+		 			
+		 			}
+		 		
+		 		
+		 		break;
+		 	
+		 	
+		 	}
+		 
+		 
+		 
+		 	$this->btnEdit->Visible = true;
+		 	$this->btnSave->Visible = false;
+		 	$this->btnCancel->Visible = false;
+		 	$this->EditMode = false;
+		 	$this->Refresh();
+			
+		}
+		
+		
+		public function btnSave_click($strFormId, $strControlId, $strParameter){
+			
+						
+			if(!$this->page->Rowid)
+				if($tpage = CustomPage::LoadByKey($this->txtPageKey->Text)){
+					_qalert(sprintf(_sp("Another page already exists with key %s. Please choose a new key.") , $this->txtPageKey->Text));
+					return;
+				}
+					
+			
+			$this->page->Key = $this->txtPageKey->Text;
+			$this->page->Title = stripslashes($this->txtPageTitle->Text);
+			//error_log($this->txtPageText->Text);
+			$this->page->Page = stripslashes($this->txtPageText->Text);
+			$this->page->ProductTag = $this->txtProductTag->Text;
+			$this->page->MetaKeywords = stripslashes($this->txtPageKeywords->Text);
+			$this->page->MetaDescription = stripslashes($this->txtPageDescription->Text);
+
+		 	$this->btnEdit->Visible = true;
+		 	$this->btnSave->Visible = false;
+		 	$this->btnCancel->Visible = false;
+		 	$this->EditMode = false;
+			
+			
+			if(!$this->page->Rowid){
+				$this->page->Save(true);
+				_rd($_SERVER['REQUEST_URI']);
+			}else
+				$this->page->Save();
+			
+		 	$this->Refresh();
+			
+		}
+		 
+		public function btnCancel_click($strFormId, $strControlId, $strParameter){
+		 	$this->btnEdit->Visible = true;
+		 	$this->btnSave->Visible = false;
+		 	$this->btnCancel->Visible = false;
+		 	$this->EditMode = false;
+		 	//$this->Refresh();
+						
+		}
+		
+
+		public function btnDeleteConfirm_click($strFormId, $strControlId, $strParameter){
+			$this->page->Delete();
+		 	//$this->btnCancel->Visible = false;
+		 	QApplication::ExecuteJavaScript("window.location.reload()");
+			
+		}
+		
+		
+		public function btnDelete_click($strFormId, $strControlId, $strParameter){	
+			$this->btnEdit->Visible = false;
+			$this->btnDelete->Visible = false;	
+			$this->btnDeleteConfirm->SetCustomStyle('padding','0 5px 3px 5px');		
+			$this->btnCancel->SetCustomStyle('padding','0 5px 3px 5px');													
+			$this->btnDeleteConfirm->Visible = true;
+			$this->btnCancel->Visible = true;
+		}
+		 
+		 
+		 
+	}
+	
+		/* underpinning panel for tasks that require criteria to run
+	*/					
+	class xlsws_admin_task_promorestrict_panel extends QPanel {
+		
+	
+		protected $strMethodCallBack;
+		
+		public $fields;
+		public $helpers = array();
+		
+		
+		protected $objParentObject;
+
+		public $page;
+		
+		public $btnSave;
+		public $btnEdit;
+		public $btnCancel;
+		public $btnDelete;
+		public $btnDeleteConfirm;
+		
+        public $Info = "";
+		
+        
+		public $txtPageKey;
+		public $txtPageTitle;
+		public $txtPageKeywords;
+		public $txtPageDescription;
+		public $txtPageText;
+		public $txtProductTag;
+		
+		public $ctlPromoCode;
+ 		public $ctlExcept;
+        public $ctlCategories;
+        public $ctlFamilies;
+        public $ctlProductCodes;
+        public $ctlClasses;
+        public $ctlKeywords;
+        
+		public $pxyAddNewPage;
+		
+        
+        public $EditMode = false;
+        public $NewMode = false;
+        public $IsShipping = false;
+        public $intShippingRowID = false;
+			
+        
+        
+		public function __construct($objParentControl, $objParentObject, $page , $strMethodCallBack, $strControlId = null) {
+		 	// First, let's call the Parent's __constructor
+		 	try {
+		 		parent::__construct($objParentControl, $strControlId);
+		 	} catch (QCallerException $objExc) {
+		 		$objExc->IncrementOffset();
+		 		throw $objExc;
+		 	}
+	
+		 	// Next, we set the local module object
+		 	$this->objParentObject = $objParentObject;
+		 	$this->page = $page;
+		 	$this->IsShipping = ($this->page->Page == "shipping" ? 1 : 0);
+		 	
+		 	// Let's record the reference to the form's MethodCallBack
+		 	$this->strMethodCallBack = $strMethodCallBack;
+	
+				
+			$this->ctlPromoCode = new QListBox($this,'ctlPromoCode');
+		    $this->ctlPromoCode->Name = "PromoCode";
+		    $this->ctlPromoCode->CssClass = 'selectone';
+		    $this->ctlPromoCode->AddAction(new QChangeEvent() , new QAjaxControlAction($this,"btnChange_click"));
+			
+		    
+		    if($this->IsShipping) {
+			    $objItems= PromoCode::QueryArray(
+					QQ::AndCondition(QQ::Like(QQN::PromoCode()->Lscodes, 'shipping:,%')),
+					QQ::Clause(QQ::OrderBy(QQN::PromoCode()->Code)));
+				
+				if ($objItems) foreach ($objItems as $objItem) {
+						$this->intShippingRowID = $objItem->Rowid;
+						$this->ctlPromoCode->AddItem('free shipping'.($objItem->Code=='shipping:' ? ' (without code)':''),
+							$objItem->Rowid);	
+					}
+					
+			} else {	
+				$this->ctlPromoCode->AddItem('-- Select --', 0);
+			    $objItems= PromoCode::QueryArray(
+					QQ::AndCondition(QQ::NotLike(QQN::PromoCode()->Lscodes, 'shipping:,%')),
+					QQ::Clause(QQ::OrderBy(QQN::PromoCode()->Code)));
+				if ($objItems) foreach ($objItems as $objItem)
+					$this->ctlPromoCode->AddItem($objItem->Code, $objItem->Rowid);
+			}
+			$this->ctlExcept = new QListBox($this,'ctlExcept');
+		    $this->ctlExcept->Name = "Except";
+		    $this->ctlExcept->CssClass = 'selecttwo';
+		    $this->ctlExcept->Enabled = false;
+		    
+		    if($this->IsShipping) {
+				$this->ctlExcept->AddItem('all cart products match the following criteria', 0);
+				$this->ctlExcept->AddItem('at least one cart product matches the criteria', 2);
+				$this->ctlExcept->AddItem('all cart products DO NOT match the criteria', 1);
+			}
+			else {
+				$this->ctlExcept->AddItem('products match the following criteria', 0);
+				$this->ctlExcept->AddItem('matching everything BUT the following criteria', 1);
+			}
+												
+			$this->ctlFamilies = new QListBox($this,'ctlFamilies');
+		    $this->ctlFamilies->CssClass = 'SmallMenu';
+		    $this->ctlFamilies->SetCustomAttribute('size', 9);
+		    $this->ctlFamilies->SetCustomAttribute('multiple','yes');
+		    $this->ctlFamilies->SelectionMode = QSelectionMode::Multiple;
+		    $this->ctlFamilies->Enabled = false;
+		    $this->ctlFamilies->Name = "Families";
+		    $this->ctlFamilies->AddAction(new QMouseDownEvent(),new QJavaScriptAction('GetCurrentListValues(this)'));
+		    $this->ctlFamilies->AddAction(new QChangeEvent(),new QJavaScriptAction('FillListValues(this)'));
+		    $objItems= Family::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Family()->Family)));
+			if ($objItems) foreach ($objItems as $objItem) {
+				$this->ctlFamilies->AddItem($objItem->Family, $objItem->Family);
+			}
+
+			$this->ctlClasses = new QListBox($this,'ctlClasses');
+		    $this->ctlClasses->CssClass = 'SmallMenu';
+		    $this->ctlClasses->SetCustomAttribute('size', 9);
+		    $this->ctlClasses->SetCustomAttribute('multiple','yes');
+		    $this->ctlClasses->SelectionMode = QSelectionMode::Multiple;
+		    $this->ctlClasses->Enabled = false;
+		    $this->ctlClasses->Name = "Families";
+		    $this->ctlClasses->AddAction(new QMouseDownEvent(),new QJavaScriptAction('GetCurrentListValues(this)'));
+		    $this->ctlClasses->AddAction(new QChangeEvent(),new QJavaScriptAction('FillListValues(this)'));		    
+		    $objItems= Product::QueryArray(
+				    QQ::AndCondition(
+		            QQ::NotEqual(QQN::Product()->ClassName, ''),
+		            QQ::IsNotNull(QQN::Product()->ClassName)
+		        ),
+		    	QQ::Clause(
+		    		QQ::GroupBy(QQN::Product()->ClassName),
+		    		QQ::OrderBy(QQN::Product()->ClassName)
+		    	));
+
+			if ($objItems) foreach ($objItems as $objItem) {
+				$this->ctlClasses->AddItem($objItem->ClassName, $objItem->ClassName);
+			}
+
+
+			$this->ctlCategories = new QListBox($this,'ctlCategories');
+		    $this->ctlCategories->CssClass = 'SmallMenu';
+		    $this->ctlCategories->SetCustomAttribute('size', 9);
+		    $this->ctlCategories->SetCustomAttribute('multiple','yes');
+		    $this->ctlCategories->SelectionMode = QSelectionMode::Multiple;
+		    $this->ctlCategories->Enabled = false;
+		    $this->ctlCategories->Name = "Categories";
+		    $this->ctlCategories->AddAction(new QMouseDownEvent(),new QJavaScriptAction('GetCurrentListValues(this)'));
+		    $this->ctlCategories->AddAction(new QChangeEvent(),new QJavaScriptAction('FillListValues(this)'));
+		    $objItems= Category::QueryArray(
+				QQ::AndCondition(
+					QQ::Equal(QQN::Category()->Parent, 0)
+				),
+				QQ::Clause(QQ::OrderBy(QQN::Category()->Name))
+			);
+			if ($objItems) foreach ($objItems as $objItem) {
+				$this->ctlCategories->AddItem($objItem->Name, $objItem->Name);
+			}
+				
+			$this->ctlKeywords = new QListBox($this,'ctlKeywords');
+		    $this->ctlKeywords->CssClass = 'SmallMenu';
+		    $this->ctlKeywords->SetCustomAttribute('size', 9);
+		    $this->ctlKeywords->SetCustomAttribute('multiple','yes');
+		    $this->ctlKeywords->SelectionMode = QSelectionMode::Multiple;
+		    $this->ctlKeywords->Enabled = false;
+		    $this->ctlKeywords->Name = "Keywords";
+		    $this->ctlKeywords->AddAction(new QMouseDownEvent(),new QJavaScriptAction('GetCurrentListValues(this)'));
+		    $this->ctlKeywords->AddAction(new QChangeEvent(),new QJavaScriptAction('FillListValues(this)'));
+		    $arrKeywords=array();
+		    $objItems= Product::QueryArray(
+				    QQ::AndCondition(QQ::NotEqual(QQN::Product()->WebKeyword1, ''),QQ::IsNotNull(QQN::Product()->WebKeyword1)),
+		    		QQ::Clause(QQ::GroupBy(QQN::Product()->WebKeyword1), QQ::OrderBy(QQN::Product()->WebKeyword1)));
+			if ($objItems) foreach ($objItems as $objItem) $arrKeywords[]=strtolower($objItem->WebKeyword1);
+		    $objItems= Product::QueryArray(
+				    QQ::AndCondition(QQ::NotEqual(QQN::Product()->WebKeyword2, ''),QQ::IsNotNull(QQN::Product()->WebKeyword2)),
+		    		QQ::Clause(QQ::GroupBy(QQN::Product()->WebKeyword2), QQ::OrderBy(QQN::Product()->WebKeyword2)));
+			if ($objItems) foreach ($objItems as $objItem) $arrKeywords[]=strtolower($objItem->WebKeyword2);
+		    $objItems= Product::QueryArray(
+				    QQ::AndCondition(QQ::NotEqual(QQN::Product()->WebKeyword3, ''),QQ::IsNotNull(QQN::Product()->WebKeyword3)),
+		    		QQ::Clause(QQ::GroupBy(QQN::Product()->WebKeyword3), QQ::OrderBy(QQN::Product()->WebKeyword3)));
+			if ($objItems) foreach ($objItems as $objItem) $arrKeywords[]=strtolower($objItem->WebKeyword3);
+			$arrKeywords=array_unique($arrKeywords);
+			sort($arrKeywords);
+			foreach ($arrKeywords as $strKeyword) 
+				$this->ctlKeywords->AddItem($strKeyword, $strKeyword);
+
+
+			$this->ctlProductCodes = new QListBox($this,'ctlProductCodes');
+		    $this->ctlProductCodes->CssClass = 'SmallMenu';
+		    $this->ctlProductCodes->SetCustomAttribute('size', 9);
+		    $this->ctlProductCodes->SetCustomAttribute('multiple','yes');
+		    $this->ctlProductCodes->SelectionMode = QSelectionMode::Multiple;
+		    $this->ctlProductCodes->Enabled = false;
+		    $this->ctlProductCodes->Name = "Productcodes";
+		    $this->ctlProductCodes->AddAction(new QMouseDownEvent(),new QJavaScriptAction('GetCurrentListValues(this)'));
+		    $this->ctlProductCodes->AddAction(new QChangeEvent(),new QJavaScriptAction('FillListValues(this)'));
+		    $objItems= Product::QueryArray(
+				QQ::AndCondition(
+					QQ::Equal(QQN::Product()->Web, 1),
+					QQ::Equal(QQN::Product()->FkProductMasterId, 0)
+				),
+				QQ::Clause(QQ::OrderBy(QQN::Product()->Code))
+			);
+			if ($objItems) foreach ($objItems as $objItem) {
+				$this->ctlProductCodes->AddItem($objItem->Code, $objItem->Code);
+			}
+
+
+		 	$this->btnSave = new QButton($this);
+		 	$this->btnSave->Text = _sp('Save');
+		 	$this->btnSave->CssClass = 'button rounded admin_edit';
+		 	$this->btnSave->Visible = false;
+		 	$this->btnSave->AddAction(new QClickEvent() , new QServerControlAction($this , 'btnSave_click'));
+		 	$this->btnSave->CausesValidation = true;
+			
+		 	$this->btnCancel = new QButton($this);
+		 	$this->btnCancel->Text = _sp('Cancel');
+		 	$this->btnCancel->Visible = false;
+		 	$this->btnCancel->CssClass = 'button rounded admin_edit';
+		 	$this->btnCancel->AddAction(new QClickEvent() , new QServerControlAction($this , 'btnCancel_click'));
+
+		 	$this->btnEdit = new QButton($this);
+		 	$this->btnEdit->Text = _sp('Begin');
+		 	$this->btnEdit->CssClass = 'button rounded admin_edit';
+		 	$this->btnEdit->AddAction(new QClickEvent() , new QAjaxControlAction($this , 'btnEdit_click'));
+
+		 	$this->pxyAddNewPage = new QControlProxy($this);
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QAjaxControlAction($this , 'btnEdit_click'));
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QTerminateAction());
+		 	
+		 			
+		 	
+		 	$this->strTemplate = adminTemplate($page->Key.'.tpl.php');
+		 	
+	
+		 	
+		 }
+		 
+		 public function btnChange_click()
+		 {
+		 	
+			$intPromoCode = $this->ctlPromoCode->SelectedValue;
+			$this->loadCode($intPromoCode);
+			$this->Refresh();
+		 
+		 }
+		 
+		 private function loadCode($intPromoCode) {
+
+			if ($intPromoCode<1)
+			{
+				$this->ctlExcept->Enabled = false;
+				$this->ctlCategories->Enabled = false;
+				$this->ctlFamilies->Enabled = false;
+				$this->ctlClasses->Enabled = false;
+				$this->ctlKeywords->Enabled = false;
+				$this->ctlProductCodes->Enabled = false;
+				
+				$this->ctlExcept->SelectedValue=0;
+				$this->ctlCategories->SelectedValues=null;
+				$this->ctlFamilies->SelectedValues=null;
+				$this->ctlClasses->SelectedValues=null;
+				$this->ctlKeywords->SelectedValues=null;
+				$this->ctlProductCodes->SelectedValues=null;
+				return false;
+			}
+			
+			$objPromoCode = PromoCode::Load($intPromoCode);
+			$strRestrictions =  $objPromoCode->Lscodes;
+			
+			$arrRestrictions = explode(",",$strRestrictions);
+			
+			$arrCategories = array();
+			$arrFamilies= array();
+			$arrClasses = array();
+			$arrKeywords = array();
+			$arrProducts = array();
+			
+			foreach ($arrRestrictions as $strCode) {
+  
+				if (substr($strCode, 0,7) == "family:") $arrFamilies[] = trim(substr($strCode,7,255));
+				elseif (substr($strCode, 0,6) == "class:") $arrClasses[] = trim(substr($strCode,6,255));
+				elseif (substr($strCode, 0,8) == "keyword:") $arrKeywords[] = trim(substr($strCode,8,255));
+				elseif (substr($strCode, 0,9) == "category:") $arrCategories[] = trim(substr($strCode,9,255));
+				else $arrProducts[] = $strCode;
+           
+        	}  
+        
+			$this->ctlExcept->Enabled = true;
+			$this->ctlCategories->Enabled = true;
+			$this->ctlFamilies->Enabled = true;
+			$this->ctlClasses->Enabled = true;
+			$this->ctlKeywords->Enabled = true;
+			$this->ctlProductCodes->Enabled = true;
+			
+			$this->ctlCategories->SelectedValues=$arrCategories;
+			$this->ctlFamilies->SelectedValues=$arrFamilies;
+			$this->ctlClasses->SelectedValues=$arrClasses;
+			$this->ctlKeywords->SelectedValues=$arrKeywords;
+			$this->ctlProductCodes->SelectedValues=$arrProducts;
+
+			$this->ctlExcept->SelectedValue=$objPromoCode->Except;
+			
+		}
+		
+		 public function btnEdit_click(){
+		 	
+		 			 	
+			//If this is just for Free Shipping, set the dropdown to this item and activate the boxes
+			if ($this->IsShipping) {
+				if (!$this->intShippingRowID)
+					{
+						QApplication::ExecuteJavaScript("alert('Free Shipping module not activated. Activate first, then return here to set restrictions.');");	
+						return;
+					}
+					$this->ctlPromoCode->SelectedValue=$this->intShippingRowID;
+					 $this->loadCode($this->intShippingRowID);
+				 
+				}	
+				
+			$this->btnEdit->Visible = false;
+		 	$this->btnSave->Visible = true;
+		 	$this->btnCancel->Visible = true;
+		 	$this->EditMode = true;
+	
+		 	$this->Refresh();
+					 	
+		 }
+		 
+		 
+		 
+		 
+		public function btnSave_click($strFormId, $strControlId, $strParameter){
+			
+			$intPromoCode = $this->ctlPromoCode->SelectedValue;
+			if ($intPromoCode<1) return false;
+			
+			//Build restriction string
+			$strRestrictions="";
+			
+			foreach($this->ctlProductCodes->SelectedValues as $strVal)
+				$strRestrictions .= ",".$strVal;
+			foreach($this->ctlCategories->SelectedValues as $strVal)
+				$strRestrictions .= ",category:".$strVal;
+			foreach($this->ctlFamilies->SelectedValues as $strVal)
+				$strRestrictions .= ",family:".$strVal;
+			foreach($this->ctlClasses->SelectedValues as $strVal)
+				$strRestrictions .= ",class:".$strVal;
+			foreach($this->ctlKeywords->SelectedValues as $strVal)
+				$strRestrictions .= ",keyword:".$strVal;
+				
+			$strRestrictions=substr($strRestrictions,1); //Our built string starts with a comma, so remove it
+			
+
+			$objPromoCode = PromoCode::Load($intPromoCode);
+
+			//Apply our selections
+			$objPromoCode->Lscodes=$strRestrictions;	
+			$objPromoCode->Except = $this->ctlExcept->SelectedValue;
+			
+			//If we're using the restriction form for Shipping, we need do extra tasks
+			if ($this->intShippingRowID == $objPromoCode->Rowid) {
+				$objPromoCode->Lscodes="shipping:,".$strRestrictions; //Set shipping prefix
+				if(strlen($strRestrictions)==0) //Just in case we've blanked restrictions, make sure it's not wide open
+					$objPromoCode->Except=0;					
+			}
+
+			if(strlen($strRestrictions)==0) //Just in case we've blanked restrictions, make sure it's not wide open
+				$objPromoCode->Except=0;
+
+			$objPromoCode->Save(); //otherwise just save promo code table
+							
+			
+			$this->btnEdit->Visible = true;
+		 	$this->btnSave->Visible = false;
+		 	$this->btnCancel->Visible = false;
+		 	$this->EditMode = false;
+		 	
+		 	$this->resetForm();
+
+		 	
+		 	$this->Refresh();
+			
+		}
+		 
+		public function btnCancel_click($strFormId, $strControlId, $strParameter){
+		 	$this->btnEdit->Visible = true;
+		 	$this->btnSave->Visible = false;
+		 	$this->btnCancel->Visible = false;
+		 	$this->EditMode = false;
+		 	
+		 	$this->resetForm();
+				
+		 	//$this->Refresh();
+						
+		}
+		
+
+		public function btnDeleteConfirm_click($strFormId, $strControlId, $strParameter){
+			$this->page->Delete();
+		 	//$this->btnCancel->Visible = false;
+		 	QApplication::ExecuteJavaScript("window.location.reload()");
+			
+		}
+		
+		
+		public function btnDelete_click($strFormId, $strControlId, $strParameter){	
+			$this->btnEdit->Visible = false;
+			$this->btnDelete->Visible = false;	
+			$this->btnDeleteConfirm->SetCustomStyle('padding','0 5px 3px 5px');		
+			$this->btnCancel->SetCustomStyle('padding','0 5px 3px 5px');													
+			$this->btnDeleteConfirm->Visible = true;
+			$this->btnCancel->Visible = true;
+		}
+		 
+		public function resetForm()
+		{
+			$this->ctlExcept->Enabled = false;
+			$this->ctlCategories->Enabled = false;
+			$this->ctlFamilies->Enabled = false;
+			$this->ctlClasses->Enabled = false;
+			$this->ctlKeywords->Enabled = false;
+			$this->ctlProductCodes->Enabled = false;
+			
+			$this->ctlPromoCode->SelectedValue=0;
+			$this->ctlExcept->SelectedValue=0;
+			$this->ctlCategories->SelectedValues=null;
+			$this->ctlFamilies->SelectedValues=null;
+			$this->ctlClasses->SelectedValues=null;
+			$this->ctlKeywords->SelectedValues=null;
+			$this->ctlProductCodes->SelectedValues=null;
+		}
+		 
+	}
 	
 	/* class xlsws_admin_cpage
 	* class to create an edit data grid, similar to the destinations tab
@@ -1991,7 +3201,8 @@
 			
 			$this->listPages();
 			
-			
+			$this->HelperRibbon = "Looking to override your default home page? Create a custom page using the key \"index\" which will be shown instead.";
+
 		}
 		
 	
@@ -2000,7 +3211,7 @@
 			
 			$pages = CustomPage::QueryArray(QQ::All() , QQ::Clause(QQ::OrderBy(QQN::CustomPage()->Title)));
 			
-			foreach($pages as $page){
+			foreach($pages as $page){ 
 				$this->cpagePnls[$page->Rowid] = new xlsws_admin_cpage_panel($this, $this , $page , "pageDone");
 			}
 
@@ -2475,10 +3686,11 @@
 		protected $default_sort_direction = 0;
 		
 		
-		// These needs to be defined
+		// These need to be defined
 		protected $className;
 		protected $blankObj;
 		protected $qqn;
+		protected $qqnot;
 		
 		
 		protected $txtSearch;
@@ -2598,37 +3810,57 @@
 
 		protected function dtgItems_Bind() {
 
+			$className = $this->className;
+			$cond = array(); 
 			
-			
-			if(($this->txtSearch->Text != '') && ($this->txtSearch->Text != $this->helperText)){
-				$cond = array();
-				foreach($this->arrFields as $field=>$properties){
+			if(($this->txtSearch->Text != '') && ($this->txtSearch->Text != $this->helperText)) {
+
+				foreach($this->arrFields as $field=>$properties) {
+				
 					if(isset($properties['NoSearch']))
 						continue;
 					$cond[] = new QQXLike($this->qqn->$field , $this->txtSearch->Text);
 				}
-				
-				$this->dtgItems->TotalItemCount = $this->blankObj->QueryCount(QQ::OrCondition($cond));
-				$objItemsArray = $this->dtgItems->DataSource = $this->blankObj->QueryArray(QQ::OrCondition($cond) , QQ::Clause(
-	                $this->dtgItems->OrderByClause,
-    	            $this->dtgItems->LimitClause
-    		        ));
-			}else{
-				$this->dtgItems->TotalItemCount = $this->blankObj->CountAll();
-				$objItemsArray = $this->dtgItems->DataSource = $this->blankObj->LoadAll(QQ::Clause(
-					$this->dtgItems->OrderByClause,
-					$this->dtgItems->LimitClause
-					));
-			}			
 			
+			} else	
+				$cond[] = new QQXLike($this->qqn->Rowid , '');
 			
-			
+			if (isset($this->qqnot)) {
 
-			$className = $this->className;
+				$objItemsArray = $this->dtgItems->DataSource = 
+					$this->blankObj->QueryArray(
+						QQ::AndCondition(($this->qqnot),
+						QQ::OrCondition($cond)),
+							QQ::Clause(
+	                					$this->dtgItems->OrderByClause,
+    	            					$this->dtgItems->LimitClause
+    		        		)
+    		        );
+    		   
+    		   
+    		        
+    		  } else {
+    		  
+    		  	$objItemsArray = $this->dtgItems->DataSource = 
+					$this->blankObj->QueryArray(
+						QQ::OrCondition($cond),
+							QQ::Clause(
+	                					$this->dtgItems->OrderByClause,
+    	            					$this->dtgItems->LimitClause
+    		        		)
+    		        );
+    		  
+    		  
+    		  
+    		  }      
+    		        
+
+			$this->dtgItems->TotalItemCount = count($objItemsArray);
+			
 			
 			// If we are editing someone new, we need to add a new (blank) person to the data source
 			if ($this->intEditRowid == -1)
-			array_push($objItemsArray, new $className);
+				array_push($objItemsArray, new $className);
 
 			// Bind the datasource to the datagrid
 			$this->dtgItems->DataSource = $objItemsArray;
@@ -2909,15 +4141,25 @@
 			$this->intEditRowid = -1;
 			
 			
-			foreach($this->arrFields as $field =>$properties){
+			foreach($this->arrFields as $field =>$properties) {
 				
 				
 				if($this->arrFields[$field]['Field'] instanceof QListBox  )
-					$this->arrFields[$field]['Field']->SelectedValue = '';
+					{
+						$this->arrFields[$field]['Field']->SelectedValue = '';
+						if (isset($this->arrFields[$field]['DefaultValue']))
+							$this->arrFields[$field]['Field']->SelectedValue = $this->arrFields[$field]['DefaultValue'];
+					}
 				elseif($this->arrFields[$field]['Field'] instanceof QCheckBox   )
-					$this->arrFields[$field]['Field']->Checked = 1;
-				else
-					$this->arrFields[$field]['Field']->Text = '';
+					{ 
+						if (isset($this->arrFields[$field]['DefaultValue']))
+							$this->arrFields[$field]['Field']->Checked = $this->arrFields[$field]['DefaultValue'];				
+					}
+				else {
+						$this->arrFields[$field]['Field']->Text = '';
+						if (isset($this->arrFields[$field]['DefaultValue']))
+							$this->arrFields[$field]['Field']->Text = $this->arrFields[$field]['DefaultValue'];
+					}
 			}
 			
 			$field = key($this->arrFields);
@@ -2991,7 +4233,7 @@
 		}		
 		
 		
-		protected function RenderBoolen($value){
+		protected function RenderBoolean($value){
 			if($value)
 				return QApplication::HtmlEntities(_sp('Yes'));
 			else
@@ -3456,8 +4698,9 @@
 			$this->arrFields['Enabled'] = array('Name' => 'Enabled');
 			$this->arrFields['Enabled']['Field'] = new QCheckBox($this); 	
 			$this->arrFields['Enabled']['Width'] = "30";
-			$this->arrFields['Enabled']['DisplayFunc'] = "RenderBoolen";
-			$this->arrFields['Enabled']['Width'] = 50;	
+			$this->arrFields['Enabled']['DisplayFunc'] = "RenderBoolean";
+			$this->arrFields['Enabled']['Width'] = 50;
+			$this->arrFields['Enabled']['DefaultValue'] = true;	
 			
 			parent::Form_Create();
 			
@@ -3471,8 +4714,10 @@
 	* see class xlsws_admin_generic_edit_form for further specs
 	*/		
 	
-	class xlsws_admin_promo extends xlsws_admin_generic_edit_form{
-		protected function Form_Create(){
+	class xlsws_admin_promo extends xlsws_admin_generic_edit_form {
+	
+		protected function Form_Create() {
+		
 			$this->arrTabs = $GLOBALS['arrPaymentTabs'];
 			$this->currentTab = 'promo';
 			
@@ -3481,9 +4726,16 @@
 			$this->className = "PromoCode";
 			$this->blankObj = new PromoCode();
 			$this->qqn = QQN::PromoCode();
+			$this->qqnot = QQ::NotLike(QQN::PromoCode()->Lscodes, 'shipping:,%' );
+
 
 			$this->arrFields = array();
-
+		
+			$this->arrFields['Enabled'] = array('Name' => 'Enabled');
+			$this->arrFields['Enabled']['Field'] = new QCheckBox($this); 	
+			$this->arrFields['Enabled']['DisplayFunc'] = "RenderCheck";
+			$this->arrFields['Enabled']['Width'] = 20;
+			$this->arrFields['Enabled']['DefaultValue'] = true;	
 			
 			$this->arrFields['Code'] = array('Name' => 'Promo Code');
 			$this->arrFields['Code']['Field'] = new XLSTextBox($this);
@@ -3504,18 +4756,18 @@
 			
 			$this->arrFields['ValidFrom'] = array('Name' => 'Valid from<br>(yyyy-mm-dd)');
 			$this->arrFields['ValidFrom']['Field'] = new XLSTextBox($this);
-			$this->arrFields['ValidFrom']['Field']->Required = true;
+			$this->arrFields['ValidFrom']['DisplayFunc'] = "RenderDateAnytime";
 			$this->arrFields['ValidFrom']['Width'] = 90;
 			
 			$this->arrFields['ValidUntil'] = array('Name' => 'Valid until<br>(yyyy-mm-dd)');
 			$this->arrFields['ValidUntil']['Field'] = new XLSTextBox($this);
-			$this->arrFields['ValidUntil']['Field']->Required = true;
+			$this->arrFields['ValidUntil']['DisplayFunc'] = "RenderDateAnytime";
 			$this->arrFields['ValidUntil']['Width'] = 90;	
 			
-			$this->arrFields['Lscodes'] = array('Name' => 'Specific Product Codes<br>(comma delimited)');
-			$this->arrFields['Lscodes']['Field'] = new XLSTextBox($this);
-			$this->arrFields['Lscodes']['Field']->Required = false;
-			$this->arrFields['Lscodes']['Width'] = 120;
+			$this->arrFields['Lscodes'] = array('Name' => 'Product<br>Restrictions');
+			$this->arrFields['Lscodes']['Field'] = new XLSTextBox($this);	
+			$this->arrFields['Lscodes']['Width'] = 90;
+			$this->arrFields['Lscodes']['DisplayFunc'] = "RenderPromoFilters";
 
 			$this->arrFields['QtyRemaining'] = array('Name' => '# Uses Remain<br>(blank = unlimited)');
 			$this->arrFields['QtyRemaining']['Field'] = new XLSTextBox($this); 	
@@ -3527,9 +4779,9 @@
 			$this->arrFields['Threshold']['Field'] = new XLSTextBox($this); 	
 			$this->arrFields['Threshold']['Width'] = "100";
 			$this->arrFields['Threshold']['DisplayFunc'] = "RenderThreshold";
-			$this->arrFields['Threshold']['Width'] = 60;
+			$this->arrFields['Threshold']['Width'] = 40;
 			
-
+			$this->HelperRibbon = "Need help setting up Promo Codes? Read our configuration guide at http://lightspeedretail.com/training for info. Please note the Free Shipping promo code is configured separately within the Free Shipping module.";
 						
 			parent::Form_Create();
 
@@ -3537,6 +4789,11 @@
 
         protected function RenderType($intType) {
             return PromoCodeType::ToString($intType);
+		}
+		
+		protected function RenderCheck($intType) {
+            if ($intType==1) return "✓";
+            else return "";
 		}
 		
 		protected function RenderQtyRemaining($intQtyRemaining){			
@@ -3555,6 +4812,24 @@
 			
 		}
 
+		protected function RenderPromoFilters($item){
+		
+			//$strUrl = "xls_admin.php?func=edit&page=paym&subpage=promotasks".admin_sid();
+			//ToDo: be able to hot link directly to editing for this promo code	
+			if (strlen($item)>0)
+				return "<b>Applied</b>";
+			else
+				return "";
+		}
+
+		protected function RenderDateAnytime($item){
+			if (strlen($item)>0)
+				return $item;
+			else
+				return "Anytime";
+		}
+
+
 
 		protected function btnEdit_Click($strFormId, $strControlId, $strParameter){
 			parent::btnEdit_Click($strFormId, $strControlId, $strParameter);
@@ -3564,24 +4839,31 @@
 
 
 		protected function btnSave_Click($strFormId, $strControlId, $strParameter) {
-			if (!preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/',$this->arrFields['ValidFrom']['Field']->Text))
-			{
-				$this->arrFields['ValidFrom']['Field']->Text = _sp("Invalid: use yyyy-mm-dd format");
-				return;
-			}
 			
-			if (!preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/',$this->arrFields['ValidUntil']['Field']->Text))
-			{
-				$this->arrFields['ValidUntil']['Field']->Text = _sp("Invalid: use yyyy-mm-dd format");
-				return;
-			}
 			
-			$timeconvertedfrom = strtotime($this->arrFields['ValidFrom']['Field']->Text);
-			$timeconvertedto = strtotime($this->arrFields['ValidUntil']['Field']->Text);
-			if ($timeconvertedfrom > $timeconvertedto)
-			{
-				$this->arrFields['ValidUntil']['Field']->Text = _sp("End Date cannot be before Start Date");
-				return;	
+			if ($this->arrFields['ValidFrom']['Field']->Text != '' || 
+					$this->arrFields['ValidUntil']['Field']->Text != '') {
+					
+				if (!preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/',$this->arrFields['ValidFrom']['Field']->Text))
+				{
+					$this->arrFields['ValidFrom']['Field']->Text = 'Invalid: use yyyy-mm-dd format';
+					return;
+				}
+				
+				if (!preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/',$this->arrFields['ValidUntil']['Field']->Text))
+				{
+					$this->arrFields['ValidUntil']['Field']->Text = 'Invalid: use yyyy-mm-dd format';
+					return;
+				}
+				
+			
+				$timeconvertedfrom = strtotime($this->arrFields['ValidFrom']['Field']->Text);
+				$timeconvertedto = strtotime($this->arrFields['ValidUntil']['Field']->Text);
+				if ($timeconvertedfrom > $timeconvertedto)
+				{
+					$this->arrFields['ValidUntil']['Field']->Text = _sp("End Date cannot be before Start Date");
+					return;	
+				}
 			}
 			if($this->arrFields['Threshold']['Field']->Text=='') $this->arrFields['Threshold']['Field']->Text='0';
 				
@@ -3594,6 +4876,195 @@
 				$objItem->QtyRemaining = '-1';
 			return $objItem;			
 		}
+		
+	}
+	
+	
+	/* class xlsws_admin_promotasks
+	* class to create the main configuration section panel
+	* see api.qcodo.com under Qpanel for methods and parameters
+	*/		
+	class xlsws_admin_promotasks extends xlsws_admin {
+		
+
+		protected $btnCancel;
+		protected $btnSave;
+		protected $btnDelete;
+		
+		protected $configPnls;
+		
+		public $page;
+		
+		public $pxyAddNewPage;
+		
+		
+		protected function Form_Create(){
+			parent::Form_Create();
+			
+			$this->arrTabs = $GLOBALS['arrPaymentTabs'];
+			$this->currentTab = 'promotasks';
+
+
+			$this->page = new CustomPage();
+			
+			
+			$this->pxyAddNewPage = new QControlProxy($this);
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QServerAction('NewPage'));
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QTerminateAction());
+			
+	        
+			
+			//$this->btnEdit = new QButton($this->dtrConfigs);
+			//$this->btnEdit->Text = _sp("Edit");
+			$this->btnCancel = new QButton($this);
+			$this->btnCancel->Text = _sp("Cancel");
+			$this->btnCancel->CssClass = 'admin_cancel';
+			$this->btnCancel->AddAction( new QClickEvent() , new QAjaxAction('btnCancel_Click'));
+			
+			
+			
+			$this->btnSave = new QButton($this);
+			$this->btnSave->Text = _sp("Save");
+			$this->btnSave->CssClass = 'admin_save';
+			$this->btnSave->AddAction( new QClickEvent() , new QServerAction('btnSave_Click'));
+			$this->btnSave->CausesValidation = true;
+			
+			$this->listPages();
+
+
+		}
+		
+	
+		
+		protected function listPages(){
+
+			
+			$page = new CustomPage();
+			$page->Title = _sp('Set Promo Code Product Restrictions');
+			$page->Key = "promo_restrict";
+			$page->Page = 'promocodes';
+			$this->configPnls[0] = new xlsws_admin_task_promorestrict_panel($this, $this , $page , "pageDone");
+
+			$page = new CustomPage();
+			$page->Title = _sp('Batch Create Promo Codes');
+			$page->Key = "promo_create_batch";
+			$this->configPnls[1] = new xlsws_admin_task_panel($this, $this , $page , "pageDone");
+
+			$page = new CustomPage();
+			$page->Title = _sp('Batch Delete Promo Codes');
+			$page->Key = "promo_delete_batch";
+			$this->configPnls[2] = new xlsws_admin_task_panel($this, $this , $page , "pageDone");
+			
+			
+		}
+	
+		
+		function pageDone(){
+			$this->listPages();
+		}
+		
+		
+		public function NewPage(){
+			
+		}
+	
+	
+		
+	}
+	
+	/* class xlsws_admin_promotasks
+	* class to create the main configuration section panel
+	* see api.qcodo.com under Qpanel for methods and parameters
+	*/		
+	class xlsws_admin_shippingtasks extends xlsws_admin {
+			
+		protected $btnCancel;
+		protected $btnSave;
+		protected $btnDelete;
+		
+		protected $configPnls;
+		
+		public $page;
+		
+		public $pxyAddNewPage;
+		
+		
+		protected function Form_Create(){
+			parent::Form_Create();
+			
+			$this->arrTabs = $GLOBALS['arrShipTabs'];
+			$this->currentTab = 'shippingtasks';
+
+
+			$this->page = new CustomPage();
+			
+			
+			$this->pxyAddNewPage = new QControlProxy($this);
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QServerAction('NewPage'));
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QTerminateAction());
+			
+	        
+			
+			//$this->btnEdit = new QButton($this->dtrConfigs);
+			//$this->btnEdit->Text = _sp("Edit");
+			$this->btnCancel = new QButton($this);
+			$this->btnCancel->Text = _sp("Cancel");
+			$this->btnCancel->CssClass = 'admin_cancel';
+			$this->btnCancel->AddAction( new QClickEvent() , new QAjaxAction('btnCancel_Click'));
+			
+			
+			
+			$this->btnSave = new QButton($this);
+			$this->btnSave->Text = _sp("Save");
+			$this->btnSave->CssClass = 'admin_save';
+			$this->btnSave->AddAction( new QClickEvent() , new QServerAction('btnSave_Click'));
+			$this->btnSave->CausesValidation = true;
+			
+			$this->listPages();
+
+
+		}
+		
+	
+		
+		protected function listPages(){
+
+			
+			$page = new CustomPage();
+			$page->Title = _sp('Define Tiers for Tier Based Shipping');
+			$page->Key = "ship_define_tiers";
+			$this->configPnls[0] = new xlsws_admin_edittiers_panel($this, $this , $page , "pageDone");
+
+
+			$page = new CustomPage();
+			$page->Title = _sp('Set Free Shipping Restrictions');
+			$page->Key = "promo_restrict";
+			$page->Page = 'shipping';
+			$this->configPnls[1] = new xlsws_admin_task_promorestrict_panel($this, $this , $page , "pageDone");
+
+			$page = new CustomPage();
+			$page->Title = _sp('Batch Change Countries and States/Regions');
+			$page->Key = "ship_modify_cities_countries";
+			$this->configPnls[2] = new xlsws_admin_task_panel($this, $this , $page , "pageDone");
+			
+			
+		}
+	
+		
+		function pageDone(){
+			$this->listPages();
+		}
+		
+		
+		public function NewPage(){
+			
+		}
+	
+	
+	
+
+
+
 		
 	}
 	
@@ -4300,101 +5771,133 @@
 	
 	
 	
-	/// Include custom admin modules
+	// Include custom admin modules
 	if(is_dir(CUSTOM_INCLUDES . 'admin')){
 		xlsws_admin_load_module(CUSTOM_INCLUDES , 'admin/');
 	}
 	
-	
-	
-	
-	
+	if(!isset($XLSWS_VARS['page'])) 	$XLSWS_VARS['page']="";
+	if(!isset($XLSWS_VARS['subpage'])) 	$XLSWS_VARS['subpage']="";
 
-	
-	
-	
-	if(isset($XLSWS_VARS['page']) && ($XLSWS_VARS['page'] == "cpage")){
-		xlsws_admin_cpage::Run('xlsws_admin_cpage' , adminTemplate('cpage.tpl.php'));
-	}elseif(isset($XLSWS_VARS['page']) && ($XLSWS_VARS['page'] == "system")){
+	switch ($XLSWS_VARS['page'])
+	{
+		case "cpage":
+			xlsws_admin_cpage::Run('xlsws_admin_cpage' , adminTemplate('cpage.tpl.php'));
+			break;
 		
+		case "system":
+			switch ($XLSWS_VARS['subpage'])
+			{
+				case "slog":
+					xlsws_admin_syslog::Run('xlsws_admin_syslog' , adminTemplate('edit.tpl.php'));
+					break;
+					
+				case "task":
+					xlsws_admin_maintenance::Run('xlsws_admin_maintenance' , adminTemplate('maintenance.tpl.php'));
+					break;
+					
+				default:
+					xlsws_admin_system_config::Run('xlsws_admin_system_config' , adminTemplate('config.tpl.php'));
+			}
+			break;
 		
-		
-		if(isset($XLSWS_VARS['subpage']) && ($XLSWS_VARS['subpage'] == "slog"))
-			xlsws_admin_syslog::Run('xlsws_admin_syslog' , adminTemplate('edit.tpl.php'));
-		elseif(isset($XLSWS_VARS['subpage']) && ($XLSWS_VARS['subpage'] == "task"))
-			xlsws_admin_maintenance::Run('xlsws_admin_maintenance' , adminTemplate('maintenance.tpl.php'));
-		else
-			xlsws_admin_system_config::Run('xlsws_admin_system_config' , adminTemplate('config.tpl.php'));
-		
-		
-	}elseif(isset($XLSWS_VARS['page']) && ($XLSWS_VARS['page'] == "ship")){
+		case "ship":
+			switch ($XLSWS_VARS['subpage'])
+			{
+				case "methods":
+					xlsws_admin_ship_modules::Run('xlsws_admin_ship_modules' , adminTemplate('modules.tpl.php'));
+					break;
+				
+				case "destinations":
+					xlsws_admin_destinations::Run('xlsws_admin_destinations' , adminTemplate('edit.tpl.php'));
+					break;
+					
+				case "countries":
+					xlsws_admin_countries::Run('xlsws_admin_countries' , adminTemplate('edit.tpl.php'));
+					break;
+				
+				case "states":
+					xlsws_admin_states::Run('xlsws_admin_states' , adminTemplate('edit.tpl.php'));
+					break;
+					
+				case "shippingtasks":
+					xlsws_admin_promotasks::Run('xlsws_admin_shippingtasks' , adminTemplate('config.tpl.php'));
+					break;
 
-		if(isset($XLSWS_VARS['subpage'])  && ($XLSWS_VARS['subpage'] == 'methods'))
-			xlsws_admin_ship_modules::Run('xlsws_admin_ship_modules' , adminTemplate('modules.tpl.php'));
-		elseif(isset($XLSWS_VARS['subpage'])  && ($XLSWS_VARS['subpage'] == 'destinations'))
-			xlsws_admin_destinations::Run('xlsws_admin_destinations' , adminTemplate('edit.tpl.php'));
-		elseif(isset($XLSWS_VARS['subpage']) && ($XLSWS_VARS['subpage'] == "countries"))
-			xlsws_admin_countries::Run('xlsws_admin_countries' , adminTemplate('edit.tpl.php'));
-		elseif(isset($XLSWS_VARS['subpage']) && ($XLSWS_VARS['subpage'] == "states"))
-			xlsws_admin_states::Run('xlsws_admin_states' , adminTemplate('edit.tpl.php'));
-		elseif (isset($XLSWS_VARS['subpage']) && ($XLSWS_VARS['subpage'] == "tier"))
-			xlsws_admin_tier::Run('xlsws_admin_tier' , adminTemplate('edit.tpl.php'));			
-		else
-			xlsws_admin_ship_config::Run('xlsws_admin_ship_config' , adminTemplate('config.tpl.php'));	
-		
+				case "tier":
+					xlsws_admin_tier::Run('xlsws_admin_tier' , adminTemplate('edit.tpl.php'));
+					break;
+					
+				default:
+					xlsws_admin_ship_config::Run('xlsws_admin_ship_config' , adminTemplate('config.tpl.php'));
+					
+			}
+			break;
 			
-	}elseif(isset($XLSWS_VARS['page']) && ($XLSWS_VARS['page'] == "stats")){
-
-		
-		if(isset($XLSWS_VARS['subpage']) && ($XLSWS_VARS['subpage'] == "vlog"))
-			xlsws_admin_visitlog::Run('xlsws_admin_visitlog' , adminTemplate('edit.tpl.php'));
-		else
-			xlsws_admin_chart::Run('xlsws_admin_chart' , adminTemplate('chart.tpl.php'));
-		
-		
-	}elseif(isset($XLSWS_VARS['page']) && ($XLSWS_VARS['page'] == "paym")){
-		if(isset($XLSWS_VARS['subpage']) && ($XLSWS_VARS['subpage'] == "cc"))
-			xlsws_admin_cc::Run('xlsws_admin_cc' , adminTemplate('edit.tpl.php'));
-		else if (isset($XLSWS_VARS['subpage']) && ($XLSWS_VARS['subpage'] == "promo"))
-			xlsws_admin_promo::Run('xlsws_admin_promo' , adminTemplate('edit.tpl.php'));			
-		else
-			xlsws_admin_payment_modules::Run('xlsws_admin_payment_modules' , adminTemplate('modules.tpl.php'));
-	}elseif(isset($XLSWS_VARS['page']) && ($XLSWS_VARS['page'] == "custom")){
-		
-		if(isset($XLSWS_VARS['subpage'])){
-			$class = $XLSWS_VARS['subpage'];
-			if(class_exists($class))
-				eval("$class::Run('$class' , $class::\$strTemplate );");
-			_xls_log("Invalid admin panel custom class $class ");
-		}else{
-			// load the first admin module
-			$rD = dir(CUSTOM_INCLUDES . 'admin/');
+		case "stats":
+			switch ($XLSWS_VARS['subpage'])
+			{
+				case "vlog":
+					xlsws_admin_visitlog::Run('xlsws_admin_visitlog' , adminTemplate('edit.tpl.php'));
+					break;
+				default:
+					xlsws_admin_chart::Run('xlsws_admin_chart' , adminTemplate('chart.tpl.php'));
+			}
+			break;
 			
-			while (false!== ($filename = $rD->read())) { 
-//				_xls_log("Checking $filename");
-				 if (substr($filename, -4) == '.php') { // whatever your includes extensions are 
-				 	$class = substr($filename, 0 , strlen($filename) -4);
-//					_xls_log("Checking class $class");
-					if(class_exists($class)){
-//						_xls_log("Class found $class");
-						eval("$class::Run('$class' , $class::\$strTemplate );");
-						exit();
-					}
-				 } 
-			} 
-			$rD->close();			
-			 
-		}
+		case "paym":
+			switch ($XLSWS_VARS['subpage'])
+			{
+				case "cc":
+					xlsws_admin_cc::Run('xlsws_admin_cc' , adminTemplate('edit.tpl.php'));
+					break;
+				case "promo":
+					xlsws_admin_promo::Run('xlsws_admin_promo' , adminTemplate('edit.tpl.php'));
+					break;
+				case "promotasks":
+					xlsws_admin_promotasks::Run('xlsws_admin_promotasks' , adminTemplate('config.tpl.php'));
+					break;
+				default:
+					xlsws_admin_payment_modules::Run('xlsws_admin_payment_modules' , adminTemplate('modules.tpl.php'));
+			}
+			break;
 			
-	}else{
-		
-		if(isset($XLSWS_VARS['subpage'])  && ($XLSWS_VARS['subpage'] == 'appear'))
-			xlsws_admin_appear_config::Run('xlsws_admin_appear_config' , adminTemplate('config.tpl.php'));	
-		elseif(isset($XLSWS_VARS['subpage'])  && ($XLSWS_VARS['subpage'] == 'sidebars'))
-			xlsws_admin_sidebar_modules::Run('xlsws_admin_sidebar_modules' , adminTemplate('modules.tpl.php'));	
-		else
-			xlsws_admin_store_config::Run('xlsws_admin_store_config' , adminTemplate('config.tpl.php'));	
-		
+		case "custom":
+			if($XLSWS_VARS['subpage'] != "") {
+				$class = $XLSWS_VARS['subpage'];
+				if(class_exists($class))
+					eval("$class::Run('$class' , $class::\$strTemplate );");
+					_xls_log("Invalid admin panel custom class $class ");
+			} else {
+				// load the first admin module
+				$rD = dir(CUSTOM_INCLUDES . 'admin/');		
+				while (false!== ($filename = $rD->read())) { 
+					 if (substr($filename, -4) == '.php') { // whatever your includes extensions are 
+					 	$class = substr($filename, 0 , strlen($filename) -4);
+						if(class_exists($class)) {
+							eval("$class::Run('$class' , $class::\$strTemplate );");
+							exit();
+						}
+					 } 
+				} 
+				$rD->close();
+			}
+			break;
+			
+		default:
+			switch ($XLSWS_VARS['subpage'])
+			{
+				case "appear":
+					xlsws_admin_appear_config::Run('xlsws_admin_appear_config' , adminTemplate('config.tpl.php'));
+					break;
+				case "sidebars":
+					xlsws_admin_sidebar_modules::Run('xlsws_admin_sidebar_modules' , adminTemplate('modules.tpl.php'));
+					break;
+				default:
+					xlsws_admin_store_config::Run('xlsws_admin_store_config' , adminTemplate('config.tpl.php'));
+			}
+			
+	
 	}
 	
 
