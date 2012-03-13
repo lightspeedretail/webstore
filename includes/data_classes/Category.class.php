@@ -154,9 +154,11 @@ class Category extends CategoryGen {
 	/**
 	 * GetTrail - return array of Category Trail for product
 	 * @param $intRowid RowID of Product
+	 * @param $strType passing "names" will just get simple array of names
+	 *                 otherwise it's it's a full array of items
 	 * @return $arrPath[]
 	 */
-	public static function GetTrail($intRowid) {
+	public static function GetTrail($intRowid,$strType = 'all') {
 		$arrPath=array();
 		
 		$objCategory = parent::LoadArrayByProduct($intRowid); 
@@ -170,7 +172,8 @@ class Category extends CategoryGen {
 	
 			$strName = $objCategory->Name; 
 			if($objCategory)
-				array_push($arrPath , array( 'key' => $category_id , 'tag' => 'c' , 'name' => $strName , 'link' => $objCategory->Link));
+				array_push($arrPath , $strType=='names' ? 
+					 $strName : array( 'key' => $category_id , 'tag' => 'c' , 'name' => $strName , 'link' => $objCategory->Link));
 	
 		} while ($objCategory && ($category_id = $objCategory->Parent));
 		

@@ -1,0 +1,1 @@
+<tr><td><?php $_CONTROL->txtStartPrice->Render(); ?><?= $_ITEM->StartPrice ?></td><td><?= $_ITEM->EndPrice ?></td><td><?= $_ITEM->Rate ?></td></tr>

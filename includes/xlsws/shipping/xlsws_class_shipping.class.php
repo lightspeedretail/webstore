@@ -182,7 +182,8 @@ class xlsws_class_shipping extends XLSModule {
 
 	/**
 	 * Check if the module is valid or not.
-	 * Returning false here will exclude the module from both admin panel and checkout page
+	 * Returning false here will exclude the module from checkout page
+	 * Can be used for tests against cart conditions
 	 *
 	 * @return boolean
 	 */

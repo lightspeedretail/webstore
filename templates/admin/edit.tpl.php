@@ -100,6 +100,10 @@
 <div class="content">
 <?php
 
+if(isset($this->HelperRibbon)) 
+	if (strlen($this->HelperRibbon)>0)
+		echo '<div style="padding: 5px;"><img style="padding-right: 5px;width:44px; height:35px;" align="left" src="'.adminTemplate('css/images/questionmark.png').'"> '.$this->HelperRibbon.'</div>';
+
 $this->dtgItems->Render('CssClass="rounded wide"');
 
 ?>

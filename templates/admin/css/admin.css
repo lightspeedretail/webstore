@@ -251,6 +251,16 @@ padding:5px 15px;
 text-shadow:#000 1px 1px 1px;
 }
 
+#options .whitebutton,.whitebutton input{
+background:url(images/tab_bg_hover.png) repeat-x;
+border:1px solid #ddd;
+color:#fff;
+font-weight:normal;
+font-size: small;
+text-shadow:none;
+
+}
+
 #options a {
 color:#222;
 text-decoration:none;
@@ -343,7 +353,7 @@ color:#fff;
 display:inline;
 float:left;
 font-size:14px;
-height:28px;
+
 margin-top:-6px;
 text-align:left;
 display: block;
@@ -369,6 +379,72 @@ width:100%;
 margin-left:30px;
 padding-left:20px;
 }
+
+.module_task {
+padding-bottom:30px;
+padding-left:20px;
+padding-top:10px;
+width: 940px;
+margin: auto;
+background: #eee;
+}
+.short {
+height:170px;
+}
+.tall {
+height:360px;
+}
+.module_task .label {
+font-size:14px;
+font-weight:700;
+height:0;
+float:left;
+margin-left:5px;
+margin-right:5px;
+text-align:right;
+
+display: block;
+}
+.module_task .left {
+text-align:left;
+}
+.module_task .selectone {
+background:#222;
+border:1px solid #111;
+color:#fff;
+font-size:13px;
+height: 23px;
+width: 230px;
+text-align:left;
+display: block;
+}
+.module_task .selecttwo {
+background:#222;
+border:1px solid #111;
+color:#fff;
+font-size:13px;
+height: 23px;
+width: 330px;
+text-align:left;
+display: block;
+}
+.module_task select {
+background:#f7f7f7;
+border:1px solid #111;
+color:#000;
+font-size:11px;
+text-align:left;
+}
+.module_task field {
+background:#f7f7f7;
+border:1px solid #111;
+color:#000;
+font-size:14px;
+text-align:left;
+}
+
+.listboxReset { font-family:  helvetica; font-size: 9pt; color: #000000; text-shadow: 0px;}
+
 
 .extra_height{
 	height: 150px;
@@ -485,12 +561,10 @@ color: #fff;
 text-shadow: 1px 1px 1px #000;
 }
 
-.table_base a, .table_base .page a, #c11 a, #c6 a { 
+.table_base a, .table_base .page a { 
 color: #fff;
 text-shadow: 1px 1px 1px #000;
 }
-
-#c11 .page, #c11 .arrow, #c11 .break, #c11 .ellipsis, #c6 .page, #c6 .arrow, #c6 .break, #c6 .ellipsis { margin: 0 3px; }
 
 .wide {
 width: 890px;
@@ -553,3 +627,36 @@ font-size: 8px;
 -webkit-border-bottom-left-radius: 5px;
 -webkit-border-bottom-left-radius: 5px;
 }
+
+.SmallMenu {
+height: 150px;
+width: auto;
+max-width: 300px;
+
+}
+
+.tip {
+margin-top: 184px;
+margin-left: 10px;
+font-size: 10px;
+}
+
+.datagrid {
+	 width:500px;
+	 border:1px solid #CCCCCC;
+	 margin-left: 200px;
+	 margin-top: 4px;
+	 }
+
+.dtg_column { border-bottom: 1px solid #CCCCCC; }
+
+.dtg_header { 
+	font-weight:bold;
+	background-color:#aaaaaa;
+	border-top: 1px solid #CCCCCC; 
+	border-bottom: 1px solid #a2b6ff; 
+	background-image: url(images/title_bg.png);
+	background-repeat: repeat-x;
+	background-position: bottom;
+}
+
