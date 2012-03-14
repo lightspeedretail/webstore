@@ -888,7 +888,7 @@ class xlsws_checkout extends xlsws_index {
     // TODO :: Required ? 
     protected static function PostFinalizeHooks($objCart, $objCustomer) {
 		if (function_exists('_custom_after_order_complete'))
-			_custom_before_after_process($objCart, $objCustomer);
+			_custom_after_order_complete($objCart, $objCustomer);
     
         return $objCart;
     }
