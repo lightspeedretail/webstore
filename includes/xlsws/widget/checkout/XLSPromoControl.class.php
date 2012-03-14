@@ -50,6 +50,11 @@ class XLSPromoControl extends XLSCompositeControl {
     protected function BuildLabelControl() {
         $objControl = $this->objLabelControl = 
             new QLabel($this, $this->GetChildName('Label'));
+        
+        $this->UpdateLabelControl();
+        $this->BindLabelControl();
+
+        return $objControl;
     }
 
     protected function UpdateLabelControl() {
@@ -64,6 +69,11 @@ class XLSPromoControl extends XLSCompositeControl {
         $objControl = $this->objSubmitControl = 
             new QButton($this, $this->GetChildName('Submit'));
         $objControl->Text = _sp('Apply Promo Code');
+
+        $this->UpdateSubmitControl();
+        $this->BindSubmitControl();
+
+        return $objControl;
     }
 
     protected function UpdateSubmitControl() {
@@ -76,6 +86,7 @@ class XLSPromoControl extends XLSCompositeControl {
         if (!$objControl)
             return;
 
+        error_log('ADD ACTION');
         $objControl->AddActionArray(
             new QClickEvent(),
             new QToggleEnableAction($this->objInputControl, false),
