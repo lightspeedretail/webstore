@@ -305,13 +305,15 @@ class Cart extends CartGen {
 		
 		// Sort array by High Price to Low Price, reset discount to 0 to evaluate from the beginning
 		$arrSorted = array();
+		$intOriginalSubTotal=0;
 		foreach ($this->GetCartItemArray() as $objItem) {
 			if (!$dryRun)
 				$objItem->Discount = 0;
 			$arrSorted[] = $objItem;
+			$intOriginalSubTotal += $objItem->Qty*$objItem->Sell;
         }	
 				
-		if ($objPromoCode->Threshold > $this->Subtotal) {
+		if ($objPromoCode->Threshold > $intOriginalSubTotal && $this->FkPromoId != NULL) {
 				$this->UpdateDiscountExpiry();
 				$this->FkPromoId = NULL;
 				QApplication::ExecuteJavaScript("alert('Promo Code \"" .$objPromoCode->Code .  _sp("\" no longer applies to your cart and has been removed.")  . "')");				
