@@ -123,8 +123,11 @@ class destination_table extends xlsws_class_shipping {
 			$unit = $cart->total_length() * $cart->total_width() * $cart->total_height();
 		}
 
-		if($unit>$dest->ShipFree)
-			$unit -= $dest->ShipFree;
+		if ($unit >= $dest->ShipFree)
+            $unit -= $dest->ShipFree;
+
+        if ($unit < 0)
+            $unit = 0;
 
         // If the Base Charge is unset or lesser than 0, don't apply this module
         if ($dest-BaseCharge == '' or $dest->BaseCharge < 0)
