@@ -44,7 +44,7 @@ class XLSPromoControl extends XLSCompositeControl {
     }
 
     public function DoInputControlChange($strFormId, $strControlId, $strParam) {
-        return $this->Validate();
+
     }
 
     protected function BuildLabelControl() {
@@ -90,7 +90,8 @@ class XLSPromoControl extends XLSCompositeControl {
             new QClickEvent(),
             array(
             	new QToggleEnableAction($this->objInputControl, false),
-            	new QAjaxControlAction($this,'DoSubmitControlClick')
+            	new QAjaxControlAction($this,'DoSubmitControlClick'),
+            	new QToggleEnableAction($this->objInputControl, true)
             )
         ); 
     }
@@ -105,10 +106,7 @@ class XLSPromoControl extends XLSCompositeControl {
 
         if ($this->Validate())
             $this->ApplyPromoCode();
-
-        if ($this->objInputControl)
-            $this->objInputControl->Enabled = true;
-
+		
         return $objInputControl;
     }
 
@@ -123,14 +121,14 @@ class XLSPromoControl extends XLSCompositeControl {
         $objCart = Cart::GetCart();
 
         if ($objCart->FkPromoId > 0) {
-            $objInputControl->ValidationError = 
+            $this->objInputControl->ValidationError = 
                 _sp('Promo Code has already been applied to this order.');
             return false;
         }
 
         $objCart->FkPromoId = $objPromoCode->Rowid;
 
-        if ($objCart->UpdatePromoCode(true)) { error_log("apple1");
+        if ($objCart->UpdatePromoCode(true)) {
             $objCart->UpdateCart();
             $this->objLabelControl->Text = sprintf(
                 _sp('Promo Code applied at %s'),
@@ -142,7 +140,7 @@ class XLSPromoControl extends XLSCompositeControl {
         }
         else { 
             $this->objInputControl->ValidationError = 
-                _sp('Promo Code could not be applied to your cart.');
+                _sp('Promo Code cannot be used with these items.');
             return false;
         }
 
@@ -156,7 +154,7 @@ class XLSPromoControl extends XLSCompositeControl {
 
     public function Validate() {
         $objInputControl = $this->objInputControl;
-        $objInputControl->ValidationReset();
+       // $objInputControl->ValidationReset();
 
         if (!$objInputControl->Text)
             return true;
@@ -184,12 +182,13 @@ class XLSPromoControl extends XLSCompositeControl {
 
         if ($objPromoCode->Threshold > $objCart->Subtotal) {
             $objInputControl->ValidationError =
-                _sp('Promo Code only valid when cart exceds ') . 
+                _sp('Promo Code only valid when cart exceeds ') . 
                 _xls_currency($objPromoCode->Threshold) . '.';
             return false;
         }
 
         $this->objPromoCode = $objPromoCode;
+
         return true;
     }
 
