@@ -86,12 +86,13 @@ class XLSPromoControl extends XLSCompositeControl {
         if (!$objControl)
             return;
 
-        error_log('ADD ACTION');
         $objControl->AddActionArray(
             new QClickEvent(),
-            new QToggleEnableAction($this->objInputControl, false),
-            new QAjaxControlAction('DoSubmitControlClick', $this)
-        );
+            array(
+            	new QToggleEnableAction($this->objInputControl, false),
+            	new QAjaxControlAction($this,'DoSubmitControlClick')
+            )
+        ); 
     }
 
     public function DoSubmitControlClick($strFormId, $strControlId, $strParam) {
@@ -111,9 +112,9 @@ class XLSPromoControl extends XLSCompositeControl {
         return $objInputControl;
     }
 
-    protected function ApplyPromoCode() {
-        $objPromoCode = $this->objPromoCode;
-        if (!$objPromoCode);
+    protected function ApplyPromoCode() { 
+        $objPromoCode = $this->objPromoCode; 
+        if (!$objPromoCode)
             $objPromoCode = PromoCode::LoadByCode($objInputControl->Text);
 
         if (!$objPromoCode)
@@ -121,15 +122,15 @@ class XLSPromoControl extends XLSCompositeControl {
 
         $objCart = Cart::GetCart();
 
-        if (!$objCart->FkPromoId > 0) {
+        if ($objCart->FkPromoId > 0) {
             $objInputControl->ValidationError = 
                 _sp('Promo Code has already been applied to this order.');
             return false;
         }
 
-        $objCart->FkPromoId = $objPromoCode;
+        $objCart->FkPromoId = $objPromoCode->Rowid;
 
-        if ($objCart->UpdatePromoCode(true)) { 
+        if ($objCart->UpdatePromoCode(true)) { error_log("apple1");
             $objCart->UpdateCart();
             $this->objLabelControl->Text = sprintf(
                 _sp('Promo Code applied at %s'),
@@ -139,7 +140,7 @@ class XLSPromoControl extends XLSCompositeControl {
                 )
             );
         }
-        else {
+        else { 
             $this->objInputControl->ValidationError = 
                 _sp('Promo Code could not be applied to your cart.');
             return false;
