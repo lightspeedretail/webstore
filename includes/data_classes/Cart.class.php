@@ -289,6 +289,7 @@ class Cart extends CartGen {
 
 	/**
 	 * Update Cart by applying a Promo Code
+	 * dryRun is deprecated, we shouldn't run this as a validation test
 	 */
 	public function UpdatePromoCode($dryRun = false) {
 		if (!$this->FkPromoId)
@@ -319,7 +320,7 @@ class Cart extends CartGen {
 				QApplication::ExecuteJavaScript("alert('Promo Code \"" .$objPromoCode->Code .  _sp("\" no longer applies to your cart and has been removed.")  . "')");				
 			return;
 		}
-			
+	
 
 		$intDiscount = 0;
 		if ($objPromoCode->Type == PromoCodeType::Flat)
@@ -332,26 +333,11 @@ class Cart extends CartGen {
 			return;
 		}
 
-		$bolApplied = false;
-
-					
-			
+		$bolApplied = false;	
 			
 		usort($arrSorted, array('XLSCartItemManager', 'CompareByPrice'));
 
-		if ($objPromoCode->Shipping) {
-			//If this is for shipping, we need to make sure all items in the cart qualify
-			//Since a shipping promo code doesn't discount the items in the cart, just return here
-			
-			$bolApplied = true;	
-			foreach ($arrSorted as $objItem) 
-				if (!$objPromoCode->IsProductAffected($objItem)) $bolApplied=false;
-
-			return $bolApplied;
-			
-		}
-
-
+		
 		foreach ($arrSorted as $objItem) { 
 			if (!$objPromoCode->IsProductAffected($objItem))
 				continue;

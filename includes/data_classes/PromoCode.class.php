@@ -85,12 +85,13 @@ class PromoCode extends PromoCodeGen {
 	}
 
 	public function IsProductAffected($objItem) {
+
 		$arrCode = unserialize(strtolower(serialize($this->LsCodeArray)));
-		
 		if (empty($arrCode)) //no product restrictions
 			return true;
+		
 
-		//We normally return true if it's a match. If this code uses Except, then the logic is reversed
+		
 		$boolReturn = false;
 		
         foreach($arrCode as $strCode) {
@@ -111,7 +112,6 @@ class PromoCode extends PromoCodeGen {
                 ) 
             $boolReturn = true; 
             
-            
             if (substr($strCode, 0,9) == "category:") {
 				$arrTrail = Category::GetTrail($objItem->Product->Rowid,'names');
 				$strTrail = implode("|",$arrTrail);
@@ -126,9 +126,10 @@ class PromoCode extends PromoCodeGen {
 		  if (_xls_array_search_begin(strtolower($objItem->Code), $arrCode))
 			$boolReturn = true; 
 
+		//We normally return true if it's a match. If this code uses Except, then the logic is reversed
 		if ($this->IsExcept())
 			$boolReturn = ($boolReturn == true ? false : true);
-		
+
 		return $boolReturn; 
 	}
 

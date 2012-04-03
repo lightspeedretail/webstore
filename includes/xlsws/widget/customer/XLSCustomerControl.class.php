@@ -122,7 +122,7 @@ class XLSCustomerControl extends XLSCompositeControl {
         $objControl =
             new QCheckBox($this, $this->GetChildName('CheckSame'));
         $objControl->Text = _sp('Shipping Address is the same' . 
-            ' as BillingAddress');
+            ' as Billing Address');
 
         $this->UpdateCheckSameControl();
         $this->BindCheckSameControl();

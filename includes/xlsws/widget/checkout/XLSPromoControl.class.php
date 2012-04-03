@@ -113,7 +113,7 @@ class XLSPromoControl extends XLSCompositeControl {
     protected function ApplyPromoCode() { 
         $objPromoCode = $this->objPromoCode; 
         if (!$objPromoCode)
-            $objPromoCode = PromoCode::LoadByCode($objInputControl->Text);
+            $objPromoCode = PromoCode::LoadByCode($this->objInputControl->Text);
 
         if (!$objPromoCode)
             return null;
@@ -126,26 +126,19 @@ class XLSPromoControl extends XLSCompositeControl {
             return false;
         }
 
-        $objCart->FkPromoId = $objPromoCode->Rowid;
-
-        if ($objCart->UpdatePromoCode(true)) {
-            $objCart->UpdateCart();
-            $this->objLabelControl->Text = sprintf(
-                _sp('Promo Code applied at %s'),
-                PromoCodeType::Display(
-                    $objPromoCode->Type,
-                    $objPromoCode->Amount
-                )
-            );
-        }
-        else { 
-            $this->objInputControl->ValidationError = 
-                _sp('Promo Code cannot be used with these items.');
-            return false;
-        }
-
+        
+		$objCart->FkPromoId = $objPromoCode->Rowid;
+        $objCart->UpdateCart();
+        $this->objLabelControl->Text = sprintf(
+            _sp('Promo Code applied at %s'),
+            PromoCodeType::Display(
+                $objPromoCode->Type,
+                $objPromoCode->Amount
+            )
+        );
+      
         $this->objPromoCode = $objPromoCode;
-        return $objPromoCode;
+	
     }
 
     protected function ResetPromoCode() {
@@ -154,10 +147,10 @@ class XLSPromoControl extends XLSCompositeControl {
 
     public function Validate() {
         $objInputControl = $this->objInputControl;
-       // $objInputControl->ValidationReset();
+        $objInputControl->ValidationReset();
 
         if (!$objInputControl->Text)
-            return true;
+            return;
 
         $objPromoCode = PromoCode::LoadByCode($objInputControl->Text);
 
@@ -168,18 +161,21 @@ class XLSPromoControl extends XLSCompositeControl {
 
         $objCart = Cart::GetCart();
 
+		//If start date is defined, have we reached it yet
         if (!$objPromoCode->Started) {
             $objInputControl->ValidationError = 
                 _sp('Promo Code is not active yet');
             return false;
         }
 
+		//If end date is defined or remaining uses
         if ($objPromoCode->Expired || !$objPromoCode->HasRemaining) {
             $objInputControl->ValidationError = 
                 _sp('Promo Code has expired or has been used up.');
             return false;
         }
 
+		//Minimum price threshold
         if ($objPromoCode->Threshold > $objCart->Subtotal) {
             $objInputControl->ValidationError =
                 _sp('Promo Code only valid when cart exceeds ') . 
@@ -187,8 +183,41 @@ class XLSPromoControl extends XLSCompositeControl {
             return false;
         }
 
-        $this->objPromoCode = $objPromoCode;
+		//If this is for shipping, we need to make sure all items in the cart qualify
+		//Since a shipping promo code doesn't discount the items in the cart, just return here
+		$arrSorted = array();
+		foreach ($objCart->GetCartItemArray() as $objItem)
+			$arrSorted[] = $objItem;
 
+		if ($objPromoCode->Shipping) {	
+			$bolApplied = true;	//We start with true because we want to make sure we don't have a disqualifying item in our cart
+			
+			foreach ($arrSorted as $objItem) 
+				if (!$objPromoCode->IsProductAffected($objItem)) $bolApplied=false;
+
+			if ($bolApplied==false)
+				$this->objInputControl->ValidationError = 
+               		_sp('Free Shipping Promo Code cannot be used with your cart items.');
+               		
+			return $bolApplied;
+			
+		}
+		
+		//See if any items in the cart match qualify for this promo code
+		$bolApplied = false;
+		foreach ($arrSorted as $objItem) {
+			if ($objPromoCode->IsProductAffected($objItem))
+				$bolApplied = true;
+		}	
+		
+		//If we have reached this point and $bolApplied is still false, none of our items qualify
+		if (!$bolApplied) {
+			$this->objInputControl->ValidationError = 
+                _sp('Promo Code cannot be used with your cart items.');
+                 return $bolApplied;
+          }
+
+		
         return true;
     }
 
