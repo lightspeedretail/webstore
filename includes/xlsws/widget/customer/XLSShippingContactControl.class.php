@@ -113,10 +113,10 @@ class XLSShippingContactControl extends XLSCustomerContactControl {
             $objInfo = $this->GetChildByName('Info');
         elseif ($objControl instanceof XLSCustomerAddressControl)
             $objAddress = $this->GetChildByName('Address');
-        elseif ($objControl instanceof XLSCustomerComposite)
+        elseif ($objControl instanceof XLSCustomerComposite) {
             $objInfo = $this->GetChildByName('Info');
             $objAddress = $this->GetChildByName('Address');
-
+        }
         if ($objInfo) {
             $mixValueArray = array(
                 'FirstName' => $objControl->FirstName->Value,

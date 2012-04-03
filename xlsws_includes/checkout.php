@@ -1007,6 +1007,12 @@ class xlsws_checkout extends xlsws_index {
                     _sp('You have to login to check out'),
                     'index.php?xlspg=checkout'
                 );
+
+		if ($_SESSION['customer']->Country1=='')
+			$_SESSION['customer']->Country1=_xls_get_conf('DEFAULT_COUNTRY');  
+		if ($_SESSION['customer']->Country2=='')
+			$_SESSION['customer']->Country2=_xls_get_conf('DEFAULT_COUNTRY');  
+
     }
 
 	protected function Form_Validate() {
