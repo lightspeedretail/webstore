@@ -154,7 +154,8 @@ class xlsws_product_listing extends xlsws_index {
     protected function GetClause() {
         return QQ::Clause(
             $this->GetSortOrder(),
-            $this->dtrProducts->LimitClause
+            $this->dtrProducts->LimitClause,
+            QQ::Distinct()
         );
     }
 
