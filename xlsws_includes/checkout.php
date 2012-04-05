@@ -532,7 +532,7 @@ class xlsws_checkout extends xlsws_index {
         return $objControl;
     }
 
-	public function DoSubmitControlClick($strFormId, $strControlId, $strParam) { error_log(__function__);
+	public function DoSubmitControlClick($strFormId, $strControlId, $strParam) {
         $objCart = Cart::GetCart();
 
         if ($objCart->IdStr && $objCart->Status == CartType::order)
