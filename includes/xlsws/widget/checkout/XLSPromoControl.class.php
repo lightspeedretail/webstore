@@ -150,7 +150,7 @@ class XLSPromoControl extends XLSCompositeControl {
         $objInputControl->ValidationReset();
 
         if (!$objInputControl->Text)
-            return;
+            return true;
 
         $objPromoCode = PromoCode::LoadByCode($objInputControl->Text);
 

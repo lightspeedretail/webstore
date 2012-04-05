@@ -505,7 +505,7 @@ class xlsws_checkout extends xlsws_index {
         $objControl->CausesValidation = true;
         $objControl->PrimaryButton = true;
         $objControl->Required = true;
- 
+              
         return $objControl;
     }
 
@@ -518,25 +518,30 @@ class xlsws_checkout extends xlsws_index {
 
         if (!$objControl)
             return;
+            
+            
 
         $objControl->AddActionArray(
             new QClickEvent(),
             array(
                 new QAjaxAction('ToggleCheckoutControls'),
-                new QServerAction('DoSubmitControlClick')
+                new QAjaxAction('DoSubmitControlClick')
             )
         );
-
+	
         return $objControl;
     }
 
-	public function DoSubmitControlClick($strFormId, $strControlId, $strParam) {
+	public function DoSubmitControlClick($strFormId, $strControlId, $strParam) { error_log(__function__);
         $objCart = Cart::GetCart();
 
         if ($objCart->IdStr && $objCart->Status == CartType::order)
             _rd($objCart->Link);
 
-        $this->CompleteCheckout();
+		if(is_null($objCart->Rowid)) 
+			QApplication::Log(E_ERROR, 'checkout', "Submit on non-existent cart. Likely a double-click on Submit button. Ignore.");
+		else
+        	$this->CompleteCheckout();
 	}
 
     protected function BuildLoadActionProxy() {
