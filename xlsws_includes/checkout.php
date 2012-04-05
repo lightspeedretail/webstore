@@ -532,7 +532,8 @@ class xlsws_checkout extends xlsws_index {
         return $objControl;
     }
 
-	public function DoSubmitControlClick($strFormId, $strControlId, $strParam) {
+	public function DoSubmitControlClick($strFormId, $strControlId, $strParam) { error_log(__function__);
+	return false;
         $objCart = Cart::GetCart();
 
         if ($objCart->IdStr && $objCart->Status == CartType::order)
@@ -541,7 +542,12 @@ class xlsws_checkout extends xlsws_index {
 		if(is_null($objCart->Rowid)) 
 			QApplication::Log(E_ERROR, 'checkout', "Submit on non-existent cart. Likely a double-click on Submit button. Ignore.");
 		else
-        	$this->CompleteCheckout();
+        	{ 
+        	
+        	$blnReturn = $this->CompleteCheckout();
+        	error_log("back to dosubmit". ($blnReturn==true ? "true" : "false"));
+        	return $blnReturn;
+        }
 	}
 
     protected function BuildLoadActionProxy() {
@@ -786,7 +792,7 @@ class xlsws_checkout extends xlsws_index {
         return true;
     }
 
-    protected function CompleteCheckout() {
+    protected function CompleteCheckout() { error_log(__function__);
         Visitor::add_view_log('',ViewLogType::checkoutpayment);
 
         $objCustomer = $this->CompleteUpdateCustomer();
@@ -802,19 +808,19 @@ class xlsws_checkout extends xlsws_index {
             $objCart->PaymentModule . '.php',
             'payment'
         );
-
+error_log("Pay1");
 		$objCart->PaymentMethod = $objPaymentModule->payment_method($objCart);
 		
         $strError = '';
         $mixResponse = $objPaymentModule->process(
             $objCart, $this->PaymentControl->objMethodFields, $strError
         );
-
+error_log("Pay2");
 		if (is_array($mixResponse))
-		{
+		{error_log("Pay3");
 			if ($mixResponse[0]==true) { //Successful Transaction
             	$objCart->PaymentData = $mixResponse[1];
-            } else {
+            } else { error_log("mixed error");
 				$this->errSpan->Text = ($mixResponse[1] != '' ? $mixResponse[1] : _sp('Error in processing payment'));
 			 	$this->ToggleCheckoutControls(true);
 			 	$objCart->PaymentData = $this->errSpan->Text; //Save error as part of cart in case of abandon
@@ -828,12 +834,12 @@ class xlsws_checkout extends xlsws_index {
             $this->errSpan->Text = ($strError != '' ? $strError : _sp('Error in processing payment'));
             $this->ToggleCheckoutControls(true);
             $objCart->PaymentData = $this->errSpan->Text; //Save error as part of cart in case of abandon
-			$objCart->Save();
+			$objCart->Save(); error_log("Pay4");
             return false;
         } 
         else $objCart->PaymentData = $mixResponse;
 
-        
+error_log("Pay5");        
         
 
         if (!$objPaymentModule->uses_jumper())
@@ -843,7 +849,7 @@ class xlsws_checkout extends xlsws_index {
             return false;
 
 		Visitor::add_view_log('',ViewLogType::checkoutfinal);
-
+error_log("Pay6");
         if ($objPaymentModule->uses_jumper()) { 
             _xls_stack_add('xls_jumper_form', $mixResponse);
             $objCart->PaymentData = '';
@@ -853,31 +859,31 @@ class xlsws_checkout extends xlsws_index {
         }
 
         $objCart->Save();
-
+error_log("Pay7");
         $this->FinalizeCheckout($objCart, $objCustomer);
     }
 
     public static function FinalizeCheckout(
         $objCart = null, $objCustomer = null, $blnForward = true
-    ) {
+    ) {error_log(__function__);
         if (!$objCart)
             $objCart = Cart::GetCart();
 
         if (!$objCustomer)
             $objCustomer = Customer::GetCurrent();
-
+error_log("final1");
         self::PreFinalizeHooks($objCart, $objCustomer);
 
         $objCart->Type = CartType::order;
         $objCart->Submitted = QDateTime::Now(true);
         $objCart->Save();
-
+error_log("final2");
         _xls_stack_add('xls_submit_order', true);
 
         Cart::ClearCart();
-
+error_log("final3");
         self::PostFinalizeHooks($objCart, $objCustomer);
-
+error_log("final4");
         if ($blnForward)
             _rd($objCart->Link);
     }

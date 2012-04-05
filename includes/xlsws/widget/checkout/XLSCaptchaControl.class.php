@@ -59,7 +59,7 @@ class XLSCaptchaControl extends XLSCompositeControl {
         return $this->objCodeControl;
     }
 
-    protected function BuildInputControl() {
+    protected function BuildInputControl() {error_log(__function__);
         $objControl = $this->objInputControl = 
             new XLSTextControl($this, $this->GetChildName('Input'));
         $objControl->Name = _sp($this->strLabelForInput);
@@ -71,11 +71,11 @@ class XLSCaptchaControl extends XLSCompositeControl {
         return $objControl;
     }
 
-    protected function UpdateInputControl() {
+    protected function UpdateInputControl() {error_log(__function__);
         return $this->objInputControl;
     }
 
-    protected function BindInputControl() {
+    protected function BindInputControl() {error_log(__function__);
         $objControl = $this->objInputControl;
 
         if (!$objControl)
