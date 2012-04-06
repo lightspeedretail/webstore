@@ -83,9 +83,5 @@
 			// Print Float with Localized Formatting
 		}
 
-		function _c($strString) {
-			// Not Yet Implemented
-			// Print Currency with Localized Formatting
-		}
 	//////////////////////////////////////
 ?>
