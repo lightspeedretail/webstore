@@ -55,9 +55,11 @@ class Paypal extends xlsws_class_payment {
 	 *
 	 */
 	public function admin_name() {
-		return _sp('PayPal (Simple Integration)');
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "PayPal (Simple Integration)";
+		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		return $strName;
 	}
-
 	/**
 	 * The Web Admin panel for configuring this payment option
 	 *

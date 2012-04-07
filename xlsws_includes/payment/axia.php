@@ -30,21 +30,37 @@ include_once('usaepay.php');
 class axia extends credit_card {
 	private $paid_amount;
 
-	public function admin_name() {
-		return "Axia via USAEpay";
-	}
-
+	/**
+	 * The name of the payment module that will be displayed in the checkout page
+	 * @return string
+	 *
+	 *
+	 */
 	public function name() {
-
-		$config = $this->GetConfigurationValues('axia');
-
-		if(isset($config['label'])) {
-			return $config['label'];
-		}
-
-		return "Credit Card";
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "";
+		
+		if(isset($config['label']))
+			$strName = $config['label'];
+		else $strName =  "Credit Card";
+		
+		if ($config['live']=="test") $strName .= " (TEST MODE)";
+		
+		return $strName;
 	}
 
+	/**
+	 * The name of the payment module that will be displayed in Web Admin payments
+	 * @return string
+	 *
+	 *
+	 */
+	public function admin_name() {
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "Axia via USAEpay (Advanced Integration)";
+		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		return $strName;
+	}
 	public function config_fields($objParent) {
 		$ret= array();
 

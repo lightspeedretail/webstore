@@ -40,12 +40,16 @@ class eway_cvn_aus extends credit_card {
 	 *
 	 */
 	public function name() {
-		$config = $this->getConfigValues('eway_cvn_aus');
-
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "";
+		
 		if(isset($config['label']))
-			return $config['label'];
-
-		return "Credit Card";
+			$strName = $config['label'];
+		else $strName =  "Credit Card";
+		
+		if ($config['live']=="test") $strName .= " (TEST MODE)";
+		
+		return $strName;
 	}
 
 	/**
@@ -55,9 +59,11 @@ class eway_cvn_aus extends credit_card {
 	 *
 	 */
 	public function admin_name() {
-		return "eWAY CVN (Australia) Advanced Integration";
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "eWAY CVN Australia (Advanced Integration)";
+		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		return $strName;
 	}
-
 	/**
 	 * The Web Admin panel for configuring this payment option
 	 *

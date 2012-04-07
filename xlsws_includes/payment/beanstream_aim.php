@@ -42,12 +42,16 @@ class beanstream_aim extends credit_card {
 	 *
 	 */
 	public function name() {
-		$config = $this->getConfigValues('beanstream_aim');
-
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "";
+		
 		if(isset($config['label']))
-			return $config['label'];
-
-		return "Credit Card";
+			$strName = $config['label'];
+		else $strName =  "Credit Card";
+		
+		if ($config['live']=="test") $strName .= " (TEST MODE)";
+		
+		return $strName;
 	}
 
 	/**
@@ -57,7 +61,10 @@ class beanstream_aim extends credit_card {
 	 *
 	 */
 	public function admin_name() {
-		return "Beanstream Advanced Integration (Canada/USA)";
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "Beanstream (Advanced Integration)";
+		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		return $strName;
 	}
 
 

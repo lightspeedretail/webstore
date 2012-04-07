@@ -40,14 +40,18 @@ class worldpay extends xlsws_class_payment {
 	 *
 	 */
 	public function name() {
-		$config = $this->getConfigValues('worldpay');
-
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "";
+		
 		if(isset($config['label']))
-			return $config['label'];
-
-		return "WorldPay";
+			$strName = $config['label'];
+		else $strName =  "Worldpay";
+		
+		if ($config['live']=="test") $strName .= " (TEST MODE)";
+		
+		return $strName;
 	}
-
+	
 	/**
 	 * The name of the payment module that will be displayed in Web Admin payments
 	 * @return string
@@ -55,9 +59,11 @@ class worldpay extends xlsws_class_payment {
 	 *
 	 */
 	public function admin_name() {
-		return "WorldPay Simple Integration";
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "Worldpay (Simple Integration)";
+		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		return $strName;
 	}
-
 	/**
 	 * The Web Admin panel for configuring this payment option
 	 *

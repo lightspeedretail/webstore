@@ -44,12 +44,17 @@ class paypal_webpayments_pro extends credit_card {
 	 */
 	public function name() {
 		$config = $this->getConfigValues(get_class($this));
-
+		$strName = "";
+		
 		if(isset($config['label']))
-			return $config['label'];
-
-		return "Credit Card";
+			$strName = $config['label'];
+		else $strName =  "Credit Card";
+		
+		if ($config['live']=="test") $strName .= " (TEST MODE)";
+		
+		return $strName;
 	}
+
 
 	/**
 	 * The name of the payment module that will be displayed in Web Admin payments
@@ -58,7 +63,10 @@ class paypal_webpayments_pro extends credit_card {
 	 *
 	 */
 	public function admin_name() {
-		return "PayPal Payments Pro (Advanced Integration)";
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "PayPal Payments Pro (Advanced Integration)";
+		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		return $strName;
 	}
 
 	/**

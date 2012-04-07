@@ -35,17 +35,37 @@ include_once(XLSWS_INCLUDES . 'payment/credit_card.php');
 class merchantware extends credit_card {
 	private $paid_amount;
 
-	public function admin_name() {
-		return "MerchantWARE Online";
-	}
 
+	/**
+	 * The name of the payment module that will be displayed in the checkout page
+	 * @return string
+	 *
+	 *
+	 */
 	public function name() {
-		$config = $this->getConfigValues('merchantware');
-
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "";
+		
 		if(isset($config['label']))
-			return $config['label'];
-
-		return "Credit Card";
+			$strName = $config['label'];
+		else $strName =  "Credit Card";
+		
+		if ($config['live']=="test") $strName .= " (TEST MODE)";
+		
+		return $strName;
+	}
+	
+	/**
+	 * The name of the payment module that will be displayed in Web Admin payments
+	 * @return string
+	 *
+	 *
+	 */
+	public function admin_name() {
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "MerchantWARE Online (Advanced Integration)";
+		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		return $strName;
 	}
 
 	public function config_fields($objParent) {
