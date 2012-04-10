@@ -284,6 +284,30 @@ class xlsws_db_maintenance extends xlsws_index {
 
 			_dbx("UPDATE `xlsws_country` SET `country`='Russia' where `code`='RU'");
 
+			//ReCaptcha Keys
+			$this->add_config_key('RECAPTCHA_PUBLIC_KEY' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'ReCaptcha Public Key', 
+				'RECAPTCHA_PUBLIC_KEY', '', 'Sign up for an account at http://www.google.com/recaptcha', 18, 2, NOW(), NOW(), NULL);");
+			$this->add_config_key('RECAPTCHA_PRIVATE_KEY' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'ReCaptcha Private Key', 
+				'RECAPTCHA_PRIVATE_KEY', '', 'Sign up for an account at http://www.google.com/recaptcha', 18, 3, NOW(), NOW(), NULL);");
+
+			$this->add_config_key('CAPTCHA_STYLE' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Captcha Style', 
+				'CAPTCHA_STYLE', '0', 'Sign up for an account at http://www.google.com/recaptcha', 18, 1, NOW(), NOW(), 'CAPTCHA_STYLE');");
+
+			$this->add_config_key('CAPTCHA_CHECKOUT' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Captcha on Checkout', 
+				'CAPTCHA_CHECKOUT', '1', '', 18, 4, NOW(), NOW(), 'CAPTCHA_CHECKOUT');");
+			$this->add_config_key('CAPTCHA_CONTACTUS' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Captcha on Contact Us', 
+				'CAPTCHA_CONTACTUS', '1', '', 18, 5, NOW(), NOW(), 'CAPTCHA_CONTACTUS');");
+			$this->add_config_key('CAPTCHA_REGISTRATION' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Captcha on Registration', 
+				'CAPTCHA_REGISTRATION', '1', '', 18, 6, NOW(), NOW(), 'CAPTCHA_REGISTRATION');");
+
+
+
 			
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");

@@ -328,7 +328,7 @@
 		const Localisation = 15;
 		const Security = 16;
 		const Images = 17;
-		
+		const Captcha = 18;
 
 	}
 	
@@ -583,6 +583,21 @@
 	
 				case 'STORE_IMAGE_LOCATION':
 					return array('DB'=>'Database' , 'FS' => 'File System');
+					
+					
+				case 'CAPTCHA_REGISTRATION':
+					return array(0 => _sp("OFF for Everyone") , 1 => _sp("ON for Everyone"));											
+				case 'CAPTCHA_CONTACTUS':
+					return array(0 => _sp("OFF for Everyone") , 1 => _sp("OFF for Logged-in Users") , 2 => _sp("ON for Everyone"));											
+				case 'CAPTCHA_CHECKOUT':
+					return array(0 => _sp("OFF for Everyone") , 1 => _sp("OFF for Logged-in Users") , 2 => _sp("ON for Everyone"));											
+				case 'CAPTCHA_STYLE':
+					return array(0 => _sp("Google ReCAPTCHA") , 1 => _sp("Integrated Captcha (DEPRECATED)"));											
+
+				case 'ENABLE_SLASHED_PRICES':
+					return array(0 => _sp("Off") , 1 => _sp("Only on Details Page") , 2 => _sp("On Grid and Details Pages"));											
+
+					
 				default:
 					if(stristr($str , "return"))
 						return @eval($str);
@@ -703,6 +718,9 @@
 			$this->configPnls['custreg']->Name = _sp('Customer Registration');
 			$this->configPnls['custreg']->Info = _sp('Information required for customer registration');
 			
+			$this->configPnls['captcha'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Captcha , "configDone");
+			$this->configPnls['captcha']->Name = _sp('Captcha Setup');
+			$this->configPnls['captcha']->Info = _sp('Information required for Captcha security');
 			
 			
 		}
