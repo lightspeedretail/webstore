@@ -345,8 +345,7 @@ class xlsws_checkout extends xlsws_index {
         $objControl = $this->VerifyControl = 
             new QPanel($this, 'Verify');
         $objControl->Name = 'Submit your order';
-        $objControl->Template = 
-            $objControl->GetTemplatePath('checkout_verify.tpl.php');
+        $objControl->Template = templateNamed('checkout_verify.tpl.php');
     }
 
     protected function UpdateVerifyControl() {
@@ -359,8 +358,8 @@ class xlsws_checkout extends xlsws_index {
 
     protected function BuildCaptchaControl() {
         $objParent = $this->VerifyControl;
-        if (!$objParent)
-            $objParent = $this;
+        if (!$objParent) die("couldn't get parent??");
+          //  $objParent = $this;
 
         $objControl = $this->CaptchaControl = 
             new XLSCaptchaControl($objParent, 'Captcha');
@@ -420,7 +419,7 @@ class xlsws_checkout extends xlsws_index {
         $objControl = $this->LoginRegisterControl;
 
         if (!$objControl)
-            return $objControl;
+            return;
 
         $objCustomer = Customer::GetCurrent();
         if ($objCustomer->Rowid)
@@ -483,7 +482,7 @@ class xlsws_checkout extends xlsws_index {
         $objControl = $this->RegisterControl;
 
         if (!$objControl)
-            return $objControl;
+            return;
 
         $objControl->AddAction(
             new QClickEvent(), 

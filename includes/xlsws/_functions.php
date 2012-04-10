@@ -56,7 +56,7 @@ function templateNamed($name) {
 
 	$file = 'templates/' . _xls_get_conf('DEFAULT_TEMPLATE' , 'xsilva') . '/'.$name;
 	if(!file_exists($file) && stristr($name , ".tpl")) {
-		QApplication::Log(E_USER_NOTICE,"Template ".$file." not found - site cannot continue");
+		QApplication::Log(E_ERROR,"Template ".$file." not found - site cannot continue");
 		die("Template file missing. Check System Log for details.");
 	}
 	else return $file;
