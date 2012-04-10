@@ -196,14 +196,12 @@ class xlsws_track_order extends xlsws_index {
 
 		$this->orderViewItemsPnl = new QPanel($this->orderViewPnl);
 
-		$this->show_submit_order = _xls_stack_pop('xls_submit_order');
-		$this->new_order = $this->show_submit_order; //maintain the boolean value for this since the previous variable gets altered later
-
 		$this->lblOrderMsg = new QLabel($this->mainPnl);
 		$this->bind_widgets();
 
-		if($this->show_submit_order)
+		if(isset($_GET['final']))
 			 $this->lblOrderMsg->Text = _sp("Thank you for your order.");
+			 
 
 		if(isset($_GET['dosearch'])) {
 			$this->txtOrderId->Text = $_GET['orderid'];
@@ -213,7 +211,7 @@ class xlsws_track_order extends xlsws_index {
 
 		if(isset($_GET['getuid'])) {
 			$this->show_submit_order = $_GET['getuid'];
-			$this->search_Order();
+			$this->search_Order($_GET['getuid']);
 		}
 
 		if ($_GET['sendemail'] == "true" && isset($_GET['oid'])) {
@@ -223,6 +221,10 @@ class xlsws_track_order extends xlsws_index {
 		}
 
 		$this->order_display($this->order , $this->orderViewItemsPnl);
+
+
+        
+        	
 	}
 
 	/**
@@ -230,9 +232,9 @@ class xlsws_track_order extends xlsws_index {
 	 * @param none
 	 * @return none
 	 */
-	protected function search_Order() {
-		if($this->show_submit_order) {
-			$this->order = Cart::QuerySingle(QQ::Equal(QQN::Cart()->Linkid , $this->show_submit_order));
+	protected function search_Order($strLinkId = null) {
+		if($strLinkId) {
+			$this->order = Cart::QuerySingle(QQ::Equal(QQN::Cart()->Linkid , $strLinkId));
 		} else {
 			$orderid = trim($this->txtOrderId->Text);
 			// $zipcode = trim($this->txtZipCode->Text);
@@ -325,7 +327,7 @@ class xlsws_track_order extends xlsws_index {
 		$this->orderResultPnl->Visible= false;
 		$this->orderResultPnl->Visible= false;
 		$this->order_display($this->order , $this->orderViewItemsPnl);
-		if ($this->new_order) {
+		if(isset($_GET['final'])) {
 			QApplication::ExecuteJavaScript("$(document).ready(function() { $.get('index.php?xlspg=order_track&sendemail=true&oid=".$_GET['getuid'] . "',function(data) { });});");
 		}
 	}

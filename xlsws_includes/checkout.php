@@ -358,8 +358,8 @@ class xlsws_checkout extends xlsws_index {
 
     protected function BuildCaptchaControl() {
         $objParent = $this->VerifyControl;
-        if (!$objParent) die("couldn't get parent??");
-          //  $objParent = $this;
+        if (!$objParent) 
+          $objParent = $this;
 
         $objControl = $this->CaptchaControl = 
             new XLSCaptchaControl($objParent, 'Captcha');
@@ -532,7 +532,7 @@ class xlsws_checkout extends xlsws_index {
     }
 
 	public function DoSubmitControlClick($strFormId, $strControlId, $strParam) { error_log(__function__);
-	return false;
+
         $objCart = Cart::GetCart();
 
         if ($objCart->IdStr && $objCart->Status == CartType::order)
@@ -541,11 +541,10 @@ class xlsws_checkout extends xlsws_index {
 		if(is_null($objCart->Rowid)) 
 			QApplication::Log(E_ERROR, 'checkout', "Submit on non-existent cart. Likely a double-click on Submit button. Ignore.");
 		else
-        	{ 
-        	
+        {         	
         	$blnReturn = $this->CompleteCheckout();
         	error_log("back to dosubmit". ($blnReturn==true ? "true" : "false"));
-        	return $blnReturn;
+			return $blnReturn;       	
         }
 	}
 
@@ -860,6 +859,7 @@ error_log("Pay6");
         $objCart->Save();
 error_log("Pay7");
         $this->FinalizeCheckout($objCart, $objCustomer);
+        return true;
     }
 
     public static function FinalizeCheckout(
@@ -877,14 +877,18 @@ error_log("final1");
         $objCart->Submitted = QDateTime::Now(true);
         $objCart->Save();
 error_log("final2");
-        _xls_stack_add('xls_submit_order', true);
+        //_xls_stack_add('xls_submit_order', true);
 
         Cart::ClearCart();
 error_log("final3");
         self::PostFinalizeHooks($objCart, $objCustomer);
 error_log("final4");
         if ($blnForward)
-            _rd($objCart->Link);
+            {
+            	_rd($objCart->Link."&final=1"); 
+            	return true;
+            }
+            else return true;
     }
 
     // TODO :: Required ? 
