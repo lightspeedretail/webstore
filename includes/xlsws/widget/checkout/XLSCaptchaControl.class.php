@@ -2,7 +2,7 @@
 
 class XLSCaptchaControl extends XLSCompositeControl {
     protected $arrRegisteredChildren = array(
-        'Code', 'Input'
+         'Input','Code'
     );
 
     protected $strLabelForInput = 'Enter the text from above.';
@@ -10,7 +10,8 @@ class XLSCaptchaControl extends XLSCompositeControl {
 
     // Objects
     protected $objCodeControl;
-    protected $objInputControl;    
+    protected $objInputControl;
+    protected $objCaptchaResponse;    
 
     protected function BuildCodeControl() {
         $objControl = $this->objCodeControl = 
@@ -42,8 +43,12 @@ class XLSCaptchaControl extends XLSCompositeControl {
                 __CAPTCHA_ASSETS__ .
                 '/images/audio_icon.gif"/>' .
         '</a></div>';
-
-        return "$strImage $strRefresh $strAudio";
+		
+		require_once(__INCLUDES__."/recaptcha/recaptchalib.php");
+		$publickey = ""; // you got this from the signup page
+		unset($this->objCaptchaResponse);
+ 		return recaptcha_get_html($publickey);
+        //return "$strImage $strRefresh $strAudio";
     }
 
     protected function UpdateCodeControl($strMessage = null) {
@@ -59,7 +64,7 @@ class XLSCaptchaControl extends XLSCompositeControl {
         return $this->objCodeControl;
     }
 
-    protected function BuildInputControl() {error_log(__function__);
+    protected function BuildInputControl() {
         $objControl = $this->objInputControl = 
             new XLSTextControl($this, $this->GetChildName('Input'));
         $objControl->Name = _sp($this->strLabelForInput);
@@ -71,11 +76,11 @@ class XLSCaptchaControl extends XLSCompositeControl {
         return $objControl;
     }
 
-    protected function UpdateInputControl() {error_log(__function__);
+    protected function UpdateInputControl() {
         return $this->objInputControl;
     }
 
-    protected function BindInputControl() {error_log(__function__);
+    protected function BindInputControl() {
         $objControl = $this->objInputControl;
 
         if (!$objControl)
@@ -99,17 +104,29 @@ class XLSCaptchaControl extends XLSCompositeControl {
             return true;
 
         require_once(SECIMG_DIR . '/securimage.php');
-        $objSecurimage = new Securimage();
+       // $objSecurimage = new Securimage();
+//        if ($objSecurimage->getCode() != $objInput->Text) {
 
-        if ($objSecurimage->getCode() != $objInput->Text) {
-            $objInput->ValidationError = $this->strLabelForValidationError;
-            return false;
+
+
+		require_once(__INCLUDES__."/recaptcha/recaptchalib.php");
+		$privatekey = "";
+		if (!isset($this->objCaptchaResponse) && strlen($_POST["recaptcha_response_field"])>0)
+  			$this->objCaptchaResponse = recaptcha_check_answer ($privatekey,
+                $_SERVER["REMOTE_ADDR"],
+                $_POST["recaptcha_challenge_field"],
+                $_POST["recaptcha_response_field"]);
+
+		if (!$this->objCaptchaResponse->is_valid) {
+			$objInput->ValidationError = $this->objCaptchaResponse->error;
+			return false;
+		} else
+			{
+        	$objInput->ValidationReset();
+        	$this->ValidationReset(false);
+
+        	return true;
         }
-
-        $objInput->ValidationReset();
-        $this->ValidationReset(false);
-
-        return true;
     }
 
     protected function UpdateControl() {
