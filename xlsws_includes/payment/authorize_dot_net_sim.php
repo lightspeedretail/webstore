@@ -48,14 +48,18 @@ class authorize_dot_net_sim extends xlsws_class_payment {
 		return "Credit Card";
 	}
 
-	/**
+		/**
 	 * The name of the payment module that will be displayed in Web Admin payments
 	 * @return string
 	 *
 	 *
 	 */
 	public function admin_name() {
-		return _sp('Authorize.net Simple Integration');
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "Authorize.Net";
+		if (!$this->uses_jumper())$strName .= "&nbsp;&nbsp;&nbsp;<font size=2>Advanced Integration</font>";
+		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		return $strName;
 	}
 
 	/**

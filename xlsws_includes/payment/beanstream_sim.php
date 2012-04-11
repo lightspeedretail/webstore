@@ -48,14 +48,18 @@ class beanstream_sim extends xlsws_class_payment {
 		return "Credit Card";
 	}
 
-	/**
+		/**
 	 * The name of the payment module that will be displayed in Web Admin payments
 	 * @return string
 	 *
 	 *
 	 */
 	public function admin_name() {
-		return "Beanstream Simple Integration (Canada/USA)";
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "Beanstream (US/CAN)";
+		if (!$this->uses_jumper())$strName .= "&nbsp;&nbsp;&nbsp;<font size=2>Advanced Integration</font>";
+		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		return $strName;
 	}
 
 	/**

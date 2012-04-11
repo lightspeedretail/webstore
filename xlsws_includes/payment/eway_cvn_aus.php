@@ -60,7 +60,8 @@ class eway_cvn_aus extends credit_card {
 	 */
 	public function admin_name() {
 		$config = $this->getConfigValues(get_class($this));
-		$strName = "eWAY CVN Australia (Advanced Integration)";
+		$strName = "eWAY CVN Australia";
+		if (!$this->uses_jumper())$strName .= "&nbsp;&nbsp;&nbsp;<font size=2>Advanced Integration</font>";
 		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
 		return $strName;
 	}

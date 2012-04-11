@@ -57,7 +57,8 @@ class axia extends credit_card {
 	 */
 	public function admin_name() {
 		$config = $this->getConfigValues(get_class($this));
-		$strName = "Axia via USAEpay (Advanced Integration)";
+		$strName = "Axia via USAEpay";
+		if (!$this->uses_jumper())$strName .= "&nbsp;&nbsp;&nbsp;<font size=2>Advanced Integration</font>";
 		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
 		return $strName;
 	}

@@ -60,7 +60,8 @@ class worldpay extends xlsws_class_payment {
 	 */
 	public function admin_name() {
 		$config = $this->getConfigValues(get_class($this));
-		$strName = "Worldpay (Simple Integration)";
+		$strName = "Worldpay";
+		if (!$this->uses_jumper())$strName .= "&nbsp;&nbsp;&nbsp;<font size=2>Advanced Integration</font>";
 		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
 		return $strName;
 	}

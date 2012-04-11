@@ -62,7 +62,8 @@ class beanstream_aim extends credit_card {
 	 */
 	public function admin_name() {
 		$config = $this->getConfigValues(get_class($this));
-		$strName = "Beanstream (Advanced Integration)";
+		$strName = "Beanstream (US/CAN)";
+		if (!$this->uses_jumper())$strName .= "&nbsp;&nbsp;&nbsp;<font size=2>Advanced Integration</font>";
 		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
 		return $strName;
 	}
