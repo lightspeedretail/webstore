@@ -518,33 +518,36 @@ class xlsws_checkout extends xlsws_index {
         if (!$objControl)
             return;
             
-            
 
         $objControl->AddActionArray(
             new QClickEvent(),
             array(
                 new QAjaxAction('ToggleCheckoutControls'),
-                new QAjaxAction('DoSubmitControlClick')
+                new QServerAction('DoSubmitControlClick')
             )
         );
 	
         return $objControl;
     }
 
-	public function DoSubmitControlClick($strFormId, $strControlId, $strParam) { error_log(__function__);
+	public function DoSubmitControlClick($strFormId, $strControlId, $strParam) {
 
         $objCart = Cart::GetCart();
 
         if ($objCart->IdStr && $objCart->Status == CartType::order)
-            _rd($objCart->Link);
-
+        {
+        	//already has ID string, redirecting
+        	_rd($objCart->Link);
+			return;
+		}
+			
 		if(is_null($objCart->Rowid)) 
-			QApplication::Log(E_ERROR, 'checkout', "Submit on non-existent cart. Likely a double-click on Submit button. Ignore.");
+			QApplication::Log(E_USER_NOTICE, 'checkout', "Submit on non-existent cart. Likely a double-click on Submit button. Ignore.");
 		else
         {         	
         	$blnReturn = $this->CompleteCheckout();
-        	error_log("back to dosubmit". ($blnReturn==true ? "true" : "false"));
-			return $blnReturn;       	
+        	if (!$blnReturn)
+        		QApplication::Log(E_USER_NOTICE, 'checkout', "Checkout halted, likely due to payment decline.");    	
         }
 	}
 
@@ -790,7 +793,7 @@ class xlsws_checkout extends xlsws_index {
         return true;
     }
 
-    protected function CompleteCheckout() { error_log(__function__);
+    protected function CompleteCheckout() {
         Visitor::add_view_log('',ViewLogType::checkoutpayment);
 
         $objCustomer = $this->CompleteUpdateCustomer();
@@ -806,19 +809,19 @@ class xlsws_checkout extends xlsws_index {
             $objCart->PaymentModule . '.php',
             'payment'
         );
-error_log("Pay1");
+
 		$objCart->PaymentMethod = $objPaymentModule->payment_method($objCart);
 		
         $strError = '';
         $mixResponse = $objPaymentModule->process(
             $objCart, $this->PaymentControl->objMethodFields, $strError
         );
-error_log("Pay2");
+
 		if (is_array($mixResponse))
-		{error_log("Pay3");
+		{
 			if ($mixResponse[0]==true) { //Successful Transaction
             	$objCart->PaymentData = $mixResponse[1];
-            } else { error_log("mixed error");
+            } else { 
 				$this->errSpan->Text = ($mixResponse[1] != '' ? $mixResponse[1] : _sp('Error in processing payment'));
 			 	$this->ToggleCheckoutControls(true);
 			 	$objCart->PaymentData = $this->errSpan->Text; //Save error as part of cart in case of abandon
@@ -829,15 +832,16 @@ error_log("Pay2");
 		
 		}
 		elseif ($mixResponse === FALSE) { //Backwards compatibility for any custom modules that just return t/f
+			QApplication::Log(E_ERROR, 'Payment', $objCart->PaymentModule." module returned decline with no explanation. Legacy code?");
             $this->errSpan->Text = ($strError != '' ? $strError : _sp('Error in processing payment'));
             $this->ToggleCheckoutControls(true);
             $objCart->PaymentData = $this->errSpan->Text; //Save error as part of cart in case of abandon
-			$objCart->Save(); error_log("Pay4");
+			$objCart->Save();
             return false;
         } 
         else $objCart->PaymentData = $mixResponse;
 
-error_log("Pay5");        
+        
         
 
         if (!$objPaymentModule->uses_jumper())
@@ -847,7 +851,7 @@ error_log("Pay5");
             return false;
 
 		Visitor::add_view_log('',ViewLogType::checkoutfinal);
-error_log("Pay6");
+
         if ($objPaymentModule->uses_jumper()) { 
             _xls_stack_add('xls_jumper_form', $mixResponse);
             $objCart->PaymentData = '';
@@ -857,38 +861,38 @@ error_log("Pay6");
         }
 
         $objCart->Save();
-error_log("Pay7");
+
         $this->FinalizeCheckout($objCart, $objCustomer);
         return true;
     }
 
     public static function FinalizeCheckout(
         $objCart = null, $objCustomer = null, $blnForward = true
-    ) {error_log(__function__);
+    ) {
         if (!$objCart)
             $objCart = Cart::GetCart();
 
         if (!$objCustomer)
             $objCustomer = Customer::GetCurrent();
-error_log("final1");
+
         self::PreFinalizeHooks($objCart, $objCustomer);
 
         $objCart->Type = CartType::order;
         $objCart->Submitted = QDateTime::Now(true);
         $objCart->Save();
-error_log("final2");
+
         //_xls_stack_add('xls_submit_order', true);
 
         Cart::ClearCart();
-error_log("final3");
+
         self::PostFinalizeHooks($objCart, $objCustomer);
-error_log("final4");
+
         if ($blnForward)
             {
             	_rd($objCart->Link."&final=1"); 
             	return true;
             }
-            else return true;
+            else return false;
     }
 
     // TODO :: Required ? 
