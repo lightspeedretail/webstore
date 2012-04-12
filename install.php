@@ -2831,6 +2831,20 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 				
 				
 					//Run database upgrade beyond what is included in install
+					
+					//Bootstrap the QCodo DB object so we can use our functions
+					define('DB_CONNECTION_1', serialize(array( 
+					'adapter' => 'MySqli5',
+					'server' => $dbhost->Text,
+					'port' => ($dbport->Text!='')?$dbport->Text:null,
+					'database' => $db->Text,
+					'username' => $dbuser->Text,
+					'password' => $dbpass->Text,
+					'encoding' => 'utf8',
+					'profiling' => false)));
+					QApplication::InitializeDatabaseConnections();
+
+
 					include(XLSWS_INCLUDES . 'db_maintenance.php');
 					$objDbMaint = new xlsws_db_maintenance;
 					$objDbMaint->RunUpdateSchema();
