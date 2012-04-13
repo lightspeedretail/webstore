@@ -518,11 +518,12 @@ class xlsws_checkout extends xlsws_index {
         if (!$objControl)
             return;
             
-
+            
         $objControl->AddActionArray(
             new QClickEvent(),
             array(
-                new QAjaxAction('ToggleCheckoutControls'),
+            	new QToggleEnableAction($objControl, false),
+                new QAjaxAction('ToggleCheckoutControls',false),
                 new QServerAction('DoSubmitControlClick')
             )
         );
@@ -536,18 +537,24 @@ class xlsws_checkout extends xlsws_index {
 
         if ($objCart->IdStr && $objCart->Status == CartType::order)
         {
+        	QApplication::Log(E_USER_NOTICE, 'str', "already has ID string, redirecting");
         	//already has ID string, redirecting
         	_rd($objCart->Link);
 			return;
 		}
-			
-		if(is_null($objCart->Rowid)) 
-			QApplication::Log(E_USER_NOTICE, 'checkout', "Submit on non-existent cart. Likely a double-click on Submit button. Ignore.");
+
+		if(is_null($objCart->Rowid) ||  $objCart->Count == 0) 
+			{ QApplication::Log(E_USER_NOTICE, 'checkout', "Submit on non-existent cart. Likely a double-click on Submit button. Ignore."); exit(); }
 		else
-        {         	
-        	$blnReturn = $this->CompleteCheckout();
-        	if (!$blnReturn)
-        		QApplication::Log(E_USER_NOTICE, 'checkout', "Checkout halted, likely due to payment decline.");    	
+        { 
+        	//We only want to check Captcha after everything else has passed, to avoid multiple checks
+    		if ($this->CaptchaControl->Validate_Captcha())
+    			{
+		    	$blnReturn = $this->CompleteCheckout();
+		    	if (!$blnReturn)
+		    		QApplication::Log(E_USER_NOTICE, 'checkout', "Checkout halted, likely due to payment decline.");    	
+			} else $this->errSpan->Text = "Captcha Validation Error";
+
         }
 	}
 
@@ -682,7 +689,7 @@ class xlsws_checkout extends xlsws_index {
     }
 
     protected function ToggleCheckoutControls($blnVisibility = false) {
-		$this->pnlLoginRegister->Visible = $blnVisibility;
+   		$this->pnlLoginRegister->Visible = $blnVisibility;
 		$this->pnlWait->Visible = $blnVisibility;
         
         $this->CustomerControl->Visible = $blnVisibility;
@@ -881,8 +888,6 @@ class xlsws_checkout extends xlsws_index {
         $objCart->Submitted = QDateTime::Now(true);
         $objCart->Save();
 
-        //_xls_stack_add('xls_submit_order', true);
-
         Cart::ClearCart();
 
         self::PostFinalizeHooks($objCart, $objCustomer);
@@ -1039,9 +1044,6 @@ class xlsws_checkout extends xlsws_index {
 
 		$errors = array();
 
-        if (!$this->ValidateControlAndChildren($this->CaptchaControl))
-			$errors[] = _sp("Wrong Verification Code.");
-
         if (!$this->ValidateControlAndChildren($this->CustomerControl))
 			$errors[] = _sp('Please complete the required fields marked with an asterisk *');
 
@@ -1056,7 +1058,7 @@ class xlsws_checkout extends xlsws_index {
 
 		if (count($errors)) {
 			$this->errSpan->Text = join('<br />', $errors);
-
+			$this->ToggleCheckoutControls(true);
 			return false;
 		}
 

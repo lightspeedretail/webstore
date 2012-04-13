@@ -11,11 +11,14 @@ class XLSCaptchaControl extends XLSCompositeControl {
     // Objects
     protected $objCodeControl;
     protected $objInputControl;
-    protected $objCaptchaResponse;    
+    protected $objCaptchaResponse;
+    
+    protected $strError = null;    
 
     protected function BuildCodeControl() {
         $objControl = $this->objCodeControl = 
             new QLabel($this, $this->GetChildName('Code'));
+            
         $objControl->HtmlEntities = false;
         $objControl->CssClass = 'customer_reg_draw_verify';
 
@@ -49,11 +52,12 @@ class XLSCaptchaControl extends XLSCompositeControl {
 			return "$strImage $strRefresh $strAudio";
 		}
 		
-		
 		require_once(__INCLUDES__."/recaptcha/recaptchalib.php");
 		$publickey = _xls_get_conf('RECAPTCHA_PUBLIC_KEY' , '');
 		unset($this->objCaptchaResponse);
- 		return recaptcha_get_html($publickey,null,(_xls_get_conf('ENABLE_SSL',0)=='1' ? true : false));
+
+		if ($this->objInputControl->ValidationError=="Invalid Entry, try again") $this->strError='incorrect-captcha-sol';
+ 		return recaptcha_get_html($publickey,$this->strError,(_xls_get_conf('ENABLE_SSL',0)=='1' ? true : false));
 
     }
 
@@ -70,10 +74,12 @@ class XLSCaptchaControl extends XLSCompositeControl {
         return $this->objCodeControl;
     }
 
-    protected function BuildInputControl() { error_log(__function__);
-    if (_xls_get_conf('CAPTCHA_STYLE' , '0')=='1') {
+    protected function BuildInputControl() { 
+      
+    if (_xls_get_conf('CAPTCHA_STYLE' , '0')=='1') { //Will be removed in 2.3, customers should migrate and get account
         $objControl = $this->objInputControl = 
             new XLSTextControl($this, $this->GetChildName('Input'));
+         
         $objControl->Name = _sp($this->strLabelForInput);
         $objControl->SetCustomAttribute('autocomplete', 'off');
 
@@ -100,33 +106,38 @@ class XLSCaptchaControl extends XLSCompositeControl {
 
         if (!$objControl)
             return;
-
-        $objControl->AddAction(
-            new QChangeEvent(),
-            new QAjaxControlAction($this, 'DoInputControlChange')
-        );
     }
 
     public function DoInputControlChange() {
-        return $this->Validate();
+        return;
     }
 
-    public function Validate() {error_log(__class__.' '.__function__);
+	public function Validate() {
+		//Because Validate may be called multiple times, we don't want to keep
+		//calling externally, so our Validate is a separate function
+		return true;
+	}
+	
+
+    public function Validate_Captcha() {  
+
+    	if (_xls_get_conf('CAPTCHA_CHECKOUT' , '1')==0) return true;
+
+
         $objCode = $this->objCodeControl;
         $objInput = $this->objInputControl;
 		$blnValid = 0;
-		$strError = "";
 		
         if (!$objCode || !$objInput)
             return true;
-  //This gets hit a couple of more times on Submit due to other validation processes          
+
 		//Will be removed in 2.3, customers should migrate and get account
     	if (_xls_get_conf('CAPTCHA_STYLE' , '0')=='1') {
         	require_once(SECIMG_DIR . '/securimage.php');
        		$objSecurimage = new Securimage();
 			if ($objSecurimage->getCode() == $objInput->Text)
 				$blnValid=1;
-			else $strError = "Invalid Entry, try again";
+			$objInput->Text = "";
 		}
 		else
 		{
@@ -134,23 +145,20 @@ class XLSCaptchaControl extends XLSCompositeControl {
 
 			require_once(__INCLUDES__."/recaptcha/recaptchalib.php");
 			$privatekey = _xls_get_conf('RECAPTCHA_PRIVATE_KEY' , '');
-			if (!isset($this->objCaptchaResponse) && 
-				isset($_POST["recaptcha_response_field"]) && 
-				strlen($_POST["recaptcha_response_field"])>0)
-	  			$this->objCaptchaResponse = recaptcha_check_answer ($privatekey,
-	                $_SERVER["REMOTE_ADDR"],
-	                $_POST["recaptcha_challenge_field"],
-	                $_POST["recaptcha_response_field"]);
-	
-			$blnValid = $this->objCaptchaResponse->is_valid; error_log("blnvalid is ".$blnValid);
-			$strError = $this->objCaptchaResponse->error;
-			//$objCode->Refresh();
+
+  			$this->objCaptchaResponse = recaptcha_check_answer ($privatekey,
+                $_SERVER["REMOTE_ADDR"],
+                $_POST["recaptcha_challenge_field"],
+                $_POST["recaptcha_response_field"]);
+	                	
+			$blnValid = $this->objCaptchaResponse->is_valid;
+			$this->strError = $this->objCaptchaResponse->error;
 		}
 		
-		if (!$blnValid) { error_log("validation failed");
-			$objInput->ValidationError = $strError;
+		if (!$blnValid) { 
+			$objInput->ValidationError = "Invalid Entry, try again";
 			return false;
-		} else { error_log("validation passed");
+		} else { 
         	$objInput->ValidationReset();
         	$this->ValidationReset(false);
         	return true;
@@ -176,9 +184,12 @@ class XLSCaptchaControl extends XLSCompositeControl {
         switch ($strName) {
             case 'CodeControl': return $this->objCodeControl;
             case 'InputControl': return $this->objInputControl;
+            case 'Error': return $this->strError;
             default: return parent::__get($strName);
         }
     }
+
+
 }
 
 /* vim: set ft=php ts=4 sw=4 tw=0 et: */

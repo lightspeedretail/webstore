@@ -224,7 +224,7 @@ class Cart extends CartGen {
             $this->Save();
         }
         catch (Exception $objExc) {
-            QApplicaiton::Log(E_USER_ERROR, 'checkout', 
+            QApplication::Log(E_USER_ERROR, 'checkout', 
                 'Failed to save cart with : ' . $objExc);
         }
 

@@ -24,6 +24,7 @@
  
  */
 
+
 /**
  * Open a file for writing
  *
@@ -1345,4 +1346,17 @@ function _xls_escape($strText) {
 			array('\\\\', '\\0', '\\n', '\\r', "\\'", '\\"', '\\Z'),
 			$strText);
 	return $strText;
+}
+
+/**
+ * Function for displaying what called function, useful for debugging
+ */
+function _xls_whereCalled( $level = 1 ) {
+    $trace = debug_backtrace();
+    $file   = $trace[$level]['file'];
+    $line   = $trace[$level]['line'];
+    $object = $trace[$level]['object'];
+    if (is_object($object)) { $object = get_class($object); }
+
+    return "Where called: line $line of $object \n(in $file)";
 }
