@@ -307,8 +307,11 @@ class xlsws_db_maintenance extends xlsws_index {
 				'CAPTCHA_REGISTRATION', '1', '', 18, 6, NOW(), NOW(), 'CAPTCHA_REGISTRATION');");
 
 
-
-			
+			//Email option
+			$this->add_config_key('EMAIL_SMTP_AUTH_PLAIN' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Force AUTH PLAIN Authentication', 
+				'EMAIL_SMTP_AUTH_PLAIN', '0', 'Force plain text password in rare circumstances', 5, 9, NOW(), NOW(), 'BOOL');");
+	
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
 			$config->Value="220";
