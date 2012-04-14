@@ -5,7 +5,7 @@ class XLSCaptchaControl extends XLSCompositeControl {
          'Input','Code'
     );
 
-    protected $strLabelForInput = 'Enter the text from above.';
+    protected $strLabelForInput = 'Enter the text from the above image.';
     protected $strLabelForValidationError = 'Wrong Verification Code.';
 
     // Objects
@@ -49,7 +49,7 @@ class XLSCaptchaControl extends XLSCompositeControl {
 	                __CAPTCHA_ASSETS__ .
 	                '/images/audio_icon.gif"/>' .
 	        '</a></div>';
-			return "$strImage $strRefresh $strAudio";
+			return "$strImage $strRefresh $strAudio<br>".$this->strLabelForInput;
 		}
 		
 		require_once(__INCLUDES__."/recaptcha/recaptchalib.php");
@@ -118,11 +118,7 @@ class XLSCaptchaControl extends XLSCompositeControl {
 		return true;
 	}
 	
-
     public function Validate_Captcha() {  
-
-    	if (_xls_get_conf('CAPTCHA_CHECKOUT' , '1')==0) return true;
-
 
         $objCode = $this->objCodeControl;
         $objInput = $this->objInputControl;

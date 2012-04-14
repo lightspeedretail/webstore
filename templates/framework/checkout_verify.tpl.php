@@ -31,6 +31,7 @@
 	<fieldset style="display: block; float: left;">
 		<legend><?php _xt('Submit your order') ?></legend>
 
+<?	if (_xls_get_conf('CAPTCHA_CHECKOUT' , '0')=='2' || (!$this->isLoggedIn() && _xls_get_conf('CAPTCHA_CHECKOUT' , '0')=='1')) { ?>
 		<div class="block margin">
 			<dl>
 				<dt><label for="Name"><?php $this->lblVerifyImage->Render(); ?></label></dt>
@@ -39,10 +40,10 @@
 
 		<div class="block margin">
 			<dl class="left">
-				<dt><label for="Verify"><?php _xt("Enter the text from the above image"); ?></label></dt>
 				<dd><?php $this->txtCRVerify->RenderWithError(); ?></dd>
 			</dl>
 		</div>
+<? } ?>
 
 		<div class="block margin">
 			<dl>

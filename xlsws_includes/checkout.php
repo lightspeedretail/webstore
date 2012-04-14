@@ -548,7 +548,13 @@ class xlsws_checkout extends xlsws_index {
 		else
         { 
         	//We only want to check Captcha after everything else has passed, to avoid multiple checks
-    		if ($this->CaptchaControl->Validate_Captcha())
+        	$blnCaptchaValid=1;
+        	if (_xls_get_conf('CAPTCHA_CHECKOUT' , '0')=='2' || 
+        		(!$this->isLoggedIn() && _xls_get_conf('CAPTCHA_CHECKOUT' , '0')=='1')
+        	)
+        		$blnCaptchaValid = $this->CaptchaControl->Validate_Captcha();
+        		
+    		if ($blnCaptchaValid)
     			{
 		    	$blnReturn = $this->CompleteCheckout();
 		    	if (!$blnReturn)
@@ -1188,11 +1194,11 @@ class xlsws_checkout extends xlsws_index {
             case 'pnlVerify':
                 return $this->VerifyControl;
 
-            case 'lblVerifyImage':
-                return $this->CaptchaControl->Code;
+            case 'lblVerifyImage': 
+                	return $this->CaptchaControl->Code;
 
             case 'txtCRVerify':
-                return $this->CaptchaControl->Input;
+                	return $this->CaptchaControl->Input;
 
             case 'txtNotes':
                 return $this->CommentControl;
