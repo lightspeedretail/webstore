@@ -1017,7 +1017,7 @@
 			if (property_exists($objSoapObject, 'ProductTag'))
 				$objToReturn->strProductTag = $objSoapObject->ProductTag;
 			if (property_exists($objSoapObject, 'TabPosition'))
-				$objToReturn->intTabPosition = $objSoapObject->tabPosition;
+				$objToReturn->intTabPosition = $objSoapObject->TabPosition;
 			if (property_exists($objSoapObject, '__blnRestored'))
 				$objToReturn->__blnRestored = $objSoapObject->__blnRestored;
 			return $objToReturn;
