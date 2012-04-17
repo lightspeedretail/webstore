@@ -2,7 +2,7 @@
 
 class XLSCustomerInfoControl extends XLSCustomerComposite {
     protected $arrRegisteredChildren = array(
-        'FirstName', 'LastName', 'Company', 'Phone', 'Email'
+        'FirstName', 'LastName', 'Company', 'Phone', 'Email','EmailConfirm'
     );
 
     protected function BuildFirstNameControl() {
@@ -97,11 +97,34 @@ class XLSCustomerInfoControl extends XLSCustomerComposite {
 
         return $objControl;
     }
-
+    
     protected function UpdateEmailControl() {
     }
 
     protected function BindEmailControl() {
     }
-}
+
+
+    protected function BuildEmailConfirmControl() {
+        $objControl =
+            new XLSTextControl($this, $this->GetChildName('EmailConfirm'));
+        $objControl->Name = _sp('EmailConfirm');
+        $objControl->Required = true;
+        $objControl->RenderMethod = 'RenderAsDefinition';
+        $objControl->SetCustomAttribute('maxlength', 255);
+
+        $this->UpdateEmailConfirmControl();
+        $this->BindEmailConfirmControl();
+
+        return $objControl;
+    }
+    
+    protected function UpdateEmailConfirmControl() {
+    }
+
+    protected function BindEmailConfirmControl() {
+    }
+
+
+   }
 

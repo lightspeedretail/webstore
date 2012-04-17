@@ -31,7 +31,6 @@ class XLSCustomerControl extends XLSCompositeControl {
         $objControl =
             new BillingContactControl($this, $this->GetChildName('Billing'));
 
-        $this->UpdateBillingControl();
         $this->BindBillingControl();
 
         $objControl->Info->Template = 
@@ -47,13 +46,10 @@ class XLSCustomerControl extends XLSCompositeControl {
     }
 
     protected function UpdateBillingControl() {
+ 
         $objControl = $this->GetChildByName('Billing');
         if (!$objControl)
             return;
-
-        $objControl->UpdateFieldsFromCart();
-        $objControl->UpdateFieldsFromCustomer();
-        $objControl->SaveFieldsToCart();
 
         return $objControl;
     }
@@ -79,7 +75,6 @@ class XLSCustomerControl extends XLSCompositeControl {
         $objControl =
             new ShippingContactControl($this, $this->GetChildName('Shipping'));
 
-        $this->UpdateShippingControl();
         $this->BindShippingControl();
 
         // TODO :: This is bad
@@ -93,10 +88,6 @@ class XLSCustomerControl extends XLSCompositeControl {
         $objControl = $this->GetChildByName('Shipping');
         if (!$objControl)
             return;
-
-        $objControl->UpdateFieldsFromCart();
-        $objControl->UpdateFieldsFromCustomer();
-        $objControl->SaveFieldsToCart();
 
         return $objControl;
     }

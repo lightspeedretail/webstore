@@ -14,6 +14,7 @@ class XLSBillingContactControl extends XLSCustomerContactControl {
                 'LastName' => $objCustomer->Lastname,
                 'Company' => $objCustomer->Company,
                 'Email' => $objCustomer->Email,
+                'EmailConfirm' => $objCustomer->Email,
                 'Phone' => $objCustomer->Mainphone
             );
 
@@ -90,6 +91,7 @@ class XLSBillingContactControl extends XLSCustomerContactControl {
                 'LastName' => $objCart->Lastname,
                 'Company' => $objCart->Company,
                 'Email' => $objCart->Email,
+                'EmailConfirm' => $objCart->Email,
                 'Phone' => $objCart->Phone
             );
 

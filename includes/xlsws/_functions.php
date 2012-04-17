@@ -559,6 +559,8 @@ function _xls_mail_body_from_template($templatefile, $vars) {
  *
  * @return string
  */
+  //ToDo: Delete these after migrating captcha to other files
+
 function _xls_verify_img() {
 	if (Customer::GetCurrent()) {
 		// TODO :: Disable captcha after login

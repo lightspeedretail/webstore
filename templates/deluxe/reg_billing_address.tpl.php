@@ -68,11 +68,11 @@
 	
 	<dd><?php $this->txtCRBillZip->RenderWithError() ?></dd>
 	</dl>
-	</div>
-	
-	<?php if(isset($this->chkSame) && ($this->chkSame->Visible)): ?>
+	</div>	
+
 	<dl>
 	<dd style="margin-top: 20px;"><?php $this->chkSame->Render() ?></dd>
 	</dl>
-	</fieldset>
-	<?php endif; ?>
+	
+
+</fieldset>

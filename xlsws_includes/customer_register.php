@@ -31,7 +31,41 @@
  * and assigning template variables to the views related to the register page
  */
 class xlsws_cregister extends xlsws_index {
-	/*see xlsws_index for shared widgets*/
+
+  	// NEW
+    protected $CustomerControl;
+
+    protected $BillingContactControl;
+    protected $ShippingContactControl;
+    protected $CalculateShippingControl;
+
+    protected $PasswordControlWrapper;
+    protected $PasswordControl;
+
+    protected $PreviousAddressControl;
+
+    protected $LoginRegisterControl;
+    protected $LoginControl;
+    protected $RegisterControl;
+
+    protected $ShippingControl;
+    protected $PaymentControl;
+    protected $PromoControl;
+
+    protected $CartControl;
+
+    protected $VerifyControl;
+    protected $CaptchaControl;
+    protected $CommentControl;
+    protected $TermsControl;
+
+    protected $SubmitControl;
+
+    protected $LoadActionProxy;
+
+  	protected $errSpan; //the span that generates or shows the error
+  	
+	/*
 	protected $txtCRConfEmail; //input text box confirm email address
 	protected $txtCRPass; //input password box for password
 	protected $txtCRConfPass; //input password box for confirm password
@@ -56,342 +90,179 @@ class xlsws_cregister extends xlsws_index {
 	protected $btnSave; //the actual save or submit button
 	protected $chkSame; //input checkbox for shipping address is the same as billing
 	protected $chkAdditionalContact; //checkbox for additional contact (unused)
-	protected $errSpan; //the span that generates or shows the error
+	
 	protected $lblVerifyImage; //the verify image label that shows the captcha image
 
 	protected $languages; //list of languages to choose from
 	protected $currencies; //list of currencies to choose from (unused)
 	protected $phone_types; //list of phone types to choose fromn
-
+*/
 	public $customer; //the customer object if any
+	
+	
+	protected function BuildCustomerControl() {
+        $this->CustomerControl = $objControl = 
+            new XLSRegisterCustomerControl($this, 'CustomerContact'); 
+        $this->BillingContactControl = 
+            $this->CustomerControl->Billing;
+        $this->ShippingContactControl = 
+            $this->CustomerControl->Shipping;
 
-	/**
-	 * build_widgets - builds the widgets needed for the template
-	 * @param none
-	 * @return none
-	 */
-	protected function build_widgets() {
-		//billing details
-		$this->build_fname_widget($this, 'firstname');
-		$this->build_lname_widget($this, 'lastname');
-		$this->build_company_widget($this , 'company');
-		$this->build_phone_widget($this , 'mphone');
-		$this->build_phone_types_widget();
+        return $objControl;
+    }
+    
 
-		$this->build_add1_widget($this->pnlBillingAdde , 'billstreet1');
-		$this->build_add2_widget($this->pnlBillingAdde , 'billstreet2');
-		$this->build_country_widget($this->pnlBillingAdde , 'billcountry');
-		$this->build_state_widget($this->pnlBillingAdde , 'billstate');
-		$this->build_city_widget($this->pnlBillingAdde , 'billcity');
-		$this->build_zip_widget($this->pnlBillingAdde , 'billzip');
-		$this->build_shipsame_widget();
+    protected function UpdateCustomerControl() {
+        $objControl = $this->CustomerControl;
 
-		//shipping details
-		$this->build_add1_widget($this->pnlShippingAdde , 'shipstreet1');
-		$this->build_add2_widget($this->pnlShippingAdde , 'shipstreet2');
-		$this->build_country_widget($this->pnlShippingAdde , 'shipcountry');
-		$this->build_state_widget($this->pnlShippingAdde , 'shipstate');
-		$this->build_city_widget($this->pnlShippingAdde , 'shipcity');
-		$this->build_zip_widget($this->pnlShippingAdde , 'shipzip');
 
-		$this->build_email_widget($this);
-		$this->build_email_confirm_widget();
-		$this->build_password_widget();
-		$this->build_password_confirm_widget();
-		$this->build_newsletter_widget();
-		$this->build_htmlemail_widget();
+        return $objControl;
+    }
 
-		$this->build_captcha_widget($this);
-	}
+    protected function BindCustomerControl() {
+        return $this->CustomerControl;
+    }
 
-	/**
-	 * checkLoginShippingFields - checks and populates shipping address fields for if a client
-	 * has an already entered shipping address
-	 * @param none
-	 * @return none
-	 */
-	private function checkLoginShippingFields() {
-		//Address1
-		if($this->customer)
-			$this->txtCRShipAddr1->Text=$this->customer->Address21;
+    protected function BuildPasswordControlWrapper() {
+        $objControl = $this->PasswordControlWrapper = 
+            new QPanel($this, 'Password');
+        $objControl->Name = 'Set your password';
+        $objControl->Template = templateNamed('customer_register_password.tpl.php');
+                    
+    }
 
-		//Address2
-		if($this->customer)
-			$this->txtCRShipAddr2->Text=$this->customer->Address22;
+    protected function UpdatePasswordControlWrapper() {
+        return $this->PasswordControlWrapper;
+    }
 
-		//Country
-		if($this->customer)
-			$this->txtCRShipCountry->SelectedValue=$this->customer->Country2;
+    protected function BindPasswordControlWrapper() {
+        return $this->PasswordControlWrapper;
+    }
+    
+    protected function BuildPasswordControl() {
+        $objParent = $this->PasswordControlWrapper;
+        if (!$objParent) 
+          $objParent = $this;
+
+        $objControl = $this->PasswordControl = 
+            new XLSPasswordControl($objParent, 'CreatePassword');
+
+        return $objControl;
+            
+    }
+
+    protected function UpdatePasswordControl() {
+        return $this->PasswordControl;
+    }
+
+    protected function BindPasswordControl() {
+        return $this->PasswordControl;
+    }
+    
+
+    protected function BuildVerifyControl() {
+        $objControl = $this->VerifyControl = 
+            new QPanel($this, 'Verify');
+        $objControl->Name = 'Submit your order';
+        $objControl->Template = templateNamed('customer_register_verify.tpl.php');
+    }
+
+    protected function UpdateVerifyControl() {
+        return $this->VerifyControl;
+    }
+
+    protected function BindVerifyControl() {
+        return $this->VerifyControl;
+    }
+
+    protected function BuildCaptchaControl() {
+        $objParent = $this->VerifyControl;
+        if (!$objParent) 
+          $objParent = $this;
+
+        $objControl = $this->CaptchaControl = 
+            new XLSCaptchaControl($objParent, 'Captcha');
+
+        return $objControl;
+    }
+
+    protected function UpdateCaptchaControl() {
+        return $this->CaptchaControl;
+    }
+    
+    protected function BindCaptchaControl() {
+        return $this->CaptchaControl;
+    }
+
+	protected function BuildSubmitControl() {
+        $objControl = $this->SubmitControl = 
+            new QButton($this, 'Submit');
+        $objControl->Text = _sp('Submit');
+        $objControl->CausesValidation = true;
+        $objControl->PrimaryButton = true;
+        $objControl->Required = true;
+              
+        return $objControl;
+    }
+
+    protected function UpdateSubmitControl() {
+        return $this->SubmitControl;
+    }
+
+    protected function BindSubmitControl() {
+        $objControl = $this->SubmitControl;
+
+        if (!$objControl)
+            return;
+            
+            
+        $objControl->AddActionArray(
+            new QClickEvent(),
+            array(
+            	new QToggleEnableAction($objControl, false),
+            	new QAjaxAction('ToggleCheckoutControls',false),
+                new QServerAction('DoSubmitControlClick')
+            )
+        );
+	
+        return $objControl;
+    }
+
+	public function DoSubmitControlClick($strFormId, $strControlId, $strParam) {
+
+        
+        	//We only want to check Captcha after everything else has passed, to avoid multiple checks
+        	$blnCaptchaValid=1;
+        	if (_xls_get_conf('CAPTCHA_CHECKOUT' , '0')=='2' || 
+        		(!$this->isLoggedIn() && _xls_get_conf('CAPTCHA_CHECKOUT' , '0')=='1')
+        	)
+        		$blnCaptchaValid = $this->CaptchaControl->Validate_Captcha();
+        		
+    		if ($blnCaptchaValid)
+    			$this->CompleteRegistration();
+		    else
+		    	$this->errSpan->Text = "Captcha Validation Error";
+
+        }
+	
+	
+	
+	private function CompleteRegistration() {
+		if($this->isLoggedIn())
+			{ error_log("a"); $objCustomer = Customer::LoadByRowId($this->customer->Rowid);}
 		else
-			$this->txtCRShipCountry->SelectedValue=_xls_get_conf('DEFAULT_COUNTRY');
-
-		if($this->customer) {
-			$this->txtCRShipState->SelectedValue=$this->customer->State2;
-		}
-
-		//City
-		if($this->customer)
-			$this->txtCRShipCity->Text=$this->customer->City2;
-
-		// Postal/Zip Code
-		if($this->customer)
-			$this->txtCRShipZip->Text=$this->customer->Zip2;
-	}
-
-	/**
-	 * build_email_confirm_widget - builds the confirm email input type textbox on customer register
-	 * @param none
-	 * @return none
-	 */
-	protected function build_email_confirm_widget() {
-		$this->txtCRConfEmail = new XLSTextBox($this , 'emailconf');
-
-		if($this->customer)
-			$this->txtCRConfEmail->Text=$this->customer->Email;
-
-		$this->txtCRConfEmail->Required =  $this->txtCRConfEmail->ValidateTrimmed =  true;
-	}
-
-	/**
-	 * build_password_widget - builds the password input type on customer register
-	 * @param none
-	 * @return none
-	 */
-	protected function build_password_widget() {
-		$this->txtCRPass = new XLSTextBox($this , 'password');
-		$this->txtCRPass->TextMode =QTextMode::Password;
-		$this->txtCRPass->Required = true;
-		$this->txtCRPass->ValidateTrimmed = true;
-		$this->txtCRPass->MinLength = _xls_get_conf('MIN_PASSWORD_LEN' , 6);
-	}
-
-	/**
-	 * build_captcha_widget - builds the captcha code with the input textbox to enter this code
-	 * @param Qpanel - the Qpanel these widgets should be laid out in
-	 * @return none
-	 */
-	protected function build_captcha_widget($qpanel) {
-		$this->lblVerifyImage = new QPanel($qpanel);
-		$this->lblVerifyImage->CssClass='customer_reg_draw_verify';
-		$this->lblVerifyImage->Text=_xls_verify_img();
-
-		// verify code
-		$this->txtCRVerify = new XLSTextBox($this);
-		$this->txtCRVerify->SetCustomAttribute("autocomplete" , "off");
-	}
-
-	/**
-	 * build_password_confirm_widget - builds the confirm password input type password on customer register
-	 * @param none
-	 * @return none
-	 */
-	protected function build_password_confirm_widget() {
-		$this->txtCRConfPass = new XLSTextBox($this , 'passwordconf');
-		$this->txtCRConfPass->TextMode =QTextMode::Password;
-
-		if($this->customer) {
-			$this->txtCRPass->Required = $this->txtCRConfPass->Required = false;
-			$this->txtCRPass->MinLength = null;
-		}
-	}
-
-	/**
-	 * build_phone_types_widget - builds the phone types listbox
-	 * @param none
-	 * @return none
-	 */
-	protected function build_phone_types_widget() {
-		$this->txtCRMPhoneType = new XLSListBox($this , 'mphonetype');
-		$this->txtCRMPhoneType->AddItem('mobile', 'mobile');
-		$this->txtCRMPhoneType->AddItem('work', 'work');
-		$this->txtCRMPhoneType->AddItem('home', 'home');
-
-		if($this->customer)
-			$this->txtCRMPhoneType->SelectedValue=$this->customer->Mainephonetype;
-	}
-
-	/**
-	 * build_newsletter_widget - builds the tickbox to choose to news letters
-	 * @param none
-	 * @return none`
-	 */
-	protected function build_newsletter_widget() {
-		$this->chkNewsletter = new QCheckBox($this, 'newsletter');
-		$this->chkNewsletter->Checked = true;
-	}
-
-	/**
-	 * build_htmlemail_widget - builds the tickbox to choose to receive html formatted emails
-	 * @param none
-	 * @return none
-	 */
-	protected function build_htmlemail_widget() {
-		$this->chkHtmlEmail = new QCheckBox($this, 'htmlmail');
-
-		if($this->customer)
-			$this->chkHtmlEmail->Checked = $this->customer->HtmlEmail;
-
-		else
-			$this->chkHtmlEmail->Checked = _xls_get_conf('HTML_EMAIL' , 1);
-	}
-
-	/**
-	 * bind_widgets - binds callback actions for the widgets
-	 * @param none
-	 * @return none
-	 */
-	protected function bind_widgets() {
-		$this->txtCRBillAddr1->AddAction(new QChangeEvent(), new QAjaxAction('txtBillAddr1_Change'));
-		$this->txtCRBillAddr2->AddAction(new QChangeEvent(), new QAjaxAction('txtBillAddr2_Change'));
-		$this->txtCRBillState->AddAction(new QChangeEvent(), new QAjaxAction('txtBillState_Change'));
-		$this->txtCRBillCity->AddAction(new QChangeEvent(), new QAjaxAction('txtBillCity_Change'));
-		$this->txtCRBillZip->AddAction(new QChangeEvent(), new QAjaxAction('txtBillZip_Change'));
-		$this->txtCRBillCountry->AddAction(new QChangeEvent(), new QAjaxAction('txtBillCountry_Change'));
-		$this->btnSave->AddAction(new QClickEvent(), new QServerAction('btnSave_Click'));
-		$this->txtCRShipCountry->AddAction(new QChangeEvent() , new QAjaxAction('shipCountry_Change'));
-	}
-
-	/**
-	 * build_main - constructor for this controller
-	 * @param none
-	 * @return none
-	 */
-	protected function build_main() {
-		$customer = Customer::GetCurrent();
-
-		if(!$customer)
-			$this->customer = null; //for first time insertion
-		else
-			$this->customer = $customer;
-
-		$this->mainPnl = new QPanel($this);
-		$this->mainPnl->Template = templateNamed('customer_register.tpl.php');
-
-		// Wait icon
-		$this->objDefaultWaitIcon = new QWaitIcon($this);
-
-		if(!$this->customer)
-			$this->crumbs[] = array('key'=>'xlspg=customer_register' , 'case'=> '' , 'name'=> _sp('Register'));
-		else{
-			$this->crumbs[] = array('key'=>'xlspg=myaccount' , 'case'=> '' , 'name'=> _sp('My Account'));
-			$this->crumbs[] = array('key'=>'xlspg=customer_register' , 'case'=> '' , 'name'=> _sp('Edit Account Details'));
-		}
-
-		// Define the layout
-
-		//error msg
-		$this->errSpan = new QPanel($this);
-		$this->errSpan->CssClass='customer_reg_err_msg';
-
-		//************ Billing panel
-		$this->pnlBillingAdde = new QPanel($this);
-		$this->pnlBillingAdde->CssClass = "c1";
-		$this->pnlBillingAdde->Template = templateNamed('reg_billing_address.tpl.php');
-
-		//************ Shipping panel
-		$this->pnlShippingAdde = new QPanel($this);
-		$this->pnlShippingAdde->CssClass = "c2";
-		$this->pnlShippingAdde->Template = templateNamed('reg_shipping_address.tpl.php');
-
-		$this->build_widgets();
-
-		//save button, not intended to be extended or overloaded
-		$this->btnSave = new QButton($this);
-		$this->btnSave->Text = _sp('Submit');
-		$this->btnSave->CausesValidation = true;
-		$this->btnSave->PrimaryButton = true;
-
-		$this->bind_widgets();
-		$this->checkLoginShippingFields();
-
-		$this->shipping_elements(true);
-
-		Visitor::add_view_log('', ViewLogType::registration);
-	}
-
-	/**
-	 * shipCountry_Change - Event that fetches the cost of shipping and populates appropriate states for the shipping
-	 * country based on country chosen
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	public function shipCountry_Change($strFormId, $strControlId, $strParameter) {
-		$country_code = $this->txtCRShipCountry->SelectedValue;
-
-		if ($country_code) {
-			$states = State::LoadArrayByCountryCode($country_code , QQ::Clause(QQ::OrderBy(QQN::State()->SortOrder , QQN::State()->State)));
-
-			$this->txtCRShipState->RemoveAllItems();
-			foreach($states as $state) {
-				$this->txtCRShipState->AddItem($state->State, $state->Code);
-			}
-
-			if($this->chkSame->Checked) {
-				$this->txtCRBillCountry->SelectedValue=$this->txtCRShipCountry->SelectedValue;
-
-				$country_code = $this->txtCRShipCountry->SelectedValue;
-
-				if ($country_code) {
-					$states = State::LoadArrayByCountryCode($country_code , QQ::Clause(QQ::OrderBy(QQN::State()->SortOrder , QQN::State()->State)));
-
-					$this->txtCRBillState->RemoveAllItems();
-
-					foreach($states as $state) {
-						$this->txtCRBillState->AddItem($state->State, $state->Code);
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * txtBillCountry_Change - Event that fetches the cost of shipping and populates appropriate states for the billing
-	 * country based on country chosen
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	public function txtBillCountry_Change($strFormId, $strControlId, $strParameter) {
-		$country_code = $this->txtCRBillCountry->SelectedValue;
-
-		if ($country_code) {
-			$states = State::LoadArrayByCountryCode($country_code , QQ::Clause(QQ::OrderBy(QQN::State()->SortOrder , QQN::State()->State)));
-
-			$this->txtCRBillState->RemoveAllItems();
-
-			foreach($states as $state) {
-				$this->txtCRBillState->AddItem($state->State, $state->Code);
-			}
-
-			if(count($states) > 0)
-				$this->txtCRBillState->focus();
-		}
-
-		if($this->chkSame->Checked) {
-			$this->txtCRShipCountry->SelectedValue = $country_code;
-			$this->shipCountry_Change($strFormId, $strControlId, $strParameter);
-		}
-	}
-
-	/**
-	 * btnSave_Click - Function that fires when you click the submit button
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	public function btnSave_Click($strFormId, $strControlId, $strParameter) {
-		if($this->customer)
-			$objCustomer = Customer::LoadByRowId($this->customer->Rowid);
-		else
-			$objCustomer = new Customer();
-
-		$objCustomer->Email= strtolower(trim($this->txtCREmail->Text));
-		$objCustomer->Password = md5(trim($this->txtCRPass->Text));
-		$objCustomer->Firstname = trim($this->txtCRFName->Text);
+			{ error_log("2"); $objCustomer = new Customer();}
+error_log("c");
+		$objCustomer->Email= strtolower(trim($this->BillingContactControl->Email));error_log("1");
+		$objCustomer->Password = md5(trim($this->PasswordControl->Password1->Text));error_log("2");
+		$objCustomer->Firstname = trim($this->txtCRFName->Text);error_log("3");
 		$objCustomer->Lastname = trim($this->txtCRLName->Text);
 		$objCustomer->Mainname = (($this->customer) && ($this->customer->Mainname != '')) ? $this->customer->Mainname : (trim($this->txtCRFName->Text) . " " . trim($this->txtCRLName->Text));
 		$objCustomer->Company = trim($this->txtCRCompany->Text);
-		$objCustomer->Homepage = trim($this->txtCRHomePage->Text);
+		/*$objCustomer->Homepage = trim($this->txtCRHomePage->Text);
 		$objCustomer->Mainephonetype = trim($this->txtCRMPhoneType->SelectedValue);
 		$objCustomer->Mainphone = trim($this->txtCRMPhone->Text);
+		
 		$objCustomer->Phonetype1 = trim($this->txtCRPhoneType1->SelectedValue);
 		$objCustomer->Phone1 = trim($this->txtCRPhone1->Text);
 		$objCustomer->Phonetype2 = trim($this->txtCRPhoneType2->SelectedValue);
@@ -400,7 +271,7 @@ class xlsws_cregister extends xlsws_index {
 		$objCustomer->Phone3 = trim($this->txtCRPhone3->Text);
 		$objCustomer->Phonetype4 = trim($this->txtCRPhoneType4->SelectedValue);
 		$objCustomer->Phone4 = trim($this->txtCRPhone4->Text);
-
+		*/
 		$objCustomer->Address11 = trim($this->txtCRBillAddr1->Text);
 		$objCustomer->Address12 = trim($this->txtCRBillAddr2->Text);
 		$objCustomer->Country1 = trim($this->txtCRBillCountry->SelectedValue);
@@ -415,8 +286,8 @@ class xlsws_cregister extends xlsws_index {
 		$objCustomer->City2 = trim($this->txtCRShipCity->Text);
 		$objCustomer->Zip2 = trim($this->txtCRShipZip->Text);
 
-		$objCustomer->NewsletterSubscribe = $this->chkNewsletter->Checked;
-		$objCustomer->HtmlEmail = $this->chkHtmlEmail->Checked;
+		$objCustomer->NewsletterSubscribe = 1;
+		$objCustomer->HtmlEmail = 1;
 
 		//Moderate login
 		if(!$objCustomer->AllowLogin && _xls_get_conf('MODERATE_REGISTRATION', 0))
@@ -453,132 +324,149 @@ class xlsws_cregister extends xlsws_index {
 			else
 				_rd('index.php?xlspg=myaccount');
 		}
+		
+		
 	}
 
-	/*DEPRECIATED*/
-	public function chkAddiContact_Click($strFormId, $strControlId, $strParameter) {
-		if($this->chkAdditionalContact->Checked) {
-			QApplication::ExecuteJavaScript("document.getElementById('customer_reg_addi_contact').style.display='block';", true);
-		} else {
-			QApplication::ExecuteJavaScript("document.getElementById('customer_reg_addi_contact').style.display='none';", true);
-		}
+
+	protected function ToggleCheckoutControls($blnVisibility = false) {
+   		$this->pnlLoginRegister->Visible = $blnVisibility;
+		        
+        $this->CustomerControl->Visible = $blnVisibility;
+        $this->ShippingControl->Visible = $blnVisibility;
+        $this->VerifyControl->Visible = $blnVisibility;
+    }
+    
+
+	/**
+	 * build_phone_types_widget - builds the phone types listbox
+	 * @param none
+	 * @return none
+	 */
+	protected function build_phone_types_widget() {
+		$this->txtCRMPhoneType = new XLSListBox($this , 'mphonetype');
+		$this->txtCRMPhoneType->AddItem('mobile', 'mobile');
+		$this->txtCRMPhoneType->AddItem('work', 'work');
+		$this->txtCRMPhoneType->AddItem('home', 'home');
+
+		if($this->customer)
+			$this->txtCRMPhoneType->SelectedValue=$this->customer->Mainephonetype;
 	}
 
 	/**
-	 * shipping_elements - Enable or disable shipping address fields on the checkout form dynamically
-	 * @param boolean true or false to enable or disable an element
-	 * @return none
+	 * build_newsletter_widget - builds the tickbox to choose to news letters
+	 * @param none
+	 * @return none`
 	 */
-	protected function shipping_elements($enable) {
-		$this->txtCRShipAddr1->Enabled = $enable;
-		$this->txtCRShipAddr2->Enabled = $enable;
-		$this->txtCRShipCountry->Enabled = $enable;
-		$this->txtCRShipState->Enabled = $enable;
-		$this->txtCRShipCity->Enabled = $enable;
-		$this->txtCRShipZip->Enabled = $enable;
-	}
-
-
-	/**
-	 * chkSame_Click - Event handler for when someone checks shipping address is the same as billing address
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	public function chkSame_Click($strFormId, $strControlId, $strParameter) {
-		if($this->chkSame->Checked) {
-			$this->pnlShippingAdde->Opacity = 50;
-
-			$this->txtCRShipAddr1->Text = $this->txtCRBillAddr1->Text;
-			$this->txtCRShipAddr2->Text = $this->txtCRBillAddr2->Text;
-			$this->txtCRShipCountry->SelectedValue = $this->txtCRBillCountry->SelectedValue;
-
-			$country_code = $this->txtCRBillCountry->SelectedValue;
-
-			if ($country_code) {
-				$states = State::LoadArrayByCountryCode($country_code, QQ::Clause(QQ::OrderBy(QQN::State()->SortOrder, QQN::State()->State)));
-
-				$this->txtCRShipState->RemoveAllItems();
-				foreach($states as $state) {
-					$this->txtCRShipState->AddItem($state->State, $state->Code);
-				}
-			}
-
-			$this->txtCRShipState->SelectedValue = $this->txtCRBillState->SelectedValue;
-			$this->txtCRShipCity->Text = $this->txtCRBillCity->Text;
-			$this->txtCRShipZip->Text = $this->txtCRBillZip->Text;
-			$this->shipping_elements(false);
-		} else {
-			$this->shipping_elements(true);
-			$this->pnlShippingAdde->Opacity = 100;
-		}
+	protected function build_newsletter_widget() {
+		$this->chkNewsletter = new QCheckBox($this, 'newsletter');
+		$this->chkNewsletter->Checked = true;
 	}
 
 	/**
-	 * txtBillAddr1_Change - Event that fires when billing address 1 changes
-	 * country based on country chosen
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
+	 * build_htmlemail_widget - builds the tickbox to choose to receive html formatted emails
+	 * @param none
 	 * @return none
 	 */
-	public function txtBillAddr1_Change($strFormId, $strControlId, $strParameter) {
-		if($this->chkSame->Checked) {
-			$this->txtCRShipAddr1->Text=$this->txtCRBillAddr1->Text;
-		}
+	protected function build_htmlemail_widget() {
+		$this->chkHtmlEmail = new QCheckBox($this, 'htmlmail');
+
+		if($this->customer)
+			$this->chkHtmlEmail->Checked = $this->customer->HtmlEmail;
+		else
+			$this->chkHtmlEmail->Checked = _xls_get_conf('HTML_EMAIL' , 1);
 	}
 
 	/**
-	 * txtBillAddr2_Change - Event that fires when billing address 2 changes
-	 * country based on country chosen
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
+	 * build_main - constructor for this controller
+	 * @param none
 	 * @return none
 	 */
-	public function txtBillAddr2_Change($strFormId, $strControlId, $strParameter) {
-		if($this->chkSame->Checked) {
-			$this->txtCRShipAddr2->Text=$this->txtCRBillAddr2->Text;
+	protected function build_main() {
+		$customer = Customer::GetCurrent();
+
+		if(!$customer)
+			$this->customer = null; //for first time insertion
+		else
+			$this->customer = $customer;
+
+		$this->mainPnl = new QPanel($this);
+		$this->mainPnl->Template = templateNamed('customer_register.tpl.php');
+
+		// Wait icon
+		$this->objDefaultWaitIcon = new QWaitIcon($this);
+
+		if($this->isLoggedIn()) {
+			$this->crumbs[] = array('key'=>'xlspg=myaccount' , 'case'=> '' , 'name'=> _sp('My Account'));
+			$this->crumbs[] = array('key'=>'xlspg=customer_register' , 'case'=> '' , 'name'=> _sp('Edit Account Details'));
 		}
+		else $this->crumbs[] = array('key'=>'xlspg=customer_register' , 'case'=> '' , 'name'=> _sp('Register'));
+
+		// Define the layout
+		
+		$this->errSpan = new QPanel($this);
+		$this->errSpan->CssClass='customer_reg_err_msg';
+
+
+		$this->BuildCustomerControl();
+		$this->BuildVerifyControl();
+		$this->BuildCaptchaControl();
+		$this->BuildSubmitControl();
+		$this->BuildPasswordControlWrapper();
+		$this->BuildPasswordControl();
+
+
+		$this->UpdateCustomerControl();
+		$this->UpdateVerifyControl();
+		$this->UpdateCaptchaControl();
+		$this->UpdateSubmitControl();
+		$this->UpdatePasswordControlWrapper();
+		$this->UpdatePasswordControl();
+
+
+		$this->BindCustomerControl();
+		$this->BindVerifyControl();
+		$this->BindCaptchaControl();
+		$this->BindSubmitControl();
+		$this->BindPasswordControlWrapper();
+		$this->BindPasswordControl();
+		
+		//$this->build_phone_types_widget();
+		
+		Visitor::add_view_log('', ViewLogType::registration);
 	}
 
-	/**
-	 * txtBillCity_Change - Event that fires when billing city changes
-	 * country based on country chosen
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	public function txtBillCity_Change($strFormId, $strControlId, $strParameter) {
-		if($this->chkSame->Checked){
-			$this->txtCRShipCity->Text=$this->txtCRBillCity->Text;
-		}
-	}
-
-	/**
-	 * txtBillZip_Change - Event that fires when billing zipcode changes
-	 * country based on country chosen
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	public function txtBillZip_Change($strFormId, $strControlId, $strParameter) {
-		if($this->chkSame->Checked) {
-			$this->txtCRShipZip->Text=$this->txtCRBillZip->Text;
-		}
-	}
-
-	/**
-	 * txtBillState_Change - Event that fires when billing state changes
-	 * country based on country chosen
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	public function txtBillState_Change($strFormId, $strControlId, $strParameter) {
-		if($this->chkSame->Checked) {
-			$this->txtCRShipState->SelectedValue=$this->txtCRBillState->SelectedValue;
-		}
-	}
-
+	
 	/**
 	 * Form_Validate - Validates all form fields for valid input
 	 * @param none
 	 * @return none
 	 */
 	protected function Form_Validate() {
+	
+		$errors = array();
+		
+		// check that email address is unique
+		$cust = Customer::LoadByEmail(strtolower(trim($this->BillingContactControl->Email->Text)));
+		if( $cust && (($this->customer && $this->customer->Rowid != $cust->Rowid ) || (!$this->customer) )) {
+			$this->errSpan->Text= _sp("Another customer with this e-mail address already exists. Please login ");
+			return false;
+		}
+		
+
+        if (!$this->ValidateControlAndChildren($this->CustomerControl))
+			$errors[] = _sp('Please complete the required fields marked with an asterisk *');
+
+		if (count($errors)) {
+			$this->errSpan->Text = join('<br />', $errors);
+			$this->ToggleCheckoutControls(true);
+			return false;
+		}
+
+		$this->errSpan->Text='';
+		return true;
+		
+		/*
 		global $_SESSION;
 
 		$this->errSpan->Text='';
@@ -644,11 +532,153 @@ class xlsws_cregister extends xlsws_index {
 
 		$this->errSpan->Text='';
 		return true;
+		*/
 	}
 
+    
 	public function require_ssl() {
 		return true;
 	}
+	
+	public function __get($strName) {
+        switch ($strName) {
+            case 'txtCRFName':
+                return $this->BillingContactControl->FirstName;
+
+            case 'txtCRLName': 
+                return $this->BillingContactControl->LastName;
+
+            case 'txtCRCompany': 
+                return $this->BillingContactControl->Company;
+
+            case 'txtCRMPhone': 
+                return $this->BillingContactControl->Phone;
+
+            case 'txtCREmail': 
+                return $this->BillingContactControl->Email;
+
+            case 'txtCRPass': 
+                return $this->PasswordControl->Password1;
+
+            case 'txtCRConfPass': 
+                return $this->PasswordControl->Password2;
+                
+            case 'txtCRConfEmail':
+                return $this->BillingContactControl->EmailConfirm;           
+
+            case 'txtCRBillAddr1':
+                return $this->BillingContactControl->Street1;
+            
+            case 'txtCRBillAddr2':
+                return $this->BillingContactControl->Street2;
+
+            case 'txtCRBillCity':
+                return $this->BillingContactControl->City;
+
+            case 'txtCRBillCountry':
+                return $this->BillingContactControl->Country;
+
+            case 'txtCRBillState':
+                return $this->BillingContactControl->State;
+
+            case 'txtCRBillZip':
+                return $this->BillingContactControl->Zip;
+
+            case 'txtCRShipFirstname': 
+                return $this->ShippingContactControl->FirstName;
+
+            case 'txtCRShipLastname': 
+                return $this->ShippingContactControl->LastName;
+
+            case 'txtCRShipCompany': 
+                return $this->ShippingContactControl->Company;
+
+            case 'txtCRShipPhone': 
+                return $this->ShippingContactControl->Phone;
+
+            case 'txtCRShipAddr1':
+                return $this->ShippingContactControl->Street1;
+            
+            case 'txtCRShipAddr2':
+                return $this->ShippingContactControl->Street2;
+
+            case 'txtCRShipCity':
+                return $this->ShippingContactControl->City;
+
+            case 'txtCRShipCountry':
+                return $this->ShippingContactControl->Country;
+
+            case 'txtCRShipState':
+                return $this->ShippingContactControl->State;
+
+            case 'txtCRShipZip':
+                return $this->ShippingContactControl->Zip;
+
+            case 'chkSame':
+                return $this->CustomerControl->CheckSame;
+
+            case 'butCalcShipping':
+                return $this->CalculateShippingControl;
+
+            case 'pnlCustomer':
+                return $this->BillingContactControl->Info;
+
+            case 'pnlPassword':
+                return $this->PasswordControlWrapper;
+
+            case 'pnlBillingAdde':
+                return $this->BillingContactControl->Address;
+
+            case 'pnlShippingAdde':
+                return $this->ShippingContactControl;
+
+            case 'lstCRShipPrevious':
+                return $this->PreviousAddressControl;
+
+            case 'pnlCart':
+                return $this->CartControl;
+
+            case 'pnlVerify':
+                return $this->VerifyControl;
+
+            case 'lblVerifyImage': 
+                	return $this->CaptchaControl->Code;
+
+            case 'txtCRVerify':
+                	return $this->CaptchaControl->Input;
+
+            case 'btnSubmit':
+                return $this->SubmitControl;
+
+            case 'pxyCheckout':
+                return $this->LoadActionProxy;
+
+            case 'pnlLoginRegister':
+                return $this->LoginRegisterControl;
+
+            case 'butLogin':
+                return $this->LoginControl;
+
+            case 'butRegister':
+                return $this->RegisterControl;
+
+            case 'customer':
+                return Customer::GetCurrent();
+
+            case 'cart':
+                return Cart::GetCart();
+
+            default:
+                try { 
+                    return parent::__get($strName);
+                }
+                catch (QCallerException $objExc) {
+                    $objExc->IncrementOffset();
+                    throw $objExc;
+                }
+        }
+    }
+    
 }
 
 if(!defined('CUSTOM_STOP_XLSWS'))

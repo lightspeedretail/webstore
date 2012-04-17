@@ -64,9 +64,9 @@ class xlsws_checkout extends xlsws_index {
     protected $objDestination;
     protected $objTaxCode;
 
-    protected function BuildCustomerControl() {
+    protected function BuildCustomerControl() { 
         $this->CustomerControl = $objControl = 
-            new XLSCustomerControl($this, 'CustomerContact');
+            new XLSCheckoutCustomerControl($this, 'CustomerContact');
         $this->BillingContactControl = 
             $this->CustomerControl->Billing;
         $this->ShippingContactControl = 
