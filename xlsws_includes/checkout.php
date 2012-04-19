@@ -890,7 +890,15 @@ class xlsws_checkout extends xlsws_index {
         $objCart->Type = CartType::order;
         $objCart->Submitted = QDateTime::Now(true);
         $objCart->Save();
-
+        
+        //Set reserved inventory numbers since we now have a pending order
+        $arrItems = $objCart->GetCartItemArray(); 
+		foreach($arrItems as $objItem) {
+			$objProduct = Product::Load($objItem->ProductId);
+			$objProduct->InventoryReserved=$objProduct->CalculateReservedInventory();
+			$objProduct->Save();
+		}
+		
         Cart::ClearCart();
 
         self::PostFinalizeHooks($objCart, $objCustomer);

@@ -569,6 +569,8 @@ EOS;
             	$strWebKeyword1==$strFeatured || $strWebKeyword2==$strFeatured || $strWebKeyword2==$strFeatured))
             $product->Featured=1;
             
+            $product->InventoryReserved=$product->CalculateReservedInventory();
+            
             // Now save the product
             try {
                 $product->Save($blnForceInsert, $blnForceUpdate, true);
@@ -2696,7 +2698,10 @@ EOS;
             $objCart->AddSoapProduct($product,
                 $fltQty, $strDescription,
                 $fltSell, $fltDiscount, CartType::order);
-
+			
+			$product->InventoryReserved=$product->CalculateReservedInventory();
+			$product->Save();
+			
             return self::OK;
         }
         

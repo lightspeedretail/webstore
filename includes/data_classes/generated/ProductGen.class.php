@@ -28,6 +28,7 @@
 	 * @property boolean $Inventoried the value for blnInventoried 
 	 * @property double $Inventory the value for fltInventory 
 	 * @property double $InventoryTotal the value for fltInventoryTotal 
+	 * @property double $InventoryReserved the value for fltInventoryReserved 
 	 * @property boolean $MasterModel the value for blnMasterModel 
 	 * @property integer $FkProductMasterId the value for intFkProductMasterId 
 	 * @property string $ProductSize the value for strProductSize 
@@ -182,6 +183,14 @@
 		 */
 		protected $fltInventoryTotal;
 		const InventoryTotalDefault = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_product.inventory_total
+		 * @var double fltInventoryTotal
+		 */
+		protected $fltInventoryReserved;
+		const InventoryReservedDefault = null;
 
 
 		/**
@@ -814,6 +823,7 @@
 			$objBuilder->AddSelectItem($strTableName, 'inventoried', $strAliasPrefix . 'inventoried');
 			$objBuilder->AddSelectItem($strTableName, 'inventory', $strAliasPrefix . 'inventory');
 			$objBuilder->AddSelectItem($strTableName, 'inventory_total', $strAliasPrefix . 'inventory_total');
+			$objBuilder->AddSelectItem($strTableName, 'inventory_reserved', $strAliasPrefix . 'inventory_reserved');
 			$objBuilder->AddSelectItem($strTableName, 'master_model', $strAliasPrefix . 'master_model');
 			$objBuilder->AddSelectItem($strTableName, 'fk_product_master_id', $strAliasPrefix . 'fk_product_master_id');
 			$objBuilder->AddSelectItem($strTableName, 'product_size', $strAliasPrefix . 'product_size');
@@ -1023,6 +1033,8 @@
 			$objToReturn->fltInventory = $objDbRow->GetColumn($strAliasName, 'Float');
 			$strAliasName = array_key_exists($strAliasPrefix . 'inventory_total', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'inventory_total'] : $strAliasPrefix . 'inventory_total';
 			$objToReturn->fltInventoryTotal = $objDbRow->GetColumn($strAliasName, 'Float');
+			$strAliasName = array_key_exists($strAliasPrefix . 'inventory_reserved', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'inventory_reserved'] : $strAliasPrefix . 'inventory_reserved';
+			$objToReturn->fltInventoryReserved = $objDbRow->GetColumn($strAliasName, 'Float');
 			$strAliasName = array_key_exists($strAliasPrefix . 'master_model', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'master_model'] : $strAliasPrefix . 'master_model';
 			$objToReturn->blnMasterModel = $objDbRow->GetColumn($strAliasName, 'Bit');
 			$strAliasName = array_key_exists($strAliasPrefix . 'fk_product_master_id', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'fk_product_master_id'] : $strAliasPrefix . 'fk_product_master_id';
@@ -1508,6 +1520,7 @@
 							`inventoried`,
 							`inventory`,
 							`inventory_total`,
+							`inventory_reserved`,
 							`master_model`,
 							`fk_product_master_id`,
 							`product_size`,
@@ -1542,6 +1555,7 @@
 							' . $objDatabase->SqlVariable($this->blnInventoried) . ',
 							' . $objDatabase->SqlVariable($this->fltInventory) . ',
 							' . $objDatabase->SqlVariable($this->fltInventoryTotal) . ',
+							' . $objDatabase->SqlVariable($this->fltInventoryReserved) . ',
 							' . $objDatabase->SqlVariable($this->blnMasterModel) . ',
 							' . $objDatabase->SqlVariable($this->intFkProductMasterId) . ',
 							' . $objDatabase->SqlVariable($this->strProductSize) . ',
@@ -1605,6 +1619,7 @@
 							`inventoried` = ' . $objDatabase->SqlVariable($this->blnInventoried) . ',
 							`inventory` = ' . $objDatabase->SqlVariable($this->fltInventory) . ',
 							`inventory_total` = ' . $objDatabase->SqlVariable($this->fltInventoryTotal) . ',
+							`inventory_reserved` = ' . $objDatabase->SqlVariable($this->fltInventoryReserved) . ',
 							`master_model` = ' . $objDatabase->SqlVariable($this->blnMasterModel) . ',
 							`fk_product_master_id` = ' . $objDatabase->SqlVariable($this->intFkProductMasterId) . ',
 							`product_size` = ' . $objDatabase->SqlVariable($this->strProductSize) . ',
@@ -1728,6 +1743,7 @@
 			$this->blnInventoried = $objReloaded->blnInventoried;
 			$this->fltInventory = $objReloaded->fltInventory;
 			$this->fltInventoryTotal = $objReloaded->fltInventoryTotal;
+			$this->fltInventoryReserved = $objReloaded->fltInventoryReserved;
 			$this->blnMasterModel = $objReloaded->blnMasterModel;
 			$this->FkProductMasterId = $objReloaded->FkProductMasterId;
 			$this->strProductSize = $objReloaded->strProductSize;
@@ -1834,6 +1850,11 @@
 					// Gets the value for fltInventoryTotal 
 					// @return double
 					return $this->fltInventoryTotal;
+
+				case 'InventoryReserved':
+					// Gets the value for fltInventoryReserved 
+					// @return double
+					return $this->fltInventoryReserved;
 
 				case 'MasterModel':
 					// Gets the value for blnMasterModel 
@@ -2229,6 +2250,17 @@
 					// @return double
 					try {
 						return ($this->fltInventoryTotal = QType::Cast($mixValue, QType::Float));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'InventoryReserved':
+					// Sets the value for fltInventoryReserved 
+					// @param double $mixValue
+					// @return double
+					try {
+						return ($this->fltInventoryReserved = QType::Cast($mixValue, QType::Float));
 					} catch (QCallerException $objExc) {
 						$objExc->IncrementOffset();
 						throw $objExc;
@@ -3725,6 +3757,7 @@
 			$strToReturn .= '<element name="Inventoried" type="xsd:boolean"/>';
 			$strToReturn .= '<element name="Inventory" type="xsd:float"/>';
 			$strToReturn .= '<element name="InventoryTotal" type="xsd:float"/>';
+			$strToReturn .= '<element name="InventoryReserved" type="xsd:float"/>';
 			$strToReturn .= '<element name="MasterModel" type="xsd:boolean"/>';
 			$strToReturn .= '<element name="FkProductMaster" type="xsd1:Product"/>';
 			$strToReturn .= '<element name="ProductSize" type="xsd:string"/>';
@@ -3797,6 +3830,8 @@
 				$objToReturn->fltInventory = $objSoapObject->Inventory;
 			if (property_exists($objSoapObject, 'InventoryTotal'))
 				$objToReturn->fltInventoryTotal = $objSoapObject->InventoryTotal;
+			if (property_exists($objSoapObject, 'InventoryReserved'))
+				$objToReturn->fltInventoryReserved = $objSoapObject->InventoryReserved;
 			if (property_exists($objSoapObject, 'MasterModel'))
 				$objToReturn->blnMasterModel = $objSoapObject->MasterModel;
 			if ((property_exists($objSoapObject, 'FkProductMaster')) &&
@@ -3971,6 +4006,8 @@
 					return new QQNode('inventory', 'Inventory', 'double', $this);
 				case 'InventoryTotal':
 					return new QQNode('inventory_total', 'InventoryTotal', 'double', $this);
+				case 'InventoryReserved':
+					return new QQNode('inventory_reserved', 'InventoryReserved', 'double', $this);
 				case 'MasterModel':
 					return new QQNode('master_model', 'MasterModel', 'boolean', $this);
 				case 'FkProductMasterId':
@@ -4081,6 +4118,8 @@
 					return new QQNode('inventory', 'Inventory', 'double', $this);
 				case 'InventoryTotal':
 					return new QQNode('inventory_total', 'InventoryTotal', 'double', $this);
+				case 'InventoryReserved':
+					return new QQNode('inventory_reserved', 'InventoryReserved', 'double', $this);
 				case 'MasterModel':
 					return new QQNode('master_model', 'MasterModel', 'boolean', $this);
 				case 'FkProductMasterId':

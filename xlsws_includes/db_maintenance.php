@@ -320,6 +320,28 @@ class xlsws_db_maintenance extends xlsws_index {
 	
 			_dbx("DELETE from xlsws_configuration WHERE `key`='ADMIN_EMAIL'");
 			
+			
+			
+			//Fix some sequencing problems for options
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=5 where `key`='INVENTORY_ZERO_NEG_TITLE'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=6 where `key`='INVENTORY_AVAILABLE'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=7 where `key`='INVENTORY_LOW_TITLE'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=8 where `key`='INVENTORY_LOW_THRESHOLD'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=9 where `key`='INVENTORY_NON_TITLE'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=10 where `key`='INVENTORY_OUT_ALLOW_ADD'");
+			
+			//Inventory handling changes
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Inventory should include Virtual Warehouses'
+				where `key`='INVENTORY_FIELD_TOTAL'");
+			$this->add_config_key('INVENTORY_RESERVED' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Deduct Pending Orders from Available Inventory', 
+				'INVENTORY_RESERVED', '1', 'This option will calculate Qty Available minus Pending Orders. Turning on Upload Orders in LightSpeed eCommerce is required to make this feature work properly.', 11, 4, NOW(), NOW(), 'BOOL');");
+			
+			
+			if ($this->add_column('xlsws_product' , 'inventory_reserved' ,
+				"ALTER TABLE xlsws_product ADD COLUMN inventory_reserved float NOT NULL DEFAULT 0 AFTER inventory_total;"))
+				_dbx("UPDATE xlsws_product SET inventory_reserved=0");
+			
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
 			$config->Value="220";

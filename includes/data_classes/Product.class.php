@@ -214,16 +214,20 @@ class Product extends ProductGen {
 	 * product's availability
 	 */
 	public function InventoryDisplay() {
-		$intValue = $this->Inventory;
-
+		
 		if (!$this->Inventoried)
 			return _sp(_xls_get_conf('INVENTORY_NON_TITLE' , ''));
-
+		
 		// Do not display master inventory levels
 		if ($this->IsMaster()) {
 			return '';
 		}
+	
+		$intValue = $this->Inventory;
 
+		if (_xls_get_conf('INVENTORY_RESERVED' , 0) == '1')
+			$intValue -= $this->InventoryReserved;
+		
 		if (_xls_get_conf('INVENTORY_DISPLAY_LEVEL' , 0) == 1) {
 			if($intValue <= 0)
 				return _sp(
@@ -365,6 +369,33 @@ class Product extends ProductGen {
 	}
 
 	/**
+	* Calculates pending order qty to count against available
+	* inventory by searching for Requested or Awaiting Processing orders
+	*/
+	public function CalculateReservedInventory() {
+	
+		try { 
+			$intReserved = _dbx_first_cell("select sum(qty) from xlsws_cart_item as a 
+					left join xlsws_cart as b on a.cart_id=b.rowid where 
+					a.product_id=". $this->Rowid." and b.type=4 
+					and (b.status='Requested' or b.status='Awaiting Processing')");
+					
+		}
+        catch (Exception $objExc) {
+            QApplication::Log(E_USER_ERROR, 'Product', 
+                'UpdateReservedInventory failed to calculate');
+        }
+
+        if (empty($intReserved))
+            return 0;
+        else
+            return $intReserved;
+	
+	
+	}
+
+
+	/**
 	 * Calculates the tax on an item
 	 * @param obj|int $taxCode      :: TaxCode or Rowid to apply
 	 * @param float [$fltPrice]     :: Price to calculate on
@@ -477,7 +508,7 @@ class Product extends ProductGen {
 				return $this->GetInventory();
 
 			default:
-				try {
+				try { 
 					return parent::__get($strName);
 				} catch (QCallerException $objExc) {
 					$objExc->IncrementOffset();
