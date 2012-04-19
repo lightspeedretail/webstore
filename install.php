@@ -1461,7 +1461,6 @@ $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Date Format', 'DATE_FO
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'SRO Additional Items', 'SRO_ADDITIONAL_ITEMS', 'Mouse,Keyboard,Cables', 'Options in Additional Items field. Enter values separated by comma', 6, 5, NOW(), NOW(), '');";
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'SRO Warranty options', 'SRO_WARRANTY_OPTIONS', 'None,6 Months,12 Months,24 Months,36 Months', 'Options in Warranty field. Enter values separated by comma.', 6, 5, NOW(), NOW(), '');";
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Default Expiry Days', 'DEFAULT_EXPIRY_GIFT_REGISTRY', '30', 'Default number of days for gift registry expiry', 7, 2, NOW(), NOW(), '');";
-$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Admin Email', 'ADMIN_EMAIL', 'you@yourdomain.com', 'The administrator email address used for administrative access', 1, 5, NOW(), NOW(), NULL);";
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Enable Families?', 'ENABLE_FAMILIES', '', '', 8, 5, NOW(), NOW(), 'BOOL');";
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Products Per Page', 'PRODUCTS_PER_PAGE', '8', 'Number of products per page to display in product listing or search', 8, 3, NOW(), NOW(), NULL);";
 $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Products Sorting', 'PRODUCT_SORT_FIELD', 'Code', 'By which field products will sorted in result', 8, 4, NOW(), NOW(), 'PRODUCT_SORT');";

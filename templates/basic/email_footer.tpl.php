@@ -30,7 +30,7 @@
 	
 	
 	<div id="footer" style="height: 36px; background: url(<?= templateNamed('images/email_footer_bg.png') ?>) no-repeat; color: #fff;">
-		<p style="display: block; float: left; margin: 8px 0 0 15px; color: #fff;"><a href="mailto:<?= _xls_get_conf('ADMIN_EMAIL'); ?>"><?= _xls_get_conf('ADMIN_EMAIL'); ?></a></p>
+		<p style="display: block; float: left; margin: 8px 0 0 15px; color: #fff;"><a href="mailto:<?= _xls_get_conf('EMAIL_FROM'); ?>"><?= _xls_get_conf('EMAIL_FROM'); ?></a></p>
 		<?php if(_xls_get_conf('STORE_PHONE')): ?>
 		<p style="display: block; float: right; margin: 8px 15px 0 0;">Phone: <?= _xls_get_conf('STORE_PHONE') ?></p>		
 		<?php endif; ?>
