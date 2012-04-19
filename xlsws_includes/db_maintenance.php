@@ -311,6 +311,12 @@ class xlsws_db_maintenance extends xlsws_index {
 			$this->add_config_key('EMAIL_SMTP_AUTH_PLAIN' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Force AUTH PLAIN Authentication', 
 				'EMAIL_SMTP_AUTH_PLAIN', '0', 'Force plain text password in rare circumstances', 5, 9, NOW(), NOW(), 'BOOL');");
+			$this->add_config_key('EMAIL_SEND_CUSTOMER' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Send Receipts to Customers', 
+				'EMAIL_SEND_CUSTOMER', '1', 'Option whether to email order receipts to customers', 5, 2, NOW(), NOW(), 'BOOL');");
+			$this->add_config_key('EMAIL_SEND_STORE' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Send Order Alerts to Store', 
+				'EMAIL_SEND_STORE', '1', 'Option to send Store Owner email when order is placed', 5, 2, NOW(), NOW(), 'BOOL');");
 	
 			_dbx("DELETE from xlsws_configuration WHERE `key`='ADMIN_EMAIL'");
 			
