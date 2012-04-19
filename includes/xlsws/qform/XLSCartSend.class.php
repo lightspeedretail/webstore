@@ -118,12 +118,6 @@ class XLSCartSend extends QDialogBox {
 	public function Validate() {
 		$valid = true;
 
-		if(_xls_verify_img_txt() != (($this->txtVerify->Text))) {
-			$this->txtVerify->Warning = _sp("Wrong Verification Code.");
-			$valid = false && $valid;
-
-		}
-
 		if(!isValidEmail($this->txtFromEmail->Text)) {
 			$this->txtFromEmail->Warning = _sp("Invalid E-mail Address.");
 			$valid = false && $valid;

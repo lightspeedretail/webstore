@@ -1350,6 +1350,23 @@ function _xls_escape($strText) {
 	return $strText;
 }
 
+/** Determine whether to show the captcha to the user
+*/
+function _xls_show_captcha($strPage = "checkout") {
+	switch ($strPage) {
+		
+		case 'register': $strKey = "CAPTCHA_REGISTRATION"; break;
+		case 'contactus':  $strKey = "CAPTCHA_CONTACTUS"; break;	
+		case 'checkout': 
+		default: $strKey = "CAPTCHA_CHECKOUT"; break;
+	}
+
+	if (_xls_get_conf($strKey , '0')=='2' || (!xlsws_index::isLoggedIn() && _xls_get_conf($strKey , '0')=='1'))
+	return true;
+	else return false;
+	
+}
+
 /**
  * Function for displaying what called function, useful for debugging
  */

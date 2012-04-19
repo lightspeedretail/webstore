@@ -125,7 +125,7 @@ class xlsws_cregister extends xlsws_index {
 
     protected function BuildPasswordControlWrapper() {
         $objControl = $this->PasswordControlWrapper = 
-            new QPanel($this, 'Password');
+            new QPanel($this, 'PasswordWrapper');
         $objControl->Name = 'Set your password';
         $objControl->Template = templateNamed('customer_register_password.tpl.php');
                     
@@ -152,6 +152,7 @@ class xlsws_cregister extends xlsws_index {
     }
 
     protected function UpdatePasswordControl() {
+    	
         return $this->PasswordControl;
     }
 
@@ -233,8 +234,8 @@ class xlsws_cregister extends xlsws_index {
         
         	//We only want to check Captcha after everything else has passed, to avoid multiple checks
         	$blnCaptchaValid=1;
-        	if (_xls_get_conf('CAPTCHA_CHECKOUT' , '0')=='2' || 
-        		(!$this->isLoggedIn() && _xls_get_conf('CAPTCHA_CHECKOUT' , '0')=='1')
+        	if (_xls_get_conf('CAPTCHA_REGISTRATION' , '0')=='2' || 
+        		(!$this->isLoggedIn() && _xls_get_conf('CAPTCHA_REGISTRATION' , '0')=='1')
         	)
         		$blnCaptchaValid = $this->CaptchaControl->Validate_Captcha();
         		
@@ -249,10 +250,10 @@ class xlsws_cregister extends xlsws_index {
 	
 	private function CompleteRegistration() {
 		if($this->isLoggedIn())
-			{ error_log("a"); $objCustomer = Customer::LoadByRowId($this->customer->Rowid);}
+			$objCustomer = Customer::LoadByRowId($this->customer->Rowid);
 		else
-			{ error_log("2"); $objCustomer = new Customer();}
-error_log("c");
+			$objCustomer = new Customer();
+
 		$objCustomer->Email= strtolower(trim($this->BillingContactControl->Email));error_log("1");
 		$objCustomer->Password = md5(trim($this->PasswordControl->Password1->Text));error_log("2");
 		$objCustomer->Firstname = trim($this->txtCRFName->Text);error_log("3");
@@ -299,27 +300,31 @@ error_log("c");
 			_custom_before_customer_save($objCustomer);
 
 		//****
-		if(!$this->customer || !$this->customer->Rowid) {
+		if(!$this->isLoggedIn()) {
 			$objCustomer->Created= new QDateTime(QDateTime::Now);
 			$objCustomer->IdCustomer='';
-			$objCustomer->Save();
-
-			// remind old password
-			$objCustomer->Password = trim($this->txtCRPass->Text);
-
-			_xls_mail($objCustomer->Email, _sp("Welcome to ") . _xls_get_conf('STORE_NAME') , _xls_mail_body_from_template(templatenamed('email_customer_register.tpl.php') , array('cust' =>$objCustomer)));
-		} else
-			$objCustomer->Save();
-
+		}
+		
+		$objCustomer->Save();
+			
 		if(function_exists('_custom_after_customer_save'))
 			_custom_after_customer_save($objCustomer);
+
+		if(!$this->isLoggedIn()) {
+
+			_xls_mail($objCustomer->Email, _sp("Welcome to ") . _xls_get_conf('STORE_NAME') ,
+			_xls_mail_body_from_template(templatenamed('email_customer_register.tpl.php') , array('cust' =>$objCustomer)));
+			
+			Customer::Login($this->BillingContactControl->Email,$this->PasswordControl->Password1->Text);
+			Cart::UpdateCartCustomer();			
+		}
+			
 
 		if(!$objCustomer->AllowLogin) {
 			_xls_display_msg("Thank you for becoming a member. A representative will be in touch with you shortly about your login.");
 		} else {
-			Customer::Login($objCustomer->Email , $objCustomer->Password);
-
-			if($url = _xls_stack_get('register_redirect_uri'))
+					
+				if($url = _xls_stack_get('register_redirect_uri'))
 				_rd($url);
 			else
 				_rd('index.php?xlspg=myaccount');
@@ -430,7 +435,7 @@ error_log("c");
 		$this->BindSubmitControl();
 		$this->BindPasswordControlWrapper();
 		$this->BindPasswordControl();
-		
+
 		//$this->build_phone_types_widget();
 		
 		Visitor::add_view_log('', ViewLogType::registration);
@@ -457,6 +462,29 @@ error_log("c");
         if (!$this->ValidateControlAndChildren($this->CustomerControl))
 			$errors[] = _sp('Please complete the required fields marked with an asterisk *');
 
+
+		if (!$this->isLoggedIn()) {
+		
+			if ($this->txtCRPass->Text=='')
+				$errors[] .= _sp("Password Required.");
+
+			if ($this->txtCRPass->Text != $this->txtCRConfPass->Text)
+				$errors[] .= _sp("Passwords do not match.");
+
+			if($this->txtCREmail->Text != $this->txtCRConfEmail->Text)
+				$errors[] .= _sp("E-mail addresses do not match.");
+					
+		}			
+		
+		if ($this->isLoggedIn()) {
+	
+			//We are changing password
+			if (strlen($this->txtCRPass->Text)>0)
+				if ($this->txtCRPass->Text != $this->txtCRPassConf->Text)
+					$errors[] .= _sp("Passwords do not match.");
+		}
+		
+		
 		if (count($errors)) {
 			$this->errSpan->Text = join('<br />', $errors);
 			$this->ToggleCheckoutControls(true);
@@ -556,16 +584,16 @@ error_log("c");
 
             case 'txtCREmail': 
                 return $this->BillingContactControl->Email;
-
+                
+            case 'txtCRConfEmail':
+                return $this->BillingContactControl->EmailConfirm;    
+                
             case 'txtCRPass': 
                 return $this->PasswordControl->Password1;
 
             case 'txtCRConfPass': 
                 return $this->PasswordControl->Password2;
                 
-            case 'txtCRConfEmail':
-                return $this->BillingContactControl->EmailConfirm;           
-
             case 'txtCRBillAddr1':
                 return $this->BillingContactControl->Street1;
             

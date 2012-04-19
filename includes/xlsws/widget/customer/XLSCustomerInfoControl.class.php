@@ -91,7 +91,8 @@ class XLSCustomerInfoControl extends XLSCustomerComposite {
         $objControl->Required = true;
         $objControl->RenderMethod = 'RenderAsDefinition';
         $objControl->SetCustomAttribute('maxlength', 255);
-
+		$objControl->Width = 200;
+		
         $this->UpdateEmailControl();
         $this->BindEmailControl();
 
@@ -112,6 +113,7 @@ class XLSCustomerInfoControl extends XLSCustomerComposite {
         $objControl->Required = true;
         $objControl->RenderMethod = 'RenderAsDefinition';
         $objControl->SetCustomAttribute('maxlength', 255);
+        $objControl->Width = 200;
 
         $this->UpdateEmailConfirmControl();
         $this->BindEmailConfirmControl();
@@ -125,6 +127,31 @@ class XLSCustomerInfoControl extends XLSCustomerComposite {
     protected function BindEmailConfirmControl() {
     }
 
+	public function Validate() { 
+		//isValidEmail
 
-   }
+	 	$objEmail = $this->GetChildByName('Email');
+        $objConfirm = $this->GetChildByName('EmailConfirm');
+        
+        $blnReturn = true;
+        
+        if ($objEmail && $objEmail->OnPage)
+        	if(!isValidEmail($objEmail->Text))        
+        		{ $objEmail->ValidationError = "Not a properly formatted email address"; $blnReturn = false; }
+
+		if ($objConfirm && $objConfirm->OnPage) {
+		    if(!isValidEmail($objConfirm->Text))        
+	        	{ $objConfirm->ValidationError = "Not a properly formatted email address"; $blnReturn = false; }
+			elseif ($objEmail->Text != $objConfirm->Text)
+	        	{ $objConfirm->ValidationError = "Email Addresses do not match"; $blnReturn = false; }
+			
+		}
+        
+		//Because Validate may be called multiple times, we don't want to keep
+		//calling externally, so our Validate is a separate function
+		return $blnReturn;
+	
+	}
+
+}
 

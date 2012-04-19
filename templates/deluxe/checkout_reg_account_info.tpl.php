@@ -64,5 +64,13 @@
 				<dd><?php $this->txtCREmail->RenderWithError() ?></dd>
 			</dl>	
 		</div>
+		<?php if (!$this->isLoggedIn()) { ?>
+		<div class="left margin clear">
+			<dl>
+				<dt><label for="EmailConfirm"><span class="red">*</span> <?php _xt("Email (Confirm)"); ?></label></dt>
+				<dd><?php $this->txtCRConfEmail->RenderWithError() ?></dd>
+			</dl>	
+		</div>
+		<? } ?>
 		</fieldset>	
 			

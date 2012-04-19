@@ -549,9 +549,7 @@ class xlsws_checkout extends xlsws_index {
         { 
         	//We only want to check Captcha after everything else has passed, to avoid multiple checks
         	$blnCaptchaValid=1;
-        	if (_xls_get_conf('CAPTCHA_CHECKOUT' , '0')=='2' || 
-        		(!$this->isLoggedIn() && _xls_get_conf('CAPTCHA_CHECKOUT' , '0')=='1')
-        	)
+        	if (_xls_show_captcha('checkout'))
         		$blnCaptchaValid = $this->CaptchaControl->Validate_Captcha();
         		
     		if ($blnCaptchaValid)
@@ -696,7 +694,6 @@ class xlsws_checkout extends xlsws_index {
 
     protected function ToggleCheckoutControls($blnVisibility = false) {
    		$this->pnlLoginRegister->Visible = $blnVisibility;
-		$this->pnlWait->Visible = $blnVisibility;
         
         $this->CustomerControl->Visible = $blnVisibility;
         $this->ShippingControl->Visible = $blnVisibility;
@@ -1061,10 +1058,11 @@ class xlsws_checkout extends xlsws_index {
 
         if (!$this->TermsControl->Checked)
 			$errors[] =  _sp("You must agree to terms and conditions to place an order");
-
+		
 		if (count($errors)) {
 			$this->errSpan->Text = join('<br />', $errors);
 			$this->ToggleCheckoutControls(true);
+			$this->SubmitControl->Enabled=true;
 			return false;
 		}
 
@@ -1103,6 +1101,9 @@ class xlsws_checkout extends xlsws_index {
 
             case 'txtCREmail': 
                 return $this->BillingContactControl->Email;
+                
+            case 'txtCRConfEmail':
+                return $this->BillingContactControl->EmailConfirm;  
 
             case 'txtCRBillAddr1':
                 return $this->BillingContactControl->Street1;

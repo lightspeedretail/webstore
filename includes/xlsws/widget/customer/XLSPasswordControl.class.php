@@ -8,12 +8,11 @@ class XLSPasswordControl extends XLSCompositeControl {
     protected function BuildPassword1Control() {
         $objControl =
             new XLSTextControl($this, $this->GetChildName('Password1'));
-        $objControl->Name = _sp('Password');
-        $objControl->Required = true;
+        $objControl->Name = _sp('Password1');
         $objControl->RenderMethod = 'RenderAsDefinition';
         $objControl->SetCustomAttribute('maxlength', 25);
-        $objControl->TextMode =QTextMode::Password;
-		$objControl->ValidateTrimmed = true;
+        $objControl->TextMode = QTextMode::Password;
+        $objControl->SetCustomAttribute('autocomplete', 'off');
 		$objControl->MinLength = _xls_get_conf('MIN_PASSWORD_LEN' , 6);
 
         $this->UpdatePassword1Control();
@@ -32,10 +31,11 @@ class XLSPasswordControl extends XLSCompositeControl {
     protected function BuildPassword2Control() {
         $objControl =
             new XLSTextControl($this, $this->GetChildName('Password2'));
+        $objControl->Name = _sp('Password2');
         $objControl->RenderMethod = 'RenderAsDefinition';
         $objControl->SetCustomAttribute('maxlength', 25);
-        $objControl->TextMode =QTextMode::Password;
-		$objControl->ValidateTrimmed = true;
+        $objControl->TextMode = QTextMode::Password;
+        $objControl->SetCustomAttribute('autocomplete', 'off');
 		$objControl->MinLength = _xls_get_conf('MIN_PASSWORD_LEN' , 6);
 
         $this->UpdatePassword2Control();

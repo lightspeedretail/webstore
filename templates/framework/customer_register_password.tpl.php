@@ -19,37 +19,30 @@
  */
 
 /**
- * Deluxe template: Captcha and terms confirmation on CheckOut screen 
+ * Password entry/change for profile 
  *
  * 
  *
  */
 
 ?>
+	<fieldset style="display: block; float: left; width:300px;">
+	<legend><?php $this->isLoggedIn() ?  _xt('Change Password') :  _xt('Set Password') ?></legend>
 
-	<fieldset style="display: block; float: left;">
-		<legend><?php $this->isLoggedIn() ?  _xt('Update Profile') :  _xt('Complete Registration') ?></legend>
+<?php $this->isLoggedIn() ?  _xt('To set a new password, enter it here. Otherwise, leave these blank.') :  "" ?><br>
 
-<?	if (_xls_show_captcha('register')) { ?>
-		<div class="block margin">
-			<dl>
-				<dt><label for="Name"><?php $this->lblVerifyImage->Render(); ?></label></dt>
-			</dl>
+	<div class="left margin clear">
+	        <dl>
+	        	<dt><label for="Password1"><?php _xt("Password"); ?></label></dt>
+	            <dd><?php $this->txtCRPass->RenderWithError() ?></dd>
+	        </dl>
 		</div>
 
-		<div class="block margin">
+		<div class="left margin">
 			<dl class="left">
-				<dd><?php $this->txtCRVerify->RenderWithError(); ?></dd>
+	        	<dt><label for="Password2"><?php _xt("Confirm Password"); ?></label></dt>
+	            <dd><?php $this->txtCRConfPass->RenderWithError() ?></dd>
 			</dl>
-		</div>
-<? } ?>
-
-
-		<div class="left margin clear">
-			<dl>
-				<dd><?php $this->btnSubmit->Render('CssClass=button rounded') ?></dd>
-			</dl>	
-		</div>
-
-
-	</fieldset>
+		</div><br />
+		
+		</fieldset>

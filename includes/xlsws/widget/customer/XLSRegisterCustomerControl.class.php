@@ -18,8 +18,9 @@ class XLSRegisterCustomerControl extends XLSCustomerControl {
 
 		parent::UpdateBillingControl();
 		
-        $objControl->UpdateFieldsFromCustomer();
+       $objControl->UpdateFieldsFromCustomer();
 
+	
         return $objControl;
     }
     

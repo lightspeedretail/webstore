@@ -36,11 +36,28 @@ class xlsws_contact_us extends xlsws_index {
 	protected $txtPhone; //input text box for phone number
 	protected $txtSubject; //input text box for subject
 	protected $txtMsg; //input textarea for the message or comments
-	protected $txtVerify; //input text box for the captcha verification image
-	protected $lblVerifyImage; //the label where the dynamic captcha image renders
 	protected $btnSubmit; //input button to submit the contact form
 	protected $lblError; //the label that shows an error message
 	protected $page = ''; //the current page
+
+    protected $CaptchaControl;
+
+
+    protected function BuildCaptchaControl() {
+        $objControl = $this->CaptchaControl = 
+            new XLSCaptchaControl($this, 'Captcha');
+
+        return $objControl;
+    }
+
+    protected function UpdateCaptchaControl() {
+        return $this->CaptchaControl;
+    }
+    
+    protected function BindCaptchaControl() {
+        return $this->CaptchaControl;
+    }
+
 
 	/**
 	 * build_name_widget - builds the input type name textbox
@@ -93,24 +110,6 @@ class xlsws_contact_us extends xlsws_index {
 	}
 
 	/**
-	 * build_captcha_widget - builds the captcha code with the input textbox to enter this code
-	 * @param Qpanel - the Qpanel these widgets should be laid out in (unused in this case)
-	 * @return none
-	 */
-	protected function build_captcha_widget($qpanel) {
-		//image verification
-
-		$this->lblVerifyImage = new QPanel($this);
-		$this->lblVerifyImage->CssClass='customer_reg_draw_verify';
-		$this->lblVerifyImage->Text=_xls_verify_img();
-
-		// verify code
-		$this->txtVerify = new XLSTextBox($this);
-		$this->txtVerify->Required = true;
-		$this->txtVerify->SetCustomAttribute("autocomplete" , "off");
-	}
-
-	/**
 	 * build_widgets - builds the widgets needed for the template
 	 * @param none
 	 * @return none
@@ -121,7 +120,11 @@ class xlsws_contact_us extends xlsws_index {
 		$this->build_subject_widget();
 		$this->build_phone_widget();
 		$this->build_comments_widget();
-		$this->build_captcha_widget();
+
+        $this->BuildCaptchaControl();
+        $this->UpdateCaptchaControl();        
+        $this->BindCaptchaControl();
+        
 	}
 
 	/**
@@ -172,6 +175,10 @@ class xlsws_contact_us extends xlsws_index {
 		$this->btnSubmit->AddAction(new QClickEvent() , new QServerAction('butSubmit_click'));
 		$this->btnSubmit->CausesValidation = true;
 
+
+
+        
+                
 		Visitor::add_view_log('', ViewLogType::contactus);
 	}
 
@@ -185,17 +192,22 @@ class xlsws_contact_us extends xlsws_index {
 		$this->lblError->Text='';
 		$this->lblError->CssClass='customer_reg_err_msg';
 
-		if(_xls_verify_img_txt() != (($this->txtVerify->Text))){
-			$this->lblError->Text= "Wrong Verification Code.";
-			return false;
-		}
-
 		if(!preg_match('/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i', $this->txtEmail->Text )){
 			$email=$this->txtEmail->Text;
 			$this->lblError->Text= $email . _sp(" - Is Not A Correct E-mail Address");
 			return false;
 		}
 
+       	//We only want to check Captcha after everything else has passed, to avoid multiple checks
+       	$blnCaptchaValid=1;
+       	if (_xls_show_captcha('contactus'))
+       		$blnCaptchaValid = $this->CaptchaControl->Validate_Captcha();
+		if (!$blnCaptchaValid) {
+			$this->lblError->Text = "Captcha Validation Error";
+			return false;
+		}
+		
+		
 		_xls_mail(
 			_xls_get_conf('ORDER_FROM'),
 			_xls_get_conf('STORE_NAME' , 'Web') . " " . _sp("Inquiry"). " : " . $this->txtSubject->Text,
@@ -224,6 +236,32 @@ class xlsws_contact_us extends xlsws_index {
 	protected function butSubmit_click($strFormId, $strControlId, $strParameter) {
 		_xls_display_msg(_sp("Thank you for your inquiry. A representative will contact you shortly."));
 	}
+	
+	
+	public function __get($strName) {
+        switch ($strName) {
+
+            case 'pnlVerify':
+                return $this->VerifyControl;
+
+            case 'lblVerifyImage': 
+                	return $this->CaptchaControl->Code;
+
+            case 'txtCRVerify':
+                	return $this->CaptchaControl->Input;
+
+
+
+            default:
+                try { 
+                    return parent::__get($strName);
+                }
+                catch (QCallerException $objExc) {
+                    $objExc->IncrementOffset();
+                    throw $objExc;
+                }
+        }
+    }
 }
 
 if(!defined('CUSTOM_STOP_XLSWS'))

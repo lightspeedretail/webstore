@@ -31,7 +31,7 @@
 	<fieldset style="display: block; float: left;">
 		<legend><?php _xt('Submit your order') ?></legend>
 
-<?	if (_xls_get_conf('CAPTCHA_CHECKOUT' , '0')=='2' || (!$this->isLoggedIn() && _xls_get_conf('CAPTCHA_CHECKOUT' , '0')=='1')) { ?>
+<?	if (_xls_show_captcha('checkout')) { ?>
 		<div class="block margin">
 			<dl>
 				<dt><label for="Name"><?php $this->lblVerifyImage->Render(); ?></label></dt>
