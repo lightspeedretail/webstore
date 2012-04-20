@@ -209,6 +209,9 @@ class xlsws_db_maintenance extends xlsws_index {
 				'If this keyword is one of your product keywords, the product will be featured on the Web Store homepage.', 
 				8, 6, NOW(), NOW(), NULL);" , '2.2.0');
 
+			$this->add_config_key('LIGHTSPEED_HOSTING' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'LightSpeed Hosting', 
+				'LIGHTSPEED_HOSTING', '0', 'Flag which indicates site is hosted by LightSpeed', 0, 0, NOW(), NOW(), 'BOOL');" , '2.2.0');
 
 			//Add debug keys
 			$this->add_config_key('DEBUG_PAYMENTS' , 
