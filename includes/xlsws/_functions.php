@@ -457,7 +457,12 @@ function _xls_mail($strAddTo, $strSubject, $strBody, $strAddFrom = false) {
             _sp('SMTP Server is not defined'));
         return false;
     }
-
+	
+	if (QEmailServer::$SmtpServer=="localhost" && _xls_get_conf('LIGHTSPEED_HOSTING' , '0')=='1') {
+			QApplication::Log(E_ERROR, 'email', "Email server not configured, cannot send receipts");
+			return;
+	}
+		
     // Set default values
     $strAddFrom = _xls_get_conf('ORDER_FROM', $strAddFrom);
     $strAddBcc = _xls_get_conf('EMAIL_BCC', false);
@@ -1379,3 +1384,5 @@ function _xls_whereCalled( $level = 1 ) {
 
     return "Where called: line $line of $object \n(in $file)";
 }
+
+
