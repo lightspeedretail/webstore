@@ -521,7 +521,7 @@ EOS;
                      	QApplication::Log(E_ERROR, 'uploader', 
                         'Duplicate product code found : ' . $strCode, 
                         __FUNCTION__); 
-                       return false;
+                       return self::UNKNOWN_ERROR . ' Duplicate product code found : ' . $strCode;
                      }
                 }
 
@@ -579,8 +579,9 @@ EOS;
                 QApplication::Log(E_ERROR, 'uploader', 
                     "Product update failed for $strCode . Error: " . $e);
                 return self::UNKNOWN_ERROR . $e;
-            }
-
+            }		
+			
+			
             // Save the product image
             $blbImage = trim($blbImage);
             if($blbImage && ($blbImage = base64_decode($blbImage))) {
@@ -1456,7 +1457,7 @@ EOS;
                 
             }catch(Exception $e){
                 _xls_log("SOAP ERROR : Error adding tax $strTax " . $e);
-                return self::UNKNOWN_ERROR;
+                return self::UNKNOWN_ERROR." Error adding tax $strTax " . $e;
             }
             
             return self::OK;
@@ -1554,7 +1555,7 @@ EOS;
                 
             }catch(Exception $e){
                 _xls_log("SOAP ERROR : Error adding tax code $strCode " . $e);
-                return self::UNKNOWN_ERROR;
+                return self::UNKNOWN_ERROR." Error adding tax code $strCode " . $e;
             }
             
             return self::OK;
