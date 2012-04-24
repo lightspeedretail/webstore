@@ -1382,7 +1382,11 @@ function _xls_whereCalled( $level = 1 ) {
     $object = $trace[$level]['object'];
     if (is_object($object)) { $object = get_class($object); }
 
+<<<<<<< HEAD
     return "Where called: line $line of $object \n(in $file)";
+=======
+    return "Where called: class $object was called on line $line of $file";
+>>>>>>> refs/heads/dev
 }
 
 

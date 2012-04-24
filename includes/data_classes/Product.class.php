@@ -161,7 +161,7 @@ class Product extends ProductGen {
 		if ($bolExtended)
 			if (!$this->Inventoried)
 				return true;
-			else if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD' , true))
+			else if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD' , 0)==2)
 				return true;
 
 		if ($this->GetInventory() > 0)
@@ -179,7 +179,13 @@ class Product extends ProductGen {
 		$strField = $this->GetInventoryField();
 		$intInventory = $this->$strField;
 
-		return $this->$strField;
+		$intValue= $this->$strField;
+		
+		if (_xls_get_conf('INVENTORY_RESERVED' , 0) == '1')
+			$intValue -= $this->InventoryReserved;
+
+		return ($intValue < 0 ? 0 : $intValue);
+		
 	}
 
 	/**
@@ -225,9 +231,7 @@ class Product extends ProductGen {
 	
 		$intValue = $this->Inventory;
 
-		if (_xls_get_conf('INVENTORY_RESERVED' , 0) == '1')
-			$intValue -= $this->InventoryReserved;
-		
+				
 		if (_xls_get_conf('INVENTORY_DISPLAY_LEVEL' , 0) == 1) {
 			if($intValue <= 0)
 				return _sp(
@@ -358,14 +362,65 @@ class Product extends ProductGen {
 	 * that it will optionally return a message for Master products.
 	 * @param integer defaults to 1
 	 * @return float or string
-	 */
-	public function GetPriceDisplay($intQuantity = 1,
-		$taxExclusive = false) {
+	 */ //4 => _sp("Show Highest Price"),3 => _sp("Show Price Range"), 2 => _sp("Show \"Click for Pricing\"") ,1 => _sp("Show Lowest Price"),0 => _sp("Show Master Item Price")
+	public function GetPriceDisplay($intQuantity = 1, $taxExclusive = false) {
 
-		if ($this->IsMaster() && _xls_get_conf('MATRIX_PRICE') == 1)
-			return _sp("Click for pricing");
+		if ($this->IsMaster()) {
+		
+			$objProdCondition = QQ::AndCondition(
+                QQ::Equal(QQN::Product()->Web, 1), 
+                QQ::Equal(QQN::Product()->FkProductMasterId, $this->Rowid)
+                );
+                
+			if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) == 0) {
+				 $objAvailCondition = 
+				 	QQ::OrCondition(
+				 		QQ::GreaterThan(QQN::Product()->InventoryAvail, 0),
+	                	QQ::Equal(QQN::Product()->Inventoried, 0)
+	                );
+		            	
+	            $objCondition = QQ::AndCondition(
+	                $objProdCondition, 
+	                $objAvailCondition
+	            );
+	        } 
+	        else 
+	        	$objCondition = $objProdCondition;
+                
+       		$arrMaster = Product::QueryArray($objCondition,
+				QQ::Clause(
+					QQ::OrderBy(QQN::Product()->SellWeb))
+				);
+            	        
+			if (count($arrMaster)==0) return _sp("Missing Child Products?");
+			 
+			switch (_xls_get_conf('MATRIX_PRICE')) {
 
-		return $this->GetPrice($intQuantity, $taxExclusive);
+				case 4: //Show Highest Price
+					return $arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive); 
+
+				case 3: //Show Price Range
+					if ($arrMaster[0]->GetPrice($intQuantity, $taxExclusive) != $arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive))
+					return _xls_currency($arrMaster[0]->GetPrice($intQuantity, $taxExclusive))." - "._xls_currency($arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive));
+					else return $arrMaster[0]->GetPrice($intQuantity, $taxExclusive);
+					
+				case 2: //Show "Click for Pricing"
+					if ($arrMaster[0]->GetPrice($intQuantity, $taxExclusive) != $arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive))
+						return _sp("Click for pricing");
+					else return $this->GetPrice($intQuantity, $taxExclusive);
+				
+				case 1: //Show Lowest Price
+					return $arrMaster[0]->GetPrice($intQuantity, $taxExclusive);
+			
+				case 0: //Show Master Item Price
+				default:
+					return $this->GetPrice($intQuantity, $taxExclusive);
+			
+			
+			}
+
+		}
+		else return $this->GetPrice($intQuantity, $taxExclusive);
 	}
 
 	/**
@@ -549,26 +604,28 @@ class Product extends ProductGen {
 		if (!$intRowid)
 			$intRowid = $this->intRowid;
 
-		$strQuery = <<<EOS
-		SELECT SUM(inventory) AS inv, SUM(inventory_total) AS inv_total
-		FROM xlsws_product
-		WHERE web=1
-		AND fk_product_master_id='{$intRowid}';
-EOS;
+		$strQuery = "SELECT SUM(inventory) AS inv, SUM(inventory_total) AS inv_total, SUM(inventory_avail) AS inv_avail
+			FROM xlsws_product
+			WHERE web=1
+			AND fk_product_master_id=".$intRowid;
 
 		$objQuery = _dbx($strQuery, 'Query');
 		$arrTotal = $objQuery->FetchArray();
 
 		$intInv = $arrTotal['inv'];
 		$intInvTotal = $arrTotal['inv_total'];
+		$intInvAvail = $arrTotal['inv_avail'];
 
 		if (!$intInv)
 			$intInv = 0;
 
 		if (!$intInvTotal)
 			$intInvTotal = 0;
+			
+		if (!$intInvAvail)
+			$intInvAvail = 0;
 
-		return array($intInv, $intInvTotal);
+		return array($intInv, $intInvTotal, $intInvAvail);
 	}
 
 	/**
@@ -587,54 +644,28 @@ EOS;
 		if (!$objProduct)
 			return false;
 
-        list($intInv, $intInvTotal) = 
+        list($intInv, $intInvTotal, $intInvAvail) = 
             $this->GetAggregateInventory($objProduct->Rowid);
 
 		$objProduct->Inventory = $intInv;
 		$objProduct->InventoryTotal = $intInvTotal;
+		$objProduct->InventoryAvail = $intInvAvail;
 
 		return $objProduct;
 	}
 
-	protected function UpdateMasterAvailability() {
-		// Non inventoried Products may be added to cart
-		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0) == 1)
-			return false;
-
-		if ($this->IsIndependent() || !$this->Inventoried)
-			return false;
-
-		$objProduct = $this;
-
-		if ($this->IsChild())
-			$objProduct = $this->FkProductMaster;
-
-		if (!$objProduct)
-			return false;
-
-		$blnWeb = $objProduct->Web;
-
-		if ($objProduct->GetInventory() < 1) $objProduct->Web = 0;
-		else $objProduct->Web = 1;
-
-		if ($blnWeb != $objProduct->Web)
-			return $objProduct;
-	}
-
 	public function PreSaveHandler() {
-		if ($this->IsMaster()) {
+		if ($this->IsMaster())
 			$this->UpdateMasterInventory();
-			$this->UpdateMasterAvailability();
-		}
+		
 	}
 
-	public function PostSaveHandler() {
+	public function PostSaveHandler() { 
 		if ($this->IsChild()) {
 			$this->UpdateMasterInventory();
-			$this->UpdateMasterAvailability();
 
 			if ($this->FkProductMaster)
-				$this->FkProductMaster->Save();
+				$this->FkProductMaster->Save(); 
 		}
 	}
 
@@ -671,6 +702,7 @@ EOS;
 	 * may be triggered to update related Products.
 	 */
 	public function Save($blnForceInsert = false, $blnForceUpdate = false, $blnSoapSave = false) {
+		
         $this->PreSaveHandler();
 
         if (!$this->Created)
@@ -708,6 +740,8 @@ EOS;
 			`inventoried`,
 			`inventory`,
 			`inventory_total`,
+			`inventory_reserved`,
+			`inventory_avail`,
 			`master_model`,
 			`fk_product_master_id`,
 			`product_size`,
@@ -743,6 +777,8 @@ EOS;
 			' . $objDatabase->SqlVariable($this->blnInventoried) . ',
 			' . $objDatabase->SqlVariable($this->fltInventory) . ',
 			' . $objDatabase->SqlVariable($this->fltInventoryTotal) . ',
+			' . $objDatabase->SqlVariable($this->fltInventoryReserved) . ',
+			' . $objDatabase->SqlVariable($this->fltInventoryAvail) . ',
 			' . $objDatabase->SqlVariable($this->blnMasterModel) . ',
 			' . $objDatabase->SqlVariable($this->intFkProductMasterId) . ',
 			' . $objDatabase->SqlVariable($this->strProductSize) . ',

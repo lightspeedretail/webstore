@@ -57,7 +57,7 @@ class XLSCaptchaControl extends XLSCompositeControl {
 		unset($this->objCaptchaResponse);
 
 		if ($this->objInputControl->ValidationError=="Invalid Entry, try again") $this->strError='incorrect-captcha-sol';
- 		return recaptcha_get_html($publickey,$this->strError,(_xls_get_conf('ENABLE_SSL',0)=='1' ? true : false));
+ 		return recaptcha_get_html($publickey,$this->strError,(_xls_get_conf('ENABLE_SSL',0)==1 ? true : false));
 
     }
 

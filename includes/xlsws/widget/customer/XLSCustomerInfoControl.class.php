@@ -128,7 +128,6 @@ class XLSCustomerInfoControl extends XLSCustomerComposite {
     }
 
 	public function Validate() { 
-		//isValidEmail
 
 	 	$objEmail = $this->GetChildByName('Email');
         $objConfirm = $this->GetChildByName('EmailConfirm');
@@ -137,16 +136,16 @@ class XLSCustomerInfoControl extends XLSCustomerComposite {
         
         if ($objEmail && $objEmail->OnPage)
         	if(!isValidEmail($objEmail->Text))        
-        		{ $objEmail->ValidationError = "Not a properly formatted email address"; $blnReturn = false; }
+        		{ $objEmail->ValidationError = "Not a properly formatted email address"; $blnReturn = false;}
 
 		if ($objConfirm && $objConfirm->OnPage) {
-		    if(!isValidEmail($objConfirm->Text))        
-	        	{ $objConfirm->ValidationError = "Not a properly formatted email address"; $blnReturn = false; }
-			elseif ($objEmail->Text != $objConfirm->Text)
-	        	{ $objConfirm->ValidationError = "Email Addresses do not match"; $blnReturn = false; }
+		    if($objConfirm->Text != '' && !isValidEmail($objConfirm->Text))        
+	        	{ $objConfirm->ValidationError = "Not a properly formatted email address"; $blnReturn = false;}
+			elseif ($objConfirm->Text != '' && $objEmail->Text != $objConfirm->Text)
+	        	{ $objEmail->ValidationError = "Email Addresses do not match"; $blnReturn = false;}
 			
 		}
-        
+
 		//Because Validate may be called multiple times, we don't want to keep
 		//calling externally, so our Validate is a separate function
 		return $blnReturn;

@@ -79,18 +79,44 @@ class xlsws_product_listing extends xlsws_index {
 	 * @param none
 	 * @return QCondition
      */
-    protected function GetProductCondition() {
-        $objCondition = QQ::AndCondition(
-            QQ::Equal(QQN::Product()->Web, 1), 
-            QQ::OrCondition(
-                QQ::Equal(QQN::Product()->MasterModel, 1), 
-                QQ::AndCondition(
-                    QQ::Equal(QQN::Product()->MasterModel, 0), 
-                    QQ::Equal(QQN::Product()->FkProductMasterId, 0)
-                )
-            )
-        );
+    protected function GetProductCondition($blnIncludeChildren = false) {
+        
+        if ($blnIncludeChildren)
+	        $objProdCondition = QQ::AndCondition(
+	                QQ::Equal(QQN::Product()->Web, 1), 
+	                QQ::Equal(QQN::Product()->MasterModel, 0)
+	            );
+        else
+	        $objProdCondition = QQ::AndCondition(
+	            QQ::Equal(QQN::Product()->Web, 1), 
+	            
+	            QQ::OrCondition(          
+	                QQ::Equal(QQN::Product()->MasterModel, 1), 
+	                QQ::AndCondition(
+	                    QQ::Equal(QQN::Product()->MasterModel, 0), 
+	                    QQ::Equal(QQN::Product()->FkProductMasterId, 0)
+	                )
+	            )
+	        );
 
+		//How do we handle out of stock products?
+		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) == 0) {
+			 $objAvailCondition = 
+			 	QQ::OrCondition(
+			 		QQ::GreaterThan(QQN::Product()->InventoryAvail, 0),
+                	QQ::Equal(QQN::Product()->Inventoried, 0)
+                );
+			 		
+	            	
+            $objCondition = QQ::AndCondition(
+                $objProdCondition, 
+                $objAvailCondition
+            );
+        } 
+        else 
+            $objCondition = $objProdCondition;
+ 
+                 
         return $objCondition;
     }
 

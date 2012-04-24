@@ -133,11 +133,11 @@
 		public function ParsePostData() {
 				if (array_key_exists($this->strControlId, $_POST)) {
 					if ($_POST[$this->strControlId])
-						$this->blnChecked = true;
+						$this->blnChecked = 1;
 					else
-						$this->blnChecked = false;
+						$this->blnChecked = 0;
 				} else {
-					$this->blnChecked = false;
+					$this->blnChecked = 0;
 				}
 		}
 		
@@ -579,23 +579,30 @@
 					return array(0 => _sp("Autodetect") , 1 => _sp("Force No Security") , 2 => _sp("Force SSL") , 3 => _sp("Force TLS"));
 
 				case 'INVENTORY_DISPLAY_LEVEL':
-					return array('1' => _sp("With Messages Defined Below") , '' => _sp("Showing Actual Numbers Remaining"));
+					return array(1 => _sp("With Messages Defined Below") , 0 => _sp("Showing Actual Numbers Remaining"));
 	
 				case 'STORE_IMAGE_LOCATION':
 					return array('DB'=>'Database' , 'FS' => 'File System');
 					
 					
 				case 'CAPTCHA_REGISTRATION':
-					return array(0 => _sp("OFF for Everyone") , 1 => _sp("ON for Everyone"));											
+					return array(1 => _sp("ON for Everyone"),0 => _sp("OFF for Everyone") );											
 				case 'CAPTCHA_CONTACTUS':
-					return array(0 => _sp("OFF for Everyone") , 1 => _sp("OFF for Logged-in Users") , 2 => _sp("ON for Everyone"));											
+					return array(2 => _sp("ON for Everyone"),1 => _sp("OFF for Logged-in Users") , 0 => _sp("OFF for Everyone"));											
 				case 'CAPTCHA_CHECKOUT':
-					return array(0 => _sp("OFF for Everyone") , 1 => _sp("OFF for Logged-in Users") , 2 => _sp("ON for Everyone"));											
+					return array(2 => _sp("ON for Everyone"), 1 => _sp("OFF for Logged-in Users") ,0 => _sp("OFF for Everyone")  );											
 				case 'CAPTCHA_STYLE':
 					return array(0 => _sp("Google ReCAPTCHA") , 1 => _sp("Integrated Captcha (DEPRECATED)"));											
 
 				case 'ENABLE_SLASHED_PRICES':
 					return array(0 => _sp("Off") , 1 => _sp("Only on Details Page") , 2 => _sp("On Grid and Details Pages"));											
+
+
+				case 'INVENTORY_OUT_ALLOW_ADD':
+					return array(2 => _sp("Display and Allow backorders"),1 => _sp("Display but Do Not Allow ordering") ,0 => _sp("Make product disappear") );											
+				case 'MATRIX_PRICE':
+					return array(4 => _sp("Show Highest Price"),3 => _sp("Show Price Range"),
+						2 => _sp("Show \"Click for Pricing\"") ,1 => _sp("Show Lowest Price"),0 => _sp("Show Master Item Price") );											
 
 					
 				default:
@@ -644,6 +651,7 @@
 		 				$config->Value= implode("\n" , $field->SelectedValues);
 		 			else
 			 			$config->Value= $field->SelectedValue;
+
 		 		}elseif($field instanceof XLS_OnOff ){
 		 			$config->Value= $field->Checked;
 		 		}elseif($field instanceof QRadioButtonList ){
@@ -755,8 +763,8 @@
 			
 
 			$this->configPnls['himage'] = new xlsws_admin_config_panel($this , $this , 'HEADER_IMAGE' , "configDone");
-			$this->configPnls['himage']->Name = _sp('Header Image');
-			$this->configPnls['himage']->Info = _sp('Header image displayed in your webstore. Upload your logo or logo for webstore here.');
+			$this->configPnls['himage']->Name = _sp('Header and Email Image');
+			$this->configPnls['himage']->Info = _sp('Header image displayed in your webstore, also used in email templates. Upload your logo or logo for webstore here.');
 			
 			
 			$this->configPnls['prods'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::ProductListing , "configDone");
@@ -5402,6 +5410,13 @@
 			$this->arrMPnls['UpgradeWS']->HtmlEntities = false;				
 			$this->arrMPnls['UpgradeWS']->ToolTip= _sp('Upgrade webstore with latest patches/bug fixes');
 			
+			$this->arrMPnls['RecalculateAvail'] = new QPanel($this);
+			$this->arrMPnls['RecalculateAvail']->Visible = false;
+			$this->arrMPnls['RecalculateAvail']->Name = _sp('Recalculate Pending Orders');
+			$this->arrMPnls['RecalculateAvail']->HtmlEntities = false;				
+			$this->arrMPnls['RecalculateAvail']->ToolTip= _sp('Recalculate inventory based on pending orders');
+
+
 			
 			
 			$this->arrMPnls['optimizeDB'] = new QPanel($this);
@@ -5468,6 +5483,42 @@
 			$this->arrMPnls['flushCategories']->Refresh();
 		}
 
+		protected function RecalculateAvail(){
+			if($this->arrMPnls['RecalculateAvail']->Visible){
+					$this->arrMPnls['RecalculateAvail']->Visible = false;		
+					return;
+			}
+			
+			$objProdCondition = QQ::AndCondition(
+            QQ::Equal(QQN::Product()->Web,1),             
+            QQ::OrCondition(            
+                QQ::Equal(QQN::Product()->MasterModel, 1),                               
+                QQ::AndCondition(
+                    QQ::Equal(QQN::Product()->MasterModel, 0), 
+                    QQ::Equal(QQN::Product()->FkProductMasterId, 0)
+                ))  
+	        );
+	
+	    	$arrProducts = Product::QueryArray(QQ::Equal(QQN::Product()->Web,1),
+					QQ::Clause(
+						QQ::OrderBy(QQN::Product()->Rowid)
+				 ));
+			foreach ($arrProducts as $objProduct) {
+				$objProduct->InventoryReserved=$objProduct->CalculateReservedInventory();
+				//Since $objProduct->Inventory isn't the real inventory column, it's a calculation,
+				//just pass it to the Avail so we have it for queries elsewhere
+	            $objProduct->InventoryAvail=$objProduct->Inventory;
+				$objProduct->Save();
+			
+			}	
+			
+			
+			$this->arrMPnls['RecalculateAvail']->Text = _sp("Inventory availability has been recalculated.");
+			$this->arrMPnls['RecalculateAvail']->Visible = true;
+			$this->arrMPnls['RecalculateAvail']->Refresh();
+		}
+		
+		
 		protected function OffLineOnlineStore(){
 			
 			if($this->arrMPnls['OffLineOnlineStore']->Visible){

@@ -338,14 +338,22 @@ class xlsws_db_maintenance extends xlsws_index {
 				where `key`='INVENTORY_FIELD_TOTAL'");
 			$this->add_config_key('INVENTORY_RESERVED' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Deduct Pending Orders from Available Inventory', 
-				'INVENTORY_RESERVED', '1', 'This option will calculate Qty Available minus Pending Orders. Turning on Upload Orders in LightSpeed eCommerce is required to make this feature work properly.', 11, 4, NOW(), NOW(), 'BOOL');");
-			
-			
+				'INVENTORY_RESERVED', '1', 'This option will calculate Qty Available minus Pending Orders. Turning on Upload Orders in LightSpeed Tools->eCommerce->Documents is required to make this feature work properly.', 11, 4, NOW(), NOW(), 'BOOL');");			
 			if ($this->add_column('xlsws_product' , 'inventory_reserved' ,
 				"ALTER TABLE xlsws_product ADD COLUMN inventory_reserved float NOT NULL DEFAULT 0 AFTER inventory_total;"))
 				_dbx("UPDATE xlsws_product SET inventory_reserved=0");
-			
+			if ($this->add_column('xlsws_product' , 'inventory_avail' ,
+				"ALTER TABLE xlsws_product ADD COLUMN inventory_avail float NOT NULL DEFAULT 0 AFTER inventory_reserved;"))
+				_dbx("UPDATE xlsws_product SET inventory_avail=0");
+			_dbx("UPDATE `xlsws_configuration` SET `title`='When a product is Out of Stock',
+				`options`='INVENTORY_OUT_ALLOW_ADD',`helper_text`='How should system treat products currently out of stock. Note: Turn OFF the checkbox for -Only Upload Products with Available Inventory- in Tools->eCommerce.' where `key`='INVENTORY_OUT_ALLOW_ADD'");
+			//_dbx("ALTER TABLE `xlsws_product` ADD INDEX (`inventory`, `inventory_avail`);");	//need to check if exists
+			_dbx("UPDATE `xlsws_configuration` SET `title`='In Product Grid, when child product prices vary',
+				`options`='MATRIX_PRICE',`helper_text`='How should system treat child products when different child products have different prices.' where `key`='MATRIX_PRICE'");	
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
+			
+			$strUpgradeText .= "<h2>Please run RECALCULATE PENDING ORDERS after running this Upgrade.</h2>";
+			
 			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
 			$config->Value="220";
 			$config->Save();

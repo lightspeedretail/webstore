@@ -148,17 +148,9 @@ class xlsws_searchresult extends xlsws_product_listing {
      * @return QCondition
      */
     protected function GetProductCondition() {
-        $objCondition = false;
+       
+       return parent::GetProductCondition(_xls_get_conf('CHILD_SEARCH',0));
 
-        if (_xls_get_conf('CHILD_SEARCH') == 1)
-            $objCondition = QQ::AndCondition(
-                QQ::Equal(QQN::Product()->Web, 1), 
-                QQ::Equal(QQN::Product()->MasterModel, 0)
-            );
-        else
-            $objCondition = parent::GetProductCondition();
-
-        return $objCondition;
     }
 
     /**

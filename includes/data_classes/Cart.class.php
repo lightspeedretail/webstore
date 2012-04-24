@@ -249,10 +249,10 @@ class Cart extends CartGen {
 		if ($intQuantity == $objItem->Qty)
 			return;
 
-		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD','0') != '1' &&
+		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) < 2 &&
 			$intQuantity > $objItem->Qty &&
 			$objItem->Product->Inventoried &&
-			$objItem->Product->Inventory < $intQuantity) {
+			$objItem->Product->InventoryAvail < $intQuantity) {
 				_qalert(_sp('Your chosen quantity is not available' .
 				' for ordering. Please come back and order later.'));
 				return false;
