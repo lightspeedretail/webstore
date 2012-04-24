@@ -53,9 +53,7 @@ class Destination extends DestinationGen {
         return Destination::QuerySingle(
             QQ::AndCondition(
                 QQ::Equal(QQN::Destination()->Country, '*'),
-                QQ::Equal(QQN::Destination()->State, '*'), 
-                QQ::IsNull(QQN::Destination()->Zipcode1),
-                QQ::IsNull(QQN::Destination()->Zipcode2)
+                QQ::Equal(QQN::Destination()->State, '*')
             )
         );
     }

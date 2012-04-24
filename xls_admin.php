@@ -4495,7 +4495,8 @@
 			$this->arrFields['Country'] = array('Name' => 'Country');
 			$this->arrFields['Country']['Field'] = new XLSListBox($this);
 			$this->arrFields['Country']['DisplayFunc'] = "RenderCountry";
-				
+			
+			$this->arrFields['Country']['Field']->AddItem(_sp('Any'), '*');	
 			$objCountries= Country::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Country()->SortOrder , QQN::Country()->Country)));
 			if ($objCountries) foreach ($objCountries as $objCountry) {
 				$this->arrFields['Country']['Field']->AddItem($objCountry->Country, $objCountry->Code);
@@ -4586,6 +4587,9 @@
 		
 		protected function RenderCountry($val){
 			
+			if($val== '*')
+				return 'Any';
+				
 			$country = Country::LoadByCode($val);
 			
 			$this->country_looked_up = $val;
