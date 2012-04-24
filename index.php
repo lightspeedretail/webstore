@@ -49,12 +49,35 @@ if ($offlinekey = _xls_get_conf('STORE_OFFLINE' , '')) {
 	}
 }
 
+
+$objUrl = new XLSURLParser($_SERVER['PHP_SELF']);
+//echo "<pre>";
+//echo print_r($objUrl,true);
+//echo $objUrl->UrlPieces;
+
+
 // Cache categories since they are used throughout
 Category::$Manager->AddArray(
 	Category::LoadAll()
 );
+//echo "on dept ".$objUrl->Department;
+switch ($objUrl->Department)
+{
 
-// Convert SEO friendly URL
+	case 'c':
+		$strFile = "category.php";
+		break;
+}
+
+if(file_exists(CUSTOM_INCLUDES . $strFile))
+		include(CUSTOM_INCLUDES . $strFile);
+	else
+		include('xlsws_includes/'.$strFile);
+
+/*
+
+
+// Convert SEO friendly URL -- 
 if (isset($XLSWS_VARS['seo_rewrite'])) {
 	$uriPath = parse_url(QApplication::$RequestUri, PHP_URL_PATH);
 	$uriPath = str_replace(__SUBDIRECTORY__, '', $uriPath);
@@ -141,7 +164,7 @@ $xlsws_form = 'xlsws_index';
 foreach (ImagesType::$NameArray as $strType) {
 	if (!isset($_GET[$strType]))
 		continue;
-
+error_log("hitting imagetype ".$_GET[$strType]);
 	$intType = ImagesType::ToToken($strType);
 
 	$imgid = $_GET[$strType];
@@ -236,5 +259,5 @@ else {
 	else
 		include('xlsws_includes/category.php');
 }
+*/
 
-?>

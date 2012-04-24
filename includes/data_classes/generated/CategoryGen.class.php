@@ -22,6 +22,7 @@
 	 * @property integer $ChildCount the value for intChildCount 
 	 * @property string $CustomPage the value for strCustomPage 
 	 * @property integer $ImageId the value for intImageId 
+	 * @property string $RequestUrl the value for strRequestUrl 
 	 * @property string $MetaKeywords the value for strMetaKeywords 
 	 * @property string $MetaDescription the value for strMetaDescription 
 	 * @property QDateTime $Created the value for dttCreated 
@@ -95,6 +96,15 @@
 		 */
 		protected $intImageId;
 		const ImageIdDefault = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_category.request_url
+		 * @var string strRequestUrl
+		 */
+		protected $strRequestUrl;
+		const RequestUrlMaxLength = 255;
+		const RequestUrlDefault = null;
 
 
 		/**
@@ -465,6 +475,7 @@
 			$objBuilder->AddSelectItem($strTableName, 'child_count', $strAliasPrefix . 'child_count');
 			$objBuilder->AddSelectItem($strTableName, 'custom_page', $strAliasPrefix . 'custom_page');
 			$objBuilder->AddSelectItem($strTableName, 'image_id', $strAliasPrefix . 'image_id');
+			$objBuilder->AddSelectItem($strTableName, 'request_url', $strAliasPrefix . 'request_url');
 			$objBuilder->AddSelectItem($strTableName, 'meta_keywords', $strAliasPrefix . 'meta_keywords');
 			$objBuilder->AddSelectItem($strTableName, 'meta_description', $strAliasPrefix . 'meta_description');
 			$objBuilder->AddSelectItem($strTableName, 'created', $strAliasPrefix . 'created');
@@ -560,6 +571,8 @@
 			$objToReturn->strCustomPage = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'image_id', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'image_id'] : $strAliasPrefix . 'image_id';
 			$objToReturn->intImageId = $objDbRow->GetColumn($strAliasName, 'Integer');
+			$strAliasName = array_key_exists($strAliasPrefix . 'request_url', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'request_url'] : $strAliasPrefix . 'request_url';
+			$objToReturn->strMetaKeywords = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'meta_keywords', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'meta_keywords'] : $strAliasPrefix . 'meta_keywords';
 			$objToReturn->strMetaKeywords = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'meta_description', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'meta_description'] : $strAliasPrefix . 'meta_description';
@@ -798,6 +811,7 @@
 							`child_count`,
 							`custom_page`,
 							`image_id`,
+							`request_url`,
 							`meta_keywords`,
 							`meta_description`,
 							`created`
@@ -808,6 +822,7 @@
 							' . $objDatabase->SqlVariable($this->intChildCount) . ',
 							' . $objDatabase->SqlVariable($this->strCustomPage) . ',
 							' . $objDatabase->SqlVariable($this->intImageId) . ',
+							' . $objDatabase->SqlVariable($this->strRequestUrl) . ',
 							' . $objDatabase->SqlVariable($this->strMetaKeywords) . ',
 							' . $objDatabase->SqlVariable($this->strMetaDescription) . ',
 							' . $objDatabase->SqlVariable($this->dttCreated) . '
@@ -847,6 +862,7 @@
 							`child_count` = ' . $objDatabase->SqlVariable($this->intChildCount) . ',
 							`custom_page` = ' . $objDatabase->SqlVariable($this->strCustomPage) . ',
 							`image_id` = ' . $objDatabase->SqlVariable($this->intImageId) . ',
+							`request_url` = ' . $objDatabase->SqlVariable($this->strRequestUrl) . ',
 							`meta_keywords` = ' . $objDatabase->SqlVariable($this->strMetaKeywords) . ',
 							`meta_description` = ' . $objDatabase->SqlVariable($this->strMetaDescription) . ',
 							`created` = ' . $objDatabase->SqlVariable($this->dttCreated) . '
@@ -946,6 +962,7 @@
 			$this->intChildCount = $objReloaded->intChildCount;
 			$this->strCustomPage = $objReloaded->strCustomPage;
 			$this->intImageId = $objReloaded->intImageId;
+			$this->strRequestUrl = $objReloaded->strRequestUrl;
 			$this->strMetaKeywords = $objReloaded->strMetaKeywords;
 			$this->strMetaDescription = $objReloaded->strMetaDescription;
 			$this->dttCreated = $objReloaded->dttCreated;
@@ -1005,6 +1022,11 @@
 					// @return integer
 					return $this->intImageId;
 
+				case 'RequestUrl':
+					// Gets the value for strRequestUrl 
+					// @return string
+					return $this->strRequestUrl;
+				
 				case 'MetaKeywords':
 					// Gets the value for strMetaKeywords 
 					// @return string
@@ -1165,6 +1187,17 @@
 						throw $objExc;
 					}
 
+				case 'RequestUrl':
+					// Sets the value for strRequestUrl 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strRequestUrl = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+				
 				case 'MetaKeywords':
 					// Sets the value for strMetaKeywords 
 					// @param string $mixValue
@@ -1548,6 +1581,7 @@
 			$strToReturn .= '<element name="ChildCount" type="xsd:int"/>';
 			$strToReturn .= '<element name="CustomPage" type="xsd:string"/>';
 			$strToReturn .= '<element name="ImageId" type="xsd:int"/>';
+			$strToReturn .= '<element name="RequestUrl" type="xsd:string"/>';
 			$strToReturn .= '<element name="MetaKeywords" type="xsd:string"/>';
 			$strToReturn .= '<element name="MetaDescription" type="xsd:string"/>';
 			$strToReturn .= '<element name="Created" type="xsd:dateTime"/>';
@@ -1590,6 +1624,8 @@
 				$objToReturn->strCustomPage = $objSoapObject->CustomPage;
 			if (property_exists($objSoapObject, 'ImageId'))
 				$objToReturn->intImageId = $objSoapObject->ImageId;
+			if (property_exists($objSoapObject, 'RequestUrl'))
+				$objToReturn->strRequestUrl = $objSoapObject->RequestUrl;
 			if (property_exists($objSoapObject, 'MetaKeywords'))
 				$objToReturn->strMetaKeywords = $objSoapObject->MetaKeywords;
 			if (property_exists($objSoapObject, 'MetaDescription'))
@@ -1685,6 +1721,8 @@
 					return new QQNode('custom_page', 'CustomPage', 'string', $this);
 				case 'ImageId':
 					return new QQNode('image_id', 'ImageId', 'integer', $this);
+				case 'RequestUrl':
+					return new QQNode('request_url', 'RequestUrl', 'string', $this);
 				case 'MetaKeywords':
 					return new QQNode('meta_keywords', 'MetaKeywords', 'string', $this);
 				case 'MetaDescription':
@@ -1733,6 +1771,8 @@
 					return new QQNode('custom_page', 'CustomPage', 'string', $this);
 				case 'ImageId':
 					return new QQNode('image_id', 'ImageId', 'integer', $this);
+				case 'RequestUrl':
+					return new QQNode('request_url', 'RequestUrl', 'string', $this);
 				case 'MetaKeywords':
 					return new QQNode('meta_keywords', 'MetaKeywords', 'string', $this);
 				case 'MetaDescription':

@@ -276,6 +276,18 @@ EOS;
 
 		parent::Delete();
 	}
+	
+	
+	public static function ConvertSEO() {
+	
+		$arrCats= Category::QueryArray();
+		foreach ($arrCats as $objCat) {
+			$strName = str_replace("&","and",$objCat->Name);
+			$objCat->RequestUrl = _xls_seo_url($strName);
+			$objCat->Save();
+		}
+	
+	}
 
 	/**
 	 * Define legacy functions
