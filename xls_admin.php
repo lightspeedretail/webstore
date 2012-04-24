@@ -1787,6 +1787,7 @@
 	        
 	        $this->txtTabPosition = new QListBox($this);
 		    $this->txtTabPosition->Name = "TabPosition";
+	        $this->txtTabPosition->AddItem('Not Displayed	', 0);
 	        $this->txtTabPosition->AddItem('1st Position Top', 11);
 	        $this->txtTabPosition->AddItem('2nd Position Top', 12);
 	        $this->txtTabPosition->AddItem('3rd Position Top', 13);
@@ -1802,7 +1803,7 @@
 
 			$this->txtPageText = new QFCKeditor($this);
 			$this->txtPageText->BasePath = __VIRTUAL_DIRECTORY__ . __JS_ASSETS__ . '/fckeditor/' ;
-            $this->txtPageText->Required = true;
+            //$this->txtPageText->Required = true;
             $this->txtPageText->Width = 550;
             $this->txtPageText->Height = 450;
 //			$this->txtPageText->ToolbarSet = "XLSWS";
