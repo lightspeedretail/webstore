@@ -460,7 +460,7 @@ function _xls_mail($strAddTo, $strSubject, $strBody, $strAddFrom = false) {
 	
 	if (QEmailServer::$SmtpServer=="localhost" && _xls_get_conf('LIGHTSPEED_HOSTING' , '0')=='1') {
 			QApplication::Log(E_ERROR, 'email', "Email server not configured, cannot send receipts");
-			return;
+			return false;
 	}
 		
     // Set default values
