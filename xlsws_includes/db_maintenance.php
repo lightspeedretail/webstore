@@ -348,8 +348,18 @@ class xlsws_db_maintenance extends xlsws_index {
 			_dbx("UPDATE `xlsws_configuration` SET `title`='When a product is Out of Stock',
 				`options`='INVENTORY_OUT_ALLOW_ADD',`helper_text`='How should system treat products currently out of stock. Note: Turn OFF the checkbox for -Only Upload Products with Available Inventory- in Tools->eCommerce.' where `key`='INVENTORY_OUT_ALLOW_ADD'");
 			//_dbx("ALTER TABLE `xlsws_product` ADD INDEX (`inventory`, `inventory_avail`);");	//need to check if exists
+			
+			
+			//Pricing Changes
 			_dbx("UPDATE `xlsws_configuration` SET `title`='In Product Grid, when child product prices vary',
 				`options`='MATRIX_PRICE',`helper_text`='How should system treat child products when different child products have different prices.' where `key`='MATRIX_PRICE'");	
+			$this->add_config_key('PRICE_REQUIRE_LOGIN' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Require login to view prices', 
+				'PRICE_REQUIRE_LOGIN', '0', 'System will not display prices to anyone not logged in.', 3, 3, NOW(), NOW(), 'BOOL');");
+			//Fix some sequencing problems for options
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=4 where `key`='LANGUAGES'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=5 where `key`='MIN_PASSWORD_LEN'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=6 where `key`='PHONE_TYPES'");
 
 
 			_dbx("UPDATE `xlsws_configuration` SET `title`='SSL Security certificate should be used',

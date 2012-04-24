@@ -248,7 +248,12 @@ class Cart extends CartGen {
 
 		if ($intQuantity == $objItem->Qty)
 			return;
-
+		
+		if (_xls_get_conf('PRICE_REQUIRE_LOGIN',0) == 1 && !xlsws_index::isLoggedIn()) {
+			_qalert(_sp('You must log in before Adding to Cart.'));
+				return false;
+		}
+		
 		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) < 2 &&
 			$intQuantity > $objItem->Qty &&
 			$objItem->Product->Inventoried &&
