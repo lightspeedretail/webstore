@@ -350,6 +350,15 @@ class xlsws_db_maintenance extends xlsws_index {
 			//_dbx("ALTER TABLE `xlsws_product` ADD INDEX (`inventory`, `inventory_avail`);");	//need to check if exists
 			_dbx("UPDATE `xlsws_configuration` SET `title`='In Product Grid, when child product prices vary',
 				`options`='MATRIX_PRICE',`helper_text`='How should system treat child products when different child products have different prices.' where `key`='MATRIX_PRICE'");	
+
+
+			_dbx("UPDATE `xlsws_configuration` SET `title`='SSL Security certificate should be used',
+				`options`='SSL_NO_NEED_FORWARD',`helper_text`='Change when SSL secure mode is used.' where `key`='SSL_NO_NEED_FORWARD'");	
+		
+				
+				
+				
+				
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			
 			$strUpgradeText .= "<h2>Please run RECALCULATE PENDING ORDERS after running this Upgrade.</h2>";

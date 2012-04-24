@@ -604,6 +604,10 @@
 					return array(4 => _sp("Show Highest Price"),3 => _sp("Show Price Range"),
 						2 => _sp("Show \"Click for Pricing\"") ,1 => _sp("Show Lowest Price"),0 => _sp("Show Master Item Price") );											
 
+
+				case 'SSL_NO_NEED_FORWARD':
+					return array(1 => _sp("Only when going to Checkout or pages involving passwords"),0 => _sp("At all times including browsing product pages"));											
+				
 					
 				default:
 					if(stristr($str , "return"))
