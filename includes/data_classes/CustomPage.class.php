@@ -44,18 +44,33 @@ class CustomPage extends CustomPageGen {
 		
 		//Because of our special handling on the contact us form	
 		if ($this->strKey=="contactus")
-			return 'index.php?xlspg=contact_us';
-			
-		if (_xls_get_conf('ENABLE_SEO_URL', false))
-			return $this->strKey . '.html';
-		else
-			return 'index.php?cpage=' . $this->strKey;
+			return 'contact_us/pg/';
+		else return $this->strRequestUrl."/cp/";
+	}
+
+	public static function LoadByRequestUrl($strName) {
+		return CustomPage::QuerySingle(
+			QQ::Equal(QQN::CustomPage()->RequestUrl, $strName)
+			);
+	}
+
+	public static function ConvertSEO() {
+	
+		$arrPages = CustomPage::QueryArray();
+		foreach ($arrPages as $objPage) {
+			$strName = str_replace("&","and",$objPage->Title);
+			$objPage->RequestUrl = _xls_seo_url($strName);
+			$objPage->Save();
+		}
+	
 	}
 
 	public function __get($strName) {
 		switch ($strName) {
 			case 'Link': 
 				return $this->GetLink();
+			case 'RequestUrl': 
+				return $this->strRequestUrl;
 
 			default:
 				try {

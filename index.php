@@ -50,30 +50,42 @@ if ($offlinekey = _xls_get_conf('STORE_OFFLINE' , '')) {
 }
 
 
-$objUrl = new XLSURLParser($_SERVER['PHP_SELF']);
+//Initialize our global parser so we can access from anywhere
+$objUrl = XLSURLParser::getInstance($_SERVER['PHP_SELF']);
 //echo "<pre>";
 //echo print_r($objUrl,true);
-//echo $objUrl->UrlPieces;
-
+//echo $objUrl->RouteData;
+if ($objUrl==false) die("A severe error has occurred that should redirect to a 404 page.");
 
 // Cache categories since they are used throughout
 Category::$Manager->AddArray(
 	Category::LoadAll()
 );
-//echo "on dept ".$objUrl->Department;
-switch ($objUrl->Department)
-{
+error_log("on dept ".$objUrl->RouteDepartment." ".$objUrl->RouteId);
 
-	case 'c':
+switch ($objUrl->RouteDepartment)
+{
+	case 'category':
+	case 'custom_page':
+	case 'customer_register':
+	case 'family':
+	case 'product':
+	case 'searchresults':
+	
+		$strFile = $objUrl->RouteDepartment.".php";
+		break;
+		
+
+	default:
 		$strFile = "category.php";
 		break;
 }
 
 if(file_exists(CUSTOM_INCLUDES . $strFile))
 		include(CUSTOM_INCLUDES . $strFile);
-	else
+	elseif(file_exists('xlsws_includes/'.$strFile))
 		include('xlsws_includes/'.$strFile);
-
+	else die("A severe error has occurred that should redirect to a 404 page.");
 /*
 
 
@@ -155,7 +167,7 @@ if (isset($XLSWS_VARS['seo_rewrite'])) {
 		}
 	}
 }
-
+*/
 $strPageTitle = _xls_get_conf('STORE_NAME' , 'XSilva Web Store');
 $xlsws_form = 'xlsws_index';
 
@@ -189,7 +201,7 @@ error_log("hitting imagetype ".$_GET[$strType]);
 
 	break;
 }
-
+/*
 // Store screen size to visitor log
 if (isset($_POST['store_screen'])) {
 	$visitor = Visitor::get_visitor();

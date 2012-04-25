@@ -110,6 +110,24 @@ class Product extends ProductGen {
 		return str_replace("%2F","/",urlencode($this->strCode));
 	}
 
+	public function GetSEOName() {
+	
+		return _xls_seo_name($this->strName);
+	
+	}
+	
+	public static function ConvertSEO() {
+	
+		$arrProducts = Product::QueryArray();
+		foreach ($arrProducts as $objProd) {
+			$strName = str_replace("&","and",$objProd->Name);
+			$objProd->RequestUrl = _xls_seo_url($strName);
+			$objProd->Save();
+		}
+	
+	}
+	
+	
 	/**
 	 * Gets the URL referring to the Product image
 	 * @param string $type :: Image size constant
@@ -128,11 +146,15 @@ class Product extends ProductGen {
 			if ($prod = $this->FkProductMaster)
 				return $prod->Link;
 
-		if(_xls_get_conf('ENABLE_SEO_URL' , false))
+		/*if(_xls_get_conf('ENABLE_SEO_URL' , false))
 			return $this->Slug . ".html";
 
 		return 'index.php?product=' . $this->Slug .
 			(isset($_GET['c'])?"&c=$_GET[c]":'');
+			
+			*/
+			
+		return $this->RequestUrl."/dp/"; 
 	}
 
 	/**
@@ -533,6 +555,9 @@ class Product extends ProductGen {
 
 			case 'Link':
 				return $this->GetLink();
+				
+			case 'SEOName':
+				return $this->GetSEOName();
 
 			case 'ListingImage':
 				return $this->GetImageLink(ImagesType::listing);
@@ -693,6 +718,12 @@ class Product extends ProductGen {
 		}
 	}
 
+	public static function LoadByRequestUrl($strName) {
+		return Product::QuerySingle(
+			QQ::Equal(QQN::Product()->RequestUrl, $strName)
+			);
+	}
+	
 	/**
 	 * Overload the generated Save handler for the Product model.
 	 *

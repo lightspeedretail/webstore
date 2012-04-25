@@ -113,7 +113,7 @@ class PromoCode extends PromoCodeGen {
             $boolReturn = true; 
             
             if (substr($strCode, 0,9) == "category:") {
-				$arrTrail = Category::GetTrail($objItem->Product->Rowid,'names');
+				$arrTrail = Category::GetTrailByProductId($objItem->Product->Rowid,'names');
 				$strTrail = implode("|",$arrTrail);
 
 				$strCompareCode = trim(substr($strCode,9,255));

@@ -572,7 +572,7 @@
 			$strAliasName = array_key_exists($strAliasPrefix . 'image_id', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'image_id'] : $strAliasPrefix . 'image_id';
 			$objToReturn->intImageId = $objDbRow->GetColumn($strAliasName, 'Integer');
 			$strAliasName = array_key_exists($strAliasPrefix . 'request_url', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'request_url'] : $strAliasPrefix . 'request_url';
-			$objToReturn->strMetaKeywords = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$objToReturn->strRequestUrl = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'meta_keywords', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'meta_keywords'] : $strAliasPrefix . 'meta_keywords';
 			$objToReturn->strMetaKeywords = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'meta_description', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'meta_description'] : $strAliasPrefix . 'meta_description';

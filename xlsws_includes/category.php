@@ -42,7 +42,23 @@ class xlsws_category extends xlsws_product_listing {
 	 * @param none
 	 * @return none
      */
-    protected function LoadCategory() {
+    protected function LoadCategory() { 
+
+    	$objUrl = XLSURLParser::getInstance();    
+		if ($objUrl->RouteId=='') return; //We haven't specified a category, so we're using this as the default home page and showing everything
+		
+		$objCategory = Category::LoadByRequestUrl($objUrl->RouteId);
+		 if ($objCategory)
+                $this->category = $objCategory;
+            else
+                _xls_display_msg(_sp('Sorry! The category was not found.'));
+		
+		if (!$this->category)
+            return false;
+            
+        
+
+		/*
         global $XLSWS_VARS;
 
         if (isset($XLSWS_VARS['c'])) {
@@ -65,6 +81,7 @@ class xlsws_category extends xlsws_product_listing {
 
         if (!$this->category)
             return false;
+        */
     }
 
     /**

@@ -36,6 +36,44 @@ class xlsws_custom_page extends xlsws_index {
 	protected $productTag = false; //the slideshow product tag used with the product slider
 	public $sliderName = "pnlSlider";
 
+		/**
+	 * build_main - constructor for this controller
+	 * @param none
+	 * @return none
+	 */
+	protected function build_main() {
+		global $strPageTitle;
+
+    	$objUrl = XLSURLParser::getInstance();    
+		$objPage = CustomPage::LoadByRequestUrl($objUrl->RouteId);
+
+		if(!$objPage) {
+			_xls_display_msg(_sp("Page") . " ". $objUrl->RouteId." " . _sp("does not exist."));
+			return;
+		}
+
+		$this->crumbs[] = array('key'=>"cpage=".$objPage->RequestUrl , 'case'=> '' , 'name'=> $objPage->Title);
+
+		$this->mainPnl = new QPanel($this);
+		$strPageTitle = $objPage->Title;
+
+		$this->content = $objPage->Page;
+
+		if($objPage->MetaDescription)
+			_xls_add_meta_desc($objPage->MetaDescription);
+
+		if($objPage->MetaKeywords)
+			_xls_add_meta_keyword($objPage->MetaKeywords);
+
+		$this->productTag = $objPage->ProductTag;
+
+		if($objPage->ProductTag != '')
+			$this->build_slider();
+
+		$this->mainPnl->Template = templateNamed('custom_page.tpl.php');
+	}
+	
+	
 	/**
 	 * build_slider - builds the products slideshow slider
 	 * @param none
@@ -44,7 +82,7 @@ class xlsws_custom_page extends xlsws_index {
 	protected function build_slider() {
 		global $strPageTitle;
 		$this->pnlSlider = new XLSSlider($this->mainPnl);
-		$this->pnlSlider->Name = $pageR->Title;
+		$this->pnlSlider->Name = $objPage->Title;
 		$search = $this->productTag;
 
 		$this->pnlSlider->SetProducts(
@@ -91,44 +129,7 @@ class xlsws_custom_page extends xlsws_index {
         return QQ::OrderBy(QQN::Product()->$strProperty, $blnAscend);
     }
     
-	/**
-	 * build_main - constructor for this controller
-	 * @param none
-	 * @return none
-	 */
-	protected function build_main() {
-		global $XLSWS_VARS , $strPageTitle;
 
-		if(!isset($XLSWS_VARS['cpage']))
-			$XLSWS_VARS['cpage'] = '404';
-
-		$pageR = CustomPage::LoadByKey($XLSWS_VARS['cpage']);
-
-		if(!$pageR) {
-			_xls_display_msg(_sp("Page") . " $XLSWS_VARS[cpage] " . _sp("does not exist."));
-			return;
-		}
-
-		$this->crumbs[] = array('key'=>"cpage=$XLSWS_VARS[cpage]" , 'case'=> '' , 'name'=> $pageR->Title);
-
-		$this->mainPnl = new QPanel($this);
-		$strPageTitle = $pageR->Title;
-
-		$this->content = $pageR->Page;
-
-		if($pageR->MetaDescription)
-			_xls_add_meta_desc($pageR->MetaDescription);
-
-		if($pageR->MetaKeywords)
-			_xls_add_meta_keyword($pageR->MetaKeywords);
-
-		$this->productTag = $pageR->ProductTag;
-
-		if($pageR->ProductTag != '')
-			$this->build_slider();
-
-		$this->mainPnl->Template = templateNamed('custom_page.tpl.php');
-	}
 }
 
 if(!defined('CUSTOM_STOP_XLSWS'))

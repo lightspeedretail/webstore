@@ -373,13 +373,16 @@ class xlsws_db_maintenance extends xlsws_index {
 			//SEO Changes
 			if ($this->add_column('xlsws_category' , 'request_url' ,
 				"ALTER TABLE xlsws_category ADD COLUMN `request_url` varchar (255) AFTER `child_count`"))
-			echo "creating seo will go here";
+			Category::ConvertSEO();
 			//_dbx("ALTER TABLE `xlsws_category` ADD INDEX (`request_url`);")
 			if ($this->add_column('xlsws_product' , 'request_url' ,
 				"ALTER TABLE xlsws_product ADD COLUMN `request_url` varchar (255) AFTER `web_keyword3`"))
-			echo "creating seo will go here";
-			//_dbx("ALTER TABLE `xlsws_product` ADD INDEX (`request_url`);")	
+			Product::ConvertSEO();
+				//_dbx("ALTER TABLE `xlsws_product` ADD INDEX (`request_url`);")	
+			if ($this->add_column('xlsws_custom_page' , 'request_url' ,
+				"ALTER TABLE xlsws_custom_page ADD COLUMN `request_url` varchar (255) AFTER `page`"))
 			Category::ConvertSEO();
+
 				
 				
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";

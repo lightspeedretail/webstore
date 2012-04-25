@@ -29,44 +29,119 @@
  */
 class XLSURLParser {
 
-	protected $strUrl;
-	protected $strDepartment; //p for product, c for category, checkout for checkout, etc. 
-	protected $arrUrlPieces;
+	private static $objInstance;
+
+	
+	protected $strUrl; //Full URL before parsing
+	protected $strRouteCode; //p for product, c for category, checkout for checkout, etc. can be customized
+	protected $strRouteDepartment; //internal names for controllers, such as "category", "product", will be unchanged
+	protected $strRouteId; //product code/SKU, category text, order # etc extracted from Url
+	protected $intStatus; //200 for OK, 301 for redirect, 404 for error. Use HTTP codes to determine result of parsing
+	protected $strRedirectUrl; //if a redirect, the URL to redirect to
+	protected $arrUrlSegments;
 	
 	function __construct( $strPhpSelf ) {
 		
 		$this->strUrl = $strPhpSelf;
-		$this->arrUrlPieces = explode('/',$strPhpSelf);
 		
-		//Our URL may have a leading / which creates a blank entry. Also drop our leading index.php
-		if ($this->arrUrlPieces[0]=='') array_shift($this->arrUrlPieces);
-		if ($this->arrUrlPieces[0]=='index.php') array_shift($this->arrUrlPieces);
-		
-		
-		$this->strDepartment=$this->arrUrlPieces[1];
+		if (!$this->ExplodeSegments()) 	return false; 
+		if (!$this->ReindexSegments())	return false;
+		if (!$this->SetRouting())	return false;
+
 	
 	} 
 	
-	public function ParsePath() {
+	//Our method for breaking up pieces of the URL
+	protected function ExplodeSegments() {
 	
-	
-	
-	
+		$this->arrUrlSegments = explode('/',$this->strUrl);
+
+		return true;
 	
 	}
 	
+	//Remove any leading invalid entries or items we don't care about
+	protected function ReindexSegments() {
+	
+		//Our URL may have a leading / which creates a blank entry. Also drop our leading index.php
+		if ($this->arrUrlSegments[0]=='') array_shift($this->arrUrlSegments);
+		if ($this->arrUrlSegments[0]=='index.php') array_shift($this->arrUrlSegments);
+
+		return true;
+	}
+	
+	
+	//Actually compare the parsed segments to determine what portion of the site we will display
+	protected function SetRouting() {
+		
+		$blnSuccessful=false; 		
+		
+		$this->strRouteCode=$this->arrUrlSegments[1];
+		
+		error_log($this->strUrl." routing on segment ".$this->strRouteCode." ".$this->arrUrlSegments[0]);
+		
+		switch ($this->strRouteCode) {
+		
+			case 'c': //Category
+				$this->strRouteId = $this->arrUrlSegments[0];
+				$this->strRouteDepartment = "category";
+				$blnSuccessful=true;
+				break;
+
+			case 'dp': //Display product
+				$this->strRouteId = $this->arrUrlSegments[0];
+				$this->strRouteDepartment = "product";
+				$blnSuccessful=true;
+				break;
+				
+			case 'cp': //Custom Page
+				$this->strRouteId = $this->arrUrlSegments[0];
+				$this->strRouteDepartment = "custom_page";
+				$blnSuccessful=true;
+				break;
+
+				
+		}
+		
+	
+		
+		
+		
+		return $blnSuccessful;
+	}
 	
 	public function __get($strName) {
 		switch ($strName) {
-			case 'UrlPieces':
-				return print_r($this->$arrUrlPieces,true);
-			case 'Department':
-				return $this->strDepartment;
-				
+			case 'Url':
+				return $this->strUrl;
+			case 'UrlSegments':
+				return print_r($this->arrUrlSegments,true);
+			case 'RouteDepartment':
+				return $this->strRouteDepartment;
+			case 'Status':
+				return $this->intStatus;
+			case 'RouteId':
+				return $this->strRouteId;
+			case 'RedirectUrl':
+				return $this->strRedirectUrl;
+			case 'RouteCode':
+				return $this->strRouteCode;
 	
 		}
 
 	}
 	
+	
+	public function getInstance($objSelf = null)
+	{
+	    if (!isset(self::$objInstance))
+	    { 
+	        $class = __CLASS__;
+	        self::$objInstance = new $class($objSelf);
+	    }
+	    return self::$objInstance;
+	}
+
+
 	
 }

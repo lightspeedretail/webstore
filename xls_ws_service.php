@@ -1259,6 +1259,8 @@ EOS;
             if ($strMetaDescription)
                 $objCategory->MetaDescription = $strMetaDescription;
 
+			
+			
             $blbImage = trim($blbImage);
             if ($blbImage && ($blbImage = base64_decode($blbImage))) {
                 $im = imagecreatefromstring($blbImage);
@@ -1296,7 +1298,8 @@ EOS;
             }
 
             $objCategory->UpdateChildCount();
-            
+ 			$objCategory->RequestUrl=$objCategory->GetSEOPath();
+            $objCategory->Save();
             return self::OK;
         }       
         
