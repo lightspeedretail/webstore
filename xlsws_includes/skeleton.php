@@ -771,13 +771,15 @@ EOS;
 		        QQ::AndCondition(
 		            QQ::GreaterOrEqual(QQN::CustomPage()->TabPosition,10),
 		            QQ::LessOrEqual(QQN::CustomPage()->TabPosition,19)
-		        )
+		        ),
+					QQ::Clause(QQ::OrderBy(QQN::CustomPage()->TabPosition))
 		    );
 		$this->arrBottomTabs = CustomPage::QueryArray(
 		        QQ::AndCondition(
 		            QQ::GreaterOrEqual(QQN::CustomPage()->TabPosition,20),
 		            QQ::LessOrEqual(QQN::CustomPage()->TabPosition,29)
-		        )
+		        ),
+					QQ::Clause(QQ::OrderBy(QQN::CustomPage()->TabPosition))
 		    );
 		
 	

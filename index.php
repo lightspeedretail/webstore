@@ -49,13 +49,22 @@ if ($offlinekey = _xls_get_conf('STORE_OFFLINE' , '')) {
 	}
 }
 
+//error_log(print_r($_SERVER,true));
+error_log(print_r($_POST,true));
+//error_log(print_r($_GET,true));
+
 
 //Initialize our global parser so we can access from anywhere
-$objUrl = XLSURLParser::getInstance($_SERVER['PHP_SELF']);
-//echo "<pre>";
-//echo print_r($objUrl,true);
-//echo $objUrl->RouteData;
+$objUrl = XLSURLParser::getInstance();
+
 if ($objUrl==false) die("A severe error has occurred that should redirect to a 404 page.");
+
+
+if ($objUrl->Status==301) {
+	header("HTTP/1.1 301 Moved Permanently");
+	header("Location: ".$objUrl->RedirectUrl);
+	exit();
+}
 
 // Cache categories since they are used throughout
 Category::$Manager->AddArray(
@@ -76,6 +85,10 @@ switch ($objUrl->RouteDepartment)
 		break;
 		
 
+	case 'xlspg':
+		$strFile = $objUrl->RouteId.".php";
+		break;
+		
 	default:
 		$strFile = "category.php";
 		break;
@@ -85,7 +98,19 @@ if(file_exists(CUSTOM_INCLUDES . $strFile))
 		include(CUSTOM_INCLUDES . $strFile);
 	elseif(file_exists('xlsws_includes/'.$strFile))
 		include('xlsws_includes/'.$strFile);
-	else die("A severe error has occurred that should redirect to a 404 page.");
+	else {
+		header('HTTP/1.0 404 Not Found');
+  		readfile('404missing.html');
+  		echo '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+			<html><head>
+			<title>404 Not Found</title>
+			</head><body>
+			<h1>Not Found</h1>
+			<p>The requested URL '.$objUrl->Uri.' was not found on this server.</p>
+			</body></html>';
+
+  		exit();
+		}
 /*
 
 

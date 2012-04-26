@@ -405,13 +405,13 @@ function _xls_stack_removeall() {
  * @param string $msg
  * @param string $redirect
  */
-function _xls_display_msg($msg, $redirect = "index.php") {
+function _xls_display_msg($msg, $redirect = "") { error_log("redirecting on ".$msg);
 	_xls_stack_add('msg', _sp($msg));
 
-	if($redirect)
-		_xls_add_meta_redirect($redirect);
+	//if($redirect)
+	//	_xls_add_meta_redirect($redirect);
 
-	_rd('index.php?xlspg=msg');
+	_rd('msg/pg/');
 }
 
 /**

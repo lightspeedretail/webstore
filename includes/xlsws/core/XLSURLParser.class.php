@@ -42,11 +42,17 @@ class XLSURLParser {
 	
 	function __construct( $strPhpSelf ) {
 		
-		$this->strUrl = $strPhpSelf;
+		$this->strUrl = $_SERVER['PHP_SELF'];
+		$this->strUri = $_SERVER['REQUEST_URI'];
 		
 		if (!$this->ExplodeSegments()) 	return false; 
 		if (!$this->ReindexSegments())	return false;
-		if (!$this->SetRouting())	return false;
+		
+		//print "<pre>"; print_r($this->arrUrlSegments);die();
+		if ($this->SetRouting()) return true;
+		if ($this->ProcessOldUrl()) return true;
+
+		return false;
 
 	
 	} 
@@ -74,7 +80,6 @@ class XLSURLParser {
 	//Actually compare the parsed segments to determine what portion of the site we will display
 	protected function SetRouting() {
 		
-		$blnSuccessful=false; 		
 		
 		$this->strRouteCode=$this->arrUrlSegments[1];
 		
@@ -85,19 +90,26 @@ class XLSURLParser {
 			case 'c': //Category
 				$this->strRouteId = $this->arrUrlSegments[0];
 				$this->strRouteDepartment = "category";
-				$blnSuccessful=true;
-				break;
-
-			case 'dp': //Display product
-				$this->strRouteId = $this->arrUrlSegments[0];
-				$this->strRouteDepartment = "product";
-				$blnSuccessful=true;
+				$this->intStatus=200;
 				break;
 				
 			case 'cp': //Custom Page
 				$this->strRouteId = $this->arrUrlSegments[0];
 				$this->strRouteDepartment = "custom_page";
-				$blnSuccessful=true;
+				$this->intStatus=200;
+
+				break;
+
+			case 'dp': //Display product
+				$this->strRouteId = $this->arrUrlSegments[0];
+				$this->strRouteDepartment = "product";
+				$this->intStatus=200;
+				break;
+				
+			case 'pg': //Web Store Page
+				$this->strRouteId = $this->arrUrlSegments[0];
+				$this->strRouteDepartment = "xlspg";
+				$this->intStatus=200;
 				break;
 
 				
@@ -105,15 +117,29 @@ class XLSURLParser {
 		
 	
 		
-		
-		
-		return $blnSuccessful;
+		return ($this->intStatus==200 ? true : false);
+	}
+	
+	
+	protected function ProcessOldUrl() {
+	
+		if (isset($_GET['xlspg'])) {
+	
+			$this->strRedirectUrl = basename($_GET['xlspg'])."/pg/";
+			$this->intStatus=301;
+			return true;
+		}
+	
+	
+	
 	}
 	
 	public function __get($strName) {
 		switch ($strName) {
 			case 'Url':
 				return $this->strUrl;
+			case 'Uri':
+				return $this->strUri;
 			case 'UrlSegments':
 				return print_r($this->arrUrlSegments,true);
 			case 'RouteDepartment':
@@ -132,12 +158,12 @@ class XLSURLParser {
 	}
 	
 	
-	public function getInstance($objSelf = null)
+	public function getInstance()
 	{
 	    if (!isset(self::$objInstance))
 	    { 
 	        $class = __CLASS__;
-	        self::$objInstance = new $class($objSelf);
+	        self::$objInstance = new $class();
 	    }
 	    return self::$objInstance;
 	}
