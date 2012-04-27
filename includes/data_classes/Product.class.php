@@ -565,6 +565,12 @@ class Product extends ProductGen {
 			case 'MiniImage':
 				return $this->GetImageLink(ImagesType::mini);
 
+			case 'PreviewImage':
+				return $this->GetImageLink(ImagesType::preview);
+
+			case 'SliderImage':
+				return $this->GetImageLink(ImagesType::slider);
+
 			case 'PDetailImage':
 				return $this->GetImageLink(ImagesType::pdetail);
 

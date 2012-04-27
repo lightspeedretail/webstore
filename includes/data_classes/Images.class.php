@@ -46,6 +46,8 @@ class Images extends ImagesGen {
 	const PDETAIL = "pdetailimage";
 	const MINI = "miniimage";
 	const LISTING = "listingimage";
+	const PREVIEW = "previewimage";
+	const SLIDER = "sliderimage";
 
 	public static $Sizes;
 	public static $SizeConfigKeys;

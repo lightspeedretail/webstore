@@ -41,8 +41,7 @@ $items = $cart->GetCartItemArray();
 		
 				<div class="minicart_item" style="border-top: none;">
 					<a href="<?= $item->Prod->Link; ?>">
-					<img src="<?= $item->Prod->MiniImage ?>" />    			
-					<h3><?= _xls_truncate($item->Description , 24) ?>
+					<img src="<?= $item->Prod->MiniImage ?>" height="<?php echo _xls_get_conf('MINI_IMAGE_HEIGHT'); ?>px" width="<?php echo _xls_get_conf('MINI_IMAGE_WIDTH'); ?>px"/>    					<h3><?= _xls_truncate($item->Description , 24) ?>
 					<!--<?php if($item->Prod->ProductSize != ''): ?>
 						<br/><?= $item->Prod->SizeLabel ?> : <?= $item->Prod->ProductSize; ?>
 					<?php endif; ?>
@@ -69,8 +68,8 @@ $items = $cart->GetCartItemArray();
 				<p class="total"><?= _xls_currency($cart->Subtotal) ?></p>
 				
 <?php if($cart->Count > 0):  ?>			
-				<a href="index.php?xlspg=cart" class="review rounded"><?php _xt("Edit Cart"); ?></a>
-				<a href="index.php?xlspg=checkout" class="gocheckout rounded"><?php _xt("Check Out"); ?></a>
+				<a href="cart/pg/" class="review rounded"><?php _xt("Edit Cart"); ?></a>
+				<a href="checkout/pg/" class="gocheckout rounded"><?php _xt("Check Out"); ?></a>
 
 <?php endif; ?>					
 			</div>

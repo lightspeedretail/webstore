@@ -198,16 +198,10 @@ class xlsws_cart extends xlsws_index {
 	protected function check_out_customer_register($strFormId, $strControlId, $strParameter){
 		$customer = Customer::GetCurrent();
 
-		// 170209 - request by ian to go the checkout page direct
-		_rd("index.php?xlspg=checkout");
+		_rd("checkout/pg/");
 
 		return;
 
-		// if loggged in - to go the shipping page
-		if($customer)
-			_rd("index.php?xlspg=checkout");
-
-		_rd("index.php?xlspg=checkout_customer");
 	}
 
 	/**

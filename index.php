@@ -49,12 +49,8 @@ if ($offlinekey = _xls_get_conf('STORE_OFFLINE' , '')) {
 	}
 }
 
-//error_log(print_r($_SERVER,true));
-error_log(print_r($_POST,true));
-//error_log(print_r($_GET,true));
 
-
-//Initialize our global parser so we can access from anywhere
+//Initialize our global URL parser so we can access from anywhere
 $objUrl = XLSURLParser::getInstance();
 
 if ($objUrl==false) die("A severe error has occurred that should redirect to a 404 page.");
@@ -70,7 +66,8 @@ if ($objUrl->Status==301) {
 Category::$Manager->AddArray(
 	Category::LoadAll()
 );
-error_log("on dept ".$objUrl->RouteDepartment." ".$objUrl->RouteId);
+
+//error_log("on dept ".$objUrl->RouteDepartment." ".$objUrl->RouteId);
 
 switch ($objUrl->RouteDepartment)
 {

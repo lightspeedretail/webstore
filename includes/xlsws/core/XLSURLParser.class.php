@@ -35,7 +35,7 @@ class XLSURLParser {
 	protected $strUrl; //Full URL before parsing
 	protected $strRouteCode; //p for product, c for category, checkout for checkout, etc. can be customized
 	protected $strRouteDepartment; //internal names for controllers, such as "category", "product", will be unchanged
-	protected $strRouteId; //product code/SKU, category text, order # etc extracted from Url
+	protected $strRouteId; //product code/SKU, category text etc extracted from Url
 	protected $intStatus; //200 for OK, 301 for redirect, 404 for error. Use HTTP codes to determine result of parsing
 	protected $strRedirectUrl; //if a redirect, the URL to redirect to
 	protected $arrUrlSegments;
@@ -60,7 +60,7 @@ class XLSURLParser {
 	//Our method for breaking up pieces of the URL
 	protected function ExplodeSegments() {
 	
-		$this->arrUrlSegments = explode('/',$this->strUrl);
+		$this->arrUrlSegments = array_filter(explode('/',$this->strUrl));
 
 		return true;
 	
@@ -107,7 +107,8 @@ class XLSURLParser {
 				break;
 				
 			case 'pg': //Web Store Page
-				$this->strRouteId = $this->arrUrlSegments[0];
+				//We use hyphens in the url but they match to actual controller filenames that use underscores
+				$this->strRouteId = str_replace("-","_",$this->arrUrlSegments[0]);
 				$this->strRouteDepartment = "xlspg";
 				$this->intStatus=200;
 				break;
@@ -121,13 +122,23 @@ class XLSURLParser {
 	}
 	
 	
+	/* So we don't completely kill our existing page ranking, properly forward
+	 * any old URLs to their new format with 301 permanent redirect codes
+	 */
 	protected function ProcessOldUrl() {
 	
 		if (isset($_GET['xlspg'])) {
-	
-			$this->strRedirectUrl = basename($_GET['xlspg'])."/pg/";
+		
+			//The first xlspg code is now our first URL segment, but any appended GET variables still need to carry
+			$strRemaining = str_replace("xlspg=".$_GET['xlspg'],"",$this->strUri);
+			$strRemaining = strstr($strRemaining,'?');	
+			$strRemaining = str_replace("?&","?",$strRemaining);
+			if ($strRemaining=="?") $strRemaining='';	
+			$this->strRedirectUrl = str_replace("_","-",basename($_GET['xlspg']))."/pg/".$strRemaining;
 			$this->intStatus=301;
 			return true;
+		
+			
 		}
 	
 	
