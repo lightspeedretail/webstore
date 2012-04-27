@@ -36,7 +36,7 @@
 					<div class="small_imgs">
 					<?php foreach($this->arrAdditionalProdImages as $img): ?>
 						<?php if($img && ($img instanceof Images)): ?>
-							<a href="#" <?php $this->pxyEnlarge->RenderAsEvents($img->Rowid) ?>><img src="<?= Images::GetUrl($img->Rowid , Images::SMALL); ?>" alt="" class="" style="height: 40px; width: 40px;"/></a>
+							<a href="#" <?php $this->pxyEnlarge->RenderAsEvents($img->Rowid) ?>><img src="<?= Images::GetImageLink($img->Rowid , Images::SMALL); ?>" alt="" class="" style="height: 40px; width: 40px;"/></a>
 						<?php endif; ?>
 					<?php endforeach; ?>
 					<?php if(_xls_get_conf('PRODUCT_ENLARGE_SHOW_LIGHTBOX' , 1)): ?>

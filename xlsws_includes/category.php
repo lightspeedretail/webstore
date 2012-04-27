@@ -37,6 +37,46 @@ class xlsws_category extends xlsws_product_listing {
 
 	protected $custom_page_content = ''; //custom page content to appear above the category listing
 
+	/**
+     * build_main - constructor for this controller, refrain from modifying this 
+     * function. It is best practice to style the category tree from menu.tpl.php 
+     * and webstore.css with the list this function generates
+	 * @param none
+	 * @return none
+	 */
+    protected function build_main() {
+        global $XLSWS_VARS;
+
+        $this->LoadCategory();
+        $this->LoadSubCategories();
+        $this->LoadCustomPage();
+        $this->LoadImage();
+
+        parent::build_main();
+
+        if ($this->category) {
+            $objCategory = $this->category;
+
+            // Set Meta Description
+			if($objCategory->MetaDescription != '')
+				_xls_add_meta_desc($objCategory->MetaDescription);
+			else
+				_xls_add_meta_desc($objCategory->Name);
+
+            // Set Meta Keywords
+			if($objCategory->MetaKeywords != '')
+				_xls_add_meta_keyword($objCategory->MetaKeywords);
+			else
+				_xls_add_meta_keyword($objCategory->Name);
+
+            // Set Title
+			_xls_add_page_title($objCategory->Name);
+
+			Visitor::add_view_log($XLSWS_VARS['c'], ViewLogType::categoryview);
+		}
+	}
+	
+	
     /**
      * Bind the currently selected Category to the form
 	 * @param none
@@ -205,44 +245,7 @@ class xlsws_category extends xlsws_product_listing {
         return $objCondition;
     }
 
-	/**
-     * build_main - constructor for this controller, refrain from modifying this 
-     * function. It is best practice to style the category tree from menu.tpl.php 
-     * and webstore.css with the list this function generates
-	 * @param none
-	 * @return none
-	 */
-    protected function build_main() {
-        global $XLSWS_VARS;
 
-        $this->LoadCategory();
-        $this->LoadSubCategories();
-        $this->LoadCustomPage();
-        $this->LoadImage();
-
-        parent::build_main();
-
-        if ($this->category) {
-            $objCategory = $this->category;
-
-            // Set Meta Description
-			if($objCategory->MetaDescription != '')
-				_xls_add_meta_desc($objCategory->MetaDescription);
-			else
-				_xls_add_meta_desc($objCategory->Name);
-
-            // Set Meta Keywords
-			if($objCategory->MetaKeywords != '')
-				_xls_add_meta_keyword($objCategory->MetaKeywords);
-			else
-				_xls_add_meta_keyword($objCategory->Name);
-
-            // Set Title
-			_xls_add_page_title($objCategory->Name);
-
-			Visitor::add_view_log($XLSWS_VARS['c'], ViewLogType::categoryview);
-		}
-	}
 
 }
 

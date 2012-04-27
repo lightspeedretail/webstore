@@ -707,21 +707,23 @@ function _xls_site_dir($ssl_attempt = true) {
 
 
 function _xls_seo_url($string){
+	$string = str_replace('\'','',$string);
 	$string = preg_replace("`\[.*\]`U","",$string);
 	$string = preg_replace('`&(amp;)?#?[a-z0-9]+;`i','-',$string);
 	$string = htmlentities($string, ENT_COMPAT, 'utf-8');
 	$string = preg_replace("`&([a-z])(acute|uml|circ|grave|ring|cedil|slash|tilde|caron|lig|quot|rsquo);`i","\\1", $string);
-	$string = preg_replace('-amp-','-and-',$string);
+	$string = str_replace('-amp-','-and-',$string);
 	$string = preg_replace( array("`[^a-z0-9]`i","`[-]+`") , "-", $string);
 	return strtolower(trim($string, '-'));
 }
 
 function _xls_seo_name($string){
+	$string = str_replace('\'','',$string);
 	$string = preg_replace("`\[.*\]`U","",$string);
 	$string = preg_replace('`&(amp;)?#?[A-Za-z0-9]+;`i','-',$string);
 	$string = htmlentities($string, ENT_COMPAT, 'utf-8');
 	$string = preg_replace("`&([a-z])(acute|uml|circ|grave|ring|cedil|slash|tilde|caron|lig|quot|rsquo);`i","\\1", $string);
-	$string = preg_replace('-amp-','',$string);
+	$string = str_replace('-amp-','-and-',$string);
 	$string = preg_replace( array("`[^a-z0-9]`i","`[-]+`") , "-", $string);
 	return trim($string, '- ');
 }

@@ -97,12 +97,17 @@ class XLSURLParser {
 				$this->strRouteId = $this->arrUrlSegments[0];
 				$this->strRouteDepartment = "custom_page";
 				$this->intStatus=200;
-
 				break;
 
 			case 'dp': //Display product
 				$this->strRouteId = $this->arrUrlSegments[0];
 				$this->strRouteDepartment = "product";
+				$this->intStatus=200;
+				break;
+				
+			case 'f': //Display family
+				$this->strRouteId = $this->arrUrlSegments[0];
+				$this->strRouteDepartment = "family";
 				$this->intStatus=200;
 				break;
 				

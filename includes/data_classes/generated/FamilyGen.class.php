@@ -17,6 +17,7 @@
 	 * @subpackage GeneratedDataObjects
 	 * @property integer $Rowid the value for intRowid (Read-Only PK)
 	 * @property string $Family the value for strFamily (Unique)
+	 * @property string $RequestUrl the value for strRequestUrl 
 	 * @property boolean $__Restored whether or not this object was restored from the database (as opposed to created new)
 	 */
 	class FamilyGen extends QBaseClass {
@@ -38,8 +39,17 @@
 		 * @var string strFamily
 		 */
 		protected $strFamily;
-		const FamilyMaxLength = 32;
+		const FamilyMaxLength = 255;
 		const FamilyDefault = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_family.family
+		 * @var string strFamily
+		 */
+		protected $strRequestUrl;
+		const RequestUrlMaxLength = 255;
+		const RequestUrlDefault = null;
 
 
 		/**
@@ -329,6 +339,7 @@
 
 			$objBuilder->AddSelectItem($strTableName, 'rowid', $strAliasPrefix . 'rowid');
 			$objBuilder->AddSelectItem($strTableName, 'family', $strAliasPrefix . 'family');
+			$objBuilder->AddSelectItem($strTableName, 'request_url', $strAliasPrefix . 'request_url');
 		}
 
 
@@ -364,6 +375,8 @@
 			$objToReturn->intRowid = $objDbRow->GetColumn($strAliasName, 'Integer');
 			$strAliasName = array_key_exists($strAliasPrefix . 'family', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'family'] : $strAliasPrefix . 'family';
 			$objToReturn->strFamily = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'request_url', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'request_url'] : $strAliasPrefix . 'request_url';
+			$objToReturn->strRequestUrl = $objDbRow->GetColumn($strAliasName, 'VarChar');
 
 			// Instantiate Virtual Attributes
 			foreach ($objDbRow->GetColumnNameArray() as $strColumnName => $mixValue) {
@@ -479,9 +492,11 @@
 					// Perform an INSERT query
 					$objDatabase->NonQuery('
 						INSERT INTO `xlsws_family` (
-							`family`
+							`family`,
+							`request_url`
 						) VALUES (
-							' . $objDatabase->SqlVariable($this->strFamily) . '
+							' . $objDatabase->SqlVariable($this->strFamily) . ',
+							' . $objDatabase->SqlVariable($this->strRequestUrl) . '
 						)
 					');
 
@@ -497,7 +512,8 @@
 						UPDATE
 							`xlsws_family`
 						SET
-							`family` = ' . $objDatabase->SqlVariable($this->strFamily) . '
+							`family` = ' . $objDatabase->SqlVariable($this->strFamily) . ',
+							`request_url` = ' . $objDatabase->SqlVariable($this->strRequestUrl) . ' 
 						WHERE
 							`rowid` = ' . $objDatabase->SqlVariable($this->intRowid) . '
 					');
@@ -577,6 +593,8 @@
 
 			// Update $this's local variables to match
 			$this->strFamily = $objReloaded->strFamily;
+			$this->strRequestUrl = $objReloaded->strRequestUrl;
+
 		}
 
 
@@ -606,6 +624,11 @@
 					// Gets the value for strFamily (Unique)
 					// @return string
 					return $this->strFamily;
+
+				case 'RequestUrl':
+					// Gets the value for strRequestUrl
+					// @return string
+					return $this->strRequestUrl;
 
 
 				///////////////////
@@ -655,6 +678,17 @@
 						throw $objExc;
 					}
 
+				case 'RequestUrl':
+					// Sets the value for RequestUrl 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strRequestUrl = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
 
 				///////////////////
 				// Member Objects
@@ -698,6 +732,7 @@
 			$strToReturn = '<complexType name="Family"><sequence>';
 			$strToReturn .= '<element name="Rowid" type="xsd:int"/>';
 			$strToReturn .= '<element name="Family" type="xsd:string"/>';
+			$strToReturn .= '<element name="RequestUrl" type="xsd:string"/>';
 			$strToReturn .= '<element name="__blnRestored" type="xsd:boolean"/>';
 			$strToReturn .= '</sequence></complexType>';
 			return $strToReturn;
@@ -724,6 +759,8 @@
 				$objToReturn->intRowid = $objSoapObject->Rowid;
 			if (property_exists($objSoapObject, 'Family'))
 				$objToReturn->strFamily = $objSoapObject->Family;
+			if (property_exists($objSoapObject, 'RequestUrl'))
+				$objToReturn->strRequestUrl = $objSoapObject->RequestUrl;
 			if (property_exists($objSoapObject, '__blnRestored'))
 				$objToReturn->__blnRestored = $objSoapObject->__blnRestored;
 			return $objToReturn;
@@ -766,6 +803,8 @@
 					return new QQNode('rowid', 'Rowid', 'integer', $this);
 				case 'Family':
 					return new QQNode('family', 'Family', 'string', $this);
+				case 'RequestUrl':
+					return new QQNode('request_url', 'RequestUrl', 'string', $this);
 
 				case '_PrimaryKeyNode':
 					return new QQNode('rowid', 'Rowid', 'integer', $this);
@@ -790,6 +829,8 @@
 					return new QQNode('rowid', 'Rowid', 'integer', $this);
 				case 'Family':
 					return new QQNode('family', 'Family', 'string', $this);
+				case 'RequestUrl':
+					return new QQNode('request_url', 'RequestUrl', 'string', $this);
 
 				case '_PrimaryKeyNode':
 					return new QQNode('rowid', 'Rowid', 'integer', $this);

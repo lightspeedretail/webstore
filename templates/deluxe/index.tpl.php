@@ -190,7 +190,7 @@
 			<?php
 				foreach ($this->arrBottomTabs as $arrTab)
 					echo '<a href="'.$arrTab->Link.'">'._sp($arrTab->Title).'</a> |';
-				?><a href="index.php?xlspg=sitemap"><?php _xt('Sitemap'); ?></a>
+				?><a href="sitemap/pg/"><?php _xt('Sitemap'); ?></a>
 			</div>
 	</div>
 	</div>
