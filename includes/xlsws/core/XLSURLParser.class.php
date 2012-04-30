@@ -174,7 +174,7 @@ class XLSURLParser {
 	}
 	
 	
-	public function getInstance()
+	public static function getInstance()
 	{
 	    if (!isset(self::$objInstance))
 	    { 
