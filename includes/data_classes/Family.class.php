@@ -79,10 +79,9 @@ class Family extends FamilyGen {
 	
 	public static function ConvertSEO() {
 	
-		$arrFamilies = Family::QueryArray();
+		$arrFamilies = Family::LoadAll();
 		foreach ($arrFamilies as $objFamily) {
-			$strName = str_replace("&","and",$objFamily->Family);
-			$objFamily->RequestUrl = _xls_seo_url($strName); 
+			$objFamily->RequestUrl = _xls_seo_url($objFamily->Family); 
 			$objFamily->Save();
 		}
 	

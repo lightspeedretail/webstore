@@ -111,6 +111,12 @@ class XLSURLParser {
 				$this->intStatus=200;
 				break;
 				
+			case 'feeds': //RSS/XML feeds
+				$this->strRouteId = $this->arrUrlSegments[0];
+				$this->strRouteDepartment = "feeds";
+				$this->intStatus=200;
+				break;
+			
 			case 'pg': //Web Store Page
 				//We use hyphens in the url but they match to actual controller filenames that use underscores
 				$this->strRouteId = str_replace("-","_",$this->arrUrlSegments[0]);

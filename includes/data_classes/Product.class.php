@@ -118,9 +118,12 @@ class Product extends ProductGen {
 	
 	public static function ConvertSEO() {
 	
-		$arrProducts = Product::QueryArray();
+		$arrProducts = Product::QueryArray(
+				QQ::Equal(QQN::Product()->Web, 1),
+				QQ::Clause(
+					QQ::OrderBy(QQN::Product()->Rowid)
+			 ));
 		foreach ($arrProducts as $objProd) {
-			$strName = str_replace("&","and",$objProd->Name);
 			$objProd->RequestUrl = _xls_seo_url($strName);
 			$objProd->Save();
 		}
@@ -799,6 +802,7 @@ class Product extends ProductGen {
 			`web_keyword1`,
 			`web_keyword2`,
 			`web_keyword3`,
+			`request_url`,
 			`meta_desc`,
 			`meta_keyword`,
 			`featured`,
@@ -836,6 +840,7 @@ class Product extends ProductGen {
 			' . $objDatabase->SqlVariable($this->strWebKeyword1) . ',
 			' . $objDatabase->SqlVariable($this->strWebKeyword2) . ',
 			' . $objDatabase->SqlVariable($this->strWebKeyword3) . ',
+			' . $objDatabase->SqlVariable($this->strRequestUrl) . ',
 			' . $objDatabase->SqlVariable($this->strMetaDesc) . ',
 			' . $objDatabase->SqlVariable($this->strMetaKeyword) . ',
 			' . $objDatabase->SqlVariable($this->blnFeatured) . ',

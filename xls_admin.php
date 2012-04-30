@@ -727,7 +727,7 @@
 			$this->configPnls['local']->Info = _sp('Geographical configuration for your store');
 
 			$this->configPnls['seo'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::SEO , "configDone");
-			$this->configPnls['seo']->Name = _sp('SEO - Search Engine Optimization');
+			$this->configPnls['seo']->Name = _sp('SEO (Search Engine Optimization) / 3rd Party Integration');
 			$this->configPnls['seo']->Info = _sp('SEO configuration for your store');
 
 			

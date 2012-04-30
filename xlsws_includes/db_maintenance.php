@@ -381,7 +381,7 @@ class xlsws_db_maintenance extends xlsws_index {
 				//_dbx("ALTER TABLE `xlsws_product` ADD INDEX (`request_url`);")	
 			if ($this->add_column('xlsws_custom_page' , 'request_url' ,
 				"ALTER TABLE xlsws_custom_page ADD COLUMN `request_url` varchar (255) AFTER `page`"))
-			Category::ConvertSEO();
+			CustomPage::ConvertSEO();
 			if ($this->add_column('xlsws_family' , 'request_url' ,
 				"ALTER TABLE xlsws_family ADD COLUMN `request_url` varchar (255) AFTER `family`"))
 			Family::ConvertSEO();

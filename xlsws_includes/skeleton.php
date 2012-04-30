@@ -1199,7 +1199,8 @@ EOS;
 
 		$pnlImg->Width  = $width; // _xls_get_conf('DETAIL_IMAGE_WIDTH',100);
 		$pnlImg->Height = $height; //_xls_get_conf('DETAIL_IMAGE_HEIGHT',80);
-		$pnlImg->SetCustomStyle('background' , "url(" . $prod->$imgType . ") no-repeat center");
+		//$pnlImg->SetCustomStyle('background' , "url(" . $prod->$imgType . ") no-repeat center");
+		$pnlImg->Text = "<img src='".$prod->$imgType."' >"; //width='".$width."px' height='".$height."px'
 		$pnlImg->CssClass = 'product_cell_image';
 		$pnlImg->HtmlEntities = false;
 

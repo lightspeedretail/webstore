@@ -81,6 +81,9 @@ switch ($objUrl->RouteDepartment)
 		$strFile = $objUrl->RouteDepartment.".php";
 		break;
 		
+	case 'feeds':
+		$strFile = "feeds/".$objUrl->RouteId.".php";
+		break;		
 
 	case 'xlspg':
 		$strFile = $objUrl->RouteId.".php";
@@ -97,14 +100,14 @@ if(file_exists(CUSTOM_INCLUDES . $strFile))
 		include('xlsws_includes/'.$strFile);
 	else {
 		header('HTTP/1.0 404 Not Found');
-  		readfile('404missing.html');
-  		echo '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
-			<html><head>
-			<title>404 Not Found</title>
-			</head><body>
-			<h1>Not Found</h1>
-			<p>The requested URL '.$objUrl->Uri.' was not found on this server.</p>
-			</body></html>';
+  		if (!readfile('404missing.html'))
+  			echo '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">' . chr(13) .
+				'<html><head>' . chr(13) .
+				'<title>404 Not Found</title>' . chr(13) .
+				'</head><body>' . chr(13) .
+				'<h1>Not Found</h1>' . chr(13) .
+				'<p>The requested URL '.$objUrl->Uri.' was not found on this server.</p>' . chr(13) .
+				'</body></html>';
 
   		exit();
 		}

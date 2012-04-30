@@ -306,9 +306,8 @@ EOS;
 	
 	public static function ConvertSEO() {
 	
-		$arrCats= Category::QueryArray();
+		$arrCats= Category::LoadAll();
 		foreach ($arrCats as $objCat) {
-			$strName = str_replace("&","and",$objCat->Name);
 			$objCat->RequestUrl = $objCat->GetSEOPath();
 			$objCat->Save();
 		}

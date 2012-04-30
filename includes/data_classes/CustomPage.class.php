@@ -56,10 +56,9 @@ class CustomPage extends CustomPageGen {
 
 	public static function ConvertSEO() {
 	
-		$arrPages = CustomPage::QueryArray();
+		$arrPages = CustomPage::LoadAll();
 		foreach ($arrPages as $objPage) {
-			$strName = str_replace("&","and",$objPage->Title);
-			$objPage->RequestUrl = _xls_seo_url($strName);
+			$objPage->RequestUrl = _xls_seo_url($objPage->Title);
 			$objPage->Save();
 		}
 	
