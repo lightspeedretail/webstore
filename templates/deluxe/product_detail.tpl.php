@@ -47,13 +47,20 @@
 					<a href="#" class="wishlist rounded-bottom" <?php  $this->misc_components['show_gift_registry']->RenderAsEvents('show') ?>><img src="<?= templateNamed('css') ; ?>/images/wishlist.png" /><?php _xt("Add to Wish List"); ?></a>
 					<?php endif; ?>
 					
-					<a href="#" <?php  $this->misc_components['add_to_cart']->RenderAsEvents($this->prod->Code) ?>><span class="addcart rounded-bottom"><img src="<?= templateNamed('css') ; ?>/images/addtocart.png" /><?php _xt("Add to Cart"); ?></span></a><br />
+					<a href="#" <?php  $this->misc_components['add_to_cart']->RenderAsEvents($this->prod->Code) ?>><span class="addcart rounded-bottom"><img src="<?= templateNamed('css') ; ?>/images/addtocart.png" /><?php _xt("Add to Cart"); ?></span></a>
 					
 					<?php else:?>
 						<p style="margin-top: 100px;"></p> 
 				<?php endif; ?>
 				
+				<?php if(_xls_get_conf('SHOW_SHARING' , 0)): ?>
+				
+				<div class="fb-like" data-href="<? echo $this->prod->CanonicalUrl; ?>" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false"></div>
+				<a href="http://pinterest.com/pin/create/button/?url=<? echo $this->prod->CanonicalUrl; ?>&media=<? echo _xls_site_dir().$this->prod->SmallImage; ?>&description=<? echo urlencode($this->prod->Name); ?>" class="pin-it-button" count-layout="horizontal"><img border="0" src="//assets.pinterest.com/images/PinExt.png" title="Pin It" /></a>
+				
+				<?php endif; ?>
 				<div style="clear: both;"></div>
+				
 				<?php $this->giftRegistryPnl->Render(); ?>
 				
 				
@@ -77,7 +84,8 @@
 				<div class="price"><?php _xt("Price"); ?>: <?php $this->lblPrice->Render(); ?></div>		
 				
 				<div class="description"><?php $this->lblDescription->Render() ; ?></div>
-
+				
+				
 
 				<?php if(count($this->arrAutoAddProducts)>0): ?>
 				<fieldset>

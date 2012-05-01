@@ -124,7 +124,7 @@ class Product extends ProductGen {
 					QQ::OrderBy(QQN::Product()->Rowid)
 			 ));
 		foreach ($arrProducts as $objProd) {
-			$objProd->RequestUrl = _xls_seo_url($strName);
+			$objProd->RequestUrl = _xls_seo_url(_xls_get_conf('SEO_URL_CODES' , 0) ? $strName."-".$strCode : $strName);
 			$objProd->Save();
 		}
 	
@@ -148,14 +148,6 @@ class Product extends ProductGen {
 		if ($this->IsChild)
 			if ($prod = $this->FkProductMaster)
 				return $prod->Link;
-
-		/*if(_xls_get_conf('ENABLE_SEO_URL' , false))
-			return $this->Slug . ".html";
-
-		return 'index.php?product=' . $this->Slug .
-			(isset($_GET['c'])?"&c=$_GET[c]":'');
-			
-			*/
 			
 		return $this->RequestUrl."/dp/"; 
 	}
@@ -562,6 +554,9 @@ class Product extends ProductGen {
 			case 'SEOName':
 				return $this->GetSEOName();
 
+			case 'CanonicalUrl':
+				return _xls_site_dir().'/'.$this->RequestUrl."/dp/";
+				
 			case 'ListingImage':
 				return $this->GetImageLink(ImagesType::listing);
 

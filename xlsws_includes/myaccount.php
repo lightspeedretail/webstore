@@ -90,7 +90,7 @@ class xlsws_myaccount extends xlsws_index {
 		else
 			_xls_display_msg("Sorry, you have to be logged in to access this page.");
 
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('myaccount.tpl.php');
 
 		$this->crumbs[] = array('key'=>'xlspg=myaccount' , 'case'=> '' , 'name'=> _sp('My account'));

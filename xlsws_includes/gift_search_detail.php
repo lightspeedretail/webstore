@@ -60,7 +60,7 @@ class xlsws_glist extends xlsws_index {
 	protected function build_main() {
 		global $XLSWS_VARS;
 
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('gift_search_detail.tpl.php');
 
 		$this->crumbs[] = array('key'=>'xlspg=gift_search' , 'case'=> '' , 'name'=> _sp('Wish List'));

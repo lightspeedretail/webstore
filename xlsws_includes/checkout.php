@@ -1268,7 +1268,7 @@ class xlsws_checkout extends xlsws_index {
         $objCustomer = Customer::GetCurrent();
         $objCart = Cart::GetCart();
 
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('checkout.tpl.php');
         $this->objDefaultWaitIcon = new QWaitIcon($this);
 

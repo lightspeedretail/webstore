@@ -46,7 +46,7 @@ class xlsws_gsearch extends xlsws_index {
 	 * @return none
 	 */
 	protected function build_main() {
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('gift_search.tpl.php');
 
 		$this->crumbs[] = array('key'=>'xlspg=gift_search' , 'case'=> '' , 'name'=> _sp('Wish Lists'));

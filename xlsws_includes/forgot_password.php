@@ -36,7 +36,7 @@ class xlsws_fpassword extends xlsws_index {
 
 	/*Constructor for this module, unused by views*/
 	protected function build_main() {
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('forgot_password.tpl.php');
 
 		$this->crumbs[] = array('key'=>'xlspg=forgot_password' , 'case'=> '' , 'name'=> _sp('Forgot Password?'));

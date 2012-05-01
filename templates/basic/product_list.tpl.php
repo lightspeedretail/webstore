@@ -55,11 +55,11 @@
 <?php endforeach; ?> 
 </ul>
 </div>
+<br style="clear:both"/>
 <?php endif; ?> 
-<br style="clear:both"/>
-
+<h1><?php echo $this->category->Name; ?></h1>
 </div>
-<br style="clear:both"/>
+
 <div id="main_panel" class="rounded">
 
         <?php $this->dtrProducts->Render(); ?>

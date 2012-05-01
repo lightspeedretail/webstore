@@ -76,7 +76,10 @@
 				<div class="price"><?php _xt("Price"); ?>: <?php $this->lblPrice->Render(); ?></div>		
 				
 				<div class="description"><?php $this->lblDescription->Render() ; ?></div>
-
+				
+				<?php if(_xls_get_conf('SHOW_SHARING' , 0)): ?>
+				<div id="fb-root"></div><script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script><fb:like href="" send="true" width="450" show_faces="true" font=""></fb:like>
+				<?php endif; ?>
 
 				<?php if(count($this->arrAutoAddProducts)>0): ?>
 				<fieldset>
