@@ -601,9 +601,10 @@ overflow:hidden;
 width:100%;
 }
 
-#sidebar h1 {
+#sidebar .clickbar {
 background:#fff;
 font-size:14px;
+font-weight: bold;
 height:16px;
 margin:5px 0 0;
 padding:11px;

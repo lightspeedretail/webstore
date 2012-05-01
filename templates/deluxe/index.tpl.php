@@ -164,9 +164,7 @@
 		</div>
 
 	<noscript>
-	<h1>
 	<?php _xt('This store requires you to have a JavaScript enabled web browser.'); ?>
-	</h1>
 	</noscript>	
 
 			<?php $this->mainPnl->Render(); ?>

@@ -702,11 +702,12 @@ overflow:hidden;
 width:100%;
 }
 
-#sidebar h1 {
+#sidebar .clickbar {
 background:url(images/sidebar_header.png);
 border-bottom:1px solid #333;
 border-top:1px solid #fff;
 font-size:14px;
+font-weight: bold;
 height:16px;
 margin:5px 0 0;
 padding:11px;
