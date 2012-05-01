@@ -44,7 +44,7 @@ class xlsws_product_listing extends xlsws_index {
         $objRepeater->ItemsPerPage =  _xls_get_conf('PRODUCTS_PER_PAGE' , 8);
 		$objRepeater->Template = templateNamed('product_list_item.tpl.php');
 		$objRepeater->CssClass = "product_list rounded";
-        $objRepeater->UseAjax = true;
+        $objRepeater->UseAjax = _xls_get_conf('DEBUG_DISABLE_AJAX' , 0) ? false : true;
 
         // TODO :: Move pager number to a hidden QControl
 		if (isset($XLSWS_VARS['page']))

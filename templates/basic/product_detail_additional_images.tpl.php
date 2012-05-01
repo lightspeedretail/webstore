@@ -27,7 +27,7 @@
 
 foreach($_CONTROL->Form->arrAdditionalProdImages as $img): ?>
 		<?php if($img && ($img instanceof Images)): ?>
-			<a href="#" <?php $_CONTROL->Form->pxyEnlarge->RenderAsEvents($img->Rowid) ?>><img src="<?= Images::GetUrl($img->Rowid , Images::SMALL); ?>" alt="" class="" style="<?php echo "height: "._xls_get_conf("MINI_IMAGE_WIDTH")."px; width: "._xls_get_conf("MINI_IMAGE_HEIGHT")."px;" ?>"/></a>
+			<a href="#" <?php $_CONTROL->Form->pxyEnlarge->RenderAsEvents($img->Rowid) ?>><img src="<?= Images::GetImageLink($img->Rowid , Images::SMALL); ?>" alt="" class="" style="<?php echo "height: "._xls_get_conf("MINI_IMAGE_WIDTH")."px; width: "._xls_get_conf("MINI_IMAGE_HEIGHT")."px;" ?>"/></a>
 		<?php endif; ?>
 	<?php endforeach; ?>
 	

@@ -57,9 +57,9 @@ function print_families(){
 	echo '<li><a href="#">'.$strLabel;
 	echo '<img src="'.templateNamed('css').'/images/arrow-right.gif" class="arrow" style="margin: 1px 0 0 10px;" alt="'.$strLabel.'" /></a>';
 	echo '<ul>';
-	$families = Family::LoadAll();
+	$families= Family::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Family()->Family)));
 	foreach($families as $family) {
-		echo '<li><a href="index.php?family='.urlencode($family->Family).'">'.$family->Family.'</a></li>';
+		echo '<li><a href="'.$family->RequestUrl.'/f/">'.$family->Family.'</a></li>';
 	}
 	echo '</ul></li>';	
 

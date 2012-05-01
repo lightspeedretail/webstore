@@ -143,31 +143,50 @@ class Category extends CategoryGen {
 	}
 
 	protected function GetLink() {
-		if (_xls_get_conf('ENABLE_SEO_URL', false))
+		/*if (_xls_get_conf('ENABLE_SEO_URL', false))
 			if ($this->IsPrimary())
 				return $this->Slug . '.html';
 			else
 				return $this->ParentObject->DirLink . $this->Slug . '.html';
 		return 'index.php?c=' . $this->intRowid;
+		
+		*/
+		return $this->strRequestUrl."/c/";
 	}
 
 	/**
-	 * GetTrail - return array of Category Trail for product
+	 * GetTrailByProductId - return array of Category Trail for product
 	 * @param $intRowid RowID of Product
 	 * @param $strType passing "names" will just get simple array of names
 	 *                 otherwise it's it's a full array of items
 	 * @return $arrPath[]
 	 */
-	public static function GetTrail($intRowid,$strType = 'all') {
+	public static function GetTrailByProductId($intRowid,$strType = 'all') {
 		$arrPath=array();
-		
 		$objCategory = parent::LoadArrayByProduct($intRowid); 
-		if($objCategory && (count($objCategory) > 0))
-			$category_id = current($objCategory)->Rowid;
-		else
-			return $arrPath;
+		if ($objCategory)
+			$arrPath = $objCategory[0]->GetTrail($strType);
+		return $arrPath;
+	}
+	
+	/**
+	 * GetTrail - return array of Category Trail for category
+	 * @param $strType passing "names" will just get simple array of names
+	 *                 otherwise it's it's a full array of items
+	 * @return $arrPath[]
+	 */
+	public function GetTrail($strType = 'all') {
+		$arrPath=array();
 
-		do {
+		$objCategory = $this; 
+		$category_id = $objCategory->Rowid;		
+	
+		if($objCategory->Parent==0) {
+		
+			array_push($arrPath , $strType=='names' ? 
+					 $strName : array( 'key' => $category_id , 'tag' => 'c' , 'name' => $objCategory->Name , 'link' => $objCategory->Link));
+			
+		} else do {
 			$objCategory = parent::Load($category_id);
 	
 			$strName = $objCategory->Name; 
@@ -268,6 +287,13 @@ EOS;
 		);
 	}
 
+	public static function LoadByRequestUrl($strName) {
+		return Category::QuerySingle(
+			QQ::Equal(QQN::Category()->RequestUrl, $strName)
+			);
+	}
+
+
 	public function Delete() {
 		$this->UnassociateAllProducts();
 
@@ -275,6 +301,42 @@ EOS;
 			$objCategory->Delete();
 
 		parent::Delete();
+	}
+	
+	
+	public static function ConvertSEO() {
+	
+		$arrCats= Category::LoadAll();
+		foreach ($arrCats as $objCat) {
+			$objCat->RequestUrl = $objCat->GetSEOPath();
+			$objCat->Save();
+		}
+	
+	}
+
+
+	public function GetSEOPath() {
+	
+		$arrPath=array();
+		$objCategory = $this;
+		$strName = $objCategory->Name; 
+
+		$category_id = $objCategory->Rowid;		
+	
+		if($objCategory->Parent==0) {
+			array_push($arrPath, $strName );
+			
+		}else do {
+			$objCategory = parent::Load($category_id);
+	
+			$strName = $objCategory->Name; 
+			if($objCategory)
+				array_push($arrPath, $strName );
+	
+		} while ($objCategory && ($category_id = $objCategory->Parent));
+		
+		$strPath = implode("-",array_reverse($arrPath));
+		return _xls_seo_url($strPath);
 	}
 
 	/**

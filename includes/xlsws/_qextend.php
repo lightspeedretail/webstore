@@ -57,7 +57,9 @@ function _rd($url = '') {
 
 	if(empty($url))
 		$url = $_SERVER["REQUEST_URI"];
-
+	if (substr($url,0,4) != "http")
+		$url = _xls_site_dir()."/".$url;
+		
 	QApplicationBase::Redirect($url);
 }
 

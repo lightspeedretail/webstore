@@ -461,7 +461,7 @@ class xlsws_checkout extends xlsws_index {
     }
 
     public function DoLoginControlClick($strFormId, $strControlId, $strParam) {
-        _xls_stack_add('login_redirect_uri', 'index.php?xlspg=checkout');
+        _xls_stack_add('login_redirect_uri', 'checkout/pg/');
        
         $this->dxLogin->doShow();
     }
@@ -493,7 +493,7 @@ class xlsws_checkout extends xlsws_index {
     }
 
     public function DoRegisterControlClick($strFormId, $strControlId, $strParam) {
-        _xls_stack_add('register_redirect_uri' , "index.php?xlspg=checkout");
+        _xls_stack_add('register_redirect_uri' , "checkout/pg/");
         _rd("index.php?xlspg=customer_register");
     }
 
@@ -1042,7 +1042,7 @@ class xlsws_checkout extends xlsws_index {
             if (_xls_get_conf('ALLOW_GUEST_CHECKOUT', 1) != 1)
                 _xls_display_msg(
                     _sp('You have to login to check out'),
-                    'index.php?xlspg=checkout'
+                    'checkout/pg/'
                 );
 
 		if ($_SESSION['customer']->Country1=='')
@@ -1273,7 +1273,7 @@ class xlsws_checkout extends xlsws_index {
         $this->objDefaultWaitIcon = new QWaitIcon($this);
 
         $this->crumbs[] = array(
-            'key' => 'xlspg=checkout',
+            'key' => 'checkout/pg/',
             'case' => '',
             'name' => _sp('Check Out')
         );

@@ -566,6 +566,8 @@ EOS;
             $product->WebKeyword3 = $strWebKeyword3;
             $product->Featured = $blnFeatured;
             
+            $product->RequestUrl = _xls_seo_url($strName);
+            error_log("request is ".$product->RequestUrl);
 	        $strFeatured = _xls_get_conf('FEATURED_KEYWORD','notset');
 	        if ($strFeatured != 'notset' && $product->Web && (
             	$strWebKeyword1==$strFeatured || $strWebKeyword2==$strFeatured || $strWebKeyword2==$strFeatured))
@@ -642,6 +644,7 @@ EOS;
 	            if (!$objFamily) {
 	            	$objFamily = new Family();
 	            	$objFamily->Family = $strFamily;
+	            	$objFamily->RequestUrl = _xls_seo_url($strFamily);
 	            	$objFamily->Save();
 	            }
             }        
@@ -1259,6 +1262,8 @@ EOS;
             if ($strMetaDescription)
                 $objCategory->MetaDescription = $strMetaDescription;
 
+			
+			
             $blbImage = trim($blbImage);
             if ($blbImage && ($blbImage = base64_decode($blbImage))) {
                 $im = imagecreatefromstring($blbImage);
@@ -1296,7 +1301,8 @@ EOS;
             }
 
             $objCategory->UpdateChildCount();
-            
+ 			$objCategory->RequestUrl=$objCategory->GetSEOPath();
+            $objCategory->Save();
             return self::OK;
         }       
         
@@ -2744,6 +2750,7 @@ EOS;
             }
             
             $family->Family = $strFamily;
+            $family->RequestUrl = _xls_seo_url($strFamily);
             
             try{
                 $family->Save($new);

@@ -47,6 +47,7 @@
 	 * @property string $WebKeyword1 the value for strWebKeyword1 
 	 * @property string $WebKeyword2 the value for strWebKeyword2 
 	 * @property string $WebKeyword3 the value for strWebKeyword3 
+	 * @property string $RequestUrl the value for strRequestUrl 
 	 * @property string $MetaDesc the value for strMetaDesc 
 	 * @property string $MetaKeyword the value for strMetaKeyword 
 	 * @property boolean $Featured the value for blnFeatured (Not Null)
@@ -343,6 +344,14 @@
 		const WebKeyword3MaxLength = 255;
 		const WebKeyword3Default = null;
 
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_product.meta_desc
+		 * @var string strMetaDesc
+		 */
+		protected $strRequestUrl;
+		const RequestUrlMaxLength = 255;
+		const RequestUrlDefault = null;
 
 		/**
 		 * Protected member variable that maps to the database column xlsws_product.meta_desc
@@ -851,6 +860,7 @@
 			$objBuilder->AddSelectItem($strTableName, 'web_keyword1', $strAliasPrefix . 'web_keyword1');
 			$objBuilder->AddSelectItem($strTableName, 'web_keyword2', $strAliasPrefix . 'web_keyword2');
 			$objBuilder->AddSelectItem($strTableName, 'web_keyword3', $strAliasPrefix . 'web_keyword3');
+			$objBuilder->AddSelectItem($strTableName, 'request_url', $strAliasPrefix . 'request_url');
 			$objBuilder->AddSelectItem($strTableName, 'meta_desc', $strAliasPrefix . 'meta_desc');
 			$objBuilder->AddSelectItem($strTableName, 'meta_keyword', $strAliasPrefix . 'meta_keyword');
 			$objBuilder->AddSelectItem($strTableName, 'featured', $strAliasPrefix . 'featured');
@@ -1081,6 +1091,8 @@
 			$objToReturn->strWebKeyword2 = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'web_keyword3', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'web_keyword3'] : $strAliasPrefix . 'web_keyword3';
 			$objToReturn->strWebKeyword3 = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'request_url', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'request_url'] : $strAliasPrefix . 'request_url';
+			$objToReturn->strRequestUrl = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'meta_desc', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'meta_desc'] : $strAliasPrefix . 'meta_desc';
 			$objToReturn->strMetaDesc = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'meta_keyword', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'meta_keyword'] : $strAliasPrefix . 'meta_keyword';
@@ -1551,6 +1563,7 @@
 							`web_keyword1`,
 							`web_keyword2`,
 							`web_keyword3`,
+							`request_url`,
 							`meta_desc`,
 							`meta_keyword`,
 							`featured`,
@@ -1587,6 +1600,7 @@
 							' . $objDatabase->SqlVariable($this->strWebKeyword1) . ',
 							' . $objDatabase->SqlVariable($this->strWebKeyword2) . ',
 							' . $objDatabase->SqlVariable($this->strWebKeyword3) . ',
+							' . $objDatabase->SqlVariable($this->strRequestUrl) . ',
 							' . $objDatabase->SqlVariable($this->strMetaDesc) . ',
 							' . $objDatabase->SqlVariable($this->strMetaKeyword) . ',
 							' . $objDatabase->SqlVariable($this->blnFeatured) . ',
@@ -1652,6 +1666,7 @@
 							`web_keyword1` = ' . $objDatabase->SqlVariable($this->strWebKeyword1) . ',
 							`web_keyword2` = ' . $objDatabase->SqlVariable($this->strWebKeyword2) . ',
 							`web_keyword3` = ' . $objDatabase->SqlVariable($this->strWebKeyword3) . ',
+							`request_url` = ' . $objDatabase->SqlVariable($this->strRequestUrl) . ',
 							`meta_desc` = ' . $objDatabase->SqlVariable($this->strMetaDesc) . ',
 							`meta_keyword` = ' . $objDatabase->SqlVariable($this->strMetaKeyword) . ',
 							`featured` = ' . $objDatabase->SqlVariable($this->blnFeatured) . ',
@@ -1777,6 +1792,7 @@
 			$this->strWebKeyword1 = $objReloaded->strWebKeyword1;
 			$this->strWebKeyword2 = $objReloaded->strWebKeyword2;
 			$this->strWebKeyword3 = $objReloaded->strWebKeyword3;
+			$this->strRequestUrl = $objReloaded->strRequestUrl;
 			$this->strMetaDesc = $objReloaded->strMetaDesc;
 			$this->strMetaKeyword = $objReloaded->strMetaKeyword;
 			$this->blnFeatured = $objReloaded->blnFeatured;
@@ -1961,6 +1977,11 @@
 					// Gets the value for strWebKeyword3 
 					// @return string
 					return $this->strWebKeyword3;
+
+				case 'RequestUrl':
+					// Gets the value for strRequestUrl 
+					// @return string
+					return $this->strRequestUrl;
 
 				case 'MetaDesc':
 					// Gets the value for strMetaDesc 
@@ -2482,6 +2503,17 @@
 					// @return string
 					try {
 						return ($this->strWebKeyword3 = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'RequestUrl':
+					// Sets the value for strRequestUrl 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strRequestUrl = QType::Cast($mixValue, QType::String));
 					} catch (QCallerException $objExc) {
 						$objExc->IncrementOffset();
 						throw $objExc;
@@ -3808,6 +3840,7 @@
 			$strToReturn .= '<element name="WebKeyword1" type="xsd:string"/>';
 			$strToReturn .= '<element name="WebKeyword2" type="xsd:string"/>';
 			$strToReturn .= '<element name="WebKeyword3" type="xsd:string"/>';
+			$strToReturn .= '<element name="RequestUrl" type="xsd:string"/>';
 			$strToReturn .= '<element name="MetaDesc" type="xsd:string"/>';
 			$strToReturn .= '<element name="MetaKeyword" type="xsd:string"/>';
 			$strToReturn .= '<element name="Featured" type="xsd:boolean"/>';
@@ -3903,6 +3936,8 @@
 				$objToReturn->strWebKeyword2 = $objSoapObject->WebKeyword2;
 			if (property_exists($objSoapObject, 'WebKeyword3'))
 				$objToReturn->strWebKeyword3 = $objSoapObject->WebKeyword3;
+			if (property_exists($objSoapObject, 'RequestUrl'))
+				$objToReturn->strRequestUrl = $objSoapObject->RequestUrl;
 			if (property_exists($objSoapObject, 'MetaDesc'))
 				$objToReturn->strMetaDesc = $objSoapObject->MetaDesc;
 			if (property_exists($objSoapObject, 'MetaKeyword'))
@@ -4083,6 +4118,8 @@
 					return new QQNode('web_keyword2', 'WebKeyword2', 'string', $this);
 				case 'WebKeyword3':
 					return new QQNode('web_keyword3', 'WebKeyword3', 'string', $this);
+				case 'RequestUrl':
+					return new QQNode('request_url', 'RequestUrl', 'string', $this);
 				case 'MetaDesc':
 					return new QQNode('meta_desc', 'MetaDesc', 'string', $this);
 				case 'MetaKeyword':
@@ -4197,6 +4234,8 @@
 					return new QQNode('web_keyword2', 'WebKeyword2', 'string', $this);
 				case 'WebKeyword3':
 					return new QQNode('web_keyword3', 'WebKeyword3', 'string', $this);
+				case 'RequestUrl':
+					return new QQNode('request_url', 'RequestUrl', 'string', $this);
 				case 'MetaDesc':
 					return new QQNode('meta_desc', 'MetaDesc', 'string', $this);
 				case 'MetaKeyword':

@@ -30,6 +30,6 @@ if(xlsws_index::isLoggedIn()): ?>
 <br />
 <br />
 <?php endif; ?>
-<a href="index.php?xlspg=gift_search"><strong><?php _xt('Find Wish Lists'); ?></strong></a>
+<a href="gift_search/pg/"><strong><?php _xt('Find Wish Lists'); ?></strong></a>
 <br />
 <br />

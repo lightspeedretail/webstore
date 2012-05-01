@@ -38,4 +38,4 @@ if($customer): ?>
 	<p style="margin-left:20px;"><A HREF="index.php?xlspg=gift_list"><?php _xt("Gift List"); ?></A></p>
 <?php  endif;  ?>
 
-<p style="margin-left:20px;"><A HREF="index.php?xlspg=gift_search"><?php _xt("Search"); ?></A></p>
+<p style="margin-left:20px;"><a ref="gift_search/pg/"><?php _xt("Search"); ?></A></p>

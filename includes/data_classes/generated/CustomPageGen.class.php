@@ -19,6 +19,7 @@
 	 * @property string $Key the value for strKey (Unique)
 	 * @property string $Title the value for strTitle (Not Null)
 	 * @property string $Page the value for strPage 
+	 * @property string $RequestUrl the value for strRequestUrl 
 	 * @property string $MetaKeywords the value for strMetaKeywords 
 	 * @property string $MetaDescription the value for strMetaDescription 
 	 * @property string $Modified the value for strModified (Read-Only Timestamp)
@@ -65,6 +66,15 @@
 		 */
 		protected $strPage;
 		const PageDefault = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_custom_page.meta_keywords
+		 * @var string strMetaKeywords
+		 */
+		protected $strRequestUrl;
+		const RequestUrlMaxLength = 255;
+		const RequestUrlDefault = null;
 
 
 		/**
@@ -405,6 +415,7 @@
 			$objBuilder->AddSelectItem($strTableName, 'key', $strAliasPrefix . 'key');
 			$objBuilder->AddSelectItem($strTableName, 'title', $strAliasPrefix . 'title');
 			$objBuilder->AddSelectItem($strTableName, 'page', $strAliasPrefix . 'page');
+			$objBuilder->AddSelectItem($strTableName, 'request_url', $strAliasPrefix . 'request_url');
 			$objBuilder->AddSelectItem($strTableName, 'meta_keywords', $strAliasPrefix . 'meta_keywords');
 			$objBuilder->AddSelectItem($strTableName, 'meta_description', $strAliasPrefix . 'meta_description');
 			$objBuilder->AddSelectItem($strTableName, 'modified', $strAliasPrefix . 'modified');
@@ -450,6 +461,8 @@
 			$objToReturn->strTitle = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'page', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'page'] : $strAliasPrefix . 'page';
 			$objToReturn->strPage = $objDbRow->GetColumn($strAliasName, 'Blob');
+			$strAliasName = array_key_exists($strAliasPrefix . 'request_url', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'request_url'] : $strAliasPrefix . 'request_url';
+			$objToReturn->strRequestUrl = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'meta_keywords', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'meta_keywords'] : $strAliasPrefix . 'meta_keywords';
 			$objToReturn->strMetaKeywords = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'meta_description', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'meta_description'] : $strAliasPrefix . 'meta_description';
@@ -580,6 +593,7 @@
 							`key`,
 							`title`,
 							`page`,
+							`request_url`,
 							`meta_keywords`,
 							`meta_description`,
 							`created`,
@@ -589,6 +603,7 @@
 							' . $objDatabase->SqlVariable($this->strKey) . ',
 							' . $objDatabase->SqlVariable($this->strTitle) . ',
 							' . $objDatabase->SqlVariable($this->strPage) . ',
+							' . $objDatabase->SqlVariable($this->strRequestUrl) . ',
 							' . $objDatabase->SqlVariable($this->strMetaKeywords) . ',
 							' . $objDatabase->SqlVariable($this->strMetaDescription) . ',
 							' . $objDatabase->SqlVariable($this->dttCreated) . ',
@@ -627,6 +642,7 @@
 							`key` = ' . $objDatabase->SqlVariable($this->strKey) . ',
 							`title` = ' . $objDatabase->SqlVariable($this->strTitle) . ',
 							`page` = ' . $objDatabase->SqlVariable($this->strPage) . ',
+							`request_url` = ' . $objDatabase->SqlVariable($this->strRequestUrl) . ',
 							`meta_keywords` = ' . $objDatabase->SqlVariable($this->strMetaKeywords) . ',
 							`meta_description` = ' . $objDatabase->SqlVariable($this->strMetaDescription) . ',
 							`created` = ' . $objDatabase->SqlVariable($this->dttCreated) . ',
@@ -725,6 +741,7 @@
 			$this->strKey = $objReloaded->strKey;
 			$this->strTitle = $objReloaded->strTitle;
 			$this->strPage = $objReloaded->strPage;
+			$this->strRequestUrl = $objReloaded->strRequestUrl;
 			$this->strMetaKeywords = $objReloaded->strMetaKeywords;
 			$this->strMetaDescription = $objReloaded->strMetaDescription;
 			$this->strModified = $objReloaded->strModified;
@@ -770,6 +787,11 @@
 					// Gets the value for strPage 
 					// @return string
 					return $this->strPage;
+
+				case 'RequestUrl':
+					// Gets the value for strRequestUrl 
+					// @return string
+					return $this->strRequestUrl;
 
 				case 'MetaKeywords':
 					// Gets the value for strMetaKeywords 
@@ -865,6 +887,17 @@
 					// @return string
 					try {
 						return ($this->strPage = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'RequestUrl':
+					// Sets the value for strRequestUrl 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strRequestUrl = QType::Cast($mixValue, QType::String));
 					} catch (QCallerException $objExc) {
 						$objExc->IncrementOffset();
 						throw $objExc;
@@ -970,6 +1003,7 @@
 			$strToReturn .= '<element name="Key" type="xsd:string"/>';
 			$strToReturn .= '<element name="Title" type="xsd:string"/>';
 			$strToReturn .= '<element name="Page" type="xsd:string"/>';
+			$strToReturn .= '<element name="RequestUrl" type="xsd:string"/>';
 			$strToReturn .= '<element name="MetaKeywords" type="xsd:string"/>';
 			$strToReturn .= '<element name="MetaDescription" type="xsd:string"/>';
 			$strToReturn .= '<element name="Modified" type="xsd:string"/>';
@@ -1006,6 +1040,8 @@
 				$objToReturn->strTitle = $objSoapObject->Title;
 			if (property_exists($objSoapObject, 'Page'))
 				$objToReturn->strPage = $objSoapObject->Page;
+			if (property_exists($objSoapObject, 'RequestUrl'))
+				$objToReturn->strRequestUrl = $objSoapObject->strRequestUrl;
 			if (property_exists($objSoapObject, 'MetaKeywords'))
 				$objToReturn->strMetaKeywords = $objSoapObject->MetaKeywords;
 			if (property_exists($objSoapObject, 'MetaDescription'))
@@ -1066,6 +1102,8 @@
 					return new QQNode('title', 'Title', 'string', $this);
 				case 'Page':
 					return new QQNode('page', 'Page', 'string', $this);
+				case 'RequestUrl':
+					return new QQNode('request_url', 'RequestUrl', 'string', $this);
 				case 'MetaKeywords':
 					return new QQNode('meta_keywords', 'MetaKeywords', 'string', $this);
 				case 'MetaDescription':
@@ -1106,6 +1144,8 @@
 					return new QQNode('title', 'Title', 'string', $this);
 				case 'Page':
 					return new QQNode('page', 'Page', 'string', $this);
+				case 'RequestUrl':
+					return new QQNode('request_url', 'RequestUrl', 'string', $this);
 				case 'MetaKeywords':
 					return new QQNode('meta_keywords', 'MetaKeywords', 'string', $this);
 				case 'MetaDescription':

@@ -47,8 +47,18 @@ class Family extends FamilyGen {
 				XLSObjectManager::Singleton('XLSFamilyManager','code');
 	}
 
-	// Override LoadAll to pull from the Products table for performance
-	public static function LoadAll($objOptionalClauses = null) {
+	public static function LoadByRequestUrl($strName) {
+		return Family::QuerySingle(
+			QQ::Equal(QQN::Family()->RequestUrl, $strName)
+			);
+	}
+
+	public function GetLink() {
+		return $this->strRequestUrl."/f/";
+	}
+
+	/*// Override LoadAll to pull from the Products table for performance
+	public static function LoadAll($objOptionalClauses = null) {error_log(__class__.' '.__function__);
 		try {
 			$query = 'SELECT DISTINCT family FROM xlsws_product';
 			$query .= ' WHERE web=1 AND fk_product_master_id=0';
@@ -65,4 +75,33 @@ class Family extends FamilyGen {
 			throw $objExc;
 		}
 	}
+	*/
+	
+	public static function ConvertSEO() {
+	
+		$arrFamilies = Family::LoadAll();
+		foreach ($arrFamilies as $objFamily) {
+			$objFamily->RequestUrl = _xls_seo_url($objFamily->Family); 
+			$objFamily->Save();
+		}
+	
+	}
+	
+	public function __get($strName) {
+		switch ($strName) {
+			case 'Link': 
+				return $this->GetLink();
+			case 'RequestUrl': 
+				return $this->strRequestUrl;
+
+			default:
+				try {
+					return parent::__get($strName);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+	
 }

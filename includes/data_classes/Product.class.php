@@ -110,6 +110,27 @@ class Product extends ProductGen {
 		return str_replace("%2F","/",urlencode($this->strCode));
 	}
 
+	public function GetSEOName() {
+	
+		return _xls_seo_name($this->strName);
+	
+	}
+	
+	public static function ConvertSEO() {
+	
+		$arrProducts = Product::QueryArray(
+				QQ::Equal(QQN::Product()->Web, 1),
+				QQ::Clause(
+					QQ::OrderBy(QQN::Product()->Rowid)
+			 ));
+		foreach ($arrProducts as $objProd) {
+			$objProd->RequestUrl = _xls_seo_url($strName);
+			$objProd->Save();
+		}
+	
+	}
+	
+	
 	/**
 	 * Gets the URL referring to the Product image
 	 * @param string $type :: Image size constant
@@ -128,11 +149,15 @@ class Product extends ProductGen {
 			if ($prod = $this->FkProductMaster)
 				return $prod->Link;
 
-		if(_xls_get_conf('ENABLE_SEO_URL' , false))
+		/*if(_xls_get_conf('ENABLE_SEO_URL' , false))
 			return $this->Slug . ".html";
 
 		return 'index.php?product=' . $this->Slug .
 			(isset($_GET['c'])?"&c=$_GET[c]":'');
+			
+			*/
+			
+		return $this->RequestUrl."/dp/"; 
 	}
 
 	/**
@@ -533,12 +558,21 @@ class Product extends ProductGen {
 
 			case 'Link':
 				return $this->GetLink();
+				
+			case 'SEOName':
+				return $this->GetSEOName();
 
 			case 'ListingImage':
 				return $this->GetImageLink(ImagesType::listing);
 
 			case 'MiniImage':
 				return $this->GetImageLink(ImagesType::mini);
+
+			case 'PreviewImage':
+				return $this->GetImageLink(ImagesType::preview);
+
+			case 'SliderImage':
+				return $this->GetImageLink(ImagesType::slider);
 
 			case 'PDetailImage':
 				return $this->GetImageLink(ImagesType::pdetail);
@@ -693,6 +727,12 @@ class Product extends ProductGen {
 		}
 	}
 
+	public static function LoadByRequestUrl($strName) {
+		return Product::QuerySingle(
+			QQ::Equal(QQN::Product()->RequestUrl, $strName)
+			);
+	}
+	
 	/**
 	 * Overload the generated Save handler for the Product model.
 	 *
@@ -762,6 +802,7 @@ class Product extends ProductGen {
 			`web_keyword1`,
 			`web_keyword2`,
 			`web_keyword3`,
+			`request_url`,
 			`meta_desc`,
 			`meta_keyword`,
 			`featured`,
@@ -799,6 +840,7 @@ class Product extends ProductGen {
 			' . $objDatabase->SqlVariable($this->strWebKeyword1) . ',
 			' . $objDatabase->SqlVariable($this->strWebKeyword2) . ',
 			' . $objDatabase->SqlVariable($this->strWebKeyword3) . ',
+			' . $objDatabase->SqlVariable($this->strRequestUrl) . ',
 			' . $objDatabase->SqlVariable($this->strMetaDesc) . ',
 			' . $objDatabase->SqlVariable($this->strMetaKeyword) . ',
 			' . $objDatabase->SqlVariable($this->blnFeatured) . ',

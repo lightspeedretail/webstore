@@ -802,10 +802,10 @@ class Cart extends CartGen {
     }
 
 	protected function GetLink($blnTracking = false) { 
-		$strUrl = _xls_site_dir() . '/index.php?xlspg=';
+		$strUrl = _xls_site_dir();
 
-		if ($blnTracking) $strUrl = $strUrl . 'order_track&getuid=';
-		else $strUrl = $strUrl . 'cart&getcart=';
+		if ($blnTracking) $strUrl = $strUrl . '/order-track/pg/?getuid=';
+		else $strUrl = $strUrl . '/cart/pg/?getcart=';
 
 		$strUrl = $strUrl . $this->Linkid;
 		return $strUrl;

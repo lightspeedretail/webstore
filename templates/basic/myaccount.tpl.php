@@ -61,7 +61,7 @@
 			<table width='100%'>
 			<?php foreach($this->orders as $order): ?>
 				<tr>
-				<td><a href="index.php?xlspg=order_track&getuid=<?php _xt($order->Linkid); ?>"><?php _xt($order->IdStr);?></a></td>
+				<td><a href="order_track/pg/?getuid=<?php _xt($order->Linkid); ?>"><?php _xt($order->IdStr);?></a></td>
 				<!--
 					<td><?php _xt($order->DatetimePosted); ?></td>
 					<td><?php _xt($order->Status); ?></td>

@@ -27,7 +27,7 @@
 /*
 This script is used to generate an array with each crumb in the crumbtrail set into $this->crumbtrail which can be used from any view later
 */
-
+/*
 $tmpcrumbs = array();
 
 global $XLSWS_VARS;
@@ -90,6 +90,26 @@ foreach($tmpcrumbs as $crumb) {
 }
 
 $this->crumbs = $crumbs;
+
+*/
+
+$objUrl = XLSURLParser::getInstance();
+if ($objUrl->RouteId != '')
+	switch($objUrl->RouteDepartment) {
+	
+		case "category":
+			$objCategory = Category::LoadByRequestUrl($objUrl->RouteId);
+			$this->crumbs = $objCategory->GetTrail();
+			break;
+		case "product":
+			$objProduct = Product::LoadByRequestUrl($objUrl->RouteId);
+			$this->crumbs = Category::GetTrailByProductId($objProduct->Rowid);
+		
+		
+			break;
+			
+		
+	}
 
 // Let's have the pnlPanel auto render any and all child controls
 $this->crumbTrail = new QPanel($this);

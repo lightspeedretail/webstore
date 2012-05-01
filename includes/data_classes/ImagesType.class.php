@@ -30,8 +30,10 @@ abstract class ImagesType extends QBaseClass {
 	const pdetail = 2;
 	const mini = 3;
 	const listing = 4;
+	const preview = 5;
+	const slider = 6;
 
-	const MaxId = 4;
+	const MaxId = 6;
 
 	public static $NameArray = array(
 		0 => 'image',
@@ -39,6 +41,8 @@ abstract class ImagesType extends QBaseClass {
 		2 => 'pdetailimage',
 		3 => 'miniimage',
 		4 => 'listingimage',
+		5 => 'previewimage',
+		6 => 'sliderimage'
 	);
 
 	public static $SizeArray = array(
@@ -47,6 +51,8 @@ abstract class ImagesType extends QBaseClass {
 		2 => array(100, 80),
 		3 => array(30, 30),
 		4 => array(50, 40),
+		5 => array(30, 30),
+		6 => array(100, 80),
 	);
 
 	public static $ConfigKeyArray = array(
@@ -54,7 +60,9 @@ abstract class ImagesType extends QBaseClass {
 		1 => 'LISTING_IMAGE',
 		2 => 'DETAIL_IMAGE',
 		3 => 'MINI_IMAGE',
-		4 => 'LISTING_IMAGE'
+		4 => 'LISTING_IMAGE',
+		5 => 'PREVIEW_IMAGE',
+		6 => 'SLIDER_IMAGE'
 	);
 
 	public static $TokenArray = array(
@@ -63,6 +71,9 @@ abstract class ImagesType extends QBaseClass {
 		2 => 'PDETAIL',
 		3 => 'MINI',
 		4 => 'LISTING',
+		5 => 'PREVIEW',
+		6 => 'SLIDER'
+		
 	);
 
 	public static function ToString($intImageTypeId) {

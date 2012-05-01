@@ -126,7 +126,7 @@
 			
 				
 			</div>	
-			<a href="index.php">
+			<a href="<?php echo _xls_site_dir() ?>">
 				<img src="<?php
 			     $img =  _xls_get_conf('HEADER_IMAGE' ,  false ); 
 			     
@@ -185,7 +185,7 @@
 			<?php
 				foreach ($this->arrBottomTabs as $arrTab)
 					echo '<a href="'.$arrTab->Link.'">'._sp($arrTab->Title).'</a> |';
-				?><a href="index.php?xlspg=sitemap"><?php _xt('Sitemap'); ?></a>
+				?><a href="sitemap/pg/"><?php _xt('Sitemap'); ?></a>
 			</div>
 	</div>
 
@@ -195,19 +195,12 @@
 
 	<?php $this->dummy_drag_drop->Render(); ?>
 	    
-	<?php $this->RenderEnd(); ?>		
+			
 	<?php
 	if(QApplication::$Database[1]->EnableProfiling)
 		echo QApplication::$Database[1]->OutputProfiling();
 	?>    		
 	
-	<script type="text/javascript">	
-	<?php if($this->blnGetScreenRes):   ?>
-		$.post(document.forms[0].action , { store_screen: "true", width: screen.width , height: screen.height } );
-	<?php endif; ?>	
-		//done
-	</script>
-
 <?php if (_xls_get_conf('DEBUG_TEMPLATE', 0) == 1):  ?>
  	<?php $files = array();  ?>
 <!-- 
@@ -228,5 +221,5 @@
 		window.setTimeout("document.location.href='<?= _xls_site_dir() ?>/index.php'" , <?= $expires ?> * 1000 + 5000 );
 	</script>
 <?php endif; ?>
-	</body>
+<?php $this->RenderEnd(); ?>
 </html>

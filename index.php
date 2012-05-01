@@ -49,12 +49,72 @@ if ($offlinekey = _xls_get_conf('STORE_OFFLINE' , '')) {
 	}
 }
 
+
+//Initialize our global URL parser so we can access from anywhere
+$objUrl = XLSURLParser::getInstance();
+
+if ($objUrl==false) die("A severe error has occurred that should redirect to a 404 page.");
+
+
+if ($objUrl->Status==301) {
+	header("HTTP/1.1 301 Moved Permanently");
+	header("Location: ".$objUrl->RedirectUrl);
+	exit();
+}
+
 // Cache categories since they are used throughout
 Category::$Manager->AddArray(
 	Category::LoadAll()
 );
 
-// Convert SEO friendly URL
+//error_log("on dept ".$objUrl->RouteDepartment." ".$objUrl->RouteId);
+
+switch ($objUrl->RouteDepartment)
+{
+	case 'category':
+	case 'custom_page':
+	case 'customer_register':
+	case 'family':
+	case 'product':
+	case 'searchresults':
+	
+		$strFile = $objUrl->RouteDepartment.".php";
+		break;
+		
+	case 'feeds':
+		$strFile = "feeds/".$objUrl->RouteId.".php";
+		break;		
+
+	case 'xlspg':
+		$strFile = $objUrl->RouteId.".php";
+		break;
+		
+	default:
+		$strFile = "category.php";
+		break;
+}
+
+if(file_exists(CUSTOM_INCLUDES . $strFile))
+		include(CUSTOM_INCLUDES . $strFile);
+	elseif(file_exists('xlsws_includes/'.$strFile))
+		include('xlsws_includes/'.$strFile);
+	else {
+		header('HTTP/1.0 404 Not Found');
+  		if (!readfile('404missing.html'))
+  			echo '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">' . chr(13) .
+				'<html><head>' . chr(13) .
+				'<title>404 Not Found</title>' . chr(13) .
+				'</head><body>' . chr(13) .
+				'<h1>Not Found</h1>' . chr(13) .
+				'<p>The requested URL '.$objUrl->Uri.' was not found on this server.</p>' . chr(13) .
+				'</body></html>';
+
+  		exit();
+		}
+/*
+
+
+// Convert SEO friendly URL -- 
 if (isset($XLSWS_VARS['seo_rewrite'])) {
 	$uriPath = parse_url(QApplication::$RequestUri, PHP_URL_PATH);
 	$uriPath = str_replace(__SUBDIRECTORY__, '', $uriPath);
@@ -132,7 +192,7 @@ if (isset($XLSWS_VARS['seo_rewrite'])) {
 		}
 	}
 }
-
+*/
 $strPageTitle = _xls_get_conf('STORE_NAME' , 'XSilva Web Store');
 $xlsws_form = 'xlsws_index';
 
@@ -141,7 +201,7 @@ $xlsws_form = 'xlsws_index';
 foreach (ImagesType::$NameArray as $strType) {
 	if (!isset($_GET[$strType]))
 		continue;
-
+error_log("hitting imagetype ".$_GET[$strType]);
 	$intType = ImagesType::ToToken($strType);
 
 	$imgid = $_GET[$strType];
@@ -166,7 +226,7 @@ foreach (ImagesType::$NameArray as $strType) {
 
 	break;
 }
-
+/*
 // Store screen size to visitor log
 if (isset($_POST['store_screen'])) {
 	$visitor = Visitor::get_visitor();
@@ -236,5 +296,5 @@ else {
 	else
 		include('xlsws_includes/category.php');
 }
+*/
 
-?>

@@ -92,7 +92,7 @@ foreach($payModules as $module) {
 		if(isset($pay_info['output']))
 			exit($pay_info['output']);
 		else {
-			$url = _xls_site_dir() . "/index.php?xlspg=order_track&getuid=" . $cart->Linkid;
+			$url = _xls_site_dir() . "/order-track/pg/?getuid=" . $cart->Linkid;
 			exit("<html><head><meta http-equiv=\"refresh\" content=\"1;url=$url\"></head><body><a href=\"$url\">Click here to confirm your order</a></body></html>");
 		}
 	}

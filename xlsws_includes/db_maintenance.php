@@ -226,6 +226,10 @@ class xlsws_db_maintenance extends xlsws_index {
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Reset Without Flush', 'DEBUG_RESET', '',
 				'If selected, WS will not perform a flush on content tables when doing a Reset Store Products.', 
 				1, 20, NOW(), NOW(), 'BOOL');");
+			$this->add_config_key('DEBUG_DISABLE_AJAX' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Disable Ajax Paging', 'DEBUG_DISABLE_AJAX', '',
+				'If selected, WS will not page using AJAX but will use regular URLs.', 
+				1, 21, NOW(), NOW(), 'BOOL');");
 
 
 			//Families menu labeling
@@ -366,7 +370,22 @@ class xlsws_db_maintenance extends xlsws_index {
 				`options`='SSL_NO_NEED_FORWARD',`helper_text`='Change when SSL secure mode is used.' where `key`='SSL_NO_NEED_FORWARD'");	
 		
 				
-				
+			//SEO Changes
+			if ($this->add_column('xlsws_category' , 'request_url' ,
+				"ALTER TABLE xlsws_category ADD COLUMN `request_url` varchar (255) AFTER `child_count`"))
+			Category::ConvertSEO();
+			//_dbx("ALTER TABLE `xlsws_category` ADD INDEX (`request_url`);")
+			if ($this->add_column('xlsws_product' , 'request_url' ,
+				"ALTER TABLE xlsws_product ADD COLUMN `request_url` varchar (255) AFTER `web_keyword3`"))
+			Product::ConvertSEO();
+				//_dbx("ALTER TABLE `xlsws_product` ADD INDEX (`request_url`);")	
+			if ($this->add_column('xlsws_custom_page' , 'request_url' ,
+				"ALTER TABLE xlsws_custom_page ADD COLUMN `request_url` varchar (255) AFTER `page`"))
+			CustomPage::ConvertSEO();
+			if ($this->add_column('xlsws_family' , 'request_url' ,
+				"ALTER TABLE xlsws_family ADD COLUMN `request_url` varchar (255) AFTER `family`"))
+			Family::ConvertSEO();
+
 				
 				
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";

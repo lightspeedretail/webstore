@@ -72,57 +72,15 @@ class xlsws_track_order extends xlsws_index {
 	protected $lblOrderMsg; //a span that shows an error on top of this page if any
 
 	/**
-	 * build_content_box - builds the content box to search orders
-	 * @param none
-	 * @return none
-	 */
-	protected function build_content_box() {
-		$this->orderSearchPnl = new XLSContentBox($this->mainPnl);
-		$this->orderSearchPnl->Name = _sp("Search Orders");
-	}
-
-
-	/**
-	 * build_back_widget - builds the back button for order lookup
-	 * @param none
-	 * @return none
-	 */
-	protected function build_back_widget() {
-		$this->butBack = new QButton($this->orderViewPnl);
-		$this->butBack->Text = _sp("Back");
-	}
-
-	/**
-	 * build_widgets - builds the widgets needed for the template
-	 * @param none
-	 * @return none
-	 */
-	protected function build_widgets() {
-		$this->build_content_box();
-		$this->build_orderid_widget($this->orderSearchPnl,"Order ID");
-		$this->build_emailphone_widget($this->orderSearchPnl);
-		$this->build_search_widget($this->orderSearchPnl);
-	}
-
-	/**
-	 * bind_widgets - binds callback actions for the widgets
-	 * @param none
-	 * @return none
-	 */
-	protected function bind_widgets() {
-		$this->txtEmailphone->AddAction(new QEnterKeyEvent(), new QJavaScriptAction('document.getElementById(\'' . $this->btnSearch->ControlId  . '\').click();'));
-		$this->txtOrderId->AddAction(new QEnterKeyEvent(), new QJavaScriptAction('document.getElementById(\'' . $this->btnSearch->ControlId  . '\').click();'));
-		$this->pxyOrder->AddAction(new QClickEvent(), new QServerAction('display_order_click'));
-		$this->btnSearch->AddAction(new QClickEvent(), new QServerAction('search_Order'));
-	}
-
-	/**
 	 * build_main - constructor for this controller
 	 * @param none
 	 * @return none
 	 */
 	protected function build_main() {
 		global $XLSWS_VARS;
+
+    	$objUrl = XLSURLParser::getInstance();    
+
 
 		$customer = Customer::GetCurrent();
 
@@ -149,12 +107,6 @@ class xlsws_track_order extends xlsws_index {
 		$this->pxyOrder = new QControlProxy($this);
 
 		$this->build_widgets();
-
-		//DEPRECIATED FROM WEB STORE 2.0.2 ONWARDS, USED IN CASE DEVELOPERS PREFER TO USE ZIPCODE FOR LOOKUPS
-		$this->txtZipCode = new XLSTextBox($this->orderSearchPnl);
-		$this->txtZipCode->Name = _sp("Zipcode");
-		$this->txtZipCode->Display = false;
-		//END DEPRECIATED SEGMENT
 
 		$orders = array();
 
@@ -226,6 +178,54 @@ class xlsws_track_order extends xlsws_index {
         
         	
 	}
+	
+	
+	/**
+	 * build_content_box - builds the content box to search orders
+	 * @param none
+	 * @return none
+	 */
+	protected function build_content_box() {
+		$this->orderSearchPnl = new XLSContentBox($this->mainPnl);
+		$this->orderSearchPnl->Name = _sp("Search Orders");
+	}
+
+
+	/**
+	 * build_back_widget - builds the back button for order lookup
+	 * @param none
+	 * @return none
+	 */
+	protected function build_back_widget() {
+		$this->butBack = new QButton($this->orderViewPnl);
+		$this->butBack->Text = _sp("Back");
+	}
+
+	/**
+	 * build_widgets - builds the widgets needed for the template
+	 * @param none
+	 * @return none
+	 */
+	protected function build_widgets() {
+		$this->build_content_box();
+		$this->build_orderid_widget($this->orderSearchPnl,"Order ID");
+		$this->build_emailphone_widget($this->orderSearchPnl);
+		$this->build_search_widget($this->orderSearchPnl);
+	}
+
+	/**
+	 * bind_widgets - binds callback actions for the widgets
+	 * @param none
+	 * @return none
+	 */
+	protected function bind_widgets() {
+		$this->txtEmailphone->AddAction(new QEnterKeyEvent(), new QJavaScriptAction('document.getElementById(\'' . $this->btnSearch->ControlId  . '\').click();'));
+		$this->txtOrderId->AddAction(new QEnterKeyEvent(), new QJavaScriptAction('document.getElementById(\'' . $this->btnSearch->ControlId  . '\').click();'));
+		$this->pxyOrder->AddAction(new QClickEvent(), new QServerAction('display_order_click'));
+		$this->btnSearch->AddAction(new QClickEvent(), new QServerAction('search_Order'));
+	}
+
+
 
 	/**
 	 * search_Order - Searches for an order with the provided email and order id

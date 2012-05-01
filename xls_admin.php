@@ -329,6 +329,7 @@
 		const Security = 16;
 		const Images = 17;
 		const Captcha = 18;
+		
 
 	}
 	
@@ -724,6 +725,10 @@
 			$this->configPnls['local'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Localisation , "configDone");
 			$this->configPnls['local']->Name = _sp('Localization');
 			$this->configPnls['local']->Info = _sp('Geographical configuration for your store');
+
+			$this->configPnls['seo'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::SEO , "configDone");
+			$this->configPnls['seo']->Name = _sp('SEO (Search Engine Optimization) / 3rd Party Integration');
+			$this->configPnls['seo']->Info = _sp('SEO configuration for your store');
 
 			
 			$this->configPnls['custreg'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::CustomerRegistration , "configDone");

@@ -21,7 +21,7 @@
 /**
  * Basic template: View order header details (id, date, status, notes) 
  * calls other views
- * Called from /index.php?xlspg=order_track&getuid=xxxxxxxxxx
+ * Called from /order-track/pg/?getuid=xxxxxxxxxx
  *
  */
 

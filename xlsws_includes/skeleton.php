@@ -771,13 +771,15 @@ EOS;
 		        QQ::AndCondition(
 		            QQ::GreaterOrEqual(QQN::CustomPage()->TabPosition,10),
 		            QQ::LessOrEqual(QQN::CustomPage()->TabPosition,19)
-		        )
+		        ),
+					QQ::Clause(QQ::OrderBy(QQN::CustomPage()->TabPosition))
 		    );
 		$this->arrBottomTabs = CustomPage::QueryArray(
 		        QQ::AndCondition(
 		            QQ::GreaterOrEqual(QQN::CustomPage()->TabPosition,20),
 		            QQ::LessOrEqual(QQN::CustomPage()->TabPosition,29)
-		        )
+		        ),
+					QQ::Clause(QQ::OrderBy(QQN::CustomPage()->TabPosition))
 		    );
 		
 	
@@ -1197,7 +1199,8 @@ EOS;
 
 		$pnlImg->Width  = $width; // _xls_get_conf('DETAIL_IMAGE_WIDTH',100);
 		$pnlImg->Height = $height; //_xls_get_conf('DETAIL_IMAGE_HEIGHT',80);
-		$pnlImg->SetCustomStyle('background' , "url(" . $prod->$imgType . ") no-repeat center");
+		//$pnlImg->SetCustomStyle('background' , "url(" . $prod->$imgType . ") no-repeat center");
+		$pnlImg->Text = "<img src='".$prod->$imgType."' >"; //width='".$width."px' height='".$height."px'
 		$pnlImg->CssClass = 'product_cell_image';
 		$pnlImg->HtmlEntities = false;
 

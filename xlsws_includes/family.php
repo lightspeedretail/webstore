@@ -34,25 +34,60 @@ class xlsws_family extends xlsws_product_listing {
     protected $family = null; //the instantiation of a Family databsae object
 	protected $subcategories = null; //not used with families, ignore
 
+	/**
+	 * build_main - constructor for this controller
+	 * @param none
+	 * @return none
+	 */
+	protected function build_main(){
+		global $XLSWS_VARS;
+
+        $this->LoadFamily();
+
+        parent::build_main();
+        
+		if ($this->family) {
+			$objFamily = $this->family;
+			
+			// Set Meta Description
+			_xls_add_meta_desc($objFamily->Family);
+			_xls_add_meta_keyword($objFamily->Family);
+			
+			// Set Title
+			_xls_add_page_title($objFamily->Family);
+		
+		}
+		
+
+        
+
+        // Add the viewlog entry
+    	Visitor::add_view_log($this->family->Rowid, ViewLogType::familyview);
+	}
+
+
     /**
      * Bind the currently selected Family to the form
      * @param none
      * @return none
      */
     protected function LoadFamily() {
-        global $XLSWS_VARS;
-
-        if (isset($XLSWS_VARS['family'])) { 
-            $objFamily = Family::LoadByFamily($XLSWS_VARS['family']);
+    	$objUrl = XLSURLParser::getInstance();    
+		
+		$objFamily = Family::LoadByRequestUrl($objUrl->RouteId);
 
             if ($objFamily)
                 $this->family = $objFamily;
             else
                 _xls_display_msg(_sp('Sorry! The family was not found.'));
-        }
+        
 
         if (!$this->family)
             return false;
+            
+
+       $this->crumbs[] = array( 'key' => $objFamily->Rowid , 'tag' => 'f' , 'name' => $objFamily->Family , 'link' => $objFamily->Link);
+
     }
 
     /**
@@ -98,42 +133,7 @@ class xlsws_family extends xlsws_product_listing {
     }
 
 
-	/**
-	 * build_main - constructor for this controller
-	 * @param none
-	 * @return none
-	 */
-	protected function build_main(){
-		global $XLSWS_VARS;
-
-        $this->LoadFamily();
-
-        parent::build_main();
-        
-		if ($this->family) {
-			$objFamily = $this->family;
-			
-			// Set Meta Description
-			_xls_add_meta_desc($objFamily->Family);
-			_xls_add_meta_keyword($objFamily->Family);
-			
-			// Set Title
-			_xls_add_page_title($objFamily->Family);
-		
-		}
-		
-
-        // Set crumbtrail for Family
-		$this->crumbs[] = array(
-            'key'=>'family=' . $XLSWS_VARS['family'], 
-            'case'=> '' ,
-            'name'=>$this->family->Family
-        );
-
-        // Add the viewlog entry
-    	Visitor::add_view_log($this->family->Rowid, ViewLogType::familyview);
 	}
-}
 
 if(!defined('CUSTOM_STOP_XLSWS'))
 	xlsws_family::Run('xlsws_family', templateNamed('index.tpl.php'));

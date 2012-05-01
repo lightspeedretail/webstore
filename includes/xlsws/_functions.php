@@ -405,13 +405,13 @@ function _xls_stack_removeall() {
  * @param string $msg
  * @param string $redirect
  */
-function _xls_display_msg($msg, $redirect = "index.php") {
+function _xls_display_msg($msg, $redirect = "") { error_log("redirecting on ".$msg);
 	_xls_stack_add('msg', _sp($msg));
 
-	if($redirect)
-		_xls_add_meta_redirect($redirect);
+	//if($redirect)
+	//	_xls_add_meta_redirect($redirect);
 
-	_rd('index.php?xlspg=msg');
+	_rd('msg/pg/');
 }
 
 /**
@@ -703,6 +703,31 @@ function _xls_site_dir($ssl_attempt = true) {
     if (substr($strHost,-1)=="/") $strHost = substr($strHost, 0, -1);
 
 	return $strSsl . $strHost;
+}
+
+
+function _xls_seo_url($string){
+	$string = str_replace('\'','',$string);
+	$string = str_replace("&","and",$string);
+	$string = preg_replace("`\[.*\]`U","",$string);
+	$string = preg_replace('`&(amp;)?#?[a-z0-9]+;`i','-',$string);
+	$string = htmlentities($string, ENT_COMPAT, 'utf-8');
+	$string = preg_replace("`&([a-z])(acute|uml|circ|grave|ring|cedil|slash|tilde|caron|lig|quot|rsquo);`i","\\1", $string);
+	$string = str_replace('-amp-','-and-',$string);
+	$string = preg_replace( array("`[^a-z0-9]`i","`[-]+`") , "-", $string);
+	return strtolower(trim($string, '-'));
+}
+
+function _xls_seo_name($string){
+	$string = str_replace('\'','',$string);
+	$string = str_replace("&","and",$string);
+	$string = preg_replace("`\[.*\]`U","",$string);
+	$string = preg_replace('`&(amp;)?#?[A-Za-z0-9]+;`i','-',$string);
+	$string = htmlentities($string, ENT_COMPAT, 'utf-8');
+	$string = preg_replace("`&([a-z])(acute|uml|circ|grave|ring|cedil|slash|tilde|caron|lig|quot|rsquo);`i","\\1", $string);
+	$string = str_replace('-amp-','-and-',$string);
+	$string = preg_replace( array("`[^a-z0-9]`i","`[-]+`") , "-", $string);
+	return trim($string, '- ');
 }
 
 /**
