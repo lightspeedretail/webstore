@@ -32,7 +32,7 @@ class XLSURLParser {
 	private static $objInstance;
 
 	
-	protected $strUrl; //Full URL before parsing
+	protected $strUri; //URL before parsing
 	protected $strRouteCode; //p for product, c for category, checkout for checkout, etc. can be customized
 	protected $strRouteDepartment; //internal names for controllers, such as "category", "product", will be unchanged
 	protected $strRouteId; //product code/SKU, category text etc extracted from Url
@@ -41,9 +41,11 @@ class XLSURLParser {
 	protected $arrUrlSegments;
 	
 	function __construct( $strPhpSelf ) {
-		
-		$this->strUrl = $_SERVER['PHP_SELF'];
-		$this->strUri = $_SERVER['REQUEST_URI'];
+
+		if (isset($_SERVER['ORIG_PATH_INFO']))
+			$this->strUri = $_SERVER['ORIG_PATH_INFO'];
+		else
+			$this->strUri = $_SERVER['PATH_INFO'];
 		
 		if (!$this->ExplodeSegments()) 	return false; 
 		if (!$this->ReindexSegments())	return false;
@@ -60,7 +62,7 @@ class XLSURLParser {
 	//Our method for breaking up pieces of the URL
 	protected function ExplodeSegments() {
 	
-		$this->arrUrlSegments = array_filter(explode('/',$this->strUrl));
+		$this->arrUrlSegments = array_filter(explode('/',$this->strUri));
 
 		return true;
 	
@@ -70,8 +72,10 @@ class XLSURLParser {
 	protected function ReindexSegments() {
 	
 		//Our URL may have a leading / which creates a blank entry. Also drop our leading index.php
-		if ($this->arrUrlSegments[0]=='') array_shift($this->arrUrlSegments);
-		if ($this->arrUrlSegments[0]=='index.php') array_shift($this->arrUrlSegments);
+		$arrSegments = array_filter($this->arrUrlSegments, 'strlen');
+		$arrSegments = array_values($arrSegments);
+		if ($arrSegments[0]=='index.php') array_shift($arrSegments);
+		$this->arrUrlSegments = $arrSegments;
 
 		return true;
 	}
@@ -82,9 +86,7 @@ class XLSURLParser {
 		
 		
 		$this->strRouteCode=$this->arrUrlSegments[1];
-		
-		error_log($this->strUrl." routing on segment ".$this->strRouteCode." ".$this->arrUrlSegments[0]);
-		
+
 		switch ($this->strRouteCode) {
 		
 			case 'c': //Category
@@ -159,7 +161,7 @@ class XLSURLParser {
 	public function __get($strName) {
 		switch ($strName) {
 			case 'Url':
-				return $this->strUrl;
+				return $this->strUri;
 			case 'Uri':
 				return $this->strUri;
 			case 'UrlSegments':
