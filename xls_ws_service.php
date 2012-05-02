@@ -388,7 +388,7 @@
                 $objImage->Created = new QDateTime(QDateTime::Now);
 
             $objImage->SaveImageData(
-                Images::GetImageName($intRowid), $blbRawImage
+                Images::GetImageName($objProduct->RequestUrl), $blbRawImage
             );
             $objImage->Save();
 
@@ -732,7 +732,7 @@ EOS;
             $objImage->Height = imagesy($blbImage);
             $objImage->Created = new QDateTime(QDateTime::Now);
             $objImage->SaveImageData(
-                Images::GetImageName($intRowid, 0, 0, $intIndex, 'add'),
+                Images::GetImageName($objProduct->RequestUrl, 0, 0, $intIndex, 'add'),
                 $blbRawImage
             );
             $objImage->Save(true);
