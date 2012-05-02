@@ -139,7 +139,7 @@ class xlsws_track_sro extends xlsws_index {
 		if($customer)
 			$this->customer = $customer;
 
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('sro_track.tpl.php');
 
 		$this->crumbs[] = array('key'=>'xlspg=sro_track' , 'case'=> '' , 'name'=> _sp('My Repairs'));

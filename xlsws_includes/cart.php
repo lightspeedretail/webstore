@@ -152,7 +152,7 @@ class xlsws_cart extends xlsws_index {
 			_xls_display_msg(_sp("Your cart is empty. " .
 				"Please add items to this cart."));
 
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('cart.tpl.php');
 		$this->mainPnl->AutoRenderChildren = false;
 

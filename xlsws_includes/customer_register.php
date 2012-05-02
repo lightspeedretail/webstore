@@ -395,7 +395,7 @@ class xlsws_cregister extends xlsws_index {
 		else
 			$this->customer = $customer;
 
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('customer_register.tpl.php');
 
 		// Wait icon

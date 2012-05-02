@@ -85,7 +85,7 @@ class xlsws_product extends xlsws_index {
 		$this->prod =  $this->origin_prod = Product::LoadByRequestUrl($objUrl->RouteId);
 
 
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 
 		if($this->prod && $this->prod->Web){
 			if ($XLSWS_VARS['ajax'] == "true") {

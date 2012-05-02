@@ -67,7 +67,9 @@
 	<?php if (isset($strPageTitle)): ?>
 			<title><?=  _xls_get_conf('STORE_NAME', _sp('Shopping cart'));   ?> : <?php _xt($strPageTitle); ?></title>
 	<?php endif; ?>		
-
+	<?php if (isset($strCanonicalUrl)): ?>
+	<link rel="canonical" href="<?php echo $strCanonicalUrl; ?>" />
+	<?php endif; ?>	
 	<link rel="Shortcut Icon" href="favicon.ico" type="image/x-icon" />
 
 	<link rel="stylesheet" type="text/css" href="assets/css/reset.css" />
@@ -106,9 +108,17 @@
 	</head>
 	
 	<?php $this->RenderBegin(); ?>
-	
-
-	
+	<?php if(_xls_get_conf('SHOW_SHARING' , 0)): ?>
+	<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+<script type="text/javascript" src="//assets.pinterest.com/js/pinit.js"></script>
+	<?php endif; ?>
 	
 
 	
@@ -164,11 +174,8 @@
 		</div>
 
 	<noscript>
-	<h1>
 	<?php _xt('This store requires you to have a JavaScript enabled web browser.'); ?>
-	</h1>
 	</noscript>	
-
 			<?php $this->mainPnl->Render(); ?>
 	</div>
 

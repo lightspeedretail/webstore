@@ -285,7 +285,7 @@ class xlsws_gregistry extends xlsws_index {
 
 		$customer = Customer::GetCurrent();
 
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('gift_detail.tpl.php');
 
 		$this->crumbs[] = array('key'=>'xlspg=gift_registry' , 'case'=> '' , 'name'=> _sp('My Wish Lists'));

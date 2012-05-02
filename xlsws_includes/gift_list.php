@@ -52,7 +52,7 @@ class xlsws_glist extends xlsws_index {
 	 * @return none
 	 */
 	protected function build_main() {
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('gift_list.tpl.php');
 
 		$this->crumbs[] = array('key'=>'xlspg=gift_list' , 'case'=> '' , 'name'=> _sp('Gift List'));

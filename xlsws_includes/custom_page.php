@@ -56,7 +56,7 @@ class xlsws_custom_page extends xlsws_index {
 
 		$this->crumbs[] = array( 'key' => $objPage->Rowid , 'tag' => 'cp' , 'name' => $objPage->Title , 'link' => $objPage->Link);
 
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 		$strPageTitle = $objPage->Title;
 
 		$this->content = $objPage->Page;

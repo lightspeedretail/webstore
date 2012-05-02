@@ -45,7 +45,7 @@ class xlsws_sitemap extends xlsws_index {
 
 		$this->crumbs[] = array('key'=>"xlspg=sitemap", 'case'=> '', 'name'=> _sp("Sitemap"));
 
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 
 		$categs = Category::QueryArray(
 			QQ::AndCondition(

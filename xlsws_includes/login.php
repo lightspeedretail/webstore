@@ -44,7 +44,7 @@ class xlsws_login extends xlsws_index {
 		$this->dxLogin->MatteClickable = false;
 		$this->dxLogin->Visible = true;
 
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 	}
 }
 

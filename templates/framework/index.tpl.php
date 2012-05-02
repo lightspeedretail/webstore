@@ -166,9 +166,7 @@
 		</div>
 
 	<noscript>
-	<h1>
 	<?php  _xt('This store requires you to have a Java-Script enabled web browser. Please visit ') ; echo  '<a href="http://www.firefox.com" target="_blank">Firefox</a>' ;  _xt(' to download to latest version.'); ?>
-	</h1>
 	</noscript>	
 
 			<?php $this->mainPnl->Render(); ?>

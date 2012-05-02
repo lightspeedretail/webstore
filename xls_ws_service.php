@@ -566,8 +566,8 @@ EOS;
             $product->WebKeyword3 = $strWebKeyword3;
             $product->Featured = $blnFeatured;
             
-            $product->RequestUrl = _xls_seo_url($strName);
-            error_log("request is ".$product->RequestUrl);
+            $product->RequestUrl = _xls_seo_url(_xls_get_conf('SEO_URL_CODES' , 0) ? $strName."-".$strCode : $strName);
+
 	        $strFeatured = _xls_get_conf('FEATURED_KEYWORD','notset');
 	        if ($strFeatured != 'notset' && $product->Web && (
             	$strWebKeyword1==$strFeatured || $strWebKeyword2==$strFeatured || $strWebKeyword2==$strFeatured))

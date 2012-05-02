@@ -97,31 +97,6 @@ class xlsws_category extends xlsws_product_listing {
             return false;
             
         
-
-		/*
-        global $XLSWS_VARS;
-
-        if (isset($XLSWS_VARS['c'])) {
-            if ($XLSWS_VARS['c'] == 'root')
-                unset($XLSWS_VARS['c']);
-            else if (empty($XLSWS_VARS['c']))
-                unset($XLSWS_VARS['c']);
-        }
-
-        if (isset($XLSWS_VARS['c'])) {
-            $arrCategories = explode('.', $XLSWS_VARS['c']);
-            $strCategory = array_pop($arrCategories);
-            $objCategory = Category::$Manager->GetByKey($strCategory);
-
-            if ($objCategory)
-                $this->category = $objCategory;
-            else
-                _xls_display_msg(_sp('Sorry! The category was not found.'));
-        }
-
-        if (!$this->category)
-            return false;
-        */
     }
 
     /**

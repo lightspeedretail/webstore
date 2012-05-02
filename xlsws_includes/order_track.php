@@ -87,7 +87,7 @@ class xlsws_track_order extends xlsws_index {
 		if($customer)
 			$this->customer = $customer;
 
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('order_track.tpl.php');
 
 		$this->crumbs[] = array('key'=>'xlspg=myaccount' , 'case'=> '' , 'name'=> _sp('My Orders'));

@@ -52,7 +52,7 @@
 					<a href="#" class="wishlist rounded-bottom" <?php  $this->misc_components['show_gift_registry']->RenderAsEvents('show') ?>><img src="<?= templateNamed('css') ; ?>/images/wishlist.png" /><?php _xt("Add to Wish List"); ?></a>
 					<?php endif; ?>
 					
-					<a href="#" <?php  $this->misc_components['add_to_cart']->RenderAsEvents($this->prod->Code) ?>><span class="addcart rounded-bottom"><img src="<?= templateNamed('css') ; ?>/images/addtocart.png" /><?php _xt("Add to Cart"); ?></span></a><br />
+					<a href="#" <?php  $this->misc_components['add_to_cart']->RenderAsEvents($this->prod->Code) ?>><span class="addcart rounded-bottom"><img src="<?= templateNamed('css') ; ?>/images/addtocart.png" /><?php _xt("Add to Cart"); ?></span></a>
 					<?php else:?>
 						<p style="margin-top: 100px;"></p> 
 				<?php endif; ?>

@@ -47,10 +47,11 @@
 <?php endif; ?>
 
 
+
 <?php  if($this->subcategories  && (count($this->subcategories) > 0)): ?> 
 <div style="display:inline; float:left;"><br />
 <p style="font-weight: bold; margin: -10px 0 8px 15px; "><?php _xt("Browse subcategories"); ?></strong></p>
-<ul style="margin: 0 0 15px 0;">
+<ul style="margin: 0 0 0px 0;">
 <?php  foreach($this->subcategories as $categ): ?> 
 <li style="margin: 0 0 3px 15px;"><a href="<?= $categ['link']; ?>">&nbsp;<?= $categ['name']; ?></a></li> 
 <?php endforeach; ?> 
@@ -58,8 +59,7 @@
 </div>
 <br style="clear:both"/>
 <?php endif; ?> 
-
-
+<h1><?php echo $this->category->Name; ?></h1>
 </div>
 <div id="main_panel" class="rounded">
 

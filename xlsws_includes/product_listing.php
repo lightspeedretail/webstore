@@ -213,7 +213,7 @@ class xlsws_product_listing extends xlsws_index {
 	 * @return none
 	 */
     protected function build_main() {
-        $this->mainPnl = new QPanel($this);
+        $this->mainPnl = new QPanel($this,'MainPanel');
         $this->mainPnl->Template = templateNamed('product_list.tpl.php');
 
         $this->CreateDataRepeater();

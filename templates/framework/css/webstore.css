@@ -62,7 +62,7 @@ width:1024px;
 display:block;
 float:left;
 height:50px;
-margin:0 0 20px;
+margin:0 0 10px;
 padding:10px 0 75px;
 position:relative;
 text-align:left;
@@ -108,12 +108,12 @@ width:100px;
 #nav_products {
 font-size:12px;
 font-weight:700;
-height:45px;
+height:40px;
 margin:4px 0 15px;
 padding:15px 0 0 4px;
 position:absolute;
 text-decoration:none;
-top:140px;
+top:130px;
 width:105px;
 z-index:1500;  
 }
@@ -601,9 +601,10 @@ overflow:hidden;
 width:100%;
 }
 
-#sidebar h1 {
+#sidebar .clickbar {
 background:#fff;
 font-size:14px;
+font-weight: bold;
 height:16px;
 margin:5px 0 0;
 padding:11px;

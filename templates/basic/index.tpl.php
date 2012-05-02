@@ -159,9 +159,7 @@
 		</div>
 
 	<noscript>
-	<h1>
 	<?php  _xt('This store requires you to have Java-Script enabled in your browser.'); ?>
-	</h1>
 	</noscript>	
 
 			<?php $this->mainPnl->Render(); ?>

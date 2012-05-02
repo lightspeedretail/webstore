@@ -48,7 +48,7 @@ class xlsws_advanced_search extends xlsws_index {
 	 * @return none
 	 */
 	protected function build_main() {
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 
 		$this->mainPnl->Template = templateNamed('search_advanced.tpl.php');
 
