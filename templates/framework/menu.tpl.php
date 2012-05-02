@@ -34,7 +34,7 @@ function print_childs($categ){
 		return;
 	}
 		
-		echo "<img src=\"" . templateNamed('css')  . "/images/arrow-right.gif\" class=\"arrow\" alt=\"Submenu\" /></a><ul>\n";
+		echo "<img src=\"" . templateNamed('css')  . "/images/arrow-right.gif\" class=\"arrow\" /></a><ul>\n";
 	foreach($childs as $category){
 		
 		if(!$category->HasChildOrProduct())

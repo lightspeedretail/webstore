@@ -117,7 +117,6 @@
   js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
-<script type="text/javascript" src="//assets.pinterest.com/js/pinit.js"></script>
 	<?php endif; ?>
 	
 
@@ -235,4 +234,7 @@
 	</script>
 <?php endif; ?>
 <?php $this->RenderEnd(); ?>
+	<?php if(_xls_get_conf('SHOW_SHARING' , 0)): ?>
+<script type="text/javascript" src="//assets.pinterest.com/js/pinit.js"></script>
+	<?php endif; ?>
 </html>

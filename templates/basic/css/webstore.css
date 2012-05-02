@@ -62,6 +62,12 @@ padding:0 15px;
 width:1024px;
 }
 
+#MainPanel h1 {
+margin:30px 0px 5px;
+font-size: 14pt;
+font-weight: bold;
+}
+
 /***** Header *****/
 #header {
 display:block;
@@ -886,6 +892,15 @@ display:block;
 float:left;
 margin:-7px -5px 0 8px;
 padding:3px 7px 3px 0;
+}
+
+#sharingtools {
+display:relative;
+height: 28px;
+margin-top: -30px;
+text-align: right;
+width: 450px;
+z-index: 100;
 }
 
 /***** Invoice Cart *****/
