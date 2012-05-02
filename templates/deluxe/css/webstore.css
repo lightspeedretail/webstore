@@ -919,6 +919,15 @@ margin:-7px -5px 0 8px;
 padding:3px 7px 3px 0;
 }
 
+#sharingtools {
+display:relative;
+height: 28px;
+margin-top: -30px;
+text-align: right;
+width: 450px;
+z-index: 100;
+}
+
 /***** Invoice Cart *****/
 #cart_table {
 border:0;
