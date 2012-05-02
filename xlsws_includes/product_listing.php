@@ -37,7 +37,7 @@ class xlsws_product_listing extends xlsws_index {
      * Create the view's DataRepeater control
      */
     protected function CreateDataRepeater() {
-        $this->dtrProducts = $objRepeater = new QDataRepeater($this->mainPnl);
+        $this->dtrProducts = $objRepeater = new QDataRepeater($this->mainPnl,'ProductCell');
         $this->CreatePaginator();
         #$this->CreatePaginator(true);
 
