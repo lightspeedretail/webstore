@@ -69,20 +69,20 @@ class Images extends ImagesGen {
 	// $strName == intRowid
 	public static function GetImageName($strName,
 		$intWidth = 0, $intHeight = 0, $intIndex = 0, $strClass = null,
-		$blnIsThumb = false) {
+		$blnIsThumb = false, $strSection = 'product') {
 
 		$strName = pathinfo($strName, PATHINFO_FILENAME);
 
-		if (!empty($intIndex))
-			$strName .= '_' . $intIndex;
-
 		if (!empty($strClass))
-			$strName .= '_' . $strClass;
+			$strName .= '-' . $strClass;
+
+		if (!empty($intIndex))
+			$strName .= '-' . $intIndex;
 
 		if (!empty($intWidth) && !empty($intHeight))
-			$strName .= '_' . $intWidth . '_' . $intHeight;
+			$strName .= '-' . $intWidth . 'px-' . $intHeight . "px";
 
-		return $strName . '.jpg';
+		return $strSection . "/" . $strName[0] . "/" . $strName . '.jpg';
 	}
 
 	public static function GetImagePath($strFile) {
@@ -232,6 +232,15 @@ class Images extends ImagesGen {
 
             $this->DeleteImage();
 
+			$arrPath = pathinfo($strName);
+			if ($arrPath['dirname'] != '') {
+				$strPathToCreate = __PHOTOS__ . '/' . $arrPath['dirname'];
+				if ($strPathToCreate[0]=='/') $strPathToCreate=substr($strPathToCreate,1,999);
+				if (!file_exists($strPathToCreate))
+					if (!mkdir($strPathToCreate,0777,true))
+						QApplication::Log(E_ERROR, 'Images', "Error attempting to create ".$strPathToCreate);
+				}
+
 			if (file_put_contents($strPath, $blbImage)) {
 				$this->strImagePath = $strName;
 				$this->strImageData = null;
@@ -331,9 +340,10 @@ class Images extends ImagesGen {
 			imagejpeg($rawNewImage, NULL, 100);
 			return null;
 		}
-
+		
+		$strExistingName=$this->strImagePath;
 		$strImageName = Images::GetImageName(
-			$this->intRowid, $intNewWidth, $intNewHeight);
+			$strExistingName, $intNewWidth, $intNewHeight);
 
 		$objNew = new Images();
 
