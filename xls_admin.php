@@ -5423,6 +5423,15 @@
 			$this->arrMPnls['UpgradeWS']->Name = _sp('Upgrade Web Store Database');
 			$this->arrMPnls['UpgradeWS']->HtmlEntities = false;				
 			$this->arrMPnls['UpgradeWS']->ToolTip= _sp('Upgrade webstore with latest patches/bug fixes');
+
+
+			$this->arrMPnls['MigratePhotos'] = new QPanel($this);
+			$this->arrMPnls['MigratePhotos']->Visible = false;
+			$this->arrMPnls['MigratePhotos']->Name = _sp('Migrate Photos to SEO friendly structure');
+			$this->arrMPnls['MigratePhotos']->HtmlEntities = false;				
+			$this->arrMPnls['MigratePhotos']->ToolTip= _sp('Migrate Photos to SEO file structure with paths and names');
+
+
 			
 			$this->arrMPnls['RecalculateAvail'] = new QPanel($this);
 			$this->arrMPnls['RecalculateAvail']->Visible = false;
@@ -5532,6 +5541,90 @@
 			$this->arrMPnls['RecalculateAvail']->Refresh();
 		}
 		
+		protected function MigratePhotos(){
+
+			//First make sure we have our new names set
+			Product::ConvertSEO();
+			
+			//Then switch to file system if it's not already
+			_xls_set_conf('IMAGE_STORE','FS');
+			
+			
+			$objCondition = QQ::AndCondition(
+           		QQ::NotLike(QQN::Images()->ImagePath, '%/%' )
+	        );
+	
+	    	$arrImages = Images::QueryArray($objCondition);
+	    	
+			foreach ($arrImages as $objImage) {
+			
+				//We only care about the master photos, we'll delete the thumbnails and regenerate
+				if ($objImage->Rowid == $objImage->Parent) {
+				
+					$strExistingPath = $objImage->ImagePath;
+					$strName = pathinfo($strExistingPath, PATHINFO_FILENAME);
+					
+					$intPos = strpos($strName, '_');
+					
+					if ($intPos !== false) {
+						$arrFileParts = explode("_",$strName);
+						$intRowId=substr($strName,0,$intPos);
+						if (count($arrFileParts)==2) { //just add with no index
+							$strAdd = "add";
+							$intIndex = null;
+						}
+						if (count($arrFileParts)==3) { //add with index
+							$strAdd = "add";
+							$intIndex = $arrFileParts[1];
+						}
+					} else {
+						$intRowId=$strName;
+						$strAdd=null;
+						$intIndex=null;
+					}
+						
+					//echo $strName." ".$intRowId." ".$strAdd." ".$intIndex."<br>";
+					$objProduct = Product::Load($intRowId);
+					if ($objProduct && $objProduct->RequestUrl != '') {
+						$strNewImageName = Images::GetImageName($objProduct->RequestUrl, 0, 0, $intIndex, $strAdd);
+					
+					$blbImage = $objImage->GetImageData();
+					$objImage->SaveImageData($strNewImageName, $blbImage);
+					$objImage->Reload();
+					$objImage->ImagePath=$strNewImageName;
+					$objImage->ImageData=null;
+					$objImage->Save();
+					
+					//echo "will now be ".$strNewImageName."<br>";
+					
+					}
+
+				}
+
+			
+			}	
+			
+			//Now we remove all the thumbnails because our browsing will recreate them
+			$objCondition = QQ::AndCondition(
+           		QQ::NotLike(QQN::Images()->ImagePath, '%/%' ),
+           		QQ::NotEqual(QQN::Images()->Rowid,QQN::Images()->Parent)
+	        );
+	
+	    	$arrImages = Images::QueryArray($objCondition);
+	    	
+			foreach ($arrImages as $objImage) {
+				$objImage->DeleteImage();
+				//We delete directly because our class would attempt to remove the parent which we don't want
+				_dbx('DELETE FROM `xlsws_images` WHERE `rowid` = ' . $objImage->Rowid . '');				
+			}
+			
+			
+			$this->arrMPnls['MigratePhotos']->Text = _sp("Photos have been migrated and renamed to SEO names.");
+			$this->arrMPnls['MigratePhotos']->Visible = true;
+			$this->arrMPnls['MigratePhotos']->Refresh();
+		}
+
+
 		
 		protected function OffLineOnlineStore(){
 			

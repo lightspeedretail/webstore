@@ -241,6 +241,20 @@ function _xls_get_conf($strKey, $mixDefault = "") {
 }
 
 /**
+ * Set existing configuration value
+ * @param string $key
+ * @param string $mixDefault
+ * @return bool success
+ */
+function _xls_set_conf($strKey, $mixDefault = "") {
+	$conf = Configuration::LoadByKey($strKey);
+	if(!$conf) return false;
+	$conf->Value = $mixDefault;
+	$conf->Save();
+	return true;
+}
+
+/**
  * Enter a configuration into
  *
  * @param string $key

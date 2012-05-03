@@ -117,17 +117,21 @@ class Product extends ProductGen {
 	}
 	
 	public static function ConvertSEO() {
-	
-		$arrProducts = Product::QueryArray(
-				QQ::Equal(QQN::Product()->Web, 1),
-				QQ::Clause(
-					QQ::OrderBy(QQN::Product()->Rowid)
-			 ));
-		foreach ($arrProducts as $objProd) {
-			$objProd->RequestUrl = _xls_seo_url(_xls_get_conf('SEO_URL_CODES' , 0) ? $strName."-".$strCode : $strName);
-			$objProd->Save();
+
+		//Because our product table is potentially huge, we can't risk loading everything into an array and having PHP crash, 
+		//so we just have to do this directly with the db
+		$db = Product::GetDatabase();
+
+		$matches = $db->Query('SELECT rowid,name,code from xlsws_product order by rowid');
+			
+		while ($row = $matches->FetchArray()) {
+			_dbx("UPDATE xlsws_product SET request_url='".
+				_xls_seo_url(_xls_get_conf('SEO_URL_CODES' , 0) ? $row['name']."-".$row['code'] : $row['name'])."'
+				WHERE rowid=".$row['rowid']);
+				
 		}
 	
+
 	}
 	
 	
