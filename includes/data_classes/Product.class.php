@@ -153,7 +153,8 @@ class Product extends ProductGen {
 			if ($prod = $this->FkProductMaster)
 				return $prod->Link;
 			
-		return $this->RequestUrl."/dp/"; 
+		return _xls_site_url($this->RequestUrl."/dp/");
+		
 	}
 
 	/**

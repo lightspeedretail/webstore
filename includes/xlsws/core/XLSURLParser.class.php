@@ -46,7 +46,7 @@ class XLSURLParser {
 			$this->strUri = $_SERVER['ORIG_PATH_INFO'];
 		else
 			$this->strUri = $_SERVER['PATH_INFO'];
-		
+
 		if (!$this->ExplodeSegments()) 	return false; 
 		if (!$this->ReindexSegments())	return false;
 		
@@ -153,6 +153,7 @@ class XLSURLParser {
 			$strRemaining = str_replace("?&","?",$strRemaining);
 			if ($strRemaining=="?") $strRemaining='';	
 			$this->strRedirectUrl = str_replace("_","-",basename($_GET['xlspg']))."/pg/".$strRemaining;
+			$this->strRedirectUrl = _xls_site_url($this->strRedirectUrl);
 			$this->intStatus=301;
 			return true;
 		

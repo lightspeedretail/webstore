@@ -54,7 +54,8 @@ class Family extends FamilyGen {
 	}
 
 	public function GetLink() {
-		return $this->strRequestUrl."/f/";
+	
+		return _xls_site_url($this->strRequestUrl."/f/");
 	}
 
 	/*// Override LoadAll to pull from the Products table for performance

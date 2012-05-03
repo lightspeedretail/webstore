@@ -34,7 +34,7 @@
 		<?php foreach($this->crumbs as $crumb): ?>
 			<li>
 				<a <?php if(isset($crumb['link'])): ?>
-						href="<?= $crumb['link']; ?>"
+						href="<?= _xls_site_url($crumb['link']); ?>"
 					<?php elseif(isset($crumb['key'])): ?>
 						href="index.php?<?= $crumb['key']; ?>"
 					<?php else: ?>

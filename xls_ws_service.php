@@ -1408,6 +1408,7 @@ EOS;
             $category->CustomPage = trim($strCustomPage);
             $category->MetaKeywords = $strMetaKeywords;
             $category->MetaDescription = $strMetaDescription;
+            $category->RequestUrl = $category->GetSEOPath();
             $category->Save();
             $category->UpdateChildCount();
             

@@ -61,7 +61,7 @@
 			<table width='100%'>
 			<?php foreach($this->orders as $order): ?>
 				<tr>
-				<td><a href="order-track/pg/?getuid=<?php _xt($order->Linkid); ?>"><?php _xt($order->IdStr);?></a></td>
+				<td><a href="<?php echo _xls_site_url("order-track/pg/"); ?>?getuid=<?php _xt($order->Linkid); ?>"><?php _xt($order->IdStr);?></a></td>
 				<!--
 					<td><?php _xt($order->DatetimePosted); ?></td>
 					<td><?php _xt($order->Status); ?></td>
@@ -89,11 +89,11 @@
 		<div class="padding">
 		<?php if(count($this->giftregistries) > 0): ?>
 			<?php foreach($this->giftregistries as $registry): ?>
-					<a href="index.php?xlspg=gift_registry&registry_id=<?=  $registry->Rowid  ?>"><?=  $registry->RegistryName  ?></a><br/>
+					<a href="<?php echo _xls_site_url("gift-registry/pg/"); ?>?registry_id=<?=  $registry->Rowid  ?>"><?=  $registry->RegistryName  ?></a><br/>
 			<?php endforeach; ?>
 		<?php else: ?>
 				<?php _xt("You have not created any wish list yet."); ?><br/>
-				<a href="index.php?xlspg=gift_registry"><?php _xt('Click here') ?></a> to create a wish list.
+				<a href="<?php echo _xls_site_url("gift-registry/pg/"); ?>"><?php _xt('Click here') ?></a> to create a wish list.
 		<?php endif; ?>
 		</div>
 		

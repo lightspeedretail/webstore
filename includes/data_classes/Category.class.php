@@ -143,15 +143,7 @@ class Category extends CategoryGen {
 	}
 
 	protected function GetLink() {
-		/*if (_xls_get_conf('ENABLE_SEO_URL', false))
-			if ($this->IsPrimary())
-				return $this->Slug . '.html';
-			else
-				return $this->ParentObject->DirLink . $this->Slug . '.html';
-		return 'index.php?c=' . $this->intRowid;
-		
-		*/
-		return $this->strRequestUrl."/c/";
+		return _xls_site_url($this->strRequestUrl."/c/");
 	}
 
 	/**

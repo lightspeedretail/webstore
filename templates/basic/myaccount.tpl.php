@@ -89,11 +89,11 @@
 		<div class="padding">
 		<?php if(count($this->giftregistries) > 0): ?>
 			<?php foreach($this->giftregistries as $registry): ?>
-					<a href="index.php?xlspg=gift_registry&registry_id=<?=  $registry->Rowid  ?>"><?=  $registry->RegistryName  ?></a><br/>
+					<a href="<?php echo _xls_site_url("gift-registry/pg/"); ?>?registry_id=<?=  $registry->Rowid  ?>"><?=  $registry->RegistryName  ?></a><br/>
 			<?php endforeach; ?>
 		<?php else: ?>
 				<?php _xt("You have not created any wish list yet."); ?><br/>
-				<a href="index.php?xlspg=gift_registry"><?php _xt('Click here') ?></a> to create a wish list.
+				<a href="<?php echo _xls_site_url("gift-registry/pg/"); ?>"><?php _xt('Click here') ?></a> to create a wish list.
 		<?php endif; ?>
 		</div>
 		
@@ -112,7 +112,7 @@
 		<div class="padding">
 		<?php if(count($this->repairs) > 0): ?>
 			<?php foreach($this->repairs as $repair): ?>
-					<a href="index.php?xlspg=sro_track&dosearch=&zipcode=<?= $repair->Zipcode ?>&orderid=<?= $repair->LsId ?>"><?=  $repair->LsId  ?></a><br/>
+					<a href="<?php echo _xls_site_url("sro-track/pg/"); ?>&dosearch=&zipcode=<?= $repair->Zipcode ?>&orderid=<?= $repair->LsId ?>"><?=  $repair->LsId  ?></a><br/>
 			<?php endforeach; ?>
 		<?php else: ?>
 				<?php _xt("You have not placed any repair orders with us yet"); ?>

@@ -121,7 +121,7 @@
 				</div>
 				
 				<?php else: ?>
-				<div class="text"><div style="margin: 0 105px 0 0; display: block; float: left;"><a href="myaccount/pg/"><?= _xt("My Account"); ?></a></div> <?php $this->lblLogout->Render(); ?></div>
+				<div class="text"><div style="margin: 0 105px 0 0; display: block; float: left;"><a href="<? echo _xls_site_url('myaccount/pg/'); ?>"><?= _xt("My Account"); ?></a></div> <?php $this->lblLogout->Render(); ?></div>
 				<?php endif; ?>
 			
 				

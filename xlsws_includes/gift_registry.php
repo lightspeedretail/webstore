@@ -258,7 +258,7 @@ class xlsws_gregistry extends xlsws_index {
 	 */
 	protected function bind_widgets() {
 		$this->btnGRSave->AddAction(new QClickEvent(),new QServerAction('btnGRSave_Click'));
-		$this->btnGRCancel->AddAction(new QClickEvent(),new QJavaScriptAction("document.location.href='index.php?xlspg=gift_registry'"));
+		$this->btnGRCancel->AddAction(new QClickEvent(),new QJavaScriptAction("document.location.href='"._xls_site_url("gift-registry/pg/")."'"));
 		$this->pxyGREdit->AddAction(new QClickEvent(),new QServerAction('btnGRForm_Click'));
 		$this->pxyGREdit->AddAction(new QClickEvent(),new QJavaScriptAction('return false;'));
 		$this->pxyGiftItemDelete->AddAction(new QClickEvent(),new QServerAction('btnGiftItemDelete_Click'));

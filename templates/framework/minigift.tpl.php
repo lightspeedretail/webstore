@@ -32,10 +32,10 @@
 
 
 if($customer): ?>
-<p style="margin-left:20px;"><a href="gift_registry/pg/"><?php _xt("Gift Management"); ?></A></p>
+<p style="margin-left:20px;"><a href="<?php echo _xls_site_url("gift-registry/pg/"); ?>"><?php _xt("Gift Management"); ?></A></p>
 <?php  endif;  ?>
 <?php if(isset($_SESSION['gift_reg_code'])): ?>
-	<p style="margin-left:20px;"><a href="gift_list/pg/"><?php _xt("Gift List"); ?></A></p>
+	<p style="margin-left:20px;"><a href="<?php echo _xls_site_url("gift-list/pg/"); ?>"><?php _xt("Gift List"); ?></A></p>
 <?php  endif;  ?>
 
-<p style="margin-left:20px;"><a href="gift_search/pg/"><?php _xt("Search"); ?></A></p>
+<p style="margin-left:20px;"><a href="<?php echo _xls_site_url("gift-search/pg/"); ?>"><?php _xt("Search"); ?></A></p>

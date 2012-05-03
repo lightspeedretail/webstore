@@ -802,13 +802,14 @@ class Cart extends CartGen {
     }
 
 	protected function GetLink($blnTracking = false) { 
-		$strUrl = _xls_site_dir();
+		//$strUrl = _xls_site_dir();
+		//$strUrl .= (_xls_get_conf('ENABLE_SEO_URL', false) ? "" : "/index.php");
+		
+		if ($blnTracking) $strUrl =  'order-track/pg/?getuid=';
+		else $strUrl = 'cart/pg/?getcart=';
 
-		if ($blnTracking) $strUrl = $strUrl . '/order-track/pg/?getuid=';
-		else $strUrl = $strUrl . '/cart/pg/?getcart=';
-
-		$strUrl = $strUrl . $this->Linkid;
-		return $strUrl;
+		$strUrl .= $this->Linkid;
+		return _xls_site_url($strUrl);
 	}
 
 	/**

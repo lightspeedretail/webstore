@@ -425,7 +425,7 @@ function _xls_display_msg($msg, $redirect = "") { error_log("redirecting on ".$m
 	//if($redirect)
 	//	_xls_add_meta_redirect($redirect);
 
-	_rd('msg/pg/');
+	_rd(_xls_site_url('msg/pg/'));
 }
 
 /**
@@ -442,7 +442,7 @@ function _xls_require_login($msg = false) {
 	_xls_stack_add('login_msg' , _sp($msg));
 	_xls_stack_add('login_redirect_uri' , $uri);
 
-	_rd('index.php?xlspg=login');
+	_rd(_xls_site_url('login/pg/'));
 }
 
 /**
@@ -719,7 +719,20 @@ function _xls_site_dir($ssl_attempt = true) {
 	return $strSsl . $strHost;
 }
 
+//
+/**
+* Returns full qualfied URL, based on sitedir and also
+* Determines whether we should append index.php
+*
+* @param string $strUrlPath optional
+* @return string url
+*/
+function _xls_site_url($strUrlPath =  '') {
+	return _xls_site_dir() . '/' . (_xls_get_conf('ENABLE_SEO_URL', false) ? "" : "index.php/").$strUrlPath;
+}
 
+//Makes our SEO hypenated string from passed string
+//Used to build anything that will be in a URL
 function _xls_seo_url($string){
 	$string = str_replace('\'','',$string);
 	$string = str_replace("&","and",$string);
@@ -1191,27 +1204,6 @@ function _xls_build_query($array, $query = '', $prefix = '') {
 	return $query;
 }
 
-/**
- * Return the URL for a Custom Page
- * @param string $page :: The page key
- * @return string
- */
-function _xls_custom_page_url($page) {
-//Best workaround until Contact Us forms can be refactored
-//This will change with the SEO changes a bit later anyway
-//ToDo:
-	if ($page=="contactus") return "index.php?xlspg=contact_us";
-	if(!_xls_get_conf('ENABLE_SEO_URL' , false))
-		return "index.php?cpage=$page";
-
-	$cpage = CustomPage::LoadByKey($page);
-
-	
-	if($cpage)
-		return $cpage->Link;
-
-	return "index.php";
-}
 
 /**
  * Return code to load the XML sitemap

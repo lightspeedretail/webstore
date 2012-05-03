@@ -1,0 +1,20 @@
+#
+#    Copyright (c) 2005-2009 Xsilva Systems Inc. All rights reserved. 
+# 
+#    This file controls search engine friendly urls and redirection
+#
+
+# Removes index.php from URLs for better aesthetic appearance
+Options -MultiViews
+RewriteEngine On
+RewriteBase /
+
+Options +FollowSymLinks
+
+RewriteCond $1 !^(index\.php|xls_image_upload\.php|xls_soap\.php|xlsws_ws_service\.php|assets|photos|templates|css|js|favicon\.ico|robots\.txt)
+RewriteRule (.*)\.xml(.*) index.php/$1/feeds [QSA,L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php/$1 [QSA,L]
+
+

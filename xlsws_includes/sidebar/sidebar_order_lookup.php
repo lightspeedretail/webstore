@@ -78,7 +78,7 @@ class sidebar_order_lookup_qp extends QPanel {
 		);
 
 		if($sro)
-			_rd("index.php?xlspg=sro_track&dosearch=true&orderid=" . $this->txtSKOrderId->Text . "&emailphone=" . $this->txtEmailPhone->Text);
+			_rd(_xls_site_url('sro-track/pg/') . "?dosearch=true&orderid=" . $this->txtSKOrderId->Text . "&emailphone=" . $this->txtEmailPhone->Text);
 		else {
 			// is it quote?
 			$quote = Cart::QuerySingle(
@@ -96,7 +96,7 @@ class sidebar_order_lookup_qp extends QPanel {
 			if($quote)
 				_rd($quote->Link);
 			else
-				_rd("index.php?xlspg=order_track&dosearch=true&orderid=" . $this->txtSKOrderId->Text . "&emailphone=" . $this->txtEmailPhone->Text); // otherwise search orders!
+				_rd(_xls_site_url('order-track/pg/') . "?dosearch=true&orderid=" . $this->txtSKOrderId->Text . "&emailphone=" . $this->txtEmailPhone->Text); // otherwise search orders!
 		}
 	}
 }
