@@ -394,6 +394,10 @@ class xlsws_db_maintenance extends xlsws_index {
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Product Codes in Product URLs', 
 				'SEO_URL_CODES', '0', 'If your Product Codes are important (such as model numbers), this will include them when making SEO formatted URLs. If you generate your own Product Codes that are only internal, you can leave this off.', 14, 2, NOW(), NOW(), 'BOOL');");	
 					
+
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Remove index.php from SEO-Friendly URLs', `configuration_type_id`=14, `sort_order`=3,
+				`helper_text`='Requires .htaccess in Web Store root folder.' where `key`='ENABLE_SEO_URL'");	
+
 				
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			

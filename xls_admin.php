@@ -663,8 +663,10 @@
 		 			$config->Value = $field->SelectedValue;
 		 		}elseif($field instanceof QFileAsset )
 		 			$config->Value = $field->File;
-		 			
-		 		$config->Save();
+		 		
+		 		if ($this->beforeSave($key,$field))	
+		 			$config->Save();
+		 		else return false;
 			}
 			
 			
@@ -673,6 +675,27 @@
 			
 			
 		}
+		 
+		 
+		// Anything to do before save?
+		protected function beforeSave($key,$field){
+		
+			switch ($key) {
+				case 'ENABLE_SEO_URL':
+					if ($field->Checked)
+					if (!file_exists(__DOCROOT__ .  __SUBDIRECTORY__ . '/.htaccess')) {
+						_qalert("'Remove index.php from SEO-Friendly URLs' requires the file .htaccess in your Web Store root before turning this option on. There is a file named htaccess (without the period) already in that folder. Rename this file with a period to activate it, then turn this option on. Please see documentation for additional help.");
+					return false;
+				}
+			
+				default:
+					return true;		
+			}
+			
+			return true;
+		
+		}
+		 
 		 
 		public function btnCancel_click($strFormId, $strControlId, $strParameter){
 		 	$this->btnEdit->Visible = true;
@@ -4157,7 +4180,7 @@
 
 			
 			foreach($this->arrFields as $field =>$properties){
-				
+				error_log("yeah");
 				
 				if($this->arrFields[$field]['Field'] instanceof QListBox  )
 					$objItem->$field = $this->arrFields[$field]['Field']->SelectedValue;
@@ -4176,6 +4199,8 @@
 		
 		// Anything to do before save?
 		protected function beforeSave($objItem){
+		
+			
 			return $objItem;
 		}
 		
