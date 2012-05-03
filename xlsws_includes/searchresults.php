@@ -76,9 +76,11 @@ class xlsws_searchresult extends xlsws_product_listing {
      * @return string
      */
     protected function GetSearchCriteria() {
-        global $XLSWS_VARS;
 
-        $strCriteria = $XLSWS_VARS['search'];
+
+    	$objUrl = XLSURLParser::getInstance();    
+		$strCriteria = $objUrl->RouteId;
+
         $strCriteria = strip_tags($strCriteria);
         $strCriteria = trim($strCriteria);
         $strCriteria = addslashes($strCriteria);
@@ -301,14 +303,17 @@ class xlsws_searchresult extends xlsws_product_listing {
 	 * @return none
 	 */
 	protected function build_main(){
-		global $XLSWS_VARS;
+
 
         $this->LoadCategory();
 
         parent::build_main();
 
+	    $objUrl = XLSURLParser::getInstance();    
+		$strCriteria = $objUrl->RouteId;
+		
         $this->crumbs[] = array(
-            'key'=>'search=' . $XLSWS_VARS['search'],
+            'link'=>$objUrl->RouteId . "/s/",
             'case'=> '',
             'name'=>_sp('Search Results')
         );
@@ -317,7 +322,7 @@ class xlsws_searchresult extends xlsws_product_listing {
             0, 
             ViewLogType::search,
             '',
-            $XLSWS_VARS['search']
+            $objUrl->RouteId
         );
     }
 

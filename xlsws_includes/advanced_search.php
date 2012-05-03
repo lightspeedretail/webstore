@@ -53,7 +53,7 @@ class xlsws_advanced_search extends xlsws_index {
 		$this->mainPnl->Template = templateNamed('search_advanced.tpl.php');
 
 		$this->crumbs[] = array(
-			'key'=>'xlspg=advanced_search',
+			'link'=>'advanced-search/pg/',
 			'case'=> '',
 			'name'=> _sp("Advanced Search")
 		);

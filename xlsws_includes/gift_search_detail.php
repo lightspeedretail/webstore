@@ -63,7 +63,7 @@ class xlsws_glist extends xlsws_index {
 		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('gift_search_detail.tpl.php');
 
-		$this->crumbs[] = array('key'=>'xlspg=gift_search' , 'case'=> '' , 'name'=> _sp('Wish List'));
+		$this->crumbs[] = array('link'=>'gift-search/pg/' , 'case'=> '' , 'name'=> _sp('Wish List'));
 
 		$this->txtGListPassword = new XLSTextBox($this);
 		$this->txtGListPassword->TextMode =QTextMode::Password;
@@ -92,7 +92,7 @@ class xlsws_glist extends xlsws_index {
 		if(_xls_stack_get('GIFT_REGISTRY_AUTHED') == $this->objGiftDetail->Rowid)
 			$this->logTrack =1;
 
-		$this->crumbs[] = array('key'=>'xlspg=gift_search_detail&gift_code='.$XLSWS_VARS['gift_code'] , 'case'=> '' , 'name'=> $this->objGiftDetail->RegistryName);
+		$this->crumbs[] = array('link'=>'gift-search-detail/pg/?gift_code='.$XLSWS_VARS['gift_code'] , 'case'=> '' , 'name'=> $this->objGiftDetail->RegistryName);
 
 		$this->dtrGiftList = new QDataRepeater($this);
 		$this->dtrGiftList->Template = templateNamed('gift_search_detail_item.tpl.php');

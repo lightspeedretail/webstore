@@ -42,7 +42,7 @@ $this->txtSearchBox->CssClass="searchTextBox";
 
 $this->misc_components['search_img'] = new QImageButton($this->searchPnl);
 $this->misc_components['search_img']->ImageUrl = templateNamed("css/images/search_go.png");
-$this->misc_components['search_img']->AddAction(new QClickEvent(), new QJavaScriptAction("document.location.href='index.php?search='+ $('#xlsSearch').val();"));
+$this->misc_components['search_img']->AddAction(new QClickEvent(), new QJavaScriptAction("document.location.href='+ $('#xlsSearch').val() + '/s/';"));
 $this->misc_components['search_img']->CssClass= 'searchButton';
 $this->misc_components['search_img']->SetCustomStyle('float','left');
 

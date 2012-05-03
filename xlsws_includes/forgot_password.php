@@ -39,7 +39,7 @@ class xlsws_fpassword extends xlsws_index {
 		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('forgot_password.tpl.php');
 
-		$this->crumbs[] = array('key'=>'xlspg=forgot_password' , 'case'=> '' , 'name'=> _sp('Forgot Password?'));
+		$this->crumbs[] = array('link'=>'forgot-password/pg/' , 'case'=> '' , 'name'=> _sp('Forgot Password?'));
 
 		//email
 		$this->txtFEmail = new XLSTextBox($this);

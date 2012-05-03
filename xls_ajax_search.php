@@ -37,11 +37,11 @@ $SQL_WHERE = 'name';
 
 $searchq = _xls_escape(strip_tags($_GET['q']));
 $matches = $db->Query(
-	'SELECT ' . $SQL_WHERE .
+	'SELECT ' . $SQL_WHERE . ',request_url ' .
 	' FROM ' . $SQL_FROM .
 	' WHERE ' . $SQL_WHERE . ' LIKE "%' .$searchq . '%"' .
 	' AND web=1' .
-	' AND fk_product_master_id=0'
+	' AND fk_product_master_id=0 limit 15'
 );
 
 // Begin Return Display ?>
@@ -52,7 +52,7 @@ $matches = $db->Query(
 		<li class="search_item" onmouseout="clearList()">
 			<a href="javascript:{}"
 			   style="border: none;"
-			   onclick="document.getElementById('xlsSearch').value = '<?=addslashes(str_replace("\n","",urlencode($row[$SQL_WHERE])))?>';document.getElementById('searchoptions').style.display='none';document.location.href='index.php?search='+ $('#xlsSearch').val(); return false;">
+			   onclick="document.getElementById('xlsSearch').value = '<?=addslashes(str_replace("\n","",urlencode($row[$SQL_WHERE])))?>';document.getElementById('searchoptions').style.display='none';document.location.href='<?= $row['request_url']; ?>/dp/'; return false;">
 				<?php echo $row[$SQL_WHERE]; ?>
 			</a>
 		</li>

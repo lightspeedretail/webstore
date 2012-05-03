@@ -402,10 +402,10 @@ class xlsws_cregister extends xlsws_index {
 		$this->objDefaultWaitIcon = new QWaitIcon($this);
 
 		if($this->isLoggedIn()) {
-			$this->crumbs[] = array('key'=>'xlspg=myaccount' , 'case'=> '' , 'name'=> _sp('My Account'));
-			$this->crumbs[] = array('key'=>'xlspg=customer_register' , 'case'=> '' , 'name'=> _sp('Edit Account Details'));
+			$this->crumbs[] = array('link'=>'myaccount/pg/' , 'case'=> '' , 'name'=> _sp('My Account'));
+			$this->crumbs[] = array('link'=>'customer_register/pg/' , 'case'=> '' , 'name'=> _sp('Edit Account Details'));
 		}
-		else $this->crumbs[] = array('key'=>'xlspg=customer_register' , 'case'=> '' , 'name'=> _sp('Register'));
+		else $this->crumbs[] = array('link'=>'customer_register/pg/' , 'case'=> '' , 'name'=> _sp('Register'));
 
 		// Define the layout
 		

@@ -126,7 +126,12 @@ class XLSURLParser {
 				$this->intStatus=200;
 				break;
 
-				
+			case 's': //RSS/XML feeds
+				$this->strRouteId = $this->arrUrlSegments[0];
+				$this->strRouteDepartment = "searchresults";
+				$this->intStatus=200;
+				break;
+								
 		}
 		
 	

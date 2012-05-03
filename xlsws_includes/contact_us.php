@@ -160,7 +160,7 @@ class xlsws_contact_us extends xlsws_index {
 		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('contact_us.tpl.php');
 
-		$this->crumbs[] = array('key'=>'xlspg=contact_us' , 'case'=> '' , 'name'=> _sp($pageR->Title));
+		$this->crumbs[] = array('link'=>'contact_us/pg/' , 'case'=> '' , 'name'=> _sp($pageR->Title));
 
 		_xls_add_page_title(_sp($pageR->Title));
 

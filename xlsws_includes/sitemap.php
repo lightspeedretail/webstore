@@ -43,7 +43,7 @@ class xlsws_sitemap extends xlsws_index {
 	protected function build_main(){
 		global $XLSWS_VARS , $strPageTitle;
 
-		$this->crumbs[] = array('key'=>"xlspg=sitemap", 'case'=> '', 'name'=> _sp("Sitemap"));
+		$this->crumbs[] = array('link'=>"sitemap/pg/", 'case'=> '', 'name'=> _sp("Sitemap"));
 
 		$this->mainPnl = new QPanel($this,'MainPanel');
 

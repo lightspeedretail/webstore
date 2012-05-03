@@ -29,7 +29,7 @@
 
 <div class="box_close"  <?php $_CONTROL->pxyCancel->RenderAsEvents(); ?>><!--  --></div>
 <div class="login">
-			<h1>Login <a href="index.php?xlspg=customer_register" style="font-size: 14px;"><?php _xt('Create an Account') ?></a></h1>
+			<h1>Login <a href="customer-register/pg/" style="font-size: 14px;"><?php _xt('Create an Account') ?></a></h1>
 		
 			<p align="center"><?php $_CONTROL->lblErr->Render('CssClass=red') ?></p>
 			<p><?php _xt('Email Address') ?></p>

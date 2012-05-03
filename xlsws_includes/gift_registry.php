@@ -288,7 +288,7 @@ class xlsws_gregistry extends xlsws_index {
 		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('gift_detail.tpl.php');
 
-		$this->crumbs[] = array('key'=>'xlspg=gift_registry' , 'case'=> '' , 'name'=> _sp('My Wish Lists'));
+		$this->crumbs[] = array('link'=>'gift-registry/pg/' , 'case'=> '' , 'name'=> _sp('My Wish Lists'));
 
 		if(!$this->isLoggedIn())
 			_xls_require_login("Sorry, you have to be logged in to use the Wish List.");

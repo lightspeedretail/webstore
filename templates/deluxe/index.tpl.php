@@ -130,7 +130,7 @@
 				
 				<div class="text">
 					<div class="left" style="margin: 0 55px 0 0;"><?php _xt("Welcome!"); ?></div>
-					<div class="right"><a href="#" <?php $this->pxyLoginLogout->RenderAsEvents() ?>class="loginbox"><?php _xt("Login"); ?></a> &nbsp;|&nbsp; <a href="customer_register/pg/"><?php _xt("Register"); ?></a></div>
+					<div class="right"><a href="#" <?php $this->pxyLoginLogout->RenderAsEvents() ?>class="loginbox"><?php _xt("Login"); ?></a> &nbsp;|&nbsp; <a href="customer-register/pg/"><?php _xt("Register"); ?></a></div>
 				</div>
 				
 				<?php else: ?>

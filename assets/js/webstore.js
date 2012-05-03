@@ -55,7 +55,7 @@ function setCaptchaImage(name){ $('#captcha-verif-img').attr('src', name); }
 /* -------------------------- */
 function autosuggest(event) {
 var search = document.getElementById('xlsSearch').value;
-if (event.keyCode == 13) { document.location.href='index.php?search='+search; }
+if (event.keyCode == 13) { document.location.href=''+search + '/s/'; }
 if (event.keyCode == 40) { traverse("down"); return;}
 if (event.keyCode == 38) { traverse("up"); return;}
 

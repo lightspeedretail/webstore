@@ -156,7 +156,7 @@ class xlsws_cart extends xlsws_index {
 		$this->mainPnl->Template = templateNamed('cart.tpl.php');
 		$this->mainPnl->AutoRenderChildren = false;
 
-		$this->crumbs[] = array('key'=>'xlspg=cart',
+		$this->crumbs[] = array('link'=>'cart/pg/',
 			'case'=> '',
 			'name'=> _sp('Shopping Cart'));
 

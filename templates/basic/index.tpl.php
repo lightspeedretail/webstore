@@ -117,11 +117,11 @@
 				
 				<div class="text">
 					<div class="left" style="margin: 0 55px 0 0;"><?php _xt("Welcome!"); ?></div>
-					<div class="right"><a href="#" <?php $this->pxyLoginLogout->RenderAsEvents() ?>class="loginbox"><?php _xt("Login"); ?></a> &nbsp;|&nbsp; <a href="index.php?xlspg=customer_register"><?php _xt("Register"); ?></a></div>
+					<div class="right"><a href="#" <?php $this->pxyLoginLogout->RenderAsEvents() ?>class="loginbox"><?php _xt("Login"); ?></a> &nbsp;|&nbsp; <a href="customer-register/pg/"><?php _xt("Register"); ?></a></div>
 				</div>
 				
 				<?php else: ?>
-				<div class="text"><div style="margin: 0 105px 0 0; display: block; float: left;"><a href="index.php?xlspg=myaccount"><?= _xt("My Account"); ?></a></div> <?php $this->lblLogout->Render(); ?></div>
+				<div class="text"><div style="margin: 0 105px 0 0; display: block; float: left;"><a href="myaccount/pg/"><?= _xt("My Account"); ?></a></div> <?php $this->lblLogout->Render(); ?></div>
 				<?php endif; ?>
 			
 				

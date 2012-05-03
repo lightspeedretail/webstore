@@ -494,7 +494,7 @@ class xlsws_checkout extends xlsws_index {
 
     public function DoRegisterControlClick($strFormId, $strControlId, $strParam) {
         _xls_stack_add('register_redirect_uri' , "checkout/pg/");
-        _rd("index.php?xlspg=customer_register");
+        _rd("customer-register/pg/");
     }
 
     protected function BuildSubmitControl() {
@@ -1273,7 +1273,7 @@ class xlsws_checkout extends xlsws_index {
         $this->objDefaultWaitIcon = new QWaitIcon($this);
 
         $this->crumbs[] = array(
-            'key' => 'checkout/pg/',
+            'link' => 'checkout/pg/',
             'case' => '',
             'name' => _sp('Check Out')
         );
