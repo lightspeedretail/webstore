@@ -201,7 +201,7 @@ $xlsws_form = 'xlsws_index';
 foreach (ImagesType::$NameArray as $strType) {
 	if (!isset($_GET[$strType]))
 		continue;
-error_log("hitting imagetype ".$_GET[$strType]);
+
 	$intType = ImagesType::ToToken($strType);
 
 	$imgid = $_GET[$strType];
