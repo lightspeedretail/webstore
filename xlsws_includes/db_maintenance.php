@@ -230,7 +230,16 @@ class xlsws_db_maintenance extends xlsws_index {
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Disable Ajax Paging', 'DEBUG_DISABLE_AJAX', '',
 				'If selected, WS will not page using AJAX but will use regular URLs.', 
 				1, 21, NOW(), NOW(), 'BOOL');");
-
+			$this->add_config_key('DEBUG_DELETE_DUPES' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Uploader should delete duplicates', 'DEBUG_DELETE_DUPES', '',
+				'If selected, a product which is uploading will replace any duplicate product codes.', 
+				1, 22, NOW(), NOW(), 'BOOL');");
+			$this->add_config_key('LOG_ROTATE_DAYS' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Log Rotate Days', 
+				'LOG_ROTATE_DAYS', '30', 'How many days System Log should be retained.', 1, 23, NOW(), NOW(), 'NULL');");					
+			$this->add_config_key('UPLOADER_TIMESTAMP' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Last timestamp uploader ran', 
+				'UPLOADER_TIMESTAMP', '0', 'Internal', 0, 0, NOW(), NOW(), 'NULL');");
 
 			//Families menu labeling
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Show Families on Product Menu?',
@@ -393,7 +402,6 @@ class xlsws_db_maintenance extends xlsws_index {
 			$this->add_config_key('SEO_URL_CODES' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Product Codes in Product URLs', 
 				'SEO_URL_CODES', '0', 'If your Product Codes are important (such as model numbers), this will include them when making SEO formatted URLs. If you generate your own Product Codes that are only internal, you can leave this off.', 14, 2, NOW(), NOW(), 'BOOL');");	
-					
 
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Remove index.php from SEO-Friendly URLs', `configuration_type_id`=14, `sort_order`=3,
 				`helper_text`='Requires .htaccess in Web Store root folder.' where `key`='ENABLE_SEO_URL'");	
