@@ -2514,12 +2514,22 @@ EOS;
         /**
          * Update all webstore orders before a timestamp ***DEPRECIATED - DO NOT USE, USED ONLY AS A WRAPPER FOR LIGHTSPEED DOWNLOAD REQUESTS, DO NOT DELETE****
          *
+         * Since we call this once, we can use this as a trigger for other housekeeping since we currently don't have a separate key
          * @param string $passkey
          * @param int $intDttSubmitted
          * @param int $intDownloaded
          * @return string
          */
         public function update_order_downloaded_status_by_ts($passkey , $intDttSubmitted , $intDownloaded){
+        
+        	$intLogRotateDays = _xls_get_conf('LOG_ROTATE_DAYS',0);
+        	if ($intLogRotateDays>0) {
+        		$LastDate = date('YmdHis', strtotime("-".$intLogRotateDays." days"));
+       
+        		_dbx("DELETE from xlsws_log where DATE_FORMAT(`created`, '%Y%m%d%H%i%s')<'".$LastDate."'");
+        	}
+        	
+        	
             return self::OK;
             
         }
