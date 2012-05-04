@@ -49,6 +49,36 @@ table {
 font-size: 12px;
 }
 
+#cartitems table {
+	width: 730px;
+	margin-top: 10px;
+	margin-bottom: 20px;
+	
+}
+
+#cartitems th {
+background: none repeat scroll 0 0 #000000;
+color: #FFFFFF;
+font-weight: bold;
+padding-left: 2px;
+text-align: left;
+}
+
+#cartitems .summary {
+text-align:right;
+font-weight: bold;
+}
+
+
+#cartitems .rightprice {
+text-align:right;
+}
+
+#cartitems .shipping {
+vertical-align: top;
+text-align: left;
+}
+
 #footer a {color: #fff;}
 
 a img {border: none;}

@@ -908,9 +908,9 @@ class xlsws_checkout extends xlsws_index {
 
 
 		if (_xls_get_conf('EMAIL_SEND_CUSTOMER',0)==1)
-        	self::SendCustomerEmail($objCart, $objCustomer);
+        	xlsws_index::SendCustomerEmail($objCart, $objCustomer);
         if (_xls_get_conf('EMAIL_SEND_STORE',0)==1)
-        	self::SendOwnerEmail($objCart, $objCustomer);
+        	xlsws_index::SendOwnerEmail($objCart, $objCustomer);
         	
         	
         if ($blnForward)
@@ -937,45 +937,6 @@ class xlsws_checkout extends xlsws_index {
         return $objCart;
     }
 
-    protected static function SendCustomerEmail($objCart, $objCustomer) {
-        if (!_xls_mail(
-            $objCart->Email,
-            sprintf('%s %s %s', 
-                _xls_get_conf('STORE_NAME', 'Web'),
-                _sp('Order Notification'),
-                $objCart->IdStr
-            ),
-            _xls_mail_body_from_template(
-                templateNamed('email_order_notification.tpl.php'),
-                array(
-                    'cart' => $objCart, 
-                    'customer' => $objCustomer
-                )
-            ),
-            _xls_get_conf('ORDER_FROM')
-        ))
-        QApplication::Log(E_ERROR, 'Customer Receipt', $objCart->Email." email failed to send.");
-    }
-
-    protected static function SendOwnerEmail($objCart, $objCustomer) {
-        if (!_xls_mail(
-            _xls_get_conf('ORDER_FROM'),
-            sprintf('%s %s %s', 
-                _xls_get_conf('STORE_NAME', 'Web'),
-                _sp('Order Notification'),
-                $objCart->IdStr
-            ),
-            _xls_mail_body_from_template(
-                templateNamed('email_order_notification_owner.tpl.php'),
-                array(
-                    'cart' => $objCart, 
-                    'customer' => $objCustomer
-                )
-            ),
-            _xls_get_conf('ORDER_FROM')
-        ))
-        QApplication::Log(E_ERROR, 'Store Receipt', $objCart->Email." email failed to send.");
-    }
 
     protected function BuildForm() {
         $this->BuildCustomerControl();

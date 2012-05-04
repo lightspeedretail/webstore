@@ -1069,6 +1069,10 @@ class Cart extends CartGen {
 			case 'SubTotalTaxIncIfSet':
 				QApplication::Log(E_USER_NOTICE, 'legacy', $strName);
 				return $this->Subtotal;
+				
+			case 'TaxTotal':
+				return round(round($this->Tax1,2)+round($this->Tax2,2)+
+									round($this->Tax3,2)+round($this->Tax4,2)+round($this->Tax5,2),2);
 
 			default:
 				try {
