@@ -1334,7 +1334,9 @@ EOS;
 
 	public static function send_email($cart) {
         QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
-        xlsws_checkout::SendCustomerEmail($cart, null);
-        xlsws_checkout::SendOwnerEmail($cart, null);
+        if (_xls_get_conf('EMAIL_SEND_CUSTOMER',0)==1)
+        	xlsws_checkout::SendCustomerEmail($cart, null);
+        if (_xls_get_conf('EMAIL_SEND_STORE',0)==1)
+        	xlsws_checkout::SendOwnerEmail($cart, null);
 	}
 }
