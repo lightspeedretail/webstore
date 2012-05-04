@@ -329,6 +329,7 @@
 		const Security = 16;
 		const Images = 17;
 		const Captcha = 18;
+		const Templates = 19;
 		
 
 	}
@@ -789,9 +790,9 @@
 			
 				
 			
-			$this->configPnls['stemp'] = new xlsws_admin_config_panel($this , $this , 'DEFAULT_TEMPLATE' , "configDone");
-			$this->configPnls['stemp']->Name = _sp('Store Template');
-			$this->configPnls['stemp']->Info = _sp('Choose which template you would use for your store.');
+			$this->configPnls['stemp'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Templates , "configDone");
+			$this->configPnls['stemp']->Name = _sp('Template Options');
+			$this->configPnls['stemp']->Info = _sp('Choose template and set display options.');
 			
 
 			$this->configPnls['himage'] = new xlsws_admin_config_panel($this , $this , 'HEADER_IMAGE' , "configDone");
@@ -812,7 +813,7 @@
 			
 			$this->configPnls['image'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Images , "configDone");
 			$this->configPnls['image']->Name = _sp('Images');
-			$this->configPnls['image']->Info = _sp('Image dimentions and other image related options');
+			$this->configPnls['image']->Info = _sp('Image dimensions and other image related options');
 			
 			
 			$this->configPnls['cart'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Cart , "configDone");

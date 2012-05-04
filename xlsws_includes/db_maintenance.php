@@ -242,12 +242,12 @@ class xlsws_db_maintenance extends xlsws_index {
 				'UPLOADER_TIMESTAMP', '0', 'Internal', 0, 0, NOW(), NOW(), 'NULL');");
 
 			//Families menu labeling
-			_dbx("UPDATE `xlsws_configuration` SET `title`='Show Families on Product Menu?',
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Show Families on Product Menu?',`configuration_type_id`=19,`sort_order`=3,
 				`options`='ENABLE_FAMILIES' where `key`='ENABLE_FAMILIES'");
 			
 			$this->add_config_key('ENABLE_FAMILIES_MENU_LABEL' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Show Families Menu label', 
-				'ENABLE_FAMILIES_MENU_LABEL', 'By Manufacturer', '', 8, 6, NOW(), NOW(), NULL);");
+				'ENABLE_FAMILIES_MENU_LABEL', 'By Manufacturer', '', 19, 4, NOW(), NOW(), NULL);");
 
 
 			//Promo code table changes
@@ -259,11 +259,13 @@ class xlsws_db_maintenance extends xlsws_index {
 				"ALTER TABLE xlsws_promo_code ADD COLUMN except tinyint (1) NOT NULL DEFAULT 0 AFTER enabled "))
 				_dbx("UPDATE xlsws_promo_code SET except=0");
 			
-
+			//Template section
+			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=19,`sort_order`=1 
+				where `key`='DEFAULT_TEMPLATE'");
 			$this->add_config_key('ENABLE_SLASHED_PRICES' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Enabled Slashed \"Original\" Prices', 'ENABLE_SLASHED_PRICES', '',
 				'If selected, will display original price slashed out and Web Price as a Sale Price.', 
-				8, 20, NOW(), NOW(), 'ENABLE_SLASHED_PRICES');");
+				19, 2, NOW(), NOW(), 'ENABLE_SLASHED_PRICES');");
 
 
 			//Fix some sequencing problems for Product options
@@ -345,6 +347,10 @@ class xlsws_db_maintenance extends xlsws_index {
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=8 where `key`='INVENTORY_LOW_THRESHOLD'");
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=9 where `key`='INVENTORY_NON_TITLE'");
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=10 where `key`='INVENTORY_OUT_ALLOW_ADD'");
+			
+					
+		//	_dbx("UPDATE `xlsws_configuration` SET `title`='Enter relative URL (usually starting with /photos) to your header image. Used in both templates and email receipts.'
+		//		where `key`='HEADER_IMAGE'");
 			
 			//Inventory handling changes
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Inventory should include Virtual Warehouses'
