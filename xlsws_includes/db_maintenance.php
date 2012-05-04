@@ -407,7 +407,10 @@ class xlsws_db_maintenance extends xlsws_index {
 				'SHOW_SHARING', '1', 'Show Sharing buttons such as Facebook and Pinterest', 14, 1, NOW(), NOW(), 'BOOL');");	
 			$this->add_config_key('SEO_URL_CODES' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Product Codes in Product URLs', 
-				'SEO_URL_CODES', '0', 'If your Product Codes are important (such as model numbers), this will include them when making SEO formatted URLs. If you generate your own Product Codes that are only internal, you can leave this off.', 14, 2, NOW(), NOW(), 'BOOL');");	
+				'SEO_URL_CODES', '0', 'If your Product Codes are important (such as model numbers), this will include them when making SEO formatted URLs. If you generate your own Product Codes that are only internal, you can leave this off.', 14, 2, NOW(), NOW(), 'BOOL');");
+			$this->add_config_key('GOOGLE_ANALYTICS' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Google Analytics Code (format: UA-00000000-0)', 
+				'GOOGLE_ANALYTICS', '', 'Google Analytics code for tracking', 14, 5, NOW(), NOW(), 'NULL');");		
 
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Remove index.php from SEO-Friendly URLs', `configuration_type_id`=14, `sort_order`=3,
 				`helper_text`='Requires .htaccess in Web Store root folder.' where `key`='ENABLE_SEO_URL'");	
