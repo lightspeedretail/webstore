@@ -32,7 +32,7 @@ class XLSLoginPopup extends QDialogBox {
 	public $strNoEmail = 'Please enter your email address';
 	public $strLoginInactive = 'Your login is not active yet. Please contact us if you need assistance.';
 	public $strPasswordSent = 'Your password has been sent to your e-mail address at %s';
-	public $strEmailInexistant = 'Sorry, we could not locate the e-mail address %s';
+	public $strEmailNotLocated = 'Sorry, we could not locate the e-mail address %s';
 
 	// Define QTextBox
 	public $txtEmail;
@@ -102,12 +102,17 @@ class XLSLoginPopup extends QDialogBox {
 			return;
 		}
 
+		//Return where we're at after log in
+		$objUrl = XLSURLParser::getInstance();
+		_xls_stack_add('login_redirect_uri', _xls_site_url($objUrl->Uri));
+
 		$this->Form->performLogin($strFormId, $strControlId, $strParameter);
 
 	}
 
 	public function doShow() {
 		$this->ShowDialogBox();
+		
 		$this->txtEmail->Focus();
 	}
 
@@ -145,7 +150,7 @@ class XLSLoginPopup extends QDialogBox {
 		}
 		else {
 			$this->lblErr->Text = (sprintf(
-				_sp($this->strEmailInexistant), $email));
+				_sp($this->strEmailNotLocated), $email));
 		}
 	}
 }

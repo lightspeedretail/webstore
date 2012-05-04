@@ -707,7 +707,7 @@ EOS;
 
 			$uri = _xls_stack_pop('login_redirect_uri');
 			if($uri) _rd($uri);
-			else _rd();
+			else _rd(_xls_site_dir());
 
 			return;
 		}
@@ -728,7 +728,7 @@ EOS;
 		Customer::Logout();
 		Cart::ClearCart();
 
-		_rd($_SERVER['REQUEST_URI']);
+		_rd(_xls_site_dir());
 	}
 
 	/*overloaded in extended classes as the view contructor*/

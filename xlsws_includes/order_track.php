@@ -327,9 +327,9 @@ class xlsws_track_order extends xlsws_index {
 		$this->orderResultPnl->Visible= false;
 		$this->orderResultPnl->Visible= false;
 		$this->order_display($this->order , $this->orderViewItemsPnl);
-		if(isset($_GET['final'])) {
-			QApplication::ExecuteJavaScript("$(document).ready(function() { $.get('index.php?xlspg=order_track&sendemail=true&oid=".$_GET['getuid'] . "',function(data) { });});");
-		}
+		//if(isset($_GET['final'])) {
+		//	QApplication::ExecuteJavaScript("$(document).ready(function() { $.get('index.php?xlspg=order_track&sendemail=true&oid=".$_GET['getuid'] . "',function(data) { });});");
+		//}
 	}
 
 	/**

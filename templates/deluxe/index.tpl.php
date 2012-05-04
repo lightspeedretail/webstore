@@ -130,7 +130,7 @@
 				
 				<div class="text">
 					<div class="left" style="margin: 0 55px 0 0;"><?php _xt("Welcome!"); ?></div>
-					<div class="right"><a href="#" <?php $this->pxyLoginLogout->RenderAsEvents() ?>class="loginbox"><?php _xt("Login"); ?></a> &nbsp;|&nbsp; <a href="customer-register/pg/"><?php _xt("Register"); ?></a></div>
+					<div class="right"><a href="#" <?php $this->pxyLoginLogout->RenderAsEvents() ?>class="loginbox"><?php _xt("Login"); ?></a> &nbsp;|&nbsp; <a href="<? echo _xls_site_url('customer-register/pg/'); ?>"><?php _xt("Register"); ?></a></div>
 				</div>
 				
 				<?php else: ?>
@@ -161,7 +161,7 @@
     
 		<div id="nav" class="rounded-top">
 			<ul>
-				<li id="products"><a href="index.php"></a></li>
+				<li id="products"><a href="<?php echo _xls_site_dir() ?>"></a></li>
 				<?php
 				foreach ($this->arrTopTabs as $arrTab)
 					echo '<li id="tab'.count($this->arrTopTabs).'"><a href="'.$arrTab->Link.'">'._sp($arrTab->Title).'</a></li>';
@@ -196,7 +196,7 @@
 			<?php
 				foreach ($this->arrBottomTabs as $arrTab)
 					echo '<a href="'.$arrTab->Link.'">'._sp($arrTab->Title).'</a> |';
-				?><a href="sitemap/pg/"><?php _xt('Sitemap'); ?></a>
+				?><a href="<? echo _xls_site_url('sitemap/pg/'); ?>"><?php _xt('Sitemap'); ?></a>
 			</div>
 	</div>
 	</div>
@@ -233,8 +233,9 @@
 		window.setTimeout("document.location.href='<?= _xls_site_dir() ?>'" , <?= $expires ?> * 1000 + 5000 );
 	</script>
 <?php endif; ?>
-<?php $this->RenderEnd(); ?>
+
 	<?php if(_xls_get_conf('SHOW_SHARING' , 0)): ?>
 <script type="text/javascript" src="//assets.pinterest.com/js/pinit.js"></script>
 	<?php endif; ?>
+<?php $this->RenderEnd(); ?>
 </html>

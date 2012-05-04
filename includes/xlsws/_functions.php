@@ -728,6 +728,7 @@ function _xls_site_dir($ssl_attempt = true) {
 * @return string url
 */
 function _xls_site_url($strUrlPath =  '') {
+	if (substr($strUrlPath,0,1)=="/") $strUrlPath = substr($strUrlPath,1,999); //remove a leading / so we don't // by accident
 	return _xls_site_dir() . '/' . (_xls_get_conf('ENABLE_SEO_URL', false) ? "" : "index.php/").$strUrlPath;
 }
 

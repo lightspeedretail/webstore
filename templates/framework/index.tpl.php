@@ -124,11 +124,11 @@
 				
 				<div class="text">
 					<div class="left" style="margin: 0 55px 0 0;"><?php _xt("Welcome!"); ?></div>
-					<div class="right"><a href="#" <?php $this->pxyLoginLogout->RenderAsEvents() ?>class="loginbox"><?php _xt("Login"); ?></a> &nbsp;|&nbsp; <a href="customer-register/pg/"><?php _xt("Register"); ?></a></div>
+					<div class="right"><a href="#" <?php $this->pxyLoginLogout->RenderAsEvents() ?>class="loginbox"><?php _xt("Login"); ?></a> &nbsp;|&nbsp; <a href="<? echo _xls_site_url('customer-register/pg/'); ?>"><?php _xt("Register"); ?></a></div>
 				</div>
 				
 				<?php else: ?>
-				<div class="text"><div style="margin: 0 105px 0 0; display: block; float: left;"><a href="index.php?xlspg=myaccount"><?= _xt("My Account"); ?></a></div> <?php $this->lblLogout->Render(); ?></div>
+				<div class="text"><div style="margin: 0 105px 0 0; display: block; float: left;"><a href="<? echo _xls_site_url('myaccount/pg/'); ?>"><?= _xt("My Account"); ?></a></div> <?php $this->lblLogout->Render(); ?></div>
 				<?php endif; ?>
 			
 				
@@ -166,7 +166,7 @@
 		</div>
 
 	<noscript>
-	<?php  _xt('This store requires you to have a Java-Script enabled web browser. Please visit ') ; echo  '<a href="http://www.firefox.com" target="_blank">Firefox</a>' ;  _xt(' to download to latest version.'); ?>
+	<?php  _xt('This store requires you to have a JavaScript enabled web browser.'); ?>
 	</noscript>	
 
 			<?php $this->mainPnl->Render(); ?>

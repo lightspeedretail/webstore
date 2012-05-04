@@ -461,7 +461,7 @@ class xlsws_checkout extends xlsws_index {
     }
 
     public function DoLoginControlClick($strFormId, $strControlId, $strParam) {
-        _xls_stack_add('login_redirect_uri', 'checkout/pg/');
+        _xls_stack_add('login_redirect_uri', _xls_site_url('checkout/pg/'));
        
         $this->dxLogin->doShow();
     }
@@ -906,6 +906,13 @@ class xlsws_checkout extends xlsws_index {
 
         self::PostFinalizeHooks($objCart, $objCustomer);
 
+
+		if (_xls_get_conf('EMAIL_SEND_CUSTOMER',0)==1)
+        	self::SendCustomerEmail($objCart, $objCustomer);
+        if (_xls_get_conf('EMAIL_SEND_STORE',0)==1)
+        	self::SendOwnerEmail($objCart, $objCustomer);
+        	
+        	
         if ($blnForward)
             {
             	_rd($objCart->Link."&final=1"); 
@@ -931,7 +938,7 @@ class xlsws_checkout extends xlsws_index {
     }
 
     protected static function SendCustomerEmail($objCart, $objCustomer) {
-        _xls_mail(
+        if (!_xls_mail(
             $objCart->Email,
             sprintf('%s %s %s', 
                 _xls_get_conf('STORE_NAME', 'Web'),
@@ -946,11 +953,12 @@ class xlsws_checkout extends xlsws_index {
                 )
             ),
             _xls_get_conf('ORDER_FROM')
-        );
+        ))
+        QApplication::Log(E_ERROR, 'Customer Receipt', $objCart->Email." email failed to send.");
     }
 
     protected static function SendOwnerEmail($objCart, $objCustomer) {
-        _xls_mail(
+        if (!_xls_mail(
             _xls_get_conf('ORDER_FROM'),
             sprintf('%s %s %s', 
                 _xls_get_conf('STORE_NAME', 'Web'),
@@ -965,7 +973,8 @@ class xlsws_checkout extends xlsws_index {
                 )
             ),
             _xls_get_conf('ORDER_FROM')
-        );
+        ))
+        QApplication::Log(E_ERROR, 'Store Receipt', $objCart->Email." email failed to send.");
     }
 
     protected function BuildForm() {
