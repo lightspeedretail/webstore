@@ -762,7 +762,7 @@ class xlsws_checkout extends xlsws_index {
                 sprintf("%s: %s", _sp('Promo Code'), $objPromo->Code)
             ));
 
-			foreach ($cart->GetCartItemArray() as $objItem)
+			foreach ($objCart->GetCartItemArray() as $objItem)
                 if ($objItem->Discount > 0)
                     $objCart->PrintedNotes = implode("\n", array(
                         $objCart->PrintedNotes, 

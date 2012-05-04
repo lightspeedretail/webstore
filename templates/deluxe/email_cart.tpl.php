@@ -92,11 +92,11 @@ foreach ($items as $item) {
 	}
 echo '</table></div>';
 
-//If our notes have something other than just the WO number, that means the customer entered something
-if ($cart->PrintedNotes != $cart->IdStr) {
+
+if (strlen($cart->PrintedNotes)>0) {
 echo '<div id="cartitems"><table>';
 echo '<tr>';
-echo '<th>Notes</th></tr>';
+echo '<th>Additional Notes</th></tr>';
 	echo '<tr>';
 	echo '<td>'. $cart->PrintedNotes . '</td>';
 	echo '</tr>';
