@@ -769,8 +769,9 @@ EOS;
             $product = Product::Load($intRowid);
             
             if(!$product){
-                _xls_log("SOAP ERROR : Product id does not exist $intRowid .");
-                return self::UNKNOWN_ERROR;
+                //_xls_log("SOAP ERROR : Product id does not exist $intRowid .");
+                //We were asked to delete a product that was apparently already deleted, so just ignore
+                return self::OK;
             }
                 
             try{
