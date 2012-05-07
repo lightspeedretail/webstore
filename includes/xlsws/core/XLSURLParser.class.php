@@ -146,9 +146,8 @@ class XLSURLParser {
 	protected function ProcessOldUrl() {
 	
 		if (isset($_GET['xlspg'])) {
-		
 			//The first xlspg code is now our first URL segment, but any appended GET variables still need to carry
-			$strRemaining = str_replace("xlspg=".$_GET['xlspg'],"",$this->strUri);
+			$strRemaining = str_replace("xlspg=".$_GET['xlspg'],"",$_SERVER['REQUEST_URI']);
 			$strRemaining = strstr($strRemaining,'?');	
 			$strRemaining = str_replace("?&","?",$strRemaining);
 			if ($strRemaining=="?") $strRemaining='';	
