@@ -117,9 +117,8 @@ class xlsws_index extends QForm {
 	 * @return none
 	 */
 	protected function build_menu() {
-		if (_xls_get_conf('CACHE_CATEGORY', false) &&
-		 ($this->menu_categories = _xls_stack_get('XLS_CACHE_MENU'))) {
-			// Load cached categories from Session if applicable
+		if ($this->menu_categories = _xls_stack_get('XLS_CACHE_MENU')) {
+			// Load cached categories from Session
 		}
 
 		else {
@@ -133,8 +132,7 @@ class xlsws_index extends QForm {
 				$this->menu_categories[] = $objCategory;
 			}
 
-			if (_xls_get_conf('CACHE_CATEGORY', false) == 1)
-				$_SESSION['stack_vars']['XLS_CACHE_MENU'][0] =
+			$_SESSION['stack_vars']['XLS_CACHE_MENU'][0] =
 					$this->menu_categories;
 		}
 

@@ -2972,18 +2972,6 @@ EOS;
         public function flush_category($passkey) {
             if (!$this->check_passkey($passkey))
                 return self::FAIL_AUTH;
-
-            /*if (_xls_get_conf('CACHE_CATEGORY', 0) == 1)
-                return self::OK;
-
-            if (_xls_get_conf('DEBUG_RESET', 0) == 1) {
-                QApplication::Log(
-                    E_NOTICE, 'uploader',
-                    "Skipped Category flush operation due to DEBUG mode"
-                );
-                return self::OK;
-            }
-			*/
 			
             $obj = new CategoryAddl();
 

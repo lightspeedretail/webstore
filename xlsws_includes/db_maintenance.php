@@ -50,7 +50,6 @@ class xlsws_db_maintenance extends xlsws_index {
 			$this->check_column_type('xlsws_cart_item' , 'qty' , 'float' , 'NOT NULL' , '2.0.1');
 			$this->check_column_type('xlsws_product_related' , 'qty' , 'float' , 'NULL DEFAULT NULL' , '2.0.1');
 			$this->add_config_key('QTY_FRACTION_PURCHASE' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Allow Qty-purchase in fraction', 'QTY_FRACTION_PURCHASE', '0', 'If enabled, customers will be able to purchase items in fractions. E.g. 0.5 of an item can ordered by a customer.', 0, 10, NOW(), NOW(), 'BOOL');" , '2.0.1');
-			$this->add_config_key('CACHE_CATEGORY' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Cache category', 'CACHE_CATEGORY', '0', 'If you have a large category tree and large product database, you may gain performance by caching the category tree parsing. ', 8,6 , NOW(), NOW(), 'BOOL');" , '2.0.1');
 			$this->add_config_key('SITEMAP_SHOW_PRODUCTS' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Show products in Sitemap', 'SITEMAP_SHOW_PRODUCTS', '0', 'Enable this option if you want to show products in your sitemap page. If you have a very large product database, we recommend you turn off this option', 8, 7, NOW(), NOW(), 'BOOL');" , '2.0.1');
 
 			$this->check_index_exists('xlsws_product','featured','2.0.1');
@@ -276,7 +275,7 @@ class xlsws_db_maintenance extends xlsws_index {
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=8 where `key`='MATRIX_PRICE'");
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=9 where `key`='ENABLE_SLASHED_PRICES'");
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=10 where `key`='CHILD_SEARCH'");
-			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=11 where `key`='CACHE_CATEGORY'");
+			_dbx("DELETE from `xlsws_configuration` where `key`='CACHE_CATEGORY'");
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=12 where `key`='DISPLAY_EMPTY_CATEGORY'");
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=13 where `key`='FEATURED_KEYWORD'");
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=14 where `key`='SITEMAP_SHOW_PRODUCTS'");
@@ -346,8 +345,8 @@ class xlsws_db_maintenance extends xlsws_index {
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=10 where `key`='INVENTORY_OUT_ALLOW_ADD'");
 			
 					
-		//	_dbx("UPDATE `xlsws_configuration` SET `title`='Enter relative URL (usually starting with /photos) to your header image. Used in both templates and email receipts.'
-		//		where `key`='HEADER_IMAGE'");
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Enter relative URL (usually starting with /photos) to your header image. Used in both templates and email receipts.'
+				where `key`='HEADER_IMAGE'");
 			
 			//Inventory handling changes
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Inventory should include Virtual Warehouses'

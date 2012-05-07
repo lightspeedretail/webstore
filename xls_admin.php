@@ -214,7 +214,7 @@
 	$arrConfigTabs = array('store' => _sp('Store') , 'appear' => _sp('Appearance') , 'sidebars' =>_sp('Sidebars'));
 	$arrPaymentTabs = array('methods' => _sp('Methods') , 'cc' => _sp('Credit Card Types'), 
 		'promo' => _sp('Promo Codes'),'promotasks' => _sp('Promo Code Tasks'));
-	$arrStatTabs = array('chart' => _sp('Charts') , 'vlog' => _sp('Visitor Log'));
+	$arrSeoTabs = array('templates' => _sp('Templates') , 'products' => _sp('Products'), 'categories' => _sp('Categories'));
 	$arrSystemTabs = array('config' => _sp('Configuration') , 'task' => _sp('Tasks')  , 'slog' => _sp('System Log'));
 	
 	
@@ -252,7 +252,7 @@
 			,	'paym'		=>	_sp('Payment Methods')
 			,	'ship'		=>	_sp('Shipping')
 			,	'cpage'		=>	_sp('Pages')
-			,	'stats'		=>	_sp('Stats')
+			,	'seo'		=>	_sp('SEO')
 			,	'system'	=>	_sp('System')
 			);
 			
@@ -1725,7 +1725,6 @@
 	* class to create payment modules that can be attached to the admin panel to extend
 	* see class xlsws_admin for further specs
      */					
-    //IAMHERE
 	class xlsws_admin_payment_modules extends xlsws_admin_modules {
 		
 		function Form_Create(){
@@ -1738,8 +1737,7 @@
 		
 	}	
 	
-	
-	
+
 	
 	/* class xlsws_admin_cpage_panel
 	* class to create the edit pages for each editable section
@@ -3318,422 +3316,97 @@
 	* class to create the charts in the stats section of the admin panel
 	* see class xlsws_admin for further specs
 	*/			
-	class xlsws_admin_chart extends xlsws_admin {
+	class xlsws_admin_seo_modules extends xlsws_admin {
+					
+		protected $btnCancel;
+		protected $btnSave;
+		protected $btnDelete;
 		
-		protected $gChart;
-		protected $lstGraphType;
+		protected $configPnls;
 		
-		protected $arrGraphPnls = array();
+		public $page;
 		
-		
-		protected $pxyViewChart;
+		public $pxyAddNewPage;
 		
 		
 		protected function Form_Create(){
 			parent::Form_Create();
 			
-			$this->arrTabs = $GLOBALS['arrStatTabs'];
-			$this->currentTab = 'chart';			
-			
-			global $XLSWS_VARS;
-			
-			$this->arrGraphPnls['mvp'] = new QPanel($this);
-			$this->arrGraphPnls['mvp']->Text = $this->drawChart('mvp');
-			$this->arrGraphPnls['mvp']->Visible = false;
-			$this->arrGraphPnls['mvp']->Name = _sp('Most Viewed Products');
-			$this->arrGraphPnls['mvp']->HtmlEntities = false;
-			
-			
-			$this->arrGraphPnls['mop'] = new QPanel($this);
-			$this->arrGraphPnls['mop']->Text = $this->drawChart('mop');
-			$this->arrGraphPnls['mop']->Visible = false;
-			$this->arrGraphPnls['mop']->Name = _sp('Most Ordered Products');
-			$this->arrGraphPnls['mop']->HtmlEntities = false;
-			
-			
-			$this->arrGraphPnls['tvs'] = new QPanel($this);
-			$this->arrGraphPnls['tvs']->Text = $this->drawChart('tvs');
-			$this->arrGraphPnls['tvs']->Visible = false;
-			$this->arrGraphPnls['tvs']->Name = _sp('Today\'s Visitors/Sales');
-			$this->arrGraphPnls['tvs']->HtmlEntities = false;
+			$this->arrTabs = $GLOBALS['arrSeoTabs'];
+			$this->currentTab = 'templates';
 
 
-			$this->arrGraphPnls['mvs'] = new QPanel($this);
-			$this->arrGraphPnls['mvs']->Text = $this->drawChart('mvs');
-			$this->arrGraphPnls['mvs']->Visible = false;
-			$this->arrGraphPnls['mvs']->Name = _sp('Last 30 days Visitors/Sales');
-			$this->arrGraphPnls['mvs']->HtmlEntities = false;
+			$this->page = new CustomPage();
+			
+			
+			$this->pxyAddNewPage = new QControlProxy($this);
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QServerAction('NewPage'));
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QTerminateAction());
+			
+	        
+			
+			//$this->btnEdit = new QButton($this->dtrConfigs);
+			//$this->btnEdit->Text = _sp("Edit");
+			$this->btnCancel = new QButton($this);
+			$this->btnCancel->Text = _sp("Cancel");
+			$this->btnCancel->CssClass = 'admin_cancel';
+			$this->btnCancel->AddAction( new QClickEvent() , new QAjaxAction('btnCancel_Click'));
+			
+			
+			
+			$this->btnSave = new QButton($this);
+			$this->btnSave->Text = _sp("Save");
+			$this->btnSave->CssClass = 'admin_save';
+			$this->btnSave->AddAction( new QClickEvent() , new QServerAction('btnSave_Click'));
+			$this->btnSave->CausesValidation = true;
+			
+			$this->listPages();
+
+
+		}
+		
+	
+		
+		protected function listPages(){
 
 			
-			
-			$this->arrGraphPnls['bro'] = new QPanel($this);
-			$this->arrGraphPnls['bro']->Text = $this->drawChart('bro');
-			$this->arrGraphPnls['bro']->Visible = false;
-			$this->arrGraphPnls['bro']->Name = _sp('Web Browsers');
-			$this->arrGraphPnls['bro']->HtmlEntities = false;
-			
-			
-			$this->arrGraphPnls['scr'] = new QPanel($this);
-			$this->arrGraphPnls['scr']->Text = $this->drawChart('scr');
-			$this->arrGraphPnls['scr']->Visible = false;
-			$this->arrGraphPnls['scr']->Name = _sp('Screen Resolutions');
-			$this->arrGraphPnls['scr']->HtmlEntities = false;
-			
-			
-			$this->pxyViewChart = new QControlProxy($this);
-			$this->pxyViewChart->AddAction(new QClickEvent() , new QAjaxAction('viewChart'));
-			$this->pxyViewChart->AddAction(new QClickEvent() , new QTerminateAction());
+			$page = new CustomPage();
+			$page->Title = _sp('Define Tiers for Tier Based Shipping');
+			$page->Key = "ship_define_tiers";
+			$this->configPnls[0] = new xlsws_admin_edittiers_panel($this, $this , $page , "pageDone");
+
+
+			$page = new CustomPage();
+			$page->Title = _sp('Set Free Shipping Restrictions');
+			$page->Key = "promo_restrict";
+			$page->Page = 'shipping';
+			$this->configPnls[1] = new xlsws_admin_task_promorestrict_panel($this, $this , $page , "pageDone");
+
+			$page = new CustomPage();
+			$page->Title = _sp('Batch Change Countries and States/Regions');
+			$page->Key = "ship_modify_cities_countries";
+			$this->configPnls[2] = new xlsws_admin_task_panel($this, $this , $page , "pageDone");
 			
 			
 		}
+	
 		
-		
-		protected function viewChart($strFormId, $strControlId, $strParameter){
-			if(!isset($this->arrGraphPnls[$strParameter]))
-				return;
-				
-			$this->arrGraphPnls[$strParameter]->Visible = $this->arrGraphPnls[$strParameter]->Visible?false:true;
-			$this->arrGraphPnls[$strParameter]->Refresh();
+		function pageDone(){
+			$this->listPages();
 		}
 		
 		
+		public function NewPage(){
+			
+		}
+	
+	
+	
+
+
+
 		
-		protected function drawChart($chart){
-					$this->gChart = "http://chart.apis.google.com/chart?";
-			
-			
-			
-			
-			if($chart == 'mop'){
-				
-				// Most ordered products
-				$this->gChart .= "&cht=bhg";
-				
-				$this->gChart .= "&chtt=" . _sp("Most ordered Products");
-				
-				$this->gChart .= "&chs=600x400";
-				
-				$objDbResult = _dbx("SELECT Product.Name as Code , SUM(CartItem.qty) as Value FROM xlsws_product Product, xlsws_cart_item CartItem , xlsws_cart  Cart WHERE Cart.type = '" . CartType::order . "' AND Cart.rowid = CartItem.cart_id AND CartItem.product_id = Product.rowid GROUP BY 1 ORDER BY 2 DESC LIMIT 10" , "Query");
-								
-				$labels = array();
-				$data = array();
-				
-				
-				while($res = $objDbResult->GetNextRow()){
-					$labels[] = $res->GetColumn('Code' , 'VarChar');
-					$data[] = $res->GetColumn('Value' , 'Integer');
-				}
-					
-				$this->gChart .= "&chd=" . $this->chart_data($data). "&chxr=0,0," . max($data) . "," . round($this->stat_stdev($data)) . "&chds=0," . max($data);
-					
-				$this->gChart .= "&chco=" . "00AF33";	
-				
-				$this->gChart .= "&chxt=x,y&chxl=1:|" . implode("|" , $labels);	
-				
-				
-			}elseif($chart == 'bro'){
-				
-				// Most user browsers
-				$this->gChart .= "&cht=p3";
-				
-				$this->gChart .= "&chtt=" . _sp("Web browsers used to access your site");
-				
-				$this->gChart .= "&chs=900x180";
-				
-				$objDbResult = _dbx("SELECT REPLACE(REPLACE(REPLACE(REPLACE(browser,'Macintosh', 'Mac'),'Mac OS X','OSX'),'Version','V'),'AppleWebKit','AWK') as Code , COUNT(browser) as Value FROM xlsws_visitor WHERE browser != '' GROUP BY 1 ORDER BY 2 DESC LIMIT 10" , "Query");
-								
-				$labels = array();
-				$data = array();
-				
-				
-				while($res = $objDbResult->GetNextRow()){
-					$labels[] = $res->GetColumn('Code' , 'VarChar');
-					$data[] = $res->GetColumn('Value' , 'Integer');
-				}
-					
-				$this->gChart .= "&chd=" . $this->chart_data($data). "&chxr=0,0," . max($data) . "," . round($this->stat_stdev($data)) . "&chds=0," . max($data);
-					
-				$this->gChart .= "&chco=" . "00AF33";	
-				
-				$this->gChart .= "&chl=" . implode("|" , $labels);	
-				
-				
-			}elseif($chart == 'scr'){
-				
-				// screen res
-				$this->gChart .= "&cht=p3";
-				
-				$this->gChart .= "&chtt=" . _sp("Screen resolutions for your website visitors");
-				
-				$this->gChart .= "&chs=900x180";
-				
-				$objDbResult = _dbx("SELECT screen_res as Code , COUNT(screen_res) as Value FROM xlsws_visitor WHERE screen_res != '' GROUP BY 1 ORDER BY 2 DESC LIMIT 10" , "Query");
-								
-				$labels = array();
-				$data = array();
-				
-				
-				while($res = $objDbResult->GetNextRow()){
-					$labels[] = $res->GetColumn('Code' , 'VarChar');
-					$data[] = $res->GetColumn('Value' , 'Integer');
-				}
-					
-				$this->gChart .= "&chd=" . $this->chart_data($data). "&chxr=0,0," . max($data) . "," . round($this->stat_stdev($data)) . "&chds=0," . max($data);
-					
-				$this->gChart .= "&chco=" . "00AF33";	
-				
-				$this->gChart .= "&chl=" . implode("|" , $labels);	
-				
-				
-			}elseif($chart == 'tvs'){
-				
-				// Today's visitors and sales
-				$this->gChart .= "&cht=lc";
-				
-				$this->gChart .= "&chtt=" . sprintf(_sp("Today's visitors/sales %s" ) , date(_xls_get_conf('DATE_FORMAT' , 'D d M y')));
-				
-				$this->gChart .= "&chs=600x400";
-				
-				
-				//$objDbResult = _dbx("SELECT date_format(created , '%H' ) as Code , COUNT(rowid) as Value FROM xlsws_view_log WHERE created >= '2009-01-24' GROUP BY 1 ORDER BY 1" , "Query");
-								
-				$labels = array();
-				$vdata = array();
-				
-				
-				for($i=0; $i<= 23 ; $i++){
-					$labels[] = sprintf("%02d" , $i);
-					$vdata[] = _dbx_first_cell("SELECT COUNT(DISTINCT visitor_id) as Value FROM xlsws_view_log WHERE created BETWEEN (CURDATE() + INTERVAL $i HOUR) AND  (CURDATE() + INTERVAL ($i+1) HOUR)  ");
-					$sdata[] = _dbx_first_cell("SELECT COUNT(DISTINCT Cart.rowid) as Value FROM xlsws_cart_item CartItem , xlsws_cart Cart WHERE Cart.rowid = CartItem.cart_id AND Cart.type = " . CartType::order . "   AND (Cart.submitted BETWEEN (CURDATE() + INTERVAL $i HOUR) AND  (CURDATE() + INTERVAL ($i+1) HOUR) ) ");
-				}
-				
-				
-				$this->gChart .= "&chd=" . $this->chart_data($vdata). "|" . str_replace("t:" , "" , $this->chart_data($sdata)) .  "&chxr=0,0," . max($vdata) . "," . 1 . "&chds=0," . max($vdata);
-					
-				$this->gChart .= "&chco=" . "00AF33,FF0000";	
-				
-				$this->gChart .= "&chdl=" . sprintf("%s|%s" , _sp('Visitors') , _sp('Web Orders'));	
-				
-				$this->gChart .= "&chxt=y,x&chxl=1:|" . implode("|" , $labels);	
-				
-				
-			}elseif($chart == 'mvs'){
-				
-				// Monthly visitors and sales
-				$this->gChart .= "&cht=lc";
-				
-				$this->gChart .= "&chtt=" . sprintf(_sp("Last 30 days' visitors/sales" ) );
-				
-				$this->gChart .= "&chs=600x400";
-				
-								
-				$labels = array();
-				$vdata = array();
-				
-				
-				for($i=-30; $i<= 0 ; $i++){
-					$dt = mktime(1,1,1,date('m') , date('d') +$i , date('Y'));
-					
-					$labels[] = date("d" , $dt);
-					
-					$vdata[] = _dbx_first_cell("SELECT COUNT(DISTINCT visitor_id) as Value FROM xlsws_view_log WHERE created BETWEEN (CURDATE() + INTERVAL $i Day) AND  (CURDATE() + INTERVAL ($i+1) Day)  ");
-					$sdata[] = _dbx_first_cell("SELECT COUNT(DISTINCT Cart.rowid) as Value FROM xlsws_cart_item CartItem , xlsws_cart Cart WHERE Cart.rowid = CartItem.cart_id AND Cart.type = " . CartType::order . "   AND (Cart.submitted BETWEEN (CURDATE() + INTERVAL $i Day) AND  (CURDATE() + INTERVAL ($i+1) Day) ) ");
-				}
-				
-				
-				$this->gChart .= "&chd=" . $this->chart_data($vdata). "|" . str_replace("t:" , "" , $this->chart_data($sdata)) .  "&chxr=0,0," . max($vdata) . "," . 1 . "&chds=0," . max($vdata);
-					
-				$this->gChart .= "&chco=" . "00AF33,FF0000";	
-				
-				$this->gChart .= "&chdl=" . sprintf("%s|%s" , _sp('Visitors') , _sp('Web Orders'));	
-				
-				$this->gChart .= "&chxt=y,x&chxl=1:|" . implode("|" , $labels);	
-				
-				
-			}else{
-				// Most view products
-				$this->gChart .= "&cht=bhg";
-				
-				$this->gChart .= "&chtt=" . _sp("Most viewed Products");
-				
-				$this->gChart .= "&chs=600x400";
-				
-				$objDbResult = _dbx("SELECT Product.Name as Code , COUNT(ViewLog.resource_id) as Value FROM xlsws_product Product, xlsws_view_log ViewLog , xlsws_view_log_type LogType WHERE LogType.name = 'productview' AND ViewLog.log_type_id = LogType.rowid AND ViewLog.resource_id = Product.rowid GROUP BY 1 ORDER BY 2 DESC LIMIT 10" , "Query");
-								
-				$labels = array();
-				$data = array();
-				
-				
-				while($res = $objDbResult->GetNextRow()){
-					$labels[] = $res->GetColumn('Code' , 'VarChar');
-					$data[] = $res->GetColumn('Value' , 'Integer');
-				}
-					
-				$this->gChart .= "&chd=" . $this->chart_data($data) . "&chxr=0,0," . max($data) . "," . round($this->stat_stdev($data)) . "&chds=0," . max($data);
-					
-				$this->gChart .= "&chco=" . "00AF33";	
-				
-				$this->gChart .= "&chxt=x,y&chxl=1:|" . implode("|" , $labels);	
-				
-				
-			}
-			
-			return "<img src=\"$this->gChart\" />";
-			
-		}
-		
-		
-		
-		
-		public function chart_data($values) {
 
-			
-			$chartData = "t:";
-			
-			$maxValue = max($values);
-			$minValue = min($values);
-			
-//			if(!$interval)
-//				$interval = round($this->stat_stdev($values));
-//			
-			foreach($values as $value)
-				$chartData .= number_format($value,1) . ",";
-
-			$chartData = substr($chartData , 0 , strlen($chartData) -1);
-			
-			//$chartData .= "&chxr=0,0,$maxValue,$interval&chds=0,$maxValue";
-			
-			return $chartData;
-			
-			
-			// OLD code below to use simple encoding
-			
-			// Port of JavaScript from http://code.google.com/apis/chart/
-			// http://james.cridland.net/code
-
-			// First, find the maximum value from the values given
-
-			$maxValue = max($values);
-
-			// A list of encoding characters to help later, as per Google's example
-			$simpleEncoding = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-			$chartData = "s:";
-			for ($i = 0; $i < count($values); $i++) {
-				$currentValue = $values[$i];
-
-				if ($currentValue > -1) {
-					$chartData.=substr($simpleEncoding,61*($currentValue/$maxValue),1);
-				}
-				else {
-					$chartData.='_';
-				}
-			}
-
-			// Return the chart data - and let the Y axis to show the maximum value
-			return $chartData ."&chxt=y&chxl=0:|0|".$maxValue;
-		}
-		
-		
-		
-		// Following stat functions are copied from http://bytes.com/groups/php/3114-statistical-functions-php
-
-
-		function stat_mean ($data) {
-			// calculates mean
-			return (array_sum($data) / count($data));
-		}
-
-		function stat_median ($data) {
-			// calculates median
-			sort ($data);
-			$elements = count ($data);
-			if (($elements % 2) == 0) {
-				$i = $elements / 2;
-				return (($data[$i - 1] + $data[$i]) / 2);
-			} else {
-				$i = ($elements - 1) / 2;
-				return $data[$i];
-			}
-		}
-
-		function stat_range ($data) {
-			// calculates range
-			return (max($data) - min($data));
-		}
-
-		function stat_var ($data) {
-			// calculates sample variance
-			$n = count ($data);
-			$mean = $this->stat_mean ($data);
-			$sum = 0;
-			foreach ($data as $element) {
-				$sum += pow (($element - $mean), 2);
-			}
-			$n = ($n - 1);
-			if($n == 0) $n =1;
-			return ($sum / $n);
-		}
-
-		function stat_varp ($data) {
-			// calculates population variance
-			$n = count ($data);
-			$mean = $this->stat_mean ($data);
-			$sum = 0;
-			foreach ($data as $element) {
-				$sum += pow (($element - $mean), 2);
-			}
-			return ($sum / $n);
-		}
-
-		function stat_stdev ($data) {
-			// calculates sample standard deviation
-			return sqrt ($this->stat_var($data));
-		}
-
-		function stat_stdevp ($data) {
-			// calculates population standard deviation
-			return sqrt ($this->stat_varp($data));
-		}
-
-		function stat_simple_regression ($x, $y) {
-			// runs a simple linear regression on $x and $y
-			// returns an associative array containing the following fields:
-			// a - intercept
-			// b - slope
-			// s - standard error of estimate
-			// r - correlation coefficient
-			// r2 - coefficient of determination (r-squared)
-			// cov - covariation
-			// t - t-statistic
-			$output = array();
-			$output['a'] = 0;
-			$n = min (count($x), count($y));
-			$mean_x = $this->stat_mean ($x);
-			$mean_y = $this->stat_mean ($y);
-			$SS_x = 0;
-			foreach ($x as $element) {
-				$SS_x += pow (($element - $mean_x), 2);
-			}
-			$SS_y = 0;
-			foreach ($y as $element) {
-				$SS_y += pow (($element - $mean_y), 2);
-			}
-			$SS_xy = 0;
-			for ($i = 0; $i < $n; $i++) {
-				$SS_xy += ($x[$i] - $mean_x) * ($y[$i] - $mean_y);
-			}
-			$output['b'] = $SS_xy / $SS_x;
-			$output['a'] = $mean_y - $output['b'] * $mean_x;
-			$output['s'] = sqrt (($SS_y - $output['b'] * $SS_xy)/ ($n - 2));
-			$output['r'] = $SS_xy / sqrt ($SS_x * $SS_y);
-			$output['r2'] = pow ($output['r'], 2);
-			$output['cov'] = $SS_xy / ($n - 1);
-			$output['t'] = $output['r'] / sqrt ((1 - $output['r2']) / ($n - 2));
-
-			return $output;
-		}
-		
 	}
 	
 	
@@ -5483,9 +5156,9 @@
 			
 			$this->arrMPnls['flushCategories'] = new QPanel($this);
 			$this->arrMPnls['flushCategories']->Visible = false;
-			$this->arrMPnls['flushCategories']->Name = _sp('Flush Category Tree');
+			$this->arrMPnls['flushCategories']->Name = _sp('Flush Deleted Categories');
 			$this->arrMPnls['flushCategories']->HtmlEntities = false;			
-			$this->arrMPnls['flushCategories']->ToolTip= _sp('In some cases, deletion of categories or caching of categories may require a flush, press this button if you are experiencing mismatches in your category tree');
+			$this->arrMPnls['flushCategories']->ToolTip= _sp('In some cases, deletion of categories or caching of categories may require a purge, press this button if you are experiencing mismatches in your category tree');
 			
 			$this->pxyAction = new QControlProxy($this);
 			$this->pxyAction->AddAction(new QClickEvent() , new QAjaxAction('doAction'));
@@ -5526,8 +5199,10 @@
 			}
 			
 			$db = QApplication::$Database[1];
-			$db->NonQuery("delete from xlsws_category");
-			$this->arrMPnls['flushCategories']->Text = _sp("Category tree has been flushed");
+			$db->NonQuery("DELETE xlsws_category.* FROM xlsws_category 
+				LEFT JOIN xlsws_category_addl ON xlsws_category_addl.rowid = xlsws_category.rowid 
+				WHERE xlsws_category_addl.rowid IS NULL");
+			$this->arrMPnls['flushCategories']->Text = _sp("Deleted categories have been purged from Category list.");
 			$this->arrMPnls['flushCategories']->Visible = true;
 			$this->arrMPnls['flushCategories']->Refresh();
 		}
@@ -6050,14 +5725,15 @@
 			}
 			break;
 			
-		case "stats":
+		case "seo":
 			switch ($XLSWS_VARS['subpage'])
 			{
 				case "vlog":
 					xlsws_admin_visitlog::Run('xlsws_admin_visitlog' , adminTemplate('edit.tpl.php'));
 					break;
 				default:
-					xlsws_admin_chart::Run('xlsws_admin_chart' , adminTemplate('chart.tpl.php'));
+					//xlsws_admin_chart::Run('xlsws_admin_chart' , adminTemplate('chart.tpl.php'));
+					xlsws_admin_seo_modules::Run('xlsws_admin_seo_modules' , adminTemplate('config.tpl.php'));
 			}
 			break;
 			
