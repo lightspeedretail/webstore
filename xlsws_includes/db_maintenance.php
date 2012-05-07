@@ -122,9 +122,6 @@ class xlsws_db_maintenance extends xlsws_index {
 			$sql = "UPDATE xlsws_configuration SET helper_text='Show the messages below instead of the amounts in inventory' WHERE title='Display Inventory Level'";
 			_dbx($sql);
 
-			$sql = "UPDATE xlsws_configuration SET helper_text='Make your URLs search engine friendly (www.example.com/category.html instead of www.example.com/index.php?id=123)' WHERE title='Use SEO-Friendly URL'";
-			_dbx($sql);
-
 			$sql = "UPDATE xlsws_configuration SET helper_text='Authorized IPs for Admin Panel (comma seperated) - DO NOT USE WITH DYNAMIC IP ADDRESSES' WHERE title='Authorized IPs For Web Store Admin'";
 			_dbx($sql);
 

@@ -327,7 +327,7 @@ class xlsws_cregister extends xlsws_index {
 				if($url = _xls_stack_get('register_redirect_uri'))
 				_rd($url);
 			else
-				_rd('index.php?xlspg=myaccount');
+				_rd(_xls_site_url("myaccount/pg/"));
 		}
 		
 		

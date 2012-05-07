@@ -419,11 +419,8 @@ function _xls_stack_removeall() {
  * @param string $msg
  * @param string $redirect
  */
-function _xls_display_msg($msg, $redirect = "") { error_log("redirecting on ".$msg);
+function _xls_display_msg($msg) {
 	_xls_stack_add('msg', _sp($msg));
-
-	//if($redirect)
-	//	_xls_add_meta_redirect($redirect);
 
 	_rd(_xls_site_url('msg/pg/'));
 }

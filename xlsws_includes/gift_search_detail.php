@@ -29,7 +29,7 @@ global $XLSWS_VARS;
 require(__QCODO__.'/qform/QJsCalendar.class.php');
 
 if(!isset($XLSWS_VARS['gift_code']) && !isset($XLSWS_VARS['gift_token'])) {
-	header("location:index.php?xlspg=gift_search");
+	header("location: "._xls_site_url("gift-search/pg/"));
 	exit;
 }
 

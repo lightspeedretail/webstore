@@ -140,7 +140,7 @@ class xlsws_cart extends xlsws_index {
 		if(isset($XLSWS_VARS['getcart'])) {
 			try {
 				Cart::LoadCartByLink($XLSWS_VARS['getcart']);
-				_rd("index.php?xlspg=cart");
+				_rd(_xls_site_url("cart/pg/"));
 			} catch (Exception $objExc) {
 				_xls_display_msg($objExc->getMessage());
 			}

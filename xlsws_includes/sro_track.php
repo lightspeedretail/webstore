@@ -257,7 +257,7 @@ class xlsws_track_sro extends xlsws_index {
 
 		$this->butBack = new QButton($this->sroViewPartsPnl);
 		$this->butBack->Text = _sp("Back");
-		$this->butBack->AddAction(new QClickEvent() , new QJavaScriptAction("document.location.href='index.php?xlspg=sro_track'"));
+		$this->butBack->AddAction(new QClickEvent() , new QJavaScriptAction("document.location.href='"._xls_site_url("sro-track/pg/")."'"));
 
 		$this->lblSubTotal = new QLabel($this->dtgPart , "subtotal");
 		$this->lblSubTotal->Text ='';

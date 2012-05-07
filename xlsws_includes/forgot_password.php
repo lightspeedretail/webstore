@@ -77,7 +77,7 @@ class xlsws_fpassword extends xlsws_index {
 		if($cust && $cust->AllowLogin==0) {
 			_xls_display_msg(
 				_sp("Your login is not active yet. ") .
-				_sp("Please ") . "<a href=\"index.php?xlspg=contact_us\">" . _sp("contact us") . "</a>" .
+				_sp("Please ") . "<a href=\"". _xls_site_url("contact_us/pg/"). "\">" . _sp("contact us") . "</a>" .
 				_sp(" if you need urgent assistance.")
 			);
 

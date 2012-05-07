@@ -21,7 +21,7 @@
 /**
  * Deluxe template: View Order details 
  * Calls each element that makes up the detail display
- * called from /index.php?xlspg=order_track
+ * called from order-track/pg/
  *
  */
 

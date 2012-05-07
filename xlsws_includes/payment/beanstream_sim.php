@@ -189,7 +189,7 @@ class beanstream_sim extends xlsws_class_payment {
 			);
 			_xls_log("Beanstream success " . print_r($retarr , true)) ;
 		} else {
-			$url = _xls_site_dir() . "/" . "index.php?xlspg=msg";
+			$url = _xls_site_url("msg/pg/");
 			_xls_stack_add('msg', "Your payment could not be processed due to the following error: " . $XLSWS_VARS['messageText'] . ". Please try again");
 			$retarr =  array(
 				'order_id' => $XLSWS_VARS['trnOrderNumber'],

@@ -897,7 +897,7 @@ class xlsws_gregistry extends xlsws_index {
 		foreach($objItemArray as $objItem)
 			$objItem->Delete();
 
-		_rd("index.php?xlspg=gift_registry");
+		_rd(_xls_site_url("gift-registry/pg/"));
 	}
 
 	/**

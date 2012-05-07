@@ -20,7 +20,7 @@
 
 /**
  * Deluxe template: SRO Track individual item details 
- * only comes up directly with /index.php?xlspg=sro_track
+ * only comes up directly with sro-track/pg/
  * when logged in
  *
  */

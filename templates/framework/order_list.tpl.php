@@ -20,7 +20,7 @@
 
 /**
  * Framework template Order Track individual item details 
- * only comes up directly with /index.php?xlspg=order_track
+ * only comes up directly with order-track/pg/
  * when logged in
  *
  */

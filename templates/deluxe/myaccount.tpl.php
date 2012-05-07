@@ -39,7 +39,7 @@
 	<div class="border rounded">
 		<div class="border_header">
 			<p class="left"><?php _xt('Welcome'); ?>, <?= $this->customer->Firstname ?>!
-			<p class="right" style="margin: -2px 15px 0 0;"><a href="customer-register/pg/"><img src="<?= templateNamed('css/images/btn_edit.png') ?>" onclick="document.location.href='index.php?xlspg=customer_register'" alt="<?php _xt('Edit') ?>"/></a></p>
+			<p class="right" style="margin: -2px 15px 0 0;"><a href="customer-register/pg/"><img src="<?= templateNamed('css/images/btn_edit.png') ?>" onclick="document.location.href='<?= _xls_site_url("customer-register/pg/") ?>'" alt="<?php _xt('Edit') ?>"/></a></p>
 		</div>
 		<div class="padding">
 			<p>Name : <?= $this->customer->Firstname . " " . $this->customer->Lastname ?></p>
@@ -113,7 +113,7 @@
 		<div class="padding">
 		<?php if(count($this->repairs) > 0): ?>
 			<?php foreach($this->repairs as $repair): ?>
-					<a href="index.php?xlspg=sro_track&dosearch=&zipcode=<?= $repair->Zipcode ?>&orderid=<?= $repair->LsId ?>"><?=  $repair->LsId  ?></a><br/>
+					<a href="<?= _xls_site_url("sro-track/pg/") ?>?dosearch=&zipcode=<?= $repair->Zipcode ?>&orderid=<?= $repair->LsId ?>"><?=  $repair->LsId  ?></a><br/>
 			<?php endforeach; ?>
 		<?php else: ?>
 				<?php _xt("You have not placed any repair orders with us yet"); ?>
