@@ -19,6 +19,12 @@
 			return new QQNodeCategory('xlsws_category', null, null);
 		}
 		/**
+		 * @return QQNodeCategoryAddl
+		 */
+		static public function CategoryAddl() {
+			return new QQNodeCategoryAddl('xlsws_category_addl', null, null);
+		}
+		/**
 		 * @return QQNodeConfiguration
 		 */
 		static public function Configuration() {
@@ -53,6 +59,12 @@
 		 */
 		static public function Destination() {
 			return new QQNodeDestination('xlsws_destination', null, null);
+		}
+		/**
+		 * @return QQNodeEmail
+		 */
+		static public function Email() {
+			return new QQNodeEmail('xlsws_email', null, null);
 		}
 		/**
 		 * @return QQNodeFamily
@@ -101,6 +113,12 @@
 		 */
 		static public function Product() {
 			return new QQNodeProduct('xlsws_product', null, null);
+		}
+		/**
+		 * @return QQNodeProductCopy
+		 */
+		static public function ProductCopy() {
+			return new QQNodeProductCopy('xlsws_product_copy', null, null);
 		}
 		/**
 		 * @return QQNodeProductQtyPricing

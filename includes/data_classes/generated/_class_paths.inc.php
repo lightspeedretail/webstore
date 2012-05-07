@@ -14,6 +14,11 @@
 		QApplicationBase::$ClassFile['qqnodecategory'] = __DATA_CLASSES__ . '/Category.class.php';
 		QApplicationBase::$ClassFile['qqreversereferencenodecategory'] = __DATA_CLASSES__ . '/Category.class.php';
 
+	// ClassPaths for the CategoryAddl class
+		QApplicationBase::$ClassFile['categoryaddl'] = __DATA_CLASSES__ . '/CategoryAddl.class.php';
+		QApplicationBase::$ClassFile['qqnodecategoryaddl'] = __DATA_CLASSES__ . '/CategoryAddl.class.php';
+		QApplicationBase::$ClassFile['qqreversereferencenodecategoryaddl'] = __DATA_CLASSES__ . '/CategoryAddl.class.php';
+
 	// ClassPaths for the Configuration class
 		QApplicationBase::$ClassFile['configuration'] = __DATA_CLASSES__ . '/Configuration.class.php';
 		QApplicationBase::$ClassFile['qqnodeconfiguration'] = __DATA_CLASSES__ . '/Configuration.class.php';
@@ -43,6 +48,11 @@
 		QApplicationBase::$ClassFile['destination'] = __DATA_CLASSES__ . '/Destination.class.php';
 		QApplicationBase::$ClassFile['qqnodedestination'] = __DATA_CLASSES__ . '/Destination.class.php';
 		QApplicationBase::$ClassFile['qqreversereferencenodedestination'] = __DATA_CLASSES__ . '/Destination.class.php';
+
+	// ClassPaths for the Email class
+		QApplicationBase::$ClassFile['email'] = __DATA_CLASSES__ . '/Email.class.php';
+		QApplicationBase::$ClassFile['qqnodeemail'] = __DATA_CLASSES__ . '/Email.class.php';
+		QApplicationBase::$ClassFile['qqreversereferencenodeemail'] = __DATA_CLASSES__ . '/Email.class.php';
 
 	// ClassPaths for the Family class
 		QApplicationBase::$ClassFile['family'] = __DATA_CLASSES__ . '/Family.class.php';
@@ -83,6 +93,11 @@
 		QApplicationBase::$ClassFile['product'] = __DATA_CLASSES__ . '/Product.class.php';
 		QApplicationBase::$ClassFile['qqnodeproduct'] = __DATA_CLASSES__ . '/Product.class.php';
 		QApplicationBase::$ClassFile['qqreversereferencenodeproduct'] = __DATA_CLASSES__ . '/Product.class.php';
+
+	// ClassPaths for the ProductCopy class
+		QApplicationBase::$ClassFile['productcopy'] = __DATA_CLASSES__ . '/ProductCopy.class.php';
+		QApplicationBase::$ClassFile['qqnodeproductcopy'] = __DATA_CLASSES__ . '/ProductCopy.class.php';
+		QApplicationBase::$ClassFile['qqreversereferencenodeproductcopy'] = __DATA_CLASSES__ . '/ProductCopy.class.php';
 
 	// ClassPaths for the ProductQtyPricing class
 		QApplicationBase::$ClassFile['productqtypricing'] = __DATA_CLASSES__ . '/ProductQtyPricing.class.php';

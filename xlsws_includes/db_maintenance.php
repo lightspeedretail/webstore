@@ -414,19 +414,16 @@ class xlsws_db_maintenance extends xlsws_index {
 			
 			//Copy our category table since we will use this to handle uploads and SEO activities
 			$this->add_table('xlsws_category_addl' , "CREATE TABLE `xlsws_category_addl` (
-			   `rowid` int(11) NOT NULL AUTO_INCREMENT,   
-			   `name` varchar(64) DEFAULT NULL,   
-			   `parent` int(11) DEFAULT NULL,   
-			   `position` int(11) NOT NULL,   
-			   `child_count` int(11) DEFAULT '1',   
-			   `request_url` varchar(255) DEFAULT NULL,   
-			   `custom_page` varchar(64) DEFAULT NULL,   
-			   `image_id` bigint(20) DEFAULT NULL,   
-			   `meta_keywords` varchar(255) DEFAULT NULL,   
-			   `meta_description` varchar(255) DEFAULT NULL,   
-			   `created` datetime DEFAULT NULL,   
-			   `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,   
-			   PRIMARY KEY (`rowid`),   KEY `name` (`name`),   KEY `parent` (`parent`) ) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
+			  `rowid` int(11) NOT NULL AUTO_INCREMENT,
+			  `name` varchar(64) DEFAULT NULL,
+			  `parent` int(11) DEFAULT NULL,
+			  `position` int(11) NOT NULL,
+			  `created` datetime DEFAULT NULL,
+			  `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			  PRIMARY KEY (`rowid`),
+			  KEY `name` (`name`),
+			  KEY `parent` (`parent`)
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
 			
 			
 				

@@ -32,7 +32,7 @@ ob_end_clean();
 
 define('XLSWS_SOAP' , true);
 
-if(_xls_get_conf('DEBUG_LS_SOAP_CALL' , false)  && isset($GLOBALS['HTTP_RAW_POST_DATA']))
+//if(_xls_get_conf('DEBUG_LS_SOAP_CALL' , false)  && isset($GLOBALS['HTTP_RAW_POST_DATA']))
 	_xls_log("SOAP DEBUG : " . print_r($GLOBALS['HTTP_RAW_POST_DATA'] , true));
 
 // ENABLE SOAP Debugging by the following SQL:

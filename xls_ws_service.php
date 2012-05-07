@@ -1190,9 +1190,24 @@ EOS;
         
         
                 
-        
-        
-        
+        /*
+        SOAP DEBUG : <SOAP-ENV:Envelope xmlns:ns3="http://www.webstore.site/save_category_with_id" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:ns0="http://schemas.xmlsoap.org/soap/encoding/" xmlns:ns1="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns2="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+   <SOAP-ENV:Header/>
+   <ns1:Body>
+      <ns3:save_category_with_id>
+         <passkey xsi:type="ns2:string">webstore</passkey>
+         <intRowId xsi:type="ns2:int">18</intRowId>
+         <intParentId xsi:type="ns2:int">12</intParentId>
+         <strCategory xsi:type="ns2:string">Cupcakes</strCategory>
+         <strMetaKeywords xsi:type="ns2:string"></strMetaKeywords>
+         <strMetaDescription xsi:type="ns2:string"></strMetaDescription>
+         <strCustomPage xsi:type="ns2:string"></strCustomPage>
+         <intPosition xsi:type="ns2:int">0</intPosition>
+         <blbImage xsi:type="ns2:string"></blbImage>
+      </ns3:save_category_with_id>
+   </ns1:Body>
+</SOAP-ENV:Envelope>
+        */
         /**
          * Save/Add a category with ID.
          * Rowid and ParentId are RowID of the current category and parentIDs
@@ -1238,24 +1253,28 @@ EOS;
                 return self::UNKNOWN_ERROR;
             }
 
-            $objCategory = false; 
+            $objCategoryAddl = false; 
 
             // If provided a rowid, attempt to load it
             if ($intRowId)
-                $objCategory = Category::Load($intRowId);
-            else if (!$objCategory and $intParentId)
-                $objCategory = 
-                    Category::LoadByNameParent($strCategory, $intParentId);
+                $objCategoryAddl = CategoryAddl::Load($intRowId);
+            else if (!$objCategoryAddl and $intParentId)
+                $objCategoryAddl = 
+                    CategoryAddl::LoadByNameParent($strCategory, $intParentId);
 
             // Failing that, create a new Category
-            if (!$objCategory) { 
-                $objCategory = new Category();
-                $objCategory->Created = new QDateTime(QDateTime::Now);
+            if (!$objCategoryAddl) { 
+                $objCategoryAddl = new CategoryAddl();
+                $objCategoryAddl->Created = new QDateTime(QDateTime::Now);
             }
 
-            $objCategory->Name = $strCategory;
-            $objCategory->Parent = $intParentId;
-            $objCategory->Position = $intPosition;
+            $objCategoryAddl->Name = $strCategory;
+            $objCategoryAddl->Parent = $intParentId;
+            $objCategoryAddl->Position = $intPosition;
+            
+            /*
+              LS currently does not support this information being sent, so ignore it for now
+              
             if ($strCustomPage)
                 $objCategory->CustomPage = $strCustomPage;
             if ($strMetaKeywords)
@@ -1269,7 +1288,7 @@ EOS;
             if ($blbImage && ($blbImage = base64_decode($blbImage))) {
                 $im = imagecreatefromstring($blbImage);
 
-                if ($objCategory->ImageId){ // There is a image already
+                if ($objCategoryAddl->ImageId){ // There is a image already
                     $image = Images::LoadByRowid($category->ImageId);
                     $image->SetImage($blbImage , $intRowId . "_categ");
                     $image->Width = imagesx ( $im );
@@ -1284,7 +1303,7 @@ EOS;
                     $image->Created = new  QDateTime(QDateTime::Now);
                     
                     $image->Save(true);
-                    $objCategory->ImageId = $image->Rowid;
+                    $objCategoryAddl->ImageId = $image->Rowid;
                 }
                 
                 $image->Parent = $image->Rowid;
@@ -1294,16 +1313,41 @@ EOS;
                 unset($image);
                 unset($im);
             }
+				
+				*/
+				
+            if ($intRowId && $objCategoryAddl->Rowid != $intRowId) { 
+                $objCategoryAddl->Save(true);
+                self::changeRowId($objCategoryAddl , QQN::CategoryAddl() , $intRowId);
+                $objCategoryAddl = CategoryAddl::Load($intRowId);
+            }
+            
 
+                        
+            
+            //Now that we've successfully saved in our cache table, update the regular Category table
+            $objCategory = Category::Load($intRowId);
+            // Failing that, create a new Category
+            if (!$objCategory) { 
+                $objCategory = new Category();
+                $objCategory->Created = new QDateTime(QDateTime::Now);
+            }
+            if ($objCategory) {
+            	$objCategory->Name = $objCategoryAddl->Name;
+            	$objCategory->Parent = $objCategoryAddl->Parent;
+            	$objCategory->Position = $objCategoryAddl->Position;
+            }
             if ($intRowId && $objCategory->Rowid != $intRowId) { 
                 $objCategory->Save(true);
                 self::changeRowId($objCategory , QQN::Category() , $intRowId);
                 $objCategory = Category::Load($intRowId);
             }
-
+            $objCategory->Save(); 
             $objCategory->UpdateChildCount();
  			$objCategory->RequestUrl=$objCategory->GetSEOPath();
-            $objCategory->Save();
+            $objCategory->Save(); 
+
+            
             return self::OK;
         }       
         
@@ -2920,7 +2964,8 @@ EOS;
         
         /**
          * Flush categories (But not the associations to products!)
-         * This gets called on every Update Store. We defeat the erasing if cache categorie is turned on
+         * This gets called on every Update Store. We cache the transaction in category_addl and then sync changes,
+         * to avoid wiping out saved info.
          * @param string $passkey
          * @return string
          */
@@ -2928,7 +2973,7 @@ EOS;
             if (!$this->check_passkey($passkey))
                 return self::FAIL_AUTH;
 
-            if (_xls_get_conf('CACHE_CATEGORY', 0) == 1)
+            /*if (_xls_get_conf('CACHE_CATEGORY', 0) == 1)
                 return self::OK;
 
             if (_xls_get_conf('DEBUG_RESET', 0) == 1) {
@@ -2938,8 +2983,9 @@ EOS;
                 );
                 return self::OK;
             }
-
-            $obj = new Category();
+			*/
+			
+            $obj = new CategoryAddl();
 
             try {
                 $obj->Truncate();
@@ -3113,7 +3159,7 @@ EOS;
     private static function changeRowId($obj , $qqn , $rowid){
 
         $st = "UPDATE " . substr($qqn->GetAsManualSqlColumn() , strpos($qqn->GetAsManualSqlColumn() , ".")+1 ) . " SET Rowid = '" . $rowid . "' WHERE Rowid =  '" . $obj->Rowid  . "'";
-        //_xls_log($st);
+       // error_log($st);
         _dbx( $st  , "NonQuery");       
         
     }
