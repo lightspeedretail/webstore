@@ -3868,7 +3868,6 @@
 
 			
 			foreach($this->arrFields as $field =>$properties){
-				error_log("yeah");
 				
 				if($this->arrFields[$field]['Field'] instanceof QListBox  )
 					$objItem->$field = $this->arrFields[$field]['Field']->SelectedValue;
@@ -5217,7 +5216,9 @@
 		public function RenderImage($val){
 			if ($val>0) return "<b>Set</b>"; else return;
 		}
-		
+		public function canNew(){
+			return false;
+		}
 		
 	}	
 	
