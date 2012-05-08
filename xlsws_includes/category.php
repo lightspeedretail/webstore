@@ -50,7 +50,6 @@ class xlsws_category extends xlsws_product_listing {
         $this->LoadCategory();
         $this->LoadSubCategories();
         $this->LoadCustomPage();
-        $this->LoadImage();
 
         parent::build_main();
 
@@ -149,20 +148,6 @@ class xlsws_category extends xlsws_product_listing {
             $this->category->MetaKeywords = $objPage->MetaKeywords;
     }
 
-    /**
-     * Bind the category Image to the form
-	 * @param none
-	 * @return none
-     */
-    protected function LoadImage() {
-        if (!$this->category)
-            return false;
-
-        if (!$this->category->HasImage)
-            return false;
-
-        $this->image = $this->category->SmallImage;
-    }
 
     /**
      * Create the paginator(s) for the DataRepeater

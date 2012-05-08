@@ -214,7 +214,7 @@
 	$arrConfigTabs = array('store' => _sp('Store') , 'appear' => _sp('Appearance') , 'sidebars' =>_sp('Sidebars'));
 	$arrPaymentTabs = array('methods' => _sp('Methods') , 'cc' => _sp('Credit Card Types'), 
 		'promo' => _sp('Promo Codes'),'promotasks' => _sp('Promo Code Tasks'));
-	$arrSeoTabs = array('templates' => _sp('Templates') , 'products' => _sp('Products'), 'categories' => _sp('Categories'));
+	$arrSeoTabs = array('general' => _sp('General') , 'products' => _sp('Products'), 'categories' => _sp('Categories'));
 	$arrSystemTabs = array('config' => _sp('Configuration') , 'task' => _sp('Tasks')  , 'slog' => _sp('System Log'));
 	
 	
@@ -330,6 +330,9 @@
 		const Images = 17;
 		const Captcha = 18;
 		const Templates = 19;
+		
+		const Google = 20;
+		const URL = 21;
 		
 
 	}
@@ -749,11 +752,6 @@
 			$this->configPnls['local'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Localisation , "configDone");
 			$this->configPnls['local']->Name = _sp('Localization');
 			$this->configPnls['local']->Info = _sp('Geographical configuration for your store');
-
-			$this->configPnls['seo'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::SEO , "configDone");
-			$this->configPnls['seo']->Name = _sp('SEO (Search Engine Optimization) / 3rd Party Integration');
-			$this->configPnls['seo']->Info = _sp('SEO configuration for your store');
-
 			
 			$this->configPnls['custreg'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::CustomerRegistration , "configDone");
 			$this->configPnls['custreg']->Name = _sp('Customer Registration');
@@ -3333,7 +3331,7 @@
 			parent::Form_Create();
 			
 			$this->arrTabs = $GLOBALS['arrSeoTabs'];
-			$this->currentTab = 'templates';
+			$this->currentTab = 'general';
 
 
 			$this->page = new CustomPage();
@@ -3370,7 +3368,22 @@
 		protected function listPages(){
 
 			
-			$page = new CustomPage();
+			$this->configPnls['seo'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::SEO , "configDone");
+			$this->configPnls['seo']->Name = _sp('Template Options');
+			$this->configPnls['seo']->Info = _sp('SEO Template Options');
+
+			$this->configPnls['url'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::URL , "configDone");
+			$this->configPnls['url']->Name = _sp('URL Formatting');
+			$this->configPnls['url']->Info = _sp('Change URL options and structure');
+
+
+			$this->configPnls['google'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Google , "configDone");
+			$this->configPnls['google']->Name = _sp('Google Integration');
+			$this->configPnls['google']->Info = _sp('Google account information and settings');
+
+		
+			
+			/*$page = new CustomPage();
 			$page->Title = _sp('Define Tiers for Tier Based Shipping');
 			$page->Key = "ship_define_tiers";
 			$this->configPnls[0] = new xlsws_admin_edittiers_panel($this, $this , $page , "pageDone");
@@ -3386,6 +3399,7 @@
 			$page->Title = _sp('Batch Change Countries and States/Regions');
 			$page->Key = "ship_modify_cities_countries";
 			$this->configPnls[2] = new xlsws_admin_task_panel($this, $this , $page , "pageDone");
+			*/
 			
 			
 		}
@@ -5062,7 +5076,150 @@
 	}	
 	
 	
-	
+	/* class xlsws_admin_states
+	* class to create the states/regions list under admin panel shipping
+	* see class xlsws_admin_generic_edit_form for further specs
+	*/			
+	class xlsws_seo_categories extends xlsws_admin_generic_edit_form{
+		
+		
+		protected $countries;
+		protected $objItems;
+		protected $objImages;
+		
+		protected function Form_Create(){
+			
+			$this->arrTabs = $GLOBALS['arrSeoTabs'];
+			$this->currentTab = 'categories';
+			
+			
+			QApplication::$EncodingType = "UTF-8";
+
+			$this->appName = "Edit Categories";
+			
+			$this->className = "Category";
+			$this->blankObj = new Category();
+			$this->qqn = QQN::Category();
+
+			$this->arrFields = array();
+			$this->default_sort_index = 1;
+			
+			$this->arrFields['RequestUrl'] = array('Name' => 'Category Path (URL)');
+			$this->arrFields['RequestUrl']['Field'] = new QLabel($this);
+			$this->arrFields['RequestUrl']['Field']->Required = true;			
+			//$this->arrFields['RequestUrl']['DisplayFunc'] = "RenderPath";
+			$this->arrFields['RequestUrl']['UTF8'] = true;
+			$this->arrFields['RequestUrl']['Width'] = 100;
+			
+			$this->arrFields['Parent'] = array('Name' => 'Tier');
+			$this->arrFields['Parent']['Field'] = new QLabel($this);
+			$this->arrFields['Parent']['DisplayFunc'] = "RenderParent";
+			$this->arrFields['Parent']['UTF8'] = true;
+			$this->arrFields['Parent']['Width'] = 180;	
+
+
+			$this->arrFields['MetaDescription'] = array('Name' => 'Meta Description');
+			$this->arrFields['MetaDescription']['Field'] = new XLSTextBox($this);
+			$this->arrFields['MetaDescription']['UTF8'] = true;
+			$this->arrFields['MetaDescription']['DisplayFunc'] = "RenderMeta";
+			$this->arrFields['MetaDescription']['Width'] = 180;	
+
+			$this->arrFields['MetaKeywords'] = array('Name' => 'Meta Keywords');
+			$this->arrFields['MetaKeywords']['Field'] = new XLSTextBox($this);
+			$this->arrFields['MetaKeywords']['UTF8'] = true;
+			$this->arrFields['MetaKeywords']['DisplayFunc'] = "RenderMeta";
+			$this->arrFields['MetaKeywords']['Width'] = 120;
+						
+			$this->arrFields['CustomPage'] = array('Name' => 'Custom Page Text');
+			$this->arrFields['CustomPage']['Field'] = new XLSListBox($this);		
+			$this->arrFields['CustomPage']['DisplayFunc'] = "RenderCustom";
+			$this->objItems = CustomPage::LoadAll(QQ::Clause(QQ::OrderBy(QQN::CustomPage()->Title)));
+			$this->arrFields['CustomPage']['Field']->AddItem('None', NULL);
+			foreach($this->objItems as $objItem)
+				$this->arrFields['CustomPage']['Field']->AddItem($objItem->Title , $objItem->Key);
+
+
+
+
+			$this->arrFields['ImageId'] = array('Name' => 'Use Image');
+			$this->arrFields['ImageId']['Field'] = new XLSListBox($this);		
+			$this->arrFields['ImageId']['DisplayFunc'] = "RenderImage";
+			$this->objImages = Product::QueryArray(QQ::AndCondition(
+				QQ::Equal(QQN::Product()->FkProductMasterId,0),
+				QQ::IsNotNull(QQN::Product()->ImageId)
+				),
+					QQ::Clause(
+						QQ::OrderBy(QQN::Product()->Code)
+				 ));
+			$this->arrFields['ImageId']['Field']->AddItem('None', NULL);
+			foreach($this->objImages as $objItem)
+				$this->arrFields['ImageId']['Field']->AddItem($objItem->Code , $objItem->ImageId);
+					
+			
+			/*
+			$this->arrFields['CountryCode'] = array('Name' => 'Country');
+			$this->arrFields['CountryCode']['Field'] = new XLSListBox($this);
+			$this->arrFields['CountryCode']['Field']->Required = true;			
+			$this->arrFields['CountryCode']['DisplayFunc'] = "RenderCountry";
+			$this->arrFields['CountryCode']['Width'] = 150;
+			
+
+			$this->countries = Country::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Country()->Country)));
+			
+			foreach($this->countries as $country)
+				$this->arrFields['CountryCode']['Field']->AddItem($country->Country , $country->Code);
+
+			$this->arrFields['SortOrder'] = array('Name' => 'Sort Order');
+			$this->arrFields['SortOrder']['Field'] = new QIntegerTextBox($this);
+			$this->arrFields['SortOrder']['Width'] = 50;
+			
+			
+			
+				
+				
+			$this->arrFields['Avail'] = array('Name' => 'Available?');
+			$this->arrFields['Avail']['Field'] = new XLSListBox($this);
+			$this->arrFields['Avail']['Field']->AddItem('Yes' , 'Y');
+			$this->arrFields['Avail']['Field']->AddItem('No' , 'N');
+			$this->arrFields['Avail']['Width'] = 50;
+			*/
+			
+			parent::Form_Create();
+			
+			
+		}
+		
+		public function RenderCustom($val){
+			foreach($this->objItems as $objItem)
+				if($objItem->Key == $val)
+					return $objItem->Title;
+			
+			return '';
+		}
+		public function RenderMeta($val){
+			if (strlen($val)>15)
+				return substr($val,0,15)."...";
+			else return $val;
+		}		
+		
+		public function RenderState($val){
+			return $val;
+		}		
+		
+		public function RenderParent($val){
+			if ($val==0) return "Top Tier"; else return "";
+		}
+		
+		public function RenderPath($val){
+			return str_replace("-"," &gt; ", $val);
+		}
+		
+		public function RenderImage($val){
+			if ($val>0) return "<b>Set</b>"; else return;
+		}
+		
+		
+	}	
 	
 	
 	/* class xlsws_admin_maintenance
@@ -5730,6 +5887,11 @@
 			{
 				case "vlog":
 					xlsws_admin_visitlog::Run('xlsws_admin_visitlog' , adminTemplate('edit.tpl.php'));
+					break;
+				case "products":
+					break;
+				case "categories":
+					xlsws_seo_categories::Run('xlsws_seo_categories' , adminTemplate('edit.tpl.php'));
 					break;
 				default:
 					//xlsws_admin_chart::Run('xlsws_admin_chart' , adminTemplate('chart.tpl.php'));

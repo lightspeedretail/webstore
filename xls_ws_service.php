@@ -3047,6 +3047,7 @@ EOS;
                 
                 	case "Category":
                     	_dbx("TRUNCATE `xlsws_product_category_assn`");
+                    	$obj = new CategoryAddl(); //We blank our caching table, not the real table
                     	break;
                     	             
                 	case "Images":

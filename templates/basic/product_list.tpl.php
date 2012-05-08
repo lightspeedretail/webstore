@@ -35,13 +35,9 @@
 	</p>
 <?php endif; ?>
 
-<?php if(isset($this->category) && $this->category->ImageExist): ?>
+<?php if( _xls_get_conf('ENABLE_CATEGORY_IMAGE',0) && isset($this->category) && $this->category->ImageExist): ?>
 	<div style="float:left; display:inline;">
-	<img src="<?= $this->category->ListingImage; ?>" />
-	</div>
-<?php elseif(isset($this->image) && $this->image): ?>
-	<div style="float:left; display:inline;">
-	<img src="<?= $this->image; ?>" />
+	<img src="<?= $this->category->CategoryImage; ?>" />
 	</div>
 <?php endif; ?>
 

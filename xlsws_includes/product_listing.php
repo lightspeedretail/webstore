@@ -33,10 +33,26 @@
 class xlsws_product_listing extends xlsws_index {
 	protected $dtrProducts; //list of products in the category
 
+
+	/**
+     * build_main - constructor for this controller, refrain from modifying this 
+     * function. It is best practice to style the category tree from menu.tpl.php 
+     * and webstore.css with the list this function generates
+	 * @param none
+	 * @return none
+	 */
+    protected function build_main() {
+        $this->mainPnl = new QPanel($this,'MainPanel');
+        $this->mainPnl->Template = templateNamed('product_list.tpl.php');
+
+        $this->CreateDataRepeater();
+	}
+	
     /**
      * Create the view's DataRepeater control
      */
     protected function CreateDataRepeater() {
+    	global $XLSWS_VARS;
         $this->dtrProducts = $objRepeater = new QDataRepeater($this->mainPnl,'ProductCell');
         $this->CreatePaginator();
         #$this->CreatePaginator(true);
@@ -46,7 +62,6 @@ class xlsws_product_listing extends xlsws_index {
 		$objRepeater->CssClass = "product_list rounded";
         $objRepeater->UseAjax = _xls_get_conf('DEBUG_DISABLE_AJAX' , 0) ? false : true;
 
-        // TODO :: Move pager number to a hidden QControl
 		if (isset($XLSWS_VARS['page']))
 			$objRepeater->PageNumber = intval($XLSWS_VARS['page']);
         
@@ -205,18 +220,6 @@ class xlsws_product_listing extends xlsws_index {
         $this->bind_result_images($objProductArray);
     }
 
-	/**
-     * build_main - constructor for this controller, refrain from modifying this 
-     * function. It is best practice to style the category tree from menu.tpl.php 
-     * and webstore.css with the list this function generates
-	 * @param none
-	 * @return none
-	 */
-    protected function build_main() {
-        $this->mainPnl = new QPanel($this,'MainPanel');
-        $this->mainPnl->Template = templateNamed('product_list.tpl.php');
 
-        $this->CreateDataRepeater();
-	}
 }
 

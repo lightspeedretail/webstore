@@ -39,6 +39,7 @@ class XLSURLParser {
 	protected $intStatus; //200 for OK, 301 for redirect, 404 for error. Use HTTP codes to determine result of parsing
 	protected $strRedirectUrl; //if a redirect, the URL to redirect to
 	protected $arrUrlSegments;
+	protected $strQueryString; //query string
 	
 	function __construct( $strPhpSelf ) {
 
@@ -47,6 +48,8 @@ class XLSURLParser {
 		else
 			$this->strUri = $_SERVER['PATH_INFO'];
 
+		$this->strQueryString = $_SERVER['QUERY_STRING'];
+		
 		if (!$this->ExplodeSegments()) 	return false; 
 		if (!$this->ReindexSegments())	return false;
 		
@@ -171,6 +174,8 @@ class XLSURLParser {
 				return $this->strUri;
 			case 'UrlSegments':
 				return print_r($this->arrUrlSegments,true);
+			case 'QueryString':
+				return $this->strQueryString;
 			case 'RouteDepartment':
 				return $this->strRouteDepartment;
 			case 'Status':

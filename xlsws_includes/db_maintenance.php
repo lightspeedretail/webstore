@@ -385,17 +385,19 @@ class xlsws_db_maintenance extends xlsws_index {
 			if ($this->add_column('xlsws_category' , 'request_url' ,
 				"ALTER TABLE xlsws_category ADD COLUMN `request_url` varchar (255) AFTER `child_count`"))
 			Category::ConvertSEO();
-			//_dbx("ALTER TABLE `xlsws_category` ADD INDEX (`request_url`);")
+			$this->add_index('xlsws_category','request_url');
 			if ($this->add_column('xlsws_product' , 'request_url' ,
 				"ALTER TABLE xlsws_product ADD COLUMN `request_url` varchar (255) AFTER `web_keyword3`"))
 			Product::ConvertSEO();
-				//_dbx("ALTER TABLE `xlsws_product` ADD INDEX (`request_url`);")	
+			$this->add_index('xlsws_product','request_url');	
 			if ($this->add_column('xlsws_custom_page' , 'request_url' ,
 				"ALTER TABLE xlsws_custom_page ADD COLUMN `request_url` varchar (255) AFTER `page`"))
 			CustomPage::ConvertSEO();
+			$this->add_index('xlsws_custom_page','request_url');	
 			if ($this->add_column('xlsws_family' , 'request_url' ,
 				"ALTER TABLE xlsws_family ADD COLUMN `request_url` varchar (255) AFTER `family`"))
 			Family::ConvertSEO();
+			$this->add_index('xlsws_family','request_url');
 
 			
 			$this->add_config_key('SHOW_SHARING' , 
@@ -403,12 +405,12 @@ class xlsws_db_maintenance extends xlsws_index {
 				'SHOW_SHARING', '1', 'Show Sharing buttons such as Facebook and Pinterest', 14, 1, NOW(), NOW(), 'BOOL');");	
 			$this->add_config_key('SEO_URL_CODES' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Product Codes in Product URLs', 
-				'SEO_URL_CODES', '0', 'If your Product Codes are important (such as model numbers), this will include them when making SEO formatted URLs. If you generate your own Product Codes that are only internal, you can leave this off.', 14, 2, NOW(), NOW(), 'BOOL');");
+				'SEO_URL_CODES', '0', 'If your Product Codes are important (such as model numbers), this will include them when making SEO formatted URLs. If you generate your own Product Codes that are only internal, you can leave this off.', 21, 1, NOW(), NOW(), 'BOOL');");
 			$this->add_config_key('GOOGLE_ANALYTICS' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Google Analytics Code (format: UA-00000000-0)', 
-				'GOOGLE_ANALYTICS', '', 'Google Analytics code for tracking', 14, 5, NOW(), NOW(), 'NULL');");		
+				'GOOGLE_ANALYTICS', '', 'Google Analytics code for tracking', 20, 1, NOW(), NOW(), 'NULL');");		
 
-			_dbx("UPDATE `xlsws_configuration` SET `title`='Remove index.php from SEO-Friendly URLs', `configuration_type_id`=14, `sort_order`=3,
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Remove index.php from SEO-Friendly URLs', `configuration_type_id`=21, `sort_order`=2,
 				`helper_text`='Requires .htaccess in Web Store root folder.' where `key`='ENABLE_SEO_URL'");	
 			
 			//Copy our category table since we will use this to handle uploads and SEO activities
@@ -423,8 +425,58 @@ class xlsws_db_maintenance extends xlsws_index {
 			  KEY `name` (`name`),
 			  KEY `parent` (`parent`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
+
+			//Additional image sizes
+			$this->drop_index('xlsws_images_type','size');
+			$this->drop_index('xlsws_images_type','width');
 			
+			_dbx("INSERT IGNORE INTO `xlsws_images_type` set id=6, `name`='categoryimage', width=180,height=180");
+			_dbx("INSERT IGNORE INTO `xlsws_images_type` set id=7, `name`='previewimage', width=30,height=30");
+			_dbx("INSERT IGNORE INTO `xlsws_images_type` set id=8, `name`='sliderimage', width=90,height=90");
+		
+		
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Grid image width', `configuration_type_id`=17, `sort_order`=1 
+				where `key`='LISTING_IMAGE_WIDTH'");	
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Grid image height', `configuration_type_id`=17, `sort_order`=2 
+				where `key`='LISTING_IMAGE_HEIGHT'");
 			
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Shopping Cart image width', `configuration_type_id`=17, `sort_order`=3 
+				where `key`='MINI_IMAGE_WIDTH'");	
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Shopping Cart image height', `configuration_type_id`=17, `sort_order`=4 
+				where `key`='MINI_IMAGE_HEIGHT'");		
+
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Width', `configuration_type_id`=17, `sort_order`=5 
+				where `key`='DETAIL_IMAGE_WIDTH'");	
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Width', `configuration_type_id`=17, `sort_order`=6 
+				where `key`='DETAIL_IMAGE_HEIGHT'");		
+
+				
+			$this->add_config_key('CATEGORY_IMAGE_WIDTH' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Category Page Image Width', 
+				'CATEGORY_IMAGE_WIDTH', '180', 'if using a Category Page image', 17, 7, NOW(), NOW(), 'INT');");	
+			$this->add_config_key('CATEGORY_IMAGE_HEIGHT' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Category Page Image Width', 
+				'CATEGORY_IMAGE_HEIGHT', '180', 'if using a Category Page image', 17, 8, NOW(), NOW(), 'INT');");	
+			$this->add_config_key('PREVIEW_IMAGE_WIDTH' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Preview Thumbnail (Product Detail Page) Width', 
+				'PREVIEW_IMAGE_WIDTH', '30', 'Preview Thumbnail image', 17, 9, NOW(), NOW(), 'INT');");	
+			$this->add_config_key('PREVIEW_IMAGE_HEIGHT' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Preview Thumbnail (Product Detail Page) Height', 
+				'PREVIEW_IMAGE_HEIGHT', '30', 'Preview Thumbnail image', 17, 10, NOW(), NOW(), 'INT');");	
+			$this->add_config_key('SLIDER_IMAGE_WIDTH' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Slider Image Width', 
+				'SLIDER_IMAGE_WIDTH', '120', 'Slider on custom pages', 17, 11, NOW(), NOW(), 'INT');");	
+			$this->add_config_key('SLIDER_IMAGE_HEIGHT' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Slider Image Height', 
+				'SLIDER_IMAGE_HEIGHT', '120', 'Slider on custom pages', 17, 12, NOW(), NOW(), 'INT');");	
+			
+			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=17, `sort_order`=15 
+				where `key`='PRODUCT_ENLARGE_SHOW_LIGHTBOX'");	
+			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=17, `sort_order`=16 
+				where `key`='IMAGE_STORE'");	
+			$this->add_config_key('ENABLE_CATEGORY_IMAGE' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Display Image on Category Page (when set)', 
+				'ENABLE_CATEGORY_IMAGE', '0', 'Requires a defined Category image under SEO settings', 17, 13, NOW(), NOW(), 'BOOL');");				
 				
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			
@@ -443,7 +495,28 @@ class xlsws_db_maintenance extends xlsws_index {
 	}
 	
 	
+	private function drop_index($table,$indexname) {
+		$res = _dbx("SHOW INDEXES FROM `$table` WHERE key_name='$indexname'" , 'Query');
+
+		if($res && ($row = $res->GetNextRow()))
+				_dbx("ALTER TABLE `$table` DROP INDEX `$indexname`");
+						
+
+			return true;
 	
+	}
+
+	private function add_index($table,$indexname) {
+		$res = _dbx("SHOW INDEXES FROM $table WHERE key_name='$indexname'" , 'Query');
+
+		if($res && ($row = $res->GetNextRow()))
+				return false;
+
+		_dbx("ALTER TABLE `$table` ADD INDEX `$indexname` (`$indexname`)");	
+		return true;
+	
+	}
+		
 	private function add_column($table , $column , $create_sql , $version = false) {
 
 			$res = _dbx("SHOW COLUMNS FROM $table WHERE Field='$column'" , 'Query');

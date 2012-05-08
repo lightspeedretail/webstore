@@ -420,19 +420,28 @@ EOS;
 				return $this->HasImage();
 
 			case 'ListingImage':
-				return $this->GetImageLink('listingimage');
+				return $this->GetImageLink(ImagesType::listing);
 
 			case 'MiniImage':
-				return $this->GetImageLink('miniimage');
+				return $this->GetImageLink(ImagesType::mini);
+
+			case 'PreviewImage':
+				return $this->GetImageLink(ImagesType::preview);
+
+			case 'SliderImage':
+				return $this->GetImageLink(ImagesType::slider);
+
+			case 'CategoryImage':
+				return $this->GetImageLink(ImagesType::category);
 
 			case 'PDetailImage':
-				return $this->GetImageLink('pdetailimage');
+				return $this->GetImageLink(ImagesType::pdetail);
 
 			case 'SmallImage':
-				return $this->GetImageLink('smallimage');
+				return $this->GetImageLink(ImagesType::small);
 
 			case 'Image':
-				return $this->GetImageLink('image');
+				return $this->GetImageLink(ImagesType::normal);
 
 			case 'DirLink':
 				return $this->GetDirLink();
