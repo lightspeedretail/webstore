@@ -333,7 +333,7 @@
 		
 		const Google = 20;
 		const URL = 21;
-		
+		const ProductTitleFormat = 22;
 
 	}
 	
@@ -438,11 +438,14 @@
     	           $this->fields[$config->Key] = new XLSTextBox($this);
     	           $this->fields[$config->Key]->Text = $config->Value;
     	           $this->fields[$config->Key]->Required = true;
+    	           $this->fields[$config->Key]->Width=250;
                }else{
     	           $this->fields[$config->Key] = new XLSTextBox($this);
     	           $this->fields[$config->Key]->Text = $config->Value;
     	           if($config->Key=="EMAIL_SMTP_PASSWORD") $this->fields[$config->Key]->TextMode = QTextMode::Password;
-    	        	//$this->fields[$config->Key]->Required = true;
+    	            
+    	           $this->fields[$config->Key]->Width=250;
+    	        	if($optType=="INT") $this->fields[$config->Key]->Width=50;
                }
 			   
 			   
@@ -512,6 +515,7 @@
               		$this->fields[$config->Key]->SelectedValue = $config->Value;
                }else{
     	           $this->fields[$config->Key]->Text = $config->Value;
+    	          // $this->fields[$config->Key]->Width = 150;
                }
 
 		 			
@@ -3373,9 +3377,12 @@
 			$this->configPnls['seo']->Info = _sp('SEO Template Options');
 
 			$this->configPnls['url'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::URL , "configDone");
-			$this->configPnls['url']->Name = _sp('URL Formatting');
-			$this->configPnls['url']->Info = _sp('Change URL options and structure');
+			$this->configPnls['url']->Name = _sp('URL Options');
+			$this->configPnls['url']->Info = _sp('Change URL options');
 
+			$this->configPnls['producttitle'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::ProductTitleFormat , "configDone");
+			$this->configPnls['producttitle']->Name = _sp('Title/Description Formatting');
+			$this->configPnls['producttitle']->Info = _sp('Change how title and description meta data is built for pages');
 
 			$this->configPnls['google'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Google , "configDone");
 			$this->configPnls['google']->Name = _sp('Google Integration');

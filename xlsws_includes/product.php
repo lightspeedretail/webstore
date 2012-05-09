@@ -127,18 +127,12 @@ class xlsws_product extends xlsws_index {
 		$this->pnlAdditionalProdImages->Template = templateNamed('product_detail_additional_images.tpl.php');
 		$this->PopulateAdditionalImagesPnl();
 
-		// add desc
-		if($this->prod->MetaDesc != '')
-			_xls_add_meta_desc($this->prod->MetaDesc);
-		else
-			_xls_add_meta_desc($this->prod->Name);
-
-		if($this->prod->MetaKeyword != '')
-			_xls_add_meta_keyword($this->prod->MetaKeyword);
-		else
-			_xls_add_meta_keyword(array($this->prod->Name , $this->prod->Code , $this->prod->WebKeyword1 , $this->prod->WebKeyword2 , $this->prod->WebKeyword3));
-
-		_xls_add_page_title($this->prod->Name . " - " .  $this->prod->Code);
+		
+		_xls_stack_add('xls_canonical_url',$this->prod->CanonicalUrl);
+		_xls_add_meta_desc($this->prod->PageDescription);
+		_xls_add_page_title($this->prod->PageTitle);
+		//Keywords are pretty worthless and ignored by search engines, but still tack them on here
+		_xls_add_meta_keyword(array($this->prod->Name , $this->prod->Code , $this->prod->WebKeyword1 , $this->prod->WebKeyword2 , $this->prod->WebKeyword3));
 
 		// Stock
 		$this->lblStock = new QLabel($this->mainPnl,'lblStock');

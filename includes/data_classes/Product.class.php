@@ -157,6 +157,48 @@ class Product extends ProductGen {
 		
 	}
 
+
+
+	protected function GetPageMeta($strConf = 'SEO_PRODUCT_TITLE') { 
+	
+		$strItem = _xls_get_conf($strConf, '%description : %storename');
+		
+		if (stripos($strItem,'%category') !==false) //reduce potentially expensive db hit if we don't need it
+			$strCatPath=implode("|",Category::GetTrailByProductId($this->Rowid,'names')); else $strCatPath='';	
+				
+		$arrPatterns = array("%code",
+			"%storename",
+			"%name",
+			"%description",
+			"%shortdescription",
+			"%longdescription",
+			"%keyword1",
+			"%keyword2",
+			"%keyword3",
+			"%price",
+			"%family",
+			"%class",
+			"%category");
+			
+		$arrItems = array($this->Code,
+			_xls_get_conf('STORE_NAME',''),
+			$this->Name,
+			$this->Name,
+			$this->DescriptionShort,
+			$this->Description,
+			$this->WebKeyword1,
+			$this->WebKeyword2,
+			$this->WebKeyword3,
+			_xls_currency($this->Price),
+			$this->Family,
+			$this->ClassName,
+			$strCatPath);		
+			
+			
+		return str_replace($arrPatterns, $arrItems, $strItem);
+		
+	}
+
 	/**
 	 * Get and optionally load the Master Product
 	 * @return string
@@ -527,118 +569,7 @@ class Product extends ProductGen {
 		return $p;
 	}
 
-	public function __get($strName) {
-		switch ($strName) {
-			case 'IsMaster':
-				return $this->IsMaster();
-
-			case 'IsChild':
-				return $this->IsChild();
-
-			case 'IsIndependent':
-				return $this->IsIndependent();
-
-			case 'IsAvailable':
-				return $this->IsAvailable();
-
-			case 'Slug':
-				return $this->GetSlug();
-
-			case 'Code':
-				if ($this->IsChild())
-					if ($prod = $this->GetMaster())
-						return $prod->Code;
-				return $this->strCode;
-
-			case 'FkProductMaster':
-				return $this->GetMaster();
-
-			case 'Link':
-				return $this->GetLink();
-				
-			case 'SEOName':
-				return $this->GetSEOName();
-
-			case 'CanonicalUrl':
-				return _xls_site_dir().'/'.$this->RequestUrl."/dp/";
-				
-			case 'ListingImage':
-				return $this->GetImageLink(ImagesType::listing);
-
-			case 'MiniImage':
-				return $this->GetImageLink(ImagesType::mini);
-
-			case 'PreviewImage':
-				return $this->GetImageLink(ImagesType::preview);
-
-			case 'SliderImage':
-				return $this->GetImageLink(ImagesType::slider);
-
-			case 'CategoryImage':
-				return $this->GetImageLink(ImagesType::category);
-
-			case 'PDetailImage':
-				return $this->GetImageLink(ImagesType::pdetail);
-
-			case 'SmallImage':
-				return $this->GetImageLink(ImagesType::small);
-
-			case 'Image':
-				return $this->GetImageLink(ImagesType::normal);
-
-			case 'OriginalCode':
-				return $this->strCode;
-
-			case 'Price':
-				return $this->GetPriceDisplay();
-
-			case 'PriceValue':
-				return $this->GetPrice();
-
-			case 'SizeLabel':
-					return _xls_get_conf('PRODUCT_SIZE_LABEL' , _sp('Size'));
-			case 'ColorLabel':
-					return _xls_get_conf('PRODUCT_COLOR_LABEL' , _sp('Color'));
-			case 'Inventory':
-				return $this->GetInventory();
-
-			default:
-				try { 
-					return parent::__get($strName);
-				} catch (QCallerException $objExc) {
-					$objExc->IncrementOffset();
-					throw $objExc;
-				}
-		}
-	}
-
-	public function __set($strName, $mixValue) {
-		switch ($strName) {
-			case 'Rowid':
-				if (defined('XLSWS_SOAP'))
-					try {
-						return ($this->intRowid =
-							QType::Cast($mixValue, QType::Integer));
-					}
-					catch (QCallerException $objExc) {
-						$objExc->IncrementOffset();
-						throw $objExc;
-					}
-				else
-					QApplication::Log(E_ERROR, 'uploader',
-						'You may only update the Product Rowid during' .
-						' SOAP operations');
-				break;
-
-			default:
-				try {
-					return parent::__set($strName, $mixValue);
-				} catch (QCallerException $objExc) {
-					$objExc->IncrementOffset();
-					throw $objExc;
-				}
-		}
-	}
+	
 
 	protected function GetAggregateInventory($intRowid = false) {
 		if (!$intRowid)
@@ -875,4 +806,123 @@ class Product extends ProductGen {
 			if ($objImage) $objImage->Delete();
 		}
 	}
+	
+	public function __get($strName) {
+		switch ($strName) {
+			case 'IsMaster':
+				return $this->IsMaster();
+
+			case 'IsChild':
+				return $this->IsChild();
+
+			case 'IsIndependent':
+				return $this->IsIndependent();
+
+			case 'IsAvailable':
+				return $this->IsAvailable();
+
+			case 'Slug':
+				return $this->GetSlug();
+
+			case 'Code':
+				if ($this->IsChild())
+					if ($prod = $this->GetMaster())
+						return $prod->Code;
+				return $this->strCode;
+
+			case 'FkProductMaster':
+				return $this->GetMaster();
+
+			case 'Link':
+				return $this->GetLink();
+				
+			case 'SEOName':
+				return $this->GetSEOName();
+
+			case 'CanonicalUrl':
+				return _xls_site_dir().'/'.$this->RequestUrl."/dp/";
+				
+			case 'ListingImage':
+				return $this->GetImageLink(ImagesType::listing);
+
+			case 'MiniImage':
+				return $this->GetImageLink(ImagesType::mini);
+
+			case 'PreviewImage':
+				return $this->GetImageLink(ImagesType::preview);
+
+			case 'SliderImage':
+				return $this->GetImageLink(ImagesType::slider);
+
+			case 'CategoryImage':
+				return $this->GetImageLink(ImagesType::category);
+
+			case 'PDetailImage':
+				return $this->GetImageLink(ImagesType::pdetail);
+
+			case 'SmallImage':
+				return $this->GetImageLink(ImagesType::small);
+
+			case 'Image':
+				return $this->GetImageLink(ImagesType::normal);
+
+			case 'OriginalCode':
+				return $this->strCode;
+
+			case 'Price':
+				return $this->GetPriceDisplay();
+
+			case 'PriceValue':
+				return $this->GetPrice();
+
+			case 'SizeLabel':
+					return _xls_get_conf('PRODUCT_SIZE_LABEL' , _sp('Size'));
+			case 'ColorLabel':
+					return _xls_get_conf('PRODUCT_COLOR_LABEL' , _sp('Color'));
+			case 'Inventory':
+				return $this->GetInventory();
+				
+			case 'PageTitle':
+				return substr($this->GetPageMeta('SEO_PRODUCT_TITLE'),0,64);
+			case 'PageDescription':
+				return substr($this->GetPageMeta('SEO_PRODUCT_DESCRIPTION'),0,255);
+
+			default:
+				try { 
+					return parent::__get($strName);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+
+	public function __set($strName, $mixValue) {
+		switch ($strName) {
+			case 'Rowid':
+				if (defined('XLSWS_SOAP'))
+					try {
+						return ($this->intRowid =
+							QType::Cast($mixValue, QType::Integer));
+					}
+					catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+				else
+					QApplication::Log(E_ERROR, 'uploader',
+						'You may only update the Product Rowid during' .
+						' SOAP operations');
+				break;
+
+			default:
+				try {
+					return parent::__set($strName, $mixValue);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+	
 }

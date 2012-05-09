@@ -922,6 +922,7 @@ function _xls_add_meta_redirect($url , $delay = 60) {
 function _xls_add_page_title($title) {
 	global $strPageTitle;
 	$strPageTitle = $title;
+	_xls_stack_add('xls_page_title',$title);
 }
 
 /**

@@ -33,6 +33,8 @@ ob_start();
 require_once(CUSTOM_INCLUDES . 'prepend.inc.php');
 ob_end_clean();
 
+$strPageTitle = _xls_get_conf('STORE_NAME' , 'XSilva Web Store');
+
 // If store is offline then show offline
 if ($offlinekey = _xls_get_conf('STORE_OFFLINE' , '')) {
 	// User knows the key and is requesting initial access
@@ -193,8 +195,7 @@ if (isset($XLSWS_VARS['seo_rewrite'])) {
 	}
 }
 */
-$strPageTitle = _xls_get_conf('STORE_NAME' , 'XSilva Web Store');
-$xlsws_form = 'xlsws_index';
+
 
 // Print out any image data then exit
 // TODO : Refactor the image types collection

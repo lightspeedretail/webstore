@@ -232,7 +232,7 @@ class xlsws_db_maintenance extends xlsws_index {
 				1, 22, NOW(), NOW(), 'BOOL');");
 			$this->add_config_key('LOG_ROTATE_DAYS' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Log Rotate Days', 
-				'LOG_ROTATE_DAYS', '30', 'How many days System Log should be retained.', 1, 23, NOW(), NOW(), 'NULL');");					
+				'LOG_ROTATE_DAYS', '30', 'How many days System Log should be retained.', 1, 23, NOW(), NOW(), 'INT');");					
 			$this->add_config_key('UPLOADER_TIMESTAMP' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Last timestamp uploader ran', 
 				'UPLOADER_TIMESTAMP', '0', 'Internal', 0, 0, NOW(), NOW(), 'NULL');");
@@ -345,7 +345,7 @@ class xlsws_db_maintenance extends xlsws_index {
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=10 where `key`='INVENTORY_OUT_ALLOW_ADD'");
 			
 					
-			_dbx("UPDATE `xlsws_configuration` SET `title`='Enter relative URL (usually starting with /photos) to your header image. Used in both templates and email receipts.'
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Enter relative URL (usually starting with /photos)'
 				where `key`='HEADER_IMAGE'");
 			
 			//Inventory handling changes
@@ -411,7 +411,22 @@ class xlsws_db_maintenance extends xlsws_index {
 				'GOOGLE_ANALYTICS', '', 'Google Analytics code for tracking', 20, 1, NOW(), NOW(), 'NULL');");		
 
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Remove index.php from SEO-Friendly URLs', `configuration_type_id`=21, `sort_order`=2,
-				`helper_text`='Requires .htaccess in Web Store root folder.' where `key`='ENABLE_SEO_URL'");	
+				`helper_text`='Requires .htaccess in Web Store root folder.' where `key`='ENABLE_SEO_URL'");
+			
+			
+			//URL and Description Formatting
+			$this->add_config_key('SEO_PRODUCT_TITLE' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Product Title format', 
+				'SEO_PRODUCT_TITLE', '%description : %storename', 'Which elements appear in the Title', 22, 2, NOW(), NOW(), 'NULL');");				
+			$this->add_config_key('SEO_PRODUCT_DESCRIPTION' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Product Description format', 
+				'SEO_PRODUCT_DESCRIPTION', '%longdescription', 'Which elements appear in the Description', 22, 3, NOW(), NOW(), 'NULL');");				
+			$this->add_config_key('SEO_CATEGORY_TITLE' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Category pages Title format', 
+				'SEO_CATEGORY_TITLE', '%category : %storename', 'Which elements appear in the title of a category page', 22, 4, NOW(), NOW(), 'NULL');");				
+			$this->add_config_key('SEO_CUSTOMPAGE_TITLE' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Custom pages Title format', 
+				'SEO_CUSTOMPAGE_TITLE', '%name : %storename', 'Which elements appear in the title of a custom page', 22, 5, NOW(), NOW(), 'NULL');");				
 			
 			//Copy our category table since we will use this to handle uploads and SEO activities
 			$this->add_table('xlsws_category_addl' , "CREATE TABLE `xlsws_category_addl` (
@@ -435,19 +450,19 @@ class xlsws_db_maintenance extends xlsws_index {
 			_dbx("INSERT IGNORE INTO `xlsws_images_type` set id=8, `name`='sliderimage', width=90,height=90");
 		
 		
-			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Grid image width', `configuration_type_id`=17, `sort_order`=1 
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Grid image width', `configuration_type_id`=17, `sort_order`=1,options='INT' 
 				where `key`='LISTING_IMAGE_WIDTH'");	
-			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Grid image height', `configuration_type_id`=17, `sort_order`=2 
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Grid image height', `configuration_type_id`=17, `sort_order`=2 ,options='INT' 
 				where `key`='LISTING_IMAGE_HEIGHT'");
 			
-			_dbx("UPDATE `xlsws_configuration` SET `title`='Shopping Cart image width', `configuration_type_id`=17, `sort_order`=3 
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Shopping Cart image width', `configuration_type_id`=17, `sort_order`=3 ,options='INT' 
 				where `key`='MINI_IMAGE_WIDTH'");	
-			_dbx("UPDATE `xlsws_configuration` SET `title`='Shopping Cart image height', `configuration_type_id`=17, `sort_order`=4 
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Shopping Cart image height', `configuration_type_id`=17, `sort_order`=4 ,options='INT' 
 				where `key`='MINI_IMAGE_HEIGHT'");		
 
-			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Width', `configuration_type_id`=17, `sort_order`=5 
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Width', `configuration_type_id`=17, `sort_order`=5 ,options='INT' 
 				where `key`='DETAIL_IMAGE_WIDTH'");	
-			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Width', `configuration_type_id`=17, `sort_order`=6 
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Width', `configuration_type_id`=17, `sort_order`=6 ,options='INT' 
 				where `key`='DETAIL_IMAGE_HEIGHT'");		
 
 				
@@ -477,7 +492,20 @@ class xlsws_db_maintenance extends xlsws_index {
 			$this->add_config_key('ENABLE_CATEGORY_IMAGE' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Display Image on Category Page (when set)', 
 				'ENABLE_CATEGORY_IMAGE', '0', 'Requires a defined Category image under SEO settings', 17, 13, NOW(), NOW(), 'BOOL');");				
-				
+			
+			
+			//Because of a change to the width display in Admin panel, make sure the option type is set so numbers aren't huge fields
+			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='QUOTE_EXPIRY'");		
+			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='CART_LIFE'");
+			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='DEFAULT_EXPIRY_GIFT_REGISTRY'");
+			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='RESET_GIFT_REGISTRY_PURCHASE_STATUS'");
+			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='INVENTORY_LOW_THRESHOLD'");
+			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='PRODUCTS_PER_PAGE'");
+			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='MAX_PRODUCTS_IN_SLIDER'");
+			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='EMAIL_SMTP_PORT'");
+			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='MIN_PASSWORD_LEN'");
+
+					
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			
 			$strUpgradeText .= "<h2>Please run RECALCULATE PENDING ORDERS after running this Upgrade.</h2>";
