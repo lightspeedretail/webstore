@@ -56,22 +56,12 @@ class xlsws_category extends xlsws_product_listing {
         if ($this->category) {
             $objCategory = $this->category;
 
-            // Set Meta Description
-			if($objCategory->MetaDescription != '')
-				_xls_add_meta_desc($objCategory->MetaDescription);
-			else
-				_xls_add_meta_desc($objCategory->Name);
+			_xls_stack_put('xls_canonical_url',$objCategory->CanonicalUrl);
+			_xls_add_meta_desc($objCategory->PageDescription);
+			_xls_add_page_title($objCategory->PageTitle);
 
-            // Set Meta Keywords
-			if($objCategory->MetaKeywords != '')
-				_xls_add_meta_keyword($objCategory->MetaKeywords);
-			else
-				_xls_add_meta_keyword($objCategory->Name);
-
-            // Set Title
-			_xls_add_page_title($objCategory->Name);
-
-			Visitor::add_view_log($XLSWS_VARS['c'], ViewLogType::categoryview);
+			
+			
 		}
 	}
 	
@@ -95,7 +85,7 @@ class xlsws_category extends xlsws_product_listing {
 		if (!$this->category)
             return false;
             
-        
+       // Visitor::add_view_log($objUrl->RouteId, ViewLogType::categoryview);
     }
 
     /**

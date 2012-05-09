@@ -67,7 +67,7 @@
 				</div>
 				<?php endif; ?>	
 				
-				 <h2><?= $this->prod->Code ?><!-- <?= $this->prod->Rowid ?>--></h2>
+				 <h2><?= $this->prod->Code ?></h2>
 
 				<?php	if(_xls_get_conf('INVENTORY_DISPLAY')):	?>
 					<h3><?php $this->lblStock->Render() ; ?></h3>

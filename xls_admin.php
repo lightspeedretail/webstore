@@ -214,8 +214,8 @@
 	$arrConfigTabs = array('store' => _sp('Store') , 'appear' => _sp('Appearance') , 'sidebars' =>_sp('Sidebars'));
 	$arrPaymentTabs = array('methods' => _sp('Methods') , 'cc' => _sp('Credit Card Types'), 
 		'promo' => _sp('Promo Codes'),'promotasks' => _sp('Promo Code Tasks'));
-	$arrSeoTabs = array('general' => _sp('General') , 'products' => _sp('Products'), 'categories' => _sp('Categories'));
-	$arrSystemTabs = array('config' => _sp('Configuration') , 'task' => _sp('Tasks')  , 'slog' => _sp('System Log'));
+	$arrSeoTabs = array('general' => _sp('General') , 'meta' => _sp('Meta'), 'categories' => _sp('Categories'));
+	$arrSystemTabs = array('config' => _sp('Configuration') , 'task' => _sp('Tasks')  , 'vlog' => _sp('Visitor Log'), 'slog' => _sp('System Log'));
 	
 	
 	
@@ -334,6 +334,7 @@
 		const Google = 20;
 		const URL = 21;
 		const ProductTitleFormat = 22;
+		const CategoryTitleFormat = 23;
 
 	}
 	
@@ -443,7 +444,8 @@
     	           $this->fields[$config->Key] = new XLSTextBox($this);
     	           $this->fields[$config->Key]->Text = $config->Value;
     	           if($config->Key=="EMAIL_SMTP_PASSWORD") $this->fields[$config->Key]->TextMode = QTextMode::Password;
-    	            
+    	           if (isset( $config->MaxLength))
+    	           	$this->fields[$config->Key]->MaxLength = $config->MaxLength;
     	           $this->fields[$config->Key]->Width=250;
     	        	if($optType=="INT") $this->fields[$config->Key]->Width=50;
                }
@@ -1769,7 +1771,7 @@
         
 		public $txtPageKey;
 		public $txtPageTitle;
-		public $txtPageKeywords;
+		//public $txtPageKeywords;
 		public $txtPageDescription;
 		public $txtPageText;
 		public $txtProductTag;
@@ -1846,11 +1848,11 @@
 			$this->txtProductTag->Height = 20;
 			
 	        
-			$this->txtPageKeywords = new XLSTextBox($this);
+			/*$this->txtPageKeywords = new XLSTextBox($this);
 	        $this->txtPageKeywords->AddAction(new QEnterKeyEvent() , new QServerControlAction($this , 'btnSave_click'));
 	        $this->txtPageKeywords->AddAction(new QEscapeKeyEvent() , new QServerControlAction($this , 'btnCancel_click'));
 	        $this->txtPageKeywords->Height = 20;
-
+			*/
 	        
 			$this->txtPageDescription = new XLSTextBox($this);
 	        $this->txtPageDescription->AddAction(new QEnterKeyEvent() , new QServerControlAction($this , 'btnSave_click'));
@@ -1914,7 +1916,7 @@
 			$this->txtPageTitle->Text = ($this->page->Title == _sp('+ Add new page'))?'':$this->page->Title;
 			$this->txtPageText->Text = $this->page->Page;
 			$this->txtProductTag->Text = $this->page->ProductTag;
-			$this->txtPageKeywords->Text = $this->page->MetaKeywords;
+			//$this->txtPageKeywords->Text = $this->page->MetaKeywords;
 			$this->txtPageDescription->Text = $this->page->MetaDescription;
 
 		 	$this->Refresh();
@@ -1943,7 +1945,7 @@
 			//error_log($this->txtPageText->Text);
 			$this->page->Page = stripslashes($this->txtPageText->Text);
 			$this->page->ProductTag = $this->txtProductTag->Text;
-			$this->page->MetaKeywords = stripslashes($this->txtPageKeywords->Text);
+			//$this->page->MetaKeywords = stripslashes($this->txtPageKeywords->Text);
 			$this->page->MetaDescription = stripslashes($this->txtPageDescription->Text);
 
 		 	$this->btnEdit->Visible = true;
@@ -2021,7 +2023,7 @@
         
 		public $txtPageKey;
 		public $txtPageTitle;
-		public $txtPageKeywords;
+		//public $txtPageKeywords;
 		public $txtPageDescription;
 		public $txtPageText;
 		public $txtProductTag;
@@ -2442,7 +2444,7 @@
         
 		public $txtPageKey;
 		public $txtPageTitle;
-		public $txtPageKeywords;
+		//public $txtPageKeywords;
 		public $txtPageDescription;
 		public $txtPageText;
 		public $txtProductTag;
@@ -2504,11 +2506,11 @@
 			$this->txtProductTag->Height = 20;
 			
 	        
-			$this->txtPageKeywords = new XLSTextBox($this);
+			/*$this->txtPageKeywords = new XLSTextBox($this);
 	        $this->txtPageKeywords->AddAction(new QEnterKeyEvent() , new QServerControlAction($this , 'btnSave_click'));
 	        $this->txtPageKeywords->AddAction(new QEscapeKeyEvent() , new QServerControlAction($this , 'btnCancel_click'));
 	        $this->txtPageKeywords->Height = 20;
-
+			*/
 	        
 			$this->txtPageDescription = new XLSTextBox($this);
 	        $this->txtPageDescription->AddAction(new QEnterKeyEvent() , new QServerControlAction($this , 'btnSave_click'));
@@ -2738,7 +2740,7 @@
 			//error_log($this->txtPageText->Text);
 			$this->page->Page = stripslashes($this->txtPageText->Text);
 			$this->page->ProductTag = $this->txtProductTag->Text;
-			$this->page->MetaKeywords = stripslashes($this->txtPageKeywords->Text);
+			//$this->page->MetaKeywords = stripslashes($this->txtPageKeywords->Text);
 			$this->page->MetaDescription = stripslashes($this->txtPageDescription->Text);
 
 		 	$this->btnEdit->Visible = true;
@@ -2814,7 +2816,7 @@
         
 		public $txtPageKey;
 		public $txtPageTitle;
-		public $txtPageKeywords;
+		//public $txtPageKeywords;
 		public $txtPageDescription;
 		public $txtPageText;
 		public $txtProductTag;
@@ -3345,10 +3347,6 @@
 			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QServerAction('NewPage'));
 			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QTerminateAction());
 			
-	        
-			
-			//$this->btnEdit = new QButton($this->dtrConfigs);
-			//$this->btnEdit->Text = _sp("Edit");
 			$this->btnCancel = new QButton($this);
 			$this->btnCancel->Text = _sp("Cancel");
 			$this->btnCancel->CssClass = 'admin_cancel';
@@ -3380,33 +3378,99 @@
 			$this->configPnls['url']->Name = _sp('URL Options');
 			$this->configPnls['url']->Info = _sp('Change URL options');
 
-			$this->configPnls['producttitle'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::ProductTitleFormat , "configDone");
-			$this->configPnls['producttitle']->Name = _sp('Title/Description Formatting');
-			$this->configPnls['producttitle']->Info = _sp('Change how title and description meta data is built for pages');
 
 			$this->configPnls['google'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Google , "configDone");
 			$this->configPnls['google']->Name = _sp('Google Integration');
 			$this->configPnls['google']->Info = _sp('Google account information and settings');
+			
+		}
+	
+		
+		function pageDone(){
+			$this->listPages();
+		}
+		
+		
+		public function NewPage(){
+			
+		}
+	
+	
+	
+
+
 
 		
+
+	}
+	
+	
+		/* class xlsws_admin_chart
+	* class to create the charts in the stats section of the admin panel
+	* see class xlsws_admin for further specs
+	*/			
+	class xlsws_admin_seometa_modules extends xlsws_admin {
+					
+		protected $btnCancel;
+		protected $btnSave;
+		protected $btnDelete;
+		
+		protected $configPnls;
+		
+		public $page;
+		
+		public $pxyAddNewPage;
+		
+		public $HelperRibbon;
+		
+		protected function Form_Create(){
+			parent::Form_Create();
 			
-			/*$page = new CustomPage();
-			$page->Title = _sp('Define Tiers for Tier Based Shipping');
-			$page->Key = "ship_define_tiers";
-			$this->configPnls[0] = new xlsws_admin_edittiers_panel($this, $this , $page , "pageDone");
+			$this->arrTabs = $GLOBALS['arrSeoTabs'];
+			$this->currentTab = 'meta';
 
 
-			$page = new CustomPage();
-			$page->Title = _sp('Set Free Shipping Restrictions');
-			$page->Key = "promo_restrict";
-			$page->Page = 'shipping';
-			$this->configPnls[1] = new xlsws_admin_task_promorestrict_panel($this, $this , $page , "pageDone");
+			$this->page = new CustomPage();
+			
+			
+			$this->pxyAddNewPage = new QControlProxy($this);
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QServerAction('NewPage'));
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QTerminateAction());
+			
+	        
+			
+			//$this->btnEdit = new QButton($this->dtrConfigs);
+			//$this->btnEdit->Text = _sp("Edit");
+			$this->btnCancel = new QButton($this);
+			$this->btnCancel->Text = _sp("Cancel");
+			$this->btnCancel->CssClass = 'admin_cancel';
+			$this->btnCancel->AddAction( new QClickEvent() , new QAjaxAction('btnCancel_Click'));
+			
+			
+			
+			$this->btnSave = new QButton($this);
+			$this->btnSave->Text = _sp("Save");
+			$this->btnSave->CssClass = 'admin_save';
+			$this->btnSave->AddAction( new QClickEvent() , new QServerAction('btnSave_Click'));
+			$this->btnSave->CausesValidation = true;
+			
+			$this->listPages();
 
-			$page = new CustomPage();
-			$page->Title = _sp('Batch Change Countries and States/Regions');
-			$page->Key = "ship_modify_cities_countries";
-			$this->configPnls[2] = new xlsws_admin_task_panel($this, $this , $page , "pageDone");
-			*/
+
+		}
+		
+	
+		
+		protected function listPages(){
+
+			$this->configPnls['producttitle'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::ProductTitleFormat , "configDone");
+			$this->configPnls['producttitle']->Name = _sp('Product Meta Data formatting');
+			$this->configPnls['producttitle']->Info = _sp('Change how title and description meta data is built for Product pages');
+
+			$this->configPnls['categorytitle'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::CategoryTitleFormat , "configDone");
+			$this->configPnls['categorytitle']->Name = _sp('Category/Custom Page Meta Data formatting');
+			$this->configPnls['categorytitle']->Info = _sp('Change how title and description meta data is built for other pages');
+		
 			
 			
 		}
@@ -4108,7 +4172,7 @@
 		protected function Form_Create(){
 			
 			
-			$this->arrTabs = $GLOBALS['arrStatTabs'];
+			$this->arrTabs = $GLOBALS['arrSystemTabs'];
 			$this->currentTab = 'vlog';			
 			
 			$this->appName = "Visitor Logs";
@@ -5129,18 +5193,20 @@
 			$this->arrFields['MetaDescription']['UTF8'] = true;
 			$this->arrFields['MetaDescription']['DisplayFunc'] = "RenderMeta";
 			$this->arrFields['MetaDescription']['Width'] = 180;	
+			$this->arrFields['MetaDescription']['MaxLength'] = 255;	
 
-			$this->arrFields['MetaKeywords'] = array('Name' => 'Meta Keywords');
+			/*$this->arrFields['MetaKeywords'] = array('Name' => 'Meta Keywords');
 			$this->arrFields['MetaKeywords']['Field'] = new XLSTextBox($this);
 			$this->arrFields['MetaKeywords']['UTF8'] = true;
 			$this->arrFields['MetaKeywords']['DisplayFunc'] = "RenderMeta";
 			$this->arrFields['MetaKeywords']['Width'] = 120;
+			*/
 						
 			$this->arrFields['CustomPage'] = array('Name' => 'Custom Page Text');
 			$this->arrFields['CustomPage']['Field'] = new XLSListBox($this);		
 			$this->arrFields['CustomPage']['DisplayFunc'] = "RenderCustom";
 			$this->objItems = CustomPage::LoadAll(QQ::Clause(QQ::OrderBy(QQN::CustomPage()->Title)));
-			$this->arrFields['CustomPage']['Field']->AddItem('None', NULL);
+			$this->arrFields['CustomPage']['Field']->AddItem('*None*', NULL);
 			foreach($this->objItems as $objItem)
 				$this->arrFields['CustomPage']['Field']->AddItem($objItem->Title , $objItem->Key);
 
@@ -5189,7 +5255,7 @@
 			$this->arrFields['Avail']['Field']->AddItem('No' , 'N');
 			$this->arrFields['Avail']['Width'] = 50;
 			*/
-			
+			$this->HelperRibbon = "Only Top Tier categories are required to be filled out with Meta Description information. Lower tiers will automatically pull from their parent if left blank. Meta Keywords are no longer used by search engines and have been removed.";
 			parent::Form_Create();
 			
 			
@@ -5204,7 +5270,7 @@
 		}
 		public function RenderMeta($val){
 			if (strlen($val)>15)
-				return substr($val,0,15)."...";
+				return substr($val,0,35)."...";
 			else return $val;
 		}		
 		
@@ -5213,7 +5279,7 @@
 		}		
 		
 		public function RenderParent($val){
-			if ($val==0) return "Top Tier"; else return "";
+			if ($val==0) return "<b>Top Tier</b>"; else return "";
 		}
 		
 		public function RenderPath($val){
@@ -5847,7 +5913,9 @@
 				case "slog":
 					xlsws_admin_syslog::Run('xlsws_admin_syslog' , adminTemplate('edit.tpl.php'));
 					break;
-					
+				case "vlog":
+					xlsws_admin_visitlog::Run('xlsws_admin_visitlog' , adminTemplate('edit.tpl.php'));
+					break;	
 				case "task":
 					xlsws_admin_maintenance::Run('xlsws_admin_maintenance' , adminTemplate('maintenance.tpl.php'));
 					break;
@@ -5893,17 +5961,17 @@
 		case "seo":
 			switch ($XLSWS_VARS['subpage'])
 			{
-				case "vlog":
-					xlsws_admin_visitlog::Run('xlsws_admin_visitlog' , adminTemplate('edit.tpl.php'));
-					break;
-				case "products":
+
+				case "meta":
+					xlsws_admin_seo_modules::Run('xlsws_admin_seometa_modules' , adminTemplate('config.tpl.php'));
 					break;
 				case "categories":
 					xlsws_seo_categories::Run('xlsws_seo_categories' , adminTemplate('edit.tpl.php'));
 					break;
 				default:
-					//xlsws_admin_chart::Run('xlsws_admin_chart' , adminTemplate('chart.tpl.php'));
+				case "general":
 					xlsws_admin_seo_modules::Run('xlsws_admin_seo_modules' , adminTemplate('config.tpl.php'));
+					break;
 			}
 			break;
 			

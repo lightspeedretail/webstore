@@ -66,13 +66,49 @@ class CustomPage extends CustomPageGen {
 		}
 	
 	}
+	
+	protected function GetPageMeta($strConf = 'SEO_CUSTOMPAGE_TITLE') { 
+	
+		$strItem = _xls_get_conf($strConf, '%storename');
+		$strCrumbNames = '';
+		$strCrumbNamesR = '';
+		
+		$arrPatterns = array(
+			"%storename",
+			"%name",
+			"%title",
+			"%crumbtrail",
+			"%rcrumbtrail");
+		$arrCrumb = _xls_get_crumbtrail();
+		
+		foreach ($arrCrumb as $crumb) {
+			$strCrumbNames .= $crumb['name']." ";
+			$strCrumbNamesR = $crumb['name']." ".$strCrumbNamesR;
+		}
+				
+		$arrItems = array(
+			_xls_get_conf('STORE_NAME',''),
+			$this->Title,
+			$this->Title,
+			$strCrumbNames,
+			$strCrumbNamesR,
+			);		
+			
+			
+		return str_replace($arrPatterns, $arrItems, $strItem);
+		
+	}
 
 	public function __get($strName) {
 		switch ($strName) {
-			case 'Link': 
+			case 'Link':
+			case 'CanonicalUrl': 
 				return $this->GetLink();
 			case 'RequestUrl': 
 				return $this->strRequestUrl;
+
+			case 'PageTitle':
+				return _xls_truncate($this->GetPageMeta('SEO_CUSTOMPAGE_TITLE'),64);
 
 			default:
 				try {

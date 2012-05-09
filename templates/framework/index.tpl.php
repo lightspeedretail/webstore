@@ -33,22 +33,6 @@
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?= _xls_get_conf('ENCODING' , 'utf-8') ?>" />
 	<?php
-		$meta_desc = _xls_stack_pop('xls_meta_desc');
-		
-		if($meta_desc){
-	?>	
-		<meta name="description" content="<?= $meta_desc; ?>">
-	<?php
-		}
-	?><?php
-		$meta_keywords = _xls_stack_pop('xls_meta_keywords');
-		
-		if($meta_keywords){
-	?>	
-		<meta name="keywords" content="<?= $meta_keywords; ?>">
-	<?php
-		}
-	?><?php
 		$redirect = _xls_stack_pop('xls_meta_redirect');
 		
 		if($redirect && isset($redirect['url']) && isset($redirect['delay'])){
@@ -62,13 +46,18 @@
 	<meta name="Copyright" content="<?= _xls_get_conf('COPYRIGHT_MSG' , 'Xsilva Inc.') ?>" />
 	<meta name="Generator" content="LightSpeed Webstore <?= _xls_version(); ?>" />
 	<meta http-equiv="imagetoolbar" content="false" />
-	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
 	<base href="<?= _xls_site_dir(); ?>/"/>
 
-	<?php global $strPageTitle; ?>		
-	<?php if (isset($strPageTitle)): ?>
-			<title><?=  _xls_get_conf('STORE_NAME', _sp('Shopping cart'));   ?> : <?php _xt($strPageTitle); ?></title>
-	<?php endif; ?>		
+	<title><?php echo _xls_stack_get('xls_page_title'); ?></title>
+	<link rel="canonical" href="<?php echo _xls_stack_pop('xls_canonical_url'); ?>" />
+
+	<meta name="description" content="<?php echo _xls_stack_get('xls_meta_desc'); ?>">
+	<meta property="og:title" content="<?php echo _xls_stack_pop('xls_page_title'); ?>" />
+	<meta property="og:description" content="<?php echo _xls_stack_pop('xls_meta_desc'); ?>" />
+	<meta property="og:image" content="<?php echo _xls_stack_pop('xls_meta_image'); ?>" />
+
+
+	
 
 	<link rel="Shortcut Icon" href="favicon.ico" type="image/x-icon" />
 

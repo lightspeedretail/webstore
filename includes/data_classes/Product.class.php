@@ -161,11 +161,8 @@ class Product extends ProductGen {
 
 	protected function GetPageMeta($strConf = 'SEO_PRODUCT_TITLE') { 
 	
-		$strItem = _xls_get_conf($strConf, '%description : %storename');
-		
-		if (stripos($strItem,'%category') !==false) //reduce potentially expensive db hit if we don't need it
-			$strCatPath=implode("|",Category::GetTrailByProductId($this->Rowid,'names')); else $strCatPath='';	
-				
+		$strItem = _xls_get_conf($strConf, '%storename');
+						
 		$arrPatterns = array("%code",
 			"%storename",
 			"%name",
@@ -178,7 +175,8 @@ class Product extends ProductGen {
 			"%price",
 			"%family",
 			"%class",
-			"%category");
+			"%crumbtrail",
+			"%rcrumbtrail");
 			
 		$arrItems = array($this->Code,
 			_xls_get_conf('STORE_NAME',''),
@@ -192,7 +190,10 @@ class Product extends ProductGen {
 			_xls_currency($this->Price),
 			$this->Family,
 			$this->ClassName,
-			$strCatPath);		
+			implode(" ",_xls_get_crumbtrail('names')),
+			implode(" ",array_reverse(_xls_get_crumbtrail('names')))
+			
+			);		
 			
 			
 		return str_replace($arrPatterns, $arrItems, $strItem);
@@ -883,9 +884,10 @@ class Product extends ProductGen {
 				return $this->GetInventory();
 				
 			case 'PageTitle':
-				return substr($this->GetPageMeta('SEO_PRODUCT_TITLE'),0,64);
+				return _xls_truncate($this->GetPageMeta('SEO_PRODUCT_TITLE'),64);
+
 			case 'PageDescription':
-				return substr($this->GetPageMeta('SEO_PRODUCT_DESCRIPTION'),0,255);
+				return _xls_truncate($this->GetPageMeta('SEO_PRODUCT_DESCRIPTION'),255);
 
 			default:
 				try { 

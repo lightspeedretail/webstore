@@ -58,7 +58,7 @@ class xlsws_advanced_search extends xlsws_index {
 			'name'=> _sp("Advanced Search")
 		);
 
-		_xls_add_page_title(_sp("Advanced Search"));
+		_xls_add_page_title(_sp("Advanced Search")." : ". _xls_get_conf('STORE_NAME'));
 
 		$this->lblError = new QLabel($this->mainPnl);
 

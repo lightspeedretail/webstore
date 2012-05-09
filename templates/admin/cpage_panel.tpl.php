@@ -74,15 +74,7 @@
 											<a href="#" class="tooltip" title="<?php _xt('Create a keyword and enter it here. Enter the same keyword in any products you wish (in one of the Web Keyword blanks) to display in this slider.') ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" class="info_right" /></a>
 										</span> 
 									</p>
-									
-									<p>
-										<span class="label"><?php _xt('Meta Keywords') ?>:</span> 
-										<span class="field">
-											<?php $_CONTROL->txtPageKeywords->RenderWithError(); ?>
-											<a href="#" class="tooltip" title="<?php _xt('Meta keywords for search engine optimization.') ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" class="info_right" /></a>
-										</span> 
-									</p>
-									
+																		
 									<p>
 										<span class="label"><?php _xt('Meta Description') ?>:</span> 
 										<span class="field">

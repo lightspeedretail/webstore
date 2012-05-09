@@ -419,14 +419,14 @@ class xlsws_db_maintenance extends xlsws_index {
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Product Title format', 
 				'SEO_PRODUCT_TITLE', '%description : %storename', 'Which elements appear in the Title', 22, 2, NOW(), NOW(), 'NULL');");				
 			$this->add_config_key('SEO_PRODUCT_DESCRIPTION' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Product Description format', 
-				'SEO_PRODUCT_DESCRIPTION', '%longdescription', 'Which elements appear in the Description', 22, 3, NOW(), NOW(), 'NULL');");				
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Product Meta Description format', 
+				'SEO_PRODUCT_DESCRIPTION', '%longdescription', 'Which elements appear in the Meta Description', 22, 3, NOW(), NOW(), 'NULL');");				
 			$this->add_config_key('SEO_CATEGORY_TITLE' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Category pages Title format', 
-				'SEO_CATEGORY_TITLE', '%category : %storename', 'Which elements appear in the title of a category page', 22, 4, NOW(), NOW(), 'NULL');");				
+				'SEO_CATEGORY_TITLE', '%name : %storename', 'Which elements appear in the title of a category page', 23, 1, NOW(), NOW(), 'NULL');");				
 			$this->add_config_key('SEO_CUSTOMPAGE_TITLE' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Custom pages Title format', 
-				'SEO_CUSTOMPAGE_TITLE', '%name : %storename', 'Which elements appear in the title of a custom page', 22, 5, NOW(), NOW(), 'NULL');");				
+				'SEO_CUSTOMPAGE_TITLE', '%name : %storename', 'Which elements appear in the title of a custom page', 23, 2, NOW(), NOW(), 'NULL');");				
 			
 			//Copy our category table since we will use this to handle uploads and SEO activities
 			$this->add_table('xlsws_category_addl' , "CREATE TABLE `xlsws_category_addl` (

@@ -42,7 +42,7 @@ class xlsws_custom_page extends xlsws_index {
 	 * @return none
 	 */
 	protected function build_main() {
-		global $strPageTitle;
+
 
     	$objUrl = XLSURLParser::getInstance();    
 		$objPage = CustomPage::LoadByRequestUrl($objUrl->RouteId);
@@ -55,15 +55,11 @@ class xlsws_custom_page extends xlsws_index {
 		$this->crumbs[] = array( 'key' => $objPage->Rowid , 'tag' => 'cp' , 'name' => $objPage->Title , 'link' => $objPage->Link);
 
 		$this->mainPnl = new QPanel($this,'MainPanel');
-		$strPageTitle = $objPage->Title;
-
 		$this->content = $objPage->Page;
 
-		if($objPage->MetaDescription)
-			_xls_add_meta_desc($objPage->MetaDescription);
-
-		if($objPage->MetaKeywords)
-			_xls_add_meta_keyword($objPage->MetaKeywords);
+		_xls_stack_put('xls_canonical_url',$objPage->CanonicalUrl);
+		_xls_add_meta_desc($objPage->MetaDescription);
+		_xls_add_page_title($objPage->PageTitle);
 
 		$this->productTag = $objPage->ProductTag;
 

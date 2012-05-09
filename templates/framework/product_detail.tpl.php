@@ -68,7 +68,7 @@
 				<a href="http://pinterest.com/pin/create/button/?url=<? echo $this->prod->CanonicalUrl; ?>&media=<? echo _xls_site_dir().$this->prod->SmallImage; ?>&description=<? echo urlencode($this->prod->Name); ?>" class="pin-it-button" count-layout="horizontal"><img border="0" src="//assets.pinterest.com/images/PinExt.png" title="Pin It" /></a>
 				</div>
 				<?php endif; ?>	
-				 <h2><?= $this->prod->Code ?><!-- <?= $this->prod->Rowid ?>--></h2>
+				 <h2><?= $this->prod->Code ?></h2>
 
 				<?php	if(_xls_get_conf('INVENTORY_DISPLAY')):	?>
 					<h3><?php $this->lblStock->Render() ; ?></h3>

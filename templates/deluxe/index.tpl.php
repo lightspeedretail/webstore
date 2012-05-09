@@ -46,11 +46,14 @@
 	<meta http-equiv="imagetoolbar" content="false" />
 	<base href="<?= _xls_site_dir(); ?>/"/>
 
-	<title><?php echo _xls_stack_pop('xls_page_title'); ?></title>
+	<title><?php echo _xls_stack_get('xls_page_title'); ?></title>
 	<link rel="canonical" href="<?php echo _xls_stack_pop('xls_canonical_url'); ?>" />
-	
-	<meta name="description" content="<?php echo _xls_stack_pop('xls_meta_desc'); ?>">
-	<meta name="keywords" content="<?php echo _xls_stack_pop('xls_meta_keywords'); ?>">
+
+	<meta name="description" content="<?php echo _xls_stack_get('xls_meta_desc'); ?>">
+	<meta property="og:title" content="<?php echo _xls_stack_pop('xls_page_title'); ?>" />
+	<meta property="og:description" content="<?php echo _xls_stack_pop('xls_meta_desc'); ?>" />
+	<meta property="og:image" content="<?php echo _xls_stack_pop('xls_meta_image'); ?>" />
+
 	
 	
 	

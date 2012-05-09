@@ -351,18 +351,28 @@ function _xls_read_dir($dir , $ext = FALSE) {
 
 /**
 * Add variables to the stack_vars array within the _SESSION
-* If the key already exists, we add to it instead of replacing
-*
+* Stacks multiple if already exists
 * @param string $key
 * @param mix $value
 * @return void
 */
 function _xls_stack_add($key, $value) {
 	if(!isset($_SESSION['stack_vars'][$key]))
-		$_SESSION['stack_vars'][$key] = array();
-	$_SESSION['stack_vars'][$key][]=$value;
+	$_SESSION['stack_vars'][$key] = array();
+		$_SESSION['stack_vars'][$key][]=$value;
 }
 
+/**
+* Add variables to the stack_vars array within the _SESSION
+* Overwrites any previous value
+* @param string $key
+* @param mix $value
+* @return void
+*/
+function _xls_stack_put($key, $value) {
+	$_SESSION['stack_vars'][$key] = array($value);
+
+}
 /**
  * Get a variable from the stack_vars array within the _SESSION
  * Returns the last item in the array
@@ -725,6 +735,7 @@ function _xls_site_dir($ssl_attempt = true) {
 * @return string url
 */
 function _xls_site_url($strUrlPath =  '') {
+	if (substr($strUrlPath,0,4)=="http") return $strUrlPath; //we've passed through twice, don't double up
 	if (substr($strUrlPath,0,1)=="/") $strUrlPath = substr($strUrlPath,1,999); //remove a leading / so we don't // by accident
 	return _xls_site_dir() . '/' . (_xls_get_conf('ENABLE_SEO_URL', false) ? "" : "index.php/").$strUrlPath;
 }
@@ -942,6 +953,34 @@ function _xls_add_meta_keyword($words) {
 		$words = implode("," , $words);
 	_xls_stack_add('xls_meta_keywords', strip_tags($words));
 }
+
+/**
+ * Save crumbtrail to session
+ * @param array $arrCrumbs
+ */
+function _xls_set_crumbtrail($arrCrumbs) {
+
+	$_SESSION['crumbtrail'] = $arrCrumbs;
+}
+
+/**
+ * Retrieve crumbtrail, either full array with links or just names
+ * @param string $type
+ * @return $array
+ */
+function _xls_get_crumbtrail($type = 'full') {
+
+	if ($type=='full') return $_SESSION['crumbtrail'];
+	
+	$arrCrumbs = $_SESSION['crumbtrail'];
+	$retArray = array();	
+	foreach ($arrCrumbs as $crumb)
+		$retArray[] =  $crumb['name'];
+	return $retArray;
+		
+}
+
+
 
 /**
  * Return the Web Store's version

@@ -146,6 +146,45 @@ class Category extends CategoryGen {
 		return _xls_site_url($this->strRequestUrl."/c/");
 	}
 
+
+	protected function GetMetaDescription() {
+		//We test and potentially traverse up 3 levels to find a description if our current level doesn't have one
+		if ($this->strMetaDescription)
+			return $this->strMetaDescription;
+		elseif ($this->intParent > 0) {
+			$objParent = $this->GetParent();
+			if ($objParent->strMetaDescription)
+				return $objParent->strMetaDescription;
+			if ($objParent->intParent > 0) {
+				$objGrandParent = $objParent->GetParent();
+			if ($objGrandParent->strMetaDescription)
+				return $objGrandParent->strMetaDescription;
+			}
+			return $this->strName;
+		}
+		else return $this->strName;
+	
+	}
+
+	protected function GetMetaKeywords() {
+		//We test and potentially traverse up 3 levels to find a description if our current level doesn't have one
+		if ($this->strMetaKeywords)
+			return $this->strMetaKeywords;
+		elseif ($this->intParent > 0) {
+			$objParent = $this->GetParent();
+			if ($objParent->strMetaKeywords)
+				return $objParent->strMetaKeywords;
+			if ($objParent->intParent > 0) {
+				$objGrandParent = $objParent->GetParent();
+			if ($objGrandParent->strMetaKeywords)
+				return $objGrandParent->strMetaKeywords;
+			}
+			return $this->strName;
+		}
+		else return $this->strName;
+	
+	}
+	
 	/**
 	 * GetTrailByProductId - return array of Category Trail for product
 	 * @param $intRowid RowID of Product
@@ -331,6 +370,36 @@ EOS;
 		return _xls_seo_url($strPath);
 	}
 
+	protected function GetPageMeta($strConf = 'SEO_CATEGORY_TITLE') { 
+	
+		$strItem = _xls_get_conf($strConf, '%storename');
+		$strCrumbNames = '';
+		$strCrumbNamesR = '';
+		
+		$arrPatterns = array(
+			"%storename",
+			"%name",
+			"%crumbtrail",
+			"%rcrumbtrail");
+		$arrCrumb = _xls_get_crumbtrail();
+		
+		foreach ($arrCrumb as $crumb) {
+			$strCrumbNames .= $crumb['name']." ";
+			$strCrumbNamesR = $crumb['name']." ".$strCrumbNamesR;
+		}
+				
+		$arrItems = array(
+			_xls_get_conf('STORE_NAME',''),
+			$this->Name,
+			$strCrumbNames,
+			$strCrumbNamesR,
+			);		
+			
+			
+		return str_replace($arrPatterns, $arrItems, $strItem);
+		
+	}
+	
 	/**
 	 * Define legacy functions
 	 */
@@ -402,6 +471,9 @@ EOS;
 
 			case 'Slug':
 				return $this->GetSlug();
+				
+			case 'CanonicalUrl':
+				return _xls_site_dir().'/'.$this->RequestUrl."/c/";
 
 			case 'HasChildren':
 				return $this->HasChildren();
@@ -449,19 +521,18 @@ EOS;
 			case 'Link':
 				return $this->GetLink();
 
+			case 'PageTitle':
+				return _xls_truncate($this->GetPageMeta('SEO_CATEGORY_TITLE'),64);
+
 			case 'Children':
 			case 'categ_childs': // LEGACY
 				return $this->GetChildren();
 
-            case 'MetaDescription':
-            case 'MetaKeywords':
-                try { 
-                    return trim(parent::__get($strName));
-                }
-                catch (QCallerException $objExc) {
-                    $objExc->IncrementOffset();
-                    throw $objExc;
-                }
+            case 'PageDescription':
+            	return $this->GetMetaDescription();
+            	
+            case 'PageKeywords':
+            	return $this->GetMetaKeywords();
 
 			default:
 				try {
@@ -470,6 +541,8 @@ EOS;
 					$objExc->IncrementOffset();
 					throw $objExc;
 				}
+				
+				
 		}
 	}
 

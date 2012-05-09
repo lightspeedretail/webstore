@@ -162,7 +162,7 @@ class xlsws_contact_us extends xlsws_index {
 
 		$this->crumbs[] = array('link'=>'contact_us/pg/' , 'case'=> '' , 'name'=> _sp($pageR->Title));
 
-		_xls_add_page_title(_sp($pageR->Title));
+		_xls_add_page_title(_sp($pageR->PageTitle));
 
 		$this->lblError = new QLabel($this->mainPnl);
 

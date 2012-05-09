@@ -69,6 +69,9 @@ Category::$Manager->AddArray(
 	Category::LoadAll()
 );
 
+//This may be changed later in processing, but set here to have it just in case
+_xls_stack_put('xls_canonical_url',_xls_site_url($objUrl->Uri));
+
 //error_log("on dept ".$objUrl->RouteDepartment." ".$objUrl->RouteId);
 
 switch ($objUrl->RouteDepartment)
