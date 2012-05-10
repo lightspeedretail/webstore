@@ -289,7 +289,7 @@ class XLSURLParser {
 	
 	
 	public static function getInstance()
-	{
+	{ 
 	    if (!isset(self::$objInstance))
 	    { 
 	        $class = __CLASS__;

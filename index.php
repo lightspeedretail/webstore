@@ -54,8 +54,21 @@ if ($offlinekey = _xls_get_conf('STORE_OFFLINE' , '')) {
 //Initialize our global URL parser so we can access from anywhere
 $objUrl = XLSURLParser::getInstance();
 
-if ($objUrl==false) die("A severe error has occurred that should redirect to a 404 page.");
-
+if ($objUrl==false) {
+	//We should never get a false unless something has gone wrong in our parsing
+	QApplication::Log(E_ERROR, 'URL Parser', "Our parser failed to parse the URL ".$_SERVER['PHP_SELF']);
+	header('HTTP/1.1 404 Not Found');
+	  		if (!readfile('404missing.html'))
+	  			echo '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">' . chr(13) .
+					'<html><head>' . chr(13) .
+					'<title>404 Not Found</title>' . chr(13) .
+					'</head><body>' . chr(13) .
+					'<h1>Parser Error</h1>' . chr(13) .
+					'<p>The requested URL '.$objUrl->Uri.' parser service failed.</p>' . chr(13) .
+					'</body></html>';
+	
+	  		exit();
+}
 
 if ($objUrl->Status==301) {
 	header("HTTP/1.1 301 Moved Permanently");
@@ -69,14 +82,13 @@ if ($objUrl->Status==404) {
 }
 
 // Cache categories since they are used throughout
-Category::$Manager->AddArray(
-	Category::LoadAll()
-);
+Category::$Manager->AddArray(Category::LoadAll());
 
 //These may be changed later in processing, but set here to have it just in case
 _xls_stack_put('xls_canonical_url',_xls_site_url($objUrl->Uri));
 _xls_add_page_title(_xls_get_conf('STORE_NAME' , 'XSilva Web Store'));
-
+_xls_stack_put('xls_canonical_url',_xls_site_url($objUrl->Uri));
+_xls_add_meta_desc(_xls_get_conf('STORE_DEFAULT_SLOGAN' , 'XSilva Web Store'));
 //error_log("on dept ".$objUrl->RouteDepartment." ".$objUrl->RouteId);
 
 switch ($objUrl->RouteDepartment)
@@ -108,7 +120,7 @@ if (isset($strFile)) {
 		elseif(file_exists('xlsws_includes/'.$strFile))
 			include('xlsws_includes/'.$strFile);
 		else {
-			header('HTTP/1.0 404 Not Found');
+			header('HTTP/1.1 404 Not Found');
 	  		if (!readfile('404missing.html'))
 	  			echo '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">' . chr(13) .
 					'<html><head>' . chr(13) .
@@ -122,8 +134,8 @@ if (isset($strFile)) {
 			}
 }
 
-error_log("hit herE");
-// Print out any image data then exit
+
+//If we are directly trying to get photos, process those here.
 foreach (ImagesType::$NameArray as $strType) {
 	if (!isset($_GET[$strType]))
 		continue;
