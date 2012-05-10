@@ -75,7 +75,7 @@ class xlsws_category extends xlsws_product_listing {
 		 if ($objCategory)
                 $this->category = $objCategory;
             else
-                _xls_display_msg(_sp('Sorry! The category was not found.'));
+               _xls_404();
 		
 		if (!$this->category)
             return false;

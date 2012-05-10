@@ -48,7 +48,7 @@ class xlsws_custom_page extends xlsws_index {
 		$objPage = CustomPage::LoadByRequestUrl($objUrl->RouteId);
 
 		if(!$objPage) {
-			_xls_display_msg(_sp("Page") . " ". $objUrl->RouteId." " . _sp("does not exist."));
+			 _xls_404();
 			return;
 		}
 

@@ -63,6 +63,11 @@ if ($objUrl->Status==301) {
 	exit();
 }
 
+if ($objUrl->Status==404) {
+	header('HTTP/1.1 404 Not Found');
+	$objUrl->RouteDepartment=404;
+}
+
 // Cache categories since they are used throughout
 Category::$Manager->AddArray(
 	Category::LoadAll()
@@ -82,6 +87,7 @@ switch ($objUrl->RouteDepartment)
 	case 'family':
 	case 'product':
 	case 'searchresults':
+	case '404':
 	
 		$strFile = $objUrl->RouteDepartment.".php";
 		break;
@@ -93,115 +99,30 @@ switch ($objUrl->RouteDepartment)
 	case 'xlspg':
 		$strFile = $objUrl->RouteId.".php";
 		break;
-		
-	default:
-		$strFile = "category.php";
-		break;
+	
 }
 
-if(file_exists(CUSTOM_INCLUDES . $strFile)) {
-		include(CUSTOM_INCLUDES . $strFile);
-		exit(); }
-	elseif(file_exists('xlsws_includes/'.$strFile)) {
-		include('xlsws_includes/'.$strFile);
-		exit(); }
-	else {
-		header('HTTP/1.0 404 Not Found');
-  		if (!readfile('404missing.html'))
-  			echo '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">' . chr(13) .
-				'<html><head>' . chr(13) .
-				'<title>404 Not Found</title>' . chr(13) .
-				'</head><body>' . chr(13) .
-				'<h1>Not Found</h1>' . chr(13) .
-				'<p>The requested URL '.$objUrl->Uri.' was not found on this server.</p>' . chr(13) .
-				'</body></html>';
-
-  		exit();
-		}
-/*
-
-
-// Convert SEO friendly URL -- 
-if (isset($XLSWS_VARS['seo_rewrite'])) {
-	$uriPath = parse_url(QApplication::$RequestUri, PHP_URL_PATH);
-	$uriPath = str_replace(__SUBDIRECTORY__, '', $uriPath);
-	$uriPath = substr($uriPath, 1, strlen($uriPath));
-	$uriPath = str_replace('.html', '', $uriPath);
-	$uriPath = rtrim($uriPath, '/');
-
-	$uriPathParts = explode('/', $uriPath);
-	$uriPathLower = strtolower($uriPath);
-
-	// Skip index -- nothing to do in SEO
-	if ($uriPathLower == "index") {
-	}
-	// Support for sitemap
-	else if ($uriPathLower == "sitemap") {
-		$fp = tmpfile();
-		_xls_generate_sitemap($fp);
-		fseek($fp, 0);
-		fpassthru($fp);
-		exit();
-	}
-	else if (count($uriPathParts) > 0) {
-		$arrCategories = array();
-		$intParent = 0;
-
-		// Load Categories by urlencode Name
-		foreach ($uriPathParts as $strSlug) {
-			foreach (Category::$Manager->GetBySlug(trim($strSlug))
-			as $objMatch) {
-				if ($objMatch->Parent == $intParent) {
-					$arrCategories[] = $objMatch->Rowid;
-					$intParent = $objMatch->Rowid;
-
-					// Once a Category has been loaded, remove from array
-					unset($uriPathParts[array_search($strSlug,
-						$uriPathParts)]);
-
-					break;
-				}
-			}
-		}
-
-		$_GET['c'] = $XLSWS_VARS['c'] = implode('.', $arrCategories);
-	}
-
-	if (count($uriPathParts) > 0) {
-		$uriPath = implode('/', $uriPathParts);
-		$uriPath = urldecode($uriPath);
-		$uriPathLower = strtolower($uriPath);
-
-		if ($product = Product::LoadByCode($uriPath)) {
-			$_GET['product'] = $XLSWS_VARS['product'] = $product->Code;
-		}
-		else if ($page = CustomPage::LoadByKey($uriPath)) {
-			$_GET['cpage'] = $XLSWS_VARS['cpage'] = $page->Key;
-		}
-		else if ($product = Product::QuerySingle(QQ::AndCondition(
-			QQ::Equal(QQN::Product()->Name , $uriPath)))) {
-			$_GET['product'] = $XLSWS_VARS['product'] = $product->Code;
-		}
-		else if ($product = Product::QuerySingle(QQ::AndCondition(
-			QQ::Equal(QQN::Product()->Description , $uriPath)))) {
-			$_GET['product'] = $XLSWS_VARS['product'] = $product->Code;
-		}
-		else if ($family = Family::LoadByFamily($uriPath)) {
-			$_GET['family'] = $XLSWS_VARS['family'] = $family->Family;
-		}
-		else if ($page = CustomPage::QuerySingle(QQ::AndCondition(
-			QQ::Equal(QQN::CustomPage()->Title , $uriPath)))) {
-			$_GET['cpage'] =$XLSWS_VARS['cpage'] = $page->Key;
-		}
+if (isset($strFile)) {
+	if(file_exists(CUSTOM_INCLUDES . $strFile))
+			include(CUSTOM_INCLUDES . $strFile);
+		elseif(file_exists('xlsws_includes/'.$strFile))
+			include('xlsws_includes/'.$strFile);
 		else {
-			_rd(_xls_site_dir() .
-				"/index.php?seo_forward=true&search=$uriPath");
-		}
-	}
+			header('HTTP/1.0 404 Not Found');
+	  		if (!readfile('404missing.html'))
+	  			echo '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">' . chr(13) .
+					'<html><head>' . chr(13) .
+					'<title>404 Not Found</title>' . chr(13) .
+					'</head><body>' . chr(13) .
+					'<h1>Not Found</h1>' . chr(13) .
+					'<p>The requested URL '.$objUrl->Uri.' was not found on this server.</p>' . chr(13) .
+					'</body></html>';
+	
+	  		exit();
+			}
 }
-*/
 
-
+error_log("hit herE");
 // Print out any image data then exit
 foreach (ImagesType::$NameArray as $strType) {
 	if (!isset($_GET[$strType]))

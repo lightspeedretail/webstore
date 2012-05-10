@@ -808,6 +808,18 @@ function _xls_get_url_resource($filename) {
 	return $filename;
 }
 
+function _xls_404() {
+	header('HTTP/1.1 404 Not Found');
+	$strFile = "404.php";
+	if(file_exists(CUSTOM_INCLUDES . $strFile)) {
+		include(CUSTOM_INCLUDES . $strFile);
+		exit(); }
+	elseif(file_exists('xlsws_includes/'.$strFile)) {
+		include('xlsws_includes/'.$strFile);
+		 }
+	exit();	
+}
+
 /**
  * Update a QFormObject to provide an onfocus dhtml popup
  *

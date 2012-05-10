@@ -87,12 +87,12 @@ class XLSURLParser {
 	//Actually compare the parsed segments to determine what portion of the site we will display
 	protected function SetRouting() {
 		
-		
 		$this->strRouteCode=$this->arrUrlSegments[1];
 
 		switch ($this->strRouteCode) {
 		
 			case 'c': //Category
+			default:
 				$this->strRouteId = $this->arrUrlSegments[0];
 				$this->strRouteDepartment = "category";
 				$this->intStatus=200;
@@ -129,7 +129,7 @@ class XLSURLParser {
 				$this->intStatus=200;
 				break;
 
-			case 's': //RSS/XML feeds
+			case 's': //Search Results
 				$this->strRouteId = $this->arrUrlSegments[0];
 				$this->strRouteDepartment = "searchresults";
 				$this->intStatus=200;
@@ -161,8 +161,104 @@ class XLSURLParser {
 		
 			
 		}
+
+		if (substr($this->Uri,-5)==".html") {
+			//This appears to be our old SEO-formatted URL coming in, so let's find the new one and 301 redirect
+
+			//www.webstore.site/Beverages.html
+			//http://wsdemo.xsilva.com/Accessories/Jewelry.html
+			
+			//This is pretty much our old code from index.php that used to do parsing. We can still use it and just redir
+
+			$uriPath = str_replace('.html', '', $this->Uri);
+			$uriPath = substr($uriPath, 1, strlen($uriPath));
+			$uriPath = rtrim($uriPath, '/');
+				
+			$uriPathParts = explode('/', $uriPath);
+			$uriPathLower = strtolower($uriPath);
+
+			if ($uriPathLower == "sitemap") {error_log("sitemap");
+				$this->strRedirectUrl = "sitemap.xml";
+				$this->strRedirectUrl = _xls_site_url($this->strRedirectUrl);
+				$this->intStatus=301;
+				return true;
+			}
+			else if (count($uriPathParts) > 1) { 
+			//If we have more than one part of our .html URL, that means we're on an interior category path
+				//We can just convert it 
+				$arrCategories = array();
+				$intParent = 0;
+				Category::$Manager->AddArray(Category::LoadAll());
+				// Load Categories by urlencode Name
+				foreach ($uriPathParts as $strSlug) {
+					foreach (Category::$Manager->GetBySlug(trim($strSlug)) as $objMatch) {
+					
+						if ($objMatch->Parent == $intParent) {
+							$arrCategories[] = $objMatch->Link;
+							$intParent = $objMatch->Rowid;
+		
+							// Once a Category has been loaded, remove from array
+							unset($uriPathParts[array_search($strSlug, $uriPathParts)]);
+		
+							break;
+						}
+					}
+				}
+				$this->strRedirectUrl = array_pop($arrCategories);
+				if ($this->strRedirectUrl != '') {
+					$this->intStatus=301;
+					return true;
+				} else {
+					$this->intStatus=404;
+					return true;
+				}
+			}
+		
+			//If we only have one part, it may be a category, product, or custom page, so hunt in that order
+			if (count($uriPathParts) ==1) { 
+				$uriPath = implode('/', $uriPathParts);
+				$uriPath = urldecode($uriPath);
+				$uriPathLower = strtolower($uriPath);
+		
+				if ($category = Category::LoadArrayByName(trim($uriPath))) {
+					$this->strRedirectUrl = $category[0]->Link;
+					$this->intStatus=301;
+					return true;
+
+				}
+				else if ($product = Product::LoadByCode($uriPath)) {
+					$this->strRedirectUrl = $product->Link;
+					$this->intStatus=301;
+					return true;
+				}
+				else if ($page = CustomPage::LoadByKey($uriPath)) {
+					$_GET['cpage'] = $XLSWS_VARS['cpage'] = $page->Key;
+				}
+				else if ($product = Product::QuerySingle(QQ::AndCondition(
+					QQ::Equal(QQN::Product()->Name , $uriPath)))) {
+					$_GET['product'] = $XLSWS_VARS['product'] = $product->Code;
+				}
+				else if ($product = Product::QuerySingle(QQ::AndCondition(
+					QQ::Equal(QQN::Product()->Description , $uriPath)))) {
+					$_GET['product'] = $XLSWS_VARS['product'] = $product->Code;
+				}
+				else if ($family = Family::LoadByFamily($uriPath)) {
+					$_GET['family'] = $XLSWS_VARS['family'] = $family->Family;
+				}
+				else if ($page = CustomPage::QuerySingle(QQ::AndCondition(
+					QQ::Equal(QQN::CustomPage()->Title , $uriPath)))) {
+					$_GET['cpage'] =$XLSWS_VARS['cpage'] = $page->Key;
+				}
+				else {
+					_rd(_xls_site_dir() .
+						"/index.php?seo_forward=true&search=$uriPath");
+				}
+			}
+		
+		
+
 	
-	
+		}
 	
 	}
 	
