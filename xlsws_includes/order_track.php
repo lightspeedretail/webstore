@@ -173,7 +173,7 @@ class xlsws_track_order extends xlsws_index {
 		}
 
 		$this->order_display($this->order , $this->orderViewItemsPnl);
-
+		_xls_add_formatted_page_title(_sp('Order Details ').$this->order->IdStr);
 
         
         	

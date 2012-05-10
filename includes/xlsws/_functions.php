@@ -933,7 +933,19 @@ function _xls_add_meta_redirect($url , $delay = 60) {
 function _xls_add_page_title($title) {
 	global $strPageTitle;
 	$strPageTitle = $title;
-	_xls_stack_add('xls_page_title',$title);
+	_xls_stack_put('xls_page_title',$title);
+}
+
+/**
+ * Set the page title
+ * @param string $title
+ */
+function _xls_add_formatted_page_title($title) {
+	$strPattern = _xls_get_conf('SEO_CUSTOMPAGE_TITLE');
+	$strPattern = str_replace('%name', $title,$strPattern);
+	$strPattern = str_replace('%storename', _xls_get_conf('STORE_NAME','LightSpeed Web Store'),$strPattern);
+	
+	_xls_stack_put('xls_page_title',$strPattern);
 }
 
 /**
@@ -941,7 +953,7 @@ function _xls_add_page_title($title) {
  * @param string $desc
  */
 function _xls_add_meta_desc($desc) {
-	_xls_stack_add('xls_meta_desc', strip_tags($desc));
+	_xls_stack_put('xls_meta_desc', strip_tags($desc));
 }
 
 /**
@@ -951,7 +963,7 @@ function _xls_add_meta_desc($desc) {
 function _xls_add_meta_keyword($words) {
 	if(is_array($words))
 		$words = implode("," , $words);
-	_xls_stack_add('xls_meta_keywords', strip_tags($words));
+	_xls_stack_put('xls_meta_keywords', strip_tags($words));
 }
 
 /**

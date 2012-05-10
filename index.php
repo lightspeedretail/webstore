@@ -33,7 +33,6 @@ ob_start();
 require_once(CUSTOM_INCLUDES . 'prepend.inc.php');
 ob_end_clean();
 
-$strPageTitle = _xls_get_conf('STORE_NAME' , 'XSilva Web Store');
 
 // If store is offline then show offline
 if ($offlinekey = _xls_get_conf('STORE_OFFLINE' , '')) {
@@ -41,7 +40,7 @@ if ($offlinekey = _xls_get_conf('STORE_OFFLINE' , '')) {
 	if (isset($_GET['xls_offlinekey']) &&
 	   ($offlinekey == $_GET['xls_offlinekey'])) {
 		_xls_stack_add('xls_offlinekey' , $offlinekey);
-		_rd('index.php');
+		_rd(_xls_site_dir());
 	}
 
 	// User does not know the key
@@ -69,8 +68,9 @@ Category::$Manager->AddArray(
 	Category::LoadAll()
 );
 
-//This may be changed later in processing, but set here to have it just in case
+//These may be changed later in processing, but set here to have it just in case
 _xls_stack_put('xls_canonical_url',_xls_site_url($objUrl->Uri));
+_xls_add_page_title(_xls_get_conf('STORE_NAME' , 'XSilva Web Store'));
 
 //error_log("on dept ".$objUrl->RouteDepartment." ".$objUrl->RouteId);
 
@@ -99,10 +99,12 @@ switch ($objUrl->RouteDepartment)
 		break;
 }
 
-if(file_exists(CUSTOM_INCLUDES . $strFile))
+if(file_exists(CUSTOM_INCLUDES . $strFile)) {
 		include(CUSTOM_INCLUDES . $strFile);
-	elseif(file_exists('xlsws_includes/'.$strFile))
+		exit(); }
+	elseif(file_exists('xlsws_includes/'.$strFile)) {
 		include('xlsws_includes/'.$strFile);
+		exit(); }
 	else {
 		header('HTTP/1.0 404 Not Found');
   		if (!readfile('404missing.html'))
@@ -201,7 +203,6 @@ if (isset($XLSWS_VARS['seo_rewrite'])) {
 
 
 // Print out any image data then exit
-// TODO : Refactor the image types collection
 foreach (ImagesType::$NameArray as $strType) {
 	if (!isset($_GET[$strType]))
 		continue;
@@ -230,75 +231,5 @@ foreach (ImagesType::$NameArray as $strType) {
 
 	break;
 }
-/*
-// Store screen size to visitor log
-if (isset($_POST['store_screen'])) {
-	$visitor = Visitor::get_visitor();
-	$visitor->ScreenRes = $_POST['width'] . 'X' . $_POST['height'];
-	$visitor->Save();
-}
 
-// View selection process
-// TODO : Refactor / Create the autoloader for views
-elseif (isset($_GET['xlspg'])) {
-	$page = basename($_GET['xlspg']);
-
-	if(file_exists(CUSTOM_INCLUDES . "$page" . ".php"))
-		include(CUSTOM_INCLUDES . "$page" . ".php");
-	else
-		include("xlsws_includes/$page" . ".php");
-}
-
-elseif (isset($_GET['product'])) {
-	if (file_exists(CUSTOM_INCLUDES . "product.php"))
-		include(CUSTOM_INCLUDES . "product.php");
-	else
-		include('xlsws_includes/product.php');
-}
-
-elseif (isset($_GET['customer_register'])) {
-	if (file_exists(CUSTOM_INCLUDES . "customer_register.php"))
-		include(CUSTOM_INCLUDES . "customer_register.php");
-	else
-		include('xlsws_includes/customer_register.php');
-}
-
-elseif (isset($_GET['search'])) {
-	if (file_exists(CUSTOM_INCLUDES . "searchresults.php"))
-		include(CUSTOM_INCLUDES . "searchresults.php");
-	else
-		include('xlsws_includes/searchresults.php');
-}
-
-elseif (isset($_GET['family'])) {
-	if (file_exists(CUSTOM_INCLUDES . "family.php"))
-		include(CUSTOM_INCLUDES . "family.php");
-	else
-		include('xlsws_includes/family.php');
-}
-
-elseif (isset($_GET['cpage'])) {
-	if (file_exists(CUSTOM_INCLUDES . "custom_page.php"))
-		include(CUSTOM_INCLUDES . "custom_page.php");
-	else
-		include('xlsws_includes/custom_page.php');
-}
-
-elseif ((!isset($XLSWS_VARS['c'])) &&
-	($page = CustomPage::LoadByKey('index'))) {
-
-	$XLSWS_VARS['cpage'] = $_GET['cpage'] = 'index';
-	if(file_exists(CUSTOM_INCLUDES . "custom_page.php"))
-		include(CUSTOM_INCLUDES . "custom_page.php");
-	else
-		include('xlsws_includes/custom_page.php');
-}
-
-else {
-	if(file_exists(CUSTOM_INCLUDES . "category.php"))
-		include(CUSTOM_INCLUDES . "category.php");
-	else
-		include('xlsws_includes/category.php');
-}
-*/
 

@@ -64,6 +64,60 @@ class xlsws_checkout extends xlsws_index {
     protected $objDestination;
     protected $objTaxCode;
 
+
+	/*see xlsws_index for shared widgets*/
+	protected $errSpan; //span block that displays an error on top of the checkout form if any
+
+	protected $lblWait; //the label for the wait icon (optional)
+	protected $icoWait; //the actual wait icon
+
+
+	protected $pnlWait; //The QPanel that shows the wait icon(s)
+
+	protected $pxyCheckout; //Handler for checkout
+
+	protected function build_main() {
+		global $XLSWS_VARS;
+
+        $objCustomer = Customer::GetCurrent();
+        $objCart = Cart::GetCart();
+
+		$this->mainPnl = new QPanel($this,'MainPanel');
+		$this->mainPnl->Template = templateNamed('checkout.tpl.php');
+        $this->objDefaultWaitIcon = new QWaitIcon($this);
+
+        $this->crumbs[] = array(
+            'link' => 'checkout/pg/',
+            'case' => '',
+            'name' => _sp('Check Out')
+        );
+        
+        $this->BuildForm();
+        $this->UpdateForm();
+        $this->BindForm();
+
+		//error msg
+		$this->errSpan = new QPanel($this);
+		$this->errSpan->CssClass='customer_reg_err_msg';
+
+		// Wait
+		$this->pnlWait = new QPanel($this->mainPnl);
+		$this->pnlWait->Visible = false;
+		$this->pnlWait->AutoRenderChildren = true;
+
+		$this->lblWait = new QLabel($this->pnlWait);
+		$this->lblWait->Text = _sp("Please wait while we process your order");
+		$this->lblWait->CssClass = "checkout_process_label";
+
+		$this->icoWait = new QWaitIcon($this->pnlWait);
+		
+		_xls_add_formatted_page_title('Checkout');
+		
+        QApplication::ExecuteJavaScript("document.getElementById('LoadActionProxy').click();");
+    }
+
+
+
     protected function BuildCustomerControl() { 
         $this->CustomerControl = $objControl = 
             new XLSCheckoutCustomerControl($this, 'CustomerContact');
@@ -1066,7 +1120,70 @@ class xlsws_checkout extends xlsws_index {
 
     }
 
-    public function __get($strName) {
+
+
+
+	
+    /**
+	 * moduleActionProxy - General function to load particular modules for payment and shipping to be used dynamically
+	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
+	 * @return none
+	 */
+	// Use ActionHolder to respond to all custom actions
+	public function moduleActionProxy($strFormId, $strControlId, $strParameter) {
+		$control = $this->GetControl($strControlId);
+
+		$found = false;
+		// is it shipping?
+		foreach($this->shipping_fields as $field) {
+			if($field->ControlId == $strControlId) {
+				$found = 'shipping';
+				break;
+			}
+		}
+
+		if(!$found) {
+			// is it payment?
+			foreach($this->payment_fields as $field) {
+				if($field->ControlId == $strControlId) {
+					$found = 'payment';
+					break;
+				}
+			}
+
+			$objModule = $this->loadModule($this->lstPaymentMethod->SelectedValue , 'payment');
+		} else {
+			$objModule = $this->loadModule($this->lstShippingMethod->SelectedValue , 'shipping');
+		}
+
+		if(!$found || !$objModule) {
+			_xls_log("ERROR could not determine source of action $strParameter .");
+			return;
+		}
+
+		try {
+			$objModule->$strParameter($strFormId, $strControlId, $strParameter);
+		} catch(Exception $e) {
+			_xls_log("ERROR catching action $strParameter on module");
+		}
+
+	}
+
+	/*Functions below are overloaded in extended versions only, defaults set below*/
+	public function showCart() {
+		return false;
+	}
+
+	public function showSideBar() {
+		return false;
+	}
+
+	public function require_ssl() {
+		return true;
+	}
+	
+	
+	public function __get($strName) {
         switch ($strName) {
             case 'txtCRFName':
                 return $this->BillingContactControl->FirstName;
@@ -1219,114 +1336,7 @@ class xlsws_checkout extends xlsws_index {
                 }
         }
     }
-
-
-	/*see xlsws_index for shared widgets*/
-	protected $errSpan; //span block that displays an error on top of the checkout form if any
-
-	protected $lblWait; //the label for the wait icon (optional)
-	protected $icoWait; //the actual wait icon
-
-
-	protected $pnlWait; //The QPanel that shows the wait icon(s)
-
-	protected $pxyCheckout; //Handler for checkout
-
-	protected function build_main() {
-		global $XLSWS_VARS;
-
-        $objCustomer = Customer::GetCurrent();
-        $objCart = Cart::GetCart();
-
-		$this->mainPnl = new QPanel($this,'MainPanel');
-		$this->mainPnl->Template = templateNamed('checkout.tpl.php');
-        $this->objDefaultWaitIcon = new QWaitIcon($this);
-
-        $this->crumbs[] = array(
-            'link' => 'checkout/pg/',
-            'case' => '',
-            'name' => _sp('Check Out')
-        );
-        
-        $this->BuildForm();
-        $this->UpdateForm();
-        $this->BindForm();
-
-		//error msg
-		$this->errSpan = new QPanel($this);
-		$this->errSpan->CssClass='customer_reg_err_msg';
-
-		// Wait
-		$this->pnlWait = new QPanel($this->mainPnl);
-		$this->pnlWait->Visible = false;
-		$this->pnlWait->AutoRenderChildren = true;
-
-		$this->lblWait = new QLabel($this->pnlWait);
-		$this->lblWait->Text = _sp("Please wait while we process your order");
-		$this->lblWait->CssClass = "checkout_process_label";
-
-		$this->icoWait = new QWaitIcon($this->pnlWait);
-
-        QApplication::ExecuteJavaScript("document.getElementById('LoadActionProxy').click();");
-    }
-
-    /**
-	 * moduleActionProxy - General function to load particular modules for payment and shipping to be used dynamically
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	// Use ActionHolder to respond to all custom actions
-	public function moduleActionProxy($strFormId, $strControlId, $strParameter) {
-		$control = $this->GetControl($strControlId);
-
-		$found = false;
-		// is it shipping?
-		foreach($this->shipping_fields as $field) {
-			if($field->ControlId == $strControlId) {
-				$found = 'shipping';
-				break;
-			}
-		}
-
-		if(!$found) {
-			// is it payment?
-			foreach($this->payment_fields as $field) {
-				if($field->ControlId == $strControlId) {
-					$found = 'payment';
-					break;
-				}
-			}
-
-			$objModule = $this->loadModule($this->lstPaymentMethod->SelectedValue , 'payment');
-		} else {
-			$objModule = $this->loadModule($this->lstShippingMethod->SelectedValue , 'shipping');
-		}
-
-		if(!$found || !$objModule) {
-			_xls_log("ERROR could not determine source of action $strParameter .");
-			return;
-		}
-
-		try {
-			$objModule->$strParameter($strFormId, $strControlId, $strParameter);
-		} catch(Exception $e) {
-			_xls_log("ERROR catching action $strParameter on module");
-		}
-
-	}
-
-	/*Functions below are overloaded in extended versions only, defaults set below*/
-	public function showCart() {
-		return false;
-	}
-
-	public function showSideBar() {
-		return false;
-	}
-
-	public function require_ssl() {
-		return true;
-	}
+    
 }
 
 if(!defined('CUSTOM_STOP_XLSWS'))

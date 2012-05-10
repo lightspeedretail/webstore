@@ -32,6 +32,12 @@
  */
 class xlsws_product_listing extends xlsws_index {
 	protected $dtrProducts; //list of products in the category
+	protected $subcategories = null; //array of subcategories
+	protected $image = null; //image related to category
+	protected $category = null; //the instantiation of a Category database object
+    protected $family = null; //the instantiation of a Family database object
+
+	protected $custom_page_content = ''; //custom page content to appear above the category listing
 
 
 	/**
@@ -172,9 +178,9 @@ class xlsws_product_listing extends xlsws_index {
         $objCondition = false;
 
         $objProductCondition = $this->GetProductCondition();
-        $objFeaturedCondition = $this->GetFeaturedCondition();
+        //$objFeaturedCondition = $this->GetFeaturedCondition();
 
-        $intFeaturedCount = Product::QueryCount($objFeaturedCondition);
+       // $intFeaturedCount = Product::QueryCount($objFeaturedCondition);
 
         if ($intFeaturedCount > 0)
             $objCondition = QQ::AndCondition(

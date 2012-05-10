@@ -389,7 +389,7 @@ class xlsws_gregistry extends xlsws_index {
 
 			$this->pxyGRView_Click($this->strFormId , '' , $rowid);
 		}
-
+		_xls_add_formatted_page_title(_sp('Wish Lists'));
 		Visitor::add_view_log('', ViewLogType::giftregistryadd);
 	}
 

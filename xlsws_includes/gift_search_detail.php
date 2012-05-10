@@ -108,6 +108,7 @@ class xlsws_glist extends xlsws_index {
 		$this->pxyPurchaseNow->AddAction(new QClickEvent() , new QJavaScriptAction("return false;"));
 
 		$this->dlgGiftQty = new XLSdxGiftQty($this , $this);
+		_xls_add_formatted_page_title(_sp('Wish Lists'));
 	}
 
 	/**

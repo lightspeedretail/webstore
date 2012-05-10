@@ -31,34 +31,28 @@
  * and assigning template variables to the views related to the listing pages that show a listing of products in a family
  */
 class xlsws_family extends xlsws_product_listing {
-    protected $family = null; //the instantiation of a Family databsae object
-	protected $subcategories = null; //not used with families, ignore
-
+	
 	/**
 	 * build_main - constructor for this controller
 	 * @param none
 	 * @return none
 	 */
 	protected function build_main(){
-		global $XLSWS_VARS;
 
         $this->LoadFamily();
 
         parent::build_main();
         
 		if ($this->family) {
-			$objFamily = $this->family;
 			
 			// Set Meta Description
-			_xls_add_meta_desc($objFamily->Family);
+			_xls_add_meta_desc($this->family->Family);
 			
 			// Set Title
-			//_xls_add_page_title($objFamily->PageTitle);
+			_xls_add_page_title($this->family->PageTitle);
 		
 		}
 		
-
-        
 
         // Add the viewlog entry
     	Visitor::add_view_log($this->family->Rowid, ViewLogType::familyview);
@@ -72,7 +66,7 @@ class xlsws_family extends xlsws_product_listing {
      */
     protected function LoadFamily() {
     	$objUrl = XLSURLParser::getInstance();    
-		
+
 		$objFamily = Family::LoadByRequestUrl($objUrl->RouteId);
 
             if ($objFamily)

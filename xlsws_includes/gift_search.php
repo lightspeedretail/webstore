@@ -67,6 +67,7 @@ class xlsws_gsearch extends xlsws_index {
 
 		if($this->txtEmail->Text != '')
 			$this->dosearch($this->FormId , $this->txtEmail->ControlId , '');
+		_xls_add_formatted_page_title(_sp('Wish Lists'));
 	}
 
 	/**

@@ -94,6 +94,8 @@ class xlsws_glist extends xlsws_index {
 		$objStyle = $this->dtgGiftList->HeaderRowStyle;
 		$objStyle->BackColor = '#003399';
 
+		_xls_add_formatted_page_title(_sp('Wish Lists'));
+		
 		Visitor::add_view_log('', ViewLogType::giftregistryview);
 	}
 

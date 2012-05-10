@@ -31,11 +31,6 @@
  * and assigning template variables to the views related to the category pages
  */
 class xlsws_category extends xlsws_product_listing {
-	protected $subcategories = null; //array of subcategories
-	protected $image = null; //image related to category
-	protected $category = null; //the instantiation of a Category database object
-
-	protected $custom_page_content = ''; //custom page content to appear above the category listing
 
 	/**
      * build_main - constructor for this controller, refrain from modifying this 
@@ -156,7 +151,6 @@ class xlsws_category extends xlsws_product_listing {
 	 * @return QCondition
      */
     protected function GetCategoryCondition() {
-        global $XLSWS_VARS;
 
         if (!$this->category)
             return false;

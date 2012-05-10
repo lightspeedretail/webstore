@@ -27,7 +27,7 @@
 
 ?>
 <div id="breadcrumbs" class="rounded">
-	<a href="index.php"><img src="<?php echo templateNamed('css'); ?>/images/breadcrumbs_home.png"	style="display: block; float: left; margin: 0 10px 0 12px;"></a>
+	<a href="<?php echo _xls_site_url(); ?>"><img src="<?php echo templateNamed('css'); ?>/images/breadcrumbs_home.png"	style="display: block; float: left; margin: 0 10px 0 12px;"></a>
 	<img src="<?php echo templateNamed('css'); ?>/images/breadcrumbs_separrow.png" style="display: block; float: left; margin: 0 0 0 -2px;">
 
 <ul>

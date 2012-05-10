@@ -141,6 +141,8 @@ class xlsws_index extends QForm {
 
 		// Let's have the menuPnl auto render any and all child controls
 		$this->menuPnl->AutoRenderChildren = true;
+		
+		_xls_stack_put('xls_page_title', _xls_get_conf('STORE_NAME','LightSpeed Web Store') . " : "._xls_get_conf('STORE_DEFAULT_SLOGAN',''));
 	}
 
 	/**

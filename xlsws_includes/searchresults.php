@@ -33,8 +33,6 @@
 
 class xlsws_searchresult extends xlsws_product_listing {
 	protected $search_array;
-    protected $category = null;
-    protected $subcategories = null;
     protected $search_method = 'OrCondition';
 	protected $default_search_param = 'and';
 
@@ -160,7 +158,7 @@ class xlsws_searchresult extends xlsws_product_listing {
      * @param none
      * @return QCondition
      */
-    protected function GetFamilyCondition() {
+    protected function GetFamilyCondition() {error_log(__class__.' '.__function__);
         global $XLSWS_VARS;
 
         $strFamily = false;
