@@ -3744,16 +3744,21 @@
 		public function canNew(){
 			return true;
 		}
-		
+
 
 		// If the person for the row we are rendering is currently being edited,
 		// show the textbox.  Otherwise, display the contents as is.
 		public function FieldColumn_Render($objItem , $field) {
-			if (($objItem->Rowid == $this->intEditRowid) ||
-			(($this->intEditRowid == -1) && (!$objItem->Rowid))){
+			if ( ($objItem->Rowid == $this->intEditRowid) || (($this->intEditRowid == -1) && (!$objItem->Rowid))  ) {
 				if(isset($this->arrFields[$field]['Width']))
 					$this->arrFields[$field]['Field']->Width = $this->arrFields[$field]['Width'];
 				
+				//If we are displaying a label, we can use a DisplayFunc definition if one is defined
+				if(isset($this->arrFields[$field]['DisplayFunc']) && $this->arrFields[$field]['Field'] instanceOf QLabel) {
+					$func =  $this->arrFields[$field]['DisplayFunc'];
+					return $this->$func($objItem->$field);
+					}
+					
 				return $this->arrFields[$field]['Field']->RenderWithError(false);
 			}else{
 				
@@ -3942,8 +3947,9 @@
 				
 				if($this->arrFields[$field]['Field'] instanceof QListBox  )
 					$objItem->$field = $this->arrFields[$field]['Field']->SelectedValue;
-				elseif($this->arrFields[$field]['Field'] instanceof QCheckBox   )
-					$objItem->$field = $this->arrFields[$field]['Field']->Checked;
+				elseif($this->arrFields[$field]['Field'] instanceof QCheckBox   ) { error_log("here");
+					$objItem->$field = ( $this->arrFields[$field]['Field']->Checked ? 1 : 0);
+					}
 				else
 					$objItem->$field = (isset($this->arrFields[$field]['UTF8'])?utf8_decode($this->arrFields[$field]['Field']->Text):$this->arrFields[$field]['Field']->Text);
 			}
@@ -4602,9 +4608,17 @@
 			$this->arrFields['ValidUntil']['Width'] = 90;	
 			
 			$this->arrFields['Lscodes'] = array('Name' => 'Product<br>Restrictions');
-			$this->arrFields['Lscodes']['Field'] = new XLSTextBox($this);	
-			$this->arrFields['Lscodes']['Width'] = 90;
+			$this->arrFields['Lscodes']['Field'] = new QLabel($this);	
+			$this->arrFields['Lscodes']['Width'] = 10;
 			$this->arrFields['Lscodes']['DisplayFunc'] = "RenderPromoFilters";
+
+			$this->arrFields['Except'] = array('Name' => '');
+			$this->arrFields['Except']['Field'] = new QLabel($this);	
+			$this->arrFields['Except']['Width'] = 1;
+			$this->arrFields['Except']['DefaultValue'] = 0;
+			$this->arrFields['Except']['DisplayFunc'] = "RenderBlank";
+
+
 
 			$this->arrFields['QtyRemaining'] = array('Name' => '# Uses Remain<br>(blank = unlimited)');
 			$this->arrFields['QtyRemaining']['Field'] = new XLSTextBox($this); 	
@@ -4666,7 +4680,9 @@
 				return "Anytime";
 		}
 
-
+		protected function RenderBlank($item) {
+			return "";
+		}
 
 		protected function btnEdit_Click($strFormId, $strControlId, $strParameter){
 			parent::btnEdit_Click($strFormId, $strControlId, $strParameter);
