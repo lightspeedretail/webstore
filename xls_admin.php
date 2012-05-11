@@ -215,6 +215,7 @@
 	$arrPaymentTabs = array('methods' => _sp('Methods') , 'cc' => _sp('Credit Card Types'), 
 		'promo' => _sp('Promo Codes'),'promotasks' => _sp('Promo Code Tasks'));
 	$arrSeoTabs = array('general' => _sp('General') , 'meta' => _sp('Meta'), 'categories' => _sp('Categories'));
+	$arrDbAdminTabs = array('warning' => _sp('Notice') , 'dbdl' => _sp('Downloaded<br>Orders'), 'dbpending' => _sp('Pending to<br>Download')  , 'incomplete' => _sp('Incomplete<br>Orders'));
 	$arrSystemTabs = array('config' => _sp('Setup') , 'task' => _sp('Tasks')  , 'vlog' => _sp('Visitor Log'), 'slog' => _sp('System Log'));
 	
 	
@@ -251,8 +252,9 @@
 				'config'	=> _sp('Configuration')
 			,	'paym'		=>	_sp('Payment Methods')
 			,	'ship'		=>	_sp('Shipping')
-			,	'cpage'		=>	_sp('Pages')
+			,	'cpage'		=>	_sp('Custom Pages')
 			,	'seo'		=>	_sp('SEO')
+			,	'dbadmin'	=>	_sp('Database Admin')
 			,	'system'	=>	_sp('System')
 			);
 			
@@ -1166,7 +1168,8 @@
 			
 		 	$this->objModule = new $classname;		
 
-		 	$this->HelpfulHint = $this->objModule->HelpfulHint;
+		 	if (isset($this->objModule->HelpfulHint))
+		 		$this->HelpfulHint = $this->objModule->HelpfulHint;
 			 
 		}
 		 
@@ -3528,6 +3531,7 @@
 		protected $blankObj;
 		protected $qqn;
 		protected $qqnot;
+		protected $qqcondition;
 		
 		
 		protected $txtSearch;
@@ -3650,6 +3654,7 @@
 			$className = $this->className;
 			$cond = array(); 
 			
+			
 			if(($this->txtSearch->Text != '') && ($this->txtSearch->Text != $this->helperText)) {
 
 				foreach($this->arrFields as $field=>$properties) {
@@ -3661,6 +3666,10 @@
 			
 			} else	
 				$cond[] = new QQXLike($this->qqn->Rowid , '');
+			
+			//We set a condition for filtering, so use that instead
+			if (isset($this->qqcondition)) 
+				$cond = $this->qqcondition;
 			
 			if (isset($this->qqnot)) {
 
@@ -3680,7 +3689,7 @@
     		  
     		  	$objItemsArray = $this->dtgItems->DataSource = 
 					$this->blankObj->QueryArray(
-						QQ::OrCondition($cond),
+						$cond,
 							QQ::Clause(
 	                					$this->dtgItems->OrderByClause,
     	            					$this->dtgItems->LimitClause
@@ -5315,6 +5324,151 @@
 	}	
 	
 	
+	
+		/* class xlsws_admin_dbwarning
+	* class to create the credit card types tab under payment methods
+	* see class xlsws_admin_generic_edit_form for further specs
+	*/				
+	class xlsws_admin_dbwarning extends xlsws_admin_generic_edit_form{
+		
+		
+		
+		
+		
+		protected function Form_Create(){
+			$this->arrTabs = $GLOBALS['arrDbAdminTabs'];
+			$this->currentTab = 'warning';
+			
+			$this->appName = _sp("Pending Orders");
+			$this->default_items_per_page = 20;
+			$this->className = "Cart";
+			$this->blankObj = new Cart();
+			$this->qqn = QQN::Cart();
+			$this->arrFields = array();
+
+			
+			parent::Form_Create();
+			
+		}
+		
+		
+	}
+	
+	
+	/* class xlsws_admin_products
+	* class to create the credit card types tab under payment methods
+	* see class xlsws_admin_generic_edit_form for further specs
+	*/				
+	class xlsws_admin_dborders extends xlsws_admin_generic_edit_form{
+		
+		protected function Form_Create(){
+			$this->arrTabs = $GLOBALS['arrDbAdminTabs'];
+			$this->currentTab = 'dbpending';
+			
+			$this->appName = _sp("Pending Orders");
+			$this->default_items_per_page = 10;
+			$this->className = "Cart";
+			$this->blankObj = new Cart();
+			$this->qqn = QQN::Cart();
+			$this->qqcondition = 
+				QQ::AndCondition(
+				QQ::Equal(QQN::Cart()->Type, 4),
+				QQ::Equal(QQN::Cart()->Downloaded, 0));
+
+			$this->arrFields = array();
+
+			
+			$this->arrFields['IdStr'] = array('Name' => 'WO Number');
+			$this->arrFields['IdStr']['Field'] = new XLSTextBox($this);
+			$this->arrFields['IdStr']['Width'] = 70;	
+			
+			$this->arrFields['Contact'] = array('Name' => 'Customer');
+			$this->arrFields['Contact']['Field'] = new QLabel($this);
+			$this->arrFields['Contact']['Width'] = 70;	
+			
+			$this->arrFields['Phone'] = array('Name' => 'Phone');
+			$this->arrFields['Phone']['Field'] = new QLabel($this);
+			$this->arrFields['Phone']['Width'] = 70;	
+			
+			$this->arrFields['Phone'] = array('Name' => 'Phone');
+			$this->arrFields['Phone']['Field'] = new QLabel($this);
+			$this->arrFields['Phone']['Width'] = 70;	
+			
+			$this->arrFields['ShippingData'] = array('Name' => 'Ship Method');
+			$this->arrFields['ShippingData']['Field'] = new XLSTextBox($this);
+			$this->arrFields['ShippingData']['Width'] = 70;	
+
+			$this->arrFields['ShippingSell'] = array('Name' => 'Ship Price');
+			$this->arrFields['ShippingSell']['Field'] = new XLSTextBox($this);
+			$this->arrFields['ShippingSell']['Width'] = 70;	
+
+		
+			$this->arrFields['FkTaxCodeId']['Field'] = new XLSListBox($this);
+			$this->arrFields['FkTaxCodeId']['Field']->AddItem('BC' , 'Y');
+			$this->arrFields['FkTaxCodeId']['Field']->AddItem('No' , 'N');
+
+			$this->arrFields['Total'] = array('Name' => 'Total');
+			$this->arrFields['Total']['Field'] = new QLabel($this);
+			$this->arrFields['Total']['Width'] = 40;	
+		
+			$this->arrFields['Downloaded'] = array('Name' => 'Downloaded');
+			$this->arrFields['Downloaded']['Field'] = new QCheckBox($this); 	
+			$this->arrFields['Downloaded']['Width'] = "30";
+			$this->arrFields['Downloaded']['DisplayFunc'] = "RenderBoolean";
+			$this->arrFields['Downloaded']['Width'] = 50;
+
+			
+			/*
+			$this->arrFields['Prefix'] = array('Name' => 'Prefix');
+			$this->arrFields['Prefix']['Field'] = new XLSTextBox($this);
+			$this->arrFields['Prefix']['Field']->Required = true;
+			$this->arrFields['Prefix']['Width'] = 150;	
+			
+			
+			$this->arrFields['SortOrder'] = array('Name' => 'Sort Order');
+			$this->arrFields['SortOrder']['Field'] = new XLSListBox($this);
+			$this->arrFields['SortOrder']['Width'] = 150;	
+			
+			for($i=1;$i<=100;$i++)
+				$this->arrFields['SortOrder']['Field']->AddItem($i , $i);
+			
+			$this->arrFields['Enabled'] = array('Name' => 'Enabled');
+			$this->arrFields['Enabled']['Field'] = new QCheckBox($this); 	
+			$this->arrFields['Enabled']['Width'] = "30";
+			$this->arrFields['Enabled']['DisplayFunc'] = "RenderBoolean";
+			$this->arrFields['Enabled']['Width'] = 50;
+			$this->arrFields['Enabled']['DefaultValue'] = true;	
+			*/
+			
+			parent::Form_Create();
+			
+		}
+		
+		
+	}
+
+	
+	
+	class xlsws_admin_dbdownloaded extends xlsws_admin_dborders{
+		
+		protected function Form_Create(){
+			parent::Form_Create();
+			$this->arrTabs = $GLOBALS['arrDbAdminTabs'];
+			$this->currentTab = 'dbdl';
+			
+			$this->appName = _sp("Downloaded Orders");
+			$this->qqcondition = 
+				QQ::AndCondition(
+				QQ::Equal(QQN::Cart()->Type, 4),
+				QQ::Equal(QQN::Cart()->Downloaded, 1));
+			
+		}
+	}
+
+	
+	
+	
+	
 	/* class xlsws_admin_maintenance
 	* class to create the tasks tab
 	* see class xlsws_admin for more specs
@@ -6010,7 +6164,22 @@
 					xlsws_admin_payment_modules::Run('xlsws_admin_payment_modules' , adminTemplate('modules.tpl.php'));
 			}
 			break;
-			
+		case "dbadmin":
+			switch ($XLSWS_VARS['subpage'])
+			{
+				case "dbpending":
+					xlsws_admin_dborders::Run('xlsws_admin_dborders' , adminTemplate('edit.tpl.php'));
+					break;
+				case "dbdl":
+					xlsws_admin_dbdownloaded::Run('xlsws_admin_dbdownloaded' , adminTemplate('edit.tpl.php'));
+					break;
+				case "promotasks":
+					xlsws_admin_promotasks::Run('xlsws_admin_promotasks' , adminTemplate('config.tpl.php'));
+					break;
+				default:
+					xlsws_admin_dbwarning::Run('xlsws_admin_dbwarning' , adminTemplate('dbwarning.tpl.php'));
+			}
+			break;	
 		case "custom":
 			if($XLSWS_VARS['subpage'] != "") {
 				$class = $XLSWS_VARS['subpage'];
