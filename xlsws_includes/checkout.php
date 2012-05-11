@@ -86,6 +86,8 @@ class xlsws_checkout extends xlsws_index {
 		$this->mainPnl->Template = templateNamed('checkout.tpl.php');
         $this->objDefaultWaitIcon = new QWaitIcon($this);
 
+		$this->crumbs[] = array('link'=>'cart/pg/' , 'case'=> '' , 'name'=> _sp('Edit Cart'));
+	
         $this->crumbs[] = array(
             'link' => 'checkout/pg/',
             'case' => '',
@@ -388,12 +390,40 @@ class xlsws_checkout extends xlsws_index {
     }
 
     protected function UpdatePromoControl() {
+    	error_log("2");
         return $this->PromoControl;
     }
     
     protected function BindPromoControl() {
-        return $this->PromoControl;
+            
+        $objControl = $this->PromoControl;
+
+        if (!$objControl)
+            return $objControl;
+
+        $objControl->AddAction(
+            new QClickEvent(), 
+            new QAjaxAction('DoAfterPromoVerify')
+        );
+
+        return $objControl;
+        
     }
+    
+	protected function DoAfterPromoVerify() {
+	
+		$objCart = Cart::GetCart();
+
+        if ($objCart->FkPromoId > 0) { 
+        	$objPromoCode = PromoCode::Load($objCart->FkPromoId);        
+			if ($objPromoCode->Shipping) {
+				$_SESSION['XLSWS_CART']->ShippingModule="free_shipping";
+				$this->UpdateAfterShippingAddressChange();
+				
+				}
+			}
+	
+	}
 
     protected function BuildVerifyControl() {
         $objControl = $this->VerifyControl = 

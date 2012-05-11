@@ -126,9 +126,25 @@ class XLSPromoControl extends XLSCompositeControl {
             return false;
         }
 
+
+		//See if this promo code is supposed to turn on free shipping
+		//This runs AFTER the Validate() function so if we get here, it means that any criteria
+		//have passed. So just apply and refresh the shipping list
+        if ($objPromoCode->Shipping) {
+        		$this->objInputControl->ValidationError = "";
+        	   $this->objLabelControl->Text = 
+                _sp('Congratulations! This order qualifies for Free Shipping!');
+            	$objCart->FkPromoId = $objPromoCode->Rowid;
+        		$objCart->UpdateCart();
+        		$this->objPromoCode = $objPromoCode;      		
+        		return;
+            }	
         
 		$objCart->FkPromoId = $objPromoCode->Rowid;
         $objCart->UpdateCart();
+        
+        
+        
         $this->objLabelControl->Text = sprintf(
             _sp('Promo Code applied at %s'),
             PromoCodeType::Display(
@@ -145,7 +161,7 @@ class XLSPromoControl extends XLSCompositeControl {
         
     }
 
-    public function Validate() {
+    public function Validate() { 
         $objInputControl = $this->objInputControl;
         $objInputControl->ValidationReset();
 

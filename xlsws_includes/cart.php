@@ -158,7 +158,7 @@ class xlsws_cart extends xlsws_index {
 
 		$this->crumbs[] = array('link'=>'cart/pg/',
 			'case'=> '',
-			'name'=> _sp('Shopping Cart'));
+			'name'=> _sp('Edit Cart'));
 
 		//new XLSGrid($this->mainPnl);
 		$this->dtgCart = new QDataRepeater($this->mainPnl);

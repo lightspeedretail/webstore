@@ -1266,7 +1266,7 @@ EOS;
 			$prods = Product::LoadArrayByFkProductMasterId($prod->Rowid);
 
 			if(count($prods)>0) {
-				_rd("index.php?product=" . $prod->Code);
+				_rd($prod->Link);
 				return;
 			}
 		}
