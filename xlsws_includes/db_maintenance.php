@@ -403,6 +403,10 @@ class xlsws_db_maintenance extends xlsws_index {
 			$this->add_config_key('SHOW_SHARING' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Show Sharing Buttons on Product Details', 
 				'SHOW_SHARING', '1', 'Show Sharing buttons such as Facebook and Pinterest', 14, 1, NOW(), NOW(), 'BOOL');");	
+			$this->add_config_key('SHOW_TEMPLATE_CODE' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Show Product Code on Product Details', 
+				'SHOW_TEMPLATE_CODE', '1', 'Determines if the Product Code should be visible', 14, 2, NOW(), NOW(), 'BOOL');");
+				
 			$this->add_config_key('SEO_URL_CODES' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Product Codes in Product URLs', 
 				'SEO_URL_CODES', '0', 'If your Product Codes are important (such as model numbers), this will include them when making SEO formatted URLs. If you generate your own Product Codes that are only internal, you can leave this off.', 21, 1, NOW(), NOW(), 'BOOL');");
