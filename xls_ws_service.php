@@ -865,6 +865,7 @@ EOS;
 
                 
             $related = ProductRelated::LoadByProductIdRelatedId($intProductId , $intRelatedId);
+            $objProduct = Product::Load($intProductId);
             
             $new = false;
             
@@ -873,7 +874,10 @@ EOS;
                 $new = true;
             }
             
+            //You can't auto add a master product
+            if ($objProduct->MasterModel==1) $intAutoadd=0;
             
+          
             $related->ProductId = $intProductId;
             $related->RelatedId = $intRelatedId;
             $related->Autoadd = $intAutoadd;
