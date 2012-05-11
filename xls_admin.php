@@ -992,6 +992,8 @@
 		
 		public $btnOnOff;
 		
+		public $HelpfulHint;
+		
         
         // Customize Look/Feel
         //protected $strPadding = '10px';
@@ -1114,8 +1116,7 @@
 		 		$values = array();
 			
 		 		
-		 	
-		 	foreach($this->fields as $key=>$field){
+		 			 	foreach($this->fields as $key=>$field){
 		 		
 		 		
 		 		if(!isset($values[$key]))
@@ -1163,7 +1164,10 @@
 			if(!class_exists($classname))
 				return;
 			
-		 	$this->objModule = new $classname;					 
+		 	$this->objModule = new $classname;		
+
+		 	$this->HelpfulHint = $this->objModule->HelpfulHint;
+			 
 		}
 		 
 		 
@@ -1246,7 +1250,7 @@
 	* class to create modules that can be attached to the admin panel to extend
 	* see class xlsws_admin for further specs
 	*/			 	
-	class xlsws_admin_modules extends xlsws_admin{
+	class xlsws_admin_modules extends xlsws_admin{ 
 		
 		protected $dtrModules;
 		protected $arrModuleTypes;
@@ -1275,7 +1279,7 @@
 		
 		protected $elements = array();
 		
-		protected function Form_Create(){
+		protected function Form_Create(){error_log(__class__.' '.__function__);
 			parent::Form_Create();
 			
 			$this->intEditRecId = 0;
@@ -2886,11 +2890,12 @@
 		    $this->ctlExcept->Name = "Except";
 		    $this->ctlExcept->CssClass = 'selecttwo';
 		    $this->ctlExcept->Enabled = false;
+		    $this->ctlExcept->Width = 380;
 		    
 		    if($this->IsShipping) {
-				$this->ctlExcept->AddItem('all cart products match the following criteria', 0);
-				$this->ctlExcept->AddItem('at least one cart product matches the criteria', 2);
-				$this->ctlExcept->AddItem('all cart products DO NOT match the criteria', 1);
+				$this->ctlExcept->AddItem('all cart products match any of the following criteria', 0);
+				$this->ctlExcept->AddItem('at least one cart product matches any of these criteria', 2);
+				$this->ctlExcept->AddItem('all cart products DO NOT match any of these criteria', 1);
 			}
 			else {
 				$this->ctlExcept->AddItem('products match the following criteria', 0);
@@ -4882,18 +4887,16 @@
 		
 		protected function listPages(){
 
-			
-			$page = new CustomPage();
-			$page->Title = _sp('Define Tiers for Tier Based Shipping');
-			$page->Key = "ship_define_tiers";
-			$this->configPnls[0] = new xlsws_admin_edittiers_panel($this, $this , $page , "pageDone");
-
-
 			$page = new CustomPage();
 			$page->Title = _sp('Set Free Shipping Restrictions');
 			$page->Key = "promo_restrict";
 			$page->Page = 'shipping';
-			$this->configPnls[1] = new xlsws_admin_task_promorestrict_panel($this, $this , $page , "pageDone");
+			$this->configPnls[0] = new xlsws_admin_task_promorestrict_panel($this, $this , $page , "pageDone");
+		
+			$page = new CustomPage();
+			$page->Title = _sp('Define Tiers for Tier Based Shipping');
+			$page->Key = "ship_define_tiers";
+			$this->configPnls[1] = new xlsws_admin_edittiers_panel($this, $this , $page , "pageDone");
 
 			$page = new CustomPage();
 			$page->Title = _sp('Batch Change Countries and States/Regions');

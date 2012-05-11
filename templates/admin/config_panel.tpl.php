@@ -40,7 +40,8 @@
 										<span class="label"><?= $field->Name; ?>:</span> 
 										<span class="field">
 											<?php $field->RenderWithError(); ?>
-											<a href="#" onclick="return false;" class="tooltip" title="<?= $_CONTROL->GetHelperText($key); ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" alt="Key: #" class="info_right" /></a>
+											<? if (strlen($_CONTROL->GetHelperText($key))>1) { ?>
+											<a href="#" onclick="return false;" class="tooltip" title="<?= $_CONTROL->GetHelperText($key); ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" alt="Key: #" class="info_right" /></a><? } ?>
 										</span> 
 									</p>
 								

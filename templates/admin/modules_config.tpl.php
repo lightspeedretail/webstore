@@ -45,12 +45,16 @@
 										<span class="label"><?= $field->Name; ?>:</span> 
 										<span class="field">
 											<?php $field->RenderWithError(); ?>
-											<a href="#" onclick="return false;" class="tooltip" title="<?= $field->ToolTip; ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" alt="Info" class="info_right" /></a>
+											<? if (strlen($field->ToolTip)>1) { ?>
+											<a href="#" onclick="return false;" class="tooltip" title="<?= $field->ToolTip; ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" alt="Info" class="info_right" /></a><? } ?>
 										</span> 
 									</p>
 								
 									<?php endforeach; ?>
+									
+									
+								<? if (strlen($_CONTROL->HelpfulHint)>0) echo "<br><b>Note:</b> ".$_CONTROL->HelpfulHint; ?>
 								</div>
+						
 						<?php endif; ?>
 					</li>
-

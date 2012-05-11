@@ -33,7 +33,7 @@
 class free_shipping extends xlsws_class_shipping {
 
 	protected $strModuleName = "Free shipping";
-	
+	protected $strHelpfulHint = "You can set further restrictions on Free Shipping based on products ordered. After saving this module, click on the Shipping Tasks tab and click Set Free Shipping Restrictions.";
 
 
 	// return the keys for this module
@@ -71,18 +71,8 @@ class free_shipping extends xlsws_class_shipping {
 		$ret['qty_remaining']->Text = '';
 		$ret['qty_remaining']->ToolTip = _sp('If using Promo Code, how many times can this be used (blank=unlimited).');
 
-		/*$ret['restrictions'] = new XLSTextBox($objParent);
-		$ret['restrictions']->Name = _sp('Optional Product Restrictions');
-		$ret['restrictions']->Text = '';
-		$ret['restrictions']->ToolTip = _sp('Use same syntax as Promo Codes. May be used with Promo Code or without.');
 
-		$ret['except'] = new XLSListBox($objParent);
-		$ret['except']->Name = _sp('Product Restrictions are');
-		$ret['except']->ToolTip = _sp('Are your restrictions for including these products, or everything but these products?');
-		$ret['except']->RemoveAllItems();
-  		$ret['except']->AddItem(_sp("Only products that meet the set criteria") , 0);
-  		$ret['except']->AddItem(_sp("All products except those that meet the set criteria") , 1);
-  		*/	
+			
            		
 		$ret['product'] = new XLSTextBox($objParent);
 		$ret['product']->Name = _sp('LightSpeed Product Code (case sensitive)');

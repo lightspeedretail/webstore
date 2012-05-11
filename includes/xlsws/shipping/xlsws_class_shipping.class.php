@@ -29,7 +29,7 @@
  */
 class xlsws_class_shipping extends XLSModule {
 	protected $strModuleType = 'shipping';
-
+	protected $strHelpfulHint = "";
 	protected $strModuleName = "Store Pickup - Sample";
 	
 
@@ -271,4 +271,25 @@ class xlsws_class_shipping extends XLSModule {
 
 		return $ret;
 	}
+	
+	
+	public function __get($strName) {
+		switch ($strName) {
+		
+			case 'HelpfulHint':
+			return $this->strHelpfulHint;
+			
+
+
+			default:
+				try {
+					return parent::__get($strName);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+	
+	
 }
