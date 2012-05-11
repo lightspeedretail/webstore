@@ -106,6 +106,8 @@ class CustomPage extends CustomPageGen {
 				return $this->GetLink();
 			case 'RequestUrl': 
 				return $this->strRequestUrl;
+			case 'Title':
+				return $this->strTitle;
 
 			case 'PageTitle':
 				return _xls_truncate($this->GetPageMeta('SEO_CUSTOMPAGE_TITLE'),64);

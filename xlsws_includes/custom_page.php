@@ -35,6 +35,7 @@ class xlsws_custom_page extends xlsws_index {
 	protected $pnlSlider; //the product slider that shows a listing of items
 	protected $productTag = false; //the slideshow product tag used with the product slider
 	public $sliderName = "pnlSlider";
+	protected $sliderTitle = "";
 
 		/**
 	 * build_main - constructor for this controller
@@ -62,7 +63,8 @@ class xlsws_custom_page extends xlsws_index {
 		_xls_add_page_title($objPage->PageTitle);
 
 		$this->productTag = $objPage->ProductTag;
-
+		$this->sliderTitle = $objPage->Title;
+		
 		if($objPage->ProductTag != '')
 			$this->build_slider();
 
@@ -78,7 +80,7 @@ class xlsws_custom_page extends xlsws_index {
 	protected function build_slider() {
 		global $strPageTitle;
 		$this->pnlSlider = new XLSSlider($this->mainPnl);
-		$this->pnlSlider->Name = $objPage->Title;
+		$this->pnlSlider->Name = $this->sliderTitle;
 		$search = $this->productTag;
 
 		$this->pnlSlider->SetProducts(
@@ -105,7 +107,7 @@ class xlsws_custom_page extends xlsws_index {
 		);
 
 		$this->pnlSlider->Template = templateNamed('slider.tpl.php');
-		$this->pnlSlider->sliderTitle = $strPageTitle;
+		$this->pnlSlider->sliderTitle = $this->sliderTitle;
 	}
 
 	/**
