@@ -1282,7 +1282,7 @@
 		
 		protected $elements = array();
 		
-		protected function Form_Create(){error_log(__class__.' '.__function__);
+		protected function Form_Create(){
 			parent::Form_Create();
 			
 			$this->intEditRecId = 0;
@@ -1440,7 +1440,7 @@
 	       $this->ConfigDone();
            $this->currentEditId = $strParameter;
             
-			$this->pnlConfig = new xlsws_admin_modules_config($qModule, $this ,  $module['record'] , $module['filelocation'] , 'ConfigDone');
+			$this->pnlConfig = new xlsws_admin_modules_config($qModule, $this ,  $module['record'] , $module['class'] , 'ConfigDone');
 			$this->pnlConfig->Refresh();
 			$this->dtrModules->Refresh();
 			
@@ -1485,7 +1485,8 @@
 			$this->loadModules();
 			
 
-			$classname = basename($module['filelocation'] , '.php');
+			$classname = $module['class'];
+			$mod = Modules::LoadByFileType($classname , $type);
 			
 			if(!class_exists($classname))
 				return;
@@ -1497,11 +1498,13 @@
 				}
 							
 
-			if($module['enabled'] == false){
-					
-				$mod = new Modules();
-				$mod->File = $module['classname'];
+			if($module['enabled'] == false) {
+				
+				//We may have a prior entry that's just inactive, test here	
+				if (!$mod) $mod = new Modules();
+				$mod->File = $classname;
 				$mod->Type = $type;
+				$mod->Active = 1;
 				$mod->SortOrder = _dbx_first_cell("SELECT IFNULL(MAX(sort_order),0)+1 FROM xlsws_modules WHERE type = '$type'");
 				$mod->Save();
 					
@@ -1512,18 +1515,20 @@
 				}
 					
 					
-			}elseif($module['enabled'] == true){
+			} elseif($module['enabled'] == true) {
+			
 				try{
 					$class->remove();	// run a pre-remove function to do any cleanup before turning off
 				}catch(Exception $e){
 					_xls_log("Error removing module $module[file] . Error Desc: " . $e);
 				}
 										
-				$mod = Modules::LoadByFileType($module['classname'] , $type);
+				$mod = Modules::LoadByFileType($classname , $type);
 					
-				if($mod)
-					$mod->Delete(); //delete the record in xlsws_modules
-					
+				if($mod) {
+					$mod->Active=0;
+					$mod->Save(); //deactivate the record in xlsws_modules
+				}
 
 			}
 
@@ -1573,7 +1578,7 @@
 		
 		
 		
-		protected function build_list() {
+		protected function build_list() { error_log(__class__.' '.__function__);
 		
 		$selected = $this->currentModuleType;
 			
@@ -1585,75 +1590,78 @@
 			$files = _xls_read_dir(XLSWS_INCLUDES . "$selected" . "/" , "php");
 			$files2 = _xls_read_dir(CUSTOM_INCLUDES . "$selected" . "/" , "php");
 			
-			$allModules = Modules::QueryArray(QQ::Equal(QQN::Modules()->Type, $selected ) 
-					, QQ::Clause(QQ::OrderBy(QQN::Modules()->SortOrder)));
+			$allModules = Modules::QueryArray(
+				QQ::AndCondition(
+					QQ::Equal(QQN::Modules()->Active, 1),
+					QQ::Equal(QQN::Modules()->Type, $selected )),
+				QQ::Clause(QQ::OrderBy(QQN::Modules()->SortOrder)));
 			
 			$dbfiles = array();
 			
-			foreach($allModules as $module){
-				$dbfiles[$module->File] = $module->File;
+			foreach($allModules as $module) {
+				$file = $module->File . '.php';
+				$dbfiles[$file] = $file;
 				unset($files[$module->File]);	
 			}
 			
 			$files = array_merge($dbfiles , $files , $files2);
 
-
 			foreach($files as $file) {
 
-			$id = md5($file);
-			
-
-			$classname = basename($file , ".php");
-			
-			if(is_file(CUSTOM_INCLUDES . "$selected" . "/" . $file))
-				include_once(CUSTOM_INCLUDES . "$selected" . "/" . $file);
-			else
-				include_once(XLSWS_INCLUDES . "$selected" . "/" . $file);
-			
+				$id = md5($file);
 				
-			if(!class_exists($classname))
-				continue;	
+	
+				$classname = basename($file , ".php");
 				
-			try{
-				$class = new $classname($this);
-			}catch(Exception $e){
-				$class = new $classname;
-			}
-			
-			if(!$this->checkInstance($class, $selected)){
-				_xls_log("$classname is not a valid instance of xlsws_class_$selected . Ignoring file $file");
-				continue;
-			}
-			
-			
-			
-			if(method_exists($class , 'admin_name'))
-				$name = $class->admin_name();
-			else
-				$name = $class->name();
+				if(is_file(CUSTOM_INCLUDES . "$selected" . "/" . $file))
+					include_once(CUSTOM_INCLUDES . "$selected" . "/" . $file);
+				else
+					include_once(XLSWS_INCLUDES . "$selected" . "/" . $file);
 				
-			$mod = Modules::LoadByFileType($file,$selected);
-			
-			
-			$filelocation = is_file(CUSTOM_INCLUDES . "$selected" . "/" . $file)?(CUSTOM_INCLUDES . "$selected" . "/" . $file):(XLSWS_INCLUDES . "$selected" . "/" . $file);
-			
-			$this->modules[$id] = array(
-				'id'   => $id
-			,	'file' => $file
-			,	'class' => $classname
-			,	'name' => $name
-			,	'sort_order' => (($mod)?$mod->SortOrder:0)
-			,	'load_index' => count($this->modules)
-			,	'classobj' => $class
-			,	'record' => $mod
-			//,   'panel'  => $panel
-			,	'enabled' => (($mod)?true:false)
-			,	'filelocation' => $filelocation
-			);
-			
-			$panel = new xlsws_admin_modules_config($this, $id ,  $mod , $filelocation , 'ConfigDone');
-			$panel->Name = $name;
-			$this->modules[$id]['panel'] = $panel;
+					
+				if(!class_exists($classname))
+					continue;	
+					
+				try{
+					$class = new $classname($this);
+				}catch(Exception $e){
+					$class = new $classname;
+				}
+				
+				if(!$this->checkInstance($class, $selected)){
+					_xls_log("$classname is not a valid instance of xlsws_class_$selected . Ignoring file $file");
+					continue;
+				}
+				
+				
+				
+				if(method_exists($class , 'admin_name'))
+					$name = $class->admin_name();
+				else
+					$name = $class->name();
+					
+				$mod = Modules::LoadByFileType($classname,$selected);
+				if ($mod && $mod->Active==0) unset($mod);
+				
+				$filelocation = is_file(CUSTOM_INCLUDES . "$selected" . "/" . $file)?(CUSTOM_INCLUDES . "$selected" . "/" . $file):(XLSWS_INCLUDES . "$selected" . "/" . $file);
+				
+				$this->modules[$id] = array(
+					'id'   => $id
+				,	'file' => $file
+				,	'class' => $classname
+				,	'name' => $name
+				,	'sort_order' => (($mod)?$mod->SortOrder:0)
+				,	'load_index' => count($this->modules)
+				,	'classobj' => $class
+				,	'record' => $mod
+				//,   'panel'  => $panel
+				,	'enabled' => (($mod)?true:false)
+				,	'filelocation' => $filelocation
+				);
+				
+				$panel = new xlsws_admin_modules_config($this, $id ,  $mod , $filelocation , 'ConfigDone');
+				$panel->Name = $name . (($mod) && $mod->Configuration == '' ? " *** NOT YET CONFIGURED *** " : "");
+				$this->modules[$id]['panel'] = $panel;
 			
 
 				
@@ -5427,7 +5435,7 @@
 			$this->arrFields['Downloaded']['DisplayFunc'] = "RenderBoolean";
 			$this->arrFields['Downloaded']['Width'] = 50;
 
-
+			$this->HelperRibbon = "Note that changing shipping or tax will recalculate total automatically.";
 			
 			parent::Form_Create();
 			
