@@ -53,14 +53,11 @@ function _xt($strMsg) {
  * @param string $url
  */
 function _rd($url = '') {
-	global $_SERVER;
 
 	if(empty($url))
 		$url = $_SERVER["REQUEST_URI"];
-	if (substr($url,0,4) != "http")
-		$url = _xls_site_dir()."/".$url;
 		
-	QApplicationBase::Redirect($url);
+	QApplicationBase::Redirect(_xls_site_url($url));
 }
 
 /**

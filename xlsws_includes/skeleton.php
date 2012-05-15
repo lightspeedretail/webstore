@@ -955,8 +955,11 @@ EOS;
 	 * @return object instantiated object for a module (shipping or payment usually)
 	 */
 	public static function loadModule($file , $dir) {
-		$classname = basename($file , ".php");
-
+	
+		//Since our "$file" passed is a classname without .php, we build it back
+		$classname = basename($file , ".php"); 
+		$file = $classname . ".php";
+		
 		if(is_file(CUSTOM_INCLUDES . "$dir" . "/" . $file)) {
 			try {
 				include_once(CUSTOM_INCLUDES . "$dir" . "/" . $file);
