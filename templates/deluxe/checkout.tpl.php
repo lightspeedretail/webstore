@@ -48,7 +48,7 @@
 
 <?php $this->pnlPromoCode->Render() ?>
 <?php endif; ?>
-
+<?php $this->pnlWait->Render('CssClass=center'); ?>
 <?php $this->pnlShipping->Render(); ?>
 
 <br style="clear: both;"/>
