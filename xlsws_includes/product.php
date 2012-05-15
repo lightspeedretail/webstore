@@ -819,7 +819,7 @@ class xlsws_product extends xlsws_index {
 	 * @param none
 	 * @return none
 	 */
-	protected function create_prod_image() {error_log(__class__.' '.__function__);
+	protected function create_prod_image() {
 		$this->pnlImg = $this->create_prod_img($this->pnlImgHolder , $this->prod , 'PDetailImage' , _xls_get_conf('DETAIL_IMAGE_WIDTH',100) , _xls_get_conf('DETAIL_IMAGE_HEIGHT',80) , 'prod_add_to_cart');
 		$this->pnlImg->RemoveAllActions('onclick');
 		$this->pnlImg->AddAction(new QClickEvent() , new QAjaxAction('doImageEnlarge'));

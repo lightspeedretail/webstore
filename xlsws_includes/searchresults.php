@@ -158,7 +158,7 @@ class xlsws_searchresult extends xlsws_product_listing {
      * @param none
      * @return QCondition
      */
-    protected function GetFamilyCondition() {error_log(__class__.' '.__function__);
+    protected function GetFamilyCondition() {
         global $XLSWS_VARS;
 
         $strFamily = false;

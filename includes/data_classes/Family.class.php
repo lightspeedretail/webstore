@@ -58,25 +58,6 @@ class Family extends FamilyGen {
 		return _xls_site_url($this->strRequestUrl."/f/");
 	}
 
-	/*// Override LoadAll to pull from the Products table for performance
-	public static function LoadAll($objOptionalClauses = null) {error_log(__class__.' '.__function__);
-		try {
-			$query = 'SELECT DISTINCT family FROM xlsws_product';
-			$query .= ' WHERE web=1 AND fk_product_master_id=0';
-			$query .= " AND family <> ''";
-			$query .= ' ORDER BY family asc';
-
-			$db = QApplication::$Database[1];
-			$matches = $db->Query($query);
-
-			$families = Product::InstantiateDbResult($matches);
-			return $families;
-		} catch (QCallerException $objExc) {
-			$objExc->IncrementOffset();
-			throw $objExc;
-		}
-	}
-	*/
 	
 	public static function ConvertSEO() {
 	

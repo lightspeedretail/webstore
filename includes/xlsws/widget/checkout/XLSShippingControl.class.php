@@ -231,7 +231,7 @@ class XLSShippingControl extends XLSCompositeControl {
         return $objControl;
     }
 
-    protected function UpdateMethodControl($blnReset = true) {
+    protected function UpdateMethodControl($blnReset = true) {  error_log(__class__.' '.__function__);
         // While we're dealing with V1 modules, only a full lookup
         // will return a valid shipping rate selection.
         
@@ -241,16 +241,20 @@ class XLSShippingControl extends XLSCompositeControl {
         if (!$objControl)
             return;
 
-        if ($blnReset) {
+        if ($blnReset) { 
             $objControl->RemoveChildControls(true);
 
-            if ($objCart->ShippingModule) {
+            if ($objCart->ShippingModule)
+             {
                 $objModule = $this->LoadModules($objCart->ShippingModule);
-                $this->objMethodFields = 
-                    $objModule->customer_fields($objControl);
+                if ($objModule)
+                	$this->objMethodFields = 
+                    	$objModule->customer_fields($objControl);
+                else $objCart->ShippingModule = null;
                 $this->ProcessMethodControl();
+               
             }
-
+			
             if (count($this->objMethodFields) == 0)
                 $objControl->Visible = false;
             else $this->BindMethodFieldControls();
@@ -281,10 +285,10 @@ class XLSShippingControl extends XLSCompositeControl {
             if (!$objModule)
                 $objModule = $this->LoadModules($objCart->ShippingModule);
 
-        if ($objModule) { 
+        if ($objModule) {
             $this->CalculateShippingRate($objModule);
         }
-        else { 
+        else {
             $objCart->ShippingMethod = null;
         }
     
@@ -409,7 +413,7 @@ class XLSShippingControl extends XLSCompositeControl {
         );
     }
 
-    protected function ResetShippingSelection() {
+    protected function ResetShippingSelection() { 
         $objCart = Cart::GetCart();
 
         $objCart->ShippingModule = $strModule;
@@ -423,7 +427,7 @@ class XLSShippingControl extends XLSCompositeControl {
 
     protected function SetShippingSelection(
         $strModule, $strMethod, $strData, $fltPrice, $fltCost = null
-    ) {
+    ) {error_log(__class__.' '.__function__);
         
         if (is_null($fltPrice)) {
             return $this->ResetShippingSelection();
@@ -446,13 +450,13 @@ class XLSShippingControl extends XLSCompositeControl {
         }
 
         // TODO :: Verify if this is still required ?!
-        $strData = str_replace(
+       /* $strData = str_replace(
             '(' . _xls_currency($fltCost) . ')', ' ', $strData
         );
         $strData = str_replace(_xls_currency($fltCost), ' ', $strData);
         $strData = str_replace('-', '', $strData);
         $strData = trim($strData);
-
+		*/
         $objCart = Cart::GetCart();
 
         $objCart->ShippingMethod = $strMethod;
@@ -463,11 +467,12 @@ class XLSShippingControl extends XLSCompositeControl {
     }
 
     protected function LoadModules($strModule = null) {
-        $objCondition = QQ::Equal(QQN::Modules()->Type, 'shipping');
+        $objCondition = QQ::AndCondition(
+        	QQ::Equal(QQN::Modules()->Type, 'shipping'),
+        	QQ::Equal(QQN::Modules()->Active, 1));
         $objClause = QQ::Clause(QQ::OrderBy(QQN::Modules()->SortOrder));
 
         if ($strModule) {
-            $strModule = $strModule . '.php';
             $objCondition = QQ::AndCondition(
                 $objCondition, 
                 QQ::Equal(QQN::Modules()->File, $strModule)

@@ -1578,7 +1578,7 @@
 		
 		
 		
-		protected function build_list() { error_log(__class__.' '.__function__);
+		protected function build_list() { 
 		
 		$selected = $this->currentModuleType;
 			

@@ -75,7 +75,7 @@ class XLSModule extends QBaseClass {
 	}
 
     protected function GetConfig() {
-        if (!$this->objConfig) { 
+        if (!$this->objConfig) {
             $objModule = $this->GetModule();
             $this->objConfig = $objModule->GetConfigValues();
         }

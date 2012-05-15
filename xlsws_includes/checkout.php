@@ -68,11 +68,11 @@ class xlsws_checkout extends xlsws_index {
 	/*see xlsws_index for shared widgets*/
 	protected $errSpan; //span block that displays an error on top of the checkout form if any
 
-	protected $lblWait; //the label for the wait icon (optional)
-	protected $icoWait; //the actual wait icon
+	//protected $lblWait; //the label for the wait icon (optional)
+	//protected $icoWait; //the actual wait icon
 
 
-	protected $pnlWait; //The QPanel that shows the wait icon(s)
+	//protected $pnlWait; //The QPanel that shows the wait icon(s)
 
 	protected $pxyCheckout; //Handler for checkout
 
@@ -103,7 +103,7 @@ class xlsws_checkout extends xlsws_index {
 		$this->errSpan->CssClass='customer_reg_err_msg';
 
 		// Wait
-		$this->pnlWait = new QPanel($this->mainPnl);
+		/* $this->pnlWait = new QPanel($this->mainPnl);
 		$this->pnlWait->Visible = false;
 		$this->pnlWait->AutoRenderChildren = true;
 
@@ -112,7 +112,7 @@ class xlsws_checkout extends xlsws_index {
 		$this->lblWait->CssClass = "checkout_process_label";
 
 		$this->icoWait = new QWaitIcon($this->pnlWait);
-		
+		*/
 		_xls_add_formatted_page_title('Checkout');
 		
         QApplication::ExecuteJavaScript("document.getElementById('LoadActionProxy').click();");
@@ -206,7 +206,7 @@ class xlsws_checkout extends xlsws_index {
 
     public function DoCalculateShippingClick($strFormId, $strControlId, 
         $strParameter) {
-
+error_log(__class__.' '.__function__);
         return $this->UpdateAfterShippingAddressChange();
     }
 
@@ -1305,6 +1305,9 @@ class xlsws_checkout extends xlsws_index {
             case 'pnlPayment':
                 return $this->PaymentControl;
 
+			case 'pnlWait': error_log("wait");
+				return $this->ShippingControl->WaitControl;
+				
             case 'pnlCart':
                 return $this->CartControl;
 

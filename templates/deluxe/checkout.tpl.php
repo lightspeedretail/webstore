@@ -31,7 +31,7 @@
 			
 <?php $this->errSpan->Render() ?>
 
-<?php $this->pnlWait->Render('CssClass=center'); ?>
+
 
 <br style="clear: both;"/>
 

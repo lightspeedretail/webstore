@@ -507,7 +507,7 @@ class xlsws_db_maintenance extends xlsws_index {
 			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='MIN_PASSWORD_LEN'");
 
 		
-			if ($this->add_column('xlsws_modules' , 'request_url' ,
+			if ($this->add_column('xlsws_modules' , 'active' ,
 				"ALTER TABLE xlsws_modules ADD COLUMN `active` INT(11) DEFAULT NULL AFTER `rowid`"))
 			_dbx("update xlsws_modules set active=1");
 
@@ -521,7 +521,7 @@ class xlsws_db_maintenance extends xlsws_index {
 				$objItem->Save();
 
 			}
-			
+		
 			$objItems =  Cart::QueryArray(
                             QQ::AndCondition(
                                 QQ::Equal(QQN::Cart()->Type, CartType::order)
@@ -531,6 +531,11 @@ class xlsws_db_maintenance extends xlsws_index {
 				$strFile = $objItem->PaymentModule;
 				$classname = basename($strFile , ".php");
 				$objItem->PaymentModule = $classname;
+				
+				$strFile = $objItem->ShippingModule;
+				$classname = basename($strFile , ".php");
+				$objItem->ShippingModule = $classname;
+				
 				$objItem->Save();
 
 			}
