@@ -103,7 +103,7 @@ class store_pickup extends xlsws_class_shipping {
 	 * @return string
 	 *
 	 */
-	public function message($cart) {
+	public function message($cart) { error_log(_xls_whereCalled());
 		$config = $this->getConfigValues('store_pickup');
 
 		return sprintf( $config['msg'], $cart->IdStr);

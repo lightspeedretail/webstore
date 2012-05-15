@@ -421,7 +421,7 @@ class xlsws_db_maintenance extends xlsws_index {
 				'STORE_DEFAULT_SLOGAN', 'Amazing products available to order online!', 'Used as default for Title bar for home page', 2, 4, NOW(), NOW(), 'NULL');");		
 			
 			
-			
+			error_log("x1");
 			
 			
 			//URL and Description Formatting
@@ -437,7 +437,8 @@ class xlsws_db_maintenance extends xlsws_index {
 			$this->add_config_key('SEO_CUSTOMPAGE_TITLE' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Custom pages Title format', 
 				'SEO_CUSTOMPAGE_TITLE', '%name : %storename', 'Which elements appear in the title of a custom page', 23, 2, NOW(), NOW(), 'NULL');");				
-			
+			error_log("x11");
+
 			//Copy our category table since we will use this to handle uploads and SEO activities
 			$this->add_table('xlsws_category_addl' , "CREATE TABLE `xlsws_category_addl` (
 			  `rowid` int(11) NOT NULL AUTO_INCREMENT,
@@ -450,15 +451,18 @@ class xlsws_db_maintenance extends xlsws_index {
 			  KEY `name` (`name`),
 			  KEY `parent` (`parent`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
+error_log("x12");
 
 			//Additional image sizes
-			$this->drop_index('xlsws_images_type','size');
-			$this->drop_index('xlsws_images_type','width');
+			$this->drop_index('xlsws_images_type','size');error_log("x12a");
+			$this->drop_index('xlsws_images_type','width');error_log("x12b");
+error_log("x13");
 			
 			_dbx("INSERT IGNORE INTO `xlsws_images_type` set id=6, `name`='categoryimage', width=180,height=180");
 			_dbx("INSERT IGNORE INTO `xlsws_images_type` set id=7, `name`='previewimage', width=30,height=30");
 			_dbx("INSERT IGNORE INTO `xlsws_images_type` set id=8, `name`='sliderimage', width=90,height=90");
 		
+			error_log("x2");
 		
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Grid image width', `configuration_type_id`=17, `sort_order`=1,options='INT' 
 				where `key`='LISTING_IMAGE_WIDTH'");	
@@ -503,6 +507,7 @@ class xlsws_db_maintenance extends xlsws_index {
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Display Image on Category Page (when set)', 
 				'ENABLE_CATEGORY_IMAGE', '0', 'Requires a defined Category image under SEO settings', 17, 13, NOW(), NOW(), 'BOOL');");				
 			
+			error_log("x3");
 			
 			//Because of a change to the width display in Admin panel, make sure the option type is set so numbers aren't huge fields
 			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='QUOTE_EXPIRY'");		
@@ -515,6 +520,17 @@ class xlsws_db_maintenance extends xlsws_index {
 			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='EMAIL_SMTP_PORT'");
 			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='MIN_PASSWORD_LEN'");
 
+
+
+			error_log("x4");
+
+			//We've changed how we're storing payment and shipping module information, no longer using the .php extension
+			//so let's go through and update our tables
+			//$objItems = Modules::LoadAll();
+			//foreach ($objItems as $objItem) {
+				//$strFile = $objItem->File;
+				//error_log($strFile);
+			//}
 					
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			
@@ -533,9 +549,9 @@ class xlsws_db_maintenance extends xlsws_index {
 	}
 	
 	
-	private function drop_index($table,$indexname) {
+	private function drop_index($table,$indexname) { error_log("SHOW INDEXES FROM `$table` WHERE key_name='$indexname'");
 		$res = _dbx("SHOW INDEXES FROM `$table` WHERE key_name='$indexname'" , 'Query');
-
+if ($res) error_log("found"); else error_log("not found");
 		if($res && ($row = $res->GetNextRow()))
 				_dbx("ALTER TABLE `$table` DROP INDEX `$indexname`");
 						

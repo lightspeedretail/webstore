@@ -1500,7 +1500,7 @@
 			if($module['enabled'] == false){
 					
 				$mod = new Modules();
-				$mod->File = $module['file'];
+				$mod->File = $module['classname'];
 				$mod->Type = $type;
 				$mod->SortOrder = _dbx_first_cell("SELECT IFNULL(MAX(sort_order),0)+1 FROM xlsws_modules WHERE type = '$type'");
 				$mod->Save();
@@ -1519,7 +1519,7 @@
 					_xls_log("Error removing module $module[file] . Error Desc: " . $e);
 				}
 										
-				$mod = Modules::LoadByFileType($module['file'] , $type);
+				$mod = Modules::LoadByFileType($module['classname'] , $type);
 					
 				if($mod)
 					$mod->Delete(); //delete the record in xlsws_modules
@@ -1573,7 +1573,8 @@
 		
 		
 		
-		protected function build_list(){
+		protected function build_list() {
+		
 		$selected = $this->currentModuleType;
 			
 			if(!$selected)
@@ -1595,68 +1596,66 @@
 			}
 			
 			$files = array_merge($dbfiles , $files , $files2);
+
+
+			foreach($files as $file) {
+
+			$id = md5($file);
 			
-			foreach($files as $file){
+
+			$classname = basename($file , ".php");
+			
+			if(is_file(CUSTOM_INCLUDES . "$selected" . "/" . $file))
+				include_once(CUSTOM_INCLUDES . "$selected" . "/" . $file);
+			else
+				include_once(XLSWS_INCLUDES . "$selected" . "/" . $file);
+			
 				
-				$id = md5($file);
+			if(!class_exists($classname))
+				continue;	
 				
-//				try{
-					$classname = basename($file , ".php");
-					
-					if(is_file(CUSTOM_INCLUDES . "$selected" . "/" . $file))
-						include_once(CUSTOM_INCLUDES . "$selected" . "/" . $file);
-					else
-						include_once(XLSWS_INCLUDES . "$selected" . "/" . $file);
-					
-						
-					if(!class_exists($classname))
-						continue;	
-						
-					try{
-						$class = new $classname($this);
-					}catch(Exception $e){
-						$class = new $classname;
-					}
-					
-					if(!$this->checkInstance($class, $selected)){
-						_xls_log("$classname is not a valid instance of xlsws_class_$selected . Ignoring file $file");
-						continue;
-					}
-					
-					
-					
-					if(method_exists($class , 'admin_name'))
-						$name = $class->admin_name();
-					else
-						$name = $class->name();
-						
-					$mod = Modules::LoadByFileType($file,$selected);
-					
-					
-					$filelocation = is_file(CUSTOM_INCLUDES . "$selected" . "/" . $file)?(CUSTOM_INCLUDES . "$selected" . "/" . $file):(XLSWS_INCLUDES . "$selected" . "/" . $file);
-					
-					$this->modules[$id] = array(
-						'id'   => $id
-					,	'file' => $file
-					,	'class' => $classname
-					,	'name' => $name
-					,	'sort_order' => (($mod)?$mod->SortOrder:0)
-					,	'load_index' => count($this->modules)
-					,	'classobj' => $class
-					,	'record' => $mod
-					//,   'panel'  => $panel
-					,	'enabled' => (($mod)?true:false)
-					,	'filelocation' => $filelocation
-					);
-					
-					$panel = new xlsws_admin_modules_config($this, $id ,  $mod , $filelocation , 'ConfigDone');
-					$panel->Name = $name;
-					$this->modules[$id]['panel'] = $panel;
-					
-					
-//				}catch( Exception $e){
-//					_xls_log("Error including $file for $selected modules.");
-//				}
+			try{
+				$class = new $classname($this);
+			}catch(Exception $e){
+				$class = new $classname;
+			}
+			
+			if(!$this->checkInstance($class, $selected)){
+				_xls_log("$classname is not a valid instance of xlsws_class_$selected . Ignoring file $file");
+				continue;
+			}
+			
+			
+			
+			if(method_exists($class , 'admin_name'))
+				$name = $class->admin_name();
+			else
+				$name = $class->name();
+				
+			$mod = Modules::LoadByFileType($file,$selected);
+			
+			
+			$filelocation = is_file(CUSTOM_INCLUDES . "$selected" . "/" . $file)?(CUSTOM_INCLUDES . "$selected" . "/" . $file):(XLSWS_INCLUDES . "$selected" . "/" . $file);
+			
+			$this->modules[$id] = array(
+				'id'   => $id
+			,	'file' => $file
+			,	'class' => $classname
+			,	'name' => $name
+			,	'sort_order' => (($mod)?$mod->SortOrder:0)
+			,	'load_index' => count($this->modules)
+			,	'classobj' => $class
+			,	'record' => $mod
+			//,   'panel'  => $panel
+			,	'enabled' => (($mod)?true:false)
+			,	'filelocation' => $filelocation
+			);
+			
+			$panel = new xlsws_admin_modules_config($this, $id ,  $mod , $filelocation , 'ConfigDone');
+			$panel->Name = $name;
+			$this->modules[$id]['panel'] = $panel;
+			
+
 				
 			}
 		}
@@ -3670,20 +3669,19 @@
 			//We set a condition for filtering, so use that instead
 			if (isset($this->qqcondition)) 
 				$cond = $this->qqcondition;
+			else
+				$cond = QQ::OrCondition($cond);
 			
 			if (isset($this->qqnot)) {
 
 				$objItemsArray = $this->dtgItems->DataSource = 
 					$this->blankObj->QueryArray(
-						QQ::AndCondition(($this->qqnot),
-						QQ::OrCondition($cond)),
+						QQ::AndCondition($this->qqnot, $cond),
 							QQ::Clause(
 	                					$this->dtgItems->OrderByClause,
     	            					$this->dtgItems->LimitClause
     		        		)
     		        );
-    		   
-    		   
     		        
     		  } else {
     		  
@@ -3695,9 +3693,6 @@
     	            					$this->dtgItems->LimitClause
     		        		)
     		        );
-    		  
-    		  
-    		  
     		  }      
     		        
 
@@ -5394,22 +5389,37 @@
 			$this->arrFields['Phone']['Field'] = new QLabel($this);
 			$this->arrFields['Phone']['Width'] = 70;	
 			
-			$this->arrFields['ShippingData'] = array('Name' => 'Ship Method');
-			$this->arrFields['ShippingData']['Field'] = new XLSTextBox($this);
-			$this->arrFields['ShippingData']['Width'] = 70;	
+			$this->arrFields['ShippingModule'] = array('Name' => 'Ship Method');
+			$this->arrFields['ShippingModule']['Field'] = new XLSListBox($this);
+			$this->arrFields['ShippingModule']['Width'] = 120;				
+			$allModules = Modules::QueryArray(QQ::Equal(QQN::Modules()->Type, 'shipping' ), 
+				QQ::Clause(QQ::OrderBy(QQN::Modules()->File)));				
+			foreach($allModules as $code) {			
+					$values = $code->GetConfigValues();
+					$this->arrFields['ShippingModule']['Field']->AddItem( $values['label'],$code->File );
+			}		
+			$this->arrFields['ShippingModule']['DisplayFunc'] = "RenderShippingModule";
+					
 
 			$this->arrFields['ShippingSell'] = array('Name' => 'Ship Price');
 			$this->arrFields['ShippingSell']['Field'] = new XLSTextBox($this);
 			$this->arrFields['ShippingSell']['Width'] = 70;	
+			$this->arrFields['ShippingSell']['DisplayFunc'] = "RenderMoney";
 
 		
+			$this->arrFields['FkTaxCodeId'] = array('Name' => 'Tax Code');
 			$this->arrFields['FkTaxCodeId']['Field'] = new XLSListBox($this);
-			$this->arrFields['FkTaxCodeId']['Field']->AddItem('BC' , 'Y');
-			$this->arrFields['FkTaxCodeId']['Field']->AddItem('No' , 'N');
+			$taxcodes = TaxCode::LoadAll(QQ::Clause(QQ::OrderBy(QQN::TaxCode()->ListOrder)));
+			foreach($taxcodes as $code)
+				$this->arrFields['FkTaxCodeId']['Field']->AddItem($code->Code , $code->Rowid);
+			$this->arrFields['FkTaxCodeId']['DisplayFunc'] = "RenderTax";
+
 
 			$this->arrFields['Total'] = array('Name' => 'Total');
 			$this->arrFields['Total']['Field'] = new QLabel($this);
 			$this->arrFields['Total']['Width'] = 40;	
+			$this->arrFields['Total']['DisplayFunc'] = "RenderMoney";
+
 		
 			$this->arrFields['Downloaded'] = array('Name' => 'Downloaded');
 			$this->arrFields['Downloaded']['Field'] = new QCheckBox($this); 	
@@ -5417,33 +5427,35 @@
 			$this->arrFields['Downloaded']['DisplayFunc'] = "RenderBoolean";
 			$this->arrFields['Downloaded']['Width'] = 50;
 
-			
-			/*
-			$this->arrFields['Prefix'] = array('Name' => 'Prefix');
-			$this->arrFields['Prefix']['Field'] = new XLSTextBox($this);
-			$this->arrFields['Prefix']['Field']->Required = true;
-			$this->arrFields['Prefix']['Width'] = 150;	
-			
-			
-			$this->arrFields['SortOrder'] = array('Name' => 'Sort Order');
-			$this->arrFields['SortOrder']['Field'] = new XLSListBox($this);
-			$this->arrFields['SortOrder']['Width'] = 150;	
-			
-			for($i=1;$i<=100;$i++)
-				$this->arrFields['SortOrder']['Field']->AddItem($i , $i);
-			
-			$this->arrFields['Enabled'] = array('Name' => 'Enabled');
-			$this->arrFields['Enabled']['Field'] = new QCheckBox($this); 	
-			$this->arrFields['Enabled']['Width'] = "30";
-			$this->arrFields['Enabled']['DisplayFunc'] = "RenderBoolean";
-			$this->arrFields['Enabled']['Width'] = 50;
-			$this->arrFields['Enabled']['DefaultValue'] = true;	
-			*/
+
 			
 			parent::Form_Create();
 			
 		}
 		
+		protected function RenderMoney($val) {
+			return _xls_currency($val);
+		}
+		
+		protected function RenderTax($val) {
+			
+			if($val=== '')  return ' ';
+			
+			$tax = TaxCode::Load($val);
+			if(!$tax) return '';
+						
+			return $tax->Code;			
+		}	
+		
+		protected function RenderShippingModule($val) {
+			error_log("looking up ".$val);
+			$code = Modules::LoadByFileType($val , 'shipping');
+			if (!$code) return "NOT FOUND";
+			
+			$values = $code->GetConfigValues();
+			return $values['label'];
+
+		}
 		
 	}
 
@@ -5780,7 +5792,7 @@
 			
 			$this->arrMPnls['UpgradeWS']->Text = '';
 			
-			
+			error_log("starting upgrade");
 			//Include db_maint class to access update functions
 			include(XLSWS_INCLUDES . 'db_maintenance.php');
 			$objDbMaint = new xlsws_db_maintenance;
