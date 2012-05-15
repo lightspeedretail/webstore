@@ -104,7 +104,7 @@ class xlsws_checkout extends xlsws_index {
 
 		// Wait
 		$this->pnlWait = new QPanel($this->mainPnl);
-		$this->pnlWait->Visible = true;
+		$this->pnlWait->Visible = false;
 		$this->pnlWait->AutoRenderChildren = true;
 
 		$this->lblWait = new QLabel($this->pnlWait);
@@ -206,7 +206,7 @@ class xlsws_checkout extends xlsws_index {
 
     public function DoCalculateShippingClick($strFormId, $strControlId, 
         $strParameter) {
-error_log(__class__.' '.__function__);
+
         return $this->UpdateAfterShippingAddressChange();
     }
 
@@ -390,7 +390,7 @@ error_log(__class__.' '.__function__);
     }
 
     protected function UpdatePromoControl() {
-    	error_log("2");
+ 
         return $this->PromoControl;
     }
     
@@ -679,7 +679,7 @@ error_log(__class__.' '.__function__);
     }
 
     public function UpdateAfterShippingAddressChange() { 
-    	$this->pnlWait->Visible = true;
+    	//$this->pnlWait->Visible = true;
         $blnValid = $this->ValidateControlAndChildren($this->CustomerControl);
  
         $this->ShippingControl->Enabled = $blnValid;
@@ -699,7 +699,7 @@ error_log(__class__.' '.__function__);
         
         $this->UpdateCartControl();
         
-        $this->pnlWait->Visible = false;
+       // $this->pnlWait->Visible = false;
 
     }
 
