@@ -302,7 +302,7 @@ class intershipper extends xlsws_class_shipping {
 		$ret = array();
 
 		// Return just a blank list box which will be filled up using the total
-		$ret['carrier'] = new XLSListBox($objParent);
+		$ret['carrier'] = new XLSListBox($objParent,'ShippingMethod');
 		$ret['carrier']->Name = _sp('Carrier');
 		return $ret;
 	}

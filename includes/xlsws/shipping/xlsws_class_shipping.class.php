@@ -31,7 +31,6 @@ class xlsws_class_shipping extends XLSModule {
 	protected $strModuleType = 'shipping';
 	protected $strHelpfulHint = "";
 	protected $strModuleName = "Store Pickup - Sample";
-	
 
 	/**
 	 * The name of the module that will be displayed in the checkout page
@@ -277,9 +276,10 @@ class xlsws_class_shipping extends XLSModule {
 		switch ($strName) {
 		
 			case 'HelpfulHint':
-			return $this->strHelpfulHint;
+				return $this->strHelpfulHint;
 			
-
+			case 'Name':
+				return $this->name();
 
 			default:
 				try {

@@ -123,7 +123,7 @@ class australiapost extends xlsws_class_shipping {
 		$ret = array();
 		$config = $this->getConfigValues('AustraliaPost');
 
-		$ret['service'] = new XLSListBox($objParent);
+		$ret['service'] = new XLSListBox($objParent,'ModuleMethod');
 		$this->make_AustraliaPost_services($ret['service']);
 		$ret['service']->Name = _sp('Preference:');
 		$ret['service']->SelectedValue = $config['defaultproduct'];
