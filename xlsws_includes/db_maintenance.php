@@ -539,6 +539,10 @@ class xlsws_db_maintenance extends xlsws_index {
 				$objItem->Save();
 
 			}
+			
+			$this->add_column('xlsws_cart' , 'active',
+				"ALTER TABLE xlsws_cart ADD COLUMN `tracking_number` VARCHAR(255) NULL DEFAULT NULL AFTER `payment_amount`");
+
 					
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			

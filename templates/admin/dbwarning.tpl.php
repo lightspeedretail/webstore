@@ -95,7 +95,7 @@ if(isset($this->HelperRibbon))
 
 ?>	
 <div class="module_config<?= $_CONTROL->special_css_class; ?>" style="height:200px">
-								<? echo '<img style="padding-right: 5px; width:44px; height:35px;" align="left" src="'.adminTemplate('css/images/questionmark.png').'">'; ?><h3>Notice: These Database Administration utilities are provided for troubleshooting purposes. Please use caution when using these options, and consult our online documentation and technical support resources for assistance.</h3>
+								<? echo '<img style="padding-right: 5px; width:44px; height:35px;" align="left" src="'.adminTemplate('css/images/questionmark.png').'">'; ?><h3>Notice: These Database Administration utilities are provided for troubleshooting purposes only. Please use caution when using these options, and consult our online documentation and technical support resources for assistance.</h3>
 
 								</div>
 									

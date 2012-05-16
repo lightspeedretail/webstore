@@ -58,6 +58,7 @@
 	 * @property string $PaymentModule the value for strPaymentModule 
 	 * @property string $PaymentData the value for strPaymentData 
 	 * @property string $PaymentAmount the value for strPaymentAmount 
+	 * @property string $TrackingNumber the value for strTrackingNumber 
 	 * @property integer $FkTaxCodeId the value for intFkTaxCodeId 
 	 * @property boolean $TaxInclusive the value for blnTaxInclusive 
 	 * @property string $Subtotal the value for strSubtotal 
@@ -469,6 +470,15 @@
 
 
 		/**
+		 * Protected member variable that maps to the database column xlsws_cart.tracking_number
+		 * @var string strTrackingNumber
+		 */
+		protected $strTrackingNumber;
+		const TrackingNumberMaxLength = 255;
+		const TrackingNumberDefault = null;
+
+
+		/**
 		 * Protected member variable that maps to the database column xlsws_cart.fk_tax_code_id
 		 * @var integer intFkTaxCodeId
 		 */
@@ -780,7 +790,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -842,7 +852,7 @@
 		 * Static Qcodo Query method to query for a single Cart object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Cart the queried object
 		 */
@@ -1022,6 +1032,7 @@
 			$objBuilder->AddSelectItem($strTableName, 'payment_module', $strAliasPrefix . 'payment_module');
 			$objBuilder->AddSelectItem($strTableName, 'payment_data', $strAliasPrefix . 'payment_data');
 			$objBuilder->AddSelectItem($strTableName, 'payment_amount', $strAliasPrefix . 'payment_amount');
+			$objBuilder->AddSelectItem($strTableName, 'tracking_number', $strAliasPrefix . 'tracking_number');
 			$objBuilder->AddSelectItem($strTableName, 'fk_tax_code_id', $strAliasPrefix . 'fk_tax_code_id');
 			$objBuilder->AddSelectItem($strTableName, 'tax_inclusive', $strAliasPrefix . 'tax_inclusive');
 			$objBuilder->AddSelectItem($strTableName, 'subtotal', $strAliasPrefix . 'subtotal');
@@ -1205,6 +1216,8 @@
 			$objToReturn->strPaymentData = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'payment_amount', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'payment_amount'] : $strAliasPrefix . 'payment_amount';
 			$objToReturn->strPaymentAmount = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'tracking_number', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'tracking_number'] : $strAliasPrefix . 'tracking_number';
+			$objToReturn->strTrackingNumber = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'fk_tax_code_id', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'fk_tax_code_id'] : $strAliasPrefix . 'fk_tax_code_id';
 			$objToReturn->intFkTaxCodeId = $objDbRow->GetColumn($strAliasName, 'Integer');
 			$strAliasName = array_key_exists($strAliasPrefix . 'tax_inclusive', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'tax_inclusive'] : $strAliasPrefix . 'tax_inclusive';
@@ -1362,9 +1375,10 @@
 		 * @param string $strIdStr
 		 * @return Cart
 		*/
-		public static function LoadByIdStr($strIdStr) {
+		public static function LoadByIdStr($strIdStr, $objOptionalClauses = null) {
 			return Cart::QuerySingle(
 				QQ::Equal(QQN::Cart()->IdStr, $strIdStr)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1380,7 +1394,8 @@
 			try {
 				return Cart::QueryArray(
 					QQ::Equal(QQN::Cart()->CustomerId, $intCustomerId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1393,10 +1408,11 @@
 		 * @param integer $intCustomerId
 		 * @return int
 		*/
-		public static function CountByCustomerId($intCustomerId) {
+		public static function CountByCustomerId($intCustomerId, $objOptionalClauses = null) {
 			// Call Cart::QueryCount to perform the CountByCustomerId query
 			return Cart::QueryCount(
 				QQ::Equal(QQN::Cart()->CustomerId, $intCustomerId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1412,7 +1428,8 @@
 			try {
 				return Cart::QueryArray(
 					QQ::Equal(QQN::Cart()->Type, $intType),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1425,10 +1442,11 @@
 		 * @param integer $intType
 		 * @return int
 		*/
-		public static function CountByType($intType) {
+		public static function CountByType($intType, $objOptionalClauses = null) {
 			// Call Cart::QueryCount to perform the CountByType query
 			return Cart::QueryCount(
 				QQ::Equal(QQN::Cart()->Type, $intType)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1444,7 +1462,8 @@
 			try {
 				return Cart::QueryArray(
 					QQ::Equal(QQN::Cart()->Linkid, $strLinkid),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1457,10 +1476,11 @@
 		 * @param string $strLinkid
 		 * @return int
 		*/
-		public static function CountByLinkid($strLinkid) {
+		public static function CountByLinkid($strLinkid, $objOptionalClauses = null) {
 			// Call Cart::QueryCount to perform the CountByLinkid query
 			return Cart::QueryCount(
 				QQ::Equal(QQN::Cart()->Linkid, $strLinkid)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1476,7 +1496,8 @@
 			try {
 				return Cart::QueryArray(
 					QQ::Equal(QQN::Cart()->FkTaxCodeId, $intFkTaxCodeId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1489,10 +1510,11 @@
 		 * @param integer $intFkTaxCodeId
 		 * @return int
 		*/
-		public static function CountByFkTaxCodeId($intFkTaxCodeId) {
+		public static function CountByFkTaxCodeId($intFkTaxCodeId, $objOptionalClauses = null) {
 			// Call Cart::QueryCount to perform the CountByFkTaxCodeId query
 			return Cart::QueryCount(
 				QQ::Equal(QQN::Cart()->FkTaxCodeId, $intFkTaxCodeId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1508,7 +1530,8 @@
 			try {
 				return Cart::QueryArray(
 					QQ::Equal(QQN::Cart()->Submitted, $dttSubmitted),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1521,10 +1544,11 @@
 		 * @param QDateTime $dttSubmitted
 		 * @return int
 		*/
-		public static function CountBySubmitted($dttSubmitted) {
+		public static function CountBySubmitted($dttSubmitted, $objOptionalClauses = null) {
 			// Call Cart::QueryCount to perform the CountBySubmitted query
 			return Cart::QueryCount(
 				QQ::Equal(QQN::Cart()->Submitted, $dttSubmitted)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1540,7 +1564,8 @@
 			try {
 				return Cart::QueryArray(
 					QQ::Equal(QQN::Cart()->GiftRegistry, $intGiftRegistry),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1553,10 +1578,11 @@
 		 * @param integer $intGiftRegistry
 		 * @return int
 		*/
-		public static function CountByGiftRegistry($intGiftRegistry) {
+		public static function CountByGiftRegistry($intGiftRegistry, $objOptionalClauses = null) {
 			// Call Cart::QueryCount to perform the CountByGiftRegistry query
 			return Cart::QueryCount(
 				QQ::Equal(QQN::Cart()->GiftRegistry, $intGiftRegistry)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1572,7 +1598,8 @@
 			try {
 				return Cart::QueryArray(
 					QQ::Equal(QQN::Cart()->Downloaded, $blnDownloaded),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1585,10 +1612,11 @@
 		 * @param boolean $blnDownloaded
 		 * @return int
 		*/
-		public static function CountByDownloaded($blnDownloaded) {
+		public static function CountByDownloaded($blnDownloaded, $objOptionalClauses = null) {
 			// Call Cart::QueryCount to perform the CountByDownloaded query
 			return Cart::QueryCount(
 				QQ::Equal(QQN::Cart()->Downloaded, $blnDownloaded)
+			, $objOptionalClauses
 			);
 		}
 
@@ -1664,6 +1692,7 @@
 							`payment_module`,
 							`payment_data`,
 							`payment_amount`,
+							`tracking_number`,
 							`fk_tax_code_id`,
 							`tax_inclusive`,
 							`subtotal`,
@@ -1726,6 +1755,7 @@
 							' . $objDatabase->SqlVariable($this->strPaymentModule) . ',
 							' . $objDatabase->SqlVariable($this->strPaymentData) . ',
 							' . $objDatabase->SqlVariable($this->strPaymentAmount) . ',
+							' . $objDatabase->SqlVariable($this->strTrackingNumber) . ',
 							' . $objDatabase->SqlVariable($this->intFkTaxCodeId) . ',
 							' . $objDatabase->SqlVariable($this->blnTaxInclusive) . ',
 							' . $objDatabase->SqlVariable($this->strSubtotal) . ',
@@ -1817,6 +1847,7 @@
 							`payment_module` = ' . $objDatabase->SqlVariable($this->strPaymentModule) . ',
 							`payment_data` = ' . $objDatabase->SqlVariable($this->strPaymentData) . ',
 							`payment_amount` = ' . $objDatabase->SqlVariable($this->strPaymentAmount) . ',
+							`tracking_number` = ' . $objDatabase->SqlVariable($this->strTrackingNumber) . ',
 							`fk_tax_code_id` = ' . $objDatabase->SqlVariable($this->intFkTaxCodeId) . ',
 							`tax_inclusive` = ' . $objDatabase->SqlVariable($this->blnTaxInclusive) . ',
 							`subtotal` = ' . $objDatabase->SqlVariable($this->strSubtotal) . ',
@@ -1968,6 +1999,7 @@
 			$this->strPaymentModule = $objReloaded->strPaymentModule;
 			$this->strPaymentData = $objReloaded->strPaymentData;
 			$this->strPaymentAmount = $objReloaded->strPaymentAmount;
+			$this->strTrackingNumber = $objReloaded->strTrackingNumber;
 			$this->FkTaxCodeId = $objReloaded->FkTaxCodeId;
 			$this->blnTaxInclusive = $objReloaded->blnTaxInclusive;
 			$this->strSubtotal = $objReloaded->strSubtotal;
@@ -2222,6 +2254,11 @@
 					// Gets the value for strPaymentAmount 
 					// @return string
 					return $this->strPaymentAmount;
+
+				case 'TrackingNumber':
+					// Gets the value for strTrackingNumber 
+					// @return string
+					return $this->strTrackingNumber;
 
 				case 'FkTaxCodeId':
 					// Gets the value for intFkTaxCodeId 
@@ -2877,6 +2914,17 @@
 					// @return string
 					try {
 						return ($this->strPaymentAmount = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'TrackingNumber':
+					// Sets the value for strTrackingNumber 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strTrackingNumber = QType::Cast($mixValue, QType::String));
 					} catch (QCallerException $objExc) {
 						$objExc->IncrementOffset();
 						throw $objExc;
@@ -3568,6 +3616,7 @@
 			$strToReturn .= '<element name="PaymentModule" type="xsd:string"/>';
 			$strToReturn .= '<element name="PaymentData" type="xsd:string"/>';
 			$strToReturn .= '<element name="PaymentAmount" type="xsd:string"/>';
+			$strToReturn .= '<element name="TrackingNumber" type="xsd:string"/>';
 			$strToReturn .= '<element name="FkTaxCode" type="xsd1:TaxCode"/>';
 			$strToReturn .= '<element name="TaxInclusive" type="xsd:boolean"/>';
 			$strToReturn .= '<element name="Subtotal" type="xsd:string"/>';
@@ -3699,6 +3748,8 @@
 				$objToReturn->strPaymentData = $objSoapObject->PaymentData;
 			if (property_exists($objSoapObject, 'PaymentAmount'))
 				$objToReturn->strPaymentAmount = $objSoapObject->PaymentAmount;
+			if (property_exists($objSoapObject, 'TrackingNumber'))
+				$objToReturn->strTrackingNumber = $objSoapObject->TrackingNumber;
 			if ((property_exists($objSoapObject, 'FkTaxCode')) &&
 				($objSoapObject->FkTaxCode))
 				$objToReturn->FkTaxCode = TaxCode::GetObjectFromSoapObject($objSoapObject->FkTaxCode);
@@ -3886,6 +3937,8 @@
 					return new QQNode('payment_data', 'PaymentData', 'string', $this);
 				case 'PaymentAmount':
 					return new QQNode('payment_amount', 'PaymentAmount', 'string', $this);
+				case 'TrackingNumber':
+					return new QQNode('tracking_number', 'TrackingNumber', 'string', $this);
 				case 'FkTaxCodeId':
 					return new QQNode('fk_tax_code_id', 'FkTaxCodeId', 'integer', $this);
 				case 'FkTaxCode':
@@ -4042,6 +4095,8 @@
 					return new QQNode('payment_data', 'PaymentData', 'string', $this);
 				case 'PaymentAmount':
 					return new QQNode('payment_amount', 'PaymentAmount', 'string', $this);
+				case 'TrackingNumber':
+					return new QQNode('tracking_number', 'TrackingNumber', 'string', $this);
 				case 'FkTaxCodeId':
 					return new QQNode('fk_tax_code_id', 'FkTaxCodeId', 'integer', $this);
 				case 'FkTaxCode':

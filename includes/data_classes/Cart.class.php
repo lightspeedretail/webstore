@@ -884,6 +884,21 @@ class Cart extends CartGen {
 	}
 
 	/**
+	 * Findest the tallest product out of all your cart items to use as box height
+	 * @return int
+	 */
+	public static function GetPending() {
+		$intCount = Cart::QueryCount(
+		QQ::AndCondition(
+					QQ::Equal(QQN::Cart()->Downloaded, 0),
+					QQ::Equal(QQN::Cart()->Type, 4 ))
+
+	    );
+	    return $intCount;
+	}
+
+	   
+	/**
 	 * from an emailed cart, load the cart by link
 	 * @return
 	 */
@@ -1073,7 +1088,9 @@ class Cart extends CartGen {
 			case 'TaxTotal':
 				return round(round($this->Tax1,2)+round($this->Tax2,2)+
 									round($this->Tax3,2)+round($this->Tax4,2)+round($this->Tax5,2),2);
-
+			case 'Pending':
+				return $this->GetPending();
+			
 			default:
 				try {
 					return parent::__get($strName);

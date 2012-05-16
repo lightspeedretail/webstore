@@ -208,6 +208,8 @@
 	
 	
 	//THE VARIOUS ITEMS IN THE ADMIN DROPDOWN PANEL - CONFIGURATION, SHIPPING, PAYMENT, STATS AND SYSTEM
+	$strPend = Cart::GetPending() > 0 ? "(".Cart::GetPending().")" : "";
+	
 	$arrShipTabs = array('shipping' => _sp('Shipping') , 'methods' => _sp('Methods') , 
 		'destinations' =>_sp('Destinations') ,'shippingtasks' =>_sp('Shipping Tasks') ,
 		'countries' =>_sp('Countries') , 'states' =>_sp('States/Regions') );
@@ -215,7 +217,7 @@
 	$arrPaymentTabs = array('methods' => _sp('Methods') , 'cc' => _sp('Credit Card Types'), 
 		'promo' => _sp('Promo Codes'),'promotasks' => _sp('Promo Code Tasks'));
 	$arrSeoTabs = array('general' => _sp('General') , 'meta' => _sp('Meta'), 'categories' => _sp('Categories'));
-	$arrDbAdminTabs = array('warning' => _sp('Notice') , 'dbdl' => _sp('Downloaded<br>Orders'), 'dbpending' => _sp('Pending to<br>Download')  , 'incomplete' => _sp('Incomplete<br>Orders'));
+	$arrDbAdminTabs = array('warning' => _sp('Notice') , 'dborders' => _sp('Orders'), 'dbpending' => _sp('Pending to<br>Download '.$strPend)  , 'incomplete' => _sp('Incomplete<br>Orders'),'editorder' => _sp('Edit Order'));
 	$arrSystemTabs = array('config' => _sp('Setup') , 'task' => _sp('Tasks')  , 'vlog' => _sp('Visitor Log'), 'slog' => _sp('System Log'));
 	
 	
@@ -3539,6 +3541,8 @@
 		protected $qqn;
 		protected $qqnot;
 		protected $qqcondition;
+		protected $qqclause;
+		protected $hideID = false;
 		
 		
 		protected $txtSearch;
@@ -3570,8 +3574,15 @@
 			
 			// Define Columns -- we will define render helper methods to help with the rendering
 			// of the HTML for most of these columns
-			$this->dtgItems->AddColumn(new QDataGridColumn('ID', '<?= $_ITEM->Rowid ?>', 'CssClass=id',
-			array('OrderByClause' => QQ::OrderBy($qqn->Rowid), 'ReverseOrderByClause' => QQ::OrderBy($qqn->Rowid, false))));
+			if (!$this->hideID)
+				$this->dtgItems->AddColumn(
+				new QDataGridColumn('ID', 
+					'<?= $_ITEM->Rowid ?>', 
+					'CssClass=id',
+					array('OrderByClause' => QQ::OrderBy($qqn->Rowid), 'ReverseOrderByClause' => QQ::OrderBy($qqn->Rowid, false)
+				)
+				)
+			);
 
 			// Setup the First and Last name columns with HtmlEntities set to false (because they may be rendering textbox controls)
 			
@@ -5364,7 +5375,117 @@
 	*/				
 	class xlsws_admin_dborders extends xlsws_admin_generic_edit_form{
 		
+		protected $default_sort_index = 0;
+		protected $default_sort_direction = 1;
+		protected $hideID = true;
+	
 		protected function Form_Create(){
+			$this->arrTabs = $GLOBALS['arrDbAdminTabs'];
+			$this->currentTab = 'dborders';
+			
+			$this->appName = _sp("Orders");
+			$this->default_items_per_page = 10;
+			$this->className = "Cart";
+			$this->blankObj = new Cart();
+			$this->qqn = QQN::Cart();
+			
+			
+			$this->arrFields = array();
+
+			
+			$this->arrFields['IdStr'] = array('Name' => 'WO');
+			$this->arrFields['IdStr']['Field'] = new QLabel($this);
+			$this->arrFields['IdStr']['Width'] = 70;	
+			
+			$this->arrFields['Contact'] = array('Name' => 'Customer');
+			$this->arrFields['Contact']['Field'] = new QLabel($this);
+			$this->arrFields['Contact']['Width'] = 70;	
+			
+			$this->arrFields['Email'] = array('Name' => 'Email');
+			$this->arrFields['Email']['Field'] = new QLabel($this);
+			$this->arrFields['Email']['Width'] = 80;	
+			
+			$this->arrFields['Count'] = array('Name' => 'Items');
+			$this->arrFields['Count']['Field'] = new QLabel($this);
+			$this->arrFields['Count']['Width'] = 50;	
+			
+			
+			$this->arrFields['ShippingModule'] = array('Name' => 'Ship Method');
+			$this->arrFields['ShippingModule']['Field'] = new QLabel($this);
+			$this->arrFields['ShippingModule']['Width'] = 120;								
+			$this->arrFields['ShippingModule']['DisplayFunc'] = "RenderShippingModule";
+					
+
+			$this->arrFields['ShippingSell'] = array('Name' => 'Ship Price');
+			$this->arrFields['ShippingSell']['Field'] = new QLabel($this);
+			$this->arrFields['ShippingSell']['Width'] = 70;	
+			$this->arrFields['ShippingSell']['DisplayFunc'] = "RenderMoney";
+
+		
+			$this->arrFields['FkTaxCodeId'] = array('Name' => 'Tax Code');
+			$this->arrFields['FkTaxCodeId']['Field'] = new QLabel($this);
+			$this->arrFields['FkTaxCodeId']['DisplayFunc'] = "RenderTax";
+
+
+			$this->arrFields['Total'] = array('Name' => 'Total');
+			$this->arrFields['Total']['Field'] = new QLabel($this);
+			$this->arrFields['Total']['Width'] = 40;	
+			$this->arrFields['Total']['DisplayFunc'] = "RenderMoney";
+
+		
+			$this->arrFields['Downloaded'] = array('Name' => 'Downloaded');
+			$this->arrFields['Downloaded']['Field'] = new QCheckBox($this); 	
+			$this->arrFields['Downloaded']['Width'] = "10";
+			$this->arrFields['Downloaded']['DisplayFunc'] = "RenderCheck";
+			$this->arrFields['Downloaded']['Width'] = 50;
+
+			$this->HelperRibbon = "Note that changing shipping or tax will recalculate total automatically.";
+			
+			parent::Form_Create();
+			
+		}
+		
+		protected function RenderMoney($val) {
+			return _xls_currency($val);
+		}
+		
+		protected function RenderTax($val) {
+			
+			if($val=== '')  return ' ';
+			
+			$tax = TaxCode::Load($val);
+			if(!$tax) return '';
+						
+			return $tax->Code;			
+		}	
+		
+		protected function RenderShippingModule($val) {
+			
+			$code = Modules::LoadByFileType($val , 'shipping');
+			if (!$code) return "NOT FOUND";
+			
+			$values = $code->GetConfigValues();
+			return $values['label'];
+
+		}
+		
+		protected function RenderCheck($intType) {
+            if ($intType==1) return "✓";
+            else return "Pending";
+		}
+		
+		public function CanDelete() {
+			return false;
+		}
+		
+	}
+
+	
+	
+	class xlsws_admin_dbpendingorders extends xlsws_admin_generic_edit_form {
+		
+		protected function Form_Create(){
+		
 			$this->arrTabs = $GLOBALS['arrDbAdminTabs'];
 			$this->currentTab = 'dbpending';
 			
@@ -5378,10 +5499,15 @@
 				QQ::Equal(QQN::Cart()->Type, 4),
 				QQ::Equal(QQN::Cart()->Downloaded, 0));
 
+			
+			
+			
+			$this->HelperRibbon = "";
+		
 			$this->arrFields = array();
 
 			
-			$this->arrFields['IdStr'] = array('Name' => 'WO Number');
+			$this->arrFields['IdStr'] = array('Name' => 'WO');
 			$this->arrFields['IdStr']['Field'] = new XLSTextBox($this);
 			$this->arrFields['IdStr']['Width'] = 70;	
 			
@@ -5389,13 +5515,14 @@
 			$this->arrFields['Contact']['Field'] = new QLabel($this);
 			$this->arrFields['Contact']['Width'] = 70;	
 			
-			$this->arrFields['Phone'] = array('Name' => 'Phone');
-			$this->arrFields['Phone']['Field'] = new QLabel($this);
-			$this->arrFields['Phone']['Width'] = 70;	
+			$this->arrFields['Email'] = array('Name' => 'Email');
+			$this->arrFields['Email']['Field'] = new QLabel($this);
+			$this->arrFields['Email']['Width'] = 80;	
 			
-			$this->arrFields['Phone'] = array('Name' => 'Phone');
-			$this->arrFields['Phone']['Field'] = new QLabel($this);
-			$this->arrFields['Phone']['Width'] = 70;	
+			$this->arrFields['Count'] = array('Name' => 'Items');
+			$this->arrFields['Count']['Field'] = new QLabel($this);
+			$this->arrFields['Count']['Width'] = 50;	
+			
 			
 			$this->arrFields['ShippingModule'] = array('Name' => 'Ship Method');
 			$this->arrFields['ShippingModule']['Field'] = new XLSListBox($this);
@@ -5431,16 +5558,14 @@
 		
 			$this->arrFields['Downloaded'] = array('Name' => 'Downloaded');
 			$this->arrFields['Downloaded']['Field'] = new QCheckBox($this); 	
-			$this->arrFields['Downloaded']['Width'] = "30";
-			$this->arrFields['Downloaded']['DisplayFunc'] = "RenderBoolean";
+			$this->arrFields['Downloaded']['Width'] = "10";
+			$this->arrFields['Downloaded']['DisplayFunc'] = "RenderCheck";
 			$this->arrFields['Downloaded']['Width'] = 50;
 
-			$this->HelperRibbon = "Note that changing shipping or tax will recalculate total automatically.";
-			
 			parent::Form_Create();
 			
+			
 		}
-		
 		protected function RenderMoney($val) {
 			return _xls_currency($val);
 		}
@@ -5456,7 +5581,7 @@
 		}	
 		
 		protected function RenderShippingModule($val) {
-			error_log("looking up ".$val);
+			
 			$code = Modules::LoadByFileType($val , 'shipping');
 			if (!$code) return "NOT FOUND";
 			
@@ -5465,24 +5590,15 @@
 
 		}
 		
-	}
-
-	
-	
-	class xlsws_admin_dbdownloaded extends xlsws_admin_dborders{
-		
-		protected function Form_Create(){
-			parent::Form_Create();
-			$this->arrTabs = $GLOBALS['arrDbAdminTabs'];
-			$this->currentTab = 'dbdl';
-			
-			$this->appName = _sp("Downloaded Orders");
-			$this->qqcondition = 
-				QQ::AndCondition(
-				QQ::Equal(QQN::Cart()->Type, 4),
-				QQ::Equal(QQN::Cart()->Downloaded, 1));
-			
+		protected function RenderCheck($intType) {
+            if ($intType==1) return "✓";
+            else return "Pending";
 		}
+		
+		public function CanDelete() {
+			return false;
+		}
+		
 	}
 
 	
@@ -6188,10 +6304,10 @@
 			switch ($XLSWS_VARS['subpage'])
 			{
 				case "dbpending":
-					xlsws_admin_dborders::Run('xlsws_admin_dborders' , adminTemplate('edit.tpl.php'));
+					xlsws_admin_dbpendingorders::Run('xlsws_admin_dbpendingorders' , adminTemplate('edit.tpl.php'));
 					break;
-				case "dbdl":
-					xlsws_admin_dbdownloaded::Run('xlsws_admin_dbdownloaded' , adminTemplate('edit.tpl.php'));
+				case "dborders":
+					xlsws_admin_dborders::Run('xlsws_admin_dborders' , adminTemplate('edit.tpl.php'));
 					break;
 				case "promotasks":
 					xlsws_admin_promotasks::Run('xlsws_admin_promotasks' , adminTemplate('config.tpl.php'));
