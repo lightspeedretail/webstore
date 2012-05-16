@@ -358,8 +358,8 @@ function _xls_read_dir($dir , $ext = FALSE) {
 */
 function _xls_stack_add($key, $value) {
 	if(!isset($_SESSION['stack_vars'][$key]))
-	$_SESSION['stack_vars'][$key] = array();
-		$_SESSION['stack_vars'][$key][]=$value;
+		$_SESSION['stack_vars'][$key] = array();
+	$_SESSION['stack_vars'][$key][]=$value;
 }
 
 /**
@@ -380,7 +380,7 @@ function _xls_stack_put($key, $value) {
  * @param string $key
  * return mix or false
  */
-function _xls_stack_get($key) {
+function _xls_stack_get($key) { 
 	if(isset($_SESSION['stack_vars'][$key])) {
 		$intItemCount = count($_SESSION['stack_vars'][$key]);
 

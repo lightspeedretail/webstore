@@ -34,18 +34,18 @@ class iups extends xlsws_class_shipping {
 	public $service_types;
 		//US ORIGIN
 	protected $ups_service_us = array (
-		'01' => 'UPS Next Day Air',
-		'02' => 'UPS 2nd Day Air',
 		'03' => 'UPS Ground',
-		'07' => 'UPS Worldwide Express',
-		'08' => 'UPS Worldwide Expedited',
 		'11' => 'UPS Standard',
 		'12' => 'UPS 3 Day Select',
+		'02' => 'UPS 2nd Day Air',
 		'13' => 'UPS Next Day Air Saver',
+		'01' => 'UPS Next Day Air',
 		'14' => 'UPS Next Day Air Early A.M.',
+		'65' => 'UPS Express Saver',
+		'07' => 'UPS Worldwide Express',
+		'08' => 'UPS Worldwide Expedited',
 		'54' => 'UPS Worldwide Express Plus',
 		'59' => 'UPS 2nd Day Air A.M.',
-		'65' => 'UPS Express Saver',
 		'82' => 'UPS Today Standard',
 		'83' => 'UPS Today Dedicated',
 		'84' => 'UPS Today Intercity',
@@ -54,15 +54,16 @@ class iups extends xlsws_class_shipping {
 
 
 	protected $ups_service_eu = array (
-		'01' => 'UPS Next Day Air',
-		'02' => 'UPS 2nd Day Air',
 		'03' => 'UPS Ground',
-		'07' => 'UPS Worldwide Express',
-		'08' => 'UPS Worldwide Expedited',
 		'11' => 'UPS Standard',
 		'12' => 'UPS 3 Day Select',
+		'02' => 'UPS 2nd Day Air',
 		'13' => 'UPS Next Day Air Saver',
+		'01' => 'UPS Next Day Air',
 		'14' => 'UPS Next Day Air Early A.M.',
+		'07' => 'UPS Worldwide Express',
+		'08' => 'UPS Worldwide Expedited',
+
 		'54' => 'UPS Worldwide Express Plus',
 		'59' => 'UPS 2nd Day Air A.M.',
 		'65' => 'UPS Express Saver',
@@ -73,15 +74,15 @@ class iups extends xlsws_class_shipping {
 	);
 
 	protected $ups_service_ca = array (
-		'01' => 'UPS Next Day Air',
-		'02' => 'UPS 2nd Day Air',
 		'03' => 'UPS Ground',
-		'07' => 'UPS Worldwide Express',
-		'08' => 'UPS Worldwide Expedited',
 		'11' => 'UPS Standard',
 		'12' => 'UPS 3 Day Select',
+		'02' => 'UPS 2nd Day Air',
 		'13' => 'UPS Next Day Air Saver',
-		'14' => 'UPS Next Day Air Early A.M.',
+		'01' => 'UPS Next Day Air',
+		'14' => 'UPS Next Day Air Early A.M.',	
+		'07' => 'UPS Worldwide Express',
+		'08' => 'UPS Worldwide Expedited',
 		'54' => 'UPS Worldwide Express Plus',
 		'59' => 'UPS 2nd Day Air A.M.',
 		'65' => 'UPS Express Saver',
@@ -93,11 +94,12 @@ class iups extends xlsws_class_shipping {
 
 	//From Other origin
 	protected $ups_service_other = array (
+		'11' => 'UPS Standard',
+		'65' => 'UPS Saver',
 		'07' => 'UPS Express',
 		'08' => 'UPS Worldwide Expedited',
-		'11' => 'UPS Standard',
-		'54' => 'UPS Worldwide Express Plus',
-		'65' => 'UPS Saver'
+		'54' => 'UPS Worldwide Express Plus'
+		
 	);
 
 	var $userid;
@@ -287,7 +289,7 @@ class iups extends xlsws_class_shipping {
 		$ret = array();
 		$config = $this->getConfigValues('iups');
 
-		$ret['service'] = new XLSListBox($objParent);
+		$ret['service'] = new XLSListBox($objParent,'ModuleMethod');
 		$this->make_iups_products($ret['service']);
 		$ret['service']->Name = _sp('Preference:');
 		//$ret['product']->SelectedValue = $config['defaultproduct'];
@@ -308,68 +310,81 @@ class iups extends xlsws_class_shipping {
 		$this->accesskey = $config['accesskey'];
 		$this->currency = $cart->Currency;
 
-		$weight = $cart->total_weight();
+		$weight = $cart->Weight;
 		$this->weight_type = strtoupper(_xls_get_conf('WEIGHT_UNIT', 'lb'));
 		$this->weight_type .= "S"; // Add KGS or LBS
 
-		$length = $cart->total_length();
-		$width = $cart->total_width();
-		$height = $cart->total_height();
+		$length = $cart->Length;
+		$width = $cart->Width;
+		$height = $cart->Height;
 		$this->measurement_type = strtoupper(_xls_get_conf('DIMENSION_UNIT', 'in'));
 
 		$selected = $fields['service']->SelectedValue;
 
-		$this->make_iups_products($fields['service']);
 
-		$fields['service']->RemoveAllItems();
+		$strShipData=serialize(array(__class__,$weight,$address1,$zipcode));	
+		if (_xls_stack_get('ShipBasedOn') != $strShipData) {
+			_xls_stack_put('ShipBasedOn',$strShipData);
 
-		$found = 0;
-		$ret = array();
 
-			$rates = $this->rate(
-				$selected,
-				$zipcode,
-				$state,
-				$country,
-				$weight,
-				$length,
-				$width,
-				$height,
-				($company!='') ? 0 : 1,
-				$cart->Total,
-				$this->package_type
-			);
+			$this->make_iups_products($fields['service']);
+	
+			$fields['service']->RemoveAllItems();
+	
+			$found = 0;
+			$ret = array();
+	
+				$rates = $this->rate(
+					$selected,
+					$zipcode,
+					$state,
+					$country,
+					$weight,
+					$length,
+					$width,
+					$height,
+					($company!='') ? 0 : 1,
+					$cart->Total,
+					$this->package_type
+				);
+	
+				if($rates === false) {
+					$fields['service']->Visible = false;
+					return false;
+				}
 
-			if($rates === false) {
+			asort($rates,SORT_NUMERIC);
+			
+			foreach($rates as $type=>$rate) {
+				if(isset($this->service_types[$type]))
+					$desc = $this->service_types[$type];
+				else
+					$desc = "UPS $type";
+	
+				$fields['service']->AddItem("$desc (" . _xls_currency(floatval($rate) + floatval($config['markup'])) . ")" , $type);
+	
+				$ret[$type] = floatval($rate) + floatval($config['markup']);
+	
+				$found++;
+			}
+			
+
+			if($found <=0) {
+				QApplication::Log(E_ERROR, __CLASS__,
+					'Could not get shipping information for '.$state." ".$zipcode." ".$country);
+				QApplication::Log(E_ERROR, __CLASS__,
+					"Shipper Response: " . print_r($rates,TRUE));
+	
 				$fields['service']->Visible = false;
 				return false;
 			}
-
-		foreach($rates as $type=>$rate) {
-			if(isset($this->service_types[$type]))
-				$desc = $this->service_types[$type];
-			else
-				$desc = "UPS $type";
-
-			$fields['service']->AddItem("$desc (" . _xls_currency(floatval($rate) + floatval($config['markup'])) . ")" , $type);
-
-			$ret[$type] = floatval($rate) + floatval($config['markup']);
-
-			$found++;
+	
+			$fields['service']->Visible = true;
+			_xls_stack_put('ShipBasedResults',serialize($ret));
 		}
-
-		if($found <=0) {
-			QApplication::Log(E_ERROR, __CLASS__,
-				'Could not get shipping information for '.$state." ".$zipcode." ".$country);
-			QApplication::Log(E_ERROR, __CLASS__,
-				"Shipper Response: " . print_r($rates,TRUE));
-
-			$fields['service']->Visible = false;
-			return false;
-		}
-
-		$fields['service']->Visible = true;
-
+		else 
+			$ret = unserialize(_xls_stack_get('ShipBasedResults'));
+	
 		$arr = array(
 			'price' => false,
 			'msg' => '',

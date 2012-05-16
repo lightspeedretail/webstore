@@ -21,7 +21,8 @@ class XLSShippingControl extends XLSCompositeControl {
     protected function BuildLabelControl() {
         $objControl = new QLabel($this, $this->GetChildName('Label'));
         $objControl->RenderMethod = 'RenderAsDefinition';
-
+		$objControl->Visible = false;
+		
         $this->UpdateLabelControl();
         $this->BindLabelControl();
 
@@ -54,7 +55,7 @@ class XLSShippingControl extends XLSCompositeControl {
         else {
             $objControl->Visible = false;
         }
-
+		$objControl->Visible = false;
         return $objControl;
     }
 
@@ -111,7 +112,7 @@ class XLSShippingControl extends XLSCompositeControl {
         else { 
             $objControl->Visible = false;
         }
-
+		$objControl->Visible = false;
         return $objControl;
     }
 
@@ -155,7 +156,10 @@ class XLSShippingControl extends XLSCompositeControl {
         if (!$objControl)
             return;
 
+		_xls_stack_pop('ShipBasedOn');
+		
         if ($blnReset) {
+       		 
             $objControl->RemoveAllItems();
 
             foreach ($this->LoadModules() as $objModule) { 
@@ -231,7 +235,7 @@ class XLSShippingControl extends XLSCompositeControl {
         return $objControl;
     }
 
-    protected function UpdateMethodControl($blnReset = true) {  error_log(__class__.' '.__function__);
+    protected function UpdateMethodControl($blnReset = true) { 
         // While we're dealing with V1 modules, only a full lookup
         // will return a valid shipping rate selection.
         
@@ -241,7 +245,7 @@ class XLSShippingControl extends XLSCompositeControl {
         if (!$objControl)
             return;
 
-        if ($blnReset) { 
+        if ($blnReset) {
             $objControl->RemoveChildControls(true);
 
             if ($objCart->ShippingModule)
@@ -278,7 +282,7 @@ class XLSShippingControl extends XLSCompositeControl {
     }
 
     // This is a temporary method which will be replaced in the future
-    protected function ProcessMethodControl($objModule = null) {
+    protected function ProcessMethodControl($objModule = null) { 
         $objCart = Cart::GetCart();
 
         if ($objCart->ShippingModule)
@@ -324,7 +328,7 @@ class XLSShippingControl extends XLSCompositeControl {
 
     // This function will be modified in the future as we move away from 
     // legacy shipping modules
-    public function DoMethodChange($strFormId, $strControlId, $strParam = null){
+    public function DoMethodChange($strFormId, $strControlId, $strParam = null) { 
         $objControl = $this->GetChildByName('Method');
         $objControl->Enabled = true;
 
@@ -344,73 +348,79 @@ class XLSShippingControl extends XLSCompositeControl {
     protected function CalculateShippingRate($objModule) {
         $objCart = Cart::GetCart();
 
-        $strShippingModule = $objCart->ShippingModule;
-        $strShippingMethod = null;
-        $strShippingData = null;
-        $fltShippingPrice = null;
-        $fltShippingCost = null;
-        $fltShippingMarkup = 0;
 
-        try { 
-            $mixTotal = $objModule->total(
-                $this->objMethodFields,
-                $objCart,
-                $objCart->ShipCountry,
-                $objCart->ShipZip,
-                $objCart->ShipState,
-                $objCart->ShipCity,
-                $objCart->ShipAddress2,
-                $objCart->ShipAddress1,
-                $objCart->ShipCompany,
-                $objCart->ShipLastname,
-                $objCart->ShipFirstname
-            );
-        }
-        catch(Exception $objExc) {
-            $mixTotal = false;
-        }
+	        $strShippingModule = $objCart->ShippingModule;
+	        $strShippingMethod = null;
+	        $strShippingData = null;
+	        $fltShippingPrice = null;
+	        $fltShippingCost = null;
+	        $fltShippingMarkup = 0;
+	
+	        try { 
+	            $mixTotal = $objModule->total(
+	                $this->objMethodFields,
+	                $objCart,
+	                $objCart->ShipCountry,
+	                $objCart->ShipZip,
+	                $objCart->ShipState,
+	                $objCart->ShipCity,
+	                $objCart->ShipAddress2,
+	                $objCart->ShipAddress1,
+	                $objCart->ShipCompany,
+	                $objCart->ShipLastname,
+	                $objCart->ShipFirstname
+	            );
+	        }
+	        catch(Exception $objExc) {
+	            $mixTotal = false;
+	        }
 
-        if ($mixTotal === false) {
-            $this->ValidationError = _sp($this->strLabelForError);
-        }
-        else if (is_numeric($mixTotal)) {
-            $fltShippingPrice = $mixTotal; 
-        }
-        else if (is_array($mixTotal)) {
-            if (isset($mixTotal['price']) && is_numeric($mixTotal['price']))
-                $fltShippingPrice = $mixTotal['price'];
-
-            if (isset($mixTotal['msg']))
-                $strShippingData = $mixTotal['msg'];
-
-            if (isset($mixTotal['product']))
-                $strShippingMethod = $mixTotal['product'];
-
-            if (isset($mixTotal['markup']))
-                $fltShippingMarkup = $mixTotal['markup'];
-        }
-        else { 
-            $this->ValidationError = _sp($this->strLabelForError);
-            QApplication::Log(E_ERROR, 'shipping', 
-                sprintf(
-                    _sp('Could not determine return type for module %s'),
-                    $strShippingModule
-                )
-            );
-        }
-
-        if (!is_null($fltShippingPrice)) {
-            if (is_null($fltShippingCost))
-                $fltShippingCost = $fltShippingPrice - $fltShippingMarkup;
-
-            if ($fltShippingCost < 0)
-                $fltShippingCost = 0;
-        }
-
-        $this->SetShippingSelection(
-            $strShippingModule, $strShippingMethod, $strShippingData, 
-            $fltShippingPrice, $fltShippingCost
-        );
+	        if ($mixTotal === false) {
+	            $this->ValidationError = _sp($this->strLabelForError);
+	        }
+	        else if (is_numeric($mixTotal)) {
+	            $fltShippingPrice = $mixTotal; 
+	        }
+	        else if (is_array($mixTotal)) {
+	            if (isset($mixTotal['price']) && is_numeric($mixTotal['price']))
+	                $fltShippingPrice = $mixTotal['price'];
+	
+	            if (isset($mixTotal['msg']))
+	                $strShippingData = $mixTotal['msg'];
+	
+	            if (isset($mixTotal['product']))
+	                $strShippingMethod = $mixTotal['product'];
+	
+	            if (isset($mixTotal['markup']))
+	                $fltShippingMarkup = $mixTotal['markup'];
+	        }
+	        else { 
+	            $this->ValidationError = _sp($this->strLabelForError);
+	            QApplication::Log(E_ERROR, 'shipping', 
+	                sprintf(
+	                    _sp('Could not determine return type for module %s'),
+	                    $strShippingModule
+	                )
+	            );
+	        }
+	
+	        if (!is_null($fltShippingPrice)) {
+	            if (is_null($fltShippingCost))
+	                $fltShippingCost = $fltShippingPrice - $fltShippingMarkup;
+	
+	            if ($fltShippingCost < 0)
+	                $fltShippingCost = 0;
+	        }
+	       				
+		
+	        $this->SetShippingSelection(
+	            $strShippingModule, $strShippingMethod, $strShippingData, 
+	            $fltShippingPrice, $fltShippingCost
+	        );
+	     
+	     
+	     
+	     
     }
 
     protected function ResetShippingSelection() { 
@@ -427,7 +437,7 @@ class XLSShippingControl extends XLSCompositeControl {
 
     protected function SetShippingSelection(
         $strModule, $strMethod, $strData, $fltPrice, $fltCost = null
-    ) {error_log(__class__.' '.__function__);
+    ) {
         
         if (is_null($fltPrice)) {
             return $this->ResetShippingSelection();
