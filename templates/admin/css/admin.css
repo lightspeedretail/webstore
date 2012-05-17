@@ -545,7 +545,7 @@ min-width:30%;
 overflow:hidden;
 }
 
-.id,.country,.code,.a3,.n3,.region,.latitude,.longitude,.available,.zip {
+.country,.code,.a3,.n3,.region,.latitude,.longitude,.available,.zip {
 padding-top:10px;
 }
 

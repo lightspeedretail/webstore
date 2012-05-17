@@ -4598,6 +4598,11 @@
 	
 	class xlsws_admin_promo extends xlsws_admin_generic_edit_form {
 	
+		protected $default_sort_index = 0;
+		protected $default_sort_direction = 0;
+		protected $hideID = true;
+		
+		
 		protected function Form_Create() {
 		
 			$this->arrTabs = $GLOBALS['arrPaymentTabs'];
@@ -4613,16 +4618,16 @@
 
 			$this->arrFields = array();
 		
-			$this->arrFields['Enabled'] = array('Name' => 'Enabled');
-			$this->arrFields['Enabled']['Field'] = new QCheckBox($this); 	
-			$this->arrFields['Enabled']['DisplayFunc'] = "RenderCheck";
-			$this->arrFields['Enabled']['Width'] = 20;
-			$this->arrFields['Enabled']['DefaultValue'] = true;	
-			
 			$this->arrFields['Code'] = array('Name' => 'Promo Code');
 			$this->arrFields['Code']['Field'] = new XLSTextBox($this);
 			$this->arrFields['Code']['Width'] = 100;	
 			$this->arrFields['Code']['Field']->Required = true;
+			
+			$this->arrFields['Enabled'] = array('Name' => 'Enabled');
+			$this->arrFields['Enabled']['Field'] = new QCheckBox($this); 	
+			$this->arrFields['Enabled']['DisplayFunc'] = "RenderCheck";
+			$this->arrFields['Enabled']['Width'] = 20;
+			$this->arrFields['Enabled']['DefaultValue'] = true;
 			
 			$this->arrFields['Amount'] = array('Name' => 'Discount<br>Amount');
 			$this->arrFields['Amount']['Field'] = new XLSTextBox($this);
@@ -5407,6 +5412,7 @@
 			$this->arrFields['IdStr'] = array('Name' => 'WO');
 			$this->arrFields['IdStr']['Field'] = new QLabel($this);
 			$this->arrFields['IdStr']['Width'] = 70;	
+			$this->arrFields['IdStr']['CssClass']= 'id';
 			
 			$this->arrFields['Contact'] = array('Name' => 'Customer');
 			$this->arrFields['Contact']['Field'] = new QLabel($this);
