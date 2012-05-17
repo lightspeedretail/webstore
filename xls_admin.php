@@ -214,6 +214,7 @@
 		'destinations' =>_sp('Destinations') ,'shippingtasks' =>_sp('Shipping Tasks') ,
 		'countries' =>_sp('Countries') , 'states' =>_sp('States/Regions') );
 	$arrConfigTabs = array('store' => _sp('Store') , 'appear' => _sp('Appearance') , 'sidebars' =>_sp('Sidebars'));
+	$arrCustomPagesTabs = array('pages' => _sp('Edit Pages'));
 	$arrPaymentTabs = array('methods' => _sp('Methods') , 'cc' => _sp('Credit Card Types'), 
 		'promo' => _sp('Promo Codes'),'promotasks' => _sp('Promo Code Tasks'));
 	$arrSeoTabs = array('general' => _sp('General') , 'meta' => _sp('Meta'), 'categories' => _sp('Categories'));
@@ -1853,7 +1854,9 @@
             //$this->txtPageText->Required = true;
             $this->txtPageText->Width = 550;
             $this->txtPageText->Height = 450;
-//			$this->txtPageText->ToolbarSet = "XLSWS";
+			$this->txtPageText->ToolbarSet = "WebstoreToolbar";
+			//$this->txtPageText->ToolbarSet = 'Default';
+			$this->txtPageText->ToolbarStartExpanded = true;
 			$this->txtPageText->Name=_sp("Page content");
 	        $this->txtPageText->CrossScripting = QCrossScripting::Allow;        
 	        
@@ -1960,6 +1963,10 @@
 			$this->page->TabPosition = $this->txtTabPosition->SelectedValue;
 			//error_log($this->txtPageText->Text);
 			$this->page->Page = stripslashes($this->txtPageText->Text);
+			
+			$this->page->Page = filter_var(stripslashes($this->txtPageText->Text), FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);	
+			
+				
 			$this->page->ProductTag = $this->txtProductTag->Text;
 			//$this->page->MetaKeywords = stripslashes($this->txtPageKeywords->Text);
 			$this->page->MetaDescription = stripslashes($this->txtPageDescription->Text);
@@ -2511,7 +2518,7 @@
             $this->txtPageText->Required = true;
             $this->txtPageText->Width = 550;
             $this->txtPageText->Height = 450;
-//			$this->txtPageText->ToolbarSet = "XLSWS";
+			$this->txtPageText->ToolbarSet = "WebstoreToolbar";
 			$this->txtPageText->Name=_sp("Page content");
 	        $this->txtPageText->CrossScripting = QCrossScripting::Allow;        
 	        
@@ -3267,6 +3274,10 @@
 		
 		protected function Form_Create(){
 			parent::Form_Create();
+			
+					
+			$this->arrTabs = $GLOBALS['arrCustomPagesTabs'];
+			$this->currentTab = 'pages';
 			
 			$this->page = new CustomPage();
 			

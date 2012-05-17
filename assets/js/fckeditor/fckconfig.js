@@ -116,18 +116,15 @@ FCKConfig.ToolbarSets["Default"] = [
 
 
 //XLSWS
-FCKConfig.ToolbarSets["XLSWS"] = [
-	['Bold','Italic','Underline','StrikeThrough', 	'-','JustifyLeft','JustifyCenter','JustifyRight','JustifyFull', 'UnorderedList', 
-	'-', 'Link', 'Image','Flash','Rule'],
+FCKConfig.ToolbarSets["WebstoreToolbar"] = [
+	['Source','-','Bold','Italic','Underline','StrikeThrough', 	'-','JustifyLeft','JustifyCenter','JustifyRight','JustifyFull', 'UnorderedList', 
+	'-', 'Link', 'Image','Flash','Rule','Preview',],
 	'/',
-	['FontName','FontSize'],['TextColor', '-', 'RemoveFormat'],
-	'/',
-	['Cut','Copy','Paste','-','SpellCheck'], ['Undo','Redo',],
-	['Source','-','Preview',]		// No comma for the last row.
+	['FontName','FontSize'],['TextColor', '-', 'RemoveFormat'],['Cut','Copy','Paste'], ['Undo','Redo',]
 ] ;
 
 /* XLSWS
-FCKConfig.ToolbarSets["XLSWS"] = [
+FCKConfig.ToolbarSets["WebstoreToolbar"] = [
 	['Source','DocProps','-','Preview','-','Templates'],
 	['Cut','Copy','Paste','PasteText','PasteWord','-','Print','SpellCheck'],
 	['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],

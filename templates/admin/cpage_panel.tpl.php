@@ -60,7 +60,7 @@
 									<p>
 										<span class="label"><?php _xt('Text') ?>:</span> 
 										<div style="margin-left: 200px;">
-										<?php $_CONTROL->txtPageText->RenderWithError(); ?>
+										<?php $_CONTROL->txtPageText->Render(); ?>
 										<a href="#" class="textfield" class="tooltip" title="<?php _xt('The text (or HTML) for the page.') ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" class="info_right" /></a>
 										</div>
 										</span> 

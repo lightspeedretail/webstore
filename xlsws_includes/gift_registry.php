@@ -144,7 +144,7 @@ class xlsws_gregistry extends xlsws_index {
 			$this->txtGRHtmlContent->Width = "500px";
 			$this->txtGRHtmlContent->Height = 300;
 			$this->txtGRHtmlContent->ReadOnly = true;
-			$this->txtGRHtmlContent->ToolbarSet = "XLSWS";
+			$this->txtGRHtmlContent->ToolbarSet = "WebstoreToolbar";
 			$this->txtGRHtmlContent->Name=_sp("What do the visitors see?");
 		}
 	}

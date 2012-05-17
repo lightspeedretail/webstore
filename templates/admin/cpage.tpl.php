@@ -81,6 +81,31 @@
 	
 ?>
 
+
+		<br /><br />
+			
+		<div id="options" class="accord rounded"> 
+		<div id="tabs">
+			<ul>
+				<?php foreach($this->arrTabs as $type=>$label): ?>
+				<a href="<?= $this->get_uri($type); ?>" >
+					<li class="rounded 
+						<?php if($type == $this->currentTab): ?>
+							active
+						<?php endif; ?> {5px top transparent}" style="display:block; float: left">
+						<?= $label; ?>
+					</li>
+				</a>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+<?php
+
+if(isset($this->HelperRibbon)) 
+	if (strlen($this->HelperRibbon)>0)
+		echo '<div style="padding: 5px;"><img style="padding-right: 5px;width:44px; height:35px;" align="left" src="'.adminTemplate('css/images/questionmark.png').'"> '.$this->HelperRibbon.'</div>';
+
+?>	
 <div id="options" class="accord rounded"> 
 					
 		<ul id="listOrder"> 
