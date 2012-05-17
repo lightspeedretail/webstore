@@ -34,7 +34,7 @@ class ups extends xlsws_class_shipping {
 	public $service_types;
 
 	protected $strModuleName = "UPS";
-	
+	protected $strTrackingPattern = array('/^(1Z\s?[0-9A-Z]{3}\s?[0-9A-Z]{3}\s?[0-9A-Z]{2}\s?[0-9A-Z]{4}\s?[0-9A-Z]{3}\s?[0-9A-Z]$|[\dT]\d{3}\s?\d{4}s?\d{3})$/i');
 
 	/**
 	 * make_ups_products populates with shipping options available through shipper

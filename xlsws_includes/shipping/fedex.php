@@ -39,6 +39,9 @@ class fedex extends xlsws_class_shipping {
 	 *
 	 */
 	protected $strModuleName = "FedEx";
+	protected $strTrackingPattern = array('/(\b96\d{20}\b)|(\b\d{15}\b)|(\b\d{12}\b)/',
+		'/\b((98\d\d\d\d\d?\d\d\d\d|98\d\d) ?\d\d\d\d ?\d\d\d\d( ?\d\d\d)?)\b/',
+		'/^[0-9]{15}$/');
 
 		/**
 	 * check() verifies nothing has changed in the configuration since initial load

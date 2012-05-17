@@ -218,7 +218,7 @@
 	$arrPaymentTabs = array('methods' => _sp('Methods') , 'cc' => _sp('Credit Card Types'), 
 		'promo' => _sp('Promo Codes'),'promotasks' => _sp('Promo Code Tasks'));
 	$arrSeoTabs = array('general' => _sp('General') , 'meta' => _sp('Meta'), 'categories' => _sp('Categories'));
-	$arrDbAdminTabs = array('warning' => _sp('Notice') , 'dborders' => _sp('Orders'), 'dbpending' => _sp('Pending to<br>Download '.$strPend)  , 'incomplete' => _sp('Incomplete<br>Orders'),'editorder' => _sp('Edit Order'));
+	$arrDbAdminTabs = array('warning' => _sp('Notice') , 'dborders' => _sp('Orders'), 'dbpending' => _sp('Pending to<br>Download '.$strPend)  , 'incomplete' => _sp('Incomplete<br>Orders'),'dbedit' => _sp('Edit Order'));
 	$arrSystemTabs = array('config' => _sp('Setup') , 'task' => _sp('Tasks')  , 'vlog' => _sp('Visitor Log'), 'slog' => _sp('System Log'));
 	
 	
@@ -3544,7 +3544,7 @@
 		protected $default_items_per_page = 10;
 		protected $default_sort_index = 0;
 		protected $default_sort_direction = 0;
-		
+		protected $edit_override = false;
 		
 		// These need to be defined
 		protected $className;
@@ -3833,8 +3833,15 @@
 					$btnEdit->ImageUrl = adminTemplate('css/images/btn_settings.png');
 					$btnEdit->ToolTip = _sp("Edit");
 					$btnEdit->ActionParameter = $objItem->Rowid;
-					$btnEdit->AddAction(new QClickEvent(), new QAjaxAction('btnEdit_Click'));
+					
 					$btnEdit->CausesValidation = false;
+					
+					
+					
+					
+					$btnEdit->AddAction(new QClickEvent(), new QAjaxAction('btnEdit_Click'));
+					
+					
 				}
 
 				// If we are currently editing a person, then set this Edit button to be disabled
@@ -3951,24 +3958,37 @@
 		// setup the FirstName and LastName textboxes to contain the name of the person
 		// we are editing.
 		protected function btnEdit_Click($strFormId, $strControlId, $strParameter) {
+			
+			//ToDo: During Admin redesign, make a proper way to intercept editing to different QPanel
+			if ($this->edit_override)
+				_rd($_SERVER["SCRIPT_NAME"]  . '?page=dbadmin&subpage=dbedit&row=' . $strParameter . admin_sid());
+
+				
 			$this->intEditRowid = $strParameter;
 			$blankObj = $this->blankObj;
 			$objItem = $blankObj->Load($strParameter);
 			
+
 			foreach($this->arrFields as $field =>$properties){
 				
 				if($this->arrFields[$field]['Field'] instanceof QListBox  )
 					$this->arrFields[$field]['Field']->SelectedValue = $objItem->$field;
 				elseif($this->arrFields[$field]['Field'] instanceof QCheckBox   )
 					$this->arrFields[$field]['Field']->Checked = $objItem->$field?True:False;
-				else
-					$this->arrFields[$field]['Field']->Text = (isset($this->arrFields[$field]['UTF8'])?$objItem->$field:$objItem->$field);
+				elseif($objItem->$field instanceof QDateTime )
+					$this->arrFields[$field]['Field']->Text = $objItem->$field->format(_xls_get_conf( 'DATE_FORMAT' , 'D d M y'));
+				else $this->arrFields[$field]['Field']->Text = $objItem->$field;
+					
+					
+				if($this->arrFields[$field]['Field'] instanceof QTextBox && !isset($ctlId)) 
+					$ctlId = $this->arrFields[$field]['Field']->ControlId;
 			}
 
 			$field = key($this->arrFields);
 			
 			// Let's put the focus on the First Field
-			QApplication::ExecuteJavaScript(sprintf('qcodo.getControl("%s").focus()', $this->arrFields[$field]['Field']->ControlId));
+			if (isset($ctlId)) 
+				QApplication::ExecuteJavaScript(sprintf('qcodo.getControl("%s").focus()', $ctlId));
 		}
 
 		// Handle the action for the Save button being clicked.
@@ -3978,17 +3998,20 @@
 			if ($this->intEditRowid == -1){
 				$cname = get_class($blankObj);
 				$objItem = new $cname;
-			}else
-			$objItem = $blankObj->Load($this->intEditRowid);
+			}
+			else
+				$objItem = $blankObj->Load($this->intEditRowid);
 
 			
-			foreach($this->arrFields as $field =>$properties){
+			foreach($this->arrFields as $field =>$properties) {
 				
-				if($this->arrFields[$field]['Field'] instanceof QListBox  )
+				if($this->arrFields[$field]['Field'] instanceof QLabel  )
+				{ //do nothing because nothing has changed with a display label
+				}
+				elseif($this->arrFields[$field]['Field'] instanceof QListBox  )
 					$objItem->$field = $this->arrFields[$field]['Field']->SelectedValue;
-				elseif($this->arrFields[$field]['Field'] instanceof QCheckBox   ) { error_log("here");
+				elseif($this->arrFields[$field]['Field'] instanceof QCheckBox   )
 					$objItem->$field = ( $this->arrFields[$field]['Field']->Checked ? 1 : 0);
-					}
 				else
 					$objItem->$field = (isset($this->arrFields[$field]['UTF8'])?utf8_decode($this->arrFields[$field]['Field']->Text):$this->arrFields[$field]['Field']->Text);
 			}
@@ -5414,6 +5437,11 @@
 			$this->arrFields['IdStr']['Width'] = 70;	
 			$this->arrFields['IdStr']['CssClass']= 'id';
 			
+			$this->arrFields['Submitted'] = array('Name' => 'Date');
+			$this->arrFields['Submitted']['Field'] = new QLabel($this);
+			$this->arrFields['Submitted']['Width'] = 70;
+			$this->arrFields['Submitted']['DisplayFunc'] = "RenderDate";	
+
 			$this->arrFields['Contact'] = array('Name' => 'Customer');
 			$this->arrFields['Contact']['Field'] = new QLabel($this);
 			$this->arrFields['Contact']['Width'] = 70;	
@@ -5427,7 +5455,7 @@
 			$this->arrFields['Count']['Width'] = 50;	
 			
 			
-			$this->arrFields['ShippingModule'] = array('Name' => 'Ship Method');
+			/*$this->arrFields['ShippingModule'] = array('Name' => 'Ship Method');
 			$this->arrFields['ShippingModule']['Field'] = new QLabel($this);
 			$this->arrFields['ShippingModule']['Width'] = 120;								
 			$this->arrFields['ShippingModule']['DisplayFunc'] = "RenderShippingModule";
@@ -5442,12 +5470,22 @@
 			$this->arrFields['FkTaxCodeId'] = array('Name' => 'Tax Code');
 			$this->arrFields['FkTaxCodeId']['Field'] = new QLabel($this);
 			$this->arrFields['FkTaxCodeId']['DisplayFunc'] = "RenderTax";
-
+			*/
 
 			$this->arrFields['Total'] = array('Name' => 'Total');
 			$this->arrFields['Total']['Field'] = new QLabel($this);
 			$this->arrFields['Total']['Width'] = 40;	
 			$this->arrFields['Total']['DisplayFunc'] = "RenderMoney";
+
+			$this->arrFields['TrackingNumber'] = array('Name' => 'Tracking<br>Number');
+			$this->arrFields['TrackingNumber']['Field'] = new XLSTextBox($this);
+			$this->arrFields['TrackingNumber']['Width'] = 150;	
+			$this->arrFields['TrackingNumber']['DisplayFunc'] = "RenderMoney";
+
+
+
+
+
 
 		
 			$this->arrFields['Downloaded'] = array('Name' => 'Downloaded');
@@ -5462,6 +5500,10 @@
 			
 		}
 		
+		protected function RenderDate($val) { 
+			return $val->format(_xls_get_conf( 'DATE_FORMAT' , 'D d M y'));
+		}
+
 		protected function RenderMoney($val) {
 			return _xls_currency($val);
 		}
@@ -5495,11 +5537,19 @@
 			return false;
 		}
 		
+		public function canNew(){
+			return false;
+		}
+		
 	}
 
 	
 	
 	class xlsws_admin_dbpendingorders extends xlsws_admin_generic_edit_form {
+			
+		protected $default_sort_index = 0;
+		protected $default_sort_direction = 1;
+		protected $hideID = true;
 		
 		protected function Form_Create(){
 		
@@ -5515,8 +5565,7 @@
 				QQ::AndCondition(
 				QQ::Equal(QQN::Cart()->Type, 4),
 				QQ::Equal(QQN::Cart()->Downloaded, 0));
-
-			
+			$this->edit_override=true;
 			
 			
 			$this->HelperRibbon = "";
@@ -5616,10 +5665,101 @@
 			return false;
 		}
 		
+		public function canNew(){
+			return false;
+		}
+		
 	}
 
 	
+			
+	class xlsws_admin_dbedit extends xlsws_admin {
+					
+		protected $btnCancel;
+		protected $btnSave;
+		protected $btnDelete;
+		
+		protected $configPnls;
+		
+		public $page;
+		
+		public $pxyAddNewPage;
+		
+		public $HelperRibbon;
+		
+		
+	    protected $CustomerControl;
 	
+    	protected $BillingContactControl;
+    	protected $ShippingContactControl;
+
+		
+		
+		protected function Form_Create(){
+			parent::Form_Create();
+			
+			$this->arrTabs = $GLOBALS['arrDbAdminTabs'];
+			$this->currentTab = 'dbedit';
+
+
+			$this->page = new CustomPage();
+			
+			
+			$this->pxyAddNewPage = new QControlProxy($this);
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QServerAction('NewPage'));
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QTerminateAction());
+			
+	        
+			
+			//$this->btnEdit = new QButton($this->dtrConfigs);
+			//$this->btnEdit->Text = _sp("Edit");
+			$this->btnCancel = new QButton($this);
+			$this->btnCancel->Text = _sp("Cancel");
+			$this->btnCancel->CssClass = 'admin_cancel';
+			$this->btnCancel->AddAction( new QClickEvent() , new QAjaxAction('btnCancel_Click'));
+			
+			
+			
+			$this->btnSave = new QButton($this);
+			$this->btnSave->Text = _sp("Save");
+			$this->btnSave->CssClass = 'admin_save';
+			$this->btnSave->AddAction( new QClickEvent() , new QServerAction('btnSave_Click'));
+			$this->btnSave->CausesValidation = true;
+			
+			$this->HelperRibbon = "Use caution when making changes directly to Web Orders as they cannot be undone.";
+			
+			$this->BuildCustomerControl();
+			
+
+		}
+		
+		
+		function pageDone(){
+			$this->listPages();
+		}
+		
+		
+		public function NewPage(){
+			
+		}
+	
+		
+		
+		
+    	protected function BuildCustomerControl() { 
+        $this->CustomerControl = $objControl = 
+            new XLSCheckoutCustomerControl($this, 'CustomerContact');
+        $this->BillingContactControl = 
+            $this->CustomerControl->Billing;
+        $this->ShippingContactControl = 
+            $this->CustomerControl->Shipping;
+
+        return $objControl;
+    }
+    
+    
+
+	}
 	
 	
 	/* class xlsws_admin_maintenance
@@ -6244,8 +6384,7 @@
 					break;	
 				case "task":
 					xlsws_admin_maintenance::Run('xlsws_admin_maintenance' , adminTemplate('maintenance.tpl.php'));
-					break;
-					
+					break;			
 				default:
 					xlsws_admin_system_config::Run('xlsws_admin_system_config' , adminTemplate('config.tpl.php'));
 			}
@@ -6326,8 +6465,8 @@
 				case "dborders":
 					xlsws_admin_dborders::Run('xlsws_admin_dborders' , adminTemplate('edit.tpl.php'));
 					break;
-				case "promotasks":
-					xlsws_admin_promotasks::Run('xlsws_admin_promotasks' , adminTemplate('config.tpl.php'));
+				case "dbedit":
+					xlsws_admin_dbedit::Run('xlsws_admin_dbedit' , adminTemplate('dbedit.tpl.php'));
 					break;
 				default:
 					xlsws_admin_dbwarning::Run('xlsws_admin_dbwarning' , adminTemplate('dbwarning.tpl.php'));

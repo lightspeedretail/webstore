@@ -67,7 +67,7 @@ class XLSCustomerInfoControl extends XLSCustomerComposite {
     protected function BuildPhoneControl() {
         $objControl =
             new XLSTextControl($this, $this->GetChildName('Phone'));
-        $bjControl->Name = _sp('Phone');
+        $objControl->Name = _sp('Phone');
         $objControl->Required = true;
         $objControl->RenderMethod = 'RenderAsDefinition';
         $objControl->SetCustomAttribute('maxlength', 64);
