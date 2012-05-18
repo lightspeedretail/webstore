@@ -178,9 +178,9 @@ class xlsws_product_listing extends xlsws_index {
         $objCondition = false;
 
         $objProductCondition = $this->GetProductCondition();
-        //$objFeaturedCondition = $this->GetFeaturedCondition();
+        $objFeaturedCondition = $this->GetFeaturedCondition();
 
-       // $intFeaturedCount = Product::QueryCount($objFeaturedCondition);
+        $intFeaturedCount = Product::QueryCount($objFeaturedCondition);
 
         if ($intFeaturedCount > 0)
             $objCondition = QQ::AndCondition(

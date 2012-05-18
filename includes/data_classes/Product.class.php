@@ -640,6 +640,20 @@ class Product extends ProductGen {
 				$this->FkProductMaster->Save(); 
 		}
 	}
+	
+	public static function SetFeaturedByKeyword($strKeyword) {
+	
+		$objDatabase = Product::GetDatabase();
+		$objDatabase->NonQuery("UPDATE xlsws_product SET featured=0 WHERE featured=1");
+		$objDatabase->NonQuery("UPDATE xlsws_product SET featured=1 WHERE 
+			web_keyword1=" . $objDatabase->SqlVariable($strKeyword) . " OR
+			web_keyword2=" . $objDatabase->SqlVariable($strKeyword) . " OR
+			web_keyword3=" . $objDatabase->SqlVariable($strKeyword) 
+			);
+
+	
+	
+	}
 
 	/**
 	 * Load an array of Product objects,

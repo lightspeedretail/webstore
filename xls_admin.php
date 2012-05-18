@@ -703,6 +703,13 @@
 					return false;
 				}
 			
+				case 'FEATURED_KEYWORD':
+					//If we've changed our featured keyword, reset the db flagging here
+					if ($field->Text != _xls_get_conf('FEATURED_KEYWORD')) {
+						Product::SetFeaturedByKeyword($field->Text);
+						}
+			
+			
 				default:
 					return true;		
 			}
