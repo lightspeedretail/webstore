@@ -45,9 +45,9 @@ class xlsws_category extends xlsws_product_listing {
         $this->LoadCategory();
         $this->LoadSubCategories();
         $this->LoadCustomPage();
-
+error_log("here1");
         parent::build_main();
-
+error_log("here2");
         if ($this->category) {
             $objCategory = $this->category;
 
@@ -57,7 +57,7 @@ class xlsws_category extends xlsws_product_listing {
 
 			
 			
-		}
+		}error_log("here3");
 	}
 	
 	

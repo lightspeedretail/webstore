@@ -55,7 +55,7 @@
 </div>
 <br style="clear:both"/>
 <?php endif; ?> 
-<h1><?php echo $this->category->Name; ?></h1>
+<h1><?php echo _xls_stack_get('override_category') != '' ? _xls_stack_pop('override_category') : $this->category->Name; ?></h1>
 </div>
 <div id="main_panel" class="rounded">
 

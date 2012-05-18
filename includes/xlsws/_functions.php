@@ -416,6 +416,11 @@ function _xls_stack_pop($key) {
 		return false;
 }
 
+function _xls_stack_remove($key) {
+
+	while (_xls_stack_pop($key)) { }
+	
+}
 /**
  * Clear $_SESSION['stack_vars']
  */
@@ -994,6 +999,8 @@ function _xls_set_crumbtrail($arrCrumbs) {
  */
 function _xls_get_crumbtrail($type = 'full') {
 
+	if (!isset($_SESSION['crumbtrail'])) return false;
+	
 	if ($type=='full') return $_SESSION['crumbtrail'];
 	
 	$arrCrumbs = $_SESSION['crumbtrail'];

@@ -182,13 +182,22 @@ class xlsws_product_listing extends xlsws_index {
 
         $intFeaturedCount = Product::QueryCount($objFeaturedCondition);
 
-        if ($intFeaturedCount > 0)
+        if ($intFeaturedCount > 0) {
             $objCondition = QQ::AndCondition(
                 $objProductCondition, 
                 $objFeaturedCondition
             );
-        else 
+            _xls_stack_put('override_category',_sp('Featured Products'));
+            _xls_set_crumbtrail(array(array(
+				'link'=>'',
+				'case'=> '',
+				'name'=> _sp("Featured Products")
+				)));
+           }
+        else {
+        	_xls_set_crumbtrail();
             $objCondition = $objProductCondition;
+         }
 
         return $objCondition;
     }

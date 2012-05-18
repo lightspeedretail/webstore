@@ -44,7 +44,8 @@ if ($objUrl->RouteId != '')
 	}
 
 //Save the crumbtrail since we can use it elsewhere i.e. Meta information	
-_xls_set_crumbtrail($this->crumbs);
+if (isset($this->crumbs))
+	_xls_set_crumbtrail($this->crumbs);
 
 // Let's have the pnlPanel auto render any and all child controls
 $this->crumbTrail = new QPanel($this);
