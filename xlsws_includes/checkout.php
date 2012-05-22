@@ -792,6 +792,8 @@ class xlsws_checkout extends xlsws_index {
 
     protected function CompleteUpdateCart() {
         $objCart = Cart::GetCart();
+       	if(!$objCustomer)
+       		$objCustomer = Customer::GetCurrent();
 
         if (!$objCart->IdStr)
             $objCart->SetIdStr();
@@ -822,7 +824,7 @@ class xlsws_checkout extends xlsws_index {
 
         $objCart->AddressShip = implode("\n", array(
             $objCart->ShipFirstname . ' ' . 
-                $objCart->Lastname .
+                $objCart->ShipLastname .
                 (($objCart->ShipCompany) ? ("\n" . $objCart->ShipCompany) : ''),
             $objCart->ShipAddress1,
             $objCart->ShipAddress2,

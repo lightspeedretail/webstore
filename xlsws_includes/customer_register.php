@@ -254,9 +254,9 @@ class xlsws_cregister extends xlsws_index {
 		else
 			$objCustomer = new Customer();
 
-		$objCustomer->Email= strtolower(trim($this->BillingContactControl->Email));error_log("1");
-		$objCustomer->Password = md5(trim($this->PasswordControl->Password1->Text));error_log("2");
-		$objCustomer->Firstname = trim($this->txtCRFName->Text);error_log("3");
+		$objCustomer->Email= strtolower(trim($this->BillingContactControl->Email));
+		$objCustomer->Password = md5(trim($this->PasswordControl->Password1->Text));
+		$objCustomer->Firstname = trim($this->txtCRFName->Text);
 		$objCustomer->Lastname = trim($this->txtCRLName->Text);
 		$objCustomer->Mainname = (($this->customer) && ($this->customer->Mainname != '')) ? $this->customer->Mainname : (trim($this->txtCRFName->Text) . " " . trim($this->txtCRLName->Text));
 		$objCustomer->Company = trim($this->txtCRCompany->Text);
@@ -493,74 +493,7 @@ class xlsws_cregister extends xlsws_index {
 
 		$this->errSpan->Text='';
 		return true;
-		
-		/*
-		global $_SESSION;
-
-		$this->errSpan->Text='';
-		$this->errSpan->CssClass='customer_reg_err_msg';
-
-		if(_xls_verify_img_txt() != (($this->txtCRVerify->Text))) {
-			$this->errSpan->Text= _sp("Wrong Verification Code.");
-			return false;
-		}
-
-		elseif($this->txtCREmail->Text == "" || $this->txtCRMPhone->Text == "" || $this->txtCRFName->Text == "" || $this->txtCRLName->Text == "" || $this->txtCRBillAddr1->Text == "" || $this->txtCRBillCountry->SelectedValue == "" || $this->txtCRBillCity->Text == "" || $this->txtCRBillZip->Text == "" ) {
-			$this->errSpan->Text= _sp('Please complete required fields.  Required fields are marked with an asterisk *');
-			return false;
-		}
-
-		if(!preg_match( '/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i', $this->txtCREmail->Text )) {
-			$email=$this->txtCREmail->Text;
-			$this->errSpan->Text= $email . _sp(" - Is Not A Correct E-mail Address.");
-			return false;
-		}
-
-		if($this->txtCREmail->Text != $this->txtCRConfEmail->Text) {
-			$this->errSpan->Text= $this->txtCRConfEmail->Warning =_sp("E-mail addresses do not match.");
-			return false;
-		}
-
-		// validate zip code
-		$country = Country::LoadByCode($this->txtCRBillCountry->SelectedValue);
-		if ($country)
-			if (!$this->txtCRBillZip->Validate($country->ZipValidatePreg)) {
-				$this->errSpan->Text = _sp($this->txtCRBillZip->LabelForInvalid);
-				return false;
-			}
-
-		if ($this->txtCRBillCountry->SelectedValue != $this->txtCRShipCountry->SelectedValue)
-			$country = Country::LoadByCode($this->txtCRShipCountry->SelectedValue);
-
-		if ($country)
-			if (!$this->txtCRShipZip->Validate($country->ZipValidatePreg)) {
-				$this->errSpan->Text = _sp($this->txtCRShipZip->LabelForInvalid);
-				return false;
-			}
-
-		if($this->txtCRPass->Text != $this->txtCRConfPass->Text){
-			$this->errSpan->Text= $this->txtCRConfPass->Warning = _sp("Passwords do not match");
-			return false;
-		}
-
-		if(trim($this->txtCRPass->Text) != '' || !$this->customer){
-			if($error = Customer::pwdStrength($this->txtCRPass->Text)){
-				$this->errSpan->Text= $this->txtCRPass->Warning = $error;
-				return false;
-			}
-		}
-
-		// check that email address is unique
-		$cust = Customer::LoadByEmail(strtolower(trim($this->txtCREmail->Text)));
-
-		if($cust  && (($this->customer && $this->customer->Rowid != $cust->Rowid ) || (!$this->customer) )){
-			$this->errSpan->Text= $this->txtCREmail->Warning = _sp("Another customer with this e-mail address already exists. Please login ");
-			return false;
-		}
-
-		$this->errSpan->Text='';
-		return true;
-		*/
+	
 	}
 
     

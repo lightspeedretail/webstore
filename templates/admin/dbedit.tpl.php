@@ -94,43 +94,93 @@ if(isset($this->HelperRibbon))
 		echo '<div style="padding: 5px;"><img style="padding-right: 5px; width:44px; height:35px;" align="left" src="'.adminTemplate('css/images/questionmark.png').'"> '.$this->HelperRibbon.'</div>';
 
 ?>	
+<style type="text/css"> 
+#editcontainer {
+width: 920px;
+margin-left: 30px;
+margin-top: 30px;
+border: 1px solid #000000;
+font-size: 8pt;
+}
 
+
+#editcontainer .basic_row {
+clear: both;
+height:60px;
+margin-left: 10px;
+}
+
+
+#editcontainer .colone
+{
+float: left;
+width:240px;
+
+}
+#editcontainer .coltwo
+{
+float: left;
+width:240px;
+
+}
+#editcontainer .colthree
+{
+float: left;
+width:240px;
+
+}
+#editcontainer .colfour
+{
+float: left;
+width:240px;
+
+}
+/*Used to clear all floats on in a row. Noticed it is placed before the closing tag of the basic_row div.*/
+#editcontainer .clear_float {
+font-size: 0px;
+line-height: 0px;
+clear: both;
+} 
+</style>
+
+						<div class="title rounded"> 
+							<div class="name" style="cursor:pointer;">Editing Order <?= $this->page; ?></div> 
+							<div style="float:right">
+								<?php $this->btnSave->Render('CssClass=button rounded'); ?><?php $this->btnCancel->Render('CssClass=button rounded'); ?></div> 
+						</div>
+						
+						
 <div id="customer_registration edit_height module_config">
 
-<fieldset>
-		<legend><?php _xt('Account Information') ?></legend>
+<div id='editcontainer'>
 
-		<div class="left margin">
-			<dl>
-				<dt><?php _xt("First Name"); ?></dt><dd><?php $this->BillingContactControl->FirstName->RenderWithError(); ?></dd>
-				<dt><?php _xt("Last Name"); ?>:</dt><dd><?php $this->BillingContactControl->LastName->RenderWithError(); ?></dd>
-			</dl>
-		</div>
+	<div class="basic_row">
+		<div class="colone">First Name<br><?php $this->BillingContactControl->FirstName->RenderWithError(); ?></div>
+		<div class="coltwo">Last Name<br><?php $this->BillingContactControl->LastName->RenderWithError(); ?></div>
+		<div class="colthree">Phone<br><?php $this->BillingContactControl->Phone->RenderWithError() ?></div>
+		<div class="colfour">Email<br><?php $this->BillingContactControl->Email->RenderWithError() ?></div>
+		<div class="clear_float"></div>
+	</div> 
+	
+	<div class="basic_row">
+		<div class="colone"><?php $this->BillingContactControl->Company->Render(); ?><br>Company</div>
+		<div class="coltwo"><?php $this->BillingContactControl->Street1->Render(); ?><br>Address 1</div>
+		<div class="colthree"><?php $this->BillingContactControl->Street2->Render(); ?><br>Address 2</div>
+		<div class="clear_float"></div>
+	</div>
+	
+	<div class="basic_row">
+		<div class="colone"><?php $this->BillingContactControl->City->Render(); ?><br>City</div>
+		<div class="coltwo"><?php $this->BillingContactControl->State->Render(); ?><br>St/Prov</div>
+		<div class="colthree"><?php $this->BillingContactControl->Zip->Render(); ?><br>Zip/Postal</div>
+		<div class="colfour"><?php $this->BillingContactControl->Country->Render(); ?><br>Country</div>
+		<div class="clear_float"></div>
+	</div>
+	
+	
+	
+</div>
 
-		<div class="left margin clear">
-			<dl>
-				<dt><label for="Company"><?php _xt("Company"); ?></label></dt>
-				<dd><?php $this->BillingContactControl->Company->Render(); ?></dd>
-			</dl><br />
-		</div>
-
-		<div class="left margin clear">
-			<dl>
-				<dt><label for="Phone"><span class="red">*</span> <?php _xt("Phone"); ?></label></dt>
-				<dd><?php $this->BillingContactControl->Phone->RenderWithError() ?></dd>
-			</dl>	
-		</div>
-
-		<div class="left margin clear">
-			<dl>
-				<dt><label for="Email"><span class="red">*</span> <?php _xt("Email"); ?></label></dt>
-				<dd><?php $this->BillingContactControl->Email->RenderWithError() ?></dd>
-			</dl>	
-		</div>
-
-		
-		
-		</fieldset>	
 			
 <? /*
             case 'txtCRFName':

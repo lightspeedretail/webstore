@@ -44,17 +44,12 @@
 <?php  endif; ?>
 
 
-<?php  if(isset($this->txtCRShipFirstname)):   ?>
-
 		<div class="left margin">
 			<dl>
 				<dt><label for="First Name"><?php _xt("First Name") ?></label></dt>
 				<dd><?php $this->txtCRShipFirstname->RenderWithError(); ?></dd>
 			</dl>
 		</div>
-<?php  endif; ?>
-
-<?php  if(isset($this->txtCRShipLastname)):   ?>
 
 		<div class="left margin">
 			<dl class="left">
@@ -62,7 +57,7 @@
 				<dd><?php $this->txtCRShipLastname->RenderWithError(); ?></dd>
 			</dl>
 		</div>
-<?php  endif; ?>
+
 
 <?php  if(isset($this->txtCRShipPhone)):   ?>
 		<div class="left margin">

@@ -5736,7 +5736,7 @@
 			$this->HelperRibbon = "Use caution when making changes directly to Web Orders as they cannot be undone.";
 			
 			$this->BuildCustomerControl();
-			
+			$this->PopulateForm();
 
 		}
 		
@@ -5754,16 +5754,114 @@
 		
 		
     	protected function BuildCustomerControl() { 
-        $this->CustomerControl = $objControl = 
-            new XLSCheckoutCustomerControl($this, 'CustomerContact');
-        $this->BillingContactControl = 
-            $this->CustomerControl->Billing;
-        $this->ShippingContactControl = 
-            $this->CustomerControl->Shipping;
+	        $this->CustomerControl = $objControl = 
+	            new XLSCheckoutCustomerControl($this, 'CustomerContact');
+	        $this->BillingContactControl = 
+	            $this->CustomerControl->Billing;
+	        $this->ShippingContactControl = 
+	            $this->CustomerControl->Shipping;
+	            
+	        return $objControl;
+	    }
+	    
+	    protected function Populateform() { 
+			global $XLSWS_VARS;
+			$objCart = Cart::Load($XLSWS_VARS['row']);
 
-        return $objControl;
-    }
+			$objCustomer = new Customer;
+			error_log(print_r(explode("\n", $objCart->AddressBill),true));
+
+			list(
+				$objCustomer->Address11, 
+				$objCustomer->Address12, 
+				$objCustomer->City1, 
+				$objCustomer->State1,
+				$objCustomer->Zip1, $objCustomer->Country1) = explode("\n", $objCart->AddressBill);
+
+
+			$arrBilling = explode("\n", $objCart->AddressBill);
+        
+			$mixValueArray = array(
+	                'FirstName' => $objCart->Firstname,
+	                'LastName' => $objCart->Lastname,
+	                'Company' => $objCart->Company,
+	                'Phone' => $objCart->Phone,
+	                'Street1' => $arrBilling[0],
+	                'Street2' => $arrBilling[1],
+	                'City' => $arrBilling[2],
+	                'Country' => $arrBilling[5],
+	                'State' => $arrBilling[3],
+	                'Zip' => $arrBilling[4]
+	                
+	            ); 
+			$objInfo = $this->BillingContactControl->GetChildByName('Info');
+	        $objInfo->UpdateFieldsFromArray($mixValueArray);
+			$objInfo = $this->BillingContactControl->GetChildByName('Address');
+	        $objInfo->UpdateFieldsFromArray($mixValueArray);
+	      
+	      	
+	      	
+	      	/*  
+	        $mixValueArray = array(
+	                'FirstName' => $objCart->Firstname,
+	                'LastName' => $objCart->Lastname,
+	                'Company' => $objCart->Company,
+	                'Phone' => $objCart->Phone,
+	                'Street1' => $objCart->Address21,
+	                'Street2' => $objCart->Address22,
+	                'City' => $objCart->City2,
+	                'Country' => $objCart->Country2,
+	                'State' => $objCart->State2,
+	                'Zip' => $objCart->Zip2
+	                
+	                
+	                
+	            ); 
+			$objInfo = $this->BillingContactControl->GetChildByName('Info');
+	        $objInfo->UpdateFieldsFromArray($mixValueArray);
+
+			*/
+
+	            
+	        $this->page = $objCart->IdStr;
+	           
+	        return $objControl;
+	    }
+
+	    
+	    
+	    
     
+    	public function btnSave_click($strFormId, $strControlId, $strParameter){
+    	
+	    	$objCart->Contact = $objCart->Firstname . ' ' . $objCart->Lastname;
+	        $objCart->Name = 
+	            (($objCart->Company) ? ($objCart->Company) : $objCart->Contact);
+	
+	        $objCart->AddressBill = implode("\n", array(
+	            $objCustomer->Address11, 
+	            $objCustomer->Address12,
+	            $objCustomer->City1,
+	            $objCustomer->State1,
+	            $objCustomer->Zip1,
+	            $objCustomer->Country1
+	        ));
+	
+	        $objCart->AddressShip = implode("\n", array(
+	            $objCart->ShipFirstname . ' ' . 
+	                $objCart->ShipLastname .
+	                (($objCart->ShipCompany) ? ("\n" . $objCart->ShipCompany) : ''),
+	            $objCart->ShipAddress1,
+	            $objCart->ShipAddress2,
+	            $objCart->ShipCity, 
+	            $objCart->ShipState . ' ' . $objCart->ShipZip,
+	            $objCart->ShipCountry
+	        ));
+    	
+    	
+    	
+    	
+    	}
     
 
 	}
