@@ -330,13 +330,30 @@ class xlsws_db_maintenance extends xlsws_index {
 				'EMAIL_SEND_CUSTOMER', '1', 'Option whether to email order receipts to customers', 5, 2, NOW(), NOW(), 'BOOL');");
 			$this->add_config_key('EMAIL_SEND_STORE' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Send Order Alerts to Store', 
-				'EMAIL_SEND_STORE', '1', 'Option to send Store Owner email when order is placed', 5, 2, NOW(), NOW(), 'BOOL');");
-	
+				'EMAIL_SEND_STORE', '1', 'Option to send Store Owner email when order is placed', 5, 3, NOW(), NOW(), 'BOOL');");
+			$this->add_config_key('EMAIL_SEND_SHIPPING' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Send Ship Alert when Tracking # is detected', 
+				'EMAIL_SEND_SHIPPING', '1', 'Option whether to email receipts when a new tracking number is detected from an order downloaded from LightSpeed', 5, 4, NOW(), NOW(), 'BOOL');");
+				
+					
 			_dbx("DELETE from xlsws_configuration WHERE `key`='ADMIN_EMAIL'");
 			
 			
-			
 			//Fix some sequencing problems for options
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=10 where `key`='EMAIL_SIGNATURE'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=11 where `key`='EMAIL_SMTP_SERVER'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=12 where `key`='EMAIL_SMTP_PORT'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=13 where `key`='EMAIL_SMTP_USERNAME'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=14 where `key`='EMAIL_SMTP_PASSWORD'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=15 where `key`='EMAIL_SMTP_SECURITY_MODE'");
+			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=16 where `key`='EMAIL_SMTP_AUTH_PLAIN'");
+
+
+
+
+
+
+
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=5 where `key`='INVENTORY_ZERO_NEG_TITLE'");
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=6 where `key`='INVENTORY_AVAILABLE'");
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=7 where `key`='INVENTORY_LOW_TITLE'");
@@ -364,7 +381,6 @@ class xlsws_db_maintenance extends xlsws_index {
 				`options`='INVENTORY_OUT_ALLOW_ADD',`helper_text`='How should system treat products currently out of stock. Note: Turn OFF the checkbox for -Only Upload Products with Available Inventory- in Tools->eCommerce.' where `key`='INVENTORY_OUT_ALLOW_ADD'");
 			//_dbx("ALTER TABLE `xlsws_product` ADD INDEX (`inventory`, `inventory_avail`);");	//need to check if exists
 			
-			
 			//Pricing Changes
 			_dbx("UPDATE `xlsws_configuration` SET `title`='In Product Grid, when child product prices vary',
 				`options`='MATRIX_PRICE',`helper_text`='How should system treat child products when different child products have different prices.' where `key`='MATRIX_PRICE'");	
@@ -379,7 +395,6 @@ class xlsws_db_maintenance extends xlsws_index {
 
 			_dbx("UPDATE `xlsws_configuration` SET `title`='SSL Security certificate should be used',
 				`options`='SSL_NO_NEED_FORWARD',`helper_text`='Change when SSL secure mode is used.' where `key`='SSL_NO_NEED_FORWARD'");	
-		
 				
 			//SEO Changes
 			if ($this->add_column('xlsws_category' , 'request_url' ,
@@ -420,7 +435,6 @@ class xlsws_db_maintenance extends xlsws_index {
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Store Home Page slogan', 
 				'STORE_DEFAULT_SLOGAN', 'Amazing products available to order online!', 'Used as default for Title bar for home page', 2, 4, NOW(), NOW(), 'NULL');");		
 			
-						
 	
 			//URL and Description Formatting
 			$this->add_config_key('SEO_PRODUCT_TITLE' , 
@@ -506,7 +520,6 @@ class xlsws_db_maintenance extends xlsws_index {
 			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='EMAIL_SMTP_PORT'");
 			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='MIN_PASSWORD_LEN'");
 
-		
 			if ($this->add_column('xlsws_modules' , 'active' ,
 				"ALTER TABLE xlsws_modules ADD COLUMN `active` INT(11) DEFAULT NULL AFTER `rowid`"))
 			_dbx("update xlsws_modules set active=1");
@@ -539,8 +552,8 @@ class xlsws_db_maintenance extends xlsws_index {
 				$objItem->Save();
 
 			}
-			
-			$this->add_column('xlsws_cart' , 'active',
+
+			$this->add_column('xlsws_cart' , 'tracking_number',
 				"ALTER TABLE xlsws_cart ADD COLUMN `tracking_number` VARCHAR(255) NULL DEFAULT NULL AFTER `payment_amount`");
 
 					
