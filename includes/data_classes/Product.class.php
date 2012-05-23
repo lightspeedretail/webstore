@@ -676,6 +676,28 @@ class Product extends ProductGen {
 		}
 	}
 
+
+	/**
+	 * Load a Product by its Image
+	 * @param integer $intImageId
+	 * @return Product[]
+	*/
+	public static function LoadByImageId($intImageId) {
+		try {
+			return Product::QuerySingle(
+				QQ::Equal(QQN::Product()->ImageId, $intImageId));
+		} catch (QCallerException $objExc) {
+			$objExc->IncrementOffset();
+			throw $objExc;
+		}
+	}
+
+
+	/**
+	 * Load a Product by the SEO formatted url
+	 * @param string $strName
+	 * @return Product[]
+	*/
 	public static function LoadByRequestUrl($strName) {
 		return Product::QuerySingle(
 			QQ::Equal(QQN::Product()->RequestUrl, $strName)
