@@ -2,7 +2,7 @@
 
 class XLSStateControl extends XLSListControl {
     protected $blnFilterDestinations = false;
-    protected $strLabelForSelect = '-- Select One --';
+    protected $strLabelForSelect = '--';
     protected $strLabelForNone = '--';
 
     protected $strCountryControlId = null;
@@ -87,7 +87,9 @@ class XLSStateControl extends XLSListControl {
             $this->AddItem(_sp($this->strLabelForSelect), null);
 
             foreach ($objStates as $objState)
-                $this->AddItem($objState->State, $objState->Code);
+                if ($objState->CountryCode=="US" || $objState->CountryCode=="CA")
+                	$this->AddItem($objState->Code, $objState->Code);
+                else $this->AddItem($objState->State, $objState->Code);
         }
         else { 
             $this->AddItem(_sp($this->strLabelForNone), null);

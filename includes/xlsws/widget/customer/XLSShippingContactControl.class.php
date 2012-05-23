@@ -10,8 +10,6 @@ class XLSShippingContactControl extends XLSCustomerContactControl {
 
         if ($objInfo) {
             $mixValueArray = array(
-                'FirstName' => $objCustomer->Firstname,
-                'LastName' => $objCustomer->Lastname,
                 'Company' => $objCustomer->Company,
                 'Phone' => $objCustomer->Mainphone
             );

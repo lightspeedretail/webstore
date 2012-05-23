@@ -98,43 +98,53 @@ if(isset($this->HelperRibbon))
 #editcontainer {
 width: 920px;
 margin-left: 30px;
-margin-top: 30px;
+margin-top: 10px;
 border: 1px solid #000000;
 font-size: 8pt;
+height: 500px;
+}
+#editcontainer .thin_row {
+clear: both;
+height:10px;
+margin-left: 10px;
+
 }
 
 
 #editcontainer .basic_row {
 clear: both;
-height:60px;
+height:30px;
 margin-left: 10px;
+
 }
 
 
-#editcontainer .colone
+#editcontainer .collabel
 {
 float: left;
-width:240px;
-
+width:80px;
+margin-right: 10px;
 }
-#editcontainer .coltwo
+#editcontainer .colfield
 {
 float: left;
-width:240px;
+width:170px;
 
 }
-#editcontainer .colthree
+#editcontainer .colfieldwide
 {
 float: left;
-width:240px;
+width:220px;
 
 }
-#editcontainer .colfour
+#editcontainer .coladdress
 {
-float: left;
-width:240px;
 
+float: left;
+width:220px;
+height: 300px;
 }
+
 /*Used to clear all floats on in a row. Noticed it is placed before the closing tag of the basic_row div.*/
 #editcontainer .clear_float {
 font-size: 0px;
@@ -143,11 +153,11 @@ clear: both;
 } 
 </style>
 
-						<div class="title rounded"> 
-							<div class="name" style="cursor:pointer;">Editing Order <?= $this->page; ?></div> 
-							<div style="float:right">
-								<?php $this->btnSave->Render('CssClass=button rounded'); ?><?php $this->btnCancel->Render('CssClass=button rounded'); ?></div> 
-						</div>
+	<div class="title rounded"> 
+		<div class="name" style="cursor:pointer;">Editing Order <?= $this->page; ?></div> 
+		<div style="float:right">
+			<?php $this->btnSave->Render('CssClass=button rounded'); ?><?php $this->btnCancel->Render('CssClass=button rounded'); ?></div> 
+	</div>
 						
 						
 <div id="customer_registration edit_height module_config">
@@ -155,27 +165,49 @@ clear: both;
 <div id='editcontainer'>
 
 	<div class="basic_row">
-		<div class="colone">First Name<br><?php $this->BillingContactControl->FirstName->RenderWithError(); ?></div>
-		<div class="coltwo">Last Name<br><?php $this->BillingContactControl->LastName->RenderWithError(); ?></div>
-		<div class="colthree">Phone<br><?php $this->BillingContactControl->Phone->RenderWithError() ?></div>
-		<div class="colfour">Email<br><?php $this->BillingContactControl->Email->RenderWithError() ?></div>
+		<div class="collabel">First Name</div><div class="colfield"><?php $this->BillingContactControl->FirstName->RenderWithError(); ?></div>
+		<div class="collabel">Last Name</div><div class="colfield"><?php $this->BillingContactControl->LastName->RenderWithError(); ?></div>
+		<div class="collabel">Phone</div><div class="colfield"><?php $this->BillingContactControl->Phone->RenderWithError() ?></div>
 		<div class="clear_float"></div>
 	</div> 
-	
+
 	<div class="basic_row">
-		<div class="colone"><?php $this->BillingContactControl->Company->Render(); ?><br>Company</div>
-		<div class="coltwo"><?php $this->BillingContactControl->Street1->Render(); ?><br>Address 1</div>
-		<div class="colthree"><?php $this->BillingContactControl->Street2->Render(); ?><br>Address 2</div>
-		<div class="clear_float"></div>
+		<div class="collabel">Company</div><div class="colfield"><?php $this->BillingContactControl->Company->Render(); ?></div>
+		<div class="collabel">Email</div><div class="colfieldwide"><?php $this->BillingContactControl->Email->RenderWithError() ?></div>
+	</div>
+	 
+	<div class="thin_row">
 	</div>
 	
 	<div class="basic_row">
-		<div class="colone"><?php $this->BillingContactControl->City->Render(); ?><br>City</div>
-		<div class="coltwo"><?php $this->BillingContactControl->State->Render(); ?><br>St/Prov</div>
-		<div class="colthree"><?php $this->BillingContactControl->Zip->Render(); ?><br>Zip/Postal</div>
-		<div class="colfour"><?php $this->BillingContactControl->Country->Render(); ?><br>Country</div>
-		<div class="clear_float"></div>
-	</div>
+		<div class="collabel">Billing</div><div class="coladdress">
+			<?php 
+			$this->BillingContactControl->Street1->Render(); echo "<br clear='left'>";
+			$this->BillingContactControl->Street2->Render(); echo "<br clear='left'>";
+			$this->BillingContactControl->City->Render();
+			$this->BillingContactControl->State->Render(); echo "<br clear='left'>";
+			$this->BillingContactControl->Zip->Render('Width=70px'); echo "<br clear='left'>";
+			$this->BillingContactControl->Country->Render(); 
+			?></div>
+		
+		<div class="collabel">Shipping</div><div class="coladdress">
+			<?php 
+			$this->ShippingContactControl->FirstName->Render('Width=70px;Margin-right:10px;'); echo "&nbsp;&nbsp;";
+			$this->ShippingContactControl->LastName->Render('Width=70px'); echo "<br clear='left'>";
+			$this->ShippingContactControl->Street1->Render(); echo "<br clear='left'>";
+			$this->ShippingContactControl->Street2->Render(); echo "<br clear='left'>";
+			$this->ShippingContactControl->City->Render();
+			$this->ShippingContactControl->State->Render(); echo "<br clear='left'>";
+			$this->ShippingContactControl->Zip->Render('Width=70px'); echo "<br clear='left'>";
+			$this->ShippingContactControl->Country->Render(); 
+			?></div>
+
+		<div class="collabel">Payment</div><div class="coladdress">
+			</div>
+			
+			<div class="clear_float"></div>
+	</div>		
+
 	
 	
 	

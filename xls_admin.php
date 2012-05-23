@@ -5769,7 +5769,6 @@
 			$objCart = Cart::Load($XLSWS_VARS['row']);
 
 			$objCustomer = new Customer;
-			error_log(print_r(explode("\n", $objCart->AddressBill),true));
 
 			list(
 				$objCustomer->Address11, 
@@ -5791,38 +5790,38 @@
 	                'City' => $arrBilling[2],
 	                'Country' => $arrBilling[5],
 	                'State' => $arrBilling[3],
-	                'Zip' => $arrBilling[4]
+	                'Zip' => $arrBilling[4],
+					'Email' => $objCart->Email,
 	                
 	            ); 
 			$objInfo = $this->BillingContactControl->GetChildByName('Info');
 	        $objInfo->UpdateFieldsFromArray($mixValueArray);
 			$objInfo = $this->BillingContactControl->GetChildByName('Address');
 	        $objInfo->UpdateFieldsFromArray($mixValueArray);
-	      
-	      	
-	      	
-	      	/*  
-	        $mixValueArray = array(
-	                'FirstName' => $objCart->Firstname,
-	                'LastName' => $objCart->Lastname,
-	                'Company' => $objCart->Company,
-	                'Phone' => $objCart->Phone,
-	                'Street1' => $objCart->Address21,
-	                'Street2' => $objCart->Address22,
-	                'City' => $objCart->City2,
-	                'Country' => $objCart->Country2,
-	                'State' => $objCart->State2,
-	                'Zip' => $objCart->Zip2
-	                
-	                
+	        
+	        
+    		$arrShipping = explode("\n", $objCart->AddressShip);
+
+
+			$mixValueArray = array(
+	                'FirstName' => $objCart->ShipFirstname,
+	                'LastName' => $objCart->ShipLastname,
+	                'Street1' => $arrShipping[1],
+	                'Street2' => $arrShipping[2],
+	                'City' => $arrShipping[3],
+	                'Country' => $arrShipping[5],
+	                'State' => $objCart->ShipState,
+	                'Zip' => $objCart->ShipZip,
+
 	                
 	            ); 
-			$objInfo = $this->BillingContactControl->GetChildByName('Info');
-	        $objInfo->UpdateFieldsFromArray($mixValueArray);
-
-			*/
-
 	            
+			$objInfo = $this->ShippingContactControl->GetChildByName('Info');
+	        $objInfo->UpdateFieldsFromArray($mixValueArray);
+			$objInfo = $this->ShippingContactControl->GetChildByName('Address');
+	        $objInfo->UpdateFieldsFromArray($mixValueArray);
+	      
+	      	            
 	        $this->page = $objCart->IdStr;
 	           
 	        return $objControl;
@@ -5834,6 +5833,8 @@
     
     	public function btnSave_click($strFormId, $strControlId, $strParameter){
     	
+    	
+    		/*
 	    	$objCart->Contact = $objCart->Firstname . ' ' . $objCart->Lastname;
 	        $objCart->Name = 
 	            (($objCart->Company) ? ($objCart->Company) : $objCart->Contact);
@@ -5858,7 +5859,19 @@
 	            $objCart->ShipCountry
 	        ));
     	
-    	
+    		*/
+    		
+    		global $XLSWS_VARS;
+			$objCart = Cart::Load($XLSWS_VARS['row']);
+			
+			
+			
+    		$objInfo = $this->BillingContactControl->GetChildByName('Info');
+			$objCart->Firstname = $objInfo->FirstName->Value;
+			$objCart->Save();
+			
+			//error_log($objInfo->FirstName->Value);
+			//$this->BillingContactControl->SaveFieldsToCart($objCart);
     	
     	
     	}
