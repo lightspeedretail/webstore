@@ -3,7 +3,8 @@
 class XLSPaymentControl extends XLSCompositeControl {
     // Behavior
 	protected $blnEnabled = false;
-
+	protected $blnUnknown = false;
+	
     // Configuration
     protected $strDefaultMethod = 'Credit Card';
 
@@ -118,11 +119,15 @@ class XLSPaymentControl extends XLSCompositeControl {
         if (!$objControl)
             return;
 
+
         if (!$objControl->Visible && !$objControl->Enabled)
             return;
 
         $objControl->RemoveAllItems();
 
+		if ($this->blnUnknown)
+			$objControl->AddItem('--Unpaid--',0);
+			
         // TODO :: Move module loading to autoloader
         foreach ($this->LoadModules() as $objModule) { 
             $strName = $objModule->name();
@@ -242,7 +247,7 @@ class XLSPaymentControl extends XLSCompositeControl {
         $arrModules = Modules::QueryArray($objCondition, $objClause);
 
         foreach ($arrModules as $objModule) {
-            $objPaymentModule = $this->Form->loadModule(
+            $objPaymentModule = xlsws_index::loadModule(
                 $objModule->File, 'payment'
             );
 
@@ -290,6 +295,12 @@ class XLSPaymentControl extends XLSCompositeControl {
         
         parent::UpdateControl();
     }
+
+	public function AddNotPaid() {
+		$this->blnUnknown = true;
+		$this->UpdateModuleControl();
+
+	}
 
     public function __get($strName) {
         switch ($strName) {

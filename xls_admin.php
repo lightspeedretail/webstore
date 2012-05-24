@@ -5599,7 +5599,8 @@
 			
 			$this->arrFields['ShippingModule'] = array('Name' => 'Ship Method');
 			$this->arrFields['ShippingModule']['Field'] = new XLSListBox($this);
-			$this->arrFields['ShippingModule']['Width'] = 120;				
+			$this->arrFields['ShippingModule']['Width'] = 120;	
+			
 			$allModules = Modules::QueryArray(QQ::Equal(QQN::Modules()->Type, 'shipping' ), 
 				QQ::Clause(QQ::OrderBy(QQN::Modules()->File)));				
 			foreach($allModules as $code) {			
@@ -5694,13 +5695,26 @@
 		
 		public $HelperRibbon;
 		
-		
+		protected $intRowId; //Cart row we're editing
+		protected $objCart;
 	    protected $CustomerControl;
 	
     	protected $BillingContactControl;
     	protected $ShippingContactControl;
-
+		protected $PaymentControl;
 		
+		protected $ctlPaymentAmount;
+		protected $ctlPaymentDate;
+		protected $ctlPaymentRef;
+		protected $arrProducts;
+		
+		protected $ctlSubTotal;
+		protected $ctlTax;
+		protected $ctlShipping;
+		protected $ctlTotal;
+		
+		protected $ctlTaxChoices;
+		protected $ctlShippingChoices;
 		
 		protected function Form_Create(){
 			parent::Form_Create();
@@ -5708,7 +5722,11 @@
 			$this->arrTabs = $GLOBALS['arrDbAdminTabs'];
 			$this->currentTab = 'dbedit';
 
-
+			global $XLSWS_VARS;
+			
+			$this->intRowId = $XLSWS_VARS['row'];
+			$this->objCart = $objCart = Cart::Load($this->intRowId);
+			
 			$this->page = new CustomPage();
 			
 			
@@ -5736,6 +5754,20 @@
 			$this->HelperRibbon = "Use caution when making changes directly to Web Orders as they cannot be undone.";
 			
 			$this->BuildCustomerControl();
+			$this->BuildPaymentControl();
+			$this->BuildPopulateItemGrid();
+			
+			$this->ctlPaymentAmount = new XLSTextBox($this);
+			$this->ctlPaymentRef = new XLSTextBox($this);
+			
+			$this->ctlSubTotal = new QLabel($this,'subtotal');
+			$this->ctlTax = new QLabel($this,'tax');
+			$this->ctlShipping = new XLSTextBox($this,'shipping');
+			$this->ctlShipping->CssClass='smallfont mrnumber';
+			$this->ctlTotal = new QLabel($this,'total');
+			
+			$this->BuildTaxChoices();			
+			$this->BuildShippingChoices();
 			$this->PopulateForm();
 
 		}
@@ -5750,7 +5782,47 @@
 			
 		}
 	
+		protected function BuildTaxChoices() {
 		
+			$this->ctlTaxChoices = new XLSListBox($this,'taxchoice');
+			
+			$taxcodes = TaxCode::LoadAll(QQ::Clause(QQ::OrderBy(QQN::TaxCode()->ListOrder)));
+			foreach($taxcodes as $code)
+				$this->ctlTaxChoices->AddItem($code->Code , $code->Rowid);
+		
+		
+		}
+		protected function BuildShippingChoices() {
+		
+			$this->ctlShippingChoices = new XLSListBox($this,'shippingchoice');
+			
+			$objCondition = QQ::AndCondition(
+	        	QQ::Equal(QQN::Modules()->Type, 'shipping'),
+	        	QQ::Equal(QQN::Modules()->Active, 1));
+	        $objClause = QQ::Clause(QQ::OrderBy(QQN::Modules()->SortOrder));
+	
+	        $arrShippingModules = array();
+	        $arrModules = Modules::QueryArray($objCondition, $objClause);
+	
+	        foreach ($arrModules as $objModule) {
+	            $objShipModule = xlsws_index::loadModule(
+	                $objModule->File, 'shipping'
+	            );
+	
+	            if (!$objShipModule)
+	                continue;
+	
+	            $arrShippingModules[] = $objShipModule;
+	        }
+	        
+
+	        foreach ($arrShippingModules as $objModule) { 
+                $strName = $objModule->name();
+                $this->ctlShippingChoices->AddItem($strName, get_class($objModule));
+            }
+            
+        
+        }
 		
 		
     	protected function BuildCustomerControl() { 
@@ -5763,10 +5835,70 @@
 	            
 	        return $objControl;
 	    }
+	    protected function BuildPaymentControl() { 
 	    
-	    protected function Populateform() { 
-			global $XLSWS_VARS;
-			$objCart = Cart::Load($XLSWS_VARS['row']);
+	     $this->PaymentControl = $objControl = 
+            new XLSPaymentControl($this, 'Payment');
+        	$objControl->Name = 'Payment';
+        	
+        	$objCart = $this->objCart;
+        	if ($objCart->PaymentModule == '') {
+        		$objControl->ModuleControl->Visible=true;
+        		$objControl->ModuleControl->Enabled=true;
+				$objControl->AddNotPaid();
+			}
+        	
+		}
+        
+        protected function BuildPopulateItemGrid() {
+        	
+        	$objCart = $this->objCart;
+        	$arrItems = $objCart->GetCartItemArray(); 
+        	
+        	$intCounter = 1;
+        	
+        	foreach ($arrItems as $item) {
+        	
+        		$arrRow = array();
+        		
+        		$arrRow['code']=new XLSTextBox($this,'code'.$intCounter);
+        		$arrRow['code']->Text = $item->Code;
+        		$arrRow['code']->CssClass = "smallfont";
+        		$arrRow['code']->AddAction(new QChangeEvent(), new QAjaxAction('doChange'));
+        		
+        		$arrRow['name']=new QLabel($this);
+        		$arrRow['name']->Text = _xls_string_smart_truncate($item->Description,20);
+        		$arrRow['name']->CssClass = "largefont";
+        		
+        		$arrRow['qty']=new XLSTextBox($this,'qty'.$intCounter);
+        		$arrRow['qty']->Text = $item->Qty;
+        		$arrRow['qty']->Width = 40;
+        		$arrRow['qty']->CssClass = "smallfont";
+        		$arrRow['qty']->AddAction(new QChangeEvent(), new QAjaxAction('doChange'));
+        
+           		$arrRow['unitprice']=new XLSTextBox($this,'unit'.$intCounter);
+	      		$arrRow['unitprice']->Text = $item->Sell-$item->Discount;
+				$arrRow['unitprice']->Width = 60;
+				$arrRow['unitprice']->CssClass = "smallfont";
+        		$arrRow['unitprice']->AddAction(new QChangeEvent(), new QAjaxAction('doChange'));
+
+        		$arrRow['total']=new QLabel($this);
+        		$arrRow['total']->Text = $item->SellTotal;
+        		$arrRow['total']->CssClass = "largefont";
+        		
+        		$this->arrProducts[] = $arrRow;
+        		$intCounter++;
+        		
+        	}
+        	
+        
+        
+        }
+        
+	    protected function PopulateForm() { 
+			
+			$objCart = $this->objCart;
+
 
 			$objCustomer = new Customer;
 
@@ -5821,31 +5953,73 @@
 			$objInfo = $this->ShippingContactControl->GetChildByName('Address');
 	        $objInfo->UpdateFieldsFromArray($mixValueArray);
 	      
+	        $this->PaymentControl->Module->SelectedValue = $objCart->PaymentModule;
+	        
+
 	      	            
 	        $this->page = $objCart->IdStr;
-	           
-	        return $objControl;
-	    }
+	                   
+	        $this->ctlPaymentAmount->Text = $objCart->PaymentAmount;
+	        $this->ctlPaymentRef->Text = $objCart->PaymentData;
+	        
+	        $this->ctlSubTotal->Text = _xls_currency($objCart->Subtotal);
+			$this->ctlTax->Text = $objCart->TaxTotal;
+			$this->ctlShipping->Text = $objCart->ShippingSell;
+			$this->ctlShipping->AddAction(new QChangeEvent(), new QAjaxAction('doChange'));
 
-	    
-	    
+			$this->ctlTotal->Text = _xls_currency($objCart->Total);
+	        
+	        
+	    }
+		
+		public function doChange($strFormId, $strControlId, $strParameter){
+		
+			error_log("change on $strControlId");
+			error_log("parameter is ".$strParameter);
+
+			//We need to recalculate the form
+		
+		}
 	    
     
     	public function btnSave_click($strFormId, $strControlId, $strParameter){
-    	
-    	
-    		/*
-	    	$objCart->Contact = $objCart->Firstname . ' ' . $objCart->Lastname;
+
+    		
+			$objCart = $this->objCart;
+			
+			
+    		$objInfo = $this->BillingContactControl->GetChildByName('Info');
+    		$objBillInfo = $this->BillingContactControl->GetChildByName('Address');
+			$objShippingInfo = $this->ShippingContactControl->GetChildByName('Info');
+			$objShippingAddress = $this->ShippingContactControl->GetChildByName('Address');
+			
+			$objCart->Firstname = $objInfo->FirstName->Value;
+            $objCart->Lastname = $objInfo->LastName->Value;
+            $objCart->Company = $objInfo->Company->Value;
+            $objCart->Phone = $objInfo->Phone->Value;
+            $objCart->Email = $objInfo->Email->Value;
+            
+            
+            $objCart->ShipFirstname = $objShippingInfo->FirstName->Value;
+            $objCart->ShipLastname = $objShippingInfo->LastName->Value;
+            $objCart->ShipAddress1 = $objShippingAddress->Street1->Value;
+            $objCart->ShipAddress2 = $objShippingAddress->Street2->Value;
+            $objCart->ShipCity = $objShippingAddress->City->Value;
+            $objCart->ShipState = $objShippingAddress->State->Value;         
+            $objCart->ShipZip = $objShippingAddress->Zip->Value;
+            $objCart->ShipCountry = $objShippingAddress->Country->Value; 			
+			
+			$objCart->Contact = $objCart->Firstname . ' ' . $objCart->Lastname;
 	        $objCart->Name = 
 	            (($objCart->Company) ? ($objCart->Company) : $objCart->Contact);
 	
 	        $objCart->AddressBill = implode("\n", array(
-	            $objCustomer->Address11, 
-	            $objCustomer->Address12,
-	            $objCustomer->City1,
-	            $objCustomer->State1,
-	            $objCustomer->Zip1,
-	            $objCustomer->Country1
+	            $objBillInfo->Street1->Value, 
+	            $objBillInfo->Street2->Value,
+	            $objBillInfo->City->Value,
+	            $objBillInfo->State->Value,
+	            $objBillInfo->Zip->Value,
+	            $objBillInfo->Country->Value
 	        ));
 	
 	        $objCart->AddressShip = implode("\n", array(
@@ -5859,21 +6033,20 @@
 	            $objCart->ShipCountry
 	        ));
     	
-    		*/
-    		
-    		global $XLSWS_VARS;
-			$objCart = Cart::Load($XLSWS_VARS['row']);
-			
-			
-			
-    		$objInfo = $this->BillingContactControl->GetChildByName('Info');
-			$objCart->Firstname = $objInfo->FirstName->Value;
-			$objCart->Save();
-			
-			//error_log($objInfo->FirstName->Value);
-			//$this->BillingContactControl->SaveFieldsToCart($objCart);
     	
+    		$objCart->PaymentAmount = _xls_clean_currency($this->ctlPaymentAmount->Text);
+	        $objCart->PaymentData = $this->ctlPaymentRef->Text;
+	        
+			$objCart->PaymentModule = $this->PaymentControl->Module->SelectedValue;
+			$objPaymentModule = xlsws_index::loadModule(
+	            $objCart->PaymentModule . '.php',
+	            'payment'
+	        );
+			$objCart->PaymentMethod = $objPaymentModule->payment_method($objCart);
+
+    		$objCart->Save();
     	
+    		_rd($_SERVER["SCRIPT_NAME"]  . '?page=dbadmin&subpage=dbpending' . admin_sid());
     	}
     
 

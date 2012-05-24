@@ -746,19 +746,14 @@ function _xls_site_url($strUrlPath =  '') {
 }
 
 //Makes our SEO hypenated string from passed string
-//Used to build anything that will be in a URL
+//Used to build anything that will be in a URL. 
+//Same as seo_name plus lower case conversion and removing spaces
 function _xls_seo_url($string){
-	$string = str_replace('\'','',$string);
-	$string = str_replace("&","and",$string);
-	$string = preg_replace("`\[.*\]`U","",$string);
-	$string = preg_replace('`&(amp;)?#?[a-z0-9]+;`i','-',$string);
-	$string = htmlentities($string, ENT_COMPAT, 'utf-8');
-	$string = preg_replace("`&([a-z])(acute|uml|circ|grave|ring|cedil|slash|tilde|caron|lig|quot|rsquo);`i","\\1", $string);
-	$string = str_replace('-amp-','-and-',$string);
-	$string = preg_replace( array("`[^a-z0-9]`i","`[-]+`") , "-", $string);
-	return strtolower(trim($string, '-'));
+	return strtolower(trim(_xls_seo_name($string), '-'));
 }
 
+//Makes our SEO hypenated string from passed string
+//Used to build anything that will be in a Name. Allows spaces
 function _xls_seo_name($string){
 	$string = str_replace('\'','',$string);
 	$string = str_replace("&","and",$string);
@@ -932,6 +927,15 @@ function _xls_number_only($string ) {
 }
 
 /**
+ * Return a currency string removing anything not allowed
+ * @param string $string
+ * @return string
+ */
+function _xls_clean_currency($string) {
+	return preg_replace('/[^0-9\.\-]/', '', $string);
+}
+
+/**
  * Add meta redirect to the stack_vars stack
  * @param string $url
  * @param int $delay
@@ -966,7 +970,7 @@ function _xls_add_formatted_page_title($title) {
 }
 
 /**
- * Add meta escription to the stack_vars stack
+ * Add meta description to the stack_vars stack
  * @param string $desc
  */
 function _xls_add_meta_desc($desc) {

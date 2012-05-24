@@ -493,7 +493,7 @@ class XLSShippingControl extends XLSCompositeControl {
         $arrModules = Modules::QueryArray($objCondition, $objClause);
 
         foreach ($arrModules as $objModule) {
-            $objShipModule = $this->Form->loadModule(
+            $objShipModule = xlsws_index::loadModule(
                 $objModule->File, 'shipping'
             );
 

@@ -95,35 +95,67 @@ if(isset($this->HelperRibbon))
 
 ?>	
 <style type="text/css"> 
+/*Formatting for Order editing panel.*/
+
 #editcontainer {
-width: 920px;
-margin-left: 30px;
-margin-top: 10px;
-border: 1px solid #000000;
+width: 960px;
+margin-left: 00px;
+margin-top: 00px;
+padding-left: 0px;
+padding-top: 10px;
+border: 0px solid #000000;
 font-size: 8pt;
 height: 500px;
+background: #efefef;
 }
+
 #editcontainer .thin_row {
 clear: both;
 height:10px;
-margin-left: 10px;
+margin-left: 00px;
 
 }
 
 
 #editcontainer .basic_row {
 clear: both;
-height:30px;
+height:25px;
 margin-left: 10px;
-
+margin-bottom: 1px;
+}
+#editcontainer .rowbg {
+background: #e2e2e2;
+padding-top: 2px;
+width: 920px;
 }
 
+#editcontainer .basic_row .tableheader
+{
+font-size: 12px;
+font-weight: bold;
+text-shadow: none;
+height: 20px;
 
+}
+#editcontainer .smallfont
+{
+	font-size:8pt;
+	height: 15px;
+}
+#editcontainer .largefont
+{
+	font-size:10pt;
+	vertical-align:bottom;
+	text-shadow: none;
+}
 #editcontainer .collabel
 {
 float: left;
-width:80px;
+width:70px;
 margin-right: 10px;
+font-weight: bold;
+text-shadow: none;
+padding-top: 2px;
 }
 #editcontainer .colfield
 {
@@ -131,6 +163,13 @@ float: left;
 width:170px;
 
 }
+.w100 { width:100px; }
+.w70 { width:70px; }
+.ml10 { margin-left: 10px }
+.mr10 { margin-right: 10px }
+#editcontainer .mrnumber { width: 40px; text-align:right; }
+
+
 #editcontainer .colfieldwide
 {
 float: left;
@@ -141,11 +180,16 @@ width:220px;
 {
 
 float: left;
-width:220px;
-height: 300px;
+width:200px;
+height: 150px;
+}
+#editcontainer hr
+{
+width:700px;
+margin-bottom: 10px;
 }
 
-/*Used to clear all floats on in a row. Noticed it is placed before the closing tag of the basic_row div.*/
+
 #editcontainer .clear_float {
 font-size: 0px;
 line-height: 0px;
@@ -162,96 +206,143 @@ clear: both;
 						
 <div id="customer_registration edit_height module_config">
 
-<div id='editcontainer'>
-
-	<div class="basic_row">
-		<div class="collabel">First Name</div><div class="colfield"><?php $this->BillingContactControl->FirstName->RenderWithError(); ?></div>
-		<div class="collabel">Last Name</div><div class="colfield"><?php $this->BillingContactControl->LastName->RenderWithError(); ?></div>
-		<div class="collabel">Phone</div><div class="colfield"><?php $this->BillingContactControl->Phone->RenderWithError() ?></div>
-		<div class="clear_float"></div>
-	</div> 
-
-	<div class="basic_row">
-		<div class="collabel">Company</div><div class="colfield"><?php $this->BillingContactControl->Company->Render(); ?></div>
-		<div class="collabel">Email</div><div class="colfieldwide"><?php $this->BillingContactControl->Email->RenderWithError() ?></div>
-	</div>
-	 
-	<div class="thin_row">
-	</div>
+	<div id='editcontainer'>
 	
-	<div class="basic_row">
-		<div class="collabel">Billing</div><div class="coladdress">
-			<?php 
-			$this->BillingContactControl->Street1->Render(); echo "<br clear='left'>";
-			$this->BillingContactControl->Street2->Render(); echo "<br clear='left'>";
-			$this->BillingContactControl->City->Render();
-			$this->BillingContactControl->State->Render(); echo "<br clear='left'>";
-			$this->BillingContactControl->Zip->Render('Width=70px'); echo "<br clear='left'>";
-			$this->BillingContactControl->Country->Render(); 
-			?></div>
-		
-		<div class="collabel">Shipping</div><div class="coladdress">
-			<?php 
-			$this->ShippingContactControl->FirstName->Render('Width=70px;Margin-right:10px;'); echo "&nbsp;&nbsp;";
-			$this->ShippingContactControl->LastName->Render('Width=70px'); echo "<br clear='left'>";
-			$this->ShippingContactControl->Street1->Render(); echo "<br clear='left'>";
-			$this->ShippingContactControl->Street2->Render(); echo "<br clear='left'>";
-			$this->ShippingContactControl->City->Render();
-			$this->ShippingContactControl->State->Render(); echo "<br clear='left'>";
-			$this->ShippingContactControl->Zip->Render('Width=70px'); echo "<br clear='left'>";
-			$this->ShippingContactControl->Country->Render(); 
-			?></div>
-
-		<div class="collabel">Payment</div><div class="coladdress">
-			</div>
-			
+		<div class="basic_row">
+			<div class="collabel">First Name:</div><div class="colfield"><?php $this->BillingContactControl->FirstName->RenderWithError('CssClass=smallfont'); ?></div>
+			<div class="collabel">Last Name:</div><div class="colfield"><?php $this->BillingContactControl->LastName->RenderWithError('CssClass=smallfont'); ?></div>
+			<div class="collabel">Phone:</div><div class="colfield"><?php $this->BillingContactControl->Phone->RenderWithError('CssClass=smallfont') ?></div>
 			<div class="clear_float"></div>
-	</div>		
-
+		</div> 
 	
-	
-	
-</div>
-
+		<div class="basic_row">
+			<div class="collabel">Company:</div><div class="colfield"><?php $this->BillingContactControl->Company->Render('CssClass=smallfont'); ?></div>
+			<div class="collabel">Email:</div><div class="colfieldwide"><?php $this->BillingContactControl->Email->RenderWithError('CssClass=smallfont') ?></div>
+		</div>
+		 
+		<div class="thin_row">
+		</div>
+		
+		<div class="basic_row">
+			<div class="collabel">Bill To:</div><div class="coladdress">
+				<?php 
+				$this->BillingContactControl->Street1->Render('CssClass=smallfont'); echo "<br clear='left'>";
+				$this->BillingContactControl->Street2->Render('CssClass=smallfont'); echo "<br clear='left'>";
+				$this->BillingContactControl->City->Render('CssClass=smallfont w100');
+				$this->BillingContactControl->State->Render(); echo "<br clear='left'>";
+				$this->BillingContactControl->Zip->Render('CssClass=smallfont w70'); echo "<br clear='left'>";
+				$this->BillingContactControl->Country->Render(); 
+				?></div>
 			
-<? /*
-            case 'txtCRFName':
-                return $this->BillingContactControl->FirstName;
+			<div class="collabel">Ship To:</div><div class="coladdress">
+				<?php 
+				$this->ShippingContactControl->FirstName->Render('CssClass=smallfont w70 mr10'); echo "&nbsp;&nbsp;";
+				$this->ShippingContactControl->LastName->Render('CssClass=smallfont w70'); echo "<br clear='left'>";
+				$this->ShippingContactControl->Street1->Render('CssClass=smallfont'); echo "<br clear='left'>";
+				$this->ShippingContactControl->Street2->Render('CssClass=smallfont'); echo "<br clear='left'>";
+				$this->ShippingContactControl->City->Render('CssClass=smallfont w100');
+				$this->ShippingContactControl->State->Render(); echo "<br clear='left'>";
+				$this->ShippingContactControl->Zip->Render('CssClass=smallfont w70'); echo "<br clear='left'>";
+				$this->ShippingContactControl->Country->Render(); 
+				?></div>
+	
+			<div class="collabel">Pay Method:</div><div class="colfield">
+				<?php 
+				$this->PaymentControl->ModuleControl->Visible = true;
+				$this->PaymentControl->ModuleControl->Enabled = true;
+				$this->PaymentControl->ModuleControl->Render(); 
+	
+				?>
+					<div class="collabel">Amt Paid:</div><div class="collabel"><?php $this->ctlPaymentAmount->Render('CssClass=smallfont'); ?></div>
+					<div class="collabel">Reference #:</div><div class="collabel"><?php $this->ctlPaymentRef->Render('CssClass=smallfont'); ?></div>
+				</div>
+			
+			
+			
+			
+			<div class="clear_float"></div>	
+				
+		
+	
+	<hr>
 
-            case 'txtCRLName': 
-                return $this->BillingContactControl->LastName;
+	
+	<div class="clear_float"></div>
+	
+	
+			<div class="basic_row tableheader ">
+				<div class="colfield ml10">Product Code</div>
+				<div class="colfield">Description</div>
+				<div class="colfield">Qty</div>
+				<div class="colfield">Unit Price</div>
+				<div class="colfield">Total</div>
 
-            case 'txtCRCompany': 
-                return $this->BillingContactControl->Company;
+				<div class="clear_float"></div>
+			</div> 
 
-            case 'txtCRMPhone': 
-                return $this->BillingContactControl->Phone;
 
-            case 'txtCREmail': 
-                return $this->BillingContactControl->Email;
-                
-            case 'txtCRConfEmail':
-                return $this->BillingContactControl->EmailConfirm;  
 
-            case 'txtCRBillAddr1':
-                return $this->BillingContactControl->Street1;
-            
-            case 'txtCRBillAddr2':
-                return $this->BillingContactControl->Street2;
+	<? 
+		foreach ($this->arrProducts as $arrProduct) { ?>
+		
+			<div class="basic_row rowbg">
+				<div class="colfield ml10"><?php $arrProduct['code']->Render(); ?></div>
+				<div class="colfield"><?php $arrProduct['name']->Render(); ?></div>
+				<div class="colfield"><?php $arrProduct['qty']->Render(); ?></div>
+				<div class="colfield"><?php $arrProduct['unitprice']->Render(); ?></div>
+				<div class="colfield mrnumber"><?php $arrProduct['total']->Render(); ?></div>
 
-            case 'txtCRBillCity':
-                return $this->BillingContactControl->City;
+				<div class="clear_float"></div>
+			</div> 
+		<?	
+		
+		
+		}
+	
+	?>
+	
+		<div class="basic_row">
+			<div class="colfield ml10">&nbsp;</div>
+			<div class="colfield">&nbsp;</div>
+			<div class="colfield">&nbsp;</div>
+			<div class="colfield">Subtotal:</div>
+			<div class="colfield mrnumber"><?php $this->ctlSubTotal->Render(); ?></div>
+			<div class="colfield">&nbsp;</div>
+			<div class="clear_float"></div>
+		</div> 
 
-            case 'txtCRBillCountry':
-                return $this->BillingContactControl->Country;
-
-            case 'txtCRBillState':
-                return $this->BillingContactControl->State;
-
-            case 'txtCRBillZip':
-                return $this->BillingContactControl->Zip;
-              */   ?>
-              
+		<div class="basic_row">
+			<div class="colfield ml10">&nbsp;</div>
+			<div class="colfield">&nbsp;</div>
+			<div class="colfield">&nbsp;</div>
+			<div class="colfield">Tax:</div>
+			<div class="colfield mrnumber"><?php $this->ctlTax->Render(); ?></div>
+			<div class="colfield ml10"><? $this->ctlTaxChoices->Render(); ?></div>
+			<div class="clear_float"></div>
+		</div> 
+		
+		<div class="basic_row">
+			<div class="colfield ml10">&nbsp;</div>
+			<div class="colfield">&nbsp;</div>
+			<div class="colfield">&nbsp;</div>
+			<div class="colfield">Shipping:</div>
+			<div class="colfield mrnumber"><?php $this->ctlShipping->Render(); ?></div>
+			<div class="colfield ml10"><? $this->ctlShippingChoices->Render(); ?></div>
+			<div class="clear_float"></div>
+		</div> 	
+		
+		<div class="basic_row">
+			<div class="colfield ml10">&nbsp;</div>
+			<div class="colfield">&nbsp;</div>
+			<div class="colfield">&nbsp;</div>
+			<div class="colfield">Total:</div>
+			<div class="colfield mrnumber"><?php $this->ctlTotal->Render(); ?></div>
+			<div class="colfield">&nbsp;</div>
+			<div class="clear_float"></div>
+		</div> 	
+			
+	</div>
+             
               
        
 </div>

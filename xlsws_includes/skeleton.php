@@ -911,7 +911,7 @@ EOS;
 	}
 
 	/**
-	 * loadModule - build a drag n drop zone to use for products
+	 * loadModule
 	 * @param string filename of module
 	 * @param string directory that the file resides in
 	 * @return object instantiated object for a module (shipping or payment usually)
