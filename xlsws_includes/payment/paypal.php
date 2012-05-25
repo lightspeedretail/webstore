@@ -30,7 +30,7 @@
  *
  */
 
-class Paypal extends xlsws_class_payment {
+class paypal extends xlsws_class_payment {
 	const x_delim_char = "|";
 
 	/**
@@ -40,7 +40,7 @@ class Paypal extends xlsws_class_payment {
 	 *
 	 */
 	public function name() {
-		$config = $this->getConfigValues('paypal');
+		$config = $this->getConfigValues(get_class($this));
 
 		if(isset($config['label']))
 			return $config['label'];

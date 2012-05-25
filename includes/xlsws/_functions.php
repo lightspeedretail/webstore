@@ -927,6 +927,15 @@ function _xls_number_only($string ) {
 }
 
 /**
+ * Return a number out of a string only
+ * @param string $string
+ * @return string
+ */
+function _xls_letters_only($string ) {
+	return preg_replace('/[^A-Za-z]/', '', $string);
+}
+
+/**
  * Return a currency string removing anything not allowed
  * @param string $string
  * @return string

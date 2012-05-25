@@ -218,7 +218,7 @@
 	$arrPaymentTabs = array('methods' => _sp('Methods') , 'cc' => _sp('Credit Card Types'), 
 		'promo' => _sp('Promo Codes'),'promotasks' => _sp('Promo Code Tasks'));
 	$arrSeoTabs = array('general' => _sp('General') , 'meta' => _sp('Meta'), 'categories' => _sp('Categories'));
-	$arrDbAdminTabs = array('warning' => _sp('Notice') , 'dborders' => _sp('Orders'), 'dbpending' => _sp('Pending to<br>Download '.$strPend)  , 'incomplete' => _sp('Incomplete<br>Orders'),'dbedit' => _sp('Edit Order'));
+	$arrDbAdminTabs = array('warning' => _sp('Notice') , 'dborders' => _sp('Orders'), 'dbpending' => _sp('Pending to<br>Download '.$strPend)  , 'incomplete' => _sp('Incomplete<br>Orders'));
 	$arrSystemTabs = array('config' => _sp('Setup') , 'task' => _sp('Tasks')  , 'vlog' => _sp('Visitor Log'), 'slog' => _sp('System Log'));
 	
 	
@@ -5415,11 +5415,12 @@
 	}
 	
 	
+	
 	/* class xlsws_admin_products
 	* class to create the credit card types tab under payment methods
 	* see class xlsws_admin_generic_edit_form for further specs
 	*/				
-	class xlsws_admin_dborders extends xlsws_admin_generic_edit_form{
+	class xlsws_admin_dborders extends xlsws_admin_generic_edit_form {
 		
 		protected $default_sort_index = 0;
 		protected $default_sort_direction = 1;
@@ -5434,7 +5435,10 @@
 			$this->className = "Cart";
 			$this->blankObj = new Cart();
 			$this->qqn = QQN::Cart();
-			
+			$this->qqcondition = 
+				QQ::AndCondition(
+				QQ::Equal(QQN::Cart()->Type, 4),
+				QQ::Equal(QQN::Cart()->Downloaded, 1));
 			
 			$this->arrFields = array();
 
@@ -5457,16 +5461,12 @@
 			$this->arrFields['Email']['Field'] = new QLabel($this);
 			$this->arrFields['Email']['Width'] = 80;	
 			
-			$this->arrFields['Count'] = array('Name' => 'Items');
+			/*$this->arrFields['Count'] = array('Name' => 'Items');
 			$this->arrFields['Count']['Field'] = new QLabel($this);
 			$this->arrFields['Count']['Width'] = 50;	
+			*/
 			
-			
-			/*$this->arrFields['ShippingModule'] = array('Name' => 'Ship Method');
-			$this->arrFields['ShippingModule']['Field'] = new QLabel($this);
-			$this->arrFields['ShippingModule']['Width'] = 120;								
-			$this->arrFields['ShippingModule']['DisplayFunc'] = "RenderShippingModule";
-					
+						/*		
 
 			$this->arrFields['ShippingSell'] = array('Name' => 'Ship Price');
 			$this->arrFields['ShippingSell']['Field'] = new QLabel($this);
@@ -5483,6 +5483,13 @@
 			$this->arrFields['Total']['Field'] = new QLabel($this);
 			$this->arrFields['Total']['Width'] = 40;	
 			$this->arrFields['Total']['DisplayFunc'] = "RenderMoney";
+
+
+			
+			$this->arrFields['ShippingModule'] = array('Name' => 'Ship Method');
+			$this->arrFields['ShippingModule']['Field'] = new QLabel($this);
+			$this->arrFields['ShippingModule']['Width'] = 120;								
+			$this->arrFields['ShippingModule']['DisplayFunc'] = "RenderShippingModule";
 
 			$this->arrFields['TrackingNumber'] = array('Name' => 'Tracking<br>Number');
 			$this->arrFields['TrackingNumber']['Field'] = new XLSTextBox($this);
@@ -5501,7 +5508,7 @@
 			$this->arrFields['Downloaded']['DisplayFunc'] = "RenderCheck";
 			$this->arrFields['Downloaded']['Width'] = 50;
 
-			$this->HelperRibbon = "Note that changing shipping or tax will recalculate total automatically.";
+			$this->HelperRibbon = "Edit and uncheck Downloaded to force an order to download again to LightSpeed.";
 			
 			parent::Form_Create();
 			
@@ -5550,6 +5557,7 @@
 		
 	}
 
+	
 	
 	
 	class xlsws_admin_dbpendingorders extends xlsws_admin_generic_edit_form {
@@ -5679,6 +5687,36 @@
 		
 	}
 
+
+	/* class xlsws_admin_products
+	* class to create the credit card types tab under payment methods
+	* see class xlsws_admin_generic_edit_form for further specs
+	*/				
+	class xlsws_admin_dbincomplete extends xlsws_admin_dbpendingorders {
+	
+		protected function Form_Create() {
+			
+			parent::Form_Create();
+			
+			$this->arrTabs = $GLOBALS['arrDbAdminTabs'];
+			$this->currentTab = 'incomplete';
+			
+			$this->appName = _sp("Incomplete Orders");
+			$this->default_items_per_page = 10;
+			$this->className = "Cart";
+			$this->blankObj = new Cart();
+			$this->qqn = QQN::Cart();
+			$this->qqcondition = QQ::Equal(QQN::Cart()->Type, 7);
+			$this->edit_override=true;
+			
+			$this->HelperRibbon = "This screen lists orders that have been Submitted but payment was not completed. This is normally a result of declined credit cards.";
+
+
+			}
+	
+	}
+	
+	
 	
 			
 	class xlsws_admin_dbedit extends xlsws_admin {
@@ -5707,14 +5745,11 @@
 		protected $ctlPaymentDate;
 		protected $ctlPaymentRef;
 		protected $arrProducts;
+
+		protected $ctlShipLabel;
+		protected $ctlShippingTotal;
+		protected $ctlOrderTotal;
 		
-		protected $ctlSubTotal;
-		protected $ctlTax;
-		protected $ctlShipping;
-		protected $ctlTotal;
-		
-		protected $ctlTaxChoices;
-		protected $ctlShippingChoices;
 		
 		protected function Form_Create(){
 			parent::Form_Create();
@@ -5751,23 +5786,14 @@
 			$this->btnSave->AddAction( new QClickEvent() , new QServerAction('btnSave_Click'));
 			$this->btnSave->CausesValidation = true;
 			
-			$this->HelperRibbon = "Use caution when making changes directly to Web Orders as they cannot be undone.";
+			$this->HelperRibbon = "Use this screen to make changes which are preventing an order from downloading. All other changes can be made from Orders in LightSpeed once downloaded. Use caution when making changes directly to Web Orders here as they cannot be undone. ";
 			
 			$this->BuildCustomerControl();
 			$this->BuildPaymentControl();
 			$this->BuildPopulateItemGrid();
+			$this->BuildPaymentShipping();
+
 			
-			$this->ctlPaymentAmount = new XLSTextBox($this);
-			$this->ctlPaymentRef = new XLSTextBox($this);
-			
-			$this->ctlSubTotal = new QLabel($this,'subtotal');
-			$this->ctlTax = new QLabel($this,'tax');
-			$this->ctlShipping = new XLSTextBox($this,'shipping');
-			$this->ctlShipping->CssClass='smallfont mrnumber';
-			$this->ctlTotal = new QLabel($this,'total');
-			
-			$this->BuildTaxChoices();			
-			$this->BuildShippingChoices();
 			$this->PopulateForm();
 
 		}
@@ -5781,49 +5807,24 @@
 		public function NewPage(){
 			
 		}
-	
-		protected function BuildTaxChoices() {
+		protected function BuildPaymentShipping() {
 		
-			$this->ctlTaxChoices = new XLSListBox($this,'taxchoice');
+			$this->ctlPaymentAmount = new XLSTextBox($this);
+			$this->ctlPaymentAmount->CssClass="smallfont";
+			$this->ctlPaymentRef = new XLSTextBox($this);
+			$this->ctlPaymentRef->CssClass="smallfont";
 			
-			$taxcodes = TaxCode::LoadAll(QQ::Clause(QQ::OrderBy(QQN::TaxCode()->ListOrder)));
-			foreach($taxcodes as $code)
-				$this->ctlTaxChoices->AddItem($code->Code , $code->Rowid);
-		
-		
+			$this->ctlShipLabel = new QLabel($this);
+			$this->ctlShipLabel->CssClass="largefont";
+			
+			$this->ctlShippingTotal = new QLabel($this);
+			$this->ctlShippingTotal->CssClass="largefont";
+			
+			$this->ctlOrderTotal = new QLabel($this);
+			$this->ctlOrderTotal->CssClass="largefont";
+			
+			
 		}
-		protected function BuildShippingChoices() {
-		
-			$this->ctlShippingChoices = new XLSListBox($this,'shippingchoice');
-			
-			$objCondition = QQ::AndCondition(
-	        	QQ::Equal(QQN::Modules()->Type, 'shipping'),
-	        	QQ::Equal(QQN::Modules()->Active, 1));
-	        $objClause = QQ::Clause(QQ::OrderBy(QQN::Modules()->SortOrder));
-	
-	        $arrShippingModules = array();
-	        $arrModules = Modules::QueryArray($objCondition, $objClause);
-	
-	        foreach ($arrModules as $objModule) {
-	            $objShipModule = xlsws_index::loadModule(
-	                $objModule->File, 'shipping'
-	            );
-	
-	            if (!$objShipModule)
-	                continue;
-	
-	            $arrShippingModules[] = $objShipModule;
-	        }
-	        
-
-	        foreach ($arrShippingModules as $objModule) { 
-                $strName = $objModule->name();
-                $this->ctlShippingChoices->AddItem($strName, get_class($objModule));
-            }
-            
-        
-        }
-		
 		
     	protected function BuildCustomerControl() { 
 	        $this->CustomerControl = $objControl = 
@@ -5835,6 +5836,7 @@
 	            
 	        return $objControl;
 	    }
+	    
 	    protected function BuildPaymentControl() { 
 	    
 	     $this->PaymentControl = $objControl = 
@@ -5861,32 +5863,27 @@
         	
         		$arrRow = array();
         		
-        		$arrRow['code']=new XLSTextBox($this,'code'.$intCounter);
-        		$arrRow['code']->Text = $item->Code;
-        		$arrRow['code']->CssClass = "smallfont";
-        		$arrRow['code']->AddAction(new QChangeEvent(), new QAjaxAction('doChange'));
+        		$arrRow['Code']=new QLabel($this,'Code'.$item->Rowid);
+        		$arrRow['Code']->Text = $item->Code;
+        		$arrRow['Code']->CssClass = "largefont";
+        		//$arrRow['Code']->AddAction(new QChangeEvent(), new QAjaxAction('doChange'));      		
         		
-        		$arrRow['name']=new QLabel($this);
-        		$arrRow['name']->Text = _xls_string_smart_truncate($item->Description,20);
-        		$arrRow['name']->CssClass = "largefont";
+        		$arrRow['Description']=new QLabel($this,'Description'.$item->Rowid);
+        		$arrRow['Description']->Text = _xls_string_smart_truncate($item->Description,20);
+        		$arrRow['Description']->CssClass = "largefont";
         		
-        		$arrRow['qty']=new XLSTextBox($this,'qty'.$intCounter);
-        		$arrRow['qty']->Text = $item->Qty;
-        		$arrRow['qty']->Width = 40;
-        		$arrRow['qty']->CssClass = "smallfont";
-        		$arrRow['qty']->AddAction(new QChangeEvent(), new QAjaxAction('doChange'));
-        
-           		$arrRow['unitprice']=new XLSTextBox($this,'unit'.$intCounter);
-	      		$arrRow['unitprice']->Text = $item->Sell-$item->Discount;
-				$arrRow['unitprice']->Width = 60;
-				$arrRow['unitprice']->CssClass = "smallfont";
-        		$arrRow['unitprice']->AddAction(new QChangeEvent(), new QAjaxAction('doChange'));
+        		$arrRow['Qty']=new QLabel($this,'Qty'.$item->Rowid);
+        		$arrRow['Qty']->Text = $item->Qty;
+        		$arrRow['Qty']->Width = 20;
+        		$arrRow['Qty']->CssClass = "largefont";
+ 
+         		$arrRow['Delete']=new QCheckbox($this,'Delete'.$item->Rowid);
+        		$arrRow['Delete']->Width = 50;
+        		$arrRow['Delete']->CssClass = "smallfont";
+				$arrRow['Delete']->AddAction( new QClickEvent() , new QAjaxAction('doChange'));
 
-        		$arrRow['total']=new QLabel($this);
-        		$arrRow['total']->Text = $item->SellTotal;
-        		$arrRow['total']->CssClass = "largefont";
         		
-        		$this->arrProducts[] = $arrRow;
+        		$this->arrProducts[$item->Rowid] = $arrRow;
         		$intCounter++;
         		
         	}
@@ -5954,30 +5951,97 @@
 	        $objInfo->UpdateFieldsFromArray($mixValueArray);
 	      
 	        $this->PaymentControl->Module->SelectedValue = $objCart->PaymentModule;
-	        
 
 	      	            
 	        $this->page = $objCart->IdStr;
 	                   
 	        $this->ctlPaymentAmount->Text = $objCart->PaymentAmount;
 	        $this->ctlPaymentRef->Text = $objCart->PaymentData;
+			
+			$this->ctlShipLabel->Text = $objCart->ShippingData;
+			$this->ctlShippingTotal->Text = $objCart->ShippingSell;
+			$this->ctlOrderTotal->Text = $objCart->Total;
 	        
-	        $this->ctlSubTotal->Text = _xls_currency($objCart->Subtotal);
-			$this->ctlTax->Text = $objCart->TaxTotal;
-			$this->ctlShipping->Text = $objCart->ShippingSell;
-			$this->ctlShipping->AddAction(new QChangeEvent(), new QAjaxAction('doChange'));
 
-			$this->ctlTotal->Text = _xls_currency($objCart->Total);
-	        
+		
+		
 	        
 	    }
 		
 		public function doChange($strFormId, $strControlId, $strParameter){
 		
-			error_log("change on $strControlId");
-			error_log("parameter is ".$strParameter);
-
 			//We need to recalculate the form
+			//We can't use the Cart:: recalc functions because those save the cart to the db, and at this point
+			//the user hasn't clicked Save yet and may discard changes. 
+			
+			$objCart = $this->objCart;
+
+        	$arrItems = $objCart->GetCartItemArray(); 
+        	
+        	
+        	$intItem = _xls_number_only($strControlId);
+        	$strField = _xls_letters_only($strControlId);
+
+
+     		$ctlCode = QForm::GetControl('Code'.$intItem);
+     		$ctlDescription = QForm::GetControl('Description'.$intItem);
+    		$ctlQty = QForm::GetControl('Qty'.$intItem);
+    		$ctlDelete = QForm::GetControl('Delete'.$intItem);
+
+       			        	
+        	if ($strField=="Delete") $strCompareValue="x"; else $strCompareValue = $arrItems[$intItem]->$strField;
+        	
+        	if ($this->arrProducts[$intItem][$strField]->Text != $strCompareValue) {
+        		//The field has been changed, so update the display
+       		     		
+        		switch ($strField) {
+        		
+        			case 'Code': //We updated a code, so get the new information and display
+        			
+	        			$objNewProduct = Product::LoadByCode($ctlCode->Text);
+	        			if ($objNewProduct && $objNewProduct->MasterModel==0) {
+	        				$ctlDescription->Text =  _xls_string_smart_truncate($objNewProduct->Name,20);
+	        				$ctlCost->Text=$objNewProduct->Price;
+	        				$ctlCost->CssClass = 'smallfont';
+	        			}
+	        			elseif ($objNewProduct && $objNewProduct->MasterModel!=0) {
+	        				$ctlDescription->Text = "**CAN'T ADD MASTER**";
+	        			}
+	        			else {
+	        				$ctlDescription->Text = "**INVALID CODE**";
+	        			}
+						$ctlCode->CssClass = 'smallfont bgchanged';
+        			break;
+        			
+        			case 'Qty': //We updated a qty, recalc
+
+						$ctlQty->CssClass = 'smallfont bgchanged';
+						
+						
+        			break;
+        			
+        			case 'Delete':
+        				if ($ctlDelete->Checked) $ctlQty->Text=0; else $ctlQty->Text=$arrItems[$intItem]->Qty;
+        			break;
+
+        			
+        		}
+				
+   		
+        	} else  $this->arrProducts[$intItem][$strField]->CssClass = 'smallfont';
+  
+
+			//Recalculate line
+			if ($ctlQty->Text==0) {
+				$ctlCode->CssClass = 'largefont strikeout'; 
+				$ctlDescription->CssClass = 'largefont strikeout';
+				$ctlQty->CssClass = 'largefont strikeout';
+			}
+			else {
+				$ctlDescription->CssClass = 'largefont';
+				$ctlCode->CssClass = 'largefont'; 
+				$ctlQty->CssClass = 'largefont';
+			}
 		
 		}
 	    
@@ -6033,18 +6097,38 @@
 	            $objCart->ShipCountry
 	        ));
     	
-    	
-    		$objCart->PaymentAmount = _xls_clean_currency($this->ctlPaymentAmount->Text);
-	        $objCart->PaymentData = $this->ctlPaymentRef->Text;
-	        
-			$objCart->PaymentModule = $this->PaymentControl->Module->SelectedValue;
-			$objPaymentModule = xlsws_index::loadModule(
-	            $objCart->PaymentModule . '.php',
-	            'payment'
-	        );
-			$objCart->PaymentMethod = $objPaymentModule->payment_method($objCart);
 
-    		$objCart->Save();
+    		//If it's unset because it was unset before, skip. 
+	        if ($this->PaymentControl->Module->SelectedValue != '0') {
+				$objCart->PaymentModule = $this->PaymentControl->Module->SelectedValue;
+				
+				$objPaymentModule = xlsws_index::loadModule(
+		            $objCart->PaymentModule . '.php',
+		            'payment'
+		        );
+				$config = $objPaymentModule->getConfigValues($objCart->PaymentModule);
+
+
+				$objCart->PaymentMethod = $config['ls_payment_method'];
+				$objCart->PaymentAmount = _xls_clean_currency($this->ctlPaymentAmount->Text);
+		        $objCart->PaymentData = $this->ctlPaymentRef->Text;
+		     }  
+		        
+	        $objCart->Save();
+	        
+           	$arrItems = $objCart->GetCartItemArray(); 
+			foreach ($arrItems as $objItem) { 
+				$ctlQty = QForm::GetControl('Qty'.$objItem->Rowid); 
+				if ($objItem->Qty != $ctlQty->Text) {
+					QApplication::Log(0, 'MANUAL EDIT', $objCart->IdStr." edited changing ".$objItem->Code." qty from ".$objItem->Qty." to ".$ctlQty->Text);
+					$objCart->UpdateItemQuantity($objItem, $ctlQty->Text);
+					$objCart->UpdateCart();
+				}
+		
+			}
+
+		
+    		
     	
     		_rd($_SERVER["SCRIPT_NAME"]  . '?page=dbadmin&subpage=dbpending' . admin_sid());
     	}
@@ -6758,7 +6842,10 @@
 					break;
 				case "dbedit":
 					xlsws_admin_dbedit::Run('xlsws_admin_dbedit' , adminTemplate('dbedit.tpl.php'));
-					break;
+					break;					
+				case "incomplete":
+					xlsws_admin_dbincomplete::Run('xlsws_admin_dbincomplete' , adminTemplate('edit.tpl.php'));
+					break;					
 				default:
 					xlsws_admin_dbwarning::Run('xlsws_admin_dbwarning' , adminTemplate('dbwarning.tpl.php'));
 			}

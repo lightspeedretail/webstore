@@ -922,7 +922,7 @@ EOS;
 		$classname = basename($file , ".php"); 
 		$file = $classname . ".php";
 		
-		if(is_file(CUSTOM_INCLUDES . "$dir" . "/" . $file)) {
+		if(is_file(CUSTOM_INCLUDES . "$dir" . "/" . $file) && !class_exists($classname)) {
 			try {
 				include_once(CUSTOM_INCLUDES . "$dir" . "/" . $file);
 
@@ -934,7 +934,7 @@ EOS;
 			}
 		}
 
-		if(!is_file(XLSWS_INCLUDES . "$dir" . "/" . $file)) {
+		if(!is_file(XLSWS_INCLUDES . "$dir" . "/" . $file)  && !class_exists($classname)) {
 			_xls_log("ERROR: Module does not exist $file in $dir");
 			return null;
 		}
@@ -942,7 +942,7 @@ EOS;
 		try {
 			include_once(XLSWS_INCLUDES . "$dir" . "/" . $file);
 
-			$class = new $classname;
+				$class = new $classname;
 
 			return $class;
 		} catch(Exception $e) {

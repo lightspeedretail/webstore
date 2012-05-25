@@ -163,12 +163,18 @@ float: left;
 width:170px;
 
 }
+#editcontainer .mrnumber { width: 40px; text-align:right; }
+#editcontainer .w300 { width: 300px; }
+#editcontainer .w70 { width: 70px; }
+
 .w100 { width:100px; }
 .w70 { width:70px; }
 .ml10 { margin-left: 10px }
 .mr10 { margin-right: 10px }
-#editcontainer .mrnumber { width: 40px; text-align:right; }
-
+.bgchanged { background-color: #E3E4FA; }
+.bgwhite { background-color: #ffffff; }
+.bgalert { background-color: #F778A1; }
+.strikeout { text-decoration:line-through; }
 
 #editcontainer .colfieldwide
 {
@@ -253,13 +259,15 @@ clear: both;
 				$this->PaymentControl->ModuleControl->Render(); 
 	
 				?>
-					<div class="collabel">Amt Paid:</div><div class="collabel"><?php $this->ctlPaymentAmount->Render('CssClass=smallfont'); ?></div>
-					<div class="collabel">Reference #:</div><div class="collabel"><?php $this->ctlPaymentRef->Render('CssClass=smallfont'); ?></div>
+				
+				<div class="collabel">Amt Paid:</div><div class="collabel"><?php $this->ctlPaymentAmount->Render('CssClass=smallfont'); ?></div>
+				<div class="collabel">Reference #:</div><div class="collabel"><?php $this->ctlPaymentRef->Render('CssClass=smallfont'); ?></div>
+				<div class="collabel"><?php $this->ctlShipLabel->Render('CssClass=smallfont'); ?>:</div><div class="collabel"><?php $this->ctlShippingTotal->Render('CssClass=smallfont'); ?></div>
+				<div class="collabel">Order Total:</div><div class="collabel"><?php $this->ctlOrderTotal->Render('CssClass=smallfont'); ?></div>
+					
+					
+					
 				</div>
-			
-			
-			
-			
 			<div class="clear_float"></div>	
 				
 		
@@ -272,10 +280,9 @@ clear: both;
 	
 			<div class="basic_row tableheader ">
 				<div class="colfield ml10">Product Code</div>
-				<div class="colfield">Description</div>
-				<div class="colfield">Qty</div>
-				<div class="colfield">Unit Price</div>
-				<div class="colfield">Total</div>
+				<div class="colfield w70">Qty</div>
+				<div class="colfield w300">Description</div>
+				<div class="colfield">Delete This Item</div>
 
 				<div class="clear_float"></div>
 			</div> 
@@ -286,11 +293,11 @@ clear: both;
 		foreach ($this->arrProducts as $arrProduct) { ?>
 		
 			<div class="basic_row rowbg">
-				<div class="colfield ml10"><?php $arrProduct['code']->Render(); ?></div>
-				<div class="colfield"><?php $arrProduct['name']->Render(); ?></div>
-				<div class="colfield"><?php $arrProduct['qty']->Render(); ?></div>
-				<div class="colfield"><?php $arrProduct['unitprice']->Render(); ?></div>
-				<div class="colfield mrnumber"><?php $arrProduct['total']->Render(); ?></div>
+				<div class="colfield ml10"><?php $arrProduct['Code']->Render(); ?></div>
+				<div class="colfield w70"><?php $arrProduct['Qty']->Render(); ?></div>
+				<div class="colfield w300"><?php $arrProduct['Description']->Render(); ?></div>
+				<div class="colfield w70"><?php $arrProduct['Delete']->Render(); ?></div>
+
 
 				<div class="clear_float"></div>
 			</div> 
@@ -300,47 +307,7 @@ clear: both;
 		}
 	
 	?>
-	
-		<div class="basic_row">
-			<div class="colfield ml10">&nbsp;</div>
-			<div class="colfield">&nbsp;</div>
-			<div class="colfield">&nbsp;</div>
-			<div class="colfield">Subtotal:</div>
-			<div class="colfield mrnumber"><?php $this->ctlSubTotal->Render(); ?></div>
-			<div class="colfield">&nbsp;</div>
-			<div class="clear_float"></div>
-		</div> 
-
-		<div class="basic_row">
-			<div class="colfield ml10">&nbsp;</div>
-			<div class="colfield">&nbsp;</div>
-			<div class="colfield">&nbsp;</div>
-			<div class="colfield">Tax:</div>
-			<div class="colfield mrnumber"><?php $this->ctlTax->Render(); ?></div>
-			<div class="colfield ml10"><? $this->ctlTaxChoices->Render(); ?></div>
-			<div class="clear_float"></div>
-		</div> 
-		
-		<div class="basic_row">
-			<div class="colfield ml10">&nbsp;</div>
-			<div class="colfield">&nbsp;</div>
-			<div class="colfield">&nbsp;</div>
-			<div class="colfield">Shipping:</div>
-			<div class="colfield mrnumber"><?php $this->ctlShipping->Render(); ?></div>
-			<div class="colfield ml10"><? $this->ctlShippingChoices->Render(); ?></div>
-			<div class="clear_float"></div>
-		</div> 	
-		
-		<div class="basic_row">
-			<div class="colfield ml10">&nbsp;</div>
-			<div class="colfield">&nbsp;</div>
-			<div class="colfield">&nbsp;</div>
-			<div class="colfield">Total:</div>
-			<div class="colfield mrnumber"><?php $this->ctlTotal->Render(); ?></div>
-			<div class="colfield">&nbsp;</div>
-			<div class="clear_float"></div>
-		</div> 	
-			
+				
 	</div>
              
               
