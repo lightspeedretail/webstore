@@ -1028,12 +1028,13 @@ EOT;
 			          {
 			          foreach ($matches as $match)
 			              {
+                          $infotemp_keys = array_keys($phpinfotemp);
 			              if (strlen($match[1]))
 			                  $phpinfotemp[$match[1]] = array();
 			              elseif (isset($match[3]))
-			                  $phpinfotemp[end(array_keys($phpinfotemp))][] = isset($match[4]) ? array($match[3], $match[4]) : $match[3];
+			                  $phpinfotemp[end($infotemp_keys)][] = isset($match[4]) ? array($match[3], $match[4]) : $match[3];
 			              else
-			                  $phpinfotemp[end(array_keys($phpinfotemp))][] = $match[2];
+			                  $phpinfotemp[end($infotemp_keys)][] = $match[2];
 			              }
 			          }
 			      $phpinfo = array();
@@ -1074,7 +1075,8 @@ EOT;
 				$checked['MCrypt Encryption Library']= isset($phpinfo['mcrypt']) ? "pass" : "fail";
 				$checked['Session use_only_cookies must be turned Off']= ($phpinfo['session']['session.use_only_cookies']=="Off" ? "pass" : "fail");
 				$checked['Soap Library']= ($phpinfo['soap']['Soap Client']=="enabled" ? "pass" : "fail");
-			
+				$checked['OpenSSL']= ($phpinfo['openssl']['OpenSSL support']=="enabled" ? "pass" : "fail");
+
 				//Check php.ini settings
 				$checked['allow_call_time_pass_reference in Php.ini must be turned On']=($phpinfo['Core']['allow_call_time_pass_reference']=="On" ? "pass" : "fail");
 				$checked['magic_quotes_gpc in Php.ini must be turned Off']=($phpinfo['Core']['magic_quotes_gpc']=="Off" ? "pass" : "fail");
