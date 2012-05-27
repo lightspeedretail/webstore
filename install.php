@@ -1028,12 +1028,13 @@ EOT;
 			          {
 			          foreach ($matches as $match)
 			              {
+                          $infotemp_keys = array_keys($phpinfotemp);
 			              if (strlen($match[1]))
 			                  $phpinfotemp[$match[1]] = array();
 			              elseif (isset($match[3]))
-			                  $phpinfotemp[end(array_keys($phpinfotemp))][] = isset($match[4]) ? array($match[3], $match[4]) : $match[3];
+			                  $phpinfotemp[end($infotemp_keys)][] = isset($match[4]) ? array($match[3], $match[4]) : $match[3];
 			              else
-			                  $phpinfotemp[end(array_keys($phpinfotemp))][] = $match[2];
+			                  $phpinfotemp[end($infotemp_keys)][] = $match[2];
 			              }
 			          }
 			      $phpinfo = array();
