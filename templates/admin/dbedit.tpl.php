@@ -171,6 +171,7 @@ width:170px;
 .w70 { width:70px; }
 .ml10 { margin-left: 10px }
 .mr10 { margin-right: 10px }
+.w150 { width:150px; }
 .bgchanged { background-color: #E3E4FA; }
 .bgwhite { background-color: #ffffff; }
 .bgalert { background-color: #F778A1; }
@@ -260,10 +261,10 @@ clear: both;
 	
 				?>
 				
-				<div class="collabel">Amt Paid:</div><div class="collabel"><?php $this->ctlPaymentAmount->Render('CssClass=smallfont'); ?></div>
-				<div class="collabel">Reference #:</div><div class="collabel"><?php $this->ctlPaymentRef->Render('CssClass=smallfont'); ?></div>
-				<div class="collabel"><?php $this->ctlShipLabel->Render('CssClass=smallfont'); ?>:</div><div class="collabel"><?php $this->ctlShippingTotal->Render('CssClass=smallfont'); ?></div>
-				<div class="collabel">Order Total:</div><div class="collabel"><?php $this->ctlOrderTotal->Render('CssClass=smallfont'); ?></div>
+				<div class="collabel">Amt Paid:</div><div class="collabel"><?php $this->ctlPaymentAmount->Render(); ?></div>
+				<div class="collabel">Reference #:</div><div class="collabel"><?php $this->ctlPaymentRef->Render(); ?></div>
+				<div class="collabel"><?php $this->ctlShipLabel->Render(); ?>:</div><div class="collabel"><?php $this->ctlShippingTotal->Render(); ?></div><div class="clear_float"></div>
+				<div class="collabel">Order Total:</div><div class="collabel"><?php $this->ctlOrderTotal->Render(); ?></div>
 					
 					
 					

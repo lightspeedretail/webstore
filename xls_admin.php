@@ -219,7 +219,7 @@
 	$arrPaymentTabs = array('methods' => _sp('Methods') , 'cc' => _sp('Credit Card Types'), 
 		'promo' => _sp('Promo Codes'),'promotasks' => _sp('Promo Code Tasks'));
 	$arrSeoTabs = array('general' => _sp('General') , 'meta' => _sp('Meta'), 'categories' => _sp('Categories'));
-	$arrDbAdminTabs = array('warning' => _sp('Notice') , 'dborders' => _sp('Orders'), 'dbpending' => _sp('Pending to<br>Download '.$strPend)  , 'incomplete' => _sp('Incomplete<br>Orders'));
+	$arrDbAdminTabs = array('dborders' => _sp('Orders'), 'dbpending' => _sp('Pending to<br>Download '.$strPend)  , 'incomplete' => _sp('Incomplete<br>Orders'));
 	$arrSystemTabs = array('config' => _sp('Setup') , 'task' => _sp('Tasks')  , 'vlog' => _sp('Visitor Log'), 'slog' => _sp('System Log'));
 	
 	
@@ -5398,7 +5398,7 @@
 		
 		protected function Form_Create(){
 			$this->arrTabs = $GLOBALS['arrDbAdminTabs'];
-			$this->currentTab = 'warning';
+			$this->currentTab = 'orders';
 			
 			$this->appName = _sp("Pending Orders");
 			$this->default_items_per_page = 20;
@@ -5584,7 +5584,7 @@
 			$this->edit_override=true;
 			
 			
-			$this->HelperRibbon = "";
+			$this->HelperRibbon = "Editing provided for troubleshooting purposes only. Please use caution when using these options, and consult our online documentation and technical support resources for assistance.";
 		
 			$this->arrFields = array();
 
@@ -5788,7 +5788,7 @@
 			$this->btnSave->CausesValidation = true;
 			
 			$this->HelperRibbon = "Use this screen to make changes which are preventing an order from downloading. All other changes can be made from Orders in LightSpeed once downloaded. Use caution when making changes directly to Web Orders here as they cannot be undone. ";
-			
+
 			$this->BuildCustomerControl();
 			$this->BuildPaymentControl();
 			$this->BuildPopulateItemGrid();
@@ -5816,13 +5816,13 @@
 			$this->ctlPaymentRef->CssClass="smallfont";
 			
 			$this->ctlShipLabel = new QLabel($this);
-			$this->ctlShipLabel->CssClass="largefont";
+			$this->ctlShipLabel->CssClass="smallfont";
 			
 			$this->ctlShippingTotal = new QLabel($this);
-			$this->ctlShippingTotal->CssClass="largefont";
+			$this->ctlShippingTotal->CssClass="smallfont";
 			
 			$this->ctlOrderTotal = new QLabel($this);
-			$this->ctlOrderTotal->CssClass="largefont";
+			$this->ctlOrderTotal->CssClass="smallfont";
 			
 			
 		}
@@ -6838,17 +6838,17 @@
 				case "dbpending":
 					xlsws_admin_dbpendingorders::Run('xlsws_admin_dbpendingorders' , adminTemplate('edit.tpl.php'));
 					break;
-				case "dborders":
-					xlsws_admin_dborders::Run('xlsws_admin_dborders' , adminTemplate('edit.tpl.php'));
-					break;
+				
 				case "dbedit":
 					xlsws_admin_dbedit::Run('xlsws_admin_dbedit' , adminTemplate('dbedit.tpl.php'));
 					break;					
 				case "incomplete":
 					xlsws_admin_dbincomplete::Run('xlsws_admin_dbincomplete' , adminTemplate('edit.tpl.php'));
 					break;					
+				case "dborders":
 				default:
-					xlsws_admin_dbwarning::Run('xlsws_admin_dbwarning' , adminTemplate('dbwarning.tpl.php'));
+					xlsws_admin_dborders::Run('xlsws_admin_dborders' , adminTemplate('edit.tpl.php'));
+					break;
 			}
 			break;	
 		case "custom":
