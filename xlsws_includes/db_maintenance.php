@@ -432,6 +432,10 @@ class xlsws_db_maintenance extends xlsws_index {
 			$this->add_config_key('GOOGLE_ANALYTICS' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Google Analytics Code (format: UA-00000000-0)', 
 				'GOOGLE_ANALYTICS', '', 'Google Analytics code for tracking', 20, 1, NOW(), NOW(), 'NULL');");		
+			$this->add_config_key('GOOGLE_ADWORDS' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Google AdWords ID (format: 000000000)', 
+				'GOOGLE_ADWORDS', '', 'Google AdWords Conversion ID (found in line \'var google_conversion_id\' when viewing code from Google AdWords setup)', 20, 2, NOW(), NOW(), 'NULL');");		
+
 
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Remove index.php from SEO-Friendly URLs', `configuration_type_id`=21, `sort_order`=2,
 				`helper_text`='Requires .htaccess in Web Store root folder.' where `key`='ENABLE_SEO_URL'");

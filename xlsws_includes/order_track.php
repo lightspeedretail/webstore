@@ -70,6 +70,7 @@ class xlsws_track_order extends xlsws_index {
 	protected $new_order;
 
 	protected $lblOrderMsg; //a span that shows an error on top of this page if any
+	protected $lblConversionCode;  //Google Adwords conversion code
 
 	/**
 	 * build_main - constructor for this controller
@@ -98,11 +99,11 @@ class xlsws_track_order extends xlsws_index {
 		// Wait icon
 		$this->objDefaultWaitIcon = new QWaitIcon($this);
 
-		$this->orderResultPnl = new XLSContentBox($this->mainPnl);
+		$this->orderResultPnl = new XLSContentBox($this->mainPnl,'ResultPanel');
 		$this->orderResultPnl->Name = _sp("Your Orders");
 		$this->orderResultPnl->Visible = false;
 
-		$this->dtrOrder = new QDataRepeater($this->orderResultPnl);
+		$this->dtrOrder = new QDataRepeater($this->orderResultPnl,'OrderResults');
 		$this->dtrOrder->Template = templateNamed('order_list.tpl.php');
 		$this->pxyOrder = new QControlProxy($this);
 
@@ -137,22 +138,22 @@ class xlsws_track_order extends xlsws_index {
 		}
 
 		// The View Detail Panel
-		$this->orderViewPnl = new QPanel($this->mainPnl);
+		$this->orderViewPnl = new QPanel($this->mainPnl,'ViewPanel');
 		$this->orderViewPnl->Template = templateNamed('order_view.tpl.php');
 		$this->orderViewPnl->Visible = false;
 
-		$this->lblIdStr = new QLabel($this->orderViewPnl);
-		$this->lblOrderDate = new QLabel($this->orderViewPnl);
-		$this->lblOrderStatus = new QLabel($this->orderViewPnl);
-		$this->lblOrderPaymentData = new QLabel($this->orderViewPnl);
+		$this->lblIdStr = new QLabel($this->orderViewPnl,'IdStr');
+		$this->lblOrderDate = new QLabel($this->orderViewPnl,'OrderDate');
+		$this->lblOrderStatus = new QLabel($this->orderViewPnl,'OrderStatus');
+		$this->lblOrderPaymentData = new QLabel($this->orderViewPnl,'OrderPayment');
 
-		$this->orderViewItemsPnl = new QPanel($this->orderViewPnl);
+		$this->orderViewItemsPnl = new QPanel($this->orderViewPnl,'ViewItems');
 
-		$this->lblOrderMsg = new QLabel($this->mainPnl);
+		$this->lblOrderMsg = new QLabel($this->mainPnl,'OrderMessage');
+		$this->lblConversionCode = new QLabel($this->mainPnl,'ConversionCode');
 		$this->bind_widgets();
 
-		if(isset($_GET['final']))
-			 $this->lblOrderMsg->Text = _sp("Thank you for your order.");
+		
 			 
 
 		if(isset($_GET['dosearch'])) {
@@ -175,7 +176,28 @@ class xlsws_track_order extends xlsws_index {
 		$this->order_display($this->order , $this->orderViewItemsPnl);
 		_xls_add_formatted_page_title(_sp('Order Details ').$this->order->IdStr);
 
-        
+        if(isset($_GET['final'])) {
+			 $this->lblOrderMsg->Text = _sp("Thank you for your order.");
+			 $this->lblConversionCode->HtmlEntities = false;
+			 $this->lblConversionCode->Text = '<script type="text/javascript">
+				/* <![CDATA[ */
+				var google_conversion_id = '. _xls_get_conf('GOOGLE_ADWORDS','0'). '
+				var google_conversion_language = "en";
+				var google_conversion_format = "3";
+				var google_conversion_color = "ffffff";
+				var google_conversion_label = "purchase";
+				var google_conversion_value = '.$this->order->Subtotal.';
+				/* ]]> */
+				</script>
+				<script type="text/javascript" src="http://www.googleadservices.com/pagead/conversion.js">
+				</script>
+				<noscript>
+				<div style="display:inline;">
+				<img height="1" width="1" style="border-style:none;" alt="" 
+				src="http://www.googleadservices.com/pagead/conversion/'. _xls_get_conf('GOOGLE_ADWORDS','0'). '/?value='.$this->order->Subtotal.'&amp;label=purchase&amp;guid=ON&amp;script=0"/>
+				</div>
+				</noscript>';
+		}
         	
 	}
 	

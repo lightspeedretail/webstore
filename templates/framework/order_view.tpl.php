@@ -65,4 +65,5 @@ if($this->order): ?>
 
 
 <br style="clear:both"/>
+<?php $this->lblConversionCode->Render(); ?>
 <?php endif; ?>

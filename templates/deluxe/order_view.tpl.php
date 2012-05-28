@@ -62,4 +62,5 @@ if($this->order): ?>
 <?php $this->orderViewItemsPnl->Render(); ?>	
 
 <p style="height: 75px;"></p>
+<?php $this->lblConversionCode->Render(); ?>
 <?php endif; ?>
