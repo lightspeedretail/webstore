@@ -81,7 +81,8 @@
 			session_commit();
 				
 			// if session id is not set and add it in request uri
-			_rd(QApplication::$RequestUri . "?" . admin_sid());
+			$strUrl = _xls_site_url('xls_admin.php?' . admin_sid());
+			$strUrl = str_replace("/index.php","",$strUrl); //We're not passing through our regular controller
 		}else{
 			$msg = "<h1>Cannot Connect</h1>Unauthorized admin access or session timed out from " . _xls_get_ip() . " at " . gmdate("Y-m-d H:i:s") . " GMT.<br>Please re-open the Admin Panel\n\n " ; //
 			_xls_log($msg . "Session vars: " . print_r($_SESSION , true) . "  \n\nServer vars: " .  print_r($_SERVER , true) . " . \n\n Post Vars: " . print_r($_POST , true));

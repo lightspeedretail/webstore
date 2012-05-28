@@ -254,6 +254,10 @@ class xlsws_db_maintenance extends xlsws_index {
 			if ($this->add_column('xlsws_promo_code' , 'except' ,
 				"ALTER TABLE xlsws_promo_code ADD COLUMN except tinyint (1) NOT NULL DEFAULT 0 AFTER enabled "))
 				_dbx("UPDATE xlsws_promo_code SET except=0");
+
+			$this->add_column('xlsws_cart' , 'tracking_number',
+				"ALTER TABLE xlsws_cart ADD COLUMN `tracking_number` VARCHAR(255) NULL DEFAULT NULL AFTER `payment_amount`");
+
 			
 			//Template section
 			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=19,`sort_order`=1 
@@ -553,8 +557,6 @@ class xlsws_db_maintenance extends xlsws_index {
 
 			}
 
-			$this->add_column('xlsws_cart' , 'tracking_number',
-				"ALTER TABLE xlsws_cart ADD COLUMN `tracking_number` VARCHAR(255) NULL DEFAULT NULL AFTER `payment_amount`");
 
 					
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
