@@ -748,13 +748,13 @@ function _xls_site_url($strUrlPath =  '') {
 //Makes our SEO hypenated string from passed string
 //Used to build anything that will be in a URL. 
 //Same as seo_name plus lower case conversion and removing spaces
-function _xls_seo_url($string){
+function _xls_seo_url($string) {
 	return strtolower(trim(_xls_seo_name($string), '-'));
 }
 
 //Makes our SEO hypenated string from passed string
 //Used to build anything that will be in a Name. Allows spaces
-function _xls_seo_name($string){
+function _xls_seo_name($string) {
 	$string = str_replace('\'','',$string);
 	$string = str_replace("&","and",$string);
 	$string = preg_replace("`\[.*\]`U","",$string);
@@ -764,6 +764,13 @@ function _xls_seo_name($string){
 	$string = str_replace('-amp-','-and-',$string);
 	$string = preg_replace( array("`[^a-z0-9]`i","`[-]+`") , "-", $string);
 	return trim($string, '- ');
+}
+
+//Makes our SEO hypenated string from passed string
+//Used to build anything that will be in a Name. Allows spaces
+function _xls_jssafe_name($string) {
+	$string = str_replace('\'','\\\'',$string);
+	return trim($string);
 }
 
 /**

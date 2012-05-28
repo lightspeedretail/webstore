@@ -178,25 +178,79 @@ class xlsws_track_order extends xlsws_index {
 
         if(isset($_GET['final'])) {
 			 $this->lblOrderMsg->Text = _sp("Thank you for your order.");
-			 $this->lblConversionCode->HtmlEntities = false;
-			 $this->lblConversionCode->Text = '<script type="text/javascript">
-				/* <![CDATA[ */
-				var google_conversion_id = '. _xls_get_conf('GOOGLE_ADWORDS','0'). '
-				var google_conversion_language = "en";
-				var google_conversion_format = "3";
-				var google_conversion_color = "ffffff";
-				var google_conversion_label = "purchase";
-				var google_conversion_value = '.$this->order->Subtotal.';
-				/* ]]> */
-				</script>
-				<script type="text/javascript" src="http://www.googleadservices.com/pagead/conversion.js">
-				</script>
-				<noscript>
-				<div style="display:inline;">
-				<img height="1" width="1" style="border-style:none;" alt="" 
-				src="http://www.googleadservices.com/pagead/conversion/'. _xls_get_conf('GOOGLE_ADWORDS','0'). '/?value='.$this->order->Subtotal.'&amp;label=purchase&amp;guid=ON&amp;script=0"/>
-				</div>
-				</noscript>';
+			 
+			 //We put in our cart information into Analytics for additional tracking
+			 if (_xls_get_conf('GOOGLE_ANALYTICS','') != '') {
+			 
+			 
+			 	$strItemCode = "";
+			 	foreach ($this->order->GetCartItemArray() as $item) {
+			 		$objProduct = Product::Load($item->ProductId);
+			 		$strItemCode .= "_gaq.push(['_addItem',
+					    '".$this->order->IdStr."',           // order ID - required
+					    '"._xls_jssafe_name($item->Code)."',           // SKU/code - required
+					    '"._xls_jssafe_name($item->Description)."',        // product name
+					    '"._xls_jssafe_name($objProduct->ClassName)."',   // category or variation
+					    '".($item->Sell-$item->Discount)."',          // unit price - required
+					    '".$item->Qty."'               // quantity - required
+					  ]);
+					  ";
+				}
+			 
+			 
+				$this->lblGoogleAnalytics->Text = "<script type=\"text/javascript\">
+	
+				  var _gaq = _gaq || [];
+				  _gaq.push(['_setAccount', '"._xls_get_conf('GOOGLE_ANALYTICS')."']);
+				  _gaq.push(['_trackPageview']);
+				
+					 _gaq.push(['_addTrans',
+					    '".$this->order->IdStr."',           // order ID - required
+					    '"._xls_jssafe_name(_xls_get_conf('STORE_NAME',''))."',  // affiliation or store name
+					    '".$this->order->Total."',          // total - required
+					    '".$this->order->TaxTotal."',           // tax
+					    '".$this->order->ShippingSell."',              // shipping
+					    '"._xls_jssafe_name($this->order->ShipCity)."',       // city
+					    '".$this->order->ShipState."',     // state or province
+					    '".$this->order->ShipCountry."'             // country
+					  ]);
+					
+					   ".$strItemCode."
+					   
+					  _gaq.push(['_trackTrans']); //submits transaction to the Analytics servers
+					
+
+				  (function() {
+				    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+				    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+				    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+				  })();
+				
+				</script>";
+			}
+		
+			//Are we using Adwords campaigns? 
+			 if (_xls_get_conf('GOOGLE_ADWORDS','') != '') {
+				 $this->lblConversionCode->HtmlEntities = false;
+				 $this->lblConversionCode->Text = '<script type="text/javascript">
+					/* <![CDATA[ */
+					var google_conversion_id = '. _xls_get_conf('GOOGLE_ADWORDS'). '
+					var google_conversion_language = "en";
+					var google_conversion_format = "3";
+					var google_conversion_color = "ffffff";
+					var google_conversion_label = "purchase";
+					var google_conversion_value = '.$this->order->Subtotal.';
+					/* ]]> */
+					</script>
+					<script type="text/javascript" src="http://www.googleadservices.com/pagead/conversion.js">
+					</script>
+					<noscript>
+					<div style="display:inline;">
+					<img height="1" width="1" style="border-style:none;" alt="" 
+					src="http://www.googleadservices.com/pagead/conversion/'. _xls_get_conf('GOOGLE_ADWORDS','0'). '/?value='.$this->order->Subtotal.'&amp;label=purchase&amp;guid=ON&amp;script=0"/>
+					</div>
+					</noscript>';
+			}
 		}
         	
 	}

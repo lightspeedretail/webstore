@@ -72,6 +72,7 @@ class xlsws_index extends QForm {
 
 	public $blnGetScreenRes = false; //true or false, get the current shopper's screen resolution
 
+	public $lblGoogleAnalytics = ''; //Code for Google Analytics.
 
     /**
 	 * build_menu - builds the category tree
@@ -105,6 +106,25 @@ class xlsws_index extends QForm {
 		$this->menuPnl->AutoRenderChildren = true;
 		
 		_xls_stack_put('xls_page_title', _xls_get_conf('STORE_NAME','LightSpeed Web Store') . " : "._xls_get_conf('STORE_DEFAULT_SLOGAN',''));
+		
+		$this->lblGoogleAnalytics  = new QLabel($this,'GoogleAnalytics');
+		$this->lblGoogleAnalytics->HtmlEntities = false;
+		if (_xls_get_conf('GOOGLE_ANALYTICS','') != '') {
+			$this->lblGoogleAnalytics->Text = "<script type=\"text/javascript\">
+
+			  var _gaq = _gaq || [];
+			  _gaq.push(['_setAccount', '"._xls_get_conf('GOOGLE_ANALYTICS')."']);
+			  _gaq.push(['_trackPageview']);
+			
+			  (function() {
+			    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			  })();
+			
+			</script>";
+		}
+
 	}
 
 	/**
