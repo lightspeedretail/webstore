@@ -6449,7 +6449,6 @@
 			
 			$this->arrMPnls['UpgradeWS']->Text = '';
 			
-			error_log("starting upgrade");
 			//Include db_maint class to access update functions
 			include(XLSWS_INCLUDES . 'db_maintenance.php');
 			$objDbMaint = new xlsws_db_maintenance;
@@ -6457,6 +6456,10 @@
 			
 			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
 			$this->arrMPnls['UpgradeWS']->Text .= "<br/><P><b>All database upgrades done! Database on version ".$config->Value.".</b></p>";
+
+			//Since an upgrade may accompany SOAP changes, clear the SOAP cache here. It will simply be rebuilt on the next Upload process
+			foreach(glob(__DOCROOT__ .  __SUBDIRECTORY__ . '/includes/qcodo/cache/soap/*.*') as $v)
+				unlink($v);
 
 			
 			$this->arrMPnls['UpgradeWS']->Visible = true;

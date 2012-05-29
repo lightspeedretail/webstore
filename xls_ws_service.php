@@ -406,6 +406,59 @@
             return self::OK;
         }
 
+		/**
+         * Save a product in the database (Create if need be)
+         *
+         * @param string $passkey
+         * @param string $products
+         * @param string $orders
+         * @param string $quotes
+         * @param string $sros
+         * @return string
+         */
+        public function delta_update(
+                  $passkey 
+                , $products
+                , $orders
+                , $quotes
+                , $sros
+                ){
+
+            if(!$this->check_passkey($passkey))
+                return self::FAIL_AUTH;
+
+				foreach($products as $arrProduct) {
+
+					$objProduct = Product::LoadByRowid($arrProduct->intRowid);
+					
+					if ($objProduct) {
+						$strCode = $objProduct->Code;
+						foreach($arrProduct as $key=>$val) {
+							$strName = substr($key,3,100);
+							if ($key != "intRowid") $objProduct->$strName = $val;
+						}
+						 // Now save the product
+			            try {
+			                $objProduct->Save();
+			            }
+			            catch(Exception $e) {
+			                QApplication::Log(E_ERROR, 'uploader', 
+			                    "Product update failed for $strCode . Error: " . $e);
+			                return self::UNKNOWN_ERROR . $e;
+			            }
+					
+					
+					}
+					
+					
+				}
+
+	
+
+            return self::OK;
+        }
+        
+        
         /**
          * Save a product in the database (Create if need be)
          *
