@@ -226,7 +226,7 @@ class Product extends ProductGen {
 		if ($bolExtended)
 			if (!$this->Inventoried)
 				return true;
-			else if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD' , 0)>0)
+			else if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD' , 0)>1)
 				return true;
 
 		if ($this->GetInventory() > 0)

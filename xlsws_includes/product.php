@@ -106,7 +106,7 @@ class xlsws_product extends xlsws_index {
 		$this->masterProductId = $this->prod->Rowid;
 
 		/*create the add to cart proxy*/
-		$this->misc_components['add_to_cart'] = new QControlProxy($this);
+		$this->misc_components['add_to_cart'] = new QControlProxy($this,'AddToCart');
 
 		/******************* Gift Registry ************************/
 		$this->giftRegistryPnl = new QPanel($this->mainPnl);
@@ -664,19 +664,24 @@ class xlsws_product extends xlsws_index {
 	 */
 	protected function prod_add_to_cart($strFormId, $strControlId, $strParameter) {
 		$objProduct = $objOriginal = $this->prod;
-		$objProduct = $this->ValidateMatrix();
+		if ($this->prod->MasterModel==1)
+			$objProduct = $this->ValidateMatrix();
 
 		if (!$objProduct)
 			return;
 		else
 			$this->prod = $objProduct;
 
-		// Remove the existing control before adding new
-		$this->RemoveControl($this->pnlImg->ControlId);
-		$this->create_prod_image();
-		$this->pnlImgHolder->Refresh();
+		
 
 		if (Cart::AddToCart($this->prod, $this->get_qty())) {
+		
+			// Remove the existing control before adding new
+			$this->RemoveControl($this->pnlImg->ControlId);
+			$this->create_prod_image();
+			$this->pnlImgHolder->Refresh();
+			
+		
 			// add auto products - only if parent can be added
 			foreach($this->autoAddCheckIDs as $id=>$qty) {
 				$ctl = $this->GetControl($id);
@@ -687,11 +692,13 @@ class xlsws_product extends xlsws_index {
 						Cart::AddToCart($prod , $qty);
 				}
 			}
+			
+			$this->cartPnl->RemoveChildControls(true);
+			$this->build_cart();
+			$this->cartPnl->Refresh();	
 		}
 
-		$this->cartPnl->RemoveChildControls(true);
-		$this->build_cart();
-		$this->cartPnl->Refresh();
+		
 		$this->prod = $objOriginal;
 	}
 

@@ -74,6 +74,9 @@ class xlsws_index extends QForm {
 
 	public $lblGoogleAnalytics = ''; //Code for Google Analytics.
 
+	protected $ctlFlashMessages; //Flash Messages
+
+
     /**
 	 * build_menu - builds the category tree
 	 * @param none
@@ -125,6 +128,7 @@ class xlsws_index extends QForm {
 			</script>";
 		}
 
+		
 	}
 
 	
@@ -207,6 +211,33 @@ EOS;
             $listbox->AddItem($objCountry->Country, $objCountry->Code);
 	}
 
+
+	/**
+	 * build_flash_messages - builds QLabel and displays any cart messages, removing them afterwards
+	 * @param none
+	 * @return none
+	 */
+	protected function BuildFlashMessages() {
+		
+		$this->ctlFlashMessages = new QLabel($this,'FlashMessages');
+		$this->ctlFlashMessages->HtmlEntities = false;
+		
+		$cart = Cart::GetCart();
+		if ($cart)
+			$messages = CartMessages::LoadArrayByCartId($cart->Rowid);
+		if ($messages) {
+			$strMessage = "";
+			foreach ($messages as $message)
+				$strMessage .= "<div class='flash_message'>".$message->Message."</div>"; 
+			$this->ctlFlashMessages->Text = $strMessage;
+			CartMessages::DeleteByCartId($cart->Rowid);
+		}
+		
+		
+	}
+	
+	
+	
 	/**
 	 * states_for_country_code - returns a list of states from the Web Store database to a listbox based on country
 	 * @param string $country_code :: 2 letter country code
@@ -313,7 +344,10 @@ EOS;
 		if (!$cart || in_array($cart->Type,
 			array(CartType::invoice, CartType::order, CartType::sro)))
 				Cart::ClearCart();
-
+		
+		if ($cart->UpdateMissingProducts())
+			$cart->Reload();
+			
 		if(file_exists(CUSTOM_INCLUDES . "minicart.php"))
 			include(CUSTOM_INCLUDES . "minicart.php");
 		else
@@ -573,7 +607,7 @@ EOS;
 		$this->build_login();
 		$this->build_side_bar();
 		$this->build_tabs();
-
+		$this->BuildFlashMessages();
 		$this->build_main();
 
 		$this->build_dummy_dragdrop();

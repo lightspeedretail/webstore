@@ -280,16 +280,41 @@ class Cart extends CartGen {
 	}
 
 	/**
-	 * Update Cart by removing Products which no longer exist
+	 * Update Cart by removing Products which no longer exist or are unavailable
 	 */
 	public function UpdateMissingProducts() {
+		$blnResult=false;
 		foreach ($this->GetCartItemArray() as $objItem) {
+		
 			if (!$objItem->Product) {
-				QApplication::Log(E_WARNING, 'cart',
-					'Removing missing product code cart : ' . $this->Rowid);
+				CartMessages::CreateMessage($this->Rowid,_sp('The product') .
+					' "'.$objItem->Description . '" ' . _sp('is no longer available on this site and has been removed from your cart'));
 				$objItem->Delete();
+				$bnlResult = true;
 			}
+
+			
+			if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) != 2) { //IOW, unless we allow backordering
+				if ($objItem->Product->Inventoried) {
+					if ($objItem->Product->Inventory==0) {
+					 	CartMessages::CreateMessage($this->Rowid,_sp('The product') .
+						' "'.$objItem->Description . '" ' . _sp(' is now out of stock and has been removed from your cart.'));
+						$objItem->Delete();
+						$bnlResult = true;
+					 
+					 }
+					 elseif ($objItem->Qty > $objItem->Product->Inventory) {
+					 	CartMessages::CreateMessage($this->Rowid,_sp('The product') .
+						' "'.$objItem->Description . '" ' . _sp(' now has less stock available than the amount you requested. Your cart quantity has been reduced to match what is available.'));
+						$objItem->Qty=$objItem->Product->Inventory;
+						$bnlResult = true;	
+					}
+			 	}
+			}
+			
+			
 		}
+		return $bnlResult;
 	}
 
 	/**
@@ -587,11 +612,8 @@ class Cart extends CartGen {
 		$UpdateShipping = true,
 		$SaveCart = true)
 	{
-		$this->UpdateMissingProducts();
-
-		// TODO : Legacy code
-		//if ($this->IsExpired())
-		//    $this->UpdateDiscountExpiry();
+		if ($this->UpdateMissingProducts())
+			$this->Reload();
 
 		$this->UpdateSubtotal();
 

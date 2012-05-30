@@ -82,6 +82,8 @@ class xlsws_checkout extends xlsws_index {
         $objCustomer = Customer::GetCurrent();
         $objCart = Cart::GetCart();
 
+		$messages = CartMessages::LoadArrayByCartId($objCart->Rowid);
+
 		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('checkout.tpl.php');
         $this->objDefaultWaitIcon = new QWaitIcon($this);
@@ -117,7 +119,6 @@ class xlsws_checkout extends xlsws_index {
 		
         QApplication::ExecuteJavaScript("document.getElementById('LoadActionProxy').click();");
     }
-
 
 
     protected function BuildCustomerControl() { 

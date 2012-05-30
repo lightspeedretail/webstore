@@ -46,87 +46,7 @@ class xlsws_cart extends xlsws_index {
 
 	protected $pxyBackToCart; // Actions to perform when clicking Continue
 	protected $pxyCheckOut; // Actions to do on checkout
-
-	/**
-	 * build_update_widget - builds the update cart submit button
-	 * @param none
-	 * @return none
-	 */
-	protected function build_update_widget() {
-		$this->btn_update = new QButton($this->mainPnl);
-		$this->btn_update->Text = _sp("Update Cart");
-	}
-
-	/**
-	 * build_clear_widget - builds the clear cart button
-	 * @param none
-	 * @return none
-	 */
-	protected function build_clear_widget() {
-		$this->btn_clearCart = new QButton($this->mainPnl);
-		$this->btn_clearCart->Text = _sp("Clear Cart");
-	}
-
-	/**
-	 * build_send_widget - builds the send cart button
-	 * @param none
-	 * @return none
-	 */
-	protected function build_send_widget() {
-		// Only cart types of Cart can be sent
-		if($this->cart->Type == CartType::cart){
-			$this->btn_sendCart = new QButton($this->mainPnl);
-			$this->btn_sendCart->Text = _sp("Email Cart");
-			$this->btn_sendCart->AddAction(new QClickEvent(),
-				new QAjaxAction('sendCart'));
-		}
-	}
-
-	/**
-	 * build_send_box - builds the send cart modal box
-	 * @param none
-	 * @return none
-	 */
-	protected function build_send_box() {
-		$this->dxSendCart = new XLSCartSend($this->mainPnl);
-		$this->dxSendCart->Visible = false;
-	}
-
-	/**
-	 * build_widgets - builds the widgets needed for the template
-	 * @param none
-	 * @return none
-	 */
-	protected function build_widgets() {
-		$this->build_update_widget();
-		$this->build_clear_widget();
-		$this->build_send_widget();
-		$this->build_send_box();
-	}
-
-	/**
-	 * bind_widgets - binds callback actions for the widgets
-	 * @param none
-	 * @return none
-	 */
-	protected function bind_widgets() {
-		$this->btn_update->AddAction(new QClickEvent(),
-			new QAjaxAction('cartUpdate'));
-		$this->btn_clearCart->AddAction(new QClickEvent(),
-			new QConfirmAction(
-				_sp('Are you sure you want to clear the cart contents?')
-			));
-		$this->btn_clearCart->AddAction(new QClickEvent(),
-			new QServerAction('clearCart'));
-		$this->pxyBackToCart->AddAction(new QClickEvent(),
-			new QServerAction('continue_shopping'));
-		$this->pxyBackToCart->AddAction(new QClickEvent(),
-			new QJavaScriptAction('return false;'));
-		$this->pxyCheckOut->AddAction(new QClickEvent(),
-			new QServerAction('check_out_customer_register'));
-		$this->pxyCheckOut->AddAction(new QClickEvent(),
-			new QJavaScriptAction('return false;'));
-	}
+	
 
 	/**
 	 * build_main - constructor for this controller
@@ -184,7 +104,95 @@ class xlsws_cart extends xlsws_index {
 		$this->pxyBackToCart = new QControlProxy($this);
 		$this->pxyCheckOut = new QControlProxy($this);
 		$this->bind_widgets();
+
 	}
+	
+	
+	/**
+	 * build_update_widget - builds the update cart submit button
+	 * @param none
+	 * @return none
+	 */
+	protected function build_update_widget() {
+		$this->btn_update = new QButton($this->mainPnl);
+		$this->btn_update->Text = _sp("Update Cart");
+	}
+
+	/**
+	 * build_clear_widget - builds the clear cart button
+	 * @param none
+	 * @return none
+	 */
+	protected function build_clear_widget() {
+		$this->btn_clearCart = new QButton($this->mainPnl);
+		$this->btn_clearCart->Text = _sp("Clear Cart");
+	}
+
+	/**
+	 * build_send_widget - builds the send cart button
+	 * @param none
+	 * @return none
+	 */
+	protected function build_send_widget() {
+		// Only cart types of Cart can be sent
+		if($this->cart->Type == CartType::cart){
+			$this->btn_sendCart = new QButton($this->mainPnl);
+			$this->btn_sendCart->Text = _sp("Email Cart");
+			$this->btn_sendCart->AddAction(new QClickEvent(),
+				new QAjaxAction('sendCart'));
+		}
+	}
+
+
+	
+	
+	/**
+	 * build_send_box - builds the send cart modal box
+	 * @param none
+	 * @return none
+	 */
+	protected function build_send_box() {
+		$this->dxSendCart = new XLSCartSend($this->mainPnl);
+		$this->dxSendCart->Visible = false;
+	}
+
+	/**
+	 * build_widgets - builds the widgets needed for the template
+	 * @param none
+	 * @return none
+	 */
+	protected function build_widgets() {
+		$this->build_update_widget();
+		$this->build_clear_widget();
+		$this->build_send_widget();
+		$this->build_send_box();
+	}
+
+	/**
+	 * bind_widgets - binds callback actions for the widgets
+	 * @param none
+	 * @return none
+	 */
+	protected function bind_widgets() {
+		$this->btn_update->AddAction(new QClickEvent(),
+			new QAjaxAction('cartUpdate'));
+		$this->btn_clearCart->AddAction(new QClickEvent(),
+			new QConfirmAction(
+				_sp('Are you sure you want to clear the cart contents?')
+			));
+		$this->btn_clearCart->AddAction(new QClickEvent(),
+			new QServerAction('clearCart'));
+		$this->pxyBackToCart->AddAction(new QClickEvent(),
+			new QServerAction('continue_shopping'));
+		$this->pxyBackToCart->AddAction(new QClickEvent(),
+			new QJavaScriptAction('return false;'));
+		$this->pxyCheckOut->AddAction(new QClickEvent(),
+			new QServerAction('check_out_customer_register'));
+		$this->pxyCheckOut->AddAction(new QClickEvent(),
+			new QJavaScriptAction('return false;'));
+	}
+
+
 
 	/**
 	 * check_out_customer_register

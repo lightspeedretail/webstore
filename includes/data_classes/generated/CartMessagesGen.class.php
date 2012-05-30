@@ -521,6 +521,40 @@
 			, $objOptionalClauses
 			);
 		}
+			
+		/**
+		 * Load an array of CartMessages objects,
+		 * by CartId Index(es)
+		 * @param integer $intCartId
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @return CartMessages[]
+		*/
+		public static function LoadArrayByCartId($intCartId, $objOptionalClauses = null) {
+			// Call CartMessages::QueryArray to perform the LoadArrayByCartId query
+			try {
+				return CartMessages::QueryArray(
+					QQ::Equal(QQN::CartMessages()->CartId, $intCartId),
+					$objOptionalClauses
+					);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
+
+		/**
+		 * Count CartMessageses
+		 * by CartId Index(es)
+		 * @param integer $intCartId
+		 * @return int
+		*/
+		public static function CountByCartId($intCartId, $objOptionalClauses = null) {
+			// Call CartMessages::QueryCount to perform the CountByCartId query
+			return CartMessages::QueryCount(
+				QQ::Equal(QQN::CartMessages()->CartId, $intCartId)
+			, $objOptionalClauses
+			);
+		}
 
 
 
@@ -563,8 +597,6 @@
 					// Update Identity column and return its value
 					$mixToReturn = $this->intRowid = $objDatabase->InsertId('xlsws_cart_messages', 'rowid');
 
-					// Journaling
-					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
 
 				} else {
 					// Perform an UPDATE query
@@ -582,8 +614,6 @@
 							`rowid` = ' . $objDatabase->SqlVariable($this->intRowid) . '
 					');
 
-					// Journaling
-					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 			} catch (QCallerException $objExc) {
@@ -618,8 +648,6 @@
 				WHERE
 					`rowid` = ' . $objDatabase->SqlVariable($this->intRowid) . '');
 
-			// Journaling
-			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -666,59 +694,7 @@
 			$this->strMessage = $objReloaded->strMessage;
 		}
 
-		/**
-		 * Journals the current object into the Log database.
-		 * Used internally as a helper method.
-		 * @param string $strJournalCommand
-		 */
-		public function Journal($strJournalCommand) {
-			$objDatabase = CartMessages::GetDatabase()->JournalingDatabase;
-
-			$objDatabase->NonQuery('
-				INSERT INTO `xlsws_cart_messages` (
-					`rowid`,
-					`cart_id`,
-					`message`,
-					__sys_login_id,
-					__sys_action,
-					__sys_date
-				) VALUES (
-					' . $objDatabase->SqlVariable($this->intRowid) . ',
-					' . $objDatabase->SqlVariable($this->intCartId) . ',
-					' . $objDatabase->SqlVariable($this->strMessage) . ',
-					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
-					' . $objDatabase->SqlVariable($strJournalCommand) . ',
-					NOW()
-				);
-			');
-		}
-
-		/**
-		 * Gets the historical journal for an object from the log database.
-		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
-		 * @param integer intRowid
-		 * @return CartMessages[]
-		 */
-		public static function GetJournalForId($intRowid) {
-			$objDatabase = CartMessages::GetDatabase()->JournalingDatabase;
-
-			$objResult = $objDatabase->Query('SELECT * FROM xlsws_cart_messages WHERE rowid = ' .
-				$objDatabase->SqlVariable($intRowid) . ' ORDER BY __sys_date');
-
-			return CartMessages::InstantiateDbResult($objResult);
-		}
-
-		/**
-		 * Gets the historical journal for this object from the log database.
-		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
-		 * @return CartMessages[]
-		 */
-		public function GetJournal() {
-			return CartMessages::GetJournalForId($this->intRowid);
-		}
-
-
-
+		
 
 		////////////////////
 		// PUBLIC OVERRIDERS
