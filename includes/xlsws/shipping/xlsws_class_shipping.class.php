@@ -161,7 +161,6 @@ class xlsws_class_shipping extends XLSModule {
 	}
 
 	public function Autoload($strClassName) {
-		error_log(__FUNCTION__);
 		if(file_exists(XLSWS_INCLUDES . 'shipping/' . $strClassName . ".php"))
 			require_once(XLSWS_INCLUDES . 'shipping/' . $strClassName . ".php");
 	}

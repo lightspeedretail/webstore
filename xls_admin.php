@@ -2247,8 +2247,6 @@
 		// show the textbox.  Otherwise, display the contents as is.
 		public function FieldColumn_Render($objItem , $field) {
 			
-			//error_log("sfield is ".$field);
-			error_log("here");
 			return $this->txtFirstName->RenderWithError(false);	
 			}
 

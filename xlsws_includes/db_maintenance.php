@@ -580,9 +580,9 @@ class xlsws_db_maintenance extends xlsws_index {
 	}
 	
 	
-	private function drop_index($table,$indexname) { error_log("SHOW INDEXES FROM `$table` WHERE key_name='$indexname'");
+	private function drop_index($table,$indexname) { 
 		$res = _dbx("SHOW INDEXES FROM `$table` WHERE key_name='$indexname'" , 'Query');
-if ($res) error_log("found"); else error_log("not found");
+
 		if($res && ($row = $res->GetNextRow()))
 				_dbx("ALTER TABLE `$table` DROP INDEX `$indexname`");
 						
