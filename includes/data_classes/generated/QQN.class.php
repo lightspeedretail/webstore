@@ -13,6 +13,12 @@
 			return new QQNodeCartItem('xlsws_cart_item', null, null);
 		}
 		/**
+		 * @return QQNodeCartMessages
+		 */
+		static public function CartMessages() {
+			return new QQNodeCartMessages('xlsws_cart_messages', null, null);
+		}
+		/**
 		 * @return QQNodeCategory
 		 */
 		static public function Category() {

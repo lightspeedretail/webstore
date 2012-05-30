@@ -9,6 +9,11 @@
 		QApplicationBase::$ClassFile['qqnodecartitem'] = __DATA_CLASSES__ . '/CartItem.class.php';
 		QApplicationBase::$ClassFile['qqreversereferencenodecartitem'] = __DATA_CLASSES__ . '/CartItem.class.php';
 
+	// ClassPaths for the CartMessages class
+		QApplicationBase::$ClassFile['cartmessages'] = __DATA_CLASSES__ . '/CartMessages.class.php';
+		QApplicationBase::$ClassFile['qqnodecartmessages'] = __DATA_CLASSES__ . '/CartMessages.class.php';
+		QApplicationBase::$ClassFile['qqreversereferencenodecartmessages'] = __DATA_CLASSES__ . '/CartMessages.class.php';
+
 	// ClassPaths for the Category class
 		QApplicationBase::$ClassFile['category'] = __DATA_CLASSES__ . '/Category.class.php';
 		QApplicationBase::$ClassFile['qqnodecategory'] = __DATA_CLASSES__ . '/Category.class.php';
