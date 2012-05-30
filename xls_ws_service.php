@@ -452,7 +452,35 @@
 					
 					
 				}
+				
+				//Because orders and quotes are both cart items, we can just process them as one
+				$carts = array_merge($orders,$quotes);
+				
+				foreach($carts as $arrOrder) {
 
+					$objOrder = Cart::LoadByIdStr($arrOrder->strId);
+					
+					if ($objOrder) {
+						$strCode = $objOrder->IdStr;
+						foreach($arrOrder as $key=>$val) {
+							$strName = substr($key,3,100);
+							if ($key != "strId") $objOrder->$strName = $val;
+						}
+						 // Now save the product
+			            try {
+			                $objOrder->Save();
+			            }
+			            catch(Exception $e) {
+			                QApplication::Log(E_ERROR, 'uploader', 
+			                    "Order update failed for $strCode . Error: " . $e);
+			                return self::UNKNOWN_ERROR . $e;
+			            }
+					
+					
+					}
+					
+					
+				}
 	
 
             return self::OK;
