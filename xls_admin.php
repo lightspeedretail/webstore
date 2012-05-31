@@ -254,7 +254,7 @@
 			
 			$this->admin_pages = array(
 				'config'	=> _sp('Configuration')
-			,	'paym'		=>	_sp('Payment Methods')
+			,	'paym'		=>	_sp('Payments')
 			,	'ship'		=>	_sp('Shipping')
 			,	'cpage'		=>	_sp('Custom Pages')
 			,	'seo'		=>	_sp('SEO')

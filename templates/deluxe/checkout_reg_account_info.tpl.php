@@ -28,7 +28,7 @@
 ?>
 
 		<fieldset>
-		<legend><?php _xt('Account Information') ?></legend>
+		<legend><?php _xt('Customer Contact') ?></legend>
 
 		<div class="left margin">
 			<dl>
