@@ -26,7 +26,7 @@
  */
 
 ?>
-	<fieldset style="width:370px;" class="shipping">
+	<fieldset class="shipping">
 		<legend><span class="red">*</span> <?php _xt("Shipping Address") ?></legend>
 
 

@@ -1222,9 +1222,9 @@ float:left;
 
 #customer_registration fieldset,#checkout fieldset,.xlsfset fieldset {
 border:1px solid #555;
-margin:15px 0 30px;
+margin:15px 20px 30px;
 padding:10px;
-width:745px;
+width:337px;
 }
 
 .border fieldset,fieldset {
