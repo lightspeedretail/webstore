@@ -33,7 +33,7 @@
 	<img src="<?php echo templateNamed('css'); ?>/images/breadcrumbs_separrow.png" style="display: block; float: left; margin: 0 0 0 -2px;">
 
 <ul>
-		<?php foreach(_xls_get_crumbtrail() as $crumb): ?>
+		<?php foreach($this->crumbs as $crumb): ?>
 			<li>
 				<a href="<?= _xls_site_url($crumb['link']); ?>" title="<?= $crumb['name']; ?>" >			
 					<?= _xls_truncate($crumb['name'], 45, "...", true); ?>

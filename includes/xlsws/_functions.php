@@ -997,9 +997,12 @@ function _xls_add_meta_keyword($words) {
  * Save crumbtrail to session
  * @param array $arrCrumbs
  */
-function _xls_set_crumbtrail($arrCrumbs) {
+function _xls_set_crumbtrail($arrCrumbs = null) {
 
-	$_SESSION['crumbtrail'] = $arrCrumbs;
+	if($arrCrumbs)
+		$_SESSION['crumbtrail'] = $arrCrumbs;
+	else
+		unset($_SESSION['crumbtrail']);
 }
 
 /**

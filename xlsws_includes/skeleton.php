@@ -394,7 +394,37 @@ EOS;
 		if(file_exists(CUSTOM_INCLUDES . "crumbtrail.php"))
 			include(CUSTOM_INCLUDES . "crumbtrail.php");
 		else
-			include('xlsws_includes/crumbtrail.php');
+			{
+			$objUrl = XLSURLParser::getInstance();
+			if ($objUrl->RouteId != '')
+				switch($objUrl->RouteDepartment) {
+				
+					case "category":
+						$objCategory = Category::LoadByRequestUrl($objUrl->RouteId);
+						if ($objCategory) $this->crumbs = $objCategory->GetTrail();
+						break;
+					case "product":
+						$objProduct = Product::LoadByRequestUrl($objUrl->RouteId);
+						if ($objProduct) $this->crumbs = Category::GetTrailByProductId($objProduct->Rowid);
+					
+					
+						break;
+						
+					
+				}
+			
+			//Save the crumbtrail since we can use it elsewhere i.e. Meta information	
+			if (isset($this->crumbs))
+				_xls_set_crumbtrail($this->crumbs);
+			
+			// Let's have the pnlPanel auto render any and all child controls
+			$this->crumbTrail = new QPanel($this);
+			$this->crumbTrail->Template = templateNamed('crumbtrail.tpl.php');
+			$this->crumbTrail->AutoRenderChildren = true;
+			
+			}
+			
+			
 	}
 
 
@@ -620,6 +650,12 @@ EOS;
 			$this->mainPnl->AutoRenderChildren = true;
 	}
 
+
+	protected function Form_Exit() {
+		_xls_set_crumbtrail();
+				
+	}
+	
 	/**
 	 * build_dummy_dragdrop - build a drag n drop zone to use for products
 	 * @param none
