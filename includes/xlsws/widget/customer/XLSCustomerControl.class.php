@@ -122,6 +122,14 @@ class XLSCustomerControl extends XLSCompositeControl {
     }
 
     protected function UpdateCheckSameControl() {
+    	$objControl = $this->GetChildByName('CheckSame');
+        if (!$objControl)
+            return;
+    
+    	$objCustomer = Customer::GetCurrent();
+		if ($objControl)
+			$objControl->Checked = $objCustomer->CheckSame;
+		$this->DoCheckSameChange(null,null,null);
         return;
     }
 
@@ -162,6 +170,11 @@ class XLSCustomerControl extends XLSCompositeControl {
             $objShipping->SaveFieldsToCustomer();
             $objShipping->SaveFieldsToCart();
         }
+        
+        $objCustomer = Customer::GetCurrent();
+		if ($objControl)
+			$objCustomer->CheckSame = $objControl->Checked;
+			
     }
 
     public function DoBillingFieldUpdate($strFormId, $strControlId, $strParam) {

@@ -459,14 +459,6 @@ class XLSShippingControl extends XLSCompositeControl {
                 $strData = _sp('Shipping rate');
         }
 
-        // TODO :: Verify if this is still required ?!
-       /* $strData = str_replace(
-            '(' . _xls_currency($fltCost) . ')', ' ', $strData
-        );
-        $strData = str_replace(_xls_currency($fltCost), ' ', $strData);
-        $strData = str_replace('-', '', $strData);
-        $strData = trim($strData);
-		*/
         $objCart = Cart::GetCart();
 
         $objCart->ShippingMethod = $strMethod;
@@ -513,4 +505,3 @@ class XLSShippingControl extends XLSCompositeControl {
     }
 }
 
-/* vim: set ft=php ts=4 sw=4 tw=0 et: */

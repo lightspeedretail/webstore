@@ -59,6 +59,7 @@ class XLSBillingContactControl extends XLSCustomerContactControl {
             $objCustomer->Zip1 = $objAddress->Zip->Value;
         }
 
+			
         return $objCustomer;
     }
 
