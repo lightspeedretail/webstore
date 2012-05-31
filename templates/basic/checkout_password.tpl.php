@@ -43,7 +43,14 @@ if (!$this->isLoggedIn()) {
 	        	<dt><label for="cPassword"><?php _xt("Confirm Password"); ?></label></dt>
 	            <dd><?php $this->PasswordControl->Password2->RenderWithError() ?></dd>
 			</dl>
-		</div><br />
-		
+		</div>
+		<div class="left margin clear">
+        	<dl class="left">
+	            <dd>
+	                <?php $this->PasswordControl->NewsletterSubscribe->Render() ?><label for="newsletter" class="opt"><?php _xt("Receive emails about special offers") ?></label>
+	            </dd>
+            </dl>
+         </div>
+
 		</fieldset>
 <? } ?>
