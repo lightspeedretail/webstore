@@ -153,7 +153,7 @@
 
 			<?php $this->crumbTrail->Render(); ?>
 		</div>
-
+	<?php $this->ctlFlashMessages->Render(); ?>
 	<noscript>
 	<?php  _xt('This store requires you to have a JavaScript enabled web browser.'); ?>
 	</noscript>	

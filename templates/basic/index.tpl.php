@@ -146,7 +146,7 @@
 
 			<?php $this->crumbTrail->Render(); ?>
 		</div>
-
+	<?php $this->ctlFlashMessages->Render(); ?>
 	<noscript>
 	<?php  _xt('This store requires you to have Java-Script enabled in your browser.'); ?>
 	</noscript>	
