@@ -49,7 +49,7 @@
         public function ws_version($passkey){
             
             if(!$this->check_passkey($passkey))
-                return self::FAIL_AUTH;
+                return "Invalid Password";
                             
             
             return _xls_version();
