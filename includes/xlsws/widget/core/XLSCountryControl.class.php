@@ -13,6 +13,8 @@ class XLSCountryControl extends XLSListControl {
             $objExc->IncrementOffset();
             throw $objExc;
         }
+        
+        $this->blnFilterDestinations = _xls_get_conf('SHIP_RESTRICT_DESTINATION',0);
     }
 
     public function Update() {
