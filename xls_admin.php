@@ -1671,7 +1671,7 @@
 				);
 				
 				$panel = new xlsws_admin_modules_config($this, $id ,  $mod , $filelocation , 'ConfigDone');
-				$panel->Name = $name . (($mod) && $mod->Configuration == '' ? " *** NOT YET CONFIGURED *** " : "");
+				$panel->Name = $name . (($mod) && $mod->Configuration == '' && $mod->Type != 'sidebar' ? " *** NOT YET CONFIGURED *** " : "");
 				$this->modules[$id]['panel'] = $panel;
 			
 
