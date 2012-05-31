@@ -28,7 +28,7 @@
 ?>
 
 	<fieldset style="display: block; float: left; width:300px;">
-	<legend><?php _xt("Billing Address") ?></legend>
+	<legend><span class="red">*</span> <?php _xt("Billing Address") ?></legend>
 
 	<div class="block margin">
 	<dl>
