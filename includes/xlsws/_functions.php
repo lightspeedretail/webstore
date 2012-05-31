@@ -773,16 +773,6 @@ function _xls_jssafe_name($string) {
 	return trim($string);
 }
 
-/**
- * Get the current customer object
- *
- * @param boolean $fallbackonStackTemp
- * @return obj customer
- */
-function _xls_get_current_customer($fallbackOnStackTemp=false) {
-	QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
-	return Customer::GetCurrent($fallbackonStackTemp);
-}
 
 /**
  * Get the ID of the current customer object

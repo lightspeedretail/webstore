@@ -45,6 +45,8 @@ class xlsws_checkout extends xlsws_index {
     protected $LoginControl;
     protected $RegisterControl;
 
+	protected $PasswordControlWrapper;
+    protected $PasswordControl;
     protected $ShippingControl;
     protected $PaymentControl;
     protected $PromoControl;
@@ -308,6 +310,48 @@ class xlsws_checkout extends xlsws_index {
 
         return $objControl;
     }
+
+
+
+	 protected function BuildPasswordControlWrapper() {
+        $objControl = $this->PasswordControlWrapper = 
+            new QPanel($this, 'PasswordWrapper');
+        $objControl->Name = 'Set your password';
+        $objControl->Template = templateNamed('checkout_password.tpl.php');
+                    
+    }
+
+    protected function UpdatePasswordControlWrapper() {
+        return $this->PasswordControlWrapper;
+    }
+
+    protected function BindPasswordControlWrapper() {
+        return $this->PasswordControlWrapper;
+    }
+    
+    protected function BuildPasswordControl() {
+        $objParent = $this->PasswordControlWrapper;
+        if (!$objParent) 
+          $objParent = $this;
+
+        $objControl = $this->PasswordControl = 
+            new XLSPasswordControl($objParent, 'CreatePassword');
+
+        return $objControl;
+            
+    }
+
+    protected function UpdatePasswordControl() {
+    	
+        return $this->PasswordControl;
+    }
+
+    protected function BindPasswordControl() {
+        return $this->PasswordControl;
+    }
+
+
+
 
     protected function BuildShippingControl() {
         $this->ShippingControl = $objControl = 
@@ -872,12 +916,73 @@ class xlsws_checkout extends xlsws_index {
     }
 
     protected function CompleteUpdateCustomer() {
-        $objCustomer = Customer::GetCurrent();
-
+    
+    	//Did we enter a password to create a new account?
+    	if(!$this->isLoggedIn())
+      	{
+		
+			if ($this->PasswordControl->Password1->Text != '' &&
+				$this->PasswordControl->Password2->Text != '' &&
+				$this->PasswordControl->Password1->Text == $this->PasswordControl->Password2->Text) {
+						
+				
+				$objCustomer = new Customer();
+				
+				$objCustomer->Email= strtolower(trim($this->BillingContactControl->Email));
+				$objCustomer->Password = md5(trim($this->PasswordControl->Password1->Text));
+				$objCustomer->Firstname = trim($this->txtCRFName->Text);
+				$objCustomer->Lastname = trim($this->txtCRLName->Text);
+				$objCustomer->Mainname = (($this->customer) && ($this->customer->Mainname != '')) ? 
+					$this->customer->Mainname : (trim($this->txtCRFName->Text) . " " . trim($this->txtCRLName->Text));
+				$objCustomer->Company = trim($this->txtCRCompany->Text);
+				$objCustomer->Address11 = trim($this->txtCRBillAddr1->Text);
+				$objCustomer->Address12 = trim($this->txtCRBillAddr2->Text);
+				$objCustomer->Country1 = trim($this->txtCRBillCountry->SelectedValue);
+				$objCustomer->State1 = trim($this->txtCRBillState->SelectedValue);
+				$objCustomer->City1 = trim($this->txtCRBillCity->Text);
+				$objCustomer->Zip1 = trim($this->txtCRBillZip->Text);
+				
+				$objCustomer->Address21 = trim($this->txtCRShipAddr1->Text);
+				$objCustomer->Address22 = trim($this->txtCRShipAddr2->Text);
+				$objCustomer->Country2= trim($this->txtCRShipCountry->SelectedValue);
+				$objCustomer->State2= trim($this->txtCRShipState->SelectedValue);
+				$objCustomer->City2 = trim($this->txtCRShipCity->Text);
+				$objCustomer->Zip2 = trim($this->txtCRShipZip->Text);
+				
+				$objCustomer->NewsletterSubscribe = $this->PasswordControl->NewsletterSubscribe->Checked;
+				$objCustomer->HtmlEmail = 1;
+				
+				//Moderate login
+				if(!$objCustomer->AllowLogin && _xls_get_conf('MODERATE_REGISTRATION', 0))
+					$objCustomer->AllowLogin = 0;
+				else
+					$objCustomer->AllowLogin = 1;
+				
+				if(function_exists('_custom_before_customer_save'))
+					_custom_before_customer_save($objCustomer);
+				
+				
+				$objCustomer->Created= new QDateTime(QDateTime::Now);
+				$objCustomer->IdCustomer='';
+				
+				
+				$objCustomer->Save();
+					
+				if(function_exists('_custom_after_customer_save'))
+					_custom_after_customer_save($objCustomer);
+		
+				_xls_mail($objCustomer->Email, _sp("Welcome to ") . _xls_get_conf('STORE_NAME') ,
+					_xls_mail_body_from_template(templatenamed('email_customer_register.tpl.php') , array('cust' =>$objCustomer)));
+					
+				Customer::Login($this->BillingContactControl->Email,$this->PasswordControl->Password1->Text);
+				Cart::UpdateCartCustomer();			
+				
+			}
+		}
+       		
         return $objCustomer;
     }
 
-    // TODO :: Required ? 
     protected function PrePaymentHooks() {
 		if (function_exists('_custom_before_order_process'))
 			_custom_before_order_process($cart);
@@ -885,7 +990,7 @@ class xlsws_checkout extends xlsws_index {
         return true;
     }
 
-    // TODO :: Required ? 
+
     protected function PostPaymentHooks() {
 		if (function_exists('_custom_after_order_process'))
 			_custom_before_after_process($cart);
@@ -1031,6 +1136,8 @@ class xlsws_checkout extends xlsws_index {
     protected function BuildForm() {
         $this->BuildCustomerControl();
         $this->BuildCalculateShippingControl();
+        $this->BuildPasswordControlWrapper();
+		$this->BuildPasswordControl();
         $this->BuildShippingControl();
         $this->BuildPaymentControl();
         $this->BuildCartControl();
@@ -1049,6 +1156,8 @@ class xlsws_checkout extends xlsws_index {
     protected function UpdateForm() {
         $this->UpdateCustomerControl();
         $this->UpdateCalculateShippingControl();
+        $this->UpdatePasswordControlWrapper();
+		$this->UpdatePasswordControl();
         $this->UpdateShippingControl();
         $this->UpdatePaymentControl();
         $this->UpdateCartControl();
@@ -1067,6 +1176,8 @@ class xlsws_checkout extends xlsws_index {
     protected function BindForm() {
         $this->BindCustomerControl();
         $this->BindCalculateShippingControl();
+        $this->BindPasswordControlWrapper();
+		$this->BindPasswordControl();
         $this->BindShippingControl();
         $this->BindPaymentControl();
         $this->BindCartControl();
@@ -1130,6 +1241,14 @@ class xlsws_checkout extends xlsws_index {
         if (!$this->TermsControl->Checked)
 			$errors[] =  _sp("You must agree to terms and conditions to place an order");
 		
+		
+		
+		if ($this->PasswordControl->Password1->Text != '' &&
+				$this->PasswordControl->Password2->Text != '')
+			if (!$this->ValidateControlAndChildren($this->PasswordControl))
+            $errors[] =  _sp("Password error");
+				
+				
 		if (count($errors)) {
 			$this->errSpan->Text = join('<br />', $errors);
 			$this->ToggleCheckoutControls(true);

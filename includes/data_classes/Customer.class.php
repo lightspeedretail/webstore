@@ -74,18 +74,13 @@ class Customer extends CustomerGen {
 
 	/**
 	 * Get the current customer object
-	 * @param boolean $fallbackonStackTemp
 	 * @return obj customer
 	 */
-	public static function GetCurrent($fallbackOnStackTemp = false) {
+	public static function GetCurrent() {
         $objCustomer = null;
 
         if (array_key_exists('customer', $_SESSION))
             $objCustomer = $_SESSION['customer'];
-
-        // TODO :: Historical ... why is this here
-        if (!$objCustomer && $fallbackOnStackTemp)
-            $objCustomer = _xls_stack_get('xls_temp_customer');
 
         if (!$objCustomer)
             $objCustomer = new Customer();

@@ -2,7 +2,7 @@
 
 class XLSPasswordControl extends XLSCompositeControl {
     protected $arrRegisteredChildren = array(
-        'Password1','Password2'
+        'Password1','Password2','NewsletterSubscribe'
     );
 
     protected function BuildPassword1Control() {
@@ -50,8 +50,37 @@ class XLSPasswordControl extends XLSCompositeControl {
 
     protected function BindPassword2Control() {
     }
+    
+ 	protected function BuildNewsletterSubscribeControl() {
+        $objControl =
+            new QCheckbox($this, $this->GetChildName('NewsletterSubscribe'));
+        $objControl->Name = _sp('NewsletterSubscribe');
+        $objControl->RenderMethod = 'RenderAsDefinition';
 
+        $this->UpdateNewsletterSubscribeControl();
+        $this->BindNewsletterSubscribeControl();
+
+        return $objControl;
+    }
+
+    protected function UpdateNewsletterSubscribeControl() {
+    $objControl->Text='';
+    }
+
+    protected function BindNewsletterSubscribeControl() {
+    }
    
+   	public function Validate() {
+   		$objPassword1 = $this->GetChildByName('Password1');
+   		$objPassword2 = $this->GetChildByName('Password2');
+   		if (!$objPassword1) return true;
+   		if (!$objPassword2) return true;
+   		
+		if($objPassword1->Text != '' && $objPassword2->Text != '' && $objPassword1->Text != $objPassword2->Text)        
+        		{ $objPassword1->ValidationError = _sp("Passwords do not match"); return false; }
+        		
+		return true;
+	}
      
 }
 

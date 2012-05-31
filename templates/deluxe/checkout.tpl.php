@@ -38,7 +38,7 @@
 <?php $this->pnlLoginRegister->Render(); ?>
 
 <?php $this->pnlCustomer->Render(); ?>
-
+<?php $this->PasswordControlWrapper->Render(); ?>
 <?php $this->pnlBillingAdde->Render(); ?>
 
 <div style="display: block; float: left; clear: right;"><?php $this->pnlShippingAdde->Render(); ?></div>

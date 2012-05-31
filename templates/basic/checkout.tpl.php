@@ -38,7 +38,7 @@
 <?php $this->pnlLoginRegister->Render(); ?>
 
 <?php $this->pnlCustomer->Render(); ?>
-
+<?php $this->PasswordControlWrapper->Render(); ?>
 <?php $this->pnlBillingAdde->Render(); ?>
 
 <div style="display: block; float: left; clear: right;"><?php $this->pnlShippingAdde->Render(); ?></div>
@@ -47,7 +47,7 @@
 <?php if(isset($this->pnlPromoCode) && ($this->pnlPromoCode->Visible)): ?>
 <?php $this->pnlPromoCode->Render() ?>
 <?php endif; ?>
-
+<?php $this->pnlWait->Render('CssClass=center'); ?>
 <?php $this->pnlShipping->Render(); ?>
 
 <br style="clear: both;"/>

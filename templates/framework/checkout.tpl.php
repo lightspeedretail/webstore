@@ -40,7 +40,7 @@
 
 
 <?php $this->pnlCustomer->Render(); ?>
-
+<?php $this->PasswordControlWrapper->Render(); ?>
 <?php $this->pnlBillingAdde->Render(); ?>
 
 <div style="display: block; float: left; clear: right;"><?php $this->pnlShippingAdde->Render(); ?></div>
@@ -51,7 +51,7 @@
 <?php endif; ?>
 
 <?php $this->pnlShipping->Render(); ?>
-
+<?php $this->pnlWait->Render('CssClass=center'); ?>
 <br style="clear: both;"/>
 
 <?php $this->pnlCart->Render(); ?>
