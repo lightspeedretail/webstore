@@ -32,7 +32,7 @@ echo $cart->ShipZip."<br>".$cart->ShipCountry.'<br>';
 echo '</td>';
 echo '<td class="shipping">';
 echo $cart->Firstname." ".$cart->Lastname.'<br>';
-echo $cart->Phone."<br>".$cart->Email;
+echo $cart->Phone."<br>".$cart->Email.'<br>';
 echo str_replace("\n","<br>",$cart->AddressBill).'<br>';
 echo '</td>';
 
