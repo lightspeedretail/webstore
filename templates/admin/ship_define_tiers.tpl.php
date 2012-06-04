@@ -25,7 +25,7 @@
  *
  */
 
-?><li class="rounded" <?php if($_CONTROL->EditMode): ?>style="height:350px;"<?php endif; ?>> 
+?><li class="rounded" <?php if($_CONTROL->EditMode): ?>style="height:440px;"<?php endif; ?>> 
 						<div class="title rounded"> 
 							<div class="name" style="cursor:pointer;" <?php $_CONTROL->pxyAddNewPage->RenderAsEvents(); ?>><?= $_CONTROL->page->Title; ?></div> 
 							<div style="float:right">
@@ -37,10 +37,35 @@
 						</div>
 						
 						<?php if($_CONTROL->EditMode): ?>
-<div class="smodule_config">
-<table>
-<?php $_CONTROL->dtgGrid->Render(); ?>
-</table>							
-</div>
+
+	<div id='editcontainer'>
+	<div class="basic_row"><h4>Define up to 10 tier ranges. Use dollars and cents to ensure your values don't leave price gaps in-between rows. For the last amount (the high end), you can enter 999999 to catch any high cart values.</h4></div>
+
+		<div class="basic_row leftindent">
+			<div class="colnumber tableheader">#</div>
+			<div class="collabel tableheader">Start Amount (i.e. 10.00)</div>
+			<div class="collabel tableheader">End Amount (i.e. 49.99)</div>
+			<div class="collabel tableheader">Cost</div>
+			<div class="clear_float"></div>
+		</div> 
+		
+	<?php $x=1; 
+	foreach ($_CONTROL->ctlRows as $ctlRow) {
+		echo '<div class="basic_row leftindent">';
+		echo '<div class="colnumber">'.$x++.".</div>"; 
+		foreach ($ctlRow as $ctlRowItem) {
+			echo '<div class="colfield">'; 
+			$ctlRowItem->Render(); 
+			echo '</div>';
+		}
+		echo '</div>';
+		echo '<div class="clear_float"></div>';
+		
+		} 
+	
+	?>
+	
+	</div>							
+
 <?php endif; ?>
 </li>

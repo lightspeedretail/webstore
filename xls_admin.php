@@ -2050,29 +2050,10 @@
 		public $btnDeleteConfirm;
 		
         public $Info = "";
-		
-        
-		public $txtPageKey;
-		public $txtPageTitle;
-		//public $txtPageKeywords;
-		public $txtPageDescription;
-		public $txtPageText;
-		public $txtProductTag;
-		
-		public $txtStartPrice;
-		public $txtEndPrice;
-		public $txtRate;
-		
-		public $ctlPromoCode;
- 		public $ctlExcept;
-        public $ctlCategories;
-        public $ctlFamilies;
-        public $ctlProductCodes;
-        public $ctlClasses;
-        public $ctlKeywords;
-        
+		        
 		public $pxyAddNewPage;
 		
+		public $ctlRows;
         
         public $EditMode = false;
         public $NewMode = false;
@@ -2100,59 +2081,7 @@
 		 	// Let's record the reference to the form's MethodCallBack
 		 	$this->strMethodCallBack = $strMethodCallBack;
 	
-			
-			
-			$this->dtgGrid = new QDataGrid($this);
-			$this->dtgGrid->CellPadding = 5;
-			$this->dtgGrid->CellSpacing = 0;
-			$this->dtgGrid->CssClass = "datagrid";
-
-			
-			 $this->dtgGrid->AddColumn(new QDataGridColumn('Start Price', '<?= $_FORM->FieldColumn_Render($_ITEM , \'' . 'StartPrice'  . '\') ?>'
-							, 'CssClass=dtg_column'
-							, 'Width=200'
-							, 'HtmlEntities=false'
-							)
-							);
-							
-							
-			$this->dtgGrid->AddColumn(new QDataGridColumn('End Price', '<?= $_ITEM->EndPrice ?>', 'Width=200', 'CssClass="dtg_column"', 'HtmlEntities=false'));
-		    $this->dtgGrid->AddColumn(new QDataGridColumn('Rate', '<?= $_ITEM->Rate ?>', 'Width=100','CssClass=dtg_column'));
-		    
-		    $this->dtgGrid->SetParentControl($this);
-		   
-		
-			//Change the fields parent
-			//
-	    
-		    
-		    
-		    // Make the DataGrid look nice
-			$objStyle = $this->dtgGrid->RowStyle;
-			$objStyle->CssClass = "row";
-
-			$objStyle = $this->dtgGrid->HeaderRowStyle;
-			$objStyle->CssClass = "dtg_header";
-			
-			$this->dtgGrid->DataSource = ShippingTiers::QueryArray(
-					QQ::NotEqual(QQN::ShippingTiers()->Rowid, 0),
-					QQ::Clause(QQ::OrderBy(QQN::ShippingTiers()->StartPrice))
-				);
-		    
-		    // Create the other textboxes and buttons -- make sure we specify
-            // the datagrid as the parent.  If they hit the escape key, let's perform a Cancel.
-            // Note that we need to terminate the action on the escape key event, too, b/c
-            // many browsers will perform additional processing that we won't not want.
-            $this->txtStartPrice = new QTextBox($this->dtgGrid,$this);
-            $this->txtStartPrice->Required = true;
-            $this->txtStartPrice->MaxLength = 50;
-            $this->txtStartPrice->Width = 200;
-            $this->txtStartPrice->AddAction(new QEscapeKeyEvent(), new QAjaxAction('btnCancel_Click'));
-            $this->txtStartPrice->AddAction(new QEscapeKeyEvent(), new QTerminateAction());
-            $this->txtStartPrice->SetParentControl($this);
-			
-			
-		 	$this->btnSave = new QButton($this);
+			$this->btnSave = new QButton($this);
 		 	$this->btnSave->Text = _sp('Save');
 		 	$this->btnSave->CssClass = 'button';
 		 	$this->btnSave->Visible = false;
@@ -2177,142 +2106,50 @@
 		 	$this->pxyGRCreate = new QControlProxy($this);
 			$this->pxyGRView = new QControlProxy($this);
 
+		
+		
+		
 
-		 	/*$this->dtgGrid = new QDataRepeater($this);
-            
-            // Let's set up pagination -- note that the form is the parent
-            // of the paginator here, because it's on the form where we
-            // make the call toe $this->dtrPersons->Paginator->Render()
-            $this->dtgGrid->Paginator = new QPaginator($this);
-            $this->dtgGrid->ItemsPerPage = 6;
+			for ($x=1; $x<=10; $x++) {
+			
+				$ctlEdit = array();
+				$ctlEdit['ctlStart'.$x] = new XLSTextBox($this,'ctlStart'.$x);
+				$ctlEdit['ctlStart'.$x]->CssClass= 'smallfont';
 
-            // Let's create a second paginator
-            $this->dtgGrid->PaginatorAlternate = new QPaginator($this);
-
-            // Enable AJAX-based rerendering for the QDataRepeater
-            $this->dtgGrid->UseAjax = true;
-
-            // DataRepeaters use Templates to define how the repeated
-            // item is rendered
-            $this->dtgGrid->Template = adminTemplate('ship_define_tiers_row.tpl.php');
-            
-            // Finally, we define the method that we run to bind the data source to the datarepeater
-            $this->dtgGrid->SetDataBinder('dtgItems_Bind',$this);
-            
- 		 	
-		 				
-			$this->txtStartPrice = new QTextBox($this);
-			$this->txtStartPrice->Required = true;
-			$this->txtStartPrice->Height = 20;
- 			$this->txtStartPrice->SetParentControl($this);
-		*/
+				$ctlEdit['ctlEnd'.$x] = new XLSTextBox($this,'ctlEnd'.$x);
+				$ctlEdit['ctlEnd'.$x]->CssClass= 'smallfont';
+				
+				$ctlEdit['ctlRate'.$x] = new XLSTextBox($this,'ctlRate'.$x);
+				$ctlEdit['ctlRate'.$x]->CssClass= 'smallfont';
+				
+				$this->ctlRows[] = $ctlEdit;
+				
+			}	
+			
+			$objTiers= ShippingTiers::QueryArray(
+					QQ::NotEqual(QQN::ShippingTiers()->StartPrice, 0),
+					QQ::Clause(QQ::OrderBy(QQN::ShippingTiers()->StartPrice))
+				);
+			$x=1;
+			if ($objTiers)
+				foreach ($objTiers as $objTier) {
+					$this->ctlRows[$x-1]['ctlStart'.$x]->Text=$objTier->StartPrice;
+					$this->ctlRows[$x-1]['ctlEnd'.$x]->Text=$objTier->EndPrice;
+					$this->ctlRows[$x-1]['ctlRate'.$x]->Text=$objTier->Rate;
+					$x++;
+				}
+		
+				
+			
 				 
-			$this->strTemplate = adminTemplate($page->Key.'.tpl.php');
+			$this->strTemplate = adminTemplate('ship_define_tiers.tpl.php');
 
 	
 		 }
 		 
-		 public function dtgItems_Bind()
-		 {
+		
 		 
-		 	$objItemsArray = ShippingTiers::LoadAll();
-    		        
-
-			//$this->dtgGrid->TotalItemCount = count($objItemsArray);
-			
-			
-			// If we are editing someone new, we need to add a new (blank) person to the data source
-			//if ($this->intEditRowid == -1)
-			//	array_push($objItemsArray, new $className);
-
-			// Bind the datasource to the datagrid
-			//$this->dtgGrid->DataSource = $objItemsArray;
- 			
- 			$this->dtgGrid->DataSource = $objItemsArray;
- 			$this->dtgGrid->TotalItemCount = count($objItemsArray);
-            
-		 
-		 
-		 }
-		 
-		    // If the person for the row we are rendering is currently being edited,
-        // show the textbox.  Otherwise, display the contents as is.
-        public function StartColumn_Render(Person $objPerson) {
-            
-              return $this->txtFirstName->RenderWithError(false);
-            
-        }
-        
-        // If the person for the row we are rendering is currently being edited,
-		// show the textbox.  Otherwise, display the contents as is.
-		public function FieldColumn_Render($objItem , $field) {
-			
-			return $this->txtFirstName->RenderWithError(false);	
-			}
-
-		 
-		 public function btnChange_click()
-		 {
-		 	
-		 	$intPromoCode = $this->ctlPromoCode->SelectedValue;
-			if ($intPromoCode<1)
-			{
-				$this->ctlExcept->Enabled = false;
-				$this->ctlCategories->Enabled = false;
-				$this->ctlFamilies->Enabled = false;
-				$this->ctlClasses->Enabled = false;
-				$this->ctlKeywords->Enabled = false;
-				$this->ctlProductCodes->Enabled = false;
-				
-				$this->ctlExcept->SelectedValue=0;
-				$this->ctlCategories->SelectedValues=null;
-				$this->ctlFamilies->SelectedValues=null;
-				$this->ctlClasses->SelectedValues=null;
-				$this->ctlKeywords->SelectedValues=null;
-				$this->ctlProductCodes->SelectedValues=null;
-				return false;
-			}
-			
-			$objPromoCode = PromoCode::Load($intPromoCode);
-			$strRestrictions =  $objPromoCode->Lscodes;
-			
-			$arrRestrictions = explode(",",$strRestrictions);
-			
-			$arrCategories = array();
-			$arrFamilies= array();
-			$arrClasses = array();
-			$arrKeywords = array();
-			$arrProducts = array();
-			
-			foreach ($arrRestrictions as $strCode) {
-  
-				if (substr($strCode, 0,7) == "family:") $arrFamilies[] = trim(substr($strCode,7,255));
-				elseif (substr($strCode, 0,6) == "class:") $arrClasses[] = trim(substr($strCode,6,255));
-				elseif (substr($strCode, 0,8) == "keyword:") $arrKeywords[] = trim(substr($strCode,8,255));
-				elseif (substr($strCode, 0,9) == "category:") $arrCategories[] = trim(substr($strCode,9,255));
-				else $arrProducts[] = $strCode;
-           
-        	}  
-        
-			$this->ctlExcept->Enabled = true;
-			$this->ctlCategories->Enabled = true;
-			$this->ctlFamilies->Enabled = true;
-			$this->ctlClasses->Enabled = true;
-			$this->ctlKeywords->Enabled = true;
-			$this->ctlProductCodes->Enabled = true;
-			
-			$this->ctlCategories->SelectedValues=$arrCategories;
-			$this->ctlFamilies->SelectedValues=$arrFamilies;
-			$this->ctlClasses->SelectedValues=$arrClasses;
-			$this->ctlKeywords->SelectedValues=$arrKeywords;
-			$this->ctlProductCodes->SelectedValues=$arrProducts;
-
-			$this->ctlExcept->SelectedValue=$objPromoCode->Except;
-
-			$this->Refresh();
-		 
-		 }
-		 
+		 		 
 		 public function btnEdit_click(){
 		 	
 		 	$this->btnEdit->Visible = false;
@@ -2320,14 +2157,6 @@
 		 	$this->btnCancel->Visible = true;
 		 	$this->EditMode = true;
 		 	
-
-			/*$this->txtPageKey->Text = $this->page->Key;
-			$this->txtPageTitle->Text = ($this->page->Title == _sp('+ Add new page'))?'':$this->page->Title;
-			$this->txtPageText->Text = $this->page->Page;
-			$this->txtProductTag->Text = $this->page->ProductTag;
-			$this->txtPageKeywords->Text = $this->page->MetaKeywords;
-			$this->txtPageDescription->Text = $this->page->MetaDescription;
-		*/
 		 	$this->Refresh();
 			
 			
@@ -2340,47 +2169,28 @@
 		 
 		public function btnSave_click($strFormId, $strControlId, $strParameter){
 			
-			$intPromoCode = $this->ctlPromoCode->SelectedValue;
-			if ($intPromoCode<1) return false;
+			//Just truncate the existing table because we will rewrite all rows
+			ShippingTiers::Truncate();
 			
-			//Build restriction string
-			$strRestrictions="";
+			for ($x=1; $x<=10; $x++) {
 			
-			foreach($this->ctlProductCodes->SelectedValues as $strVal)
-				$strRestrictions .= ",".$strVal;
-			foreach($this->ctlCategories->SelectedValues as $strVal)
-				$strRestrictions .= ",category:".$strVal;
-			foreach($this->ctlFamilies->SelectedValues as $strVal)
-				$strRestrictions .= ",family:".$strVal;
-			foreach($this->ctlClasses->SelectedValues as $strVal)
-				$strRestrictions .= ",class:".$strVal;
-			foreach($this->ctlKeywords->SelectedValues as $strVal)
-				$strRestrictions .= ",keyword:".$strVal;
+				$strStart = _xls_clean_currency($this->ctlRows[$x-1]['ctlStart'.$x]->Text);
+				$strEnd = _xls_clean_currency($this->ctlRows[$x-1]['ctlEnd'.$x]->Text);
+				$strRate = _xls_clean_currency($this->ctlRows[$x-1]['ctlRate'.$x]->Text);
 				
-			$strRestrictions=substr($strRestrictions,1); //Our built string starts with a comma, so remove it
-			
-
-			$objPromoCode = PromoCode::Load($intPromoCode);
-
-			//Apply our selections
-			$objPromoCode->Lscodes=$strRestrictions;	
-			$objPromoCode->Except = $this->ctlExcept->SelectedValue;
-			
-			if ($this->intShippingRowID == $objPromoCode->Rowid) {
-				$objPromoCode->Lscodes="shipping:,".$strRestrictions;	
-				$this->intShippingRowID = false;
+				if ( $strStart != '' && $strEnd != '' && $strRate != '') {
+					$ObjTier = new ShippingTiers;
+					$ObjTier->StartPrice = $this->ctlRows[$x-1]['ctlStart'.$x]->Text;
+					$ObjTier->EndPrice = $this->ctlRows[$x-1]['ctlEnd'.$x]->Text;
+					$ObjTier->Rate = $this->ctlRows[$x-1]['ctlRate'.$x]->Text;
+					$ObjTier->Save();
+				}
 			}
-				
-			$objPromoCode->Save();
-			
-			
+					 	
 			$this->btnEdit->Visible = true;
 		 	$this->btnSave->Visible = false;
 		 	$this->btnCancel->Visible = false;
 		 	$this->EditMode = false;
-		 	
-		 	$this->resetForm();
-
 		 	
 		 	$this->Refresh();
 			
@@ -2391,9 +2201,7 @@
 		 	$this->btnSave->Visible = false;
 		 	$this->btnCancel->Visible = false;
 		 	$this->EditMode = false;
-		 	
-		 	$this->resetForm();
-				
+		 					
 		 	//$this->Refresh();
 						
 		}
@@ -2418,20 +2226,14 @@
 		 
 		public function resetForm()
 		{
-			$this->ctlExcept->Enabled = false;
-			$this->ctlCategories->Enabled = false;
-			$this->ctlFamilies->Enabled = false;
-			$this->ctlClasses->Enabled = false;
-			$this->ctlKeywords->Enabled = false;
-			$this->ctlProductCodes->Enabled = false;
+			for ($x=1; $x<=10; $x++) {
 			
-			$this->ctlPromoCode->SelectedValue=0;
-			$this->ctlExcept->SelectedValue=0;
-			$this->ctlCategories->SelectedValues=null;
-			$this->ctlFamilies->SelectedValues=null;
-			$this->ctlClasses->SelectedValues=null;
-			$this->ctlKeywords->SelectedValues=null;
-			$this->ctlProductCodes->SelectedValues=null;
+				$this->ctlRows[$x-1]['ctlStart'.$x]->Text = null;
+				$this->ctlRows[$x-1]['ctlEnd'.$x]->Text = null;
+				$this->ctlRows[$x-1]['ctlRate'.$x]->Text = null;
+			
+			}	
+				
 		}
 		 
 	}

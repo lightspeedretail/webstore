@@ -749,3 +749,121 @@ left: 30px;
 top: 30px;
 white-space: nowrap;
 }
+
+
+/*Formatting for Order editing panel.*/
+
+#editcontainer {
+width: 960px;
+margin-left: 00px;
+margin-top: 00px;
+padding-left: 0px;
+padding-top: 10px;
+border: 0px solid #000000;
+font-size: 8pt;
+height: 500px;
+background: #efefef;
+}
+
+#editcontainer .thin_row {
+clear: both;
+height:10px;
+margin-left: 00px;
+
+}
+
+
+#editcontainer .basic_row {
+clear: both;
+height:25px;
+margin-left: 10px;
+margin-bottom: 1px;
+}
+#editcontainer .leftindent {
+margin-left: 160px;
+}
+#editcontainer .rowbg {
+background: #e2e2e2;
+padding-top: 2px;
+width: 920px;
+}
+
+#editcontainer .basic_row .tableheader
+{
+font-size: 12px;
+font-weight: bold;
+text-shadow: none;
+height: 20px;
+}
+#editcontainer .smallfont
+{
+	font-size:8pt;
+	height: 15px;
+}
+#editcontainer .largefont
+{
+	font-size:10pt;
+	vertical-align:bottom;
+	text-shadow: none;
+}
+#editcontainer .collabel
+{
+float: left;
+width:160px;
+margin-right: 10px;
+font-weight: bold;
+text-shadow: none;
+padding-top: 2px;
+}
+#editcontainer .colfield
+{
+float: left;
+width:170px;
+
+}
+#editcontainer .colnumber
+{
+float: left;
+width:50px;
+padding-top: 3px;
+}
+#editcontainer .mrnumber { width: 40px; text-align:right; }
+#editcontainer .w300 { width: 300px; }
+#editcontainer .w70 { width: 70px; }
+
+.w100 { width:100px; }
+.w70 { width:70px; }
+.ml10 { margin-left: 10px }
+.mr10 { margin-right: 10px }
+.w150 { width:150px; }
+.bgchanged { background-color: #E3E4FA; }
+.bgwhite { background-color: #ffffff; }
+.bgalert { background-color: #F778A1; }
+.strikeout { text-decoration:line-through; }
+
+#editcontainer .colfieldwide
+{
+float: left;
+width:220px;
+
+}
+#editcontainer .coladdress
+{
+
+float: left;
+width:200px;
+height: 150px;
+}
+#editcontainer hr
+{
+width:700px;
+margin-bottom: 10px;
+}
+
+
+#editcontainer .clear_float {
+font-size: 0px;
+line-height: 0px;
+clear: both;
+} 
+
