@@ -5846,6 +5846,9 @@
 		
 		}
 	    
+	    public function btnCancel_click($strFormId, $strControlId, $strParameter) {
+	    	_rd($_SERVER["SCRIPT_NAME"]  . '?page=dbadmin&subpage=dbpending' . admin_sid());
+	    }
     
     	public function btnSave_click($strFormId, $strControlId, $strParameter){
 
