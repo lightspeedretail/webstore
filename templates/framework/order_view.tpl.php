@@ -31,7 +31,7 @@ if($this->order): ?>
 
 	
 
-<?php $this->lblOrderMsg->Render(); ?>	
+<h1 style="text-align: center; margin: -25px 0 25px 0;"><?php $this->lblOrderMsg->Render(); ?></h1>	
 
 
 	<div class="border rounded">

@@ -47,6 +47,10 @@ body {
 
 table {
 font-size: 12px;
+border: 0px;
+width: 750px;
+margin: 0 auto; 
+background-color: #E9EBEA;
 }
 
 #cartitems table {
@@ -90,11 +94,11 @@ a img {border: none;}
 <body>	
 	<div>
 
-<table border="0" width="780px" style="margin: 0 auto; background: #E9EBEA;">
+<table>
   <tbody>
     <tr>
-      <th style="height: 105px; text-align: left;" width="780px" background="<?= templateNamed('images/email_header_bg.png') ?>">
-      <a href="index.php">
+      <th style="height: 100px; text-align: left;" width="750px" background="<?= templateNamed('images/email_header_bg.png') ?>">
+      <a href="/">
 	      <img src="<?php
 	     $img =  _xls_get_conf('HEADER_IMAGE' ,  false ); 
 	     
@@ -108,5 +112,9 @@ a img {border: none;}
      </a>
       </th>
     </tr>
+   </tbody>
+ </table>
+<table>
+  <tbody>
     <tr>
-     <td style="padding:15px;" width="780px">
+     <td style="padding:15px;" width="750px">

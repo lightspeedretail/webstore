@@ -45,7 +45,22 @@ body {
 
 table {
 font-size: 12px;
+border: 0px;
+width: 750px;
+margin: 0 auto; 
+
 }
+
+tbody {
+background-color: #E9EBEA;
+}
+
+.graphicheader {
+height: 100px; 
+text-align: left;
+width=750px;
+background-color: #ffffff;
+} 
 
 #cartitems table {
 	width: 730px;
@@ -84,11 +99,10 @@ a img {border: none;}
 </style>
 
 
-<table border="0" width="780px" style="margin: 0 auto; background: #E9EBEA;">
-  <tbody>
+<table>
     <tr>
-      <th style="height: 105px; text-align: left;" width="780px" background="<?= templateNamed('images/email_header_bg.png') ?>">
-      <a href="index.php">
+      <th class="graphicheader">
+      <a href="/">
 	      <img src="<?php
 	     $img =  _xls_get_conf('HEADER_IMAGE' ,  false ); 
 	     
@@ -102,5 +116,8 @@ a img {border: none;}
      </a>
       </th>
     </tr>
+ </table>
+<table>
+  <tbody>
     <tr>
-     <td style="padding:15px;" width="780px">
+     <td style="padding:15px;" width="750px">
