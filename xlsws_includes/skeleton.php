@@ -933,11 +933,14 @@ EOS;
 		$pnlImg->CssClass = 'product_cell_image';
 		$pnlImg->HtmlEntities = false;
 
-		if($ajax_add_action) {
-			$pnlImg->AddControlToMove($pnlImg);
-			$pnlImg->RemoveAllDropZones();
-			$pnlImg->AddDropZone($this->cartPnl);
-			$pnlImg->AddAction(new QMoveEvent() , new QAjaxAction($ajax_add_action));
+		if($ajax_add_action ) {
+			if (_xls_get_conf('DEBUG_DISABLE_DRAGDROP','0') == '0' ) {
+				$pnlImg->AddControlToMove($pnlImg);
+				$pnlImg->RemoveAllDropZones();
+				$pnlImg->AddDropZone($this->cartPnl);
+				$pnlImg->AddAction(new QMoveEvent() , new QAjaxAction($ajax_add_action));
+			}
+			
 			$pnlImg->AddAction(new QClickEvent() , new QJavaScriptAction("document.location.href='" . $prod->Link . "'"));
 
 			if(!$action_parameter)
@@ -967,7 +970,9 @@ EOS;
 	 * @return string a rendered html version of this image
 	 */
 	public function render_prod_drag_image($_ITEM) {
-		if(isset($this->arrProdDragImages[$_ITEM->Rowid]) && !$this->arrProdDragImages[$_ITEM->Rowid]['panel']->Rendered)
+		if(isset($this->arrProdDragImages[$_ITEM->Rowid]) && 
+			!$this->arrProdDragImages[$_ITEM->Rowid]['panel']->Rendered 
+			)
 			$this->arrProdDragImages[$_ITEM->Rowid]['panel']->Render();
 		else
 			echo "<img src=\"" .  $_ITEM->SmallImage . "\" />";

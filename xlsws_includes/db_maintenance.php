@@ -223,16 +223,20 @@ class xlsws_db_maintenance extends xlsws_index {
 				'If selected, WS will not perform a flush on content tables when doing a Reset Store Products.', 
 				1, 20, NOW(), NOW(), 'BOOL');");
 			$this->add_config_key('DEBUG_DISABLE_AJAX' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Disable Ajax Paging', 'DEBUG_DISABLE_AJAX', '',
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Disable Ajax Paging', 'DEBUG_DISABLE_AJAX', '0',
 				'If selected, WS will not page using AJAX but will use regular URLs.', 
 				1, 21, NOW(), NOW(), 'BOOL');");
-			$this->add_config_key('DEBUG_DELETE_DUPES' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Uploader should delete duplicates', 'DEBUG_DELETE_DUPES', '',
-				'If selected, a product which is uploading will replace any duplicate product codes.', 
+			$this->add_config_key('DEBUG_DISABLE_DRAGDROP' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Disable Drag and Drop', 'DEBUG_DISABLE_DRAGDROP', '0',
+				'If selected, WS will not use Drag and Drop for adding to cart.', 
 				1, 22, NOW(), NOW(), 'BOOL');");
+			$this->add_config_key('DEBUG_DELETE_DUPES' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Uploader should delete duplicates', 'DEBUG_DELETE_DUPES', '0',
+				'If selected, a product which is uploading will replace any duplicate product codes.', 
+				1, 23, NOW(), NOW(), 'BOOL');");
 			$this->add_config_key('LOG_ROTATE_DAYS' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Log Rotate Days', 
-				'LOG_ROTATE_DAYS', '30', 'How many days System Log should be retained.', 1, 23, NOW(), NOW(), 'INT');");					
+				'LOG_ROTATE_DAYS', '30', 'How many days System Log should be retained.', 1, 25, NOW(), NOW(), 'INT');");					
 			$this->add_config_key('UPLOADER_TIMESTAMP' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Last timestamp uploader ran', 
 				'UPLOADER_TIMESTAMP', '0', 'Internal', 0, 0, NOW(), NOW(), 'NULL');");

@@ -436,6 +436,7 @@ width:175px;
 .product_cell img,.product_cell_image {
 display:block;
 margin:0 auto 3px;
+cursor: hand; cursor: pointer;
 }
 
 .product_cell_price {
