@@ -33,7 +33,12 @@
 						</div>
 						
 						<?php if($_CONTROL->EditMode): ?>
-								<div class="module_config<?= $_CONTROL->special_css_class; ?>">
+						
+							<div class="module_config<?= $_CONTROL->special_css_class; ?>">
+								
+							<? if(isset($_CONTROL->ConfigurationGuide))
+							echo $_CONTROL->ConfigurationGuide; ?>
+	
 									<?php  foreach($_CONTROL->fields as $key => $field): ?>
 								
 									<p>

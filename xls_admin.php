@@ -369,6 +369,7 @@
 		public $btnCancel; //the cancel button
 		
         public $Info = ""; //the tooltip info text
+        public $ConfigurationGuide;
 		
         public $special_css_class = ""; //any special CSS class you wish to use for this section
 		
@@ -403,13 +404,30 @@
 		 	
 		 	
 		 	if(is_string($this->configType))
-		 		$this->configs = Configuration::QueryArray(QQ::Equal( QQN::Configuration()->Key , $this->configType) , QQ::Clause(QQ::OrderBy(QQN::Configuration()->SortOrder , QQN::Configuration()->Title)));
+		 		$this->configs = Configuration::QueryArray(
+		 			QQ::Equal( QQN::Configuration()->Key , $this->configType) ,
+		 				QQ::Clause(
+		 					QQ::OrderBy(QQN::Configuration()->SortOrder,
+		 					QQN::Configuration()->Title)
+		 				)
+		 			);
 		 	elseif(is_array($this->configType))
-		 		$this->configs = Configuration::QueryArray(QQ::In( QQN::Configuration()->Key , $this->configType) , QQ::Clause(QQ::OrderBy(QQN::Configuration()->SortOrder , QQN::Configuration()->Title)));
+		 		$this->configs = Configuration::QueryArray(
+		 			QQ::In( QQN::Configuration()->Key , $this->configType),
+		 				QQ::Clause(
+		 					QQ::OrderBy(QQN::Configuration()->SortOrder,
+		 					QQN::Configuration()->Title)
+		 				)
+		 			);
 		 	else
-			 	$this->configs = Configuration::LoadArrayByConfigurationTypeId($this->configType , QQ::Clause(QQ::OrderBy(QQN::Configuration()->SortOrder , QQN::Configuration()->Title)));
+			 	$this->configs = Configuration::LoadArrayByConfigurationTypeId($this->configType,
+			 		QQ::Clause(
+			 			QQ::OrderBy(QQN::Configuration()->SortOrder,
+			 			QQN::Configuration()->Title)
+			 		)
+			 	);
 		 	
-		 	foreach($this->configs as $config){
+		 	foreach($this->configs as $config) {
 		 		
 		 		
 	 		if($config->Options != ''){
@@ -503,6 +521,12 @@
 		 	$this->EditMode = true;
 		 	$this->Refresh();
 		 	
+		 	if (isset($this->ConfigurationGuide)) {
+		 	
+		 	
+		 	
+		 	
+		 	}
 		 	
 		 	foreach($this->fields as $key=>$field){
 		 		
@@ -3302,11 +3326,28 @@
 			$this->configPnls['producttitle'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::ProductTitleFormat , "configDone");
 			$this->configPnls['producttitle']->Name = _sp('Product Meta Data formatting');
 			$this->configPnls['producttitle']->Info = _sp('Change how title and description meta data is built for Product pages');
+			$this->configPnls['producttitle']->ConfigurationGuide = "These settings control the Page Title and Meta Description using keys that represent product information. Each of these keys begins with a percentage (%) sign. Most represent fields in the Product Card. %crumbtrail and %rcrumbtrail (reverse crumbtrail) are the product's category path. Below is the available list of keys:<br>&nbsp;<br>%storename,
+			%name,
+			%description,
+			%shortdescription,
+			%longdescription,
+			%keyword1,
+			%keyword2,
+			%keyword3,
+			%price,
+			%family,
+			%class,
+			%crumbtrail,
+			%rcrumbtrail";
 
 			$this->configPnls['categorytitle'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::CategoryTitleFormat , "configDone");
 			$this->configPnls['categorytitle']->Name = _sp('Category/Custom Page Meta Data formatting');
 			$this->configPnls['categorytitle']->Info = _sp('Change how title and description meta data is built for other pages');
 		
+			$this->configPnls['categorytitle']->ConfigurationGuide = "These settings control the Category and Custom Page Titles and Meta Descriptions using keys that represent category name or store information. Each of these keys begins with a percentage (%) sign. %crumbtrail and %rcrumbtrail (reverse crumbtrail) are the product's category path. Below is the available list of keys:<br>&nbsp;<br>%storename,
+			%name,
+			%crumbtrail,
+			%rcrumbtrail";
 			
 			
 		}
