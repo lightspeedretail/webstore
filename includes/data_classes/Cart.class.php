@@ -567,7 +567,7 @@ class Cart extends CartGen {
 		$this->Subtotal = 0;
 
 		foreach ($this->GetCartItemArray() as $objItem) {
-			$this->Count += $objItem->Qty;
+			$this->Count += 1; //How many rows in cart_items
 			$this->Subtotal += $objItem->SellTotal;
 		}
 	}
