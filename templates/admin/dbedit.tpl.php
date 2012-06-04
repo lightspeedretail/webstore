@@ -108,22 +108,22 @@ if(isset($this->HelperRibbon))
 	<div id='editcontainer'>
 	
 		<div class="basic_row">
-			<div class="collabel">First Name:</div><div class="colfield"><?php $this->BillingContactControl->FirstName->RenderWithError('CssClass=smallfont'); ?></div>
-			<div class="collabel">Last Name:</div><div class="colfield"><?php $this->BillingContactControl->LastName->RenderWithError('CssClass=smallfont'); ?></div>
-			<div class="collabel">Phone:</div><div class="colfield"><?php $this->BillingContactControl->Phone->RenderWithError('CssClass=smallfont') ?></div>
+			<div class="colshortlabel">First Name:</div><div class="colfield"><?php $this->BillingContactControl->FirstName->RenderWithError('CssClass=smallfont'); ?></div>
+			<div class="colshortlabel">Last Name:</div><div class="colfield"><?php $this->BillingContactControl->LastName->RenderWithError('CssClass=smallfont'); ?></div>
+			<div class="colshortlabel">Phone:</div><div class="colfield"><?php $this->BillingContactControl->Phone->RenderWithError('CssClass=smallfont') ?></div>
 			<div class="clear_float"></div>
 		</div> 
 	
 		<div class="basic_row">
-			<div class="collabel">Company:</div><div class="colfield"><?php $this->BillingContactControl->Company->Render('CssClass=smallfont'); ?></div>
-			<div class="collabel">Email:</div><div class="colfieldwide"><?php $this->BillingContactControl->Email->RenderWithError('CssClass=smallfont') ?></div>
+			<div class="colshortlabel">Company:</div><div class="colfield"><?php $this->BillingContactControl->Company->Render('CssClass=smallfont'); ?></div>
+			<div class="colshortlabel">Email:</div><div class="colfieldwide"><?php $this->BillingContactControl->Email->RenderWithError('CssClass=smallfont') ?></div>
 		</div>
 		 
 		<div class="thin_row">
 		</div>
 		
 		<div class="basic_row">
-			<div class="collabel">Bill To:</div><div class="coladdress">
+			<div class="colshortlabel">Bill To:</div><div class="coladdress">
 				<?php 
 				$this->BillingContactControl->Street1->Render('CssClass=smallfont'); echo "<br clear='left'>";
 				$this->BillingContactControl->Street2->Render('CssClass=smallfont'); echo "<br clear='left'>";
@@ -133,7 +133,7 @@ if(isset($this->HelperRibbon))
 				$this->BillingContactControl->Country->Render(); 
 				?></div>
 			
-			<div class="collabel">Ship To:</div><div class="coladdress">
+			<div class="colshortlabel">Ship To:</div><div class="coladdress">
 				<?php 
 				$this->ShippingContactControl->FirstName->Render('CssClass=smallfont w70 mr10'); echo "&nbsp;&nbsp;";
 				$this->ShippingContactControl->LastName->Render('CssClass=smallfont w70'); echo "<br clear='left'>";
@@ -145,7 +145,7 @@ if(isset($this->HelperRibbon))
 				$this->ShippingContactControl->Country->Render(); 
 				?></div>
 	
-			<div class="collabel">Pay Method:</div><div class="colfield">
+			<div class="colshortlabel">Pay Method:</div><div class="colfield">
 				<?php 
 				$this->PaymentControl->ModuleControl->Visible = true;
 				$this->PaymentControl->ModuleControl->Enabled = true;
@@ -153,10 +153,10 @@ if(isset($this->HelperRibbon))
 	
 				?>
 				
-				<div class="collabel">Amt Paid:</div><div class="collabel"><?php $this->ctlPaymentAmount->Render(); ?></div>
-				<div class="collabel">Reference #:</div><div class="collabel"><?php $this->ctlPaymentRef->Render(); ?></div>
-				<div class="collabel"><?php $this->ctlShipLabel->Render(); ?>:</div><div class="collabel"><?php $this->ctlShippingTotal->Render(); ?></div><div class="clear_float"></div>
-				<div class="collabel">Order Total:</div><div class="collabel"><?php $this->ctlOrderTotal->Render(); ?></div>
+				<div class="colshortlabel">Amt Paid:</div><div class="colshortlabel"><?php $this->ctlPaymentAmount->Render(); ?></div>
+				<div class="colshortlabel">Reference #:</div><div class="colshortlabel"><?php $this->ctlPaymentRef->Render(); ?></div>
+				<div class="colshortlabel"><?php $this->ctlShipLabel->Render(); ?>:</div><div class="colshortlabel"><?php $this->ctlShippingTotal->Render(); ?></div><div class="clear_float"></div>
+				<div class="colshortlabel">Order Total:</div><div class="colshortlabel"><?php $this->ctlOrderTotal->Render(); ?></div>
 					
 					
 					

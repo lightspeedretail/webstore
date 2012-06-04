@@ -815,6 +815,15 @@ font-weight: bold;
 text-shadow: none;
 padding-top: 2px;
 }
+#editcontainer .colshortlabel
+{
+float: left;
+width:70px;
+margin-right: 10px;
+font-weight: bold;
+text-shadow: none;
+padding-top: 2px;
+}
 #editcontainer .colfield
 {
 float: left;
