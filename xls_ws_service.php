@@ -1670,7 +1670,13 @@ EOS;
                 return self::OK;
             $new = false;
             // Loads tax
-            $tax = TaxCode::LoadByCode($strCode);
+            $tax = TaxCode::Load($intRowid);
+            
+            if ($tax)
+            	if ($tax->Code != $strCode) { //Tax Code has been renamed, just reinsert
+            		$tax->Delete(); 
+            		unset($tax);
+            	}
             
             if(!$tax){
                 $tax = new TaxCode();
