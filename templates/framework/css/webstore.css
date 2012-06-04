@@ -340,7 +340,7 @@ padding:4px 7px;
 /** Main Content ***/
 #main_panel {
 height:auto;
-margin:-10px 0 15px;
+margin: 0px 0 15px;
 width:765px;
 }
 
@@ -615,6 +615,7 @@ font-weight: bold;
 height:16px;
 margin:5px 0 0;
 padding:11px;
+border:1px solid #000;
 }
 
 #sidebar .containers {
@@ -2334,7 +2335,7 @@ background: none;
 border: 1px solid #000;
 }
 
-h1,fieldset,#breadcrumbs,#footer,#login,#main_panel,#nav_products ul li a,#nav,#shoppingcart,#slider,.addcart,.border,.button,.button_large_right,.containers,.cart,.cart_row,.login_button,.gocheckout,.registry,.gregistry_row,.products_slider_theme_bg
+fieldset,#breadcrumbs,#footer,#login,#main_panel,#nav_products ul li a,#nav,#shoppingcart,#slider,.addcart,.border,.button,.button_large_right,.containers,.cart,.cart_row,.login_button,.gocheckout,.registry,.gregistry_row,.products_slider_theme_bg
 .products_slider_theme,.receipt_titles,.receipt_total,.receipt_subtotals,.registry,.receipt_checkout,.registry_header,.registry_row,.registry_total,.review,a.wishlist {
 border:1px solid #000;
 }
