@@ -63,7 +63,7 @@
 		$ret .=  _sp("Generating URL for category") .
 			$category->Name . "\n";
 
-		echo(_xls_sitemap_xml_url2($strSiteDir . "/" . $category->Link,
+		echo(_xls_sitemap_xml_url2($category->Link,
 				date("c",strtotime($category->Modified)),
 				'weekly'));
 
@@ -71,6 +71,7 @@
 
 	$products = Product::QueryArray(
 		QQ::AndCondition(QQ::Equal(QQN::Product()->Web, 1),
+			QQ::IsNotNull(QQN::Product()->RequestUrl),
 			QQ::OrCondition(
 				QQ::Equal(QQN::Product()->MasterModel, 1),
 				QQ::AndCondition(
@@ -86,20 +87,25 @@
 		$ret .=  _sp("Generating URL for product") . " $product->Code " . "\n";
 
 
-			echo(_xls_sitemap_xml_url2($strSiteDir . "/" . $product->Link,
+			echo(_xls_sitemap_xml_url2($product->Link,
 				date("c",strtotime($product->Modified)),
 					'daily',
 					($product->Featured ? '0.8' : '0.5')));
 		
 	}
 
-	$pages = CustomPage::LoadAll();
+	$pages = CustomPage::QueryArray(
+		QQ::IsNotNull(QQN::CustomPage()->RequestUrl),
+			
+		QQ::Clause(QQ::OrderBy(QQN::CustomPage()->Title))
+	);
+	
 
 	foreach($pages as $page) {
 		$ret .=  _sp("Generating url for page ") . $page->Title . "\n";
 
 
-			echo(_xls_sitemap_xml_url2($strSiteDir . "/" . $page->Link,
+			echo(_xls_sitemap_xml_url2($page->Link,
 				date("c",strtotime($page->Modified)),
 				'weekly'));
 
