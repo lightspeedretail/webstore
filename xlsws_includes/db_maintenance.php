@@ -571,7 +571,25 @@ class xlsws_db_maintenance extends xlsws_index {
 			$this->add_table('xlsws_google_categories' , "CREATE TABLE `xlsws_google_categories` (
 				  `rowid` int(11) unsigned NOT NULL AUTO_INCREMENT,
 				  `name` varchar(255) DEFAULT NULL,
-				  PRIMARY KEY (`rowid`)
+				  `name1` varchar(255) DEFAULT NULL,
+				  `name2` varchar(255) DEFAULT NULL,
+				  `name3` varchar(255) DEFAULT NULL,
+				  `name4` varchar(255) DEFAULT NULL,
+				  `name5` varchar(255) DEFAULT NULL,
+				  `name6` varchar(255) DEFAULT NULL,
+				  `name7` varchar(255) DEFAULT NULL,
+				  `name8` varchar(255) DEFAULT NULL,
+				  `name9` varchar(255) DEFAULT NULL,
+				  PRIMARY KEY (`rowid`),
+				  KEY `name1` (`name1`),
+				  KEY `name2` (`name2`),
+				  KEY `name3` (`name3`),
+				  KEY `name4` (`name4`),
+				  KEY `name5` (`name5`),
+				  KEY `name6` (`name6`),
+				  KEY `name7` (`name7`),
+				  KEY `name8` (`name8`),
+				  KEY `name9` (`name9`)
 				) ENGINE=MyISAM DEFAULT CHARSET=utf8" , '2.2');
 			GoogleCategories::Truncate(); //in case this is run more than once
 			$file = fopen("googlecategories.txt", "r") or exit("Unable to open file!");
@@ -579,14 +597,27 @@ class xlsws_db_maintenance extends xlsws_index {
 			if ($file)
 				while(!feof($file)) {
 				  	$strLine = fgets($file);
-				  	$strLine = str_replace("&","&amp;",$strLine);
-				  	$strLine = str_replace(">","&gt;",$strLine);
+				  	//$strLine = str_replace("&","&amp;",$strLine);
+				  	//$strLine = str_replace(">","&gt;",$strLine);
 				  	$objGC = new GoogleCategories;
 				  	$objGC->Name = $strLine;
+				  	$arrItems = array_filter(explode(" > ",$strLine));
+				  	$objGC->Name1=trim($arrItems[0]);
+				  	$objGC->Name2=trim($arrItems[1]);
+				  	$objGC->Name3=trim($arrItems[2]);
+				  	$objGC->Name4=trim($arrItems[3]);
+				  	$objGC->Name5=trim($arrItems[4]);
+				  	$objGC->Name6=trim($arrItems[5]);
+				  	$objGC->Name7=trim($arrItems[6]);
+				  	$objGC->Name8=trim($arrItems[7]);
+				  	$objGC->Name9=trim($arrItems[8]);
+				  	
 				  	$objGC->Save();
 				  }
 				fclose($file);
-
+			for ($x=1; $x<=9; $x++)
+				_dbx("update xlsws_google_categories set `name".$x."`=null where `name".$x."`=''");
+			_dbx("delete from xlsws_google_categories where `name1` is null");
 									
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			

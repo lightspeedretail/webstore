@@ -17,6 +17,15 @@
 	 * @subpackage GeneratedDataObjects
 	 * @property integer $Rowid the value for intRowid (Read-Only PK)
 	 * @property string $Name the value for strName 
+	 * @property string $Name1 the value for strName1 
+	 * @property string $Name2 the value for strName2 
+	 * @property string $Name3 the value for strName3 
+	 * @property string $Name4 the value for strName4 
+	 * @property string $Name5 the value for strName5 
+	 * @property string $Name6 the value for strName6 
+	 * @property string $Name7 the value for strName7 
+	 * @property string $Name8 the value for strName8 
+	 * @property string $Name9 the value for strName9 
 	 * @property boolean $__Restored whether or not this object was restored from the database (as opposed to created new)
 	 */
 	class GoogleCategoriesGen extends QBaseClass {
@@ -40,6 +49,87 @@
 		protected $strName;
 		const NameMaxLength = 255;
 		const NameDefault = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_google_categories.name1
+		 * @var string strName1
+		 */
+		protected $strName1;
+		const Name1MaxLength = 255;
+		const Name1Default = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_google_categories.name2
+		 * @var string strName2
+		 */
+		protected $strName2;
+		const Name2MaxLength = 255;
+		const Name2Default = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_google_categories.name3
+		 * @var string strName3
+		 */
+		protected $strName3;
+		const Name3MaxLength = 255;
+		const Name3Default = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_google_categories.name4
+		 * @var string strName4
+		 */
+		protected $strName4;
+		const Name4MaxLength = 255;
+		const Name4Default = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_google_categories.name5
+		 * @var string strName5
+		 */
+		protected $strName5;
+		const Name5MaxLength = 255;
+		const Name5Default = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_google_categories.name6
+		 * @var string strName6
+		 */
+		protected $strName6;
+		const Name6MaxLength = 255;
+		const Name6Default = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_google_categories.name7
+		 * @var string strName7
+		 */
+		protected $strName7;
+		const Name7MaxLength = 255;
+		const Name7Default = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_google_categories.name8
+		 * @var string strName8
+		 */
+		protected $strName8;
+		const Name8MaxLength = 255;
+		const Name8Default = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_google_categories.name9
+		 * @var string strName9
+		 */
+		protected $strName9;
+		const Name9MaxLength = 255;
+		const Name9Default = null;
 
 
 		/**
@@ -376,6 +466,15 @@
 
 			$objBuilder->AddSelectItem($strTableName, 'rowid', $strAliasPrefix . 'rowid');
 			$objBuilder->AddSelectItem($strTableName, 'name', $strAliasPrefix . 'name');
+			$objBuilder->AddSelectItem($strTableName, 'name1', $strAliasPrefix . 'name1');
+			$objBuilder->AddSelectItem($strTableName, 'name2', $strAliasPrefix . 'name2');
+			$objBuilder->AddSelectItem($strTableName, 'name3', $strAliasPrefix . 'name3');
+			$objBuilder->AddSelectItem($strTableName, 'name4', $strAliasPrefix . 'name4');
+			$objBuilder->AddSelectItem($strTableName, 'name5', $strAliasPrefix . 'name5');
+			$objBuilder->AddSelectItem($strTableName, 'name6', $strAliasPrefix . 'name6');
+			$objBuilder->AddSelectItem($strTableName, 'name7', $strAliasPrefix . 'name7');
+			$objBuilder->AddSelectItem($strTableName, 'name8', $strAliasPrefix . 'name8');
+			$objBuilder->AddSelectItem($strTableName, 'name9', $strAliasPrefix . 'name9');
 		}
 
 
@@ -411,6 +510,24 @@
 			$objToReturn->intRowid = $objDbRow->GetColumn($strAliasName, 'Integer');
 			$strAliasName = array_key_exists($strAliasPrefix . 'name', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'name'] : $strAliasPrefix . 'name';
 			$objToReturn->strName = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'name1', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'name1'] : $strAliasPrefix . 'name1';
+			$objToReturn->strName1 = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'name2', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'name2'] : $strAliasPrefix . 'name2';
+			$objToReturn->strName2 = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'name3', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'name3'] : $strAliasPrefix . 'name3';
+			$objToReturn->strName3 = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'name4', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'name4'] : $strAliasPrefix . 'name4';
+			$objToReturn->strName4 = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'name5', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'name5'] : $strAliasPrefix . 'name5';
+			$objToReturn->strName5 = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'name6', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'name6'] : $strAliasPrefix . 'name6';
+			$objToReturn->strName6 = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'name7', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'name7'] : $strAliasPrefix . 'name7';
+			$objToReturn->strName7 = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'name8', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'name8'] : $strAliasPrefix . 'name8';
+			$objToReturn->strName8 = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'name9', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'name9'] : $strAliasPrefix . 'name9';
+			$objToReturn->strName9 = $objDbRow->GetColumn($strAliasName, 'VarChar');
 
 			// Instantiate Virtual Attributes
 			foreach ($objDbRow->GetColumnNameArray() as $strColumnName => $mixValue) {
@@ -521,7 +638,7 @@
 
 
 		//////////////////////////////////////
-		// SAVE, DELETE, RELOAD 
+		// SAVE, DELETE, RELOAD
 		//////////////////////////////////////
 
 		/**
@@ -541,15 +658,34 @@
 					// Perform an INSERT query
 					$objDatabase->NonQuery('
 						INSERT INTO `xlsws_google_categories` (
-							`name`
+							`name`,
+							`name1`,
+							`name2`,
+							`name3`,
+							`name4`,
+							`name5`,
+							`name6`,
+							`name7`,
+							`name8`,
+							`name9`
 						) VALUES (
-							' . $objDatabase->SqlVariable($this->strName) . '
+							' . $objDatabase->SqlVariable($this->strName) . ',
+							' . $objDatabase->SqlVariable($this->strName1) . ',
+							' . $objDatabase->SqlVariable($this->strName2) . ',
+							' . $objDatabase->SqlVariable($this->strName3) . ',
+							' . $objDatabase->SqlVariable($this->strName4) . ',
+							' . $objDatabase->SqlVariable($this->strName5) . ',
+							' . $objDatabase->SqlVariable($this->strName6) . ',
+							' . $objDatabase->SqlVariable($this->strName7) . ',
+							' . $objDatabase->SqlVariable($this->strName8) . ',
+							' . $objDatabase->SqlVariable($this->strName9) . '
 						)
 					');
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intRowid = $objDatabase->InsertId('xlsws_google_categories', 'rowid');
 
+					
 
 				} else {
 					// Perform an UPDATE query
@@ -561,7 +697,16 @@
 						UPDATE
 							`xlsws_google_categories`
 						SET
-							`name` = ' . $objDatabase->SqlVariable($this->strName) . '
+							`name` = ' . $objDatabase->SqlVariable($this->strName) . ',
+							`name1` = ' . $objDatabase->SqlVariable($this->strName1) . ',
+							`name2` = ' . $objDatabase->SqlVariable($this->strName2) . ',
+							`name3` = ' . $objDatabase->SqlVariable($this->strName3) . ',
+							`name4` = ' . $objDatabase->SqlVariable($this->strName4) . ',
+							`name5` = ' . $objDatabase->SqlVariable($this->strName5) . ',
+							`name6` = ' . $objDatabase->SqlVariable($this->strName6) . ',
+							`name7` = ' . $objDatabase->SqlVariable($this->strName7) . ',
+							`name8` = ' . $objDatabase->SqlVariable($this->strName8) . ',
+							`name9` = ' . $objDatabase->SqlVariable($this->strName9) . '
 						WHERE
 							`rowid` = ' . $objDatabase->SqlVariable($this->intRowid) . '
 					');
@@ -600,6 +745,7 @@
 				WHERE
 					`rowid` = ' . $objDatabase->SqlVariable($this->intRowid) . '');
 
+			
 		}
 
 		/**
@@ -643,9 +789,19 @@
 
 			// Update $this's local variables to match
 			$this->strName = $objReloaded->strName;
+			$this->strName1 = $objReloaded->strName1;
+			$this->strName2 = $objReloaded->strName2;
+			$this->strName3 = $objReloaded->strName3;
+			$this->strName4 = $objReloaded->strName4;
+			$this->strName5 = $objReloaded->strName5;
+			$this->strName6 = $objReloaded->strName6;
+			$this->strName7 = $objReloaded->strName7;
+			$this->strName8 = $objReloaded->strName8;
+			$this->strName9 = $objReloaded->strName9;
 		}
 
 		
+
 
 		////////////////////
 		// PUBLIC OVERRIDERS
@@ -672,6 +828,51 @@
 					// Gets the value for strName 
 					// @return string
 					return $this->strName;
+
+				case 'Name1':
+					// Gets the value for strName1 
+					// @return string
+					return $this->strName1;
+
+				case 'Name2':
+					// Gets the value for strName2 
+					// @return string
+					return $this->strName2;
+
+				case 'Name3':
+					// Gets the value for strName3 
+					// @return string
+					return $this->strName3;
+
+				case 'Name4':
+					// Gets the value for strName4 
+					// @return string
+					return $this->strName4;
+
+				case 'Name5':
+					// Gets the value for strName5 
+					// @return string
+					return $this->strName5;
+
+				case 'Name6':
+					// Gets the value for strName6 
+					// @return string
+					return $this->strName6;
+
+				case 'Name7':
+					// Gets the value for strName7 
+					// @return string
+					return $this->strName7;
+
+				case 'Name8':
+					// Gets the value for strName8 
+					// @return string
+					return $this->strName8;
+
+				case 'Name9':
+					// Gets the value for strName9 
+					// @return string
+					return $this->strName9;
 
 
 				///////////////////
@@ -721,6 +922,105 @@
 						throw $objExc;
 					}
 
+				case 'Name1':
+					// Sets the value for strName1 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strName1 = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'Name2':
+					// Sets the value for strName2 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strName2 = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'Name3':
+					// Sets the value for strName3 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strName3 = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'Name4':
+					// Sets the value for strName4 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strName4 = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'Name5':
+					// Sets the value for strName5 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strName5 = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'Name6':
+					// Sets the value for strName6 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strName6 = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'Name7':
+					// Sets the value for strName7 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strName7 = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'Name8':
+					// Sets the value for strName8 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strName8 = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'Name9':
+					// Sets the value for strName9 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strName9 = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
 
 				///////////////////
 				// Member Objects
@@ -764,6 +1064,15 @@
 			$strToReturn = '<complexType name="GoogleCategories"><sequence>';
 			$strToReturn .= '<element name="Rowid" type="xsd:int"/>';
 			$strToReturn .= '<element name="Name" type="xsd:string"/>';
+			$strToReturn .= '<element name="Name1" type="xsd:string"/>';
+			$strToReturn .= '<element name="Name2" type="xsd:string"/>';
+			$strToReturn .= '<element name="Name3" type="xsd:string"/>';
+			$strToReturn .= '<element name="Name4" type="xsd:string"/>';
+			$strToReturn .= '<element name="Name5" type="xsd:string"/>';
+			$strToReturn .= '<element name="Name6" type="xsd:string"/>';
+			$strToReturn .= '<element name="Name7" type="xsd:string"/>';
+			$strToReturn .= '<element name="Name8" type="xsd:string"/>';
+			$strToReturn .= '<element name="Name9" type="xsd:string"/>';
 			$strToReturn .= '<element name="__blnRestored" type="xsd:boolean"/>';
 			$strToReturn .= '</sequence></complexType>';
 			return $strToReturn;
@@ -790,6 +1099,24 @@
 				$objToReturn->intRowid = $objSoapObject->Rowid;
 			if (property_exists($objSoapObject, 'Name'))
 				$objToReturn->strName = $objSoapObject->Name;
+			if (property_exists($objSoapObject, 'Name1'))
+				$objToReturn->strName1 = $objSoapObject->Name1;
+			if (property_exists($objSoapObject, 'Name2'))
+				$objToReturn->strName2 = $objSoapObject->Name2;
+			if (property_exists($objSoapObject, 'Name3'))
+				$objToReturn->strName3 = $objSoapObject->Name3;
+			if (property_exists($objSoapObject, 'Name4'))
+				$objToReturn->strName4 = $objSoapObject->Name4;
+			if (property_exists($objSoapObject, 'Name5'))
+				$objToReturn->strName5 = $objSoapObject->Name5;
+			if (property_exists($objSoapObject, 'Name6'))
+				$objToReturn->strName6 = $objSoapObject->Name6;
+			if (property_exists($objSoapObject, 'Name7'))
+				$objToReturn->strName7 = $objSoapObject->Name7;
+			if (property_exists($objSoapObject, 'Name8'))
+				$objToReturn->strName8 = $objSoapObject->Name8;
+			if (property_exists($objSoapObject, 'Name9'))
+				$objToReturn->strName9 = $objSoapObject->Name9;
 			if (property_exists($objSoapObject, '__blnRestored'))
 				$objToReturn->__blnRestored = $objSoapObject->__blnRestored;
 			return $objToReturn;
@@ -825,6 +1152,15 @@
 	/**
 	 * @property-read QQNode $Rowid
 	 * @property-read QQNode $Name
+	 * @property-read QQNode $Name1
+	 * @property-read QQNode $Name2
+	 * @property-read QQNode $Name3
+	 * @property-read QQNode $Name4
+	 * @property-read QQNode $Name5
+	 * @property-read QQNode $Name6
+	 * @property-read QQNode $Name7
+	 * @property-read QQNode $Name8
+	 * @property-read QQNode $Name9
 	 */
 	class QQNodeGoogleCategories extends QQNode {
 		protected $strTableName = 'xlsws_google_categories';
@@ -836,6 +1172,24 @@
 					return new QQNode('rowid', 'Rowid', 'integer', $this);
 				case 'Name':
 					return new QQNode('name', 'Name', 'string', $this);
+				case 'Name1':
+					return new QQNode('name1', 'Name1', 'string', $this);
+				case 'Name2':
+					return new QQNode('name2', 'Name2', 'string', $this);
+				case 'Name3':
+					return new QQNode('name3', 'Name3', 'string', $this);
+				case 'Name4':
+					return new QQNode('name4', 'Name4', 'string', $this);
+				case 'Name5':
+					return new QQNode('name5', 'Name5', 'string', $this);
+				case 'Name6':
+					return new QQNode('name6', 'Name6', 'string', $this);
+				case 'Name7':
+					return new QQNode('name7', 'Name7', 'string', $this);
+				case 'Name8':
+					return new QQNode('name8', 'Name8', 'string', $this);
+				case 'Name9':
+					return new QQNode('name9', 'Name9', 'string', $this);
 
 				case '_PrimaryKeyNode':
 					return new QQNode('rowid', 'Rowid', 'integer', $this);
@@ -853,6 +1207,15 @@
 	/**
 	 * @property-read QQNode $Rowid
 	 * @property-read QQNode $Name
+	 * @property-read QQNode $Name1
+	 * @property-read QQNode $Name2
+	 * @property-read QQNode $Name3
+	 * @property-read QQNode $Name4
+	 * @property-read QQNode $Name5
+	 * @property-read QQNode $Name6
+	 * @property-read QQNode $Name7
+	 * @property-read QQNode $Name8
+	 * @property-read QQNode $Name9
 	 * @property-read QQNode $_PrimaryKeyNode
 	 */
 	class QQReverseReferenceNodeGoogleCategories extends QQReverseReferenceNode {
@@ -865,6 +1228,24 @@
 					return new QQNode('rowid', 'Rowid', 'integer', $this);
 				case 'Name':
 					return new QQNode('name', 'Name', 'string', $this);
+				case 'Name1':
+					return new QQNode('name1', 'Name1', 'string', $this);
+				case 'Name2':
+					return new QQNode('name2', 'Name2', 'string', $this);
+				case 'Name3':
+					return new QQNode('name3', 'Name3', 'string', $this);
+				case 'Name4':
+					return new QQNode('name4', 'Name4', 'string', $this);
+				case 'Name5':
+					return new QQNode('name5', 'Name5', 'string', $this);
+				case 'Name6':
+					return new QQNode('name6', 'Name6', 'string', $this);
+				case 'Name7':
+					return new QQNode('name7', 'Name7', 'string', $this);
+				case 'Name8':
+					return new QQNode('name8', 'Name8', 'string', $this);
+				case 'Name9':
+					return new QQNode('name9', 'Name9', 'string', $this);
 
 				case '_PrimaryKeyNode':
 					return new QQNode('rowid', 'Rowid', 'integer', $this);
