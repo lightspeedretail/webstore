@@ -609,9 +609,18 @@
 					return $arr;
 				
 				case 'PRODUCT_SORT':
-					return array("Name" => _sp("Product Name") , "-Rowid" => _sp("Most Recently Created") , 
-						"-Modified" => _sp("Most Recently Updated") ,"Code" => _sp("Product Code") , 
-						"SellWeb" => _sp("Price") , "InventoryTotal" => _sp("Inventory"));
+					return array(
+						"Name" => _sp("Product Name"), 
+						"-Rowid" => _sp("Most Recently Created"), 
+						"-Modified" => _sp("Most Recently Updated"),
+						"Code" => _sp("Product Code"), 
+						"SellWeb" => _sp("Price"), 
+						"InventoryAvail" => _sp("Available Inventory"),
+						"DescriptionShort" => _sp("Short Description"),
+						"WebKeyword1" => _sp("Keyword1"),
+						"WebKeyword2" => _sp("Keyword2"),
+						"WebKeyword3" => _sp("Keyword3")
+						);
 
 				case 'ENABLE_FAMILIES':
 					return array(0 => _sp("Off") , 1 => _sp("Bottom of Products Menu") , 2 => _sp("Top of Products Menu"));
