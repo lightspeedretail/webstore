@@ -566,7 +566,28 @@ class xlsws_db_maintenance extends xlsws_index {
 			}
 
 
-					
+
+			//Google categories
+			$this->add_table('xlsws_google_categories' , "CREATE TABLE `xlsws_google_categories` (
+				  `rowid` int(11) unsigned NOT NULL AUTO_INCREMENT,
+				  `name` varchar(255) DEFAULT NULL,
+				  PRIMARY KEY (`rowid`)
+				) ENGINE=MyISAM DEFAULT CHARSET=utf8" , '2.2');
+			GoogleCategories::Truncate(); //in case this is run more than once
+			$file = fopen("googlecategories.txt", "r") or exit("Unable to open file!");
+			//Output a line of the file until the end is reached
+			if ($file)
+				while(!feof($file)) {
+				  	$strLine = fgets($file);
+				  	$strLine = str_replace("&","&amp;",$strLine);
+				  	$strLine = str_replace(">","&gt;",$strLine);
+				  	$objGC = new GoogleCategories;
+				  	$objGC->Name = $strLine;
+				  	$objGC->Save();
+				  }
+				fclose($file);
+
+									
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			
 			$strUpgradeText .= "<h2>Please run RECALCULATE PENDING ORDERS after running this Upgrade.</h2>";

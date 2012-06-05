@@ -5150,11 +5150,12 @@
 				$this->arrFields['CustomPage']['Field']->AddItem($objItem->Title , $objItem->Key);
 
 
-
+			/*
 
 			$this->arrFields['ImageId'] = array('Name' => 'Use Image');
 			$this->arrFields['ImageId']['Field'] = new XLSListBox($this);		
 			$this->arrFields['ImageId']['DisplayFunc'] = "RenderImage";
+			
 			$this->objImages = Product::QueryArray(QQ::AndCondition(
 				QQ::Equal(QQN::Product()->FkProductMasterId,0),
 				QQ::IsNotNull(QQN::Product()->ImageId)
@@ -5165,35 +5166,9 @@
 			$this->arrFields['ImageId']['Field']->AddItem('None', NULL);
 			foreach($this->objImages as $objItem)
 				$this->arrFields['ImageId']['Field']->AddItem($objItem->Code , $objItem->ImageId);
-					
-			
-			/*
-			$this->arrFields['CountryCode'] = array('Name' => 'Country');
-			$this->arrFields['CountryCode']['Field'] = new XLSListBox($this);
-			$this->arrFields['CountryCode']['Field']->Required = true;			
-			$this->arrFields['CountryCode']['DisplayFunc'] = "RenderCountry";
-			$this->arrFields['CountryCode']['Width'] = 150;
+			*/		
 			
 
-			$this->countries = Country::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Country()->Country)));
-			
-			foreach($this->countries as $country)
-				$this->arrFields['CountryCode']['Field']->AddItem($country->Country , $country->Code);
-
-			$this->arrFields['SortOrder'] = array('Name' => 'Sort Order');
-			$this->arrFields['SortOrder']['Field'] = new QIntegerTextBox($this);
-			$this->arrFields['SortOrder']['Width'] = 50;
-			
-			
-			
-				
-				
-			$this->arrFields['Avail'] = array('Name' => 'Available?');
-			$this->arrFields['Avail']['Field'] = new XLSListBox($this);
-			$this->arrFields['Avail']['Field']->AddItem('Yes' , 'Y');
-			$this->arrFields['Avail']['Field']->AddItem('No' , 'N');
-			$this->arrFields['Avail']['Width'] = 50;
-			*/
 			$this->HelperRibbon = "Only Top Tier categories are required to be filled out with Meta Description information. Lower tiers will automatically pull from their parent if left blank. Meta Keywords are no longer used by search engines and have been removed.";
 			parent::Form_Create();
 			

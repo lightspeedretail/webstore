@@ -519,6 +519,12 @@ height:47px;
 overflow-y:hidden;
 }
 
+.rowtall {
+background:url(images/title_bgtall.png) repeat-x;
+height:86px;
+overflow-y:hidden;
+}
+
 .id {
 min-width:5%;
 padding:0 0 0 15px;

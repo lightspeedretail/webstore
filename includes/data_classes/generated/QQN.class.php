@@ -97,6 +97,12 @@
 			return new QQNodeGiftRegistryReceipents('xlsws_gift_registry_receipents', null, null);
 		}
 		/**
+		 * @return QQNodeGoogleCategories
+		 */
+		static public function GoogleCategories() {
+			return new QQNodeGoogleCategories('xlsws_google_categories', null, null);
+		}
+		/**
 		 * @return QQNodeImages
 		 */
 		static public function Images() {

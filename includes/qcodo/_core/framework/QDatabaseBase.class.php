@@ -347,6 +347,7 @@
 
 	abstract class QDatabaseResultBase extends QBaseClass {
 		abstract public function FetchArray();
+		abstract public function FetchObject();
 		abstract public function FetchRow();
 		abstract public function FetchField();
 		abstract public function FetchFields();

@@ -79,6 +79,11 @@
 		QApplicationBase::$ClassFile['qqnodegiftregistryreceipents'] = __DATA_CLASSES__ . '/GiftRegistryReceipents.class.php';
 		QApplicationBase::$ClassFile['qqreversereferencenodegiftregistryreceipents'] = __DATA_CLASSES__ . '/GiftRegistryReceipents.class.php';
 
+	// ClassPaths for the GoogleCategories class
+		QApplicationBase::$ClassFile['googlecategories'] = __DATA_CLASSES__ . '/GoogleCategories.class.php';
+		QApplicationBase::$ClassFile['qqnodegooglecategories'] = __DATA_CLASSES__ . '/GoogleCategories.class.php';
+		QApplicationBase::$ClassFile['qqreversereferencenodegooglecategories'] = __DATA_CLASSES__ . '/GoogleCategories.class.php';
+
 	// ClassPaths for the Images class
 		QApplicationBase::$ClassFile['images'] = __DATA_CLASSES__ . '/Images.class.php';
 		QApplicationBase::$ClassFile['qqnodeimages'] = __DATA_CLASSES__ . '/Images.class.php';

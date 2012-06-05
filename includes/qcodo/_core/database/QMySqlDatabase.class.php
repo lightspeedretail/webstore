@@ -113,6 +113,10 @@
 		public function FetchArray() {
 			return mysql_fetch_array($this->objMySqlResult);
 		}
+		
+		public function FetchObject() {
+			return mysql_fetch_object($this->objMySqlResult);
+		}
 
 		public function FetchFields() {
 			$objArrayToReturn = array();
