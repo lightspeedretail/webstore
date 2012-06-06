@@ -568,6 +568,8 @@ class xlsws_db_maintenance extends xlsws_index {
 
 
 			//Google categories
+			$this->add_column('xlsws_category' , 'google_id' ,
+				"ALTER TABLE `xlsws_category` ADD `google_id` INT  DEFAULT NULL AFTER `request_url`");
 			$this->add_table('xlsws_google_categories' , "CREATE TABLE `xlsws_google_categories` (
 				  `rowid` int(11) unsigned NOT NULL AUTO_INCREMENT,
 				  `name` varchar(255) DEFAULT NULL,
@@ -592,8 +594,7 @@ class xlsws_db_maintenance extends xlsws_index {
 				  KEY `name9` (`name9`)
 				) ENGINE=MyISAM DEFAULT CHARSET=utf8" , '2.2');
 			GoogleCategories::Truncate(); //in case this is run more than once
-			$file = fopen("googlecategories.txt", "r") or exit("Unable to open file!");
-			//Output a line of the file until the end is reached
+			$file = fopen("googlecategories.txt", "r");
 			if ($file)
 				while(!feof($file)) {
 				  	$strLine = fgets($file);
