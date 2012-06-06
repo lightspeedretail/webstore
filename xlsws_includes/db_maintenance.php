@@ -200,6 +200,9 @@ class xlsws_db_maintenance extends xlsws_index {
 		
 			//@Todo: Add any 2.2 changes here
 			
+			$this->add_column('xlsws_category' , 'google_id' ,
+				"ALTER TABLE `xlsws_category` ADD `google_id` INT  DEFAULT NULL AFTER `request_url`");
+				
 			$this->add_config_key('FEATURED_KEYWORD' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Featured Keyword', 'FEATURED_KEYWORD', 'featured',
 				'If this keyword is one of your product keywords, the product will be featured on the Web Store homepage.', 
@@ -568,8 +571,6 @@ class xlsws_db_maintenance extends xlsws_index {
 
 
 			//Google categories
-			$this->add_column('xlsws_category' , 'google_id' ,
-				"ALTER TABLE `xlsws_category` ADD `google_id` INT  DEFAULT NULL AFTER `request_url`");
 			$this->add_table('xlsws_google_categories' , "CREATE TABLE `xlsws_google_categories` (
 				  `rowid` int(11) unsigned NOT NULL AUTO_INCREMENT,
 				  `name` varchar(255) DEFAULT NULL,
