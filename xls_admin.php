@@ -6174,6 +6174,7 @@
 			$this->objWait = new QWaitIcon($this);
 			$this->objDefaultWaitIcon = $this->objWait;
 			
+			$this->HelperRibbon ="The tasks tab will show a spinning icon while running the process. Several of these tasks may take a few moments.";
 			
 		}
 		
@@ -6383,6 +6384,8 @@
 			}			
 			
 			$this->arrMPnls['UpgradeWS']->Text = '';
+			$this->arrMPnls['UpgradeWS']->Visible = true;
+			$this->arrMPnls['UpgradeWS']->Refresh();	
 			
 			//Include db_maint class to access update functions
 			include(XLSWS_INCLUDES . 'db_maintenance.php');

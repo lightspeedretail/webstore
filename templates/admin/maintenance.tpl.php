@@ -75,6 +75,7 @@
 </head>
 <body>
 <?php include_once(adminTemplate('pages.tpl.php')); ?>
+
 <?php $this->RenderBegin(); ?>				
 
 		<br /><br />
@@ -84,16 +85,25 @@
 			<ul>
 				<?php foreach($this->arrTabs as $type=>$label): ?>
 				<a href="<?= $this->get_uri($type); ?>" >
-					<li class="rounded 
+					<li class="rounded {5px top transparent} 
 						<?php if($type == $this->currentTab): ?>
 							active
-						<?php endif; ?> {5px top transparent}" style="display:block; float: left">
+						<?php endif; ?> " style="display:block; float: left">
 						<?= $label; ?>
+						<?php if($type == $this->currentTab): ?>
+						<?php $this->objDefaultWaitIcon->Render() ?>
+						<?php endif; ?>
 					</li>
 				</a>
 				<?php endforeach; ?>
 			</ul>
-		</div>
+		</div><?php
+
+if(isset($this->HelperRibbon)) 
+	if (strlen($this->HelperRibbon)>0)
+		echo '<div style="padding: 5px;"><img style="padding-right: 5px;width:44px; height:35px;" align="left" src="'.adminTemplate('css/images/questionmark.png').'"> '.$this->HelperRibbon.'</div>';
+
+?>
 		<ul id="listOrder"> 
 		<?php foreach($this->arrMPnls as $key=>$pnl): ?>
 			
