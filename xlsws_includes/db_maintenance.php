@@ -201,7 +201,8 @@ class xlsws_db_maintenance extends xlsws_index {
 			//@Todo: Add any 2.2 changes here
 			
 			$this->add_column('xlsws_category' , 'google_id' ,
-				"ALTER TABLE `xlsws_category` ADD `google_id` INT  DEFAULT NULL AFTER `request_url`");
+				"ALTER TABLE `xlsws_category` ADD `google_id` INT  DEFAULT NULL AFTER `image_id`");
+
 				
 			$this->add_config_key('FEATURED_KEYWORD' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Featured Keyword', 'FEATURED_KEYWORD', 'featured',
@@ -599,8 +600,6 @@ class xlsws_db_maintenance extends xlsws_index {
 			if ($file)
 				while(!feof($file)) {
 				  	$strLine = fgets($file);
-				  	//$strLine = str_replace("&","&amp;",$strLine);
-				  	//$strLine = str_replace(">","&gt;",$strLine);
 				  	$objGC = new GoogleCategories;
 				  	$objGC->Name = $strLine;
 				  	$arrItems = array_filter(explode(" > ",$strLine));

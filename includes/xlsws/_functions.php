@@ -1024,6 +1024,24 @@ function _xls_get_crumbtrail($type = 'full') {
 		
 }
 
+/**
+ * Retrieve Google Category based on Product RowId
+ * @param int $intProductRowid
+ * @return $string
+ */
+function _xls_get_googlecategory($intProductRowid) {
+
+	$result = _dbx("select c.name as google_category from xlsws_product_category_assn as a left join xlsws_category as b on a.category_id=b.rowid left join xlsws_google_categories as c on b.google_id=c.rowid where a.product_id=".$intProductRowid,"Query");
+	$objGoogle = $result->FetchObject();
+	$strLine = $objGoogle->google_category;
+	$strLine = str_replace("&","&amp;",$strLine);
+	$strLine = str_replace(">","&gt;",$strLine);
+	
+	return trim($strLine);		  	
+				  	
+}
+
+
 
 
 /**
