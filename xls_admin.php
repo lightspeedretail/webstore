@@ -6164,7 +6164,7 @@
 			
 			$this->arrMPnls['flushCategories'] = new QPanel($this);
 			$this->arrMPnls['flushCategories']->Visible = false;
-			$this->arrMPnls['flushCategories']->Name = _sp('Flush Deleted Categories');
+			$this->arrMPnls['flushCategories']->Name = _sp('Purge Deleted Categories');
 			$this->arrMPnls['flushCategories']->HtmlEntities = false;			
 			$this->arrMPnls['flushCategories']->ToolTip= _sp('In some cases, deletion of categories or caching of categories may require a purge, press this button if you are experiencing mismatches in your category tree');
 			
