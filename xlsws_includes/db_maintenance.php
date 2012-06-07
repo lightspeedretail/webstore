@@ -568,6 +568,17 @@ class xlsws_db_maintenance extends xlsws_index {
 				$objItem->Save();
 
 			}
+		
+		
+			//Cart flash messages table
+			$this->add_table('xlsws_cart_messages' , "CREATE TABLE `xlsws_cart_messages` (
+			  `rowid` int(11) unsigned NOT NULL AUTO_INCREMENT,
+			  `cart_id` bigint(20) DEFAULT NULL,
+			  `message` text,
+			  PRIMARY KEY (`rowid`),
+			  KEY `cart_id` (`cart_id`)
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
+
 
 
 
