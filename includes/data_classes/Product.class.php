@@ -656,6 +656,51 @@ class Product extends ProductGen {
 	}
 
 	/**
+	 * For a product, returns tax rate for all defined destinations
+	 * Useful for RSS exports
+	 * @return TaxGrid[]
+	*/
+	public function GetTaxRateGrid() {
+		
+		$arrGrid = array();
+		$intTaxStatus = $this->FkTaxStatusId;
+		$objStatus = TaxStatus::Load($intTaxStatus);
+		$objDestinations = Destination::LoadAll();
+
+		foreach ($objDestinations as $objDestination) {
+			//Because of differences in how Google defines zip code ranges, we can't convert our ranges
+			//to theirs. At this time we won't be able to support zip code ranges
+			if ($objDestination->Country != '*' && $objDestination->Zipcode1 == '') {
+			
+				$objTaxCode = TaxCode::Load($objDestination->Taxcode);
+				//print_r($objTaxCode);
+				$fltRate = 0.0;
+				for ($x=1; $x<=5; $x++) {
+					$statusstring = "Tax".$x."Status";
+					$codestring = "Tax".$x."Rate";
+					if ($objStatus->$statusstring==0) $fltRate += $objTaxCode->$codestring;
+				}
+				
+				//Our four elements
+				$strCountry = $objDestination->Country;
+				if ($objDestination->State != '*')
+					$strState = $objDestination->State; 
+				else 
+					$strState = '';
+				//$fltRate -- built above
+				$strTaxShip = _xls_get_conf('SHIPPING_TAXABLE','0') == '1' ? "y" : "n";
+				$arrGrid[] = array($strCountry,	$strState,$fltRate,$strTaxShip);
+			
+			}
+		}
+		
+		return $arrGrid;
+		
+		
+
+	}
+
+	/**
 	 * Load an array of Product objects,
 	 * by FkProductMasterId Index(es) ordered by rowid
 	 * @param integer $intFkProductMasterId

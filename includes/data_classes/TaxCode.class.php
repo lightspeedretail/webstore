@@ -55,6 +55,9 @@ class TaxCode extends TaxCodeGen {
 		if (strtolower($this->Code) == 'no tax')
 			return true;
 
+		if (strtolower($this->Code) == 'notax')
+			return true;
+			
 		$total = $this->Tax1Rate +
 			$this->Tax2Rate +
 			$this->Tax3Rate +

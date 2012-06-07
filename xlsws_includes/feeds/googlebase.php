@@ -21,12 +21,13 @@ echo '		<link>'._xls_site_url().'</link>'.chr(13);
 echo '		<description>'._xls_get_conf('STORE_DEFAULT_SLOGAN').'</description>'.chr(13);
 
 		     
-$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 ".$strQueryAddl." ORDER BY rowid limit 10", "Query");
+$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 ".$strQueryAddl." ORDER BY rowid limit 1", "Query");
 while ($objItem = $arrProducts->FetchObject()) {
 	$objProduct = Product::Load($objItem->rowid);
 	
 	$strGoogle = _xls_get_googlecategory($objProduct->Rowid);
 
+	$arrTaxGrids = $objProduct->GetTaxRateGrid();
 	
   echo '<item>'.chr(13);
       echo chr(9)."<g:id>".$objProduct->Rowid."</g:id>".chr(13);
@@ -42,11 +43,11 @@ while ($objItem = $arrProducts->FetchObject()) {
 		//echo chr(9).'<g:additional_image_link>http://www.foryarnssake.com/store/'.$objProduct->Image.'</g:additional_image_link>'.chr(13);
 		echo chr(9).'<g:condition>new</g:condition>'.chr(13);
 	   
-	  	if($intStockHandling==2 || $objProduct->IsAvailable)
+	  	if($objProduct->IsAvailable)
 	   		echo chr(9).'<g:availability>in stock</g:availability>'.chr(13);
-	   	elseif ($intStockHandling==2 || $objProduct->Inventory<=0)
+	   	elseif ($intStockHandling==2 && $objProduct->Inventory<=0)
 	   		echo chr(9).'<g:availability>available for order</g:availability>'.chr(13);
-	    elseif ($intStockHandling==1 || $objProduct->Inventory()<=0)
+	    elseif ($intStockHandling==1 && $objProduct->Inventory()<=0)
 	   		echo chr(9).'<g:availability>out of stock</g:availability>'.chr(13);
 	   
 	   echo chr(9).'<g:price>'.$objProduct->Price.'</g:price>'.chr(13);
@@ -59,14 +60,15 @@ while ($objItem = $arrProducts->FetchObject()) {
 
 		if ($objProduct->FkProductMasterId>0)
 			echo '<item_group_id>'.$objProduct->FkProductMasterId.'</item_group_id>'.chr(13);
-	   /*
-		<g:tax>
-		   <g:country>US</g:country>
-		   <g:region>MA</g:region>
-		   <g:rate>5.00</g:rate>
-		   <g:tax_ship>y</g:tax_ship>
-		</g:tax>	   
-	   */
+		
+		foreach ($arrTaxGrids as $arrTaxGrid) {			
+			echo '<g:tax>'.chr(13);
+			echo '   <g:country>'.$arrTaxGrid[0].'</g:country>'.chr(13);
+			echo '  <g:region>'.$arrTaxGrid[1].'</g:region>'.chr(13);
+			echo '  <g:rate>'.$arrTaxGrid[2].'</g:rate>'.chr(13);
+			echo '  <g:tax_ship>'.$arrTaxGrid[3].'</g:tax_ship>'.chr(13);
+			echo '</g:tax>	'.chr(13);   
+		}	   
 	   
 	   echo chr(9).'<g:shipping_weight>'.$objProduct->ProductWeight.'</g:shipping_weight>'.chr(13);
 
