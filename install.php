@@ -801,21 +801,6 @@ EOT;
 								
 
 				
-				$dbencodingname = $this->iControl('dbencodingname' , 'QLabel');
-				$dbencodingname->Text = "Database Encoding";
-				$dbencodingname->CssClass = "label";
-								
-				$dbencoding = $this->iControl('dbencoding' , 'QListBox');
-				if($dbencoding->ItemCount==0){
-					$dbencoding->Width = "350";
-					$dbencoding->AddItem('UTF8', 'utf8');
-				}
-				$dbencoding->Required = true;
-				$dbencoding->DisplayStyle = QDisplayStyle::Block;				
-				
-				
-				
-				
 				$this->pnlInstall->CssClass = "db_settings";
 				
 			}
@@ -872,8 +857,7 @@ EOT;
 					$dbuser = $this->GetControl('dbuser');
 					$dbpass = $this->GetControl('dbpass');
 					$dbport = $this->GetControl('dbport');
-					$db = $this->GetControl('db');							
-					$dbencoding = $this->GetControl('dbencoding');							
+					$db = $this->GetControl('db');														
 					
 					$pass = $this->GetControl('storepass');
 					$tz = $this->GetControl('storetz');
@@ -897,7 +881,6 @@ EOT;
 						<strong>Database Username</strong> : %s <br/>
 						<strong>Database Password</strong> : %s <br/>
 						<strong>Database</strong> : %s <br/>
-						<strong>Database Encoding</strong> : %s <br/>
 						<br/>
 						<br/>
 						<strong>Timezone</strong> : %s <br/>
@@ -915,7 +898,6 @@ EOT;
 						,	$dbuser->Text
 						,	$this->password_obs($dbpass->Text)
 						,   $db->Text
-						,   $dbencoding->SelectedValue
 						,	$tz->SelectedValue
 						,	$this->password_obs($pass->Text)
 						);
@@ -1232,8 +1214,7 @@ EOT;
 					$dbuser = $this->GetControl('dbuser');
 					$dbpass = $this->GetControl('dbpass');
 					$dbport = $this->GetControl('dbport');
-					$db = $this->GetControl('db');							
-					$dbencoding = $this->GetControl('dbencoding');							
+					$db = $this->GetControl('db');													
 					
 
 					$tz = $this->GetControl('storetz');							
@@ -1254,7 +1235,7 @@ EOT;
 						return;
 					}
 					
-				$charset = "utf8";
+				
 				
 				//ToDo: Check for existance of tables and if they exist, skip this and go to the end. 
 				//This way we can run an install in a new folder with an existing db without destroying everything
@@ -1341,7 +1322,7 @@ EOT;
   KEY `submitted` (`submitted`),
   KEY `gift_registry` (`gift_registry`),
   KEY `downloaded` (`downloaded`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
 				echo "Creating table Cart.<br/>";
@@ -1372,7 +1353,7 @@ $sql = "CREATE TABLE `xlsws_cart_item` (
   KEY `code` (`code`),
   KEY `product_id` (`product_id`),
   KEY `gift_registry_item` (`gift_registry_item`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
 				echo "Creating table Cart Items.<br/>";
@@ -1396,7 +1377,7 @@ $sql = "CREATE TABLE `xlsws_cart_item` (
   PRIMARY KEY  (`rowid`),
   KEY `name` (`name`),
   KEY `parent` (`parent`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
 				echo "Creating table Category.<br/>";
@@ -1433,7 +1414,7 @@ $sql = "CREATE TABLE `xlsws_cart_item` (
   PRIMARY KEY  (`rowid`),
   UNIQUE KEY `key` (`key`),
   KEY `configuration_type_id` (`configuration_type_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
 				echo "Creating table Configration.<br/>";
@@ -1550,7 +1531,7 @@ $sql[]= "INSERT into `xlsws_configuration` VALUES (NULL,'Database Schema Version
   PRIMARY KEY  (`rowid`),
   UNIQUE KEY `code` (`code`),
   KEY `avail` (`avail`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
 				echo "Creating country Table.<br/>";
@@ -1826,7 +1807,7 @@ $sql[] = "INSERT INTO `xlsws_country` VALUES (242, 'EU', '', '', 'Y', 10, 'Europ
   `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`rowid`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
 					
@@ -1907,7 +1888,7 @@ $sql[] = "INSERT INTO `xlsws_credit_card` VALUES (12, 'Visa Electron', '16', '41
   `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`rowid`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
 					
@@ -1933,7 +1914,7 @@ $sql[] = "INSERT INTO `xlsws_credit_card` VALUES (12, 'Visa Electron', '16', '41
   `product_tag` varchar(255) default NULL,
   PRIMARY KEY  (`rowid`),
   UNIQUE KEY `key` (`key`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				echo "Creating Custom pages Table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_custom_page`;");
@@ -1984,7 +1965,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
   `ship_rate` float default NULL,
   `modified` timestamp NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`rowid`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				echo "Creating Destinations Table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_destination`;");
@@ -1997,7 +1978,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
   `family` varchar(255) NOT NULL,
   PRIMARY KEY  (`rowid`),
   UNIQUE KEY `Family` (`family`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				echo "Creating Families Table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_family`;");
@@ -2019,7 +2000,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
   PRIMARY KEY  (`rowid`),
   UNIQUE KEY `gift_code` (`gift_code`),
   KEY `customer_id` (`customer_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				echo "Creating Gift Registry Table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_gift_registry`;");
@@ -2042,7 +2023,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
   UNIQUE KEY `rowid` (`rowid`,`registry_id`),
   KEY `registry_id` (`registry_id`),
   KEY `product_id` (`product_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
 				echo "Creating Gift Registry Items table.<br/>";
@@ -2063,7 +2044,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
   PRIMARY KEY  (`rowid`),
   KEY `registry_id` (`registry_id`),
   KEY `customer_id` (`customer_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
 				echo "Creating Gift Registry Receipients table.<br/>";
@@ -2086,7 +2067,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
   PRIMARY KEY  (`rowid`),
   UNIQUE KEY `width` (`width`,`height`,`parent`),
   KEY `parent` (`parent`)
-) ENGINE=MyISAM";
+) ENGINE=MyISAM CHARSET=utf8";
 				
 				
 				
@@ -2104,7 +2085,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
   `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`rowid`),
   KEY `visitor_id` (`visitor_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
 				echo "Creating System Logs table.<br/>";
@@ -2123,7 +2104,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
   `created` datetime default NULL,
   PRIMARY KEY  (`rowid`),
   UNIQUE KEY `file` (`file`,`type`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
 				echo "Creating Modules table.<br/>";
@@ -2194,7 +2175,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
   FULLTEXT KEY `description` (`description`),
   FULLTEXT KEY `name_2` (`name`),
   FULLTEXT KEY `code_2` (`code`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
 				echo "Creating Products table.<br/>";
@@ -2209,7 +2190,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
   `product_id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL,
   PRIMARY KEY  (`product_id`,`category_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset;";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 				
 				
 				echo "Creating Product-Category Relation table.<br/>";
@@ -2223,7 +2204,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
   `product_id` int(11) NOT NULL,
   `image_id` int(11) NOT NULL,
   KEY `product_id` (`product_id`,`image_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset;";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 				
 				
 				echo "Creating Product-Image Relation table.<br/>";
@@ -2241,7 +2222,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
   PRIMARY KEY  (rowid),
   KEY product_id (product_id),
   KEY product_id_2 (product_id,pricing_level)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset;";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 				
 				echo "Creating Qty Pricing table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_product_qty_pricing`;");
@@ -2262,7 +2243,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
   UNIQUE KEY `product_id` (`product_id`,`related_id`),
   KEY `product_id_2` (`product_id`),
   KEY `related_id` (`related_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
 				echo "Creating Related Product table.<br/>";
@@ -2291,7 +2272,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
   UNIQUE KEY `ls_id` (`ls_id`),
   KEY `cart_id` (`cart_id`),
   KEY `customer_email_phone` (`customer_email_phone`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
 				echo "Creating SRO table.<br/>";
@@ -2311,7 +2292,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
   `datetime_mod` timestamp NULL default NULL,
   PRIMARY KEY  (`rowid`),
   KEY `sro_id` (`sro_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=$charset;";
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;";
 				
 				
 				echo "Creating SRO Repair table.<br/>";
@@ -2332,7 +2313,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
   UNIQUE KEY `cs` (`country_code`,`code`),
   KEY `code` (`code`),
   KEY `country_code` (`country_code`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				echo "Creating State/Region table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_state`;");
@@ -2630,7 +2611,7 @@ $sql[] = "INSERT INTO `xlsws_state` VALUES (284, 'GB', 'WRX', 'Y', 10, 'Wrexham'
   `compounded` tinyint(1) default '0',
   PRIMARY KEY  (`rowid`),
   KEY `tax` (`tax`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 					
 				echo "Creating tax table.<br/>";
@@ -2650,7 +2631,7 @@ $sql[] = "INSERT INTO `xlsws_state` VALUES (284, 'GB', 'WRX', 'Y', 10, 'Wrexham'
   `tax5_rate` double NOT NULL default '0',
   PRIMARY KEY  (`rowid`),
   UNIQUE KEY `code` (`code`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 					
 				echo "Creating tax code.<br/>";
@@ -2668,7 +2649,7 @@ $sql[] = "INSERT INTO `xlsws_state` VALUES (284, 'GB', 'WRX', 'Y', 10, 'Wrexham'
   `tax4_status` tinyint(1) NOT NULL default '1',
   `tax5_status` tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (`rowid`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 					
 				echo "Creating tax status.<br/>";
@@ -2693,7 +2674,7 @@ $sql[] = "INSERT INTO `xlsws_state` VALUES (284, 'GB', 'WRX', 'Y', 10, 'Wrexham'
   KEY `visitor_id` (`visitor_id`),
   KEY `log_type_id` (`log_type_id`),
   KEY `resource_id` (`resource_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 					
 				echo "Creating View Log.<br/>";
@@ -2711,7 +2692,7 @@ $sql[] = "INSERT INTO `xlsws_state` VALUES (284, 'GB', 'WRX', 'Y', 10, 'Wrexham'
   `lscodes` longtext NOT NULL,
   `threshold` double NOT NULL,
   PRIMARY KEY  (`rowid`)
-) ENGINE=MyISAM  DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8";
 				
 					
 				echo "Creating Promo Codes.<br/>";
@@ -2724,7 +2705,7 @@ $sql[] = "INSERT INTO `xlsws_state` VALUES (284, 'GB', 'WRX', 'Y', 10, 'Wrexham'
   `end_price` double default '0',
   `rate` double default '0',
   PRIMARY KEY  (`rowid`)
-) ENGINE=MyISAM  DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8";
 				
 					
 				echo "Creating Shipping Tiers.<br/>";
@@ -2740,7 +2721,7 @@ $sql[] = "INSERT INTO `xlsws_state` VALUES (284, 'GB', 'WRX', 'Y', 10, 'Wrexham'
   PRIMARY KEY  (`intSessionId`),
   KEY `idxName` (`vchName`),
   KEY `idxExpires` (`uxtExpires`)
-) ENGINE=MyISAM  DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8";
 				
 					
 				echo "Creating Sessions Table.<br/>";
@@ -2753,7 +2734,7 @@ $sql[] = "INSERT INTO `xlsws_state` VALUES (284, 'GB', 'WRX', 'Y', 10, 'Wrexham'
   `name` varchar(32) NOT NULL,
   PRIMARY KEY  (`rowid`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 					
 				echo "Creating View Log Types.<br/>";
@@ -2805,7 +2786,7 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
   `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`rowid`),
   KEY `customer_id` (`customer_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=$charset";
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 					
 				echo "Creating Visitor.<br/>";
