@@ -484,12 +484,13 @@ background:url(images/header.png) repeat-x;
 font-size:12px;
 height:44px;
 overflow:hidden;
+text-shadow:none;
 }
 
 .header a {
 color:#fff;
 text-decoration:none;
-text-shadow:#222 -1px -1px 0;
+text-shadow:none;
 }
 
 .ttitle {
@@ -502,6 +503,7 @@ text-shadow:#fff -1px -1px -1px;
 }
 
 .paginator {
+color:#111;
 font-size:11px;
 margin:5px 10px 4px 0;
 text-align:right;
@@ -510,7 +512,7 @@ text-align:right;
 .paginator a {
 color:#111;
 text-decoration:none;
-text-shadow:#fff -1px -1px -1px;
+text-shadow:none;
 }
 
 .row {
@@ -671,6 +673,9 @@ font-size: 10px;
 .edit_height {
 height: 600px;
 }
+.googlecats_height {
+height: 2600px;
+}
 
 
 #customer_registration fieldset,.border fieldset,fieldset,#checkout fieldset,.xlsfset fieldset {
@@ -777,7 +782,11 @@ height:10px;
 margin-left: 00px;
 
 }
-
+#editcontainer .short_row {
+clear: both;
+height:20px;
+margin-left: 00px;
+}
 
 #editcontainer .basic_row {
 clear: both;
@@ -806,6 +815,35 @@ height: 20px;
 	font-size:8pt;
 	height: 15px;
 }
+
+#editcontainer .tinyfont
+{
+	font-size:6pt;
+	height: 12px;
+	width: 147px;
+}
+#editcontainer .colgoogle
+{
+float: left;
+width:150px;
+
+}
+#editcontainer .tinyfont2
+{
+	font-size:6pt;
+	height: 12px;
+	width: 80px;
+}
+#editcontainer .colgoogle2
+{
+	float: left;
+	width:82px;
+}
+.rowgrey {
+background: #ddd;
+height: 10px;
+}
+
 #editcontainer .largefont
 {
 	font-size:10pt;
@@ -830,6 +868,8 @@ font-weight: bold;
 text-shadow: none;
 padding-top: 2px;
 }
+
+
 #editcontainer .colfield
 {
 float: left;

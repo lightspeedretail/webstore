@@ -19,8 +19,8 @@
  */
 
 /**
- * Web Admin panel template called by xlsws_admin class
- * General use for item editing
+ * Web Admin panel template called by xlsws_admin_cpage_panel class
+ * Used for listing/adding custom pages to edit
  * 
  *
  */
@@ -32,14 +32,9 @@
 	<title><?php _xt("Admin configuration") ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?= _xls_get_conf('CHARSET' , 'utf-8') ?>" />
 	
-
-	<link rel="stylesheet" type="text/css" href="<?= adminTemplate('css/admin.css') ?>" />
-	<link rel="stylesheet" type="text/css" href="<?= adminTemplate('css/superfish.css') ?>" />
-	
     <script type="text/javascript" src="<?=  adminTemplate('js/jquery.min.js');  ?>"></script>     
     <script type="text/javascript" src="<?=  adminTemplate('js/jquery.ui.js');  ?>"></script>     
 	<script type="text/javascript" src="<?=  adminTemplate('js/admin.js'); ?>"></script>
-
 	<script type="text/javascript" src="<?=  adminTemplate('js/corners.js'); ?>"></script>
 
 	<script type="text/javascript"> 
@@ -69,21 +64,28 @@
     $($('#featureElementsc_info .feature')[n]).show();
   }
   </script>
+			
+	<style type="text/css" xml:space="preserve">
+		/*<![CDATA[*/
+		      @import url(<?= adminTemplate('css/admin.css') ?>) all;
+			  @import url(<?= adminTemplate('css/superfish.css') ?>) all;
+		/*]]>*/
+	</style>
 	
 </head>
-<body>
-
-<?php include_once(adminTemplate('pages.tpl.php')); ?>
-
-
-<?php $this->RenderBegin(); ?>
-
+<body> 
+<?php 
+	
+	include_once(adminTemplate('pages.tpl.php'));
+	$this->RenderBegin(); 
+	
+?>
 
 
 		<br /><br />
 			
-		<div id="options" class="accord rounded" style="width:890px" > 
-		<div id="tabs" style="margin-top: -43px;">
+		<div id="options" class="accord rounded"> 
+		<div id="tabs">
 			<ul>
 				<?php foreach($this->arrTabs as $type=>$label): ?>
 				<a href="<?= $this->get_uri($type); ?>" >
@@ -97,46 +99,51 @@
 				<?php endforeach; ?>
 			</ul>
 		</div>
-
-<div class="content">
 <?php
 
 if(isset($this->HelperRibbon)) 
 	if (strlen($this->HelperRibbon)>0)
 		echo '<div style="padding: 5px;"><img style="padding-right: 5px;width:44px; height:35px;" align="left" src="'.adminTemplate('css/images/questionmark.png').'"> '.$this->HelperRibbon.'</div>';
 
-$this->dtgItems->Render('CssClass="rounded wide"');
-
-?>
-
-
-<div style="margin: -6px 0 0 0; background:  url(<?= adminTemplate('css/images/header.png') ?>); height: 37px;" class="rounded-bottom">
-<?php if($this->canNew()): ?>
-	<img src="<?= adminTemplate('css/images/btn_add.png') ?>" style="margin: 12px 5px 0 15px; display: block; float: left;" />
-	<div class="add" <?php $this->btnNew->RenderAsEvents(); ?>>Add</div>
-<?php endif; ?>
-</div>
-	
-<?php if($this->canFilter()): ?>
-	<div class="search">
-		<?php $this->txtSearch->Render('CssClass=searchBox'); ?>
-		<?php $this->btnSearch->Render('CssClass=searchButton button rounded' , 'Width=50'); ?>
+?>	
+	<div class="title rounded"> 
+		<div class="name" style="cursor:pointer;">Match Your Categories with Google Categories</div> 
+		<div style="float:right">
+			<?php $this->btnSave->Render('CssClass=button rounded'); ?><?php $this->btnCancel->Render('CssClass=button rounded'); ?></div> 
 	</div>
-<?php endif; ?>
-</div>
-</div>
+						
+						
+<div id="googlecats_height">
 
+	<div id='editcontainer'>
+		
+	<?php $x=1; 
+	foreach ($this->ctlRows as $ctlRow) {
+		if ($x % 2 == 0) echo '<div class="short_row rowgrey">'; else echo '<div class="short_row">';
 
-<link rel="stylesheet" type="text/css" href="<?= adminTemplate('css/basic.css') ?>" media='screen'  />
-
-<!-- modal content -->
-		<div id="basic-modal-content">
-		Display Content Here
-		</div>
-<script type='text/javascript' src='<?= adminTemplate('js/jquery.js') ?>'></script>
-<script type='text/javascript' src='<?= adminTemplate('js/jquery.simplemodal.js') ?>'></script>
-<script type='text/javascript' src='<?= adminTemplate('js/basic.js') ?>'></script>
-<?php $this->RenderEnd(); ?>	
+		$intY=0;
+		
+		foreach ($ctlRow as $ctlRowItem) {
+			if ($intY==0)
+				echo '<div class="collabel">&nbsp;&nbsp;'; 
+			elseif ($intY>3)
+				echo '<div class="colgoogle2">'; 
+			else
+				 echo '<div class="colgoogle">'; 
+			$ctlRowItem->Render(); 
+			echo '</div>';
+			$intY++;
+		}
+		echo '</div>';
+		echo '<div class="clear_float"></div>';
+		$x++;
+		} 
 	
-</body>
+	?>
+	
+	</div>			
+<?php $this->RenderEnd(); ?>
+ 
+</body> 
 </html>
+

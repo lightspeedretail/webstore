@@ -3392,7 +3392,7 @@
 		protected $dtgItems;
 		
 		protected $arrFields;
-		
+		protected $arrExtraFields;
 		
 		protected $btnSave;
 		protected $btnCancel;
@@ -3468,6 +3468,20 @@
 				//Change the fields parent
 				$this->arrFields[$field]['Field']->SetParentControl($this->dtgItems);
 			}
+			
+			//Extra fields that are not tied to a database field. Each expects its own Render command from its class.
+			foreach($this->arrExtraFields as $field=>$properties){
+				$this->dtgItems->AddColumn(new QDataGridColumn(
+							$properties['Name'], '<?= $_FORM->'.str_replace(" ","_",$properties['DisplayFunc']).'($_ITEM , \'' . $field  . '\') ?>'
+							, 'CssClass=' . (isset($properties['CssClass'])?$properties['CssClass']:"gencol")
+							, (isset($properties['Width'])?"Width=".$properties['Width']." " : "Wrap=false ")
+							, 'HtmlEntities=false'
+							)
+							);
+			
+			}
+			
+			
 			// Again, we setup the "Edit" column and ensure that the column's HtmlEntities is set to false
 			$this->dtgItems->AddColumn(new QDataGridColumn(' ', '<?= $_FORM->EditColumn_Render($_ITEM) ?>', 'CssClass=edit', 'HtmlEntities=false'));
 			if($this->canDelete())
@@ -3487,6 +3501,8 @@
 
 			$objStyle = $this->dtgItems->HeaderRowStyle;
 			$objStyle->CssClass = "header";
+			$objStyle->ForeColor = 'white';
+			
 
 			// Because browsers will apply different styles/colors for LINKs
 			// We must explicitly define the ForeColor for the HeaderLink.
@@ -5147,17 +5163,31 @@
 			foreach($this->objItems as $objItem)
 				$this->arrFields['CustomPage']['Field']->AddItem($objItem->Title , $objItem->Key);
 
-	
-			$this->arrFields['GoogleId'] = array('Name' => 'Google Category');
-			$this->arrFields['GoogleId']['Field'] = new XLSListBox($this);		
-			$this->arrFields['GoogleId']['DisplayFunc'] = "RenderImage";
-			$this->arrFields['GoogleId']['Field']->AddItem('None', NULL);
-			$arrItems = _dbx("SELECT * FROM xlsws_google_categories ORDER BY name", "Query");
-			while ($objItem = $arrItems->FetchObject())
-				$this->arrFields['GoogleId']['Field']->AddItem($objItem->name , $objItem->rowid);
+	/*
+			$this->arrExtraFields['GoogleId'] = array('Name' => 'Google Category');
+			$this->arrExtraFields['GoogleId']['Field'] = new XLSListBox($this);		
+			$this->arrExtraFields['GoogleId']['DisplayFunc'] = "GoogleId_Render";
+			$this->arrExtraFields['GoogleId']['CssClass'] = 'tinyfont';
+			$this->arrExtraFields['GoogleId']['Field']->AddItem('None', NULL);
+	*/		
+			
+			$this->arrExtraFields['GoogleId'] = array('Name' => 'Google Category');
+			$this->arrExtraFields['GoogleId']['Field'] = new QButton($this);
+			$this->arrExtraFields['GoogleId']['DisplayFunc'] = "GoogleId_Render";
+			$this->arrExtraFields['GoogleId']['Field']->Text = 'Set'; // add css of modal window to open it
+			$this->arrExtraFields['GoogleId']['CssClass'] = 'basic';
+			
+			//$this->arrExtraFields['GoogleId'] = QApplication::Translate('Create a New') . ' ' . QApplication::Translate('User');
+//$this->btnCreateNew->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnCreateNew_Click'));
 
 
-			/*
+			
+			//$arrItems = _dbx("SELECT * FROM xlsws_google_categories ORDER BY name", "Query");
+			//while ($objItem = $arrItems->FetchObject())
+			//	$this->arrFields['GoogleId']['Field']->AddItem($objItem->name , $objItem->rowid);
+
+/*
+			
 
 			$this->arrFields['ImageId'] = array('Name' => 'Use Image');
 			$this->arrFields['ImageId']['Field'] = new XLSListBox($this);		
@@ -5175,8 +5205,14 @@
 			parent::Form_Create();
 			
 			
+			
 		}
 		
+		public function GoogleId_Render() {
+			return "<a href='#' class='basic'>Demo</a>";
+		}
+		
+
 		public function RenderCustom($val){
 			foreach($this->objItems as $objItem)
 				if($objItem->Key == $val)
@@ -5208,7 +5244,10 @@
 		public function canNew(){
 			return false;
 		}
-		
+		public function canDelete(){
+			return false;
+		}
+
 	}	
 	
 		/* class xlsws_admin_states
@@ -5222,16 +5261,92 @@
 		protected $objItems;
 		protected $objImages;
 		
+		protected $dtgItems;
+		protected $ctlRows;
+
+		protected $btnCancel;
+		protected $btnSave;
+		
 		protected function Form_Create(){
 			
 			$this->arrTabs = $GLOBALS['arrSeoTabs'];
 			$this->currentTab = 'googlecategories';
 			
+			$this->btnCancel = new QButton($this);
+			$this->btnCancel->Text = _sp("Cancel");
+			$this->btnCancel->CssClass = 'admin_cancel';
+			$this->btnCancel->AddAction( new QClickEvent() , new QAjaxAction('btnCancel_Click'));
+			
+			
+			
+			$this->btnSave = new QButton($this);
+			$this->btnSave->Text = _sp("Save");
+			$this->btnSave->CssClass = 'admin_save';
+			$this->btnSave->AddAction( new QClickEvent() , new QServerAction('btnSave_Click'));
+			$this->btnSave->CausesValidation = true;
+			
 			
 			QApplication::$EncodingType = "UTF-8";
+			
+			for ($x=1; $x<=25; $x++) {
+			
+				$ctlEdit = array();
 
+				$ctlEdit['ctlCategory'.$x] = new QLabel($this,'ctlCategory'.$x);
+				$ctlEdit['ctlCategory'.$x]->CssClass= 'smallfont';
+				$ctlEdit['ctlCategory'.$x]->Text = "blahbh-ab-asdf-asdf--asd-f";
+				
+				$ctlEdit['ctlCategory1'.$x] = array('Name' => 'Google Category');
+				$ctlEdit['ctlCategory1'.$x] = new XLSListBox($this);		
+				$ctlEdit['ctlCategory1'.$x]->AddItem('', NULL);
+				$arrItems = _dbx("SELECT DISTINCT name1 FROM xlsws_google_categories ORDER BY name1", "Query");
+				while ($objItem = $arrItems->FetchObject())
+					$ctlEdit['ctlCategory1'.$x]->AddItem($objItem->name1 , $objItem->name1);
+				$ctlEdit['ctlCategory1'.$x]->CssClass= 'tinyfont';
+
+				
+				$ctlEdit['ctlCategory2'.$x] = array('Name' => 'Google Category');
+				$ctlEdit['ctlCategory2'.$x] = new XLSListBox($this);		
+				$ctlEdit['ctlCategory2'.$x]->AddItem('', NULL);
+				$ctlEdit['ctlCategory2'.$x]->CssClass= 'tinyfont';
+				
+				$ctlEdit['ctlCategory3'.$x] = array('Name' => 'Google Category');
+				$ctlEdit['ctlCategory3'.$x] = new XLSListBox($this);		
+				$ctlEdit['ctlCategory3'.$x]->AddItem('', NULL);
+				$ctlEdit['ctlCategory3'.$x]->CssClass= 'tinyfont';
+
+
+				$ctlEdit['ctlCategory4'.$x] = array('Name' => 'Google Category');
+				$ctlEdit['ctlCategory4'.$x] = new XLSListBox($this);		
+				$ctlEdit['ctlCategory4'.$x]->AddItem('', NULL);
+				$ctlEdit['ctlCategory4'.$x]->CssClass= 'tinyfont2';
+
+
+				$ctlEdit['ctlCategory5'.$x] = array('Name' => 'Google Category');
+				$ctlEdit['ctlCategory5'.$x] = new XLSListBox($this);		
+				$ctlEdit['ctlCategory5'.$x]->AddItem('', NULL);
+				$ctlEdit['ctlCategory5'.$x]->CssClass= 'tinyfont2';
+
+
+				$ctlEdit['ctlCategory6'.$x] = array('Name' => 'Google Category');
+				$ctlEdit['ctlCategory6'.$x] = new XLSListBox($this);		
+				$ctlEdit['ctlCategory6'.$x]->AddItem('', NULL);
+				$ctlEdit['ctlCategory6'.$x]->CssClass= 'tinyfont2';
+
+
+				$ctlEdit['ctlCategory7'.$x] = array('Name' => 'Google Category');
+				$ctlEdit['ctlCategory7'.$x] = new XLSListBox($this);		
+				$ctlEdit['ctlCategory7'.$x]->AddItem('', NULL);
+				$ctlEdit['ctlCategory7'.$x]->CssClass= 'tinyfont2';
+
+				
+				$this->ctlRows[] = $ctlEdit;
+				
+			}	
+			
+			
 		
-			$this->className = "Category";
+			/*$this->className = "Category";
 			$this->blankObj = new Category();
 			$this->qqn = QQN::Category();
 
@@ -5253,7 +5368,7 @@
 			$arrItems = _dbx("SELECT * FROM xlsws_google_categories ORDER BY name", "Query");
 			while ($objItem = $arrItems->FetchObject())
 				$this->arrFields['GoogleId']['Field']->AddItem($objItem->name , $objItem->rowid);
-*/
+
 
 			$this->arrFields['Name1'] = array('Name' => 'Google Category');
 			$this->arrFields['Name1']['Field'] = new XLSListBox($this);
@@ -5275,8 +5390,8 @@
 			
 			$this->arrFields['Name7'] = array('Name' => 'Google Category');
 			$this->arrFields['Name7']['Field'] = new XLSListBox($this);
-
-			$this->HelperRibbon = "Match your Web Categories to their respective Google categories for Google Shopping integration.";
+*/
+			//$this->HelperRibbon = "Match your Web Categories to their respective Google categories for Google Shopping integration.";
 			parent::Form_Create();
 			
 			
@@ -6749,7 +6864,7 @@
 					xlsws_seo_categories::Run('xlsws_seo_categories' , adminTemplate('edit.tpl.php'));
 					break;
 				case "googlecategories":
-					xlsws_seo_googlecategories::Run('xlsws_seo_googlecategories' , adminTemplate('edit.tpl.php'));
+					xlsws_seo_googlecategories::Run('xlsws_seo_googlecategories' , adminTemplate('googlecats.tpl.php'));
 					break;
 				default:
 				case "general":
