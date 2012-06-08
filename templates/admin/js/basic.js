@@ -12,30 +12,35 @@
  */
 
 jQuery(function ($) {
-	// Load dialog on page load
-	//$('#basic-modal-content').modal();
+	var choosegoogle = {
+		message: null,
+		init: function () {
+			$('.basic').click(function (e) {
+				//$('#basic-modal-content').modal();
+				// load the contact form using ajax
+						$.get("xls_admin_js.php", function(data){
+							// create a modal dialog with the data
+							$('#basic-modal-content').html(data);
+							
+							});
+					
+				$('#basic-modal-content').modal({
+					onClose: choosegoogle.close }
+					);		
 
-	// Load dialog on click
-	$('.basic').click(function (e) {
-		//$('#basic-modal-content').modal();
-		// load the contact form using ajax
-				$.get("xls_admin_js.php", function(data){
-					// create a modal dialog with the data
-					$(data).modal({
-						closeHTML: "<a href='#' title='Close' class='modal-close'>x</a>",
-						position: ["15%",],
-						overlayId: 'contact-overlay',
-						containerId: 'contact-container'
-						//,
-						//onOpen: contact.open,
-						//onShow: contact.show,
-						//onClose: contact.close
-					});
-				});
-				
-		$('#basic-modal-content').modal();		
-		return false;
-	});
+			});
+	
+		},
+		close: function () {
+			alert("box was closed");
+			$.modal.close();
+		}
+	
+	};
+
+	choosegoogle.init();
+
+
 });
 
 jQuery(function ($) {
