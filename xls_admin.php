@@ -3536,14 +3536,15 @@
 			
 		}
 
+		
 		protected function dtgItems_Bind() {
 
 			$className = $this->className;
-			$cond = array(); 
+			
 			
 			
 			if(($this->txtSearch->Text != '') && ($this->txtSearch->Text != $this->helperText)) {
-
+				$cond = array(); 
 				foreach($this->arrFields as $field=>$properties) {
 				
 					if(isset($properties['NoSearch']))
@@ -3554,14 +3555,14 @@
 			} else	
 				$cond[] = new QQXLike($this->qqn->Rowid , '');
 			
-			//We set a condition for filtering, so use that instead
+			//We set a condition for filtering in the originating class, so use that instead
 			if (isset($this->qqcondition)) 
 				$cond = $this->qqcondition;
 			else
 				$cond = QQ::OrCondition($cond);
 			
-			if (isset($this->qqnot)) {
-
+			if (isset($this->qqnot)) { error_log("not1");
+				$this->dtgItems->TotalItemCount = $this->blankObj->QueryCount($cond);
 				$objItemsArray = $this->dtgItems->DataSource = 
 					$this->blankObj->QueryArray(
 						QQ::AndCondition($this->qqnot, $cond),
@@ -3572,7 +3573,7 @@
     		        );
     		        
     		  } else {
-    		  
+    		  	$this->dtgItems->TotalItemCount = $this->blankObj->CountAll();
     		  	$objItemsArray = $this->dtgItems->DataSource = 
 					$this->blankObj->QueryArray(
 						$cond,
@@ -3582,10 +3583,7 @@
     		        		)
     		        );
     		  }      
-    		        
-
-			$this->dtgItems->TotalItemCount = count($objItemsArray);
-			
+    		        			
 			
 			// If we are editing someone new, we need to add a new (blank) person to the data source
 			if ($this->intEditRowid == -1)
