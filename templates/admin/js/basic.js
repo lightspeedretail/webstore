@@ -18,7 +18,7 @@ jQuery(function ($) {
 			$('.basic').click(function (e) {
 				//$('#basic-modal-content').modal();
 				// load the contact form using ajax
-						$.get("xls_admin_js.php", function(data){
+						$.get("xls_admin_js.php?item=google", function(data){
 							// create a modal dialog with the data
 							$('#basic-modal-content').html(data);
 							

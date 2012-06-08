@@ -32,8 +32,24 @@ $SECIMG_DIR='includes/securimage';
 define('__PREPEND_QUICKINIT__', true);
 require('includes/prepend.inc.php');
 
-error_log("running this");
-echo "We're returning this from an xls_admin custom js page, so there";
+switch($_GET['item']) {
+	
+	case 'google':
+
+	
+		echo '<select name="c3" id="c3" class="tinyfont" >';
+		echo '<option value="1">One';
+		echo '</select>';	
+	
+	
+	break;
+	
+	
+	default:
+		echo '<p>';
+	
+	
+}
 
 
 ?>
