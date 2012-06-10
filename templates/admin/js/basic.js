@@ -41,6 +41,12 @@ jQuery(function ($) {
 	choosegoogle.init();
 
 
+	
+    $('#basic-cancel').click(function()
+    {
+	    choosegoogle.close;
+	 });
+
 });
 
 jQuery(function ($) {

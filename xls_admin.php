@@ -3577,7 +3577,7 @@
 			else
 				$cond = QQ::OrCondition($cond);
 			
-			if (isset($this->qqnot)) { error_log("not1");
+			if (isset($this->qqnot)) {
 				$this->dtgItems->TotalItemCount = $this->blankObj->QueryCount($cond);
 				$objItemsArray = $this->dtgItems->DataSource = 
 					$this->blankObj->QueryArray(

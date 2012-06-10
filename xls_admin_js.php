@@ -24,24 +24,27 @@
  
  */
 
-/** THIS SCRIPT IS USED TO GENERATE THE SECURIMAGE CAPTCHA THAT APPEAR ON THE CHECKOUT AND REGISTRATION PAGES, ALTER AT YOUR OWN RISK **/
+$strEnd = "<P>
+			<label>&nbsp;</label>
+			<button type='submit' class='basic-send contact-button' tabindex='1006'>Send</button>
+			<button type='submit' class='simplemodal-close' tabindex='1007'>Cancel</button>
+			<br/>
+			
+		</form>";
 
-$CURDIR = dirname(__FILE__);
-$SECIMG_DIR='includes/securimage';
-
-define('__PREPEND_QUICKINIT__', true);
 require('includes/prepend.inc.php');
 
 switch($_GET['item']) {
 	
 	case 'google':
-
-	
-		echo '<select name="c3" id="c3" class="tinyfont" >';
-		echo '<option value="1">One';
+		echo '<select name="google1" id="google1" class="tinyfont" >';
+		echo '<option value="0">--Choose--';
+		$arrItems = _dbx("SELECT DISTINCT name1 FROM xlsws_google_categories ORDER BY name1", "Query");
+			while ($objItem = $arrItems->FetchObject())
+			echo '<option value="'.$objItem->rowid.'">'.$objItem->name1;
 		echo '</select>';	
 	
-	
+		echo $strEnd;
 	break;
 	
 	
