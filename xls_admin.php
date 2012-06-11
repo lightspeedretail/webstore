@@ -615,7 +615,7 @@
 						"-Modified" => _sp("Most Recently Updated"),
 						"Code" => _sp("Product Code"), 
 						"SellWeb" => _sp("Price"), 
-						"InventoryAvail" => _sp("Available Inventory"),
+						"-InventoryAvail" => _sp("Most Inventory"),
 						"DescriptionShort" => _sp("Short Description"),
 						"WebKeyword1" => _sp("Keyword1"),
 						"WebKeyword2" => _sp("Keyword2"),
