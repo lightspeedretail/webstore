@@ -25,10 +25,10 @@
  */
 
 $strEnd = "<P>
-			<label>&nbsp;</label>
-			<button type='submit' class='basic-send contact-button' tabindex='1006'>Send</button>
-			<button type='submit' class='simplemodal-close' tabindex='1007'>Cancel</button>
-			<br/>
+			<div class='center'>
+			<button type='submit' class='basic-send'>Select</button>
+			<button class='basic-cancel'>Cancel</button>
+			<div/>
 			
 		</form>";
 
@@ -37,19 +37,61 @@ require('includes/prepend.inc.php');
 switch($_GET['item']) {
 	
 	case 'google':
-		echo '<select name="google1" id="google1" class="tinyfont" >';
+		echo '<h4>Choose the most appropriate Google Category for this item. Only the first level is required. If you receive a blank dropdown, that means there are no additional levels for that category.</h4>';
+		echo '<form>';
+		echo '<select name="google1" id="google1" class="tinyfont googleselect" >';
 		echo '<option value="0">--Choose--';
 		$arrItems = _dbx("SELECT DISTINCT name1 FROM xlsws_google_categories ORDER BY name1", "Query");
 			while ($objItem = $arrItems->FetchObject())
-			echo '<option value="'.$objItem->rowid.'">'.$objItem->name1;
-		echo '</select>';	
+			echo '<option value="'.$objItem->name1.'">'.$objItem->name1;
+		echo '</select>';
+		for($x=2; $x<=7; $x++) {	
+			echo '<br>'.str_repeat('&nbsp;',($x*2)).'<select disabled="true" name="google'.$x.'" id="google'.$x.'" class="tinyfont googleselect" >';
+			echo '<option value="0">';
+			echo '</select>';
+		}
 	
 		echo $strEnd;
 	break;
 	
+	case 'google1':
+	case 'google2':
+	case 'google3':
+	case 'google4':
+	case 'google5':
+	case 'google6':
+	case 'google7':
+
+		$arrCats = array();
+		$intLevel = _xls_number_only($_GET['lv']);
+		$strSelected = $_GET['selected'];
+		if ($intLevel<1 || $intLevel>9) $intLevel=1;
+		$strNext = "name".($intLevel+1);
+		
+		$strSql = "SELECT DISTINCT ".$strNext." FROM xlsws_google_categories WHERE name".$intLevel."='".$strSelected."' AND $strNext<>'' ORDER BY $strNext";
+				
+		$arrItems = _dbx($strSql, "Query");
+			while ($objItem = $arrItems->FetchObject())
+				$arrCats[$objItem->$strNext] = $objItem->$strNext;
+
+		echo json_encode($arrCats);
+	break;
+	
+	case 'current':
+		$intVal = _xls_number_only($_GET['val']); error_log("the numer is ".$intVal);
+		$objGoogleCategory = GoogleCategories::Load($intVal);
+		$arrCats=array();
+		for ($x=1; $x<=7; $x++) {
+			$strName = "Name".$x;
+			if (!is_null($objGoogleCategory->$strName))
+				$arrCats[$objGoogleCategory->$strName] = $objGoogleCategory->$strName;
+		} 
+		echo json_encode($arrCats);
+		
+	break;
 	
 	default:
-		echo '<p>';
+		echo json_encode(array());
 	
 	
 }

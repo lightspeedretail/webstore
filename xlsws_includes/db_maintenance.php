@@ -596,6 +596,7 @@ class xlsws_db_maintenance extends xlsws_index {
 				  `name8` varchar(255) DEFAULT NULL,
 				  `name9` varchar(255) DEFAULT NULL,
 				  PRIMARY KEY (`rowid`),
+				  KEY `name` (`name`),
 				  KEY `name1` (`name1`),
 				  KEY `name2` (`name2`),
 				  KEY `name3` (`name3`),
@@ -612,7 +613,7 @@ class xlsws_db_maintenance extends xlsws_index {
 				while(!feof($file)) {
 				  	$strLine = fgets($file);
 				  	$objGC = new GoogleCategories;
-				  	$objGC->Name = $strLine;
+				  	$objGC->Name = trim($strLine);
 				  	$arrItems = array_filter(explode(" > ",$strLine));
 				  	$objGC->Name1=trim($arrItems[0]);
 				  	$objGC->Name2=trim($arrItems[1]);

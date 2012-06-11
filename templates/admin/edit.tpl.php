@@ -42,16 +42,11 @@
 
 	<script type="text/javascript" src="<?=  adminTemplate('js/corners.js'); ?>"></script>
 
-	<script type="text/javascript"> 
-    $(document).ready(function(){ 
-        $("ul.sf-menu").superfish(); 
-    });
-	</script>
 	
 	<script type="text/javascript">
 		function doRefresh(){
-    $('.rounded').corners();
-    $('.rounded').corners(); /* test for double rounding */
+    //$('.rounded').corners();
+    //$('.rounded').corners(); /* test for double rounding */
     $('table', $('#featureTabsc_info .tab')[0]).each(function(){$('.native').hide();});
     $('#featureTabsc_info').show();
     tab(0);
@@ -131,7 +126,7 @@ $this->dtgItems->Render('CssClass="rounded wide"');
 
 <!-- modal content -->
 		<div id="basic-modal-content">
-		Display Content Here
+		Loading...
 		</div>
 <script type='text/javascript' src='<?= adminTemplate('js/jquery.js') ?>'></script>
 <script type='text/javascript' src='<?= adminTemplate('js/jquery.simplemodal.js') ?>'></script>

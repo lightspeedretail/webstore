@@ -28,6 +28,14 @@
 		}
 
 
+		public static function LoadByName($strParam1, $objOptionalClauses = null) {
+			// This will return a single GoogleCategories object
+			return GoogleCategories::QuerySingle(
+				QQ::Equal(QQN::GoogleCategories()->Name, $strParam1)
+				, $objOptionalClauses
+			);
+		}
+		
 		// Override or Create New Load/Count methods
 		// (For obvious reasons, these methods are commented out...
 		// but feel free to use these as a starting point)

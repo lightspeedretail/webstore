@@ -218,7 +218,7 @@
 	$arrCustomPagesTabs = array('pages' => _sp('Edit Pages'));
 	$arrPaymentTabs = array('methods' => _sp('Methods') , 'cc' => _sp('Credit Card Types'), 
 		'promo' => _sp('Promo Codes'),'promotasks' => _sp('Promo Code Tasks'));
-	$arrSeoTabs = array('general' => _sp('General') , 'meta' => _sp('Meta'), 'categories' => _sp('Categories'), 'googlecategories' => _sp('Google Categories'));
+	$arrSeoTabs = array('general' => _sp('General') , 'meta' => _sp('Meta'), 'categories' => _sp('Categories'));
 	$arrDbAdminTabs = array('dborders' => _sp('Orders'), 'dbpending' => _sp('Pending to<br>Download '.$strPend)  , 'incomplete' => _sp('Incomplete<br>Orders'));
 	$arrSystemTabs = array('config' => _sp('Setup') , 'task' => _sp('Tasks')  , 'vlog' => _sp('Visitor Log'), 'slog' => _sp('System Log'));
 	
@@ -3424,6 +3424,7 @@
 		
 		// This value is either a RowId, "null" (if nothing is being edited), or "-1" (if creating a new Item)
 		protected $intEditRowid = null;
+		protected $mixEditValues = null;
 
 		protected function Form_Create() {
 			parent::Form_Create();
@@ -3633,7 +3634,7 @@
 			else
 			$this->btnNew->Enabled = true;
 			
-			QApplication::ExecuteJavaScript("$('.rounded').corners();");
+			//QApplication::ExecuteJavaScript("$('.rounded').corners();");
 			parent::Form_PreRender();
 		}
 		
@@ -3660,7 +3661,9 @@
 		// If the person for the row we are rendering is currently being edited,
 		// show the textbox.  Otherwise, display the contents as is.
 		public function FieldColumn_Render($objItem , $field) {
-			if ( ($objItem->Rowid == $this->intEditRowid) || (($this->intEditRowid == -1) && (!$objItem->Rowid))  ) {
+			if ( 	($objItem->Rowid == $this->intEditRowid) || 
+					(($this->intEditRowid == -1) && (!$objItem->Rowid))  
+				) { //If we're adding or editing
 				if(isset($this->arrFields[$field]['Width']))
 					$this->arrFields[$field]['Field']->Width = $this->arrFields[$field]['Width'];
 				
@@ -3671,12 +3674,13 @@
 					}
 					
 				return $this->arrFields[$field]['Field']->RenderWithError(false);
-			}else{
+			} else { //All other rows, how do we display field
 				
-				if(isset($this->arrFields[$field]['DisplayFunc'])){
+				//We can use a DisplayFunc definition if one is defined
+				if(isset($this->arrFields[$field]['DisplayFunc'])) {
 					$func =  $this->arrFields[$field]['DisplayFunc'];
 					return $this->$func($objItem->$field);
-				}else
+				} else
 					return QApplication::HtmlEntities($objItem->$field);
 				
 				// Because we are rendering with HtmlEntities set to false on this column
@@ -5109,6 +5113,7 @@
 		protected $countries;
 		protected $objItems;
 		protected $objImages;
+		protected $objGoogleHidden;
 		
 		protected function Form_Create(){
 			
@@ -5163,43 +5168,22 @@
 			foreach($this->objItems as $objItem)
 				$this->arrFields['CustomPage']['Field']->AddItem($objItem->Title , $objItem->Key);
 
-	/*
-			$this->arrExtraFields['GoogleId'] = array('Name' => 'Google Category');
-			$this->arrExtraFields['GoogleId']['Field'] = new XLSListBox($this);		
+	
+			
+			$this->arrExtraFields['GoogleIdD'] = array('Name' => 'Google Category');
+			$this->arrExtraFields['GoogleIdD']['Field'] = new QButton($this,'GoogleIdD');
+			$this->arrExtraFields['GoogleIdD']['DisplayFunc'] = "GoogleIdD_Render";
+			$this->arrExtraFields['GoogleIdD']['Field']->Text = 'Set'; // add css of modal window to open it
+			$this->arrExtraFields['GoogleIdD']['CssClass'] = 'basic';
+			
+			
+
+			//$this->arrExtraFields['GoogleId'] = array('Name' => 'Google');
+			$this->arrExtraFields['GoogleId']['Field'] = new XLSTextBox($this);
+			$this->arrExtraFields['GoogleId']['UTF8'] = true;
 			$this->arrExtraFields['GoogleId']['DisplayFunc'] = "GoogleId_Render";
-			$this->arrExtraFields['GoogleId']['CssClass'] = 'tinyfont';
-			$this->arrExtraFields['GoogleId']['Field']->AddItem('None', NULL);
-	*/		
+			$this->arrExtraFields['GoogleId']['Width'] = 2;
 			
-			$this->arrExtraFields['GoogleId'] = array('Name' => 'Google Category');
-			$this->arrExtraFields['GoogleId']['Field'] = new QButton($this);
-			$this->arrExtraFields['GoogleId']['DisplayFunc'] = "GoogleId_Render";
-			$this->arrExtraFields['GoogleId']['Field']->Text = 'Set'; // add css of modal window to open it
-			$this->arrExtraFields['GoogleId']['CssClass'] = 'basic';
-			
-			//$this->arrExtraFields['GoogleId'] = QApplication::Translate('Create a New') . ' ' . QApplication::Translate('User');
-//$this->btnCreateNew->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnCreateNew_Click'));
-
-
-			
-			//$arrItems = _dbx("SELECT * FROM xlsws_google_categories ORDER BY name", "Query");
-			//while ($objItem = $arrItems->FetchObject())
-			//	$this->arrFields['GoogleId']['Field']->AddItem($objItem->name , $objItem->rowid);
-
-/*
-			
-
-			$this->arrFields['ImageId'] = array('Name' => 'Use Image');
-			$this->arrFields['ImageId']['Field'] = new XLSListBox($this);		
-			$this->arrFields['ImageId']['DisplayFunc'] = "RenderImage";
-			
-
-			$this->arrFields['ImageId']['Field']->AddItem('None', NULL);
-			$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE fk_product_master_id=0 ORDER BY code limit 100", "Query");
-			while ($objProduct = $arrProducts->FetchObject())
-				$this->arrFields['ImageId']['Field']->AddItem($objProduct->code , $objProduct->image_id);
-					
-			*/
 
 			$this->HelperRibbon = "Only Top Tier categories are required to be filled out with Meta Description information. Lower tiers will automatically pull from their parent if left blank. Meta Keywords are no longer used by search engines and have been removed.";
 			parent::Form_Create();
@@ -5208,10 +5192,33 @@
 			
 		}
 		
-		public function GoogleId_Render() {
-			return "<a href='#' class='basic'>Demo</a>";
+		
+		protected function beforeSave($objItem) {
+			$objGoogleCategory = GoogleCategories::LoadByName($_POST['GoogleCatEdit']);
+			if ($objGoogleCategory) 
+				$objItem->GoogleId = $objGoogleCategory->Rowid;
+
+			return $objItem;
 		}
 		
+		public function GoogleIdD_Render($objItem) { //Display for Google Category
+			
+			$objGoogle = GoogleCategories::Load($objItem->GoogleId);
+			
+			if($objItem->Rowid == $this->intEditRowid )
+				return "<a href='#' class='basic'><b><u>Set</u></b></a> "._xls_truncate($objGoogle->Name,15);
+			
+			return '<span title="'.$objGoogle->Name.'">'._xls_truncate($objGoogle->Name,19).'</span>';
+			
+			
+		}
+		
+		public function GoogleId_Render($objItem) { 
+			if($objItem->Rowid == $this->intEditRowid ) {
+				return "<input type='hidden' name='GoogleCatEdit' id='GoogleCatEdit' value='".$objItem->GoogleId."'>"; 
+				}
+				else return "";
+		}
 
 		public function RenderCustom($val){
 			foreach($this->objItems as $objItem)
@@ -5250,186 +5257,6 @@
 
 	}	
 	
-		/* class xlsws_admin_states
-	* class to create the states/regions list under admin panel shipping
-	* see class xlsws_admin_generic_edit_form for further specs
-	*/			
-	class xlsws_seo_googlecategories extends xlsws_admin {
-		
-		
-		protected $countries;
-		protected $objItems;
-		protected $objImages;
-		
-		protected $dtgItems;
-		protected $ctlRows;
-
-		protected $btnCancel;
-		protected $btnSave;
-		
-		protected function Form_Create(){
-			
-			$this->arrTabs = $GLOBALS['arrSeoTabs'];
-			$this->currentTab = 'googlecategories';
-			
-			$this->btnCancel = new QButton($this);
-			$this->btnCancel->Text = _sp("Cancel");
-			$this->btnCancel->CssClass = 'admin_cancel';
-			$this->btnCancel->AddAction( new QClickEvent() , new QAjaxAction('btnCancel_Click'));
-			
-			
-			
-			$this->btnSave = new QButton($this);
-			$this->btnSave->Text = _sp("Save");
-			$this->btnSave->CssClass = 'admin_save';
-			$this->btnSave->AddAction( new QClickEvent() , new QServerAction('btnSave_Click'));
-			$this->btnSave->CausesValidation = true;
-			
-			
-			QApplication::$EncodingType = "UTF-8";
-			
-			for ($x=1; $x<=25; $x++) {
-			
-				$ctlEdit = array();
-
-				$ctlEdit['ctlCategory'.$x] = new QLabel($this,'ctlCategory'.$x);
-				$ctlEdit['ctlCategory'.$x]->CssClass= 'smallfont';
-				$ctlEdit['ctlCategory'.$x]->Text = "blahbh-ab-asdf-asdf--asd-f";
-				
-				$ctlEdit['ctlCategory1'.$x] = array('Name' => 'Google Category');
-				$ctlEdit['ctlCategory1'.$x] = new XLSListBox($this);		
-				$ctlEdit['ctlCategory1'.$x]->AddItem('', NULL);
-				$arrItems = _dbx("SELECT DISTINCT name1 FROM xlsws_google_categories ORDER BY name1", "Query");
-				while ($objItem = $arrItems->FetchObject())
-					$ctlEdit['ctlCategory1'.$x]->AddItem($objItem->name1 , $objItem->name1);
-				$ctlEdit['ctlCategory1'.$x]->CssClass= 'tinyfont';
-
-				
-				$ctlEdit['ctlCategory2'.$x] = array('Name' => 'Google Category');
-				$ctlEdit['ctlCategory2'.$x] = new XLSListBox($this);		
-				$ctlEdit['ctlCategory2'.$x]->AddItem('', NULL);
-				$ctlEdit['ctlCategory2'.$x]->CssClass= 'tinyfont';
-				
-				$ctlEdit['ctlCategory3'.$x] = array('Name' => 'Google Category');
-				$ctlEdit['ctlCategory3'.$x] = new XLSListBox($this);		
-				$ctlEdit['ctlCategory3'.$x]->AddItem('', NULL);
-				$ctlEdit['ctlCategory3'.$x]->CssClass= 'tinyfont';
-
-
-				$ctlEdit['ctlCategory4'.$x] = array('Name' => 'Google Category');
-				$ctlEdit['ctlCategory4'.$x] = new XLSListBox($this);		
-				$ctlEdit['ctlCategory4'.$x]->AddItem('', NULL);
-				$ctlEdit['ctlCategory4'.$x]->CssClass= 'tinyfont2';
-
-
-				$ctlEdit['ctlCategory5'.$x] = array('Name' => 'Google Category');
-				$ctlEdit['ctlCategory5'.$x] = new XLSListBox($this);		
-				$ctlEdit['ctlCategory5'.$x]->AddItem('', NULL);
-				$ctlEdit['ctlCategory5'.$x]->CssClass= 'tinyfont2';
-
-
-				$ctlEdit['ctlCategory6'.$x] = array('Name' => 'Google Category');
-				$ctlEdit['ctlCategory6'.$x] = new XLSListBox($this);		
-				$ctlEdit['ctlCategory6'.$x]->AddItem('', NULL);
-				$ctlEdit['ctlCategory6'.$x]->CssClass= 'tinyfont2';
-
-
-				$ctlEdit['ctlCategory7'.$x] = array('Name' => 'Google Category');
-				$ctlEdit['ctlCategory7'.$x] = new XLSListBox($this);		
-				$ctlEdit['ctlCategory7'.$x]->AddItem('', NULL);
-				$ctlEdit['ctlCategory7'.$x]->CssClass= 'tinyfont2';
-
-				
-				$this->ctlRows[] = $ctlEdit;
-				
-			}	
-			
-			
-		
-			/*$this->className = "Category";
-			$this->blankObj = new Category();
-			$this->qqn = QQN::Category();
-
-			$this->arrFields = array();
-			$this->default_sort_index = 1;
-			
-			$this->arrFields['RequestUrl'] = array('Name' => 'Category Path (URL)');
-			$this->arrFields['RequestUrl']['Field'] = new QLabel($this);
-			$this->arrFields['RequestUrl']['Field']->Required = true;			
-			//$this->arrFields['RequestUrl']['DisplayFunc'] = "RenderPath";
-			$this->arrFields['RequestUrl']['UTF8'] = true;
-			$this->arrFields['RequestUrl']['Width'] = 100;
-			
-
-			/*$this->arrFields['GoogleId'] = array('Name' => 'Google Category');
-			$this->arrFields['GoogleId']['Field'] = new XLSListBox($this);		
-			$this->arrFields['GoogleId']['DisplayFunc'] = "RenderImage";
-			$this->arrFields['GoogleId']['Field']->AddItem('None', NULL);
-			$arrItems = _dbx("SELECT * FROM xlsws_google_categories ORDER BY name", "Query");
-			while ($objItem = $arrItems->FetchObject())
-				$this->arrFields['GoogleId']['Field']->AddItem($objItem->name , $objItem->rowid);
-
-
-			$this->arrFields['Name1'] = array('Name' => 'Google Category');
-			$this->arrFields['Name1']['Field'] = new XLSListBox($this);
-			
-			$this->arrFields['Name2'] = array('Name' => 'Google Category');
-			$this->arrFields['Name2']['Field'] = new XLSListBox($this);
-			
-			$this->arrFields['Name3'] = array('Name' => 'Google Category');
-			$this->arrFields['Name3']['Field'] = new XLSListBox($this);
-			
-			$this->arrFields['Name4'] = array('Name' => 'Google Category');
-			$this->arrFields['Name4']['Field'] = new XLSListBox($this);
-			
-			$this->arrFields['Name5'] = array('Name' => 'Google Category');
-			$this->arrFields['Name5']['Field'] = new XLSListBox($this);
-			
-			$this->arrFields['Name6'] = array('Name' => 'Google Category');
-			$this->arrFields['Name6']['Field'] = new XLSListBox($this);
-			
-			$this->arrFields['Name7'] = array('Name' => 'Google Category');
-			$this->arrFields['Name7']['Field'] = new XLSListBox($this);
-*/
-			//$this->HelperRibbon = "Match your Web Categories to their respective Google categories for Google Shopping integration.";
-			parent::Form_Create();
-			
-			
-		}
-		
-		public function RenderCustom($val){
-			foreach($this->objItems as $objItem)
-				if($objItem->Key == $val)
-					return $objItem->Title;
-			
-			return '';
-		}
-		public function RenderMeta($val){
-			if (strlen($val)>15)
-				return substr($val,0,35)."...";
-			else return $val;
-		}		
-		
-		public function RenderState($val){
-			return $val;
-		}		
-		
-		public function RenderParent($val){
-			if ($val==0) return "<b>Top Tier</b>"; else return "";
-		}
-		
-		public function RenderPath($val){
-			return str_replace("-"," &gt; ", $val);
-		}
-		
-		public function RenderImage($val){
-			if ($val>0) return "<b>Set</b>"; else return;
-		}
-		public function canNew(){
-			return false;
-		}
-		
-	}
 	
 		/* class xlsws_admin_dbwarning
 	* class to create the credit card types tab under payment methods
@@ -6862,9 +6689,6 @@
 					break;
 				case "categories":
 					xlsws_seo_categories::Run('xlsws_seo_categories' , adminTemplate('edit.tpl.php'));
-					break;
-				case "googlecategories":
-					xlsws_seo_googlecategories::Run('xlsws_seo_googlecategories' , adminTemplate('googlecats.tpl.php'));
 					break;
 				default:
 				case "general":

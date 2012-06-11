@@ -895,6 +895,8 @@ padding-top: 3px;
 .bgwhite { background-color: #ffffff; }
 .bgalert { background-color: #F778A1; }
 .strikeout { text-decoration:line-through; }
+.googleselect { width: 500px; }
+.center { margin-left: 230px; }
 
 #editcontainer .colfieldwide
 {
