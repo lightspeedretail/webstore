@@ -46,7 +46,7 @@ echo '		<link>'._xls_site_url().'</link>'.chr(13);
 echo '		<description>'._xls_get_conf('STORE_DEFAULT_SLOGAN').'</description>'.chr(13);
 
 		     
-$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 and rowid=28 ".$strQueryAddl." ORDER BY rowid", "Query");
+$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 ".$strQueryAddl." ORDER BY rowid", "Query");
 while ($objItem = $arrProducts->FetchObject()) {
 	$objProduct = Product::Load($objItem->rowid);
 	
