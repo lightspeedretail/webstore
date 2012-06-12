@@ -43,7 +43,7 @@
 
     function FillListValues(CONTROL) {
         var arrNewValues;
-        var intNewPos;
+        var intNewPos = -1;
         var strTemp = GetSelectValues(CONTROL);
         arrNewValues = strTemp.split(",");
         for (var i = 0; i < arrNewValues.length - 1; i++) {
@@ -52,7 +52,8 @@
             }
         }
 
-        for (var i = 0; i < arrOldValues.length - 1; i++) {
+        if (intNewPos > 0)
+         for (var i = 0; i < arrOldValues.length - 1; i++) {
             if (arrOldValues[i] == 1 && i != intNewPos) {
                 CONTROL.options[i].selected = true;
             } else if (arrOldValues[i] == 0 && i != intNewPos) {
