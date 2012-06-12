@@ -37,8 +37,8 @@ $strQueryAddl = ($intStockHandling == 0 ? " and inventory_avail>0" : "");
 
 
 
-echo '<?xmlx version="1.0" encoding="UTF-8"?>'.chr(13);
-echo ' <rssx xmlns:g="http://base.google.com/ns/1.0" version="2.0">'.chr(13);
+echo '<?xml version="1.0" encoding="UTF-8"?>'.chr(13);
+echo ' <rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">'.chr(13);
 echo '<channel>'.chr(13);
 
 echo '		<title>'._xls_get_conf('STORE_NAME','LightSpeed Web Store').'</title>'.chr(13);
