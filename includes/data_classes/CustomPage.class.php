@@ -110,7 +110,7 @@ class CustomPage extends CustomPageGen {
 				return $this->strTitle;
 
 			case 'PageTitle':
-				return _xls_truncate($this->GetPageMeta('SEO_CUSTOMPAGE_TITLE'),64);
+				return _xls_truncate($this->GetPageMeta('SEO_CUSTOMPAGE_TITLE'),70);
 
 			default:
 				try {

@@ -108,7 +108,7 @@ class Family extends FamilyGen {
 			case 'RequestUrl': 
 				return $this->strRequestUrl;
 			case 'PageTitle':
-				return _xls_truncate($this->GetPageMeta('SEO_CUSTOMPAGE_TITLE'),64);
+				return _xls_truncate($this->GetPageMeta('SEO_CUSTOMPAGE_TITLE'),70);
 
 			default:
 				try {

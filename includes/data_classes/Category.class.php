@@ -525,7 +525,7 @@ EOS;
 				return $this->GetLink();
 
 			case 'PageTitle':
-				return _xls_truncate($this->GetPageMeta('SEO_CATEGORY_TITLE'),64);
+				return _xls_truncate($this->GetPageMeta('SEO_CATEGORY_TITLE'),70);
 
 			case 'Children':
 			case 'categ_childs': // LEGACY

@@ -965,7 +965,7 @@ class Product extends ProductGen {
 				return $this->GetInventory();
 				
 			case 'PageTitle':
-				return _xls_truncate($this->GetPageMeta('SEO_PRODUCT_TITLE'),64);
+				return _xls_truncate($this->GetPageMeta('SEO_PRODUCT_TITLE'),70);
 
 			case 'PageDescription':
 				return _xls_truncate($this->GetPageMeta('SEO_PRODUCT_DESCRIPTION'),255);
