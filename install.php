@@ -115,7 +115,9 @@ define ('__VIRTUAL_DIRECTORY__', '');
 
 // read the config file
 $content = file_get_contents("includes/configuration.inc.php");
-if(stristr($content , "define ('__DOCROOT__'") && $_SERVER['REQUEST_URI']!=__SUBDIRECTORY__."/install.php?check"){
+if(stristr($content , "define ('__DOCROOT__'") 
+	&& $_SERVER['REQUEST_URI']!=__SUBDIRECTORY__."/install.php?check"
+	&& $_SERVER['REQUEST_URI']!=__SUBDIRECTORY__."/install.php?upgradedb" ){
 	// config is there.
 	exit('Store has already been installed. <script type="text/javascript">document.location.href="index.php";</script>');
 }
@@ -212,7 +214,9 @@ if(!defined('__DOCROOT__'))
 				if ((in_array("fail",$checkenv) && $_SERVER['REQUEST_URI']!=__SUBDIRECTORY__."/install.php?ignore")
 					|| $_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?check")
 					$this->environment_not_acceptable($checkenv);
-				else
+				elseif ($_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?upgradedb")
+					$this->upgrade_database();
+				else	
 					$this->license_agreement();
 				
 			}
@@ -2813,22 +2817,7 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 				
 					//Run database upgrade beyond what is included in install
 					
-					//Bootstrap the QCodo DB object so we can use our functions
-					define('DB_CONNECTION_1', serialize(array( 
-					'adapter' => 'MySqli5',
-					'server' => $dbhost->Text,
-					'port' => ($dbport->Text!='')?$dbport->Text:null,
-					'database' => $db->Text,
-					'username' => $dbuser->Text,
-					'password' => $dbpass->Text,
-					'encoding' => 'utf8',
-					'profiling' => false)));
-					QApplication::InitializeDatabaseConnections();
-
-
-					include(XLSWS_INCLUDES . 'db_maintenance.php');
-					$objDbMaint = new xlsws_db_maintenance;
-					$objDbMaint->RunUpdateSchema();
+					$this->upgrade_database();
 
 				
 					echo "<BR/><b>Don't forget to change permissions on your /includes folder back to read only, and specifically set the file includes/configuration.inc.php to 644 or world readable only! Your /includes/qcodo/cache folders need to remain writable.</b><BR/><BR/>";
@@ -2850,7 +2839,49 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 				
 			}
 			
+		protected function upgrade_database() {
+		
+			//Bootstrap the QCodo DB object so we can use our functions
+			define('DB_CONNECTION_1', serialize(array( 
+			'adapter' => 'MySqli5',
+			'server' => $dbhost->Text,
+			'port' => ($dbport->Text!='')?$dbport->Text:null,
+			'database' => $db->Text,
+			'username' => $dbuser->Text,
+			'password' => $dbpass->Text,
+			'encoding' => 'utf8',
+			'profiling' => false)));
+			QApplication::InitializeDatabaseConnections();
+
+
+			include(XLSWS_INCLUDES . 'db_maintenance.php');
+			$objDbMaint = new xlsws_db_maintenance;
+			$retVal = $objDbMaint->RunUpdateSchema();
 			
+			//Since an upgrade may accompany SOAP changes, clear the SOAP cache here. It will simply be rebuilt on the next Upload process
+			foreach(glob(__DOCROOT__ .  __SUBDIRECTORY__ . '/includes/qcodo/cache/soap/*.*') as $v)
+				unlink($v);
+			
+			$this->hideControls();
+				
+			$this->pnlStep->Text = "<img src=\"templates/install/step_01.png\" />";
+			$this->btnNext->Display = false;
+			$lbox = $this->iControl('agreement' , 'QPanel');
+			//$lbox->TextMode = QTextMode::MultiLine;
+			$lbox->Width = 500;
+			$lbox->Height = 400;
+			//$lbox->ReadOnly = true;
+			$lbox->DisplayStyle = QDisplayStyle::Block;
+			$lbox->CssClass = "install_agreement";
+			$lbox->Text = $retVal;	
+			$lbox->HtmlEntities = false;
+			
+			
+							
+			$this->pnlInstall->CssClass = '';
+				
+					
+		}
 			
 			
 			
