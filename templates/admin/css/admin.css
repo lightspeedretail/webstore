@@ -897,6 +897,7 @@ padding-top: 3px;
 .strikeout { text-decoration:line-through; }
 .googleselect { width: 500px; }
 .center { margin-left: 230px; }
+.leftbump { padding-left: 15px; }
 
 #editcontainer .colfieldwide
 {

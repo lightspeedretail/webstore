@@ -3453,7 +3453,8 @@
 				)
 				)
 			);
-
+			
+			
 			// Setup the First and Last name columns with HtmlEntities set to false (because they may be rendering textbox controls)
 			
 			foreach($this->arrFields as $field=>$properties){
@@ -4521,6 +4522,7 @@
 			$this->arrFields['Code']['Field'] = new XLSTextBox($this);
 			$this->arrFields['Code']['Width'] = 100;	
 			$this->arrFields['Code']['Field']->Required = true;
+			$this->arrFields['Code']['CssClass'] = "gencol leftbump";
 			
 			$this->arrFields['Enabled'] = array('Name' => 'Enabled');
 			$this->arrFields['Enabled']['Field'] = new QCheckBox($this); 	
@@ -4670,6 +4672,13 @@
 		protected function beforeSave($objItem ){
 			if ($this->arrFields['QtyRemaining']['Field']->Text=='')
 				$objItem->QtyRemaining = '-1';
+				
+			if (is_null($objItem->Except))
+				$objItem->Except = 0;
+				
+			if (is_null($objItem->Lscodes))
+				$objItem->Lscodes = '';	
+				
 			return $objItem;			
 		}
 		
