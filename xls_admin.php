@@ -6059,15 +6059,6 @@
 			$this->arrTabs = $GLOBALS['arrSystemTabs'];
 			$this->currentTab = 'task';
 			
-			
-			
-			$this->arrMPnls['generateSitemap'] = new QPanel($this);
-			$this->arrMPnls['generateSitemap']->Visible = false;
-			$this->arrMPnls['generateSitemap']->Name = _sp('Generate Sitemap');
-			$this->arrMPnls['generateSitemap']->HtmlEntities = false;			
-			$this->arrMPnls['generateSitemap']->ToolTip= _sp('Generate sitemap.xml file which will be used by google bot or other search engines');
-			
-
 			$this->arrMPnls['OffLineOnlineStore'] = new QPanel($this);
 			$this->arrMPnls['OffLineOnlineStore']->Visible = false;
 			$this->arrMPnls['OffLineOnlineStore']->Name = (_xls_get_conf('STORE_OFFLINE' , false))?_sp('Take Store Online'):_sp('Take Store Offline');
@@ -6139,18 +6130,6 @@
 
 		
 		
-		
-		protected function generateSitemap(){
-			if($this->arrMPnls['generateSitemap']->Visible){
-					$this->arrMPnls['generateSitemap']->Visible = false;		
-					return;
-			}
-				
-			$this->arrMPnls['generateSitemap']->Text = nl2br(_xls_generate_sitemap());
-			$this->arrMPnls['generateSitemap']->Visible = true;
-			$this->arrMPnls['generateSitemap']->Refresh();
-		}
-
 		protected function flushCategories(){
 			if($this->arrMPnls['flushCategories']->Visible){
 					$this->arrMPnls['flushCategories']->Visible = false;		
