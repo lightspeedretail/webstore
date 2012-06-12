@@ -1,9 +1,34 @@
 <?php
 
-//Note this is a sample file which will need to be modified. This is not complete and does not completely
-//conform to GoogleBase specs for products, but it should give you a starting point
-//See http://www.google.com/support/merchants/bin/answer.py?hl=en&answer=188494 for fields that you will require
-
+/*
+  LightSpeed Web Store
+ 
+  NOTICE OF LICENSE
+ 
+  This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to support@lightspeedretail.com <mailto:support@lightspeedretail.com>
+ * so we can send you a copy immediately.
+ 
+  DISCLAIMER
+ 
+ * Do not edit or add to this file if you wish to upgrade Web Store to newer
+ * versions in the future. If you wish to customize Web Store for your
+ * needs please refer to http://www.lightspeedretail.com for more information.
+ 
+ * @copyright  Copyright (c) 2011 Xsilva Systems, Inc. http://www.lightspeedretail.com
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ 
+ */
+ 
+ //Google Merchant Feed
+ //This feed is accessed via the URL http://yourstoreurl.com/googlemerchant.xml
+ //And is designed to be used by the Google Shopping Merchant Panel at http://www.google.com/merchants
+ 
 require('includes/prepend.inc.php');
 
 //Load some information we'll use within the loops
@@ -21,7 +46,7 @@ echo '		<link>'._xls_site_url().'</link>'.chr(13);
 echo '		<description>'._xls_get_conf('STORE_DEFAULT_SLOGAN').'</description>'.chr(13);
 
 		     
-$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 ".$strQueryAddl." ORDER BY rowid", "Query");
+$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 and rowid=28 ".$strQueryAddl." ORDER BY rowid", "Query");
 while ($objItem = $arrProducts->FetchObject()) {
 	$objProduct = Product::Load($objItem->rowid);
 	
@@ -29,18 +54,31 @@ while ($objItem = $arrProducts->FetchObject()) {
 
 	$arrTaxGrids = $objProduct->GetTaxRateGrid();
 	$arrTrail = Category::GetTrailByProductId($objProduct->Rowid,'names');
+	
+	//If our current category doesn't have Google set but we have a parent that does, use it
+	if (empty($strGoogle) && count($arrTrail)>1) {
+		$arrTrailFull = Category::GetTrailByProductId($objProduct->Rowid);
+		$objCat = Category::Load($arrTrailFull[0]['key']);
+		$objPar = GoogleCategories::Load($objCat->GoogleId);
+		if ($objPar) $strGoogle = $objPar->Name;
+	}
+	
   echo '<item>'.chr(13);
 		echo chr(9)."<g:id>".$objProduct->Rowid."</g:id>".chr(13);
 		echo chr(9).'<title><![CDATA['.strip_tags($objProduct->Name).']]></title>'.chr(13);
-		if ($objProduct->Description) echo chr(9).'<description><![CDATA['.$objProduct->Description.']]></description>'.chr(13);
-		if ($strGoogle) echo chr(9).'<g:google_product_category>'.$strGoogle.'</g:google_product_category>'.chr(13);
-		if ($arrTrail) echo chr(9).'<g:product_type><![CDATA['.implode(" &gt; ",$arrTrail).']]></g:product_type>'.chr(13);
+		if ($objProduct->Description)
+			echo chr(9).'<description><![CDATA['.$objProduct->Description.']]></description>'.chr(13);
+		if ($strGoogle)
+			echo chr(9).'<g:google_product_category>'.$strGoogle.'</g:google_product_category>'.chr(13);
+		if ($arrTrail)
+			echo chr(9).'<g:product_type><![CDATA['.implode(" &gt; ",$arrTrail).']]></g:product_type>'.chr(13);
 		echo chr(9).'<link>'.$objProduct->Link.'</link>'.chr(13);
-		echo chr(9).'<g:image_link>'._xls_site_url($objProduct->Image).'</g:image_link>'.chr(13);
+		echo chr(9).'<g:image_link>'._xls_site_dir().$objProduct->Image.'</g:image_link>'.chr(13);
 	   
-	   //$images = Images::LoadArrayByProductAsImage($objProduct->Rowid , QQ::Clause(QQ::OrderBy(QQN::Images()->Rowid)));
-		//print_r($images);
-		//echo chr(9).'<g:additional_image_link>http://www.foryarnssake.com/store/'.$objProduct->Image.'</g:additional_image_link>'.chr(13);
+	   	$arrImages = Images::LoadArrayByProductAsImage($objProduct->Rowid , QQ::Clause(QQ::OrderBy(QQN::Images()->Rowid)));
+		foreach ($arrImages as $objImage)
+			echo chr(9).'<g:additional_image_link>'._xls_site_dir().Images::GetImageUri($objImage->ImagePath).'</g:additional_image_link>'.chr(13);
+
 		echo chr(9).'<g:condition>new</g:condition>'.chr(13);
 	   
 	  	if($objProduct->IsAvailable)
@@ -75,7 +113,6 @@ while ($objItem = $arrProducts->FetchObject()) {
   
   
   }
-//  	   echo chr(9).'Total Item count = '.$count.chr(13);
 
 echo '</channel>'.chr(13);
 echo '</rss>';

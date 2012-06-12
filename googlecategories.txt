@@ -1751,10 +1751,10 @@ Food, Beverages & Tobacco > Food Items > Pasta & Noodles
 Food, Beverages & Tobacco > Food Items > Prepared Foods
 Food, Beverages & Tobacco > Food Items > Prepared Foods > Frozen Dinners
 Food, Beverages & Tobacco > Food Items > Prepared Foods > Hors d'Oeuvre Trays
-Food, Beverages & Tobacco > Food Items > Prepared Foods > Prepared EntrÃ©es & Sides
-Food, Beverages & Tobacco > Food Items > Prepared Foods > Prepared EntrÃ©es & Sides > Deli Sandwiches
-Food, Beverages & Tobacco > Food Items > Prepared Foods > Prepared EntrÃ©es & Sides > Pizza
-Food, Beverages & Tobacco > Food Items > Prepared Foods > Prepared EntrÃ©es & Sides > Waffles, Pancakes & French Toast
+Food, Beverages & Tobacco > Food Items > Prepared Foods > Prepared Entrées & Sides
+Food, Beverages & Tobacco > Food Items > Prepared Foods > Prepared Entrées & Sides > Deli Sandwiches
+Food, Beverages & Tobacco > Food Items > Prepared Foods > Prepared Entrées & Sides > Pizza
+Food, Beverages & Tobacco > Food Items > Prepared Foods > Prepared Entrées & Sides > Waffles, Pancakes & French Toast
 Food, Beverages & Tobacco > Food Items > Prepared Foods > Skillet Dinners
 Food, Beverages & Tobacco > Food Items > Seasonings & Spices
 Food, Beverages & Tobacco > Food Items > Seasonings & Spices > Herbs & Spices
@@ -2902,7 +2902,7 @@ Home & Garden > Kitchen & Dining > Cookware > Paella Pans
 Home & Garden > Kitchen & Dining > Cookware > Pressure Cookers
 Home & Garden > Kitchen & Dining > Cookware > Pressure Cookers > Electric Pressure Cookers
 Home & Garden > Kitchen & Dining > Cookware > Saucepans
-Home & Garden > Kitchen & Dining > Cookware > SautÃ© Pans
+Home & Garden > Kitchen & Dining > Cookware > Sauté Pans
 Home & Garden > Kitchen & Dining > Cookware > Skillets & Frying Pans
 Home & Garden > Kitchen & Dining > Cookware > Stock Pots
 Home & Garden > Kitchen & Dining > Cookware > Stovetop Kettles
