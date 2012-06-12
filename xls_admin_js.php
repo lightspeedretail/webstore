@@ -37,7 +37,8 @@ require('includes/prepend.inc.php');
 switch($_GET['item']) {
 	
 	case 'google':
-		echo '<h4>Choose the most appropriate Google Category for this item. Only the first level is required. If you receive a blank dropdown, that means there are no additional levels for that category.</h4>';
+		$strRequestUrl = preg_replace('/[^a-z0-9\-\.]/i', '', $_GET['rurl']);
+		echo '<h4>Editing: '.$strRequestUrl.'</h4><h4>Choose the most appropriate Google Category for this item. Only the first level is required. If you receive a blank dropdown, that means there are no additional levels for that category.</h4>';
 		echo '<form>';
 		echo '<select name="google1" id="google1" class="tinyfont googleselect" >';
 		echo '<option value="0">--Choose--';
@@ -78,7 +79,7 @@ switch($_GET['item']) {
 	break;
 	
 	case 'current':
-		$intVal = _xls_number_only($_GET['val']); error_log("the numer is ".$intVal);
+		$intVal = _xls_number_only($_GET['val']);
 		$objGoogleCategory = GoogleCategories::Load($intVal);
 		$arrCats=array();
 		for ($x=1; $x<=7; $x++) {

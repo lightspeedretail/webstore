@@ -5206,18 +5206,28 @@
 			$objGoogle = GoogleCategories::Load($objItem->GoogleId);
 			
 			if($objItem->Rowid == $this->intEditRowid )
-				return "<a href='#' class='basic'><b><u>Set</u></b></a> "._xls_truncate($objGoogle->Name,15);
+				return "<a href='#' class='basic'><b><u>Set</u></b></a> ".
+				'<span class="tooltip" id="googlecat" name="googlecat" title="'.$objGoogle->Name.'">'._xls_truncate($objGoogle->Name,15).'</span>';
 			
-			return '<span title="'.$objGoogle->Name.'">'._xls_truncate($objGoogle->Name,19).'</span>';
+			return '<span class="tooltip" title="'.$objGoogle->Name.'">'._xls_truncate($objGoogle->Name,19).'</span>';
 			
 			
 		}
 		
 		public function GoogleId_Render($objItem) { 
 			if($objItem->Rowid == $this->intEditRowid ) {
-				return "<input type='hidden' name='GoogleCatEdit' id='GoogleCatEdit' value='".$objItem->GoogleId."'>"; 
+				$strRetVal = "<input type='hidden' name='GoogleCatEdit' id='GoogleCatEdit' value='".$objItem->GoogleId."'>"; 
+				if ($objItem->GoogleId==0 && $objItem->Rowid != $objItem->Parent) {
+					$arrTree = $objItem->GetTrail();
+					$objCat = Category::Load($arrTree[0]['key']);
+					$strRetVal .= "<input type='hidden' name='GoogleCatParentEdit' id='GoogleCatParentEdit' value='".$objCat->GoogleId."'>";
+					
 				}
-				else return "";
+				$strRetVal .= "<input type='hidden' name='RequestUrl' id='RequestUrl' value='".$objItem->RequestUrl."'>";
+			}
+			else $strRetVal= "";
+			
+			return $strRetVal;
 		}
 
 		public function RenderCustom($val){

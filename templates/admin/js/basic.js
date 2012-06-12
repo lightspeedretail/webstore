@@ -11,12 +11,13 @@
  */
 
 jQuery(function ($) {
+	var initset=new Array('0');
 	var choosegoogle = {
 		message: null,
 		init: function () {
 			$('.basic').live('click',function (e) {
-					
-						$.get("xls_admin_js.php?item=google", function(data){
+
+						$.get("xls_admin_js.php?item=google&rurl=" + $('#RequestUrl').val(), function(data){
 							// create a modal dialog with the data
 							$('#basic-modal-content').html(data);
 							$('#google1').live('change', function() { choosegoogle.change(1); });
@@ -36,6 +37,8 @@ jQuery(function ($) {
 							
 							if ($('#GoogleCatEdit').val()>0)
 								choosegoogle.setup($('#GoogleCatEdit').val());
+							else if ($('#GoogleCatParentEdit').val()>0)
+								choosegoogle.setup($('#GoogleCatParentEdit').val());
 							
 						});
 					
@@ -49,16 +52,14 @@ jQuery(function ($) {
 		setup: function (e) {
 			$.get("xls_admin_js.php?item=current&val=" + e, function(data){
 				
-				var q=1;
+				var q=0;
 				$.each(data, function(key,value) {
-				  alert(value);
-				  $('#google'+q).val(value);
-				  choosegoogle.change(q);
+				  initset[q]=value;
 				  q++;
 				});
-		
-		
-		
+				$('#google1').val(initset[0]);
+				initset.splice(0, 0);
+				choosegoogle.change(1);
 		
 			}, 'json');
 		
@@ -78,11 +79,19 @@ jQuery(function ($) {
 				     .attr("value", value).text(key));
 				});
 				
+				if(initset[(e)]) {
+					$("#google" + (e+1)).val(initset[(e)]);
+					choosegoogle.change((e+1));
+
+				}
+				
 				for(q=(e+2); q<=7; q++) {
 					var $el = $("#google" + q);
 					$('#google' + (q) + ' option:gt(0)').remove();
 					$el.attr("disabled","disabled");
 				}
+
+				
 				
 			}, 'json');
 		},		
@@ -94,8 +103,10 @@ jQuery(function ($) {
 					if (q>1) googlestring = googlestring + ' > ' + $el.val();
 						else googlestring = $el.val();		
 			}
-			if (googlestring > '')
+			if (googlestring > '') {
 				$('#GoogleCatEdit').val(googlestring);
+				$('#googlecat').html(googlestring.substring(0,15) + '...');
+			}
 			
 			$.modal.close();
 			return;

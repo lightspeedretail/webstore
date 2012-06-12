@@ -486,6 +486,9 @@ EOS;
 
 			case 'ParentObject':
 				return $this->GetParent();
+			
+			case 'FamilyTree':
+				return $this->GetAncestors();
 
 			case 'HasImage':
 			case 'ImageExist': // LEGACY
