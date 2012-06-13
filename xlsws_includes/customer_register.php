@@ -260,9 +260,10 @@ class xlsws_cregister extends xlsws_index {
 		$objCustomer->Lastname = trim($this->txtCRLName->Text);
 		$objCustomer->Mainname = (($this->customer) && ($this->customer->Mainname != '')) ? $this->customer->Mainname : (trim($this->txtCRFName->Text) . " " . trim($this->txtCRLName->Text));
 		$objCustomer->Company = trim($this->txtCRCompany->Text);
+		$objCustomer->Mainphone = trim($this->txtCRMPhone->Text);
 		/*$objCustomer->Homepage = trim($this->txtCRHomePage->Text);
 		$objCustomer->Mainephonetype = trim($this->txtCRMPhoneType->SelectedValue);
-		$objCustomer->Mainphone = trim($this->txtCRMPhone->Text);
+		
 		
 		$objCustomer->Phonetype1 = trim($this->txtCRPhoneType1->SelectedValue);
 		$objCustomer->Phone1 = trim($this->txtCRPhone1->Text);
@@ -287,8 +288,10 @@ class xlsws_cregister extends xlsws_index {
 		$objCustomer->City2 = trim($this->txtCRShipCity->Text);
 		$objCustomer->Zip2 = trim($this->txtCRShipZip->Text);
 
-		$objCustomer->NewsletterSubscribe = 1;
+		$objCustomer->NewsletterSubscribe = $this->PasswordControl->NewsletterSubscribe->Checked;
 		$objCustomer->HtmlEmail = 1;
+		$objCustomer->CheckSame = $this->CustomerControl->CheckSame->Checked;
+
 
 		//Moderate login
 		if(!$objCustomer->AllowLogin && _xls_get_conf('MODERATE_REGISTRATION', 0))
@@ -436,8 +439,9 @@ class xlsws_cregister extends xlsws_index {
 		$this->BindPasswordControlWrapper();
 		$this->BindPasswordControl();
 
-		//$this->build_phone_types_widget();
-		
+		//Force to opt out by presenting checkbox as checked
+		if(!$this->isLoggedIn())
+			$this->PasswordControl->NewsletterSubscribe->Checked = true;
 		Visitor::add_view_log('', ViewLogType::registration);
 	}
 

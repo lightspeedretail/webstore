@@ -44,5 +44,11 @@
 	            <dd><?php $this->txtCRConfPass->RenderWithError() ?></dd>
 			</dl>
 		</div><br />
-		
+		<div class="left margin clear">
+        	<dl class="left">
+	            <dd>
+	                <?php $this->PasswordControl->NewsletterSubscribe->Render() ?><label for="newsletter" class="opt"><?php _xt("Receive emails about special offers") ?></label>
+	            </dd>
+            </dl>
+         </div>
 		</fieldset>

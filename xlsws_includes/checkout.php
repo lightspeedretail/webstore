@@ -50,7 +50,7 @@ class xlsws_checkout extends xlsws_index {
     protected $ShippingControl;
     protected $PaymentControl;
     protected $PromoControl;
-
+	protected $blnShowShippingNames = true;
     protected $CartControl;
 
     protected $VerifyControl;

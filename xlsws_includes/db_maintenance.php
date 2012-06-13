@@ -540,6 +540,10 @@ class xlsws_db_maintenance extends xlsws_index {
 				"ALTER TABLE xlsws_modules ADD COLUMN `active` INT(11) DEFAULT NULL AFTER `rowid`"))
 			_dbx("update xlsws_modules set active=1");
 
+
+			$this->add_column('xlsws_customer' , 'check_same' ,
+				"ALTER TABLE xlsws_customer ADD COLUMN `check_same` INT(11) DEFAULT NULL AFTER `zip2`");
+						
 			//We've changed how we're storing payment and shipping module information, no longer using the .php extension
 			//so let's go through and update our tables
 			$objItems = Modules::LoadAll();
