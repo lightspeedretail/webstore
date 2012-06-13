@@ -1042,7 +1042,17 @@ function _xls_get_googlecategory($intProductRowid) {
 				  	
 }
 
+function _xls_get_googleparentcategory($intProductRowid) {
 
+	$arrTrailFull = Category::GetTrailByProductId($intProductRowid);
+	$objCat = Category::Load($arrTrailFull[0]['key']);
+	$objPar = GoogleCategories::Load($objCat->GoogleId);
+	if ($objPar) $strLine = $objPar->Name;
+	$strLine = str_replace("&","&amp;",$strLine);
+	$strLine = str_replace(">","&gt;",$strLine);
+	
+	return trim($strLine);	
+}
 
 
 /**

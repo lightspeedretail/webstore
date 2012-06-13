@@ -37,8 +37,8 @@ $strQueryAddl = ($intStockHandling == 0 ? " and inventory_avail>0" : "");
 
 
 
-echo '<?xml version="1.0" encoding="UTF-8"?>'.chr(13);
-echo ' <rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">'.chr(13);
+echo '<?xmlx version="1.0" encoding="UTF-8"?>'.chr(13);
+echo ' <rssx xmlns:g="http://base.google.com/ns/1.0" version="2.0">'.chr(13);
 echo '<channel>'.chr(13);
 
 echo '		<title>'._xls_get_conf('STORE_NAME','LightSpeed Web Store').'</title>'.chr(13);
@@ -54,14 +54,11 @@ while ($objItem = $arrProducts->FetchObject()) {
 
 	$arrTaxGrids = $objProduct->GetTaxRateGrid();
 	$arrTrail = Category::GetTrailByProductId($objProduct->Rowid,'names');
-	
+
 	//If our current category doesn't have Google set but we have a parent that does, use it
-	if (empty($strGoogle) && count($arrTrail)>1) {
-		$arrTrailFull = Category::GetTrailByProductId($objProduct->Rowid);
-		$objCat = Category::Load($arrTrailFull[0]['key']);
-		$objPar = GoogleCategories::Load($objCat->GoogleId);
-		if ($objPar) $strGoogle = $objPar->Name;
-	}
+	if (empty($strGoogle) && count($arrTrail)>1)
+		$strGoogle = _xls_get_googleparentcategory($objProduct->Rowid);
+		
 	
   echo '<item>'.chr(13);
 		echo chr(9)."<g:id>".$objProduct->Rowid."</g:id>".chr(13);

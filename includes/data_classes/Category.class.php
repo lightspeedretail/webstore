@@ -194,9 +194,9 @@ class Category extends CategoryGen {
 	 */
 	public static function GetTrailByProductId($intRowid,$strType = 'all') {
 		$arrPath=array();
-		$objCategory = parent::LoadArrayByProduct($intRowid); 
-		if ($objCategory)
-			$arrPath = $objCategory[0]->GetTrail($strType);
+		$objCategory = parent::LoadArrayByProduct($intRowid);
+		if ($objCategory) {
+			$arrPath = $objCategory[0]->GetTrail($strType); }
 		return $arrPath;
 	}
 	
@@ -215,7 +215,7 @@ class Category extends CategoryGen {
 		if($objCategory->Parent==0) {
 		
 			array_push($arrPath , $strType=='names' ? 
-					 $strName : array( 'key' => $category_id , 'tag' => 'c' , 'name' => $objCategory->Name , 'link' => $objCategory->Link));
+					 $objCategory->Name : array( 'key' => $category_id , 'tag' => 'c' , 'name' => $objCategory->Name , 'link' => $objCategory->Link));
 			
 		} else do {
 			$objCategory = parent::Load($category_id);
