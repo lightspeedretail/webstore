@@ -28,7 +28,7 @@
 ?>
 
 
-	<fieldset style="display: block; float: left;">
+	<fieldset style="display: block; float: left; width:350px;">
 		<legend><?php _xt('Submit your order') ?></legend>
 
 <?	if (_xls_show_captcha('checkout')) { ?>
