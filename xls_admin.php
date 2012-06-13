@@ -341,6 +341,8 @@
 		const URL = 21;
 		const ProductTitleFormat = 22;
 		const CategoryTitleFormat = 23;
+		
+		const EmailOptions = 24;
 
 	}
 	
@@ -799,7 +801,11 @@
 			$this->configPnls['store'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Store , "configDone");
 			$this->configPnls['store']->Name = _sp('Store Information');
 			$this->configPnls['store']->Info = _sp('Store information (e.g. Contact details)');
-			
+
+			$this->configPnls['emailoptions'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::EmailOptions , "configDone");
+			$this->configPnls['emailoptions']->Name = _sp('Email Sending Options');
+			$this->configPnls['emailoptions']->Info = _sp('Options for when emails are sent, and customizations.');
+			$this->configPnls['emailoptions']->ConfigurationGuide = "These settings control under what circumstances emails are sent out. If you are looking for SMTP server settings, those can be configured under System->Setup->Email.";
 
 			$this->configPnls['local'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Localisation , "configDone");
 			$this->configPnls['local']->Name = _sp('Localization');

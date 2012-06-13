@@ -339,10 +339,12 @@ class xlsws_db_maintenance extends xlsws_index {
 				'EMAIL_SMTP_AUTH_PLAIN', '0', 'Force plain text password in rare circumstances', 5, 9, NOW(), NOW(), 'BOOL');");
 			$this->add_config_key('EMAIL_SEND_CUSTOMER' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Send Receipts to Customers', 
-				'EMAIL_SEND_CUSTOMER', '1', 'Option whether to email order receipts to customers', 5, 2, NOW(), NOW(), 'BOOL');");
+				'EMAIL_SEND_CUSTOMER', '1', 'Option whether to email order receipts to customers', 24, 1, NOW(), NOW(), 'BOOL');");
 			$this->add_config_key('EMAIL_SEND_STORE' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Send Order Alerts to Store', 
-				'EMAIL_SEND_STORE', '1', 'Option to send Store Owner email when order is placed', 5, 3, NOW(), NOW(), 'BOOL');");
+				'EMAIL_SEND_STORE', '1', 'Option to send Store Owner email when order is placed', 24, 2, NOW(), NOW(), 'BOOL');");
+			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=24, `sort_order`=5  
+				where `key`='HTML_EMAIL'");
 			/*$this->add_config_key('EMAIL_SEND_SHIPPING' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Send Ship Alert when Tracking # is detected', 
 				'EMAIL_SEND_SHIPPING', '1', 'Option whether to email receipts when a new tracking number is detected from an order downloaded from LightSpeed', 5, 4, NOW(), NOW(), 'BOOL');");*/
