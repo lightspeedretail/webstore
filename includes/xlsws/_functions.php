@@ -1054,6 +1054,35 @@ function _xls_version() { // LEGACY
 }
 
 /**
+ * Are we being browsed on an iDevice (checks for both devices)
+ * @return bool
+ */
+function _xls_is_idevice() {
+	if (_xls_is_ipad() || _xls_is_iphone()) return true;
+	else return false;
+}
+
+/**
+ * Are we being browsed on an iPad
+ * @return bool
+ */
+function _xls_is_ipad() {
+
+	return (bool) strpos($_SERVER['HTTP_USER_AGENT'],'iPad');
+}
+
+/**
+ * Are we being browsed on an iPhone/Ipod Touch
+ * @return bool
+ */
+function _xls_is_iphone() {
+	
+	if (strpos($_SERVER['HTTP_USER_AGENT'],'iPhone') || strpos($_SERVER['HTTP_USER_AGENT'],'iPod')) 
+	return true;
+	else return false;
+}
+
+/**
 * Initialize a new language.
 *
 * @param string $strLangCode

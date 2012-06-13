@@ -59,7 +59,7 @@ $items = $cart->GetCartItemArray();
 		<?php endforeach; ?>		
 <?php else: ?>
 				<div class="invoice" style="border-top: none;">
-					<div style="height: 113px; width: 128px; margin: 50px auto 0 auto; padding: 45px 20px 0 12px; text-align: center; color: #666;"><?php if (_xls_get_conf('DEBUG_DISABLE_DRAGDROP','0') == '0' )  _xt("Drag Selections Here"); else  _xt("Your cart is empty"); ?></div>
+					<div style="height: 113px; width: 128px; margin: 50px auto 0 auto; padding: 45px 20px 0 12px; text-align: center; color: #666;"><?php _xt($this->strEmptyCartMessage); ?></div>
 				</div>
 <?php endif; ?>
 

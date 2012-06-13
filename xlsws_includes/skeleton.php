@@ -75,7 +75,7 @@ class xlsws_index extends QForm {
 	public $lblGoogleAnalytics = ''; //Code for Google Analytics.
 
 	protected $ctlFlashMessages; //Flash Messages
-
+	protected $strEmptyCartMessage;
 
     /**
 	 * build_menu - builds the category tree
@@ -128,7 +128,11 @@ class xlsws_index extends QForm {
 			</script>";
 		}
 
-		
+		if (_xls_get_conf('DEBUG_DISABLE_DRAGDROP','0') == '0' && !_xls_is_idevice() )  
+			$this->strEmptyCartMessage = _sp("Drag Selections Here"); 
+		else
+	  		$this->strEmptyCartMessage = _sp("Your cart is empty");
+	  
 	}
 
 	
@@ -934,7 +938,7 @@ EOS;
 		$pnlImg->HtmlEntities = false;
 
 		if($ajax_add_action ) {
-			if (_xls_get_conf('DEBUG_DISABLE_DRAGDROP','0') == '0' ) {
+			if (_xls_get_conf('DEBUG_DISABLE_DRAGDROP','0') == '0' && !_xls_is_idevice()) {
 				$pnlImg->AddControlToMove($pnlImg);
 				$pnlImg->RemoveAllDropZones();
 				$pnlImg->AddDropZone($this->cartPnl);
