@@ -373,9 +373,11 @@ class xlsws_db_maintenance extends xlsws_index {
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=9 where `key`='INVENTORY_NON_TITLE'");
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=10 where `key`='INVENTORY_OUT_ALLOW_ADD'");
 			
-					
+			//Cleaning up some tooltips and descriptions to be clearer		
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Enter relative URL (usually starting with /photos)'
 				where `key`='HEADER_IMAGE'");
+			_dbx("UPDATE `xlsws_configuration` SET `helper_text`='Enter the location (relative to you Web Store install directory) to the header or logo image for your Web Store. Do not use a http:// prefix, this will interfere with SSL security. ' where `key`='HEADER_IMAGE'");	
+				
 			
 			//Inventory handling changes
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Inventory should include Virtual Warehouses'
@@ -427,12 +429,12 @@ class xlsws_db_maintenance extends xlsws_index {
 			$this->add_index('xlsws_family','request_url');
 
 			
-			$this->add_config_key('SHOW_SHARING' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Show Sharing Buttons on Product Details', 
-				'SHOW_SHARING', '1', 'Show Sharing buttons such as Facebook and Pinterest', 14, 1, NOW(), NOW(), 'BOOL');");	
 			$this->add_config_key('SHOW_TEMPLATE_CODE' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Show Product Code on Product Details', 
-				'SHOW_TEMPLATE_CODE', '1', 'Determines if the Product Code should be visible', 14, 2, NOW(), NOW(), 'BOOL');");
+				'SHOW_TEMPLATE_CODE', '1', 'Determines if the Product Code should be visible', 19, 20, NOW(), NOW(), 'BOOL');");
+			$this->add_config_key('SHOW_SHARING' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Show Sharing Buttons on Product Details', 
+				'SHOW_SHARING', '1', 'Show Sharing buttons such as Facebook and Pinterest', 19, 21, NOW(), NOW(), 'BOOL');");	
 				
 			$this->add_config_key('SEO_URL_CODES' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Product Codes in Product URLs', 

@@ -3239,9 +3239,9 @@
 		protected function listPages(){
 
 			
-			$this->configPnls['seo'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::SEO , "configDone");
-			$this->configPnls['seo']->Name = _sp('Template Options');
-			$this->configPnls['seo']->Info = _sp('SEO Template Options');
+			//$this->configPnls['seo'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::SEO , "configDone");
+			//$this->configPnls['seo']->Name = _sp('Template Options');
+			//$this->configPnls['seo']->Info = _sp('SEO Template Options');
 
 			$this->configPnls['url'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::URL , "configDone");
 			$this->configPnls['url']->Name = _sp('URL Options');
