@@ -236,7 +236,7 @@ class XLSPaymentControl extends XLSCompositeControl {
         $objClause = QQ::Clause(QQ::OrderBy(QQN::Modules()->SortOrder));
 
         if ($strModule) {
-            $strModule = $strModule . '.php';
+            $strModule = $strModule;
             $objCondition = QQ::AndCondition(
                 $objCondition, 
                 QQ::Equal(QQN::Modules()->File, $strModule)
