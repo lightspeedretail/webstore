@@ -442,9 +442,23 @@ class xlsws_cregister extends xlsws_index {
 		//Force to opt out by presenting checkbox as checked
 		if(!$this->isLoggedIn())
 			$this->PasswordControl->NewsletterSubscribe->Checked = true;
+			
+
+			
 		Visitor::add_view_log('', ViewLogType::registration);
 	}
 
+	 protected function Form_PreLoad() {
+        
+        parent::Form_PreLoad();
+        
+        if ($_SESSION['customer']->Country1=='')
+			$_SESSION['customer']->Country1=_xls_get_conf('DEFAULT_COUNTRY');  
+		if ($_SESSION['customer']->Country2=='')
+			$_SESSION['customer']->Country2=_xls_get_conf('DEFAULT_COUNTRY');
+        
+        
+     }
 	
 	/**
 	 * Form_Validate - Validates all form fields for valid input
