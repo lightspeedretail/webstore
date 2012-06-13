@@ -79,7 +79,12 @@ class XLSStateControl extends XLSListControl {
 
         if (!$objStates) {
             $objStates = State::LoadArrayByCountryCode(
-                $objCountry->SelectedValue
+                $objCountry->SelectedValue,QQ::Clause(
+                            QQ::OrderBy(
+                                QQN::State()->SortOrder, 
+                                QQN::State()->State
+                            )
+                        )
             );
         }
 
