@@ -32,8 +32,10 @@ class XLSCaptchaControl extends XLSCompositeControl {
 
     protected function GetCodeContent() {
     
+    	$publickey = _xls_get_conf('RECAPTCHA_PUBLIC_KEY' , '');
+    	
     	//Will be removed in 2.3, customers should migrate and get account
-    	if (_xls_get_conf('CAPTCHA_STYLE' , '0')=='1') {
+    	if (_xls_get_conf('CAPTCHA_STYLE' , '0')=='1' || empty($publickey)) {
 	        $strImage = '<img id="captcha-verif-img" src="verify-img.php"' . 
 	            ' alt="Verification Code"/>';
 	        $strRefresh = '<div id="captcha-verif-refresh"' . 
@@ -53,7 +55,7 @@ class XLSCaptchaControl extends XLSCompositeControl {
 		}
 		
 		require_once(__INCLUDES__."/recaptcha/recaptchalib.php");
-		$publickey = _xls_get_conf('RECAPTCHA_PUBLIC_KEY' , '');
+
 		unset($this->objCaptchaResponse);
 
 		if ($this->objInputControl->ValidationError=="Invalid Entry, try again") $this->strError='incorrect-captcha-sol';
