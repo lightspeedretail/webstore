@@ -72,7 +72,7 @@ class xlsws_checkout extends xlsws_index {
 
 	protected $lblWait; //the label for the wait icon (optional)
 	protected $icoWait; //the actual wait icon
-
+	protected $objWait;
 
 	protected $pnlWait; //The QPanel that shows the wait icon(s)
 
@@ -88,7 +88,7 @@ class xlsws_checkout extends xlsws_index {
 
 		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('checkout.tpl.php');
-        $this->objDefaultWaitIcon = new QWaitIcon($this);
+        //$this->objDefaultWaitIcon = new QWaitIcon($this,'WaitIcon');
 
 		$this->crumbs[] = array('link'=>'cart/pg/' , 'case'=> '' , 'name'=> _sp('Edit Cart'));
 	
@@ -116,6 +116,10 @@ class xlsws_checkout extends xlsws_index {
 		$this->lblWait->CssClass = "checkout_process_label";
 
 		$this->icoWait = new QWaitIcon($this->pnlWait);
+		
+		
+		//$this->pnlWait = new QWaitIcon($this,'Icon1');
+		$this->objDefaultWaitIcon = $this->ShippingControl->Wait;
 		
 		_xls_add_formatted_page_title('Checkout');
 		
