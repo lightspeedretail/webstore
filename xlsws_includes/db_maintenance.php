@@ -659,7 +659,15 @@ class xlsws_db_maintenance extends xlsws_index {
 			for ($x=1; $x<=9; $x++)
 				_dbx("update xlsws_google_categories set `name".$x."`=null where `name".$x."`=''");
 			_dbx("delete from xlsws_google_categories where `name1` is null");
-									
+			
+			
+			//Shipping options
+			$this->add_config_key('SHIP_SAME_BILLSHIP' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Require Billing and Shipping Address to Match', 
+				'SHIP_SAME_BILLSHIP', '0', 'Locks the Shipping and Billing are same checkbox to not allow separate shipping address.', 25, 2, NOW(), NOW(), 'BOOL');");	
+			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=25, `sort_order`=1 
+				where `key`='SHIP_RESTRICT_DESTINATION'");	
+					
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			
 			$strUpgradeText .= "<h2>Please run RECALCULATE PENDING ORDERS after running this Upgrade.</h2>";

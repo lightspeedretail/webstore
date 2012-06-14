@@ -343,6 +343,7 @@
 		const CategoryTitleFormat = 23;
 		
 		const EmailOptions = 24;
+		const ShippingRestrictions = 25;
 
 	}
 	
@@ -956,9 +957,9 @@
 			
 				
 			
-			$this->configPnls['defship'] = new xlsws_admin_config_panel($this , $this , 'SHIP_RESTRICT_DESTINATION' , "configDone");
-			$this->configPnls['defship']->Name = _sp('Restricted shipping');
-			$this->configPnls['defship']->Info = _sp('Only ship to restricted destinations?');
+			$this->configPnls['defship'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::ShippingRestrictions , "configDone");
+			$this->configPnls['defship']->Name = _sp('Shipping Restrictions');
+			$this->configPnls['defship']->Info = _sp('Options which restrict shipments');
 			
 
 			$this->configPnls['wunit'] = new xlsws_admin_config_panel($this , $this , 'WEIGHT_UNIT' , "configDone");
@@ -970,14 +971,6 @@
 			$this->configPnls['dunit']->Name = _sp('Dimension Unit');
 			$this->configPnls['dunit']->Info = _sp('This is dimension unit you are using for your products in LightSpeed. This unit will be used in shipping calculation.');
 			
-			$shipTaxconfig = Configuration::LoadByKey('SHIPPING_TAXABLE');
-			if (! $shipTaxconfig)
-			{
-
-				_xls_insert_conf('SHIPPING_TAXABLE', _sp('Taxable shipping'), '0', _sp('This is used to enable tax calculations on shipping charges.'), 9, 'BOOL');
-			}
-
-
 			$this->configPnls['taxship'] = new xlsws_admin_config_panel($this , $this , 'SHIPPING_TAXABLE' , "configDone");
 			$this->configPnls['taxship']->Name = _sp('Taxable shipping');
 			$this->configPnls['taxship']->Info = _sp('This is used to enable tax calculations on shipping charges.');

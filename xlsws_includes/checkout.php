@@ -194,7 +194,9 @@ class xlsws_checkout extends xlsws_index {
         $this->ShippingContactControl->Address->Zip->AddAction(
             new QChangeEvent(),new QAjaxAction('DoCalculateShippingClick')
         );
-        $this->CustomerControl->CheckSame->AddAction(
+       	
+       	if (_xls_get_conf('SHIP_SAME_BILLSHIP','0')=='0')
+		 $this->CustomerControl->CheckSame->AddAction(
             new QChangeEvent(),new QAjaxAction('DoCalculateShippingClick')
         );
     }
@@ -1280,6 +1282,8 @@ class xlsws_checkout extends xlsws_index {
                 if ($this->CalculateShippingControl) return true;
                 else return false;
             case 'chkSame':
+       			if (_xls_get_conf('SHIP_SAME_BILLSHIP','0')=='1')
+					return true;
                 if ($this->CustomerControl->CheckSame) return true;
                 else return false;
         }

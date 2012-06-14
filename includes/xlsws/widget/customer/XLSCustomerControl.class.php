@@ -114,7 +114,11 @@ class XLSCustomerControl extends XLSCompositeControl {
             new QCheckBox($this, $this->GetChildName('CheckSame'));
         $objControl->Text = _sp('Shipping Address is the same' . 
             ' as Billing Address');
-
+	
+		if (_xls_get_conf('SHIP_SAME_BILLSHIP','0')=='1')
+			 $objControl->Text = _sp('This merchant requires Shipping and Billing Address to match');
+       			
+		
         $this->UpdateCheckSameControl();
         $this->BindCheckSameControl();
 
@@ -129,6 +133,11 @@ class XLSCustomerControl extends XLSCompositeControl {
     	$objCustomer = Customer::GetCurrent();
 		if ($objControl)
 			$objControl->Checked = $objCustomer->CheckSame;
+		if (_xls_get_conf('SHIP_SAME_BILLSHIP','0')=='1') {
+			$objControl->Checked = 1;
+			$objControl->Enabled = false;
+		}
+		
 		$this->DoCheckSameChange(null,null,null);
         return;
     }
@@ -138,6 +147,7 @@ class XLSCustomerControl extends XLSCompositeControl {
         if (!$objControl)
             return;
 
+        if (_xls_get_conf('SHIP_SAME_BILLSHIP','0')!='1')
         $objControl->AddAction(
             new QChangeEvent(), 
             new QAjaxControlAction($this, 'DoCheckSameChange')

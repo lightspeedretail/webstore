@@ -291,6 +291,7 @@ class xlsws_cregister extends xlsws_index {
 		$objCustomer->NewsletterSubscribe = $this->PasswordControl->NewsletterSubscribe->Checked;
 		$objCustomer->HtmlEmail = 1;
 		$objCustomer->CheckSame = $this->CustomerControl->CheckSame->Checked;
+		if (_xls_get_conf('SHIP_SAME_BILLSHIP','0')=='1') $objCustomer->CheckSame = 1;
 
 
 		//Moderate login
