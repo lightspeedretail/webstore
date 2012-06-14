@@ -435,6 +435,11 @@ margin:0 auto 3px;
 cursor: hand; cursor: pointer;
 }
 
+
+.product_detail_image {
+text-align: center;
+}
+
 .product_cell_price {
 background:url(images/price_bg.png) repeat-x;
 border:1px solid #6c6c6c;
