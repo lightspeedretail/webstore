@@ -490,154 +490,84 @@ class iups extends xlsws_class_shipping {
 
 		if ($this->s_country == 'US' && $this->pickuptype == '11') {
 
-			$customer_classification=<<<EOT
-
-	<CustomerClassification>
-
+			$customer_classification='<CustomerClassification>
 		<Code>04</Code>
-
-	</CustomerClassification>
-
-EOT;
+	</CustomerClassification>';
 
 		}
 
 
-		$xml=<<<EOT
-
-<?xml version="1.0"?>
-
+		$xml='<?xml version="1.0"?>
 <AccessRequest xml:lang="en-US">
-
-	<AccessLicenseNumber>$this->accesskey</AccessLicenseNumber>
-
-	<UserId>$this->userid</UserId>
-
-	<Password>$this->passwd</Password>
-
+	<AccessLicenseNumber>'.$this->accesskey.'</AccessLicenseNumber>
+	<UserId><![CDATA['.$this->userid.']]></UserId>
+	<Password><![CDATA['.$this->passwd.']]></Password>
 </AccessRequest>
-
 <?xml version="1.0"?>
-
-<RatingServiceSelectionRequest xml:lang='en-US'>
-
+<RatingServiceSelectionRequest xml:lang=\'en-US\'>
   <Request>
-
 	<TransactionReference>
-
 	  <CustomerContext>Rating and Service</CustomerContext>
-
 	  <XpciVersion>1.0001</XpciVersion>
-
 	</TransactionReference>
-
 	<RequestAction>Rate</RequestAction>
-
 	<RequestOption>shop</RequestOption>
-
   </Request>
-
 	<PickupType>
-
-	<Code>$this->pickuptype</Code>
-
+	<Code>'.$this->pickuptype.'</Code>
   </PickupType>
-
-  $customer_classification
-
+  '.$customer_classification.'
   <Shipment>
-
 	<Shipper>
-
 		<Address>
-
-			<PostalCode>$this->s_zip</PostalCode>
-
-			<CountryCode>$this->s_country</CountryCode>
-
+			<PostalCode>'.$this->s_zip.'</PostalCode>
+			<CountryCode>'.$this->s_country.'</CountryCode>
 		</Address>
-
 	</Shipper>
-
 	<ShipTo>
-
 		<Address>
-
-			<PostalCode>$this->t_zip</PostalCode>
-
-			<CountryCode>$this->t_country</CountryCode>
-
-			<ResidentialAddressIndicator>$this->residential</ResidentialAddressIndicator>
-
+			<PostalCode>'.$this->t_zip.'</PostalCode>
+			<CountryCode>'.$this->t_country.'</CountryCode>
+			<ResidentialAddressIndicator>'.$this->residential.'</ResidentialAddressIndicator>
 		</Address>
-
 	</ShipTo>
-
 	<ShipFrom>
-
 		<Address>
-
-			<PostalCode>$this->s_zip</PostalCode>
-
-			<CountryCode>$this->s_country</CountryCode>
-
+			<PostalCode>'.$this->s_zip.'</PostalCode>
+			<CountryCode>'.$this->s_country.'</CountryCode>
 		</Address>
-
 	</ShipFrom>
 	<Service>
-
-			<Code>$this->service</Code>
-
+			<Code>'.$this->service.'</Code>
 	</Service>
 	<Package>
-
 		<PackagingType>
-
-			<Code>$this->package_type</Code>
-
+			<Code>'.$this->package_type.'</Code>
 		</PackagingType>
-
 			<Dimensions>
-
 				<UnitOfMeasurement>
-
-				  <Code>$this->measurement_type</Code>
-
+				  <Code>'.$this->measurement_type.'</Code>
 				</UnitOfMeasurement>
-
-				<Length>$this->l</Length>
-
-				<Width>$this->w</Width>
-
-				<Height>$this->h</Height>
-
+				<Length>'.$this->l.'</Length>
+				<Width>'.$this->w.'</Width>
+				<Height>'.$this->h.'</Height>
 			</Dimensions>
-
 		<PackageWeight>
-
 			<UnitOfMeasurement>
-
-				 <Code>$this->weight_type</Code>
-
+				 <Code>'.$this->weight_type.'</Code>
 			</UnitOfMeasurement>
-
-			<Weight>$this->weight</Weight>
-
+			<Weight>'.$this->weight.'</Weight>
 		</PackageWeight>
-
 	</Package>
 	<PackageServiceOptions>
 		<InsuredValue>
-			<CurrencyCode>$currency_code</CurrencyCode>
-			<MonetaryValue>$this->value</MonetaryValue>
+			<CurrencyCode>'.$currency_code.'</CurrencyCode>
+			<MonetaryValue>'.$this->value.'</MonetaryValue>
 		</InsuredValue>
 	</PackageServiceOptions>
-
   </Shipment>
+</RatingServiceSelectionRequest>';
 
-</RatingServiceSelectionRequest>
-
-EOT;
 		return $xml;
 	}
 
