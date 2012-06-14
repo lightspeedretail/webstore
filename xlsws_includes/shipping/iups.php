@@ -109,6 +109,7 @@ class iups extends xlsws_class_shipping {
 	var $upstool='https://www.ups.com/ups.app/xml/Rate';
 	var $request;
 	var $service;
+	var $customerclassification;
 	var $pickuptype='01'; // 01 daily pickup
 	  /* Pickup Type
 		01- Daily Pickup
@@ -174,7 +175,7 @@ class iups extends xlsws_class_shipping {
 	}
 
 	protected function make_iups_products($field) {
-		$config = $this->getConfigValues('iups');
+		$config = $this->getConfigValues(get_class($this));
 		$region = $config['regionservices'];
 
 		$this->service_types = $values = $this->$region;
@@ -247,12 +248,21 @@ class iups extends xlsws_class_shipping {
 
 		$ret['ratecode'] = new XLSListBox($objParent);
 		$ret['ratecode']->Name = _sp('Rate Code');
-		$ret['ratecode']->AddItem('Regular Daily Pickup', 'Regular+Daily+Pickup');
-		$ret['ratecode']->AddItem('On Call Air', 'On+Call+Air');
-		$ret['ratecode']->AddItem('One Time Pickup', 'One+Time+Pickup');
-		$ret['ratecode']->AddItem('Letter Center', 'Letter+Center');
-		$ret['ratecode']->AddItem('Customer Counter', 'Customer+Counter');
+		$ret['ratecode']->AddItem('Regular Daily Pickup', '01');
+		$ret['ratecode']->AddItem('Suggested Retail Rates', '11');
+		$ret['ratecode']->AddItem('On Call Air', '07');
+		$ret['ratecode']->AddItem('One Time Pickup', '06');
+		$ret['ratecode']->AddItem('Letter Center', '19');
+		$ret['ratecode']->AddItem('Customer Counter', '03');
+		$ret['ratecode']->AddItem('Air Service Center', '20');
 
+	
+		$ret['customerclassification'] = new XLSListBox($objParent);
+		$ret['customerclassification']->Name = _sp('Customer Classification');
+		$ret['customerclassification']->AddItem('Retail', '04');
+		$ret['customerclassification']->AddItem('Occasional', '03');
+		$ret['customerclassification']->AddItem('Wholesale', '01');                   
+                    
 		$ret['package'] = new XLSListBox($objParent);
 		$ret['package']->Name = _sp('Packaging');
 		$ret['package']->AddItem('Customer Packaging', 'CP');
@@ -288,7 +298,7 @@ class iups extends xlsws_class_shipping {
 
 	public function customer_fields($objParent) {
 		$ret = array();
-		$config = $this->getConfigValues('iups');
+		$config = $this->getConfigValues(get_class($this));
 
 		$ret['service'] = new XLSListBox($objParent,'ModuleMethod');
 		$this->make_iups_products($ret['service']);
@@ -298,7 +308,7 @@ class iups extends xlsws_class_shipping {
 	}
 
 	public function total($fields, $cart, $country = '', $zipcode = '', $state = '', $city = '', $address2 = '', $address1 = '', $company = '', $lname = '', $fname = '') {
-		$config = $this->getConfigValues('iups');
+		$config = $this->getConfigValues(get_class($this));
 
 		if(empty($config['originpostcode']) || empty($config['origincountry']) || empty($config['username']) || empty($config['accesskey']))
 			return false;
@@ -309,6 +319,8 @@ class iups extends xlsws_class_shipping {
 		$this->userid = $config['username'];
 		$this->passwd = $config['password'];
 		$this->accesskey = $config['accesskey'];
+		$this->customerclassification = $config['customerclassification'];
+		$this->pickuptype = $config['ratecode'];
 		$this->currency = $cart->Currency;
 
 		$weight = $cart->Weight;
@@ -486,16 +498,13 @@ class iups extends xlsws_class_shipping {
 	function construct_request_xml(){
 		$currency_code = $this->currency;
 
-		$customer_classification = '';
+		$customer_classification = $this->customerclassification;
+		
+		if ($customer_classification=='')
+			$customer_classification='04';
 
-		if ($this->s_country == 'US' && $this->pickuptype == '11') {
-
-			$customer_classification='<CustomerClassification>
-		<Code>04</Code>
-	</CustomerClassification>';
-
-		}
-
+		if ($this->pickuptype=='')
+			$this->pickuptype='01';
 
 		$xml='<?xml version="1.0"?>
 <AccessRequest xml:lang="en-US">
@@ -516,7 +525,9 @@ class iups extends xlsws_class_shipping {
 	<PickupType>
 	<Code>'.$this->pickuptype.'</Code>
   </PickupType>
-  '.$customer_classification.'
+  <CustomerClassification>
+		<Code>'.$customer_classification.'</Code>
+	</CustomerClassification>
   <Shipment>
 	<Shipper>
 		<Address>
