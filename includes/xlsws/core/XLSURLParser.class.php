@@ -247,7 +247,9 @@ class XLSURLParser {
 					return true;
 				}
 				else if ($page = CustomPage::LoadByKey($uriPath)) {
-					$_GET['cpage'] = $XLSWS_VARS['cpage'] = $page->Key;
+					$this->strRedirectUrl = $page->Link;
+					$this->intStatus=301;
+					return true;
 				}
 				else if ($product = Product::QuerySingle(QQ::AndCondition(
 					QQ::Equal(QQN::Product()->Name , $uriPath)))) {
