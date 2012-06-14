@@ -696,6 +696,14 @@ class xlsws_product extends xlsws_index {
 			$this->cartPnl->RemoveChildControls(true);
 			$this->build_cart();
 			$this->cartPnl->Refresh();	
+		} else {
+			//We had an add failure, but rebuild control so we reset
+			$this->RemoveControl($this->pnlImg->ControlId);
+			$this->create_prod_image();
+			$this->pnlImgHolder->Refresh();
+			$this->cartPnl->RemoveChildControls(true);
+			$this->build_cart();
+			$this->cartPnl->Refresh();
 		}
 
 		
