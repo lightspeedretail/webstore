@@ -200,6 +200,25 @@ class xlsws_db_maintenance extends xlsws_index {
 		
 			//@Todo: Add any 2.2 changes here
 			
+			$this->add_table('xlsws_cart_type' , "CREATE TABLE `xlsws_cart_type` (
+			  `id` int(10) NOT NULL AUTO_INCREMENT,
+			  `name` varchar(255) NOT NULL,
+			  PRIMARY KEY (`id`),
+			  UNIQUE KEY `name` (`name`)
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
+			_dbx("TRUNCATE TABLE `xlsws_cart_type`");
+			_dbx("INSERT INTO `xlsws_cart_type` (`id`, `name`)
+				VALUES
+					(1, 'cart'),
+					(2, 'giftregistry'),
+					(3, 'quote'),
+					(4, 'order'),
+					(5, 'invoice'),
+					(6, 'saved'),
+					(7, 'awaitpayment'),
+					(8, 'sro');
+				");
+			
 			$this->add_column('xlsws_category' , 'google_id' ,
 				"ALTER TABLE `xlsws_category` ADD `google_id` INT  DEFAULT NULL AFTER `image_id`");
 
