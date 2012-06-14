@@ -97,7 +97,7 @@ class Category extends CategoryGen {
 	}
 
 	public function HasChildOrProduct() { // LEGACY should be protected
-		if ($this->HasChildren() || $this->HasProducts())
+		if ($this->HasChildren() || $this->HasProducts() || _xls_get_conf('DISPLAY_EMPTY_CATEGORY', '1')=='1')
 			return true;
 		return false;
 	}
