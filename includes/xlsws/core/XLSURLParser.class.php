@@ -54,8 +54,9 @@ class XLSURLParser {
 		if (!$this->ReindexSegments())	return false;
 		
 		//print "<pre>"; print_r($this->arrUrlSegments);die();
-		if ($this->SetRouting()) return true;
 		if ($this->ProcessOldUrl()) return true;
+		if ($this->SetRouting()) return true;
+		
 
 		return false;
 
@@ -155,6 +156,20 @@ class XLSURLParser {
 			$strRemaining = str_replace("?&","?",$strRemaining);
 			if ($strRemaining=="?") $strRemaining='';	
 			$this->strRedirectUrl = str_replace("_","-",basename($_GET['xlspg']))."/pg/".$strRemaining;
+			$this->strRedirectUrl = _xls_site_url($this->strRedirectUrl);
+			$this->intStatus=301;
+			return true;
+		
+			
+		}
+	
+		if (isset($_GET['search'])) {
+			//The first xlspg code is now our first URL segment, but any appended GET variables still need to carry
+			$strRemaining = str_replace("search=".$_GET['search'],"",$_SERVER['REQUEST_URI']);
+			$strRemaining = strstr($strRemaining,'?');	
+			$strRemaining = str_replace("?&","?",$strRemaining);
+			if ($strRemaining=="?") $strRemaining='';	
+			$this->strRedirectUrl = basename($_GET['search'])."/s/".$strRemaining;
 			$this->strRedirectUrl = _xls_site_url($this->strRedirectUrl);
 			$this->intStatus=301;
 			return true;
