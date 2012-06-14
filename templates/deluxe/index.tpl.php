@@ -151,7 +151,7 @@
 				<li id="products"><a href="<?php echo _xls_site_dir() ?>"></a></li>
 				<?php
 				foreach ($this->arrTopTabs as $arrTab)
-					echo '<li id="tab'.count($this->arrTopTabs).'"><a href="'.$arrTab->Link.'">'._sp($arrTab->Title).'</a></li>';
+					echo '<li id="tab'.count($this->arrTopTabs).'"><a '.(strlen($arrTab->Title)>12 ? 'class="tabvcenter"' : "").' href="'.$arrTab->Link.'">'.$arrTab->Title.'</a></li>';
 				?>				
 			</ul><div id="searchedge"></div><div id="searchentry"><?php $this->searchPnl->Render(); ?></div>				
 		</div>

@@ -237,6 +237,10 @@ height:24px;
 width:112px;
 }
 
+#tab1 a.tabvcenter,#tab3 a.tabvcenter,#tab4 a.tabvcenter,#tab4 a.tabvcenter,#tab5 a.tabvcenter,#tab6 a.tabvcenter {
+padding:5px 0;
+}
+
 #searchedge {
 border-left:1px solid #adadad;
 clear:both;
