@@ -379,8 +379,9 @@ class xlsws_db_maintenance extends xlsws_index {
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Enter relative URL (usually starting with /photos)'
 				where `key`='HEADER_IMAGE'");
 			_dbx("UPDATE `xlsws_configuration` SET `helper_text`='Enter the location (relative to you Web Store install directory) to the header or logo image for your Web Store. Do not use a http:// prefix, this will interfere with SSL security. ' where `key`='HEADER_IMAGE'");	
-				
+			_dbx("UPDATE `xlsws_configuration` SET `title`='New customers can purchase', `options`='ALLOW_GUEST_CHECKOUT', `helper_text`='Force customers to sign up with an account before shopping? Note this some customers will abandon a forced-signup process. Customer cards are created in LightSpeed based on all orders, not dependent on customer registrations.' where `key`='ALLOW_GUEST_CHECKOUT'");
 			
+						
 			//Inventory handling changes
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Inventory should include Virtual Warehouses'
 				where `key`='INVENTORY_FIELD_TOTAL'");

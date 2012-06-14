@@ -659,7 +659,8 @@
 
 				case 'SSL_NO_NEED_FORWARD':
 					return array(1 => _sp("Only when going to Checkout or pages involving passwords"),0 => _sp("At all times including browsing product pages"));											
-				
+				case 'ALLOW_GUEST_CHECKOUT':
+					return array(1 => _sp("without first registering for an account (default)"),0 => _sp("only after creating an account"));										
 					
 				default:
 					if(stristr($str , "return"))
