@@ -4286,9 +4286,9 @@
 			
 			
 			// is destination_table enabled?
-			$dest = Modules::LoadByFileType('destination_table.php' , 'shipping');
+			$dest = Modules::LoadByFileType('destination_table' , 'shipping');
 			
-			if($dest){
+			if($dest && $dest->Active){
 				
 				$config = $dest->GetConfigValues();
 				
