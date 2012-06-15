@@ -156,7 +156,18 @@ class beanstream_aim extends credit_card {
 			"ordPhoneNumber"	=> $cart->Phone,
 			"ordCity"			=> $customer->City1,
 			"ordProvince"		=> $customer->State1,
-			"ordCountry"		=> $customer->Country1
+			"ordCountry"		=> $customer->Country1,
+			
+			
+			"shipName"			=> $cart->ShipFirstname." ".$cart->ShipLastname,
+			"shipAddress1"		=> $cart->ShipAddress1,
+			"shipAddress2"		=> $cart->ShipAddress2,
+			"shipCity"			=> $cart->ShipCity,
+			"shipProvince"		=> $cart->ShipState,
+			"shipPostalCode"	=> $cart->ShipZip,
+			"shipCountry"		=> $cart->ShipCountry,
+			"shippingMethod"	=> $cart->ShippingData
+			
 		);
 
 		$beanstream_fields = "";
@@ -184,12 +195,12 @@ class beanstream_aim extends credit_card {
 
 		if ($resp_vals['trnApproved'] != "1") {
 			$errortext = _sp(urldecode($resp_vals['messageText']));
-			return FALSE;
+			return array(false,$errortext);
 		}
 
 		($resp_vals['authCode'] == "TEST") ? $this->paid_amt = 0.00 : $this->paid_amt = $amount;
 
-		return $resp_vals['authCode'];
+		return array(true,$resp_vals['authCode']);
 	}
 
 	/**
