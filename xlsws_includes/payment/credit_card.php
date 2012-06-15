@@ -80,11 +80,13 @@ class credit_card extends xlsws_class_payment {
 		$ret['ccnum']->Name = _sp('Card Number');
 		$ret['ccnum']->Required = true;
 		$ret['ccnum']->DisplayStyle = QDisplayStyle::Block;
+		$ret['ccnum']->SetCustomAttribute('autocomplete', 'off');
 
 		$ret['ccsec'] = new XLSTextBox($objParent);
 		$ret['ccsec']->Name = _sp('CVV');
 		$ret['ccsec']->Required = true;
 		$ret['ccsec']->Width = 40;
+		$ret['ccsec']->SetCustomAttribute('autocomplete', 'off');
 
 		$ret['ccname'] = new XLSTextBox($objParent);
 		$ret['ccname']->Name = _sp('Name on Card');
