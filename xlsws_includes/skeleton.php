@@ -516,16 +516,20 @@ EOS;
 		$this->sidePnl->Template = templateNamed("sidebar.tpl.php");
 
 		$sidebarModules = Modules::QueryArray(
-			QQ::Equal(QQN::Modules()->Type, 'sidebar'),
+			QQ::AndCondition(
+					QQ::Equal(QQN::Modules()->Type, 'sidebar'),
+					QQ::Equal(QQN::Modules()->Active, 1)
+					),
 			QQ::Clause(QQ::OrderBy(QQN::Modules()->SortOrder))
+			
 		);
-
+	
 		foreach($sidebarModules as $module) {
 			$obj = $this->loadModule($module->File, 'sidebar');
 
 			if($obj->check())
 				$this->arrSidePanels[$obj->name()] =
-					$obj->getPanel($this->sidePnl);
+					$obj->getPanel($this->sidePnl,camelize($obj->name()));
 		}
 	}
 

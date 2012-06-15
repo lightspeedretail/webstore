@@ -83,6 +83,26 @@ function _xls_convert_camel($camel) {
 }
 
 /**
+ * Convert an string to camel cased string
+ *
+ * @param string $string :: String you wish to convert
+ * @param bool $pascalCase :: Capitalize First Letter
+ * @return string :: Converted string corresponding to a table field
+ */
+
+function camelize($string, $pascalCase = true)
+{
+  $string = str_replace(array('-', '_'), ' ', $string);
+  $string = ucwords($string);
+  $string = str_replace(' ', '', $string); 
+
+  if (!$pascalCase) {
+    return lcfirst($string);
+  }
+  return $string;
+} 
+
+/**
  * Determine whether a string is a properly formated email address
  *
  * @param string $email :: The string to test
