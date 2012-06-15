@@ -211,7 +211,7 @@ class authorize_dot_net_sim extends xlsws_class_payment {
 	 * @return string
 	 */
 	public function hmac ($key, $data) {
-		return (bin2hex (mhash(MHASH_MD5, $data, $key)));
+		return hash_hmac('md5', $data, $key);
 	}
 
 	/**
