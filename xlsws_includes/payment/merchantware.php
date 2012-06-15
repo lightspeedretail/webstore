@@ -196,12 +196,13 @@ class merchantware extends credit_card {
 		// Handle transaction response data
 		if($response_status[0] != 'APPROVED' ) {
 			$this->paid_amount = 0;
-			$errortext = _sp("Your credit card has been declined");
-			return FALSE;
+			$arrResponse = explode(";",$response_status[0]);
+			$errortext = _sp($arrResponse[0].': '.$arrResponse[2]);
+			return array(false,$errortext);
 		}
 
 		$this->paid_amount = $cart->Total;
-		return $response_authorization_code[0];
+		return array(true,$response_authorization_code[0]);
 	}
 
 	public function paid_amount(Cart $cart) {

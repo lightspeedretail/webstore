@@ -225,13 +225,13 @@ class authorize_dot_net_aim extends credit_card {
 
 		if($resp_vals[0] != '1' ) {
 			$this->paid_amount = 0;
-			$errortext = _sp("Your credit card has been declined");
-			return FALSE;
+			$errortext = _sp($resp_vals[3]);
+			return array(false,$errortext);
 		}
 
 		$this->paid_amount = $cart->Total;
 		// on success, return the transaction ID
-		return $resp_vals[4];
+		return array(true,$resp_vals[4]);
 	}
 
 	/**

@@ -166,11 +166,11 @@ class eway_cvn_aus extends credit_card {
 		$ewayResponseFields = $this->parseResponse($xmlResponse);
 
 		if($ewayResponseFields["EWAYTRXNSTATUS"]=="True") {
-			return $ewayResponseFields["EWAYAUTHCODE"];
+			return array(true,$ewayResponseFields["EWAYAUTHCODE"]);
 		}
 
 		$errortext = $ewayResponseFields["EWAYTRXNERROR"];
-		return false;
+		return array(false,$errortext);
 	}
 
 	/**

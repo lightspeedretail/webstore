@@ -165,12 +165,12 @@ class axia extends credit_card {
 			return $tran->refnum;
 		} else {
 			$this->paid_amount = 0;
-			$errortext = _sp("Your credit card has been declined");
-			return FALSE;
+			$errortext = _sp($tran->error);
+			return array(false,$errortext);
 		}
 
 		$this->paid_amount = $cart->Total;
-		return $resp_vals[4];
+		return array(true,$resp_vals[4]);
 	}
 
 	public function paid_amount(Cart $cart){
