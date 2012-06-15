@@ -492,14 +492,7 @@ EOS;
 					}
 					$objCurrentCart->Delete();			
 				}
-				//Did we have some items already in our cart?
-/*				AddToCart($objProduct,
-					$intQty = 1, $strDescription = false,
-					$fltSell = false, $fltDiscount = 0,
-					$mixCartType = false, $intGiftItemId = 0)
-*/					
 		
-			
 				$objCartInProgress->Save();
 			}
 		
