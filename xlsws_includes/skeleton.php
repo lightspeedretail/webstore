@@ -473,6 +473,36 @@ EOS;
 			Visitor::add_view_log($customer->Rowid,
 				ViewLogType::customerlogin);
 
+			
+			$objCartInProgress = Cart::LoadLastCartInProgress(1);
+			if ($objCartInProgress) {
+				$objCurrentCart = Cart::GetCart();
+				$arrCurrentItems = $objCurrentCart->GetCartItemArray();
+				
+				//Switch to original cart
+				$items = $objCartInProgress->GetCartItemArray(); 
+				$_SESSION['XLSWS_CART'] = $objCartInProgress;
+				
+				//Add any new items
+				if (count($arrCurrentItems)>0) {
+					foreach($arrCurrentItems as $objItem) {
+						$objProduct = Product::Load($objItem->ProductId);
+						$objCartInProgress->AddToCart($objProduct,$objItem->Qty,$objItem->Description,$objItem->Sell,$objItem->Discount,$objItem->CartType,$objItem->GiftRegistryItem);
+						$objItem->Delete();
+					}
+					$objCurrentCart->Delete();			
+				}
+				//Did we have some items already in our cart?
+/*				AddToCart($objProduct,
+					$intQty = 1, $strDescription = false,
+					$fltSell = false, $fltDiscount = 0,
+					$mixCartType = false, $intGiftItemId = 0)
+*/					
+		
+			
+				$objCartInProgress->Save();
+			}
+		
 			Cart::UpdateCartCustomer();
 
 			$uri = _xls_stack_pop('login_redirect_uri');
@@ -494,7 +524,7 @@ EOS;
 		$customer = Customer::GetCurrent();
 
 		Visitor::add_view_log($customer->Rowid, ViewLogType::customerlogout);
-
+				
 		Customer::Logout();
 		Cart::ClearCart();
 

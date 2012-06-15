@@ -737,10 +737,13 @@ class Cart extends CartGen {
             return false;
 
 		// If cart unsaved, Save it to get Rowid
-		if (!$this->Rowid)
+		if (!$this->Rowid) {
 			$this->Save();
+			$this->UpdateCartCustomer();
+		}
 
 		$objItem->CartId = $this->Rowid;
+		$this->UpdateSubtotal();
 		$objItem->Save();
 
 		$this->UpdateCart(false,true,false,true);
@@ -943,6 +946,34 @@ class Cart extends CartGen {
 		}
 	}
 
+	/**
+		 * Load an array of Cart objects,
+		 * by CustomerId Index(es)
+		 * @param integer $intCustomerId
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @return Cart[]
+		*/
+		public static function LoadLastCartInProgress($intCustomerId) {
+			// Call Cart::QueryArray to perform the LoadArrayByCustomerId query
+			try {
+				$items = Cart::QueryArray(
+					QQ::AndCondition(
+						QQ::Equal(QQN::Cart()->CustomerId, $intCustomerId),
+						QQ::Equal(QQN::Cart()->Type, '1'),
+						QQ::GreaterThan(QQN::Cart()->Count, 0)),
+					QQ::Clause(
+						
+						QQ::OrderBy(QQN::Cart()->Rowid, false),
+			 			QQ::LimitInfo(1)
+			 		)
+					);
+				return $items[0];
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
+		
 	/**
 	 * loads cart by a given promo code id, if it exists
 	 *
