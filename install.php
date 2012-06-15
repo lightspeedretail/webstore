@@ -1065,7 +1065,12 @@ EOT;
 
 				//Check php.ini settings
 				$checked['allow_call_time_pass_reference in Php.ini must be turned On']=($phpinfo['Core']['allow_call_time_pass_reference']=="On" ? "pass" : "fail");
-				$checked['magic_quotes_gpc in Php.ini must be turned Off']=($phpinfo['Core']['magic_quotes_gpc']=="Off" ? "pass" : "fail");
+				
+				//Removed in 5.4.0 so just check if we're running an older version
+				if (version_compare(PHP_VERSION, '5.4.0', '<'))
+					$checked['magic_quotes_gpc in Php.ini must be turned Off']=($phpinfo['Core']['magic_quotes_gpc']=="Off" ? "pass" : "fail");
+				
+				
 				$checked['register_globals in Php.ini must be turned Off']=($phpinfo['Core']['register_globals']=="Off" ? "pass" : "fail");
 				$checked['short_open_tag in Php.ini must be turned On']=($phpinfo['Core']['short_open_tag']=="On" ? "pass" : "fail");
 			
