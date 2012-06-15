@@ -3,6 +3,9 @@
 # 
 #    This file controls search engine friendly urls and redirection
 #
+# NOTE: This file must be renamed to .htaccess (adding a period in front of the filename) to be operational.
+# This file is supplied without the dot in the filename since adding this hides the file within the DMG or Zip file.
+#
 
 # Removes index.php from URLs for better aesthetic appearance
 Options -MultiViews
@@ -11,7 +14,7 @@ RewriteBase /
 
 Options +FollowSymLinks
 
-RewriteCond $1 !^(index\.php|xls_image_upload\.php|xls_soap\.php|xlsws_ws_service\.php|assets|photos|templates|css|js|favicon\.ico|robots\.txt)
+RewriteCond $1 !^(index\.php|xls_admin\.php|xls_image_upload\.php|xls_soap\.php|xls_jumper\.php|xls_payment_capture\.php|xlsws_ws_service\.php|test\.php|assets|photos|templates|css|js|favicon\.ico|robots\.txt)
 RewriteRule (.*)\.xml(.*) index.php/$1/feeds [QSA,L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

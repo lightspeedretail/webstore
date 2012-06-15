@@ -92,8 +92,8 @@ class authorize_dot_net_sim extends xlsws_class_payment {
 		$ret['live'] = new XLSListBox($objParent);
 		$ret['live']->Name = _sp('Deployment Mode');
 		$ret['live']->AddItem('live' , 'live');
-		$ret['live']->AddItem('test' , 'test');
-		//$ret['live']->AddItem('dev' , 'dev'); //See note in process() statement about this option
+		$ret['live']->AddItem('sandbox' , 'test');
+		$ret['live']->ToolTip = "To use (TEST MODE) in your regular account, leave this as Live and instead set Test Mode in your Authorize.net account settings on their site. Sandbox should only be used with Authorize.net Sandbox testing servers.";
 
 		$ret['ls_payment_method'] = new XLSTextBox($objParent);
 		$ret['ls_payment_method']->Name = _sp('LightSpeed Payment Method');
@@ -143,7 +143,7 @@ class authorize_dot_net_sim extends xlsws_class_payment {
 		 * chosen through the Web Admin panel.
 		 *
 		 */
-		if($config['live'] == 'dev')
+		if($config['live'] == 'test')
 			$auth_net_url	= "https://test.authorize.net/gateway/transact.dll";
 		else
 			$auth_net_url	= "https://secure.authorize.net/gateway/transact.dll";
@@ -187,8 +187,8 @@ class authorize_dot_net_sim extends xlsws_class_payment {
 		$str .= _xls_make_hidden('x_relay_url',   _xls_site_dir() . "/" . "xls_payment_capture.php");
 		$str .= _xls_make_hidden('x_relay_response',   'TRUE');
 
-		if($config['live'] == 'test')
-			$str .= _xls_make_hidden('x_test_request',   'TRUE');
+		//if($config['live'] == 'test')
+		//	$str .= _xls_make_hidden('x_test_request',   'TRUE');
 
 		$str .= ('</FORM>');
 

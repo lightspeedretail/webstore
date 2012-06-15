@@ -200,8 +200,8 @@ class authorize_dot_net_aim extends credit_card {
 			$authnet_values['x_card_code'] = $fields['ccsec']->Text;
 
 
-		if($config['live'] == 'test')
-			$authnet_values['x_test_request'] = 'TRUE';
+		//if($config['live'] == 'test')
+		//	$authnet_values['x_test_request'] = 'TRUE';
 
 		$auth_net_fields = "";
 		foreach( $authnet_values as $key => $value )
