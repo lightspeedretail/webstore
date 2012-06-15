@@ -221,6 +221,8 @@ class xlsws_db_maintenance extends xlsws_index {
 			
 			$this->add_column('xlsws_category' , 'google_id' ,
 				"ALTER TABLE `xlsws_category` ADD `google_id` INT  DEFAULT NULL AFTER `image_id`");
+				
+			_dbx("ALTER TABLE `xlsws_cart` CHANGE `printed_notes` `printed_notes` TEXT  NULL");
 
 				
 			$this->add_config_key('FEATURED_KEYWORD' , 
