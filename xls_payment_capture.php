@@ -34,12 +34,13 @@ ob_start(); // These includes may spit content which we need to ignore
 require_once(CUSTOM_INCLUDES . 'prepend.inc.php');
 ob_end_clean();
 
-// find all payment modules
-$payModules = Modules::QueryArray(
-	QQ::Equal(QQN::Modules()->Type, 'payment'),
-	QQ::Clause(QQ::OrderBy(QQN::Modules()->SortOrder))
-);
 
+$payModules = Modules::QueryArray(
+	QQ::AndCondition(
+		QQ::Equal(QQN::Modules()->Active, 1),
+		QQ::Equal(QQN::Modules()->Type, 'payment' )),
+	QQ::Clause(QQ::OrderBy(QQN::Modules()->SortOrder)));
+				
 // load the modules
 foreach($payModules as $module) {
 	xlsws_index::loadModule($module->File , 'payment');
@@ -98,8 +99,8 @@ foreach($payModules as $module) {
 	}
 }
 
-_xls_log("Unprocessed executation of payment_capture script. Passed paramaters " . print_r($XLSWS_VARS , true));
+_xls_log("Unprocessed payment_capture script. Passed parameters " . print_r($XLSWS_VARS , true));
 
-_rd("index.php");
+_rd(_xls_site_url());
 
 ?>
