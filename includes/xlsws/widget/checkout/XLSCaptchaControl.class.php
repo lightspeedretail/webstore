@@ -77,8 +77,8 @@ class XLSCaptchaControl extends XLSCompositeControl {
     }
 
     protected function BuildInputControl() { 
-      
-    if (_xls_get_conf('CAPTCHA_STYLE' , '0')=='1') { //Will be removed in 2.3, customers should migrate and get account
+    $publickey = _xls_get_conf('RECAPTCHA_PUBLIC_KEY' , '');  
+    if (_xls_get_conf('CAPTCHA_STYLE' , '0')=='1' || empty($publickey)) { //Will be removed in 2.3, customers should migrate and get account
         $objControl = $this->objInputControl = 
             new XLSTextControl($this, $this->GetChildName('Input'));
          
@@ -128,9 +128,10 @@ class XLSCaptchaControl extends XLSCompositeControl {
 		
         if (!$objCode || !$objInput)
             return true;
-
+            
+		$publickey = _xls_get_conf('RECAPTCHA_PUBLIC_KEY' , '');
 		//Will be removed in 2.3, customers should migrate and get account
-    	if (_xls_get_conf('CAPTCHA_STYLE' , '0')=='1') {
+    	if (_xls_get_conf('CAPTCHA_STYLE' , '0')=='1' || empty($publickey)) {
         	require_once(SECIMG_DIR . '/securimage.php');
        		$objSecurimage = new Securimage();
 			if ($objSecurimage->getCode() == $objInput->Text)
