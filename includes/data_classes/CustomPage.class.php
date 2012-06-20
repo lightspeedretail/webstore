@@ -57,6 +57,16 @@ class CustomPage extends CustomPageGen {
 			);
 	}
 
+
+	public static function GetLinkByKey($strKey) {
+	
+		$cpage = CustomPage::LoadByKey($strKey);
+		if($cpage)
+			return $cpage->Link;
+		else return _xls_site_url();
+	
+	}
+
 	public static function ConvertSEO() {
 	
 		$arrPages = CustomPage::LoadAll();

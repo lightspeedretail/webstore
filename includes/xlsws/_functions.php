@@ -1580,4 +1580,19 @@ function _xls_whereCalled( $level = 1 ) {
 
 }
 
+/*********************************************
+	LEGACY FUNCTIONS
+	
+	These functions will be removed in Web Store 2.3
+	Any code using these functions should be changed to call the 
+	code directly within these functions
+**********************************************/
+/**
+ * Return the URL for a Custom Page
+ * @param string $page :: The page key
+ * @return string
+ */
+function _xls_custom_page_url($page) {
+	return CustomPage::GetLinkByKey($page);
+}
 
