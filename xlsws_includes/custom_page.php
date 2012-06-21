@@ -83,6 +83,9 @@ class xlsws_custom_page extends xlsws_index {
 		$this->pnlSlider->Name = $this->sliderTitle;
 		$search = $this->productTag;
 
+		
+		$objProdCondition = $this->GetProductCondition(false);
+	        	
 		$this->pnlSlider->SetProducts(
 			QQ::AndCondition(
 				QQ::OrCondition(
@@ -91,25 +94,68 @@ class xlsws_custom_page extends xlsws_index {
 					new QQXLike(QQN::Product()->WebKeyword2 , "$search"),
 					new QQXLike(QQN::Product()->WebKeyword3 , "$search")
 				),
-				QQ::OrCondition(
-					QQ::Equal(QQN::Product()->MasterModel , 1),
-					QQ::AndCondition(
-						QQ::Equal(QQN::Product()->MasterModel, 0),
-						QQ::Equal(QQN::Product()->FkProductMasterId, 0)
-					)
-				),
-				QQ::Equal(QQN::Product()->Web, 1)
+				$objProdCondition
 			),
 			QQ::Clause(
 				$this->GetSortOrder(),
 				QQ::LimitInfo(_xls_get_conf('MAX_PRODUCTS_IN_SLIDER' , 64))
 			)
 		);
-
+		
+		
+		$objProd = new xlsws_product_listing;
 		$this->pnlSlider->Template = templateNamed('slider.tpl.php');
 		$this->pnlSlider->sliderTitle = $this->sliderTitle;
 	}
 
+	/**
+     * Return a QCondition to filter desired Products
+     * - Web enabled
+     * - Either Master or Independant
+	 * @param none
+	 * @return QCondition
+     */
+    protected function GetProductCondition($blnIncludeChildren = false) {
+        
+        if ($blnIncludeChildren)
+	        $objProdCondition = QQ::AndCondition(
+	                QQ::Equal(QQN::Product()->Web, 1), 
+	                QQ::Equal(QQN::Product()->MasterModel, 0)
+	            );
+        else
+	        $objProdCondition = QQ::AndCondition(
+	            QQ::Equal(QQN::Product()->Web, 1), 
+	            
+	            QQ::OrCondition(          
+	                QQ::Equal(QQN::Product()->MasterModel, 1), 
+	                QQ::AndCondition(
+	                    QQ::Equal(QQN::Product()->MasterModel, 0), 
+	                    QQ::Equal(QQN::Product()->FkProductMasterId, 0)
+	                )
+	            )
+	        );
+
+		//How do we handle out of stock products?
+		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) == 0) {
+			 $objAvailCondition = 
+			 	QQ::OrCondition(
+			 		QQ::GreaterThan(QQN::Product()->InventoryAvail, 0),
+                	QQ::Equal(QQN::Product()->Inventoried, 0)
+                );
+			 		
+	            	
+            $objCondition = QQ::AndCondition(
+                $objProdCondition, 
+                $objAvailCondition
+            );
+        } 
+        else 
+            $objCondition = $objProdCondition;
+ 
+                 
+        return $objCondition;
+    }
+    
 	/**
      * Return a QClause to order Products based on field
 	 * @param none
