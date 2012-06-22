@@ -2001,6 +2001,7 @@
 			
 			$this->page->Key = $this->txtPageKey->Text;
 			$this->page->Title = stripslashes($this->txtPageTitle->Text);
+			$this->page->RequestUrl = _xls_seo_url($this->page->Title);
 			$this->page->TabPosition = $this->txtTabPosition->SelectedValue;
 			//error_log($this->txtPageText->Text);
 			$this->page->Page = stripslashes($this->txtPageText->Text);
