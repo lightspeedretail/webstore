@@ -142,9 +142,6 @@ class Customer extends CustomerGen {
 		if (!$objCustomer->Authenticate($objCustomer, $strPassword))
 			return false;
 
-		// assign customer to the visitor
-		Visitor::update_with_customer_id($objCustomer->Rowid);
-
 		$_SESSION['customer'] = $objCustomer;
 		return true;
 	}
@@ -161,7 +158,7 @@ class Customer extends CustomerGen {
 
 		unset($_SESSION['customer']);
 		$customer = NULL;
-		Visitor::do_logout();
+
 
 		session_unset();
 		session_destroy();

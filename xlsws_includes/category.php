@@ -80,7 +80,7 @@ class xlsws_category extends xlsws_product_listing {
 		if (!$this->category)
             return false;
             
-       // Visitor::add_view_log($objUrl->RouteId, ViewLogType::categoryview);
+ 
     }
 
     /**

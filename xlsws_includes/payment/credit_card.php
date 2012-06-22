@@ -121,7 +121,7 @@ class credit_card extends xlsws_class_payment {
 		// check if card is expired
 		if(date('Y-m') > $exp) {
 			$fields['ccexpmon']->Warning = _sp("Expired");
-			Visitor::add_view_log('',ViewLogType::invalidcreditcard,'',"Expired year/month given $exp");
+
 			return false;
 		}
 
@@ -132,7 +132,7 @@ class credit_card extends xlsws_class_payment {
 				$fields['ccnum']->Warning = _sp($errortext);
 			else
 				$fields['ccnum']->Warning = _sp("Invalid credit card number");
-			Visitor::add_view_log('',ViewLogType::invalidcreditcard,'',$fields['ccnum']->Text);
+
 			return false;
 		}
 

@@ -179,7 +179,7 @@ class xlsws_contact_us extends xlsws_index {
 
         
                 
-		Visitor::add_view_log('', ViewLogType::contactus);
+	
 	}
 
 

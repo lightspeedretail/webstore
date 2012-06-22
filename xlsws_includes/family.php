@@ -54,8 +54,6 @@ class xlsws_family extends xlsws_product_listing {
 		}
 		
 
-        // Add the viewlog entry
-    	Visitor::add_view_log($this->family->Rowid, ViewLogType::familyview);
 	}
 
 

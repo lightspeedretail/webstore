@@ -97,7 +97,7 @@ class xlsws_product extends xlsws_index {
 				$this->mainPnl->Template = templateNamed('product_detail.tpl.php');
 			}
 
-			Visitor::add_view_log($this->prod->Rowid,ViewLogType::productview);
+
 		} else {
 			_xls_log("Product not found in product.php -> $XLSWS_VARS[product]");
 			_xls_display_msg("Sorry! Product not found.");

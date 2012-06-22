@@ -470,8 +470,6 @@ EOS;
 		if(Customer::Login($email , $password)) {
 			$customer = Customer::GetCurrent();
 
-			Visitor::add_view_log($customer->Rowid,
-				ViewLogType::customerlogin);
 
 			
 			$objCartInProgress = Cart::LoadLastCartInProgress(1);
@@ -516,7 +514,6 @@ EOS;
 	protected function performLogout($strFormId, $strControlId, $strParameter) {
 		$customer = Customer::GetCurrent();
 
-		Visitor::add_view_log($customer->Rowid, ViewLogType::customerlogout);
 				
 		Customer::Logout();
 		Cart::ClearCart();
@@ -588,24 +585,9 @@ EOS;
 	 * @return none
 	 */
 	public function continue_shopping($strFormId, $strControlId, $strParameter) {
-		// find the last page visited as product/search/category
-		$v = Visitor::get_visitor();
+		
 
-		$page =  ViewLog::QuerySingle(
-			QQ::AndCondition(
-				QQ::Equal(QQN::ViewLog()->VisitorId, $v->Rowid),
-				QQ::In(QQN::ViewLog()->LogTypeId, array(
-					ViewLogType::categoryview,
-					ViewLogType::productview,
-					ViewLogType::search,
-					ViewLogType::pageview
-				)),
-				QQ::NotLike(QQN::ViewLog()->Page, '%seo_forward%')  //WS2.0.2
-			),
-			QQ::Clause(
-				QQ::OrderBy(QQN::ViewLog()->Created, false)
-			)
-		);
+		//$page =  get from session
 
 		if(!$page) {
 			_rd("index.php");
@@ -622,9 +604,7 @@ EOS;
 
 	
     protected function Form_Preload() {
-		$visitor = Visitor::get_visitor();
-		if($visitor->ScreenRes == '')
-			$this->blnGetScreenRes = true;
+
     }
 
 	/**

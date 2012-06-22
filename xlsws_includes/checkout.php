@@ -1012,7 +1012,6 @@ class xlsws_checkout extends xlsws_index {
     }
 
     protected function CompleteCheckout() {
-        Visitor::add_view_log('',ViewLogType::checkoutpayment);
 
         $objCustomer = $this->CompleteUpdateCustomer();
         $objPromo = $this->CompleteUpdatePromoCode();
@@ -1068,7 +1067,7 @@ class xlsws_checkout extends xlsws_index {
         if (!$this->PostPaymentHooks())
             return false;
 
-		Visitor::add_view_log('',ViewLogType::checkoutfinal);
+
 
         if ($objPaymentModule->uses_jumper()) { 
             _xls_stack_add('xls_jumper_form', $mixResponse);

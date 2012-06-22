@@ -316,12 +316,7 @@ class xlsws_searchresult extends xlsws_product_listing {
             'name'=>_sp('Search Results')
         );
 
-        Visitor::add_view_log(
-            0, 
-            ViewLogType::search,
-            '',
-            $objUrl->RouteId
-        );
+        
     }
 
     /**

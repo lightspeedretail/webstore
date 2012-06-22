@@ -446,7 +446,7 @@ class xlsws_cregister extends xlsws_index {
 			
 
 			
-		Visitor::add_view_log('', ViewLogType::registration);
+
 	}
 
 	 protected function Form_PreLoad() {

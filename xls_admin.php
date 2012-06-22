@@ -220,7 +220,7 @@
 		'promo' => _sp('Promo Codes'),'promotasks' => _sp('Promo Code Tasks'));
 	$arrSeoTabs = array('general' => _sp('General') , 'meta' => _sp('Meta'), 'categories' => _sp('Categories'));
 	$arrDbAdminTabs = array('dborders' => _sp('Orders'), 'dbpending' => _sp('Pending to<br>Download '.$strPend)  , 'incomplete' => _sp('Incomplete<br>Orders'));
-	$arrSystemTabs = array('config' => _sp('Setup') , 'task' => _sp('Tasks')  , 'vlog' => _sp('Visitor Log'), 'slog' => _sp('System Log'));
+	$arrSystemTabs = array('config' => _sp('Setup') , 'task' => _sp('Tasks')  , 'slog' => _sp('System Log'));
 	
 	
 	
@@ -4098,111 +4098,6 @@
 	
 	
 	
-	
-
-
-	
-	
-	
-	
-	
-	
-	/* class xlsws_admin_syslog
-	* class to create the various sections for the visitor log in stats
-	* see class xlsws_admin_generic_edit_form for further specs
-	*/		
-	class xlsws_admin_visitlog extends xlsws_admin_generic_edit_form {
-		
-		
-		protected function Form_Create(){
-			
-			
-			$this->arrTabs = $GLOBALS['arrSystemTabs'];
-			$this->currentTab = 'vlog';			
-			
-			$this->appName = "Visitor Logs";
-			$this->className = "ViewLog";
-			$this->blankObj = new ViewLog();
-			$this->qqn = QQN::ViewLog();
-
-			$this->arrFields = array();
-
-			
-			$this->arrFields['Created'] = array('Name' => 'Date');
-			$this->arrFields['Created']['Field'] = new XLSTextBox($this);		
-			$this->arrFields['Created']['DisplayFunc'] = "RenderDate";
-			$this->arrFields['Created']['Width'] = 150;
-			$this->arrFields['Created']['NoSearch'] = true;
-
-
-			$this->arrFields['VisitorId'] = array('Name' =>'Customer');
-			$this->arrFields['VisitorId']['Field'] = new QLabel($this);	
-			$this->arrFields['VisitorId']['Width'] = 450;
-			$this->arrFields['VisitorId']['NoSearch'] = true;
-			
-
-			$this->arrFields['Vars'] = array('Name' => 'Log Entry');
-			$this->arrFields['Vars']['Field'] = new QLabel($this);	
-			$this->arrFields['Vars']['Width'] = 450;
-			
-			
-			$this->default_sort_index = 1;
-			$this->default_sort_direction = 1;
-			
-			
-			parent::Form_Create();
-			
-			
-		}
-		
-		public function RenderDate($val){
-			return $val->PhpDate('Y-m-d H:i:s');
-		}
-		
-		public function Form_PreRender(){
-			parent::Form_PreRender();			
-		}
-		
-		public function canNew(){
-			return false;
-		}
-		
-		public function canEdit(){
-			return false;
-		}
-		public function canDelete(){
-			return true;
-		}
-		
-	}
-		
-		
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	/* class xlsws_admin_destinations
 	* class to create the destinations data grid for editing
 	* see class xlsws_admin_generic_edit_form for further specs
@@ -6380,9 +6275,6 @@
 			$this->arrMPnls['optimizeDB']->Text .= date('Y-m-d H:i:s ') .  _sp("Optimizing Category tables") . "<br/>";
 			_dbx("OPTIMIZE table xlsws_category");
 			_dbx("OPTIMIZE table xlsws_product_category_assn");
-			$this->arrMPnls['optimizeDB']->Text .= date('Y-m-d H:i:s ') .  _sp("Optimizing Visitor tables") . "<br/>";
-			_dbx("OPTIMIZE table xlsws_visitor");
-			_dbx("OPTIMIZE table xlsws_view_log");
 			$this->arrMPnls['optimizeDB']->Text .= date('Y-m-d H:i:s ') .  _sp("Done!") . "<br/>";
 			_dbx("TRUNCATE table xlsws_log");
 			$this->arrMPnls['optimizeDB']->Text .= date('Y-m-d H:i:s ') .  _sp("Clearing system log table.") . "<br/>";
@@ -6634,9 +6526,6 @@
 				case "slog":
 					xlsws_admin_syslog::Run('xlsws_admin_syslog' , adminTemplate('edit.tpl.php'));
 					break;
-				case "vlog":
-					xlsws_admin_visitlog::Run('xlsws_admin_visitlog' , adminTemplate('edit.tpl.php'));
-					break;	
 				case "task":
 					xlsws_admin_maintenance::Run('xlsws_admin_maintenance' , adminTemplate('maintenance.tpl.php'));
 					break;			
