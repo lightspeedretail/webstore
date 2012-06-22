@@ -68,7 +68,7 @@ class xlsws_category extends xlsws_product_listing {
      */
     protected function LoadCategory() { 
 
-    	$objUrl = XLSURLParser::getInstance();    
+    	$objUrl = _xls_url_object();    
 		if ($objUrl->RouteId=='') return; //We haven't specified a category, so we're using this as the default home page and showing everything
 		
 		$objCategory = Category::LoadByRequestUrl($objUrl->RouteId);

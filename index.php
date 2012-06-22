@@ -52,7 +52,7 @@ if ($offlinekey = _xls_get_conf('STORE_OFFLINE' , '')) {
 
 
 //Initialize our global URL parser so we can access from anywhere
-$objUrl = XLSURLParser::getInstance();
+$objUrl = _xls_url_object();
 
 if ($objUrl==false) {
 	//We should never get a false unless something has gone wrong in our parsing

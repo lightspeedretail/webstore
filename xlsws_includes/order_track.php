@@ -80,7 +80,7 @@ class xlsws_track_order extends xlsws_index {
 	protected function build_main() {
 		global $XLSWS_VARS;
 
-    	$objUrl = XLSURLParser::getInstance();    
+    	$objUrl = _xls_url_object();    
 
 
 		$customer = Customer::GetCurrent();

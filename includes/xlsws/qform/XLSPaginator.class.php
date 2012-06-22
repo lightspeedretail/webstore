@@ -84,7 +84,7 @@ class XLSPaginator extends QPaginator {
     public function GetControlHtmlPage($intPageId, $strLabel = '', 
         $blnInner = false) {
 
-        $objUrl = XLSURLParser::getInstance(); 
+        $objUrl = _xls_url_object(); 
         $strQueryString = $objUrl->QueryString;
 
 		//If we have a page number from the previous URL, remove it so we don't stack it

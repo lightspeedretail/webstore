@@ -730,6 +730,20 @@ function _xls_remove_leading_slash($path) {
 		return $path;
 }
 
+
+/**
+* Return the URL Parser Object
+* Useful if we need to find out URL properties to make decisions somewhere
+*
+* @return object
+*/
+function _xls_url_object() {
+	$objUrl = XLSURLParser::getInstance();
+	return $objUrl;
+}
+
+
+
 /**
 * Return the Base URL for the site
 * Also perform http/https conversion if need be.

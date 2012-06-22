@@ -80,7 +80,7 @@ class xlsws_product extends xlsws_index {
 		define('NO_MAIN_PANEL_AUTO_RENDER' , true);
 		/*contruct all variables and only label widgets should be defined here to maintain layout*/
 
-    	$objUrl = XLSURLParser::getInstance();    
+    	$objUrl = _xls_url_object();    
 		if ($objUrl->RouteId=='') return; //We haven't specified a category, so we're using this as the default home page and showing everything
 		$this->prod =  $this->origin_prod = Product::LoadByRequestUrl($objUrl->RouteId);
 

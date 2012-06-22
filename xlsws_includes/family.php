@@ -65,7 +65,7 @@ class xlsws_family extends xlsws_product_listing {
      * @return none
      */
     protected function LoadFamily() {
-    	$objUrl = XLSURLParser::getInstance();    
+    	$objUrl = _xls_url_object();    
 
 		$objFamily = Family::LoadByRequestUrl($objUrl->RouteId);
 

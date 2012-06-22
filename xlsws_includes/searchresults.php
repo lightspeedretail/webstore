@@ -76,7 +76,7 @@ class xlsws_searchresult extends xlsws_product_listing {
     protected function GetSearchCriteria() {
 
 
-    	$objUrl = XLSURLParser::getInstance();    
+    	$objUrl = _xls_url_object();    
 		$strCriteria = $objUrl->RouteId;
 
         $strCriteria = strip_tags($strCriteria);
@@ -307,7 +307,7 @@ class xlsws_searchresult extends xlsws_product_listing {
 
         parent::build_main();
 
-	    $objUrl = XLSURLParser::getInstance();    
+	    $objUrl = _xls_url_object();    
 		$strCriteria = $objUrl->RouteId;
 		
         $this->crumbs[] = array(

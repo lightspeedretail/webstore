@@ -103,7 +103,7 @@ class XLSLoginPopup extends QDialogBox {
 		}
 
 		//Return where we're at after log in
-		$objUrl = XLSURLParser::getInstance();
+		$objUrl = _xls_url_object();
 		_xls_stack_add('login_redirect_uri', _xls_site_url($objUrl->Uri));
 
 		$this->Form->performLogin($strFormId, $strControlId, $strParameter);

@@ -45,7 +45,7 @@ class xlsws_custom_page extends xlsws_index {
 	protected function build_main() {
 
 
-    	$objUrl = XLSURLParser::getInstance();    
+    	$objUrl = _xls_url_object();    
 		$objPage = CustomPage::LoadByRequestUrl($objUrl->RouteId);
 
 		if(!$objPage) {

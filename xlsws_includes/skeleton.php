@@ -399,7 +399,7 @@ EOS;
 			include(CUSTOM_INCLUDES . "crumbtrail.php");
 		else
 			{
-			$objUrl = XLSURLParser::getInstance();
+			$objUrl = _xls_url_object();
 			if ($objUrl->RouteId != '')
 				switch($objUrl->RouteDepartment) {
 				
