@@ -78,7 +78,7 @@ if ($objUrl->Status==301) {
 
 if ($objUrl->Status==404) {
 	header('HTTP/1.1 404 Not Found');
-	$objUrl->RouteDepartment=404;
+	$objUrl->RouteController=404;
 }
 
 // Cache categories since they are used throughout
@@ -89,9 +89,9 @@ _xls_stack_put('xls_canonical_url',_xls_site_url($objUrl->Uri));
 _xls_add_page_title(_xls_get_conf('STORE_NAME' , 'XSilva Web Store'));
 _xls_stack_put('xls_canonical_url',_xls_site_url($objUrl->Uri));
 _xls_add_meta_desc(_xls_get_conf('STORE_DEFAULT_SLOGAN' , 'XSilva Web Store'));
-//error_log("on dept ".$objUrl->RouteDepartment." ".$objUrl->RouteId);
+//error_log("on dept ".$objUrl->RouteController." ".$objUrl->RouteId);
 
-switch ($objUrl->RouteDepartment)
+switch ($objUrl->RouteController)
 {
 	case 'category':
 	case 'custom_page':
@@ -101,7 +101,7 @@ switch ($objUrl->RouteDepartment)
 	case 'searchresults':
 	case '404':
 	
-		$strFile = $objUrl->RouteDepartment.".php";
+		$strFile = $objUrl->RouteController.".php";
 		break;
 		
 	case 'feeds':

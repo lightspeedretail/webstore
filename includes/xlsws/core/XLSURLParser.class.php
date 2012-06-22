@@ -34,7 +34,7 @@ class XLSURLParser {
 	
 	protected $strUri; //URL before parsing
 	protected $strRouteCode; //p for product, c for category, checkout for checkout, etc. can be customized
-	protected $strRouteDepartment; //internal names for controllers, such as "category", "product", will be unchanged
+	protected $strRouteController; //internal names for controllers, such as "category", "product", will be unchanged
 	protected $strRouteId; //product code/SKU, category text etc extracted from Url
 	protected $intStatus; //200 for OK, 301 for redirect, 404 for error. Use HTTP codes to determine result of parsing
 	protected $strRedirectUrl; //if a redirect, the URL to redirect to
@@ -95,44 +95,44 @@ class XLSURLParser {
 			case 'c': //Category
 			default:
 				$this->strRouteId = $this->arrUrlSegments[0];
-				$this->strRouteDepartment = "category";
+				$this->strRouteController = "category";
 				$this->intStatus=200;
 				break;
 				
 			case 'cp': //Custom Page
 				$this->strRouteId = $this->arrUrlSegments[0];
-				$this->strRouteDepartment = "custom_page";
+				$this->strRouteController = "custom_page";
 				$this->intStatus=200;
 				break;
 
 			case 'dp': //Display product
 				$this->strRouteId = $this->arrUrlSegments[0];
-				$this->strRouteDepartment = "product";
+				$this->strRouteController = "product";
 				$this->intStatus=200;
 				break;
 				
 			case 'f': //Display family
 				$this->strRouteId = $this->arrUrlSegments[0];
-				$this->strRouteDepartment = "family";
+				$this->strRouteController = "family";
 				$this->intStatus=200;
 				break;
 				
 			case 'feeds': //RSS/XML feeds
 				$this->strRouteId = $this->arrUrlSegments[0];
-				$this->strRouteDepartment = "feeds";
+				$this->strRouteController = "feeds";
 				$this->intStatus=200;
 				break;
 			
 			case 'pg': //Web Store Page
 				//We use hyphens in the url but they match to actual controller filenames that use underscores
 				$this->strRouteId = str_replace("-","_",$this->arrUrlSegments[0]);
-				$this->strRouteDepartment = "xlspg";
+				$this->strRouteController = "xlspg";
 				$this->intStatus=200;
 				break;
 
 			case 's': //Search Results
 				$this->strRouteId = $this->arrUrlSegments[0];
-				$this->strRouteDepartment = "searchresults";
+				$this->strRouteController = "searchresults";
 				$this->intStatus=200;
 				break;
 								
@@ -289,8 +289,8 @@ class XLSURLParser {
 				return print_r($this->arrUrlSegments,true);
 			case 'QueryString':
 				return $this->strQueryString;
-			case 'RouteDepartment':
-				return $this->strRouteDepartment;
+			case 'RouteController':
+				return $this->strRouteController;
 			case 'Status':
 				return $this->intStatus;
 			case 'RouteId':

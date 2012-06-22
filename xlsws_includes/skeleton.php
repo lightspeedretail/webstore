@@ -401,7 +401,7 @@ EOS;
 			{
 			$objUrl = _xls_url_object();
 			if ($objUrl->RouteId != '')
-				switch($objUrl->RouteDepartment) {
+				switch($objUrl->RouteController) {
 				
 					case "category":
 						$objCategory = Category::LoadByRequestUrl($objUrl->RouteId);
