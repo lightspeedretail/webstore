@@ -46,20 +46,21 @@ class usps extends xlsws_class_shipping {
 	protected $strTrackingPattern = array('/^E\D{1}\d{9}\D{2}$|^9\d{15,21}$/');
 
 	/**
-	 * check() verifies nothing has changed in the configuration since initial load
+	 * Check if the module is valid or not.
+	 * Returning false here will exclude the module from checkout page
+	 * Can be used for tests against cart conditions
+	 *
 	 * @return boolean
-	 *
-	 *
 	 */
 	public function check() {
-		if(defined('XLSWS_ADMIN_MODULE'))
-			return true;
 
+		//Shop owner must turn on what envelope options are available
+		//if nothing has been turned on in Admin panel, return false so option
+		//doesn't show up on checkout
 		$vals = $this->getConfigValues(get_class($this));
-
-		// if nothing has been configed return null
 		if(!$vals || count($vals) == 0)
 			return false;
+						
 		return true;
 	}
 
