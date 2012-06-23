@@ -485,13 +485,15 @@ EOS;
 				if (count($arrCurrentItems)>0) {
 					foreach($arrCurrentItems as $objItem) {
 						$objProduct = Product::Load($objItem->ProductId);
-						$objCartInProgress->AddToCart($objProduct,$objItem->Qty,$objItem->Description,$objItem->Sell,$objItem->Discount,$objItem->CartType,$objItem->GiftRegistryItem);
+						$objCartInProgress->AddToCart($objProduct,$objItem->Qty,$objItem->Description,
+							$objItem->Sell,$objItem->Discount,$objItem->CartType,$objItem->GiftRegistryItem);
 						$objItem->Delete();
 					}
 					$objCurrentCart->Delete();			
 				}
-		
+				$objCartInProgress->CustomerId=$customer->Rowid;
 				$objCartInProgress->Save();
+							
 			}
 		
 			Cart::UpdateCartCustomer();
@@ -514,7 +516,14 @@ EOS;
 	protected function performLogout($strFormId, $strControlId, $strParameter) {
 		$customer = Customer::GetCurrent();
 
-				
+		//Ensure customer_id is set if there are any items in the cart
+		$cart = Cart::GetCart();
+		$items = $cart->GetCartItemArray(); 
+		if (count($items)>0) {
+			$cart->CustomerId = $customer->Rowid;
+			$cart->Save();
+		}
+		
 		Customer::Logout();
 		Cart::ClearCart();
 

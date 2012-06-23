@@ -108,6 +108,10 @@ class Cart extends CartGen {
 	 * @return
 	 */
 	public static function ClearCart(){
+		$cart = Cart::GetCart();
+		$items = $cart->GetCartItemArray();
+		foreach ($items as $item)
+			$item->Delete();
 		unset($_SESSION['XLSWS_CART']);
 	}
 
