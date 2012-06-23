@@ -4834,7 +4834,6 @@
 			$this->arrFields = array();
 
 			$this->appName = "Edit Countries";
-			
 			$this->regions = array(
 						'NA' => 'North America'
 					,	'EU' => 'Europe' 
@@ -4887,6 +4886,7 @@
 			$this->arrFields['ZipValidatePreg']['Field'] = new XLSTextBox($this);
 			$this->arrFields['ZipValidatePreg']['Width'] = 110;
 			
+			$this->HelperRibbon = "Note, when entering a backslash (\ such as \d) for a pattern in the Zip Validation field, you must use a double backslash (\\\\ such as \\\\d) to save properly. Please check our online guide for help with this field.";
 			
 			parent::Form_Create();
 			
@@ -4894,6 +4894,7 @@
 		}
 		
 		protected function beforeSave($objItem){
+					
 			return $objItem;
 		}
 		
