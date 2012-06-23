@@ -41,7 +41,7 @@ Third-Party Integration
 Image Handling
 # Graphic display now uses proper IMG tags to allow third-party sites to index photos (Google Images, Pinterest, Amazon Wish, etc)
 # Product images now named with product description instead of code numbers for better SEO
-# Product images now in folder heirarchy, rather than all photos in a single /photos folder
+# Product images now in folder hierarchy, rather than all photos in a single /photos folder
 # Created separate image dimensions for Slider, Cart Thumbnail, Preview Icon to control image size independently
 
 Uploader
@@ -105,11 +105,21 @@ Programming
 # Created widget modules for checkout page elements
 # Changed uploader to watch for both ORIG_PATH_INFO and PATH_INFO for certain hosts
 # Removed an unused function that would interfere with WordPress if using both software together
-# Created isMobile(), isiPad()i, isIPhone() functions to determine these situations
+# Created  _xls_is_ipad(), _xls_is_iphone() and _xls_is_idevice() functions to determine these situations
 # Applied proper control labels to many controls in templates, avoid default id number issues
 # Updated Authorize.net has to use hash instead of mhash which was discontinued
 # Added internal checks for many controls to verify control exists before attempting use, allowing controls to be deleted from templates without breaking Web Store.
 
+# 2.1.7
+
+* General: Corrected a Cross-Site Scripting (XSS) vulnerability to now properly handle HTML encoded strings
+* General: Fixed an extremely rare issue in qCodo event handlers with certain Mac browsers
+* Payments: Added additional logging of Payment error messages returned by processors
+
+* Shipping: Improved logging of Shipping module error messages returned by calculators
+* Shipping: Corrected an issue where the UPS module may truncate a Canadian postal code
+* Templates: Corrected a rare product sorting error when using Sliders in custom pages
+* Uploader: Corrected an issue where inventory from virtual warehouses would not be included in some calculations
 
 
 # 2.1.6
