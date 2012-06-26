@@ -6131,7 +6131,7 @@
 					//echo $strName." ".$intRowId." ".$strAdd." ".$intIndex."<br>";
 					$objProduct = Product::Load($intRowId);
 					if ($objProduct && $objProduct->RequestUrl != '') {
-						$strNewImageName = Images::GetImageName(substr($objProduct->RequestUrl,0,40), 0, 0, $intIndex, $strAdd);
+						$strNewImageName = Images::GetImageName(substr($objProduct->RequestUrl,0,60), 0, 0, $intIndex, $strAdd);
 					
 					$blbImage = $objImage->GetImageData();
 					$objImage->SaveImageData($strNewImageName, $blbImage);
