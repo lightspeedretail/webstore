@@ -372,15 +372,15 @@ EOS;
 
 	protected function GetPageMeta($strConf = 'SEO_CATEGORY_TITLE') { 
 	
-		$strItem = _xls_get_conf($strConf, '%storename');
+		$strItem = _xls_get_conf($strConf, '%storename%');
 		$strCrumbNames = '';
 		$strCrumbNamesR = '';
 		
 		$arrPatterns = array(
-			"%storename",
-			"%name",
-			"%crumbtrail",
-			"%rcrumbtrail");
+			"%storename%",
+			"%name%",
+			"%crumbtrail%",
+			"%rcrumbtrail%");
 		$arrCrumb = _xls_get_crumbtrail();
 		
 		foreach ($arrCrumb as $crumb) {

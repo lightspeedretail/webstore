@@ -71,16 +71,16 @@ class Family extends FamilyGen {
 	
 	protected function GetPageMeta($strConf = 'SEO_CUSTOMPAGE_TITLE') { 
 	
-		$strItem = _xls_get_conf($strConf, '%storename');
+		$strItem = _xls_get_conf($strConf, '%storename%');
 		$strCrumbNames = '';
 		$strCrumbNamesR = '';
 		
 		$arrPatterns = array(
-			"%storename",
-			"%name",
-			"%title",
-			"%crumbtrail",
-			"%rcrumbtrail");
+			"%storename%",
+			"%name%",
+			"%title%",
+			"%crumbtrail%",
+			"%rcrumbtrail%");
 		$arrCrumb = _xls_get_crumbtrail();
 		
 		foreach ($arrCrumb as $crumb) {

@@ -1007,8 +1007,8 @@ function _xls_add_page_title($title) {
  */
 function _xls_add_formatted_page_title($title) {
 	$strPattern = _xls_get_conf('SEO_CUSTOMPAGE_TITLE');
-	$strPattern = str_replace('%name', $title,$strPattern);
-	$strPattern = str_replace('%storename', _xls_get_conf('STORE_NAME','LightSpeed Web Store'),$strPattern);
+	$strPattern = str_replace('%name%', $title,$strPattern);
+	$strPattern = str_replace('%storename%', _xls_get_conf('STORE_NAME','LightSpeed Web Store'),$strPattern);
 	
 	_xls_stack_put('xls_page_title',$strPattern);
 }

@@ -161,22 +161,22 @@ class Product extends ProductGen {
 
 	protected function GetPageMeta($strConf = 'SEO_PRODUCT_TITLE') { 
 	
-		$strItem = _xls_get_conf($strConf, '%storename');
+		$strItem = _xls_get_conf($strConf, '%storename%');
 						
-		$arrPatterns = array("%code",
-			"%storename",
-			"%name",
-			"%description",
-			"%shortdescription",
-			"%longdescription",
-			"%keyword1",
-			"%keyword2",
-			"%keyword3",
-			"%price",
-			"%family",
-			"%class",
-			"%crumbtrail",
-			"%rcrumbtrail");
+		$arrPatterns = array("%code%",
+			"%storename%",
+			"%name%",
+			"%description%",
+			"%shortdescription%",
+			"%longdescription%",
+			"%keyword1%",
+			"%keyword2%",
+			"%keyword3%",
+			"%price%",
+			"%family%",
+			"%class%",
+			"%crumbtrail%",
+			"%rcrumbtrail%");
 			
 		$arrItems = array($this->Code,
 			_xls_get_conf('STORE_NAME',''),
