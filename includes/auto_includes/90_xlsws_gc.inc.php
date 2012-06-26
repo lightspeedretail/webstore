@@ -35,6 +35,8 @@ if (!empty(QApplication::$Database)) {
 				'GarbageCollect', 'XLSFormStateHandler::GarbageCollect');
 			XLSSessionHandler::RegisterEvent(
 				'GarbageCollect', 'Customer::GarbageCollect');
+			XLSSessionHandler::RegisterEvent(
+				'GarbageCollect', 'Log::GarbageCollect');
 		}
 		// Legacy garbage collection events for php session handlers
 		else {
