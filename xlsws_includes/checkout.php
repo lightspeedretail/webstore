@@ -1232,6 +1232,11 @@ class xlsws_checkout extends xlsws_index {
 			$_SESSION['customer']->Country1=_xls_get_conf('DEFAULT_COUNTRY');  
 		if ($_SESSION['customer']->Country2=='')
 			$_SESSION['customer']->Country2=_xls_get_conf('DEFAULT_COUNTRY');  
+		if ($objCustomer) {
+			$_SESSION['XLSWS_CART']->ShipFirstname = $_SESSION['customer']->Firstname;
+			$_SESSION['XLSWS_CART']->ShipLastname = $_SESSION['customer']->Lastname;
+		}
+			
 
     }
 
