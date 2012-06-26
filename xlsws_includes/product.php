@@ -50,7 +50,8 @@ class xlsws_product extends xlsws_index {
 
 	protected $pnlImg; //the panel that holds the image
 	protected $pnlImgHolder; //the panel containing the frame around the image for drag n drop
-
+	protected $pnlSharingTools; //Sharing Tools panel
+	
 	public $arrAdditionalProdImages = array(); //array of additional product photos
 	protected $pnlAdditionalProdImages; //the panel where additional images display
 
@@ -191,6 +192,12 @@ class xlsws_product extends xlsws_index {
 
 		if ($this->lightbox)
 			$this->render_detail_lightbox();
+		
+		//Sharing Tools
+		$this->pnlSharingTools = new QLabel($this->mainPnl,'sharingtools');	
+		if(_xls_get_conf('SHOW_SHARING' , 0))
+			$this->pnlSharingTools->Template = templateNamed('sharing.tpl.php');
+				
 
 	}
 	

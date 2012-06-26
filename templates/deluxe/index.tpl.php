@@ -88,16 +88,7 @@
 	</head>
 	
 	<?php $this->RenderBegin(); ?>
-	<?php if(_xls_get_conf('SHOW_SHARING' , 0)): ?>
-	<div id="fb-root"></div>
-<script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
-	<?php endif; ?>
+	<?php $this->lblSharingHeader->Render(); ?>
 	
 
 	
@@ -220,9 +211,7 @@
 		window.setTimeout("document.location.href='<?= _xls_site_dir() ?>'" , <?= $expires ?> * 1000 + 5000 );
 	</script>
 <?php endif; ?>
+<?php $this->lblSharingFooter->Render(); ?>
 
-	<?php if(_xls_get_conf('SHOW_SHARING' , 0)): ?>
-<script type="text/javascript" src="//assets.pinterest.com/js/pinit.js"></script>
-	<?php endif; ?>
 <?php $this->RenderEnd(); ?>
 </html>

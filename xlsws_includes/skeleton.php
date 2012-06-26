@@ -76,6 +76,8 @@ class xlsws_index extends QForm {
 
 	protected $ctlFlashMessages; //Flash Messages
 	protected $strEmptyCartMessage;
+	protected $lblSharingHeader;
+	protected $lblSharingFooter;
 
     /**
 	 * build_menu - builds the category tree
@@ -128,6 +130,15 @@ class xlsws_index extends QForm {
 			</script>";
 		}
 
+
+		$this->lblSharingHeader  = new QPanel($this,'SharingHeader');
+		$this->lblSharingFooter  = new QPanel($this,'SharingFooter');
+		if(_xls_get_conf('SHOW_SHARING' , 0)) {
+			$this->lblSharingHeader->Template = templateNamed('sharing_header.tpl.php');
+			$this->lblSharingFooter->Template = templateNamed('sharing_footer.tpl.php');
+		}
+		
+		
 		if (_xls_get_conf('DEBUG_DISABLE_DRAGDROP','0') == '0' && !_xls_is_idevice() )  
 			$this->strEmptyCartMessage = _sp("Drag Selections Here"); 
 		else
