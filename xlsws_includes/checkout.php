@@ -1113,11 +1113,11 @@ class xlsws_checkout extends xlsws_index {
 
         self::PostFinalizeHooks($objCart, $objCustomer);
 
-
-		if (_xls_get_conf('EMAIL_SEND_CUSTOMER',0)==1)
-        	xlsws_index::SendCustomerEmail($objCart, $objCustomer);
+		$blnSend=true;
         if (_xls_get_conf('EMAIL_SEND_STORE',0)==1)
-        	xlsws_index::SendOwnerEmail($objCart, $objCustomer);
+        	$blnSend = xlsws_index::SendOwnerEmail($objCart, $objCustomer);
+		if (_xls_get_conf('EMAIL_SEND_CUSTOMER',0)==1 && $bnlSend) //if we failed to send store email, email is down and skip this one
+        	xlsws_index::SendCustomerEmail($objCart, $objCustomer);
         	
         	
         if ($blnForward)

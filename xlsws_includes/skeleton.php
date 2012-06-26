@@ -1118,8 +1118,10 @@ EOS;
                 )
             ),
             _xls_get_conf('ORDER_FROM')
-        ))
+        )) {
         QApplication::Log(E_ERROR, 'Customer Receipt', $objCart->Email." email failed to send.");
+        return false;
+        } else return true;
     }
 
     public static function SendOwnerEmail($objCart, $objCustomer) {
@@ -1137,7 +1139,9 @@ EOS;
                 )
             ),
             _xls_get_conf('ORDER_FROM')
-        ))
-        QApplication::Log(E_ERROR, 'Store Receipt', $objCart->Email." email failed to send.");
+        )) {
+        	QApplication::Log(E_ERROR, 'Store Receipt', $objCart->Email." email failed to send.");
+        	return false;
+        } else return true;
     }
 }
