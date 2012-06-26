@@ -72,9 +72,9 @@ if($this->sro): ?>
 		
 		<div class="clear"></div>
 		<ul class="table4">
-			<li class="medium left"><?= $repair->Family ?></li>
-			<li class="large"><?= $repair->Description ?></li>
-			<li class="medium"><?= $repair->PurchaseDate ?></li>	
+			<li class="medium left"><?= $repair->Family ?>&nbsp;</li>
+			<li class="large"><?= $repair->Description ?>&nbsp;</li>
+			<li class="medium"><?= $repair->PurchaseDate ?>&nbsp;</li>	
 			<li class="medium"><?= $repair->SerialNumber ?></li>
 		</ul><br />
 		
