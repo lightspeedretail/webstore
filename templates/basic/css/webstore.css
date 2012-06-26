@@ -2304,7 +2304,7 @@ top:-5px;
 .registry_row .invitee_name {display: block; float: left; width: 240px;}
 .registry_row input.invitee_name, .registry_row input.invitee_email {margin: -9px 0 0 0;}
 .registry_row .invitee_name .warning, .registry_row .warning {display: block; float: left; margin: -18px 0 0 160px;}
-.registry_row .invitee_email {display: block; float: left;}
+.registry_row .invitee_email { }
 .registry_row .invitee_tasks {display: block; float: right; margin: -25px 0 0 0;}
 .registry_row .invitee_tasks img {margin: 0 20px;}
 .registry_row .invitee_save, .registry_row .invitee_edit {margin: 6px 10px 0 0;}
