@@ -90,7 +90,6 @@ class xlsws_custom_page extends xlsws_index {
 		$this->pnlSlider->SetProducts(
 			QQ::AndCondition(
 				QQ::OrCondition(
-					new QQXLike(QQN::Product()->Code , "$search"),
 					new QQXLike(QQN::Product()->WebKeyword1 , "$search"),
 					new QQXLike(QQN::Product()->WebKeyword2 , "$search"),
 					new QQXLike(QQN::Product()->WebKeyword3 , "$search")
