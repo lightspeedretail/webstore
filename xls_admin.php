@@ -2003,12 +2003,9 @@
 			$this->page->Title = stripslashes($this->txtPageTitle->Text);
 			$this->page->RequestUrl = _xls_seo_url($this->page->Title);
 			$this->page->TabPosition = $this->txtTabPosition->SelectedValue;
-			//error_log($this->txtPageText->Text);
-			$this->page->Page = stripslashes($this->txtPageText->Text);
 			
-			$this->page->Page = filter_var(stripslashes($this->txtPageText->Text), FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);	
-			
-				
+			$this->page->Page = stripslashes($this->txtPageText->Text);	
+						
 			$this->page->ProductTag = $this->txtProductTag->Text;
 			//$this->page->MetaKeywords = stripslashes($this->txtPageKeywords->Text);
 			$this->page->MetaDescription = stripslashes($this->txtPageDescription->Text);
