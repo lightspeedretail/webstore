@@ -6134,13 +6134,18 @@
 						$strNewImageName = Images::GetImageName(substr($objProduct->RequestUrl,0,60), 0, 0, $intIndex, $strAdd);
 					
 					$blbImage = $objImage->GetImageData();
-					$objImage->SaveImageData($strNewImageName, $blbImage);
-					$objImage->Reload();
-					$objImage->ImagePath=$strNewImageName;
-					$objImage->ImageData=null;
-					$objImage->Save();
-					
-					//echo "will now be ".$strNewImageName."<br>";
+					if (empty($blbImage)) {
+						//We have missing photo data and/or bad file, clean up. Worse case we have to reupload.
+						$objProduct->ImageId = null;
+						$objProduct->Save();
+						$objImage->Delete();
+					} else {
+						$objImage->SaveImageData($strNewImageName, $blbImage);
+						$objImage->Reload();
+						$objImage->ImagePath=$strNewImageName;
+						$objImage->ImageData=null;
+						$objImage->Save();
+					}
 					
 					}
 
