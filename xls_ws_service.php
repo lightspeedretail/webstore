@@ -388,7 +388,7 @@
                 $objImage->Created = new QDateTime(QDateTime::Now);
 
             $objImage->SaveImageData(
-                Images::GetImageName($objProduct->RequestUrl), $blbRawImage
+                Images::GetImageName(substr($objProduct->RequestUrl,0,60)), $blbRawImage
             );
             $objImage->Save();
 
