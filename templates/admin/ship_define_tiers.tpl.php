@@ -39,7 +39,7 @@
 						<?php if($_CONTROL->EditMode): ?>
 
 	<div id='editcontainer'>
-	<div class="basic_row"><h4>Define up to 10 tier ranges. Use dollars and cents to ensure your values don't leave price gaps in-between rows. For the last amount (the high end), you can enter 999999 to catch any high cart values.</h4></div>
+	<div class="basic_row"><h4>Define up to 10 tier ranges. Use two digit decimals to ensure your values don't leave price gaps in-between rows. Start your first line defined for 0.00 and for the last amount (the high end), you can enter 999999 to catch any high cart values.</h4></div>
 
 		<div class="basic_row leftindent">
 			<div class="colnumber tableheader">#</div>

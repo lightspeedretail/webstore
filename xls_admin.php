@@ -2158,7 +2158,7 @@
 			}	
 			
 			$objTiers= ShippingTiers::QueryArray(
-					QQ::NotEqual(QQN::ShippingTiers()->StartPrice, 0),
+					QQ::NotEqual(QQN::ShippingTiers()->StartPrice, -1),
 					QQ::Clause(QQ::OrderBy(QQN::ShippingTiers()->StartPrice))
 				);
 			$x=1;
