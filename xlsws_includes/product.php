@@ -135,6 +135,13 @@ class xlsws_product extends xlsws_index {
 		_xls_add_page_title($this->prod->PageTitle);
 		_xls_stack_put('xls_meta_image',_xls_site_dir().$this->prod->SmallImage);
 		_xls_remember_url($objUrl->Url);
+		
+		$this->crumbs[] = array(
+            'link'=>$this->prod->CanonicalUrl,
+            'case'=> '',
+            'name'=>$this->prod->Name
+        );
+        
 
 		// Stock
 		$this->lblStock = new QLabel($this->mainPnl,'lblStock');
