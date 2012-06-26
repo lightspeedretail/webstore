@@ -232,7 +232,9 @@ class XLSPaymentControl extends XLSCompositeControl {
     }
 
     protected function LoadModules($strModule = null) {
-        $objCondition = QQ::Equal(QQN::Modules()->Type, 'payment');
+        $objCondition = QQ::AndCondition(
+        	QQ::Equal(QQN::Modules()->Type, 'payment'),
+        	QQ::Equal(QQN::Modules()->Active, 1));
         $objClause = QQ::Clause(QQ::OrderBy(QQN::Modules()->SortOrder));
 
         if ($strModule) {
