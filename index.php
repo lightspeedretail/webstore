@@ -88,7 +88,7 @@ Category::$Manager->AddArray(Category::LoadAll());
 _xls_stack_put('xls_canonical_url',_xls_site_url($objUrl->Uri));
 _xls_add_page_title(_xls_get_conf('STORE_NAME' , 'XSilva Web Store'));
 _xls_stack_put('xls_canonical_url',_xls_site_url($objUrl->Uri));
-_xls_add_meta_desc(_xls_get_conf('STORE_DEFAULT_SLOGAN' , 'XSilva Web Store'));
+_xls_add_meta_desc(_xls_get_conf('STORE_TAGLINE' , 'XSilva Web Store'));
 //error_log("on dept ".$objUrl->RouteController." ".$objUrl->RouteId);
 
 switch ($objUrl->RouteController)

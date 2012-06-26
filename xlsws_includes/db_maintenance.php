@@ -473,9 +473,9 @@ class xlsws_db_maintenance extends xlsws_index {
 
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Remove index.php from SEO-Friendly URLs', `configuration_type_id`=21, `sort_order`=2,
 				`helper_text`='Requires .htaccess in Web Store root folder.' where `key`='ENABLE_SEO_URL'");
-			$this->add_config_key('STORE_DEFAULT_SLOGAN' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Store Home Page slogan', 
-				'STORE_DEFAULT_SLOGAN', 'Amazing products available to order online!', 'Used as default for Title bar for home page', 2, 4, NOW(), NOW(), 'NULL');");		
+			$this->add_config_key('STORE_TAGLINE' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Store Tagline', 
+				'STORE_TAGLINE', 'Amazing products available to order online!', 'Used as default for Title bar for home page', 2, 4, NOW(), NOW(), 'NULL');");		
 			
 	
 			//URL and Description Formatting

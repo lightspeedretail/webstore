@@ -43,7 +43,7 @@ echo '<channel>'.chr(13);
 
 echo '		<title>'._xls_get_conf('STORE_NAME','LightSpeed Web Store').'</title>'.chr(13);
 echo '		<link>'._xls_site_url().'</link>'.chr(13);
-echo '		<description>'._xls_get_conf('STORE_DEFAULT_SLOGAN').'</description>'.chr(13);
+echo '		<description>'._xls_get_conf('STORE_TAGLINE').'</description>'.chr(13);
 
 		     
 $arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 ".$strQueryAddl." ORDER BY rowid", "Query");
