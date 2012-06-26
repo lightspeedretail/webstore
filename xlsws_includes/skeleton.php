@@ -1105,13 +1105,11 @@ EOS;
 	}
 	
 	public static function SendCustomerEmail($objCart, $objCustomer) { 
-        if (!_xls_mail(
+	
+		$strSubject = _xls_format_email_subject('EMAIL_SUBJECT_CUSTOMER',$objCart->Name,$objCart->IdStr);
+       	if (!_xls_mail(
             $objCart->Email,
-            sprintf('%s %s %s', 
-                _xls_get_conf('STORE_NAME', 'Web'),
-                _sp('Order Notification'),
-                $objCart->IdStr
-            ),
+            $strSubject,
             _xls_mail_body_from_template(
                 templateNamed('email_order_notification.tpl.php'),
                 array(
@@ -1125,13 +1123,12 @@ EOS;
     }
 
     public static function SendOwnerEmail($objCart, $objCustomer) {
+
+		$strSubject = _xls_format_email_subject('EMAIL_SUBJECT_OWNER',$objCart->Name,$objCart->IdStr);
+
         if (!_xls_mail(
             _xls_get_conf('ORDER_FROM'),
-            sprintf('%s %s %s', 
-                _xls_get_conf('STORE_NAME', 'Web'),
-                _sp('Order Notification'),
-                $objCart->IdStr
-            ),
+            $strSubject,
             _xls_mail_body_from_template(
                 templateNamed('email_order_notification_owner.tpl.php'),
                 array(

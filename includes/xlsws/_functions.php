@@ -1040,6 +1040,20 @@ function _xls_add_formatted_page_title($title) {
 }
 
 /**
+ * Return Email Subject
+ * Note that this doesn't populate orderid or customername, that has to be done in skeleton
+ * @param string $title
+ */
+function _xls_format_email_subject($key='EMAIL_SUBJECT_CUSTOMER',$customer="", $orderid="") {
+	$strPattern = _xls_get_conf($key);
+	$strPattern = str_replace('%customername%', $customer,$strPattern);
+	$strPattern = str_replace('%orderid%', $orderid,$strPattern);
+	$strPattern = str_replace('%storename%', _xls_get_conf('STORE_NAME','LightSpeed Web Store'),$strPattern);
+	
+	return $strPattern;
+}
+
+/**
  * Add meta description to the stack_vars stack
  * @param string $desc
  */

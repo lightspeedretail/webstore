@@ -807,7 +807,7 @@
 			$this->configPnls['emailoptions'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::EmailOptions , "configDone");
 			$this->configPnls['emailoptions']->Name = _sp('Email Sending Options');
 			$this->configPnls['emailoptions']->Info = _sp('Options for when emails are sent, and customizations.');
-			$this->configPnls['emailoptions']->ConfigurationGuide = "These settings control under what circumstances emails are sent out. If you are looking for SMTP server settings, those can be configured under System->Setup->Email.";
+			$this->configPnls['emailoptions']->ConfigurationGuide = "These settings control under what circumstances emails are sent out. If you are looking for SMTP server settings, those can be configured under System->Setup->Email.<br>&nbsp;<br>For subject lines, the following variables are available: %storename%, %orderid%, %customername%";
 
 			$this->configPnls['local'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Localisation , "configDone");
 			$this->configPnls['local']->Name = _sp('Localization');
