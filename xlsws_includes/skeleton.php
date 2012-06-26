@@ -594,16 +594,15 @@ EOS;
 	 * @return none
 	 */
 	public function continue_shopping($strFormId, $strControlId, $strParameter) {
-		
-
-		//$page =  get from session
+	
+		$page =  _xls_get_remembered_url();
 
 		if(!$page) {
-			_rd("index.php");
+			_rd(_xls_site_url());
 			return;
 		}
 
-		_rd($page->Page);
+		_rd($page);
 	}
 
 	// custom QQN node - not intended for modification

@@ -461,6 +461,32 @@ function _xls_display_msg($msg) {
 }
 
 /**
+ * Set last viewed page within _SESSION
+ *
+ * @param string $key
+ * return mix or false
+ */
+function _xls_remember_url($strUrl) {
+	if (empty($strUrl))
+		unset($_SESSION['last_url']);
+	else
+		$_SESSION['last_url'] =  $strUrl;
+}
+
+/**
+ * Set last viewed page within _SESSION
+ *
+ * @param string $key
+ * return mix or false
+ */
+function _xls_get_remembered_url() {
+	if (isset($_SESSION['last_url']))
+		return ($_SESSION['last_url']);
+	else
+		return null;
+}
+
+/**
  * Ensure that a client is logged in before accessing this page.
  *
  * @param string $msg

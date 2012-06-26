@@ -40,7 +40,7 @@ class xlsws_category extends xlsws_product_listing {
 	 * @return none
 	 */
     protected function build_main() {
-        global $XLSWS_VARS;
+        $objUrl = _xls_url_object();
 
         $this->LoadCategory();
         $this->LoadSubCategories();
@@ -54,7 +54,7 @@ class xlsws_category extends xlsws_product_listing {
 			_xls_stack_put('xls_canonical_url',$objCategory->CanonicalUrl);
 			_xls_add_meta_desc($objCategory->PageDescription);
 			_xls_add_page_title($objCategory->PageTitle);
-
+			_xls_remember_url($objUrl->Url);
 			
 			
 		}

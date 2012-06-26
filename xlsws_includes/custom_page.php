@@ -61,6 +61,7 @@ class xlsws_custom_page extends xlsws_index {
 		_xls_stack_put('xls_canonical_url',$objPage->CanonicalUrl);
 		_xls_add_meta_desc($objPage->MetaDescription);
 		_xls_add_page_title($objPage->PageTitle);
+		_xls_remember_url($objUrl->Url);
 
 		$this->productTag = $objPage->ProductTag;
 		$this->sliderTitle = $objPage->Title;
