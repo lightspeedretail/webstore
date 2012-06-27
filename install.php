@@ -116,9 +116,8 @@ define ('__VIRTUAL_DIRECTORY__', '');
 // read the config file
 $content = file_get_contents("includes/configuration.inc.php");
 if(stristr($content , "define ('__DOCROOT__'") 
-	&& $_SERVER['REQUEST_URI']!=__SUBDIRECTORY__."/install.php?check"
-	&& $_SERVER['REQUEST_URI']!=__SUBDIRECTORY__."/install.php?upgrade" 
-	&& $_SERVER['REQUEST_URI']!=__SUBDIRECTORY__."/install.php?upgradedb"){
+	&& !isset($_GET['check']) && !isset($_GET['upgrade']) && !isset($_GET['upgradedb'])
+	){
 	// config is there.
 	exit('Store has already been installed. <script type="text/javascript">document.location.href="index.php";</script>');
 }
@@ -215,7 +214,7 @@ if(!defined('__DOCROOT__'))
 				if ((in_array("fail",$checkenv) && $_SERVER['REQUEST_URI']!=__SUBDIRECTORY__."/install.php?ignore")
 					|| $_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?check")
 					$this->environment_not_acceptable($checkenv);
-				elseif ($_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?upgrade") {
+				elseif (isset($_GET['upgrade'])) {
 					$rettext = $this->upgrade_webstore();
 					
 					$this->hideControls();
@@ -234,7 +233,7 @@ if(!defined('__DOCROOT__'))
 					$this->pnlInstall->CssClass = '';
 					
 				}
-				elseif ($_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?upgradedb")
+				elseif (isset($_GET['upgradedb']))
 					$this->upgrade_database();				
 				else	
 					$this->license_agreement();
