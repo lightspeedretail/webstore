@@ -372,12 +372,6 @@ class xlsws_db_maintenance extends xlsws_index {
 			$this->add_config_key('EMAIL_SUBJECT_OWNER' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Owner Email Subject Line', 
 				'EMAIL_SUBJECT_OWNER', '%storename% Order Notification %orderid%', 'Configure Email Subject line with variables for Owner email', 24, 11, NOW(), NOW(), NULL);");
-				
-				
-			/*$this->add_config_key('EMAIL_SEND_SHIPPING' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Send Ship Alert when Tracking # is detected', 
-				'EMAIL_SEND_SHIPPING', '1', 'Option whether to email receipts when a new tracking number is detected from an order downloaded from LightSpeed', 5, 4, NOW(), NOW(), 'BOOL');");*/
-				
 					
 			_dbx("DELETE from xlsws_configuration WHERE `key`='ADMIN_EMAIL'");
 			

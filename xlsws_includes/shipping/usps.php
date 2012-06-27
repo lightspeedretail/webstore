@@ -43,7 +43,6 @@ class usps extends xlsws_class_shipping {
 	private $response;
 
 	protected $strModuleName = "USPS";
-	protected $strTrackingPattern = array('/^E\D{1}\d{9}\D{2}$|^9\d{15,21}$/');
 
 	/**
 	 * Check if the module is valid or not.
