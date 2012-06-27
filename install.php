@@ -215,10 +215,27 @@ if(!defined('__DOCROOT__'))
 				if ((in_array("fail",$checkenv) && $_SERVER['REQUEST_URI']!=__SUBDIRECTORY__."/install.php?ignore")
 					|| $_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?check")
 					$this->environment_not_acceptable($checkenv);
-				elseif ($_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?upgrade")
-					$this->upgrade_webstore();
+				elseif ($_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?upgrade") {
+					$rettext = $this->upgrade_webstore();
+					
+					$this->hideControls();
+				
+					$this->pnlStep->Text = "<img src=\"templates/install/step_01.png\" />";
+					$this->btnNext->Display = false;
+					$lbox = $this->iControl('agreement' , 'QPanel');
+					//$lbox->TextMode = QTextMode::MultiLine;
+					$lbox->Width = 800;
+					$lbox->Height = 400;
+					//$lbox->ReadOnly = true;
+					$lbox->DisplayStyle = QDisplayStyle::Block;
+					$lbox->CssClass = "install_agreement";
+					$lbox->Text = $rettext;	
+					$lbox->HtmlEntities = false;
+					$this->pnlInstall->CssClass = '';
+					
+				}
 				elseif ($_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?upgradedb")
-					$this->upgrade_database();
+					$this->upgrade_database();				
 				else	
 					$this->license_agreement();
 				
@@ -324,7 +341,7 @@ if(!defined('__DOCROOT__'))
 				
 				$lbox = $this->iControl('agreement' , 'QPanel');
 				//$lbox->TextMode = QTextMode::MultiLine;
-				$lbox->Width = 500;
+				$lbox->Width = 800;
 				$lbox->Height = 400;
 				//$lbox->ReadOnly = true;
 				$lbox->DisplayStyle = QDisplayStyle::Block;
@@ -1522,6 +1539,12 @@ $sql[]= "insert into xlsws_configuration values (null,'Update color options', 'E
 $sql[]= "INSERT into `xlsws_configuration` VALUES (NULL,'Database Schema Version', 'DATABASE_SCHEMA_VERSION', '214','Used for tracking schema changes',0,0,NOW(),NOW(),NULL);";
 //Do not add any more statements here, upgrade db lines should be in xlsws_includes/db_maintenance.php
 
+
+$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Featured Keyword', 'FEATURED_KEYWORD', 'featured', 'If this keyword is one of your product keywords, the product will be featured on the Web Store homepage.', 8, 6, NOW(), NOW(), NULL);";
+$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug Payment Methods', 'DEBUG_PAYMENTS', '', 'If selected, WS log all activity for credit card processing and other payment methods.', 1, 18, NOW(), NOW(), 'BOOL');";
+$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug Shipping Methods', 'DEBUG_SHIPPING', '', 'If selected, WS log all activity for shipping methods.', 1, 19, NOW(), NOW(), 'BOOL');";
+$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Reset Without Flush', 'DEBUG_RESET', '', 'If selected, WS will not perform a flush on content tables when doing a Reset Store Products.', 1, 20, NOW(), NOW(), 'BOOL');";
+$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Uploader should delete duplicates', 'DEBUG_DELETE_DUPES', '', 'If selected, a product which is uploading will replace any duplicate product codes.', 1, 21, NOW(), NOW(), 'BOOL');";
 
 //$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug LightSpeed Soap Call', 'DEBUG_LS_SOAP_CALL', '1', 'If selected, all soap calls will be logged in the database. It is advised that you do not enable this unless advised by XSilva', 1, 16, NOW(), NOW(), 'BOOL');";
 				
@@ -2849,12 +2872,12 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 			}
 
 		protected function upgrade_webstore() {
-		
+			
 			//Get the XML document loaded into a variable
 			$xml = file_get_contents('upgrade/upgrade.xml');
 			if (!$xml) {
-				echo "No upgrade files can be found. Is your /upgrade folder readable?";
-				die();
+				return "No upgrade files can be found. Is your /upgrade folder readable?";
+				
 			}
 			
 			//Set up the parser object
@@ -2864,7 +2887,7 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 			$VersionTo=$oXML->version_to;
 		
 			if (XLSWS_VERSION != $VersionFrom && XLSWS_VERSION != $VersionTo)
-				die("ERROR: This updater can only update Web Store version $ThisOnlyUpgrades and you have version ".XLSWS_VERSION);
+				return "ERROR: This updater can only update Web Store version $VersionFrom and you have version ".XLSWS_VERSION;
 		
 			
 			
@@ -2902,14 +2925,14 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 			
 			if ($bnlError) {
 			
-				echo "ERROR: Automatic upgrade cannot be performed. Some files to be replaced have been manually changed. Use ?ignore=1 to override and force update of changed critical files. You can also remove individual files from the /upgrade folder and these will be automatically skipped, letting the rest of the upgrade run.<P>";
+				$strtext =  "ERROR: Automatic upgrade cannot be performed. Some files to be replaced have been manually changed. Append &ignore=1 to your URL to override and force update of changed critical files. You can also remove individual files from the /upgrade folder and these will be automatically skipped, letting the rest of the upgrade run.<P>";
 				foreach ($arrErrors as $key=>$val)
-					echo $key." ".$val."<br>";
+					$strtext .= $key." ".$val."<br>";
 				
-				return false;
+				return $strtext;
 			}
 			
-			if (isset($_GET['check'])) { echo("<P>*end of check, stopping*<P>"); return false; }
+			if (isset($_GET['check'])) return "<P>*end of check, stopping*<P>"; 
 			
 			//Step 2 - If we reach this point, we're good to actually do the upgrade. Let's go!
 			$intCount = 0;
@@ -2944,7 +2967,7 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 					
 					
 					case 'replace':
-		
+					error_log("comparing ".md5_file($v->filename)." to ".$v->original_hash." for ".$v->filename);
 						$bnlReplace = false;
 						if (md5_file($v->filename) == $v->original_hash) $bnlReplace = true;
 						if (md5_file($v->filename) != $v->original_hash && $v->status=='critical' && isset($_GET['ignore']) ) $bnlReplace = true;
@@ -2988,13 +3011,15 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 			}
 		
 			//Step 3 - Show any output
-			echo "Finished with ".($intCount-$errCount)." of $intCount files updated. $errCount errors.<P>";
-			if ($errCount) echo "Any files listed below were not updated and you will need to make changes manually, per the upgrade guide.<P>";
+			$strtext = "<h1>Finished with ".($intCount-$errCount)." of $intCount files updated. $errCount errors.</h1><P>";
+			if ($errCount) $strtext .= "Any files listed below were not updated and you will need to make changes manually, per the upgrade guide.<P>";
 			
 			foreach ($arrErrors as $key=>$val)
-				echo $key. " ".$val."<br>";
-				
-			return true;
+				$strtext .= $key. " ".$val."<br>";
+			
+			if ($errCount==0) $strtext .= "<P><h3>Upgrade to <b>$VersionTo</b> successful. The next step is to update your database. You can click <a href=install.php?upgradedb>THIS LINK</a> to upgrade now. (Be patient, the update may take a few moments.)</h3>";
+			
+			return $strtext;
 			
 		}	
 		
@@ -3021,6 +3046,8 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 			//Since an upgrade may accompany SOAP changes, clear the SOAP cache here. It will simply be rebuilt on the next Upload process
 			foreach(glob(__DOCROOT__ .  __SUBDIRECTORY__ . '/includes/qcodo/cache/soap/*.*') as $v)
 				unlink($v);
+			
+			$retVal .= "<P>Further Database updates may be done by logging into Admin Panel and choosing System->Tasks to complete any remaining steps.";
 			
 			$this->hideControls();
 				
@@ -3057,7 +3084,7 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Web Store 2.0 Installation Wizard</title>
+<title>Web Store <?php echo XLSWS_VERSION; ?> Installation Wizard</title>
 <style type="text/css">
 body {
 	color: #222;
@@ -3082,6 +3109,17 @@ margin: 0;
 	max-width: 512px;
 	vertical-align: middle;
 }
+
+<?php if (isset($_GET['upgrade'])) { ?>
+.install_content {
+	width: 820px;
+}
+#content {
+	width: 812px;
+	min-width: 812px;
+	max-width: 812px;
+}
+<? } ?>
 
 .header	{
 	margin: 5px 0 45px -70px;
