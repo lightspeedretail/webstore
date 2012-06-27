@@ -117,7 +117,8 @@ define ('__VIRTUAL_DIRECTORY__', '');
 $content = file_get_contents("includes/configuration.inc.php");
 if(stristr($content , "define ('__DOCROOT__'") 
 	&& $_SERVER['REQUEST_URI']!=__SUBDIRECTORY__."/install.php?check"
-	&& $_SERVER['REQUEST_URI']!=__SUBDIRECTORY__."/install.php?upgradedb" ){
+	&& $_SERVER['REQUEST_URI']!=__SUBDIRECTORY__."/install.php?upgrade" 
+	&& $_SERVER['REQUEST_URI']!=__SUBDIRECTORY__."/install.php?upgradedb"){
 	// config is there.
 	exit('Store has already been installed. <script type="text/javascript">document.location.href="index.php";</script>');
 }
@@ -214,6 +215,8 @@ if(!defined('__DOCROOT__'))
 				if ((in_array("fail",$checkenv) && $_SERVER['REQUEST_URI']!=__SUBDIRECTORY__."/install.php?ignore")
 					|| $_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?check")
 					$this->environment_not_acceptable($checkenv);
+				elseif ($_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?upgrade")
+					$this->upgrade_webstore();
 				elseif ($_SERVER['REQUEST_URI']==__SUBDIRECTORY__."/install.php?upgradedb")
 					$this->upgrade_database();
 				else	
@@ -2844,7 +2847,158 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 				
 				
 			}
+
+		protected function upgrade_webstore() {
+		
+			//Get the XML document loaded into a variable
+			$xml = file_get_contents('upgrade/upgrade.xml');
+			if (!$xml) {
+				echo "No upgrade files can be found. Is your /upgrade folder readable?";
+				die();
+			}
 			
+			//Set up the parser object
+			$oXML = new SimpleXMLElement($xml);
+
+			$VersionFrom=$oXML->version_from;
+			$VersionTo=$oXML->version_to;
+		
+			if (XLSWS_VERSION != $VersionFrom && XLSWS_VERSION != $VersionTo)
+				die("ERROR: This updater can only update Web Store version $ThisOnlyUpgrades and you have version ".XLSWS_VERSION);
+		
+			
+			
+			
+			
+			$bnlError = 0;
+			$arrErrors = array();
+			//Step 1 - Preflight check, are all the critical files we will replace unmodified and writeable
+			foreach($oXML->item as $v)
+			{
+				$strUpgradeFileName = str_replace("./","./upgrade/",$v->filename);
+				if ( ($v->action=='replace' || $v->action=='delete' ) && $v->status=='critical' && file_exists($strUpgradeFileName)) {
+					if (md5_file($v->filename) != $v->original_hash && !isset($_GET['ignore'])) {
+						$bnlError = 1;
+						$arrErrors[]=$v->filename." (".$v->status.") has been modified, cannot be upgraded";
+						
+					}
+					else if ($v->action=='replace' && !is_writable($v->filename)) {
+						$bnlError = 1;
+						$arrErrors[]=$v->filename." (".$v->status.") doesn't have permission to write, cannot be upgraded";
+					}
+				}
+				
+				
+				$path_parts = pathinfo(substr($v->filename,2,999));
+						$strPathToCreate = $path_parts['dirname'];
+						if (!file_exists($strPathToCreate))
+							if (!mkdir($strPathToCreate,0775,true)) {
+								$arrErrors[]=$v->filename." Error attempting to create folder ".$strPathToCreate;
+								$bnlError = 1;
+							}
+		
+				
+			}
+			
+			if ($bnlError) {
+			
+				echo "ERROR: Automatic upgrade cannot be performed. Some files to be replaced have been manually changed. Use ?ignore=1 to override and force update of changed critical files. You can also remove individual files from the /upgrade folder and these will be automatically skipped, letting the rest of the upgrade run.<P>";
+				foreach ($arrErrors as $key=>$val)
+					echo $key." ".$val."<br>";
+				
+				return false;
+			}
+			
+			if (isset($_GET['check'])) { echo("<P>*end of check, stopping*<P>"); return false; }
+			
+			//Step 2 - If we reach this point, we're good to actually do the upgrade. Let's go!
+			$intCount = 0;
+			$errCount = 0;
+			foreach($oXML->item as $v)
+			{
+				$intCount++;
+				
+				$strUpgradeFileName = str_replace("./","./upgrade/",$v->filename);
+				if (!file_exists($strUpgradeFileName))
+					{	
+						$v->action = 'skip';
+						if (XLSWS_VERSION != $VersionTo) { //We may run this multiple times after upgrading, don't show skips after initial upg
+							$arrErrors[] = $v->filename." upgrade file not found, skipping";
+							$errCount++;
+						}
+					}
+					
+					
+					
+				switch($v->action) {
+				
+					case 'install':
+						//These are easy, just move new file
+						if (!@copy($strUpgradeFileName,$v->filename))
+							{ $arrErrors[] = $v->filename." could not be copied"; $errCount++; }
+						else @unlink($strUpgradeFileName);
+							
+					
+					break;
+					
+					
+					
+					case 'replace':
+		
+						$bnlReplace = false;
+						if (md5_file($v->filename) == $v->original_hash) $bnlReplace = true;
+						if (md5_file($v->filename) != $v->original_hash && $v->status=='critical' && isset($_GET['ignore']) ) $bnlReplace = true;
+			
+						if ($bnlReplace) {
+							//Remove old file first, then copy new one, then remove upgrade copy
+							if (!@unlink($v->filename))
+								$arrErrors[]= $v->filename." could not be removed";
+							else {
+								if (!@copy($strUpgradeFileName,$v->filename))
+									{ $arrErrors[]=$v->filename." could not be copied"; $errCount++; }
+								else @unlink($strUpgradeFileName);
+								}
+						}
+						else $arrErrors[]= $v->filename." (optional) modified, not replaced.";
+					
+					break;
+					
+					
+					
+					case 'delete':
+						//These are easy, just remove old file
+						if (!@unlink($v->filename))
+							{ $arrErrors[]=$v->filename." could not be removed"; $errCount++; }
+					
+					
+					break;
+				
+					case 'skip':
+						//Only exists if the original has been removed
+					break;
+				
+				
+				}
+				
+				
+				
+				
+				
+				
+			}
+		
+			//Step 3 - Show any output
+			echo "Finished with ".($intCount-$errCount)." of $intCount files updated. $errCount errors.<P>";
+			if ($errCount) echo "Any files listed below were not updated and you will need to make changes manually, per the upgrade guide.<P>";
+			
+			foreach ($arrErrors as $key=>$val)
+				echo $key. " ".$val."<br>";
+				
+			return true;
+			
+		}	
+		
+				
 		protected function upgrade_database() {
 		
 			//Bootstrap the QCodo DB object so we can use our functions
