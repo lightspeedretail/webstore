@@ -3047,7 +3047,7 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 			foreach(glob(__DOCROOT__ .  __SUBDIRECTORY__ . '/includes/qcodo/cache/soap/*.*') as $v)
 				unlink($v);
 			
-			$retVal .= "<P>Further Database updates may be done by logging into Admin Panel and choosing System->Tasks to complete any remaining steps.";
+			$retVal .= "<P>Further Database updates may be done by logging into Admin Panel and choosing System->Tasks to complete any remaining steps shown above.";
 			
 			$this->hideControls();
 				
