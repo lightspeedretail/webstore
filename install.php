@@ -2937,7 +2937,7 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 				}
 			
 			if (!isset($_GET['preflightok']) && !isset($_GET['ignore'])) {
-				$strtext .= "<h1>Preliminary Check OK</h1><P>All the files that will be upgraded have been verified to ensure we can correctly update them. You are now ready to upgrade LightSpeed Web Store. To proceed, click <a href=install.php?upgrade&preflightok>Perform Upgrade to $VersionTo</a>."; 
+				$strtext .= "<h1>Preliminary Check OK</h1><P><h3>Ready to begin upgrading... All the files that will be upgraded have been verified to ensure we can correctly replace them. You are now ready to upgrade LightSpeed Web Store. To proceed, click <a href=install.php?upgrade&preflightok>Perform Upgrade to $VersionTo</a>.</h3>"; 
 				return $strtext;
 				}
 				
