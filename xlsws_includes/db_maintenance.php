@@ -674,7 +674,7 @@ class xlsws_db_maintenance extends xlsws_index {
 					
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			
-			$strUpgradeText .= "<h2>Please run the steps RECALCULATE PENDING ORDERS and MIGRATE PHOTOS after running this Upgrade.</h2>";
+			$strUpgradeText .= "<h2>Please run the steps MIGRATE PHOTOS and RECALCULATE PENDING ORDERS after running this Upgrade.</h2>";
 			
 			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
 			$config->Value="220";
