@@ -2931,8 +2931,16 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 				return $strtext;
 			}
 			
-			if (isset($_GET['check'])) return "<P>*end of check, stopping*<P>"; 
+			if (isset($_GET['check'])) {
+				$strtext .= "<P>*end of check, stopping.* If you don't see any errors above this message, it means there were no errors. You can remove the \"check\" from the URL and allow the upgrade to run.<P>"; 
+				return $strtext;
+				}
 			
+			if (!isset($_GET['preflightok']) && !isset($_GET['ignore'])) {
+				$strtext .= "<h1>Preliminary Check OK</h1><P>All the files that will be upgraded have been verified to ensure we can correctly update them. You are now ready to upgrade LightSpeed Web Store. To proceed, click <a href=install.php?upgrade&preflightok>Perform Upgrade to $VersionTo</a>."; 
+				return $strtext;
+				}
+				
 			//Step 2 - If we reach this point, we're good to actually do the upgrade. Let's go!
 			$intCount = 0;
 			$errCount = 0;
@@ -2966,7 +2974,6 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 					
 					
 					case 'replace':
-					error_log("comparing ".md5_file($v->filename)." to ".$v->original_hash." for ".$v->filename);
 						$bnlReplace = false;
 						if (md5_file($v->filename) == $v->original_hash) $bnlReplace = true;
 						if (md5_file($v->filename) != $v->original_hash && $v->status=='critical' && isset($_GET['ignore']) ) $bnlReplace = true;
