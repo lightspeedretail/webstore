@@ -183,12 +183,10 @@ class beanstream_aim extends credit_card {
 		$resp = curl_exec($ch); //execute post and get results
 		curl_close ($ch);
 		$resp_vals = array();
-		if(_xls_get_conf('DEBUG_PAYMENTS' , false))
-			QApplication::Log(E_ERROR, get_class($this), $resp);		
 
 		if(_xls_get_conf('DEBUG_PAYMENTS' , false)) {
-			QApplication::Log(E_ERROR, get_class($this), "sending ".$cart->IdStr." for amt ".$cart->Total);
-			QApplication::Log(E_ERROR, get_class($this), "receiving ".$resp);
+			_xls_log(get_class($this) . " sending ".$cart->IdStr." for amt ".$cart->Total,true);
+			_xls_log(get_class($this) . " receiving ".$resp,true);
 		}
 
 		parse_str($resp, $resp_vals);

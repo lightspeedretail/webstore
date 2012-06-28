@@ -71,7 +71,7 @@ class tier_table extends xlsws_class_shipping {
 			$fltCriteria = $cart->Weight;
 		
 		if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
-					QApplication::Log(E_ERROR, get_class($this), "tier ship evaluating ".$fltCriteria.' as '.$config['tierbased']);
+					_xls_log(get_class($this) . " tier ship evaluating ".$fltCriteria.' as '.$config['tierbased'],true);
 				}
 				
 		$results = $db->Query("select * from xlsws_shipping_tiers where start_price <= " . $fltCriteria . " and end_price >= " .$fltCriteria);

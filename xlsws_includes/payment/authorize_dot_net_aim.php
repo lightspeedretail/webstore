@@ -216,8 +216,8 @@ class authorize_dot_net_aim extends credit_card {
 		curl_close ($ch);
 
 		if(_xls_get_conf('DEBUG_PAYMENTS' , false)) {
-			QApplication::Log(E_ERROR, get_class($this), "sending ".$cart->IdStr." for amt ");
-			QApplication::Log(E_ERROR, get_class($this), "receiving ".$resp);
+			_xls_log(get_class($this) . " sending ".$cart->IdStr." for amt ",true);
+			_xls_log(get_class($this) . " receiving ".$resp,true);
 		}
 		
 		$resp_vals = _xls_delim_to_array($resp , self::x_delim_char);

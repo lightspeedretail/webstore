@@ -232,8 +232,8 @@ class paypal_webpayments_pro extends credit_card {
 		$nvpResArray=$this->deformatNVP($resp);
 	    	    
 		if(_xls_get_conf('DEBUG_PAYMENTS' , false)) {
-			QApplication::Log(E_ERROR, get_class($this), "sending ".$cart->IdStr." for amt ".$cart->Total);
-			QApplication::Log(E_ERROR, get_class($this), "receiving ".print_r($nvpResArray,true));
+			_xls_log(get_class($this) . " sending ".$cart->IdStr." for amt ".$cart->Total,true);
+			_xls_log(get_class($this) . " receiving ".print_r($nvpResArray,true),true);
 		}
 		
 		if (curl_errno($ch)) {

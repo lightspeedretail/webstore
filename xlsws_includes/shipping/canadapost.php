@@ -269,8 +269,8 @@ class canadapost extends xlsws_class_shipping {
 			$result = curl_exec ($ch);
 			
 			if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
-				QApplication::Log(E_ERROR, get_class($this), "sending ".$xml);
-				QApplication::Log(E_ERROR, get_class($this), "receiving ".$result);
+				_xls_log(get_class($this) . " sending ".$xml,true);
+				_xls_log(get_class($this) . " receiving ".$result,true);
 			}
 			
 			$oXML = new SimpleXMLElement($result);		

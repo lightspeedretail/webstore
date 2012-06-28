@@ -656,8 +656,8 @@ class iups extends xlsws_class_shipping {
 		
 
 		if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
-			QApplication::Log(E_ERROR, get_class($this), "sending ".$y);
-			QApplication::Log(E_ERROR, get_class($this), "receiving ".$this->xmlreturndata);
+			_xls_log(get_class($this) . " sending ".$y,true);
+			_xls_log(get_class($this) . " receiving ".$this->xmlreturndata,true);
 		}
 			
 	}

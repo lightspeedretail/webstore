@@ -203,8 +203,17 @@ function _xls_make_hidden($name , $value) {
  *
  * @param unknown_type $msg
  */
-function _xls_log($msg) {
-	QApplication::Log(E_NOTICE, 'unknown', $msg);
+function _xls_log($msg,$blnSysLogOnly = false) {
+
+	if ($blnSysLogOnly) {
+		$log = new Log();
+        $log->Created = new QDateTime(QDateTime::Now);
+        $log->Log = $msg;
+        $log->Save(true);
+
+	}
+	else
+		QApplication::Log(E_NOTICE, 'unknown', $msg);
 }
 
 /**

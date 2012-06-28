@@ -231,8 +231,8 @@ class australiapost extends xlsws_class_shipping {
 			curl_close($c);
 			
 			if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
-				QApplication::Log(E_ERROR, get_class($this), "sending ".$url);
-				QApplication::Log(E_ERROR, get_class($this), "receiving ".$result);
+				_xls_log(get_class($this) . " sending ".$url,true);
+				_xls_log(get_class($this) . " receiving ".$result,true);
 			}
 		
 			/*

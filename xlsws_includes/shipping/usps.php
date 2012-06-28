@@ -378,8 +378,8 @@ class usps extends xlsws_class_shipping {
 		$this->response = $this->sendUSPSRateRequest($request);
 
 		if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
-			QApplication::Log(E_ERROR, get_class($this), "sending ".print_r($request,true));
-			QApplication::Log(E_ERROR, get_class($this), "receiving ".$this->response);
+			_xls_log(get_class($this) . " sending ".print_r($request,true),true);
+			_xls_log(get_class($this) . " receiving ".$this->response,true);
 		}
 
 		// Parse xml for response values
