@@ -1261,14 +1261,15 @@ font:12px/12px Arial, Helvetica, sans-serif;
 padding:0;
 }
 
-#customer_registration input,.border input,#checkout input.textbox,.xlsfset input {
+#customer_registration input,.border input,#checkout input,.xlsfset input {
 border:1px solid #555;
+color:#444;
 height:20px;
 padding:2px 4px;
 }
 
-#customer_registration input,.border input,#checkout input,.xlsfset input {
-border:1px solid #555;
+#customer_registration input[type='checkbox'],.border input[type='checkbox'],#checkout input[type='checkbox'],.xlsfset input[type='checkbox'] {
+color:#444;
 height:20px;
 padding:2px 4px;
 border: 0px none;
@@ -1281,7 +1282,6 @@ margin-top:-20px;
 #customer_registration legend,.border legend,.xlsfset legend {
 font:12px;
 font-weight:700;
-margin-left:40px;
 }
 
 #customer_registration label.opt,label.opt,#checkout label.opt {
@@ -1312,7 +1312,7 @@ float:left;
 }
 
 #customer_registration .margin,.border .margin,#checkout .margin,.xlsfset .margin {
-margin:0 15px;
+margin:0 5px;
 }
 
 #customer_registration .error input,.border .error input,#checkout .error input,.xlsfset .error input {
@@ -2110,7 +2110,7 @@ width:30px;
 legend {
 font:17px/21px Calibri, Arial, Helvetica, sans-serif;
 font-weight:700;
-margin:-26px 0 0 -11px;
+margin:-6px 0 0 -11px;
 padding:0 10px;
 }
 

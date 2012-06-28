@@ -144,7 +144,7 @@
 					if (strlen($arrTab->Title)>$arrTabWrap[count($this->arrTopTabs)-1]) echo 'class="tabvcenter"'; 
 					echo ' href="'.$arrTab->Link.'">'.$arrTab->Title.'</a></li>';
 				}
-				?>				
+				?>					
 			</ul><div id="searchentry"><?php $this->searchPnl->Render(); ?></div>				
 		</div>
 
