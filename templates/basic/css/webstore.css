@@ -1448,11 +1448,18 @@ font:12px/12px Arial, Helvetica, sans-serif;
 padding:0;
 }
 
-#customer_registration input,.border input,#checkout input,.xlsfset input {
+#customer_registration input,.border input,#checkout input.textbox,.xlsfset input {
 border:1px solid #acacac;
 color:#444;
 height:20px;
 padding:2px 4px;
+}
+
+#customer_registration input,.border input,#checkout input,.xlsfset input {
+color:#444;
+height:20px;
+padding:2px 4px;
+border: 0px none;
 }
 
 #customer_registration fieldset.action,.border fieldset.action,fieldset.action,#checkout fieldset.action,.xlsfset fieldset.action {
