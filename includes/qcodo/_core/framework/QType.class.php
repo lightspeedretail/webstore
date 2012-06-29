@@ -50,182 +50,117 @@
 	 * careless coding errors and tough to figure out mistakes due to PHP's sometimes
 	 * overly laxed type conversions.
 	 */
-	abstract class QType {
-		/**
-		 * This faux constructor method throws a caller exception.
-		 * The Type object should never be instantiated, and this constructor
-		 * override simply guarantees it.
-		 *
-		 * @return void
-		 */
-		public final function __construct() {
-			throw new QCallerException('Type should never be instantiated.  All methods and variables are publically statically accessible.');
-		}
-
+abstract class QType
+    {
+        // Constants
 		const String = 'string';
 		const Integer = 'integer';
 		const Float = 'double';
 		const Boolean = 'boolean';
 		const Object = 'object';
 		const ArrayType = 'array';
-
 		const DateTime = 'QDateTime';
-		
 		const Resource = 'resource';
 
-		private static function CastObjectTo($objItem, $strType) {
-			try {
-				$objReflection = new ReflectionClass($objItem);
-				if ($objReflection->getName() == 'SimpleXMLElement') {
-					switch ($strType) {
-						case QType::String:
-							return (string) $objItem;
-						case QType::Integer:
-							try {
-								return QType::Cast((string) $objItem, QType::Integer);
-							} catch (QCallerException $objExc) {
-								$objExc->IncrementOffset();
-								throw $objExc;
-							}
-						case QType::Boolean:
-							$strItem = strtolower(trim((string) $objItem));
-							if (($strItem == 'false') ||
-								(!$strItem))
-								return false;
-							else
-								return true;
-					}
-				}
+        /**
+         * This faux constructor method throws a caller exception.
+         * The Type object should never be instantiated, and this constructor
+         * override simply guarantees it.
+         *
+         * @access public
+         * @return void
+         */
+        public final function __construct()
+        {
+            throw new QCallerException('Type should never be instantiated.  All methods and variables are publically statically accessible.');
+        }
 
-				if ($objItem instanceof $strType)
-					return $objItem;
-			} catch (Exception $objExc) {
-			}
+        /**
+         *
+         * @static
+         * @final
+         * @access public
+         * @param mixed $mixItem
+         * @param mixed $mixType
+         * @return mixed
+         */
+        public final static function Cast($mixItem, $mixType)
+        {
+            // Return nulls as nulls
+            if(is_null($mixItem)) return null;
+            try
+            {
+                // Object
+                if(is_object($mixItem))
+                {
+                    if(is_string($mixType) && $mixItem instanceof $mixType) return $mixItem;
+                    try
+                    {
+                        return QType::Cast((string)$mixItem, $mixType);
+                    }
+                    catch(Exception $objExcepton)
+                    {
+                        throw new QInvalidCastException('Unable to cast Object to String');
+                    }
+                }
+                // Array
+                if(is_array($mixItem))
+                {
+                    if($mixType == QType::ArrayType) return $mixItem;
+                    throw new QInvalidCastException(sprintf('Unable to cast Array to %s', self::Constant($mixType)));
+                }
+                // String, Number or Boolean
+                if(is_string($mixItem) || is_numeric($mixItem) || is_bool($mixItem))
+                {
+                    switch ($mixType)
+                    {
+                        // Cast to Boolean
+                        case QType::Boolean:
+                            if (is_bool($mixItem))
+                                return $mixItem;
+                            if (is_null($mixItem))
+                                return false;
+                            if (strlen($mixItem) == 0)
+                                return false;
+                            if (strtolower($mixItem) == 'false')
+                                return false;
+                            return (bool)$mixItem;
+                        // Cast To Integer
+                        case QType::Integer:
+                            if (strlen($mixItem) == 0) return null;
+                            $mixNewItem = (int)$mixItem;
+                            if($mixNewItem == $mixItem) return $mixNewItem;
+                            throw new QInvalidCastException(sprintf('Unable to cast value to %s: %s', self::Constant($mixType), $mixItem));
+                        // Cast to Float
+                        case QType::Float:
+                            if (strlen($mixItem) == 0) return null;
+                            $mixNewItem = (float)$mixItem;
+                            if($mixNewItem == $mixItem) return $mixNewItem;
+                            throw new QInvalidCastException(sprintf('Unable to cast value to %s: %s', self::Constant($mixType), $mixItem));
+                        // Cast to String
+                        case QType::String:
+                            return (string)$mixItem;
+                        // Unable to Cast
+                        default:
+                            throw new QInvalidCastException(sprintf('Unable to cast value to %s: %s', self::Constant($mixType), $mixItem));
+                    }
+                }
+            }
+            catch (QCallerException $objException)
+            {
+                $objException->IncrementOffset();
+                throw $objException;
+            }
+            catch(Exception $objException)
+            {
+                throw new QInvalidCastException(sprintf('Unable to cast %s to %s', $mixItem, $mixType));
+            }
+            // Resource
+            if(is_resource($mixItem)) throw new QInvalidCastException('Resources can not be cast');
+            // Unknown type
+            throw new QInvalidCastException(sprintf('Unable to determine type of item to be cast: %s', $mixItem));
+        }
 
-			throw new QInvalidCastException(sprintf('Unable to cast %s object to %s', $objReflection->getName(), $strType));
-		}
-
-		private static function CastValueTo($mixItem, $strType) {
-			$strItemType = gettype($mixItem);
-
-			switch ($strType) {
-				case QType::Boolean:
-					if ($strItemType == QType::Boolean)
-						return $mixItem;
-					if (is_null($mixItem))
-						return false;
-					if (strlen($mixItem) == 0)
-						return false;
-					if (strtolower($mixItem) == 'false')
-						return false;
-					settype($mixItem, $strType);
-					return $mixItem;
-
-				case QType::Integer:
-				case QType::Float:
-					if (strlen($mixItem) == 0)
-						return null;
-
-					$mixOriginal = $mixItem;
-					settype($mixItem, $strType);
-
-					// Check to make sure the value hasn't changed significantly
-					$mixTest = $mixItem;
-					settype($mixTest, gettype($mixOriginal));
-
-					// Has it?
-					if ($mixTest != $mixOriginal)
-						// Yes -- therefore this is an invalid cast
-						throw new QInvalidCastException(sprintf('Unable to cast %s value to %s: %s', $strItemType, $strType, $mixOriginal));
-
-					return $mixItem;
-
-				case QType::String:
-					$mixOriginal = $mixItem;
-					settype($mixItem, $strType);
-
-/*					// Check to make sure the value hasn't changed significantly
-					$mixTest = $mixItem;
-					settype($mixTest, gettype($mixOriginal));
-
-					// Has it?
-					if ($mixTest != $mixOriginal)
-						// Yes -- therefore this is an invalid cast
-						throw new QInvalidCastException(sprintf('Unable to cast %s value to %s: %s', $strItemType, $strType, $mixOriginal));*/
-
-					return $mixItem;
-
-				default:
-					throw new QInvalidCastException(sprintf('Unable to cast %s value to %s', $strItemType, $strType));
-			}
-		}
-		
-		private static function CastArrayTo($arrItem, $strType) {
-			if ($strType == QType::ArrayType)
-				return $arrItem;
-			else
-				throw new QInvalidCastException(sprintf('Unable to cast Array to %s', $strType));
-		}
-
-		/**
-		 * Used to cast a variable to another type.  Allows for moderate
-		 * support of strongly-named types.
-		 *
-		 * Will throw an exception if the cast fails, causes unexpected side effects,
-		 * if attempting to cast an object to a value (or vice versa), or if an object
-		 * is being cast to a class that isn't a subclass (e.g. parent).  The exception
-		 * thrown will be an InvalidCastException, which extends CallerException.
-		 *
-		 * @param mixed $mixItem the value, array or object that you want to cast
-		 * @param string $strType the type to cast to.  Can be a QType::XXX constant (e.g. QType::Integer), or the name of a Class
-		 * @return mixed the passed in value/array/object that has been cast to strType
-		 */
-		public final static function Cast($mixItem, $strType) {
-			// Automatically Return NULLs
-			if (is_null($mixItem))
-				return null;
-
-			// Figure out what PHP thinks the type is
-			$strPhpType = gettype($mixItem);
-
-			switch ($strPhpType) {
-				case QType::Object:
-					try {
-						return QType::CastObjectTo($mixItem, $strType);
-					} catch (QCallerException $objExc) {
-						$objExc->IncrementOffset();
-						throw $objExc;
-					}
-
-				case QType::String:
-				case QType::Integer:
-				case QType::Float:
-				case QType::Boolean:
-					try {
-						return QType::CastValueTo($mixItem, $strType);
-					} catch (QCallerException $objExc) {
-						$objExc->IncrementOffset();
-						throw $objExc;
-					}
-
-				case QType::ArrayType:
-					try {
-						return QType::CastArrayTo($mixItem, $strType);
-					} catch (QCallerException $objExc) {
-						$objExc->IncrementOffset();
-						throw $objExc;
-					}
-
-				case QType::Resource:
-					// Cannot Cast Resources
-					throw new QInvalidCastException('Resources cannot be cast');
-
-				default:
-					// Could not determine type
-					throw new QInvalidCastException(sprintf('Unable to determine type of item to be cast: %s', $mixItem));
-			}
-		}
-		
 		/**
 		 * Used by the Qcodo Code Generator to allow for the code generation of
 		 * the actual "Type::Xxx" constant, instead of the text of the constant,
@@ -233,11 +168,13 @@
 		 *
 		 * It is rare for Constant to be used manually outside of Code Generation.
 		 *
-		 * @param string $strType the type to convert to 'constant' form
+		 * @param string $intType the type to convert to 'constant' form
 		 * @return string the text of the Text:Xxx Constant
 		 */
-		public final static function Constant($strType) {
-			switch ($strType) {
+		public final static function Constant($intType)
+        {
+			switch ($intType)
+            {
 				case QType::Object: return 'QType::Object';
 				case QType::String: return 'QType::String';
 				case QType::Integer: return 'QType::Integer';
@@ -249,12 +186,22 @@
 
 				default:
 					// Could not determine type
-					throw new QInvalidCastException(sprintf('Unable to determine type of item to lookup its constant: %s', $strType));
+					throw new QInvalidCastException(sprintf('Unable to determine type of item to lookup its constant: %s', $intType));
 			}
 		}
-		
-		public final static function TypeFromDoc($strType) {
-			switch (strtolower($strType)) {
+
+        /**
+         * Determines QType from DocString type...
+         *
+         * @final
+         * @static
+         * @param string $strType
+         * @return int
+         */
+		public final static function TypeFromDoc($strType)
+        {
+			switch (strtolower($strType))
+            {
 				case 'string':
 				case 'str':
 					return QType::String;
@@ -287,24 +234,29 @@
 					return 'void';
 
 				default:
-					try {
+					try
+                    {
 						$objReflection = new ReflectionClass($strType);
 						return $strType;
-					} catch (ReflectionException $objExc) {
+					} 
+                    catch (ReflectionException $objExc)
+                    {
 						throw new QInvalidCastException(sprintf('Unable to determine type of item from PHPDoc Comment to lookup its QType or Class: %s', $strType));
 					}
 			}
 		}
-		
+
 		/**
 		 * Used by the Qcodo Code Generator and QSoapService class to allow for the xml generation of
 		 * the actual "s:type" Soap Variable types.
 		 *
-		 * @param string $strType the type to convert to 'constant' form
+		 * @param string $intType the type to convert to 'constant' form
 		 * @return string the text of the SOAP standard s:type variable type
 		 */
-		public final static function SoapType($strType) {
-			switch ($strType) {
+		public final static function SoapType($intType)
+        {
+			switch ($intType)
+            {
 				case QType::String: return 'string';
 				case QType::Integer: return 'int';
 				case QType::Float: return 'float';
@@ -316,55 +268,8 @@
 				case QType::Resource:
 				default:
 					// Could not determine type
-					throw new QInvalidCastException(sprintf('Unable to determine type of item to lookup its constant: %s', $strType));
+					throw new QInvalidCastException(sprintf('Unable to determine type of item to lookup its constant: %s', $intType));
 			}
 		}
-/*
-		final public static function SoapArrayType($strType) {
-			try {
-				return sprintf('ArrayOf%s', ucfirst(QType::SoapType($strType)));
-			} catch (QInvalidCastException $objExc) {}
-				$objExc->IncrementOffset();
-				throw $objExc;
-			}
-		}
-
-		final public static function AlterSoapComplexTypeArray(&$strComplexTypeArray, $strType) {
-			switch ($strType) {
-				case QType::String:
-					$strItemName = 'string';
-					break;
-				case QType::Integer:
-					$strItemName = 'int';
-					break;
-				case QType::Float:
-					$strItemName = 'float';
-					break;
-				case QType::Boolean:
-					$strItemName = 'boolean';
-					break;
-				case QType::DateTime:
-					$strItemName = 'dateTime';
-					break;
-
-				case QType::ArrayType:
-				case QType::Object:
-				case QType::Resource:
-				default:
-					// Could not determine type
-					throw new QInvalidCastException(sprintf('Unable to determine type of item to lookup its constant: %s', $strType));
-			}
-
-			$strArrayName = QType::SoapArrayType($strType);
-
-			if (!array_key_exists($strArrayName, $strComplexTypeArray))
-				$strComplexTypeArray[$strArrayName] = sprintf(
-					'<s:complexType name="%s"><s:sequence>' . 
-					'<s:element minOccurs="0" maxOccurs="unbounded" name="%s" type="%s"/>' .
-					'</s:sequence></s:complexType>',
-					QType::SoapArrayType($strType),
-					$strItemName,
-					QType::SoapType($strType));
-		}*/
-	}
+    }
 ?>

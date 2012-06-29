@@ -30,6 +30,7 @@
     require('includes/prepend.inc.php');    
     ob_end_clean();
 
+
     class XLSWService extends QSoapService {
         
         
@@ -405,29 +406,28 @@
 
             return self::OK;
         }
+//, DeltaUpdates $products
+//         
 
 		/**
-         * Save a product in the database (Create if need be)
+         * Delta Updates
          *
          * @param string $passkey
-         * @param string $products
-         * @param string $orders
-         * @param string $quotes
-         * @param string $sros
+         * @param DeltaUpdates[] $DeltaUpdates
          * @return string
          */
         public function delta_update(
-                  $passkey 
-                , $products
-                , $orders
-                , $quotes
-                , $sros
-                ){
+                  $passkey,
+                  $DeltaUpdates
+                
+                ){ 
 
             if(!$this->check_passkey($passkey))
                 return self::FAIL_AUTH;
 
-				foreach($products as $arrProduct) {
+				error_log("resulting array is ".print_r($DeltaUpdates,true));
+
+				/*foreach($products as $arrProduct) {
 
 					$objProduct = Product::LoadByRowid($arrProduct->intRowid);
 					
@@ -452,7 +452,8 @@
 					
 					
 				}
-				
+				*/
+				/*
 				//Because orders and quotes are both cart items, we can just process them as one
 				$carts = array_merge($orders,$quotes);
 				
@@ -481,6 +482,7 @@
 					
 					
 				}
+			*/
 	
 
             return self::OK;

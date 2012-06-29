@@ -62,6 +62,10 @@ QApplication::$ClassFile['imagestype'] =
 QApplication::$ClassFile['promocodetype'] =
 	__DATA_CLASSES__ . '/PromoCodeType.class.php';
 
+QApplication::$ClassFile['deltaupdates'] =
+	__DATA_CLASSES__ . '/DeltaUpdates.class.php';
+
+
 // Register xlsws static class path definitions to QApplication
 QApplication::$ClassFile['xlssessionhandlerbase'] =
 	__XLSWS_INCLUDES__ . '/core/session/XLSSessionHandlerBase.class.php';
