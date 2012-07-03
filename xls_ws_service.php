@@ -406,26 +406,24 @@
 
             return self::OK;
         }
-//, DeltaUpdates $products
-//         
+      
 
 		/**
-         * Delta Updates
+         * Updating Inventory (delta update)
          *
          * @param string $passkey
-         * @param DeltaUpdates[] $DeltaUpdates
+         * @param UpdateInventory[] $UpdateInventory
          * @return string
          */
-        public function delta_update(
+        public function update_inventory(
                   $passkey,
-                  $DeltaUpdates
-                
+                  $UpdateInventory              
                 ){ 
 
             if(!$this->check_passkey($passkey))
                 return self::FAIL_AUTH;
 
-				error_log("resulting array is ".print_r($DeltaUpdates,true));
+				error_log("resulting array is ".print_r($UpdateInventory,true));
 
 				/*foreach($products as $arrProduct) {
 

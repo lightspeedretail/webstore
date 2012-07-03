@@ -24,13 +24,14 @@
  
  */
 
-class DeltaUpdates extends QBaseClass {
+//This file contains classes that are are using for Delta Updates (partial record updates) from LightSpeed
+
+class UpdateInventory extends QBaseClass {
 
 	//Fields that we can pass as part of the delta update
-	public $strObjectName;
-	public $intRowid;
-	public $intInventory;
-	public $intInventoryTotal;
+	public $productID;
+	public $inventory;
+	public $inventoryTotal;
 
 
 	////////////////////////////////////////
@@ -38,17 +39,19 @@ class DeltaUpdates extends QBaseClass {
 	////////////////////////////////////////
 
 	public static function GetSoapComplexTypeXml() {
-		$strToReturn = '<complexType name="DeltaUpdates"><sequence>';
-    	$strToReturn .= '<element name="Result" type="xsd:boolean"/>';
-    	$strToReturn .= '<element name="Msg" type="xsd:string"/>';
+		$strToReturn = '<complexType name="UpdateInventory"><sequence>';
+    	$strToReturn .= '<element name="productID" type="xsd:int"/>';
+    	$strToReturn .= '<element name="inventory" type="xsd:int"/>';
+    	$strToReturn .= '<element name="inventoryTotal" type="xsd:int"/>';
 		$strToReturn .= '</sequence></complexType>';
 		return $strToReturn;
 	}
 
 	public static function AlterSoapComplexTypeArray($strComplexTypeArray) {
-		if (!array_key_exists('DeltaUpdates', $strComplexTypeArray)) {
-			$strComplexTypeArray['DeltaUpdates'] = DeltaUpdates::GetSoapComplexTypeXml();
+		if (!array_key_exists('UpdateInventory', $strComplexTypeArray)) {
+			$strComplexTypeArray['UpdateInventory'] = UpdateInventory::GetSoapComplexTypeXml();
 		}
+
 	}
 
 	//This is called from cached .php
@@ -56,21 +59,19 @@ class DeltaUpdates extends QBaseClass {
 		$objArrayToReturn = array();
 
 		foreach ($objSoapArray as $objSoapObject)
-			array_push($objArrayToReturn, DeltaUpdates::GetObjectFromSoapObject($objSoapObject));
+			array_push($objArrayToReturn, UpdateInventory::GetObjectFromSoapObject($objSoapObject));
 
 		return $objArrayToReturn;
 	}
 
 	public static function GetObjectFromSoapObject($objSoapObject) {
-		$objToReturn = new DeltaUpdates();
-		if (property_exists($objSoapObject, 'ObjectName'))
-			$objToReturn->strObjectName = $objSoapObject->ObjectName;
-		if (property_exists($objSoapObject, 'intRowid'))
-			$objToReturn->intRowid = $objSoapObject->intRowid;
-		if (property_exists($objSoapObject, 'intInventory'))
-			$objToReturn->intInventory = $objSoapObject->intInventory;
-		if (property_exists($objSoapObject, 'intInventoryTotal'))
-			$objToReturn->intInventoryTotal = $objSoapObject->intInventoryTotal;
+		$objToReturn = new UpdateInventory();
+		if (property_exists($objSoapObject, 'productID'))
+			$objToReturn->productID = $objSoapObject->productID;
+		if (property_exists($objSoapObject, 'inventory'))
+			$objToReturn->inventory = $objSoapObject->inventory;
+		if (property_exists($objSoapObject, 'inventoryTotal'))
+			$objToReturn->inventoryTotal = $objSoapObject->inventoryTotal;
 		return $objToReturn;
 	}
 
@@ -81,23 +82,19 @@ class DeltaUpdates extends QBaseClass {
 		$objArrayToReturn = array();
 
 		foreach ($objArray as $objObject)
-			array_push($objArrayToReturn, DeltaUpdates::GetSoapObjectFromObject($objObject, true));
+			array_push($objArrayToReturn, UpdateInventory::GetSoapObjectFromObject($objObject, true));
 
 		return unserialize(serialize($objArrayToReturn));
 	}
 
 	public static function GetSoapObjectFromObject($objObject, $blnBindRelatedObjects) {
-		//if ($objObject->dttCreated)
-		//	$objObject->dttCreated = $objObject->dttCreated->__toString(QDateTime::FormatSoap);
-		return $objObject;
-	}
-
-
+			if ($objObject->objUpdateInventory)
+				$objObject->objUpdateInventory = UpdateInventory::GetSoapObjectFromObject($objObject->objUpdateInventory, false);
+			return $objObject;
+		}
 
 	public function __get($strName) {
 		switch ($strName) {
-			case 'ObjectName':
-				return $this->strObjectName;
 
 			default:
 				try {

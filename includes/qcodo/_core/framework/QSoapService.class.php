@@ -40,11 +40,11 @@
 			}
 
 			$objReflection = new ReflectionMethod($this->strType, 'AlterSoapComplexTypeArray');
-			$objReflection->invoke(null, $strComplexTypesArray, false);
+			$objReflection->invoke(null, &$strComplexTypesArray, false);
 			return $strToReturn;
 		}
 
-		public function __get($strName) { 
+		public function __get($strName) {
 			try {
 				switch ($strName) {
 					case 'Name': return $this->strName;
@@ -270,7 +270,7 @@
 					$strType);
 		}
 
-		public static function Run($strClassName, $strNamespace = null) {
+		public static function Run($strClassName, $strNamespace = null) {			
 			QApplication::$EncodingType = 'UTF-8';
 			
 			$objWsdlCache = new QCache('soap', QApplication::$ScriptName, 'wsdl', QApplication::$ScriptFilename);
@@ -354,7 +354,7 @@
 				$strParameterArray = array();
 				foreach ($objMethod->GetAllParameters() as $objParameter) {
 					$strParameterDefinition = sprintf('%s %s$%s',
-						($objParameter->Type == QType::DateTime) ? $objParameter->Type : '',
+						($objParameter->IsObject() || $objParameter->Type == QType::DateTime) ? $objParameter->Type : '',
 						($objParameter->Reference) ? '&' : '',
 						$objParameter->Name
 					);

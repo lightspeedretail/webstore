@@ -62,8 +62,8 @@ QApplication::$ClassFile['imagestype'] =
 QApplication::$ClassFile['promocodetype'] =
 	__DATA_CLASSES__ . '/PromoCodeType.class.php';
 
-QApplication::$ClassFile['deltaupdates'] =
-	__DATA_CLASSES__ . '/DeltaUpdates.class.php';
+QApplication::$ClassFile['updateinventory'] =
+	__DATA_CLASSES__ . '/UpdateInventory.class.php';
 
 
 // Register xlsws static class path definitions to QApplication
