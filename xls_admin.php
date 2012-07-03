@@ -2490,7 +2490,7 @@
 		 			} 
 		 			
 		 			$intCodeToCopy = $this->ctlPromoCodeCopy->SelectedValue;
-		 			error_log("copying ".$intCodeToCopy);
+		
 		 			if ($intCodeToCopy==0) {
 		 				QApplication::ExecuteJavaScript(
 		 					"alert('You must choose an existing promo code to use as a template for the settings.');");	
@@ -4521,7 +4521,7 @@
 					
 				}
 				*/
-				//$strRetVal .= "<input type='hidden' name='RequestUrl' id='RequestUrl' value='".$objItem->RequestUrl."'>";
+				$strRetVal .= "<input type='hidden' name='PromoId' id='PromoId' value='".$objItem->Rowid."'>";
 			}
 			else $strRetVal= "";
 			

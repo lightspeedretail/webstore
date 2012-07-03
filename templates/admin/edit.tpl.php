@@ -122,9 +122,10 @@ $this->dtgItems->Render('CssClass="rounded wide"');
 </div>
 
 
-<link rel="stylesheet" type="text/css" href="<?= adminTemplate('css/basic.css') ?>" media='screen'  />
 
 <? if($this->usejQuery) { ?>
+<link rel="stylesheet" type="text/css" href="<?= adminTemplate('css/'.$this->usejQuery.'.css') ?>" media='screen'  />
+
 <!-- modal content -->
 		<div id="basic-modal-content">
 		Loading...

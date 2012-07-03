@@ -12,38 +12,30 @@
 
 jQuery(function ($) {
 	var initset=new Array('0');
-	var choosegoogle = {
+	var choosepromo = {
 		message: null,
 		init: function () {
 			$('.basic').live('click',function (e) {
 
-						$.get("xls_admin_js.php?item=google&rurl=" + $('#RequestUrl').val(), function(data){
+						$.get("xls_admin_js.php?item=promorestrict&id=" + $('#PromoId').val(), function(data){
 							// create a modal dialog with the data
 							$('#basic-modal-content').html(data);
-							$('#google1').live('change', function() { choosegoogle.change(1); });
-							$('#google2').live('change', function() { choosegoogle.change(2); });
-							$('#google3').live('change', function() { choosegoogle.change(3); });
-							$('#google4').live('change', function() { choosegoogle.change(4); });
-							$('#google5').live('change', function() { choosegoogle.change(5); });
-							$('#google6').live('change', function() { choosegoogle.change(6); });
+							
+							
 							$('.basic-send').live('click', function() { 
-							  choosegoogle.send();
+							  choosepromo.send();
 							  return false;
 							});
 							$('.basic-cancel').live('click', function() { 
-							  choosegoogle.close();
+							  choosepromo.close();
 							  return false;
 							});
 							
-							if ($('#GoogleCatEdit').val()>0)
-								choosegoogle.setup($('#GoogleCatEdit').val());
-							else if ($('#GoogleCatParentEdit').val()>0)
-								choosegoogle.setup($('#GoogleCatParentEdit').val());
-							
+														
 						});
 					
 				$('#basic-modal-content').modal({
-					onClose: choosegoogle.close }
+					onClose: choosepromo.close }
 					);	
 							
 			});
@@ -59,7 +51,7 @@ jQuery(function ($) {
 				});
 				$('#google1').val(initset[0]);
 				initset.splice(0, 0);
-				choosegoogle.change(1);
+				choosepromo.change(1);
 		
 			}, 'json');
 		
@@ -81,7 +73,7 @@ jQuery(function ($) {
 				
 				if(initset[(e)]) {
 					$("#google" + (e+1)).val(initset[(e)]);
-					choosegoogle.change((e+1));
+					choosepromo.change((e+1));
 
 				}
 				
@@ -115,7 +107,7 @@ jQuery(function ($) {
 	};
 
 	
-	choosegoogle.init();
+	choosepromo.init();
 
 	
 	
