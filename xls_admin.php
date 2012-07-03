@@ -4446,10 +4446,26 @@
 			$this->arrFields['ValidUntil']['DisplayFunc'] = "RenderDateAnytime";
 			$this->arrFields['ValidUntil']['Width'] = 90;	
 			
-			$this->arrFields['Lscodes'] = array('Name' => 'Product<br>Restrictions');
-			$this->arrFields['Lscodes']['Field'] = new QLabel($this);	
-			$this->arrFields['Lscodes']['Width'] = 10;
-			$this->arrFields['Lscodes']['DisplayFunc'] = "RenderPromoFilters";
+			//$this->arrFields['Lscodes'] = array('Name' => 'Product<br>Restrictions');
+			//$this->arrFields['Lscodes']['Field'] = new QLabel($this);	
+			//$this->arrFields['Lscodes']['Width'] = 10;
+			//$this->arrFields['Lscodes']['DisplayFunc'] = "RenderPromoFilters";
+			
+			$this->arrExtraFields['LscodesD'] = array('Name' => 'Product<br>Restrictions');
+			$this->arrExtraFields['LscodesD']['Field'] = new QButton($this,'LscodesD');
+			$this->arrExtraFields['LscodesD']['DisplayFunc'] = "LscodesD_Render";
+			$this->arrExtraFields['LscodesD']['Width'] = 10;
+			
+			
+
+			//$this->arrExtraFields['GoogleId'] = array('Name' => 'Google');
+			$this->arrExtraFields['Lscodes']['Field'] = new XLSTextBox($this);
+			$this->arrExtraFields['Lscodes']['UTF8'] = true;
+			$this->arrExtraFields['Lscodes']['DisplayFunc'] = "Lscodes_Render";
+			$this->arrExtraFields['Lscodes']['Width'] = 2;
+
+
+
 
 			$this->arrFields['Except'] = array('Name' => '');
 			$this->arrFields['Except']['Field'] = new QLabel($this);	
@@ -4461,21 +4477,58 @@
 
 			$this->arrFields['QtyRemaining'] = array('Name' => '# Uses Remain<br>(blank = unlimited)');
 			$this->arrFields['QtyRemaining']['Field'] = new XLSTextBox($this); 	
-			$this->arrFields['QtyRemaining']['Width'] = "100";
+			$this->arrFields['QtyRemaining']['Width'] = "80";
 			$this->arrFields['QtyRemaining']['DisplayFunc'] = "RenderQtyRemaining";
 			$this->arrFields['QtyRemaining']['Width'] = 40;
 
 			$this->arrFields['Threshold'] = array('Name' => 'Good Above $<br>(blank = any)');
 			$this->arrFields['Threshold']['Field'] = new XLSTextBox($this); 	
-			$this->arrFields['Threshold']['Width'] = "100";
+			$this->arrFields['Threshold']['Width'] = "80";
 			$this->arrFields['Threshold']['DisplayFunc'] = "RenderThreshold";
 			$this->arrFields['Threshold']['Width'] = 40;
 			
 			$this->HelperRibbon = "Need help setting up Promo Codes? Read our configuration guide at http://lightspeedretail.com/training for info. Please note the Free Shipping promo code is configured separately within the Free Shipping module.";
+			
+			$this->usejQuery = 'promoset';
 						
 			parent::Form_Create();
 
 		}
+
+
+		public function LscodesD_Render($objItem) { //Display for Restrictions			
+			$strReturn = "";
+			
+			if($objItem->Rowid == $this->intEditRowid )
+				if ($objItem->Lscodes) 
+					return "<a href='#' class='basic'><b><u>Edit Restrictions</u></b></a> ";
+				else
+					return "<a href='#' class='basic'><b><u>Set Restrictions</u></b></a> ";
+				
+			if ($objItem->Lscodes) $strReturn .= "<b>Applied</b>";
+			
+			return $strReturn;
+			
+		}
+		
+		public function Lscodes_Render($objItem) { //Hidden field for Restrictions that we use to actually write to db
+			if($objItem->Rowid == $this->intEditRowid ) {
+				$strRetVal = "<input type='hidden' name='LsCodesEdit' id='LsCodesEdit' value='".$objItem->Lscodes."'>"; 
+				/*if ($objItem->GoogleId==0 && $objItem->Rowid != $objItem->Parent) {
+					$arrTree = $objItem->GetTrail();
+					$objCat = Category::Load($arrTree[0]['key']);
+					$strRetVal .= "<input type='hidden' name='GoogleCatParentEdit' id='GoogleCatParentEdit' value='".$objCat->GoogleId."'>";
+					
+				}
+				*/
+				//$strRetVal .= "<input type='hidden' name='RequestUrl' id='RequestUrl' value='".$objItem->RequestUrl."'>";
+			}
+			else $strRetVal= "";
+			
+			return $strRetVal;
+		}
+
+
 
         protected function RenderType($intType) {
             return PromoCodeType::ToString($intType);
@@ -5091,7 +5144,7 @@
 
 			$this->HelperRibbon = "Only Top Tier categories are required to be filled out with Meta Description information. Lower tiers will automatically pull from their parent if left blank. Meta Keywords are no longer used by search engines and have been removed.";
 			
-			$this->usejQuery = true;
+			$this->usejQuery = 'googlecats';
 			
 			parent::Form_Create();
 			
@@ -5111,7 +5164,6 @@
 		public function GoogleIdD_Render($objItem) { //Display for Google Category
 			
 			$objGoogle = GoogleCategories::Load($objItem->GoogleId);
-			error_log("row is ".$objItem->Rowid); error_log("edit is ".$this->intEditRowid);
 			if($objItem->Rowid == $this->intEditRowid )
 				return "<a href='#' class='basic'><b><u>Set</u></b></a> ".
 				'<span class="tooltip" id="googlecat" name="googlecat" title="'.$objGoogle->Name.'">'._xls_truncate($objGoogle->Name,15).'</span>';

@@ -131,7 +131,7 @@ $this->dtgItems->Render('CssClass="rounded wide"');
 		</div>
 <script type='text/javascript' src='<?= adminTemplate('js/jquery.js') ?>'></script>
 <script type='text/javascript' src='<?= adminTemplate('js/jquery.simplemodal.js') ?>'></script>
-<script type='text/javascript' src='<?= adminTemplate('js/basic.js') ?>'></script>
+<script type='text/javascript' src='<?= adminTemplate('js/'.$this->usejQuery.'.js') ?>'></script>
 <?php 
 
 }
