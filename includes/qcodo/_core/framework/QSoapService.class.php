@@ -354,7 +354,7 @@
 				$strParameterArray = array();
 				foreach ($objMethod->GetAllParameters() as $objParameter) {
 					$strParameterDefinition = sprintf('%s %s$%s',
-						($objParameter->IsObject() || $objParameter->Type == QType::DateTime) ? $objParameter->Type : '',
+						($objParameter->Type == QType::DateTime) ? $objParameter->Type : '',
 						($objParameter->Reference) ? '&' : '',
 						$objParameter->Name
 					);
