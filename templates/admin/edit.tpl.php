@@ -124,6 +124,7 @@ $this->dtgItems->Render('CssClass="rounded wide"');
 
 <link rel="stylesheet" type="text/css" href="<?= adminTemplate('css/basic.css') ?>" media='screen'  />
 
+<? if($this->usejQuery) { ?>
 <!-- modal content -->
 		<div id="basic-modal-content">
 		Loading...
@@ -131,7 +132,11 @@ $this->dtgItems->Render('CssClass="rounded wide"');
 <script type='text/javascript' src='<?= adminTemplate('js/jquery.js') ?>'></script>
 <script type='text/javascript' src='<?= adminTemplate('js/jquery.simplemodal.js') ?>'></script>
 <script type='text/javascript' src='<?= adminTemplate('js/basic.js') ?>'></script>
-<?php $this->RenderEnd(); ?>	
+<?php 
+
+}
+
+$this->RenderEnd(); ?>	
 	
 </body>
 </html>

@@ -257,7 +257,7 @@
 			,	'paym'		=>	_sp('Payments')
 			,	'ship'		=>	_sp('Shipping')
 			,	'cpage'		=>	_sp('Custom Pages')
-			,	'seo'		=>	_sp('SEO')
+			,	'seo'		=>	_sp('SEO / Google')
 			,	'dbadmin'	=>	_sp('Database Admin')
 			,	'system'	=>	_sp('System')
 			);
@@ -3410,6 +3410,7 @@
 		protected $qqcondition;
 		protected $qqclause;
 		protected $hideID = false;
+		protected $usejQuery = false;
 		
 		
 		protected $txtSearch;
@@ -5077,7 +5078,7 @@
 			$this->arrExtraFields['GoogleIdD']['Field'] = new QButton($this,'GoogleIdD');
 			$this->arrExtraFields['GoogleIdD']['DisplayFunc'] = "GoogleIdD_Render";
 			$this->arrExtraFields['GoogleIdD']['Field']->Text = 'Set'; // add css of modal window to open it
-			$this->arrExtraFields['GoogleIdD']['CssClass'] = 'basic';
+			//$this->arrExtraFields['GoogleIdD']['CssClass'] = 'basic';
 			
 			
 
@@ -5089,6 +5090,9 @@
 			
 
 			$this->HelperRibbon = "Only Top Tier categories are required to be filled out with Meta Description information. Lower tiers will automatically pull from their parent if left blank. Meta Keywords are no longer used by search engines and have been removed.";
+			
+			$this->usejQuery = true;
+			
 			parent::Form_Create();
 			
 			
@@ -5107,7 +5111,7 @@
 		public function GoogleIdD_Render($objItem) { //Display for Google Category
 			
 			$objGoogle = GoogleCategories::Load($objItem->GoogleId);
-			
+			error_log("row is ".$objItem->Rowid); error_log("edit is ".$this->intEditRowid);
 			if($objItem->Rowid == $this->intEditRowid )
 				return "<a href='#' class='basic'><b><u>Set</u></b></a> ".
 				'<span class="tooltip" id="googlecat" name="googlecat" title="'.$objGoogle->Name.'">'._xls_truncate($objGoogle->Name,15).'</span>';
@@ -5117,7 +5121,7 @@
 			
 		}
 		
-		public function GoogleId_Render($objItem) { 
+		public function GoogleId_Render($objItem) { //Hidden field for Google Category that we use to actually write to db
 			if($objItem->Rowid == $this->intEditRowid ) {
 				$strRetVal = "<input type='hidden' name='GoogleCatEdit' id='GoogleCatEdit' value='".$objItem->GoogleId."'>"; 
 				if ($objItem->GoogleId==0 && $objItem->Rowid != $objItem->Parent) {
