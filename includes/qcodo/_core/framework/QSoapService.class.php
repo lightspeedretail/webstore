@@ -184,7 +184,6 @@
 		public function GetWsdlBindingOperation($strNamespace) {
 			$strSoapBody = sprintf('<soap:body use="encoded" namespace="%s/%s" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>',
 				$strNamespace, $this->strName);
-			$strSoapBody = '<soap:body use="literal" />';
 			return sprintf('<operation name="%s"><soap:operation soapAction="%s/%s"/>' .
 				'<input>%s</input>' .
 				'<output>%s</output></operation>',
