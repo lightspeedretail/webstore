@@ -5281,16 +5281,6 @@
 			$this->arrFields['ShippingModule']['Width'] = 120;								
 			$this->arrFields['ShippingModule']['DisplayFunc'] = "RenderShippingModule";
 
-			$this->arrFields['TrackingNumber'] = array('Name' => 'Tracking<br>Number');
-			$this->arrFields['TrackingNumber']['Field'] = new XLSTextBox($this);
-			$this->arrFields['TrackingNumber']['Width'] = 150;	
-			$this->arrFields['TrackingNumber']['DisplayFunc'] = "RenderMoney";
-
-
-
-
-
-
 		
 			$this->arrFields['Downloaded'] = array('Name' => 'Downloaded');
 			$this->arrFields['Downloaded']['Field'] = new QCheckBox($this); 	
