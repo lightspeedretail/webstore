@@ -773,7 +773,7 @@ function _xls_remove_leading_slash($path) {
 * @return object
 */
 function _xls_url_object() {
-	$objUrl = XLSURLParser::getInstance();
+	$objUrl = XLSURL::getInstance();
 	return $objUrl;
 }
 
@@ -878,6 +878,20 @@ function _xls_get_url_resource($filename) {
 	return $filename;
 }
 
+/**
+ * Do a permanent 301 redirect
+ *
+ */
+function _xls_301($strUrl) {
+	header("HTTP/1.1 301 Moved Permanently");
+	header("Location: ".$strUrl);
+	exit();
+}
+
+/**
+ * Do a 404 fail
+ *
+ */
 function _xls_404() {
 	header('HTTP/1.1 404 Not Found');
 	$strFile = "404.php";

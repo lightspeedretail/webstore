@@ -83,9 +83,13 @@ class xlsws_product extends xlsws_index {
 
     	$objUrl = _xls_url_object();    
 		if ($objUrl->RouteId=='') return; //We haven't specified a category, so we're using this as the default home page and showing everything
-		$this->prod =  $this->origin_prod = Product::LoadByRequestUrl($objUrl->RouteId);
+		$this->prod =  $this->origin_prod = Product::Load($objUrl->RouteId);
 
 		if (!$this->prod) _xls_404();
+
+		//SEO double-check here. Is the URL the same as what we have on file? If not, do a 301 to the new location to save our ranking
+		if ($this->prod->RequestUrl != $objUrl->UrlSegments[0])
+			_xls_301($this->prod->Link);
 		
 		$this->mainPnl = new QPanel($this,'MainPanel');
 

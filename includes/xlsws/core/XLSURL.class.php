@@ -25,13 +25,24 @@
  */
 
 /**
- * XLSURLParser 
+ * XLSURL 
  */
-class XLSURLParser {
+class XLSURL {
 
 	private static $objInstance;
 
-	
+	/**
+	 * Define URL keys for our various Controllers
+	 */
+
+	const KEY_CATEGORY = "c";
+	const KEY_CUSTOMPAGE = "cp";
+	const KEY_PRODUCT = "dp";
+	const KEY_FAMILY = "f";
+	const KEY_FEEDS = "feeds"; //Note changing this one will break .htaccess if not also updated
+	const KEY_PAGE = "pg";
+	const KEY_SEARCH = "search";
+
 	protected $strUri; //URL before parsing
 	protected $strRouteCode; //p for product, c for category, checkout for checkout, etc. can be customized
 	protected $strRouteController; //internal names for controllers, such as "category", "product", will be unchanged
@@ -65,7 +76,7 @@ class XLSURLParser {
 	
 	//Our method for breaking up pieces of the URL
 	protected function ExplodeSegments() {
-	
+
 		$this->arrUrlSegments = array_filter(explode('/',$this->strUri));
 
 		return true;
@@ -90,47 +101,47 @@ class XLSURLParser {
 		
 		$this->strRouteCode=$this->arrUrlSegments[1];
 
-		switch ($this->strRouteCode) {
+		switch ($this->strRouteCode) { 
 		
-			case 'c': //Category
+			case XLSURL::KEY_CATEGORY: //Category
 			default:
 				$this->strRouteId = $this->arrUrlSegments[0];
 				$this->strRouteController = "category";
 				$this->intStatus=200;
 				break;
 				
-			case 'cp': //Custom Page
+			case XLSURL::KEY_CUSTOMPAGE: //Custom Page
 				$this->strRouteId = $this->arrUrlSegments[0];
 				$this->strRouteController = "custom_page";
 				$this->intStatus=200;
 				break;
 
-			case 'dp': //Display product
-				$this->strRouteId = $this->arrUrlSegments[0];
+			case XLSURL::KEY_PRODUCT: //Display product
+				$this->strRouteId = $this->arrUrlSegments[2];				
 				$this->strRouteController = "product";
 				$this->intStatus=200;
 				break;
 				
-			case 'f': //Display family
+			case XLSURL::KEY_FAMILY: //Display family
 				$this->strRouteId = $this->arrUrlSegments[0];
 				$this->strRouteController = "family";
 				$this->intStatus=200;
 				break;
 				
-			case 'feeds': //RSS/XML feeds
+			case XLSURL::KEY_FEEDS: //RSS/XML feeds
 				$this->strRouteId = $this->arrUrlSegments[0];
 				$this->strRouteController = "feeds";
 				$this->intStatus=200;
 				break;
 			
-			case 'pg': //Web Store Page
+			case XLSURL::KEY_PAGE: //Web Store Page
 				//We use hyphens in the url but they match to actual controller filenames that use underscores
 				$this->strRouteId = str_replace("-","_",$this->arrUrlSegments[0]);
 				$this->strRouteController = "xlspg";
 				$this->intStatus=200;
 				break;
 
-			case 's': //Search Results
+			case XLSURL::KEY_SEARCH: //Search Results
 				$this->strRouteId = $this->arrUrlSegments[0];
 				$this->strRouteController = "searchresults";
 				$this->intStatus=200;
@@ -155,7 +166,7 @@ class XLSURLParser {
 			$strRemaining = strstr($strRemaining,'?');	
 			$strRemaining = str_replace("?&","?",$strRemaining);
 			if ($strRemaining=="?") $strRemaining='';	
-			$this->strRedirectUrl = str_replace("_","-",basename($_GET['xlspg']))."/pg/".$strRemaining;
+			$this->strRedirectUrl = str_replace("_","-",basename($_GET['xlspg']))."/".XLSURL::KEY_PAGE."/".$strRemaining;
 			$this->strRedirectUrl = _xls_site_url($this->strRedirectUrl);
 			$this->intStatus=301;
 			return true;
@@ -169,7 +180,7 @@ class XLSURLParser {
 			$strRemaining = strstr($strRemaining,'?');	
 			$strRemaining = str_replace("?&","?",$strRemaining);
 			if ($strRemaining=="?") $strRemaining='';	
-			$this->strRedirectUrl = basename($_GET['search'])."/s/".$strRemaining;
+			$this->strRedirectUrl = basename($_GET['search'])."/".XLSURL::KEY_SEARCH."/".$strRemaining;
 			$this->strRedirectUrl = _xls_site_url($this->strRedirectUrl);
 			$this->intStatus=301;
 			return true;
@@ -286,7 +297,7 @@ class XLSURLParser {
 			case 'Uri':
 				return $this->strUri;
 			case 'UrlSegments':
-				return print_r($this->arrUrlSegments,true);
+				return $this->arrUrlSegments;
 			case 'QueryString':
 				return $this->strQueryString;
 			case 'RouteController':

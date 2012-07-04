@@ -71,9 +71,7 @@ if ($objUrl==false) {
 }
 
 if ($objUrl->Status==301) {
-	header("HTTP/1.1 301 Moved Permanently");
-	header("Location: ".$objUrl->RedirectUrl);
-	exit();
+	_xls_301($objUrl->RedirectUrl);
 }
 
 if ($objUrl->Status==404) {

@@ -153,11 +153,9 @@ class Product extends ProductGen {
 			if ($prod = $this->FkProductMaster)
 				return $prod->Link;
 			
-		return _xls_site_url($this->RequestUrl."/dp/");
+		return _xls_site_url($this->RequestUrl."/".XLSURL::KEY_PRODUCT."/".$this->Rowid."/");
 		
 	}
-
-
 
 	protected function GetPageMeta($strConf = 'SEO_PRODUCT_TITLE') { 
 	
@@ -922,7 +920,7 @@ class Product extends ProductGen {
 				return $this->GetSEOName();
 
 			case 'CanonicalUrl':
-				return _xls_site_dir().'/'.$this->RequestUrl."/dp/";
+				return $this->GetLink();
 				
 			case 'ListingImage':
 				return $this->GetImageLink(ImagesType::listing);
