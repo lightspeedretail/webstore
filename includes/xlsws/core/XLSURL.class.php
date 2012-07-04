@@ -35,12 +35,14 @@ class XLSURL {
 	 * Define URL keys for our various Controllers
 	 */
 
+	//Note, these should not be changed for 2.2. There are still many places not using these variables for links
+	//Will need to be built out for next version.
 	const KEY_CATEGORY = "c";
 	const KEY_CUSTOMPAGE = "cp";
 	const KEY_PRODUCT = "dp";
 	const KEY_FAMILY = "f";
 	const KEY_FEEDS = "feeds"; //Note changing this one will break .htaccess if not also updated
-	const KEY_PAGE = "pg";
+	const KEY_PAGE = "pg"; //formerly anything that was xlspg=
 	const KEY_SEARCH = "search";
 
 	protected $strUri; //URL before parsing
@@ -203,7 +205,7 @@ class XLSURL {
 			$uriPathParts = explode('/', $uriPath);
 			$uriPathLower = strtolower($uriPath);
 
-			if ($uriPathLower == "sitemap") {error_log("sitemap");
+			if ($uriPathLower == "sitemap") {
 				$this->strRedirectUrl = "sitemap.xml";
 				$this->strRedirectUrl = _xls_site_url($this->strRedirectUrl);
 				$this->intStatus=301;

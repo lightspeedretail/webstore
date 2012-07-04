@@ -44,7 +44,7 @@ class CustomPage extends CustomPageGen {
 		
 		//Because of our special handling on the contact us form	
 		if ($this->strKey=="contactus")
-			$strUrl = 'contact_us/pg/';
+			$strUrl = 'contact_us/'.XLSURL::KEY_PAGE.'/';
 		else $strUrl = $this->strRequestUrl."/cp/";
 		
 		return _xls_site_url($strUrl);

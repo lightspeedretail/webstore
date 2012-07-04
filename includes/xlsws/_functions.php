@@ -466,7 +466,7 @@ function _xls_stack_removeall() {
 function _xls_display_msg($msg) {
 	_xls_stack_add('msg', _sp($msg));
 
-	_rd(_xls_site_url('msg/pg/'));
+	_rd(_xls_site_url('msg/'.XLSURL::KEY_PAGE.'/'));
 }
 
 /**
@@ -509,7 +509,7 @@ function _xls_require_login($msg = false) {
 	_xls_stack_add('login_msg' , _sp($msg));
 	_xls_stack_add('login_redirect_uri' , $uri);
 
-	_rd(_xls_site_url('login/pg/'));
+	_rd(_xls_site_url('login/'.XLSURL::KEY_PAGE.'/'));
 }
 
 /**
