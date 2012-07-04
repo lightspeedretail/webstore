@@ -408,7 +408,61 @@
         }
       
 
-		
+		/**
+         * Updating Inventory (delta update)
+         *
+         * @param string $passkey
+         * @param UpdateInventory[] $UpdateInventory
+         * @return string
+         */
+        public function update_inventory(
+                  $passkey,
+                  $UpdateInventory              
+                ){ 
+
+            if(!$this->check_passkey($passkey))
+                return self::FAIL_AUTH;
+
+				foreach($UpdateInventory as $arrProduct) {
+
+					$objProduct = Product::LoadByRowid($arrProduct->productID);
+					if ($objProduct) {
+						$strCode = $objProduct->Code;
+						foreach($arrProduct as $key=>$val) {
+							switch ($key) {
+							
+								case 'inventory': $objProduct->Inventory = $val; break;
+								case 'inventoryTotal': $objProduct->InventoryTotal = $val; break;
+							
+							}
+							
+						}
+						 // Now save the product
+			            try {
+
+				            $objProduct->InventoryReserved=$objProduct->CalculateReservedInventory();
+				            $objProduct->InventoryAvail=$objProduct->Inventory;
+							$objProduct->Save();
+			                
+			            }
+			            catch(Exception $e) {
+			                QApplication::Log(E_ERROR, 'uploader', 
+			                    "Product update failed for $strCode . Error: " . $e);
+			                return self::UNKNOWN_ERROR . $e;
+			            }
+					
+					
+					} else
+					_xls_log("Sent inventory update for a product we can't find ".$arrProduct->productID);
+					
+					
+				}
+				
+				
+	
+
+            return self::OK;
+        }
         
         
         /**
