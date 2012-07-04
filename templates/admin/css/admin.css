@@ -443,7 +443,7 @@ font-size:14px;
 text-align:left;
 }
 
-.listboxReset { font-family:  helvetica; font-size: 9pt; color: #000000; text-shadow: 0px;}
+.listboxReset { font-family:  helvetica; font-size: 8pt; color: #000000; text-shadow: 0px;margin-left: 5px;}
 
 
 .extra_height{

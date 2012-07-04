@@ -27,13 +27,21 @@
 
 $strEnd = "<P>
 			<div class='center'>
-			<button type='submit' class='basic-send'>Select</button>
+			<button type='submit' class='basic-send'>Return to Prior Menu</button>
 			<button class='basic-cancel'>Cancel</button>
 			<div/>
 			
 		</form>";
 $jsEvent = "onChange=\"FillListValues(this);\" onMouseDown=\"GetCurrentListValues(this);\"";
 
+function GetResetButtonHtml($ctlId) {
+			$strToReturn = sprintf('<br> <a href="#" onclick="DeselectAllList(document.getElementById(%s)); return false;" class="listboxReset">%s</a>',
+				"'" . $ctlId . "'",
+				QApplication::Translate('Clear All'));
+
+			return $strToReturn;
+		}
+						
 require('includes/prepend.inc.php');
 
 switch($_GET['item']) {
@@ -41,9 +49,34 @@ switch($_GET['item']) {
 	
 	case 'promorestrict' :
 		$objPromoCode = PromoCode::Load($_GET['id']);
-		echo 'Editing Code: '.$objPromoCode->Code;
-		echo file_get_contents('templates/admin/promo_restrict2.tpl.php');
-		echo $strRestrict;
+		$strRestrictions =  $objPromoCode->Lscodes;		
+		$arrRestrictions = explode(",",$strRestrictions);
+		
+		$arrCategories = array();
+		$arrFamilies= array();
+		$arrClasses = array();
+		$arrKeywords = array();
+		$arrProducts = array();
+		
+		foreach ($arrRestrictions as $strCode) {
+
+			if (substr($strCode, 0,7) == "family:") $arrFamilies[] = trim(substr($strCode,7,255));
+			elseif (substr($strCode, 0,6) == "class:") $arrClasses[] = trim(substr($strCode,6,255));
+			elseif (substr($strCode, 0,8) == "keyword:") $arrKeywords[] = trim(substr($strCode,8,255));
+			elseif (substr($strCode, 0,9) == "category:") $arrCategories[] = trim(substr($strCode,9,255));
+			else $arrProducts[] = $strCode;
+       
+    	}  
+
+		echo '<table>
+				<td class="label">Set restrictions for <strong>'.$objPromoCode->Code.'</strong> to apply when</td>
+					<td>
+						<select name="ctlMatchWhen" id="ctlMatchWhen" class="dropdown">
+							<option value="0">products match any of the following criteria</option>
+							<option value="1"'.($objPromoCode->Except==1 ? " selected" : "").'>products match anything BUT the following criteria</option>
+						</select>
+					</td>
+				</table>';
 		
 		
 		$ctlCategories = '<select name="ctlCategories" id="ctlCategories" class="SmallMenu" size="9" multiple="multiple" '.$jsEvent.'>';
@@ -54,14 +87,14 @@ switch($_GET['item']) {
 				QQ::Clause(QQ::OrderBy(QQN::Category()->Name))
 			);
 			if ($objItems) foreach ($objItems as $objItem) {
-				$ctlCategories .= "<option value=\"".$objItem->Name."\">".$objItem->Name."</option>";
+				$ctlCategories .= "<option value=\"".$objItem->Name."\"".(in_array($objItem->Name,$arrCategories) ? " selected" : "").">".$objItem->Name."</option>";
 			}
-		$ctlCategories .= "</select>";
+		$ctlCategories .= "</select>"; 
 
 		$ctlFamilies = '<select name="ctlFamilies" id="ctlFamilies" class="SmallMenu" size="9" multiple="multiple" '.$jsEvent.'>';
 		$objItems= Family::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Family()->Family)));
 			if ($objItems) foreach ($objItems as $objItem) {
-				$ctlFamilies .= "<option value=\"".$objItem->Family."\">".$objItem->Family."</option>";
+				$ctlFamilies .= "<option value=\"".$objItem->Family."\"".(in_array($objItem->Family,$arrFamilies) ? " selected" : "").">".$objItem->Family."</option>";
 			}
 		$ctlFamilies .= "</select>";
 		
@@ -76,35 +109,35 @@ switch($_GET['item']) {
 		    		QQ::OrderBy(QQN::Product()->ClassName)
 		    	));
 			if ($objItems) foreach ($objItems as $objItem) {
-				$ctlClasses .= "<option value=\"".$objItem->ClassName."\">".$objItem->ClassName."</option>";
+				$ctlClasses .= "<option value=\"".$objItem->ClassName."\"".(in_array($objItem->ClassName,$arrClasses) ? " selected" : "").">".$objItem->ClassName."</option>";
 			}
 		$ctlClasses .= "</select>";
 		
 
-		$ctlKeywords = '<select name="ctlFamilies" id="ctlFamilies" class="SmallMenu" size="9" multiple="multiple" '.$jsEvent.'>';
-		$arrKeywords=array();
+		$ctlKeywords = '<select name="ctlKeywords" id="ctlKeywords" class="SmallMenu" size="9" multiple="multiple" '.$jsEvent.'>';
+		$arrKeys=array();
 		    $objItems= Product::QueryArray(
 				    QQ::AndCondition(QQ::NotEqual(QQN::Product()->WebKeyword1, ''),QQ::IsNotNull(QQN::Product()->WebKeyword1)),
 		    		QQ::Clause(QQ::GroupBy(QQN::Product()->WebKeyword1), QQ::OrderBy(QQN::Product()->WebKeyword1)));
-			if ($objItems) foreach ($objItems as $objItem) $arrKeywords[]=strtolower($objItem->WebKeyword1);
+			if ($objItems) foreach ($objItems as $objItem) $arrKeys[]=strtolower($objItem->WebKeyword1);
 		    $objItems= Product::QueryArray(
 				    QQ::AndCondition(QQ::NotEqual(QQN::Product()->WebKeyword2, ''),QQ::IsNotNull(QQN::Product()->WebKeyword2)),
 		    		QQ::Clause(QQ::GroupBy(QQN::Product()->WebKeyword2), QQ::OrderBy(QQN::Product()->WebKeyword2)));
-			if ($objItems) foreach ($objItems as $objItem) $arrKeywords[]=strtolower($objItem->WebKeyword2);
+			if ($objItems) foreach ($objItems as $objItem) $arrKeys[]=strtolower($objItem->WebKeyword2);
 		    $objItems= Product::QueryArray(
 				    QQ::AndCondition(QQ::NotEqual(QQN::Product()->WebKeyword3, ''),QQ::IsNotNull(QQN::Product()->WebKeyword3)),
 		    		QQ::Clause(QQ::GroupBy(QQN::Product()->WebKeyword3), QQ::OrderBy(QQN::Product()->WebKeyword3)));
-			if ($objItems) foreach ($objItems as $objItem) $arrKeywords[]=strtolower($objItem->WebKeyword3);
-			$arrKeywords=array_unique($arrKeywords);
-			sort($arrKeywords);
+			if ($objItems) foreach ($objItems as $objItem) $arrKeys[]=strtolower($objItem->WebKeyword3);
+			$arrKeys=array_unique($arrKeys);
+			sort($arrKeys);
 
-			if ($arrKeywords) foreach ($arrKeywords as $objItem) {
-				$ctlKeywords .= "<option value=\"".$objItem."\">".$objItem."</option>";
+			if ($arrKeys) foreach ($arrKeys as $objItem) {
+				$ctlKeywords .= "<option value=\"".$objItem."\"".(in_array($objItem,$arrKeywords) ? " selected" : "").">".$objItem."</option>";
 			}
 		$ctlKeywords .= "</select>";
 
 
-		$ctlProductCodes = '<select name="ctlFamilies" id="ctlFamilies" class="SmallMenu" size="9" multiple="multiple" '.$jsEvent.'>';
+		$ctlProductCodes = '<select name="ctlProducts" id="ctlProducts" class="SmallMenu" size="9" multiple="multiple" '.$jsEvent.'>';
 		$objItems= Product::QueryArray(
 				QQ::AndCondition(
 					QQ::Equal(QQN::Product()->Web, 1),
@@ -113,19 +146,19 @@ switch($_GET['item']) {
 				QQ::Clause(QQ::OrderBy(QQN::Product()->Code))
 			);
 		if ($objItems) foreach ($objItems as $objItem) {
-				$ctlProductCodes .= "<option value=\"".$objItem->Code."\">".$objItem->Code."</option>";
+				$ctlProductCodes .= "<option value=\"".$objItem->Code."\"".(in_array($objItem->Code,$arrProducts) ? " selected" : "").">".$objItem->Code."</option>";
 			}
 		$ctlProductCodes .= "</select>";
 		
 		echo '<table>';
-		echo '<td class="label left">Categories:<br>'.$ctlCategories.'</td>';
-		echo '<td class="label left">Families:<br>'.$ctlFamilies.'</td>';
-		echo '<td class="label left">Classes:<br>'.$ctlClasses.'</td>';
-		echo '<td class="label left">Keywords:<br>'.$ctlKeywords.'</td>';
-		echo '<td class="label left">Product Codes:<br>'.$ctlProductCodes.'</td>';
+		echo '<td class="label left">Categories:<br>'.$ctlCategories.GetResetButtonHtml('ctlCategories').'</td>';
+		echo '<td class="label left">Families:<br>'.$ctlFamilies.GetResetButtonHtml('ctlFamilies').'</td>';
+		echo '<td class="label left">Classes:<br>'.$ctlClasses.GetResetButtonHtml('ctlClasses').'</td>';
+		echo '<td class="label left">Keywords:<br>'.$ctlKeywords.GetResetButtonHtml('ctlKeywords').'</td>';
+		echo '<td class="label left">Product Codes:<br>'.$ctlProductCodes.GetResetButtonHtml('ctlProducts').'</td>';
 		echo '</table>';
 
-		echo '<div class="tip">Tip: Click in the scrollbar area to avoid accidentally clicking items.</div>';
+		echo '<div class="tip">Tip: Click in the scrollbar area to avoid accidentally clicking items when switching columns. After returning, remember to click the Green Check icon to save any changes.</div>';
 	
 		
 		echo $strEnd;

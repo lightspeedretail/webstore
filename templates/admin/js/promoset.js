@@ -10,6 +10,68 @@
  *
  */
 
+var arrOldValues;
+
+function SelectAllList(CONTROL) {
+    for (var i = 0; i < CONTROL.length; i++) {
+        CONTROL.options[i].selected = true;
+    }
+}
+
+function DeselectAllList(CONTROL) {
+    for (var i = 0; i < CONTROL.length; i++) {
+        CONTROL.options[i].selected = false;
+    }
+}
+
+
+function FillListValues(CONTROL) {
+    var arrNewValues;
+    var intNewPos = -1;
+    var strTemp = GetSelectValues(CONTROL);
+    arrNewValues = strTemp.split(",");
+    for (var i = 0; i < arrNewValues.length - 1; i++) {
+        if (arrNewValues[i] == 1) {
+            intNewPos = i;
+        }
+    }
+
+    if (intNewPos > -1)
+     for (var i = 0; i < arrOldValues.length - 1; i++) {
+        if (arrOldValues[i] == 1 && i != intNewPos) {
+            CONTROL.options[i].selected = true;
+        } else if (arrOldValues[i] == 0 && i != intNewPos) {
+            CONTROL.options[i].selected = false;
+        }
+
+        if (arrOldValues[intNewPos] == 1) {
+            CONTROL.options[intNewPos].selected = false;
+        } else {
+            CONTROL.options[intNewPos].selected = true;
+        }
+    }
+}
+
+
+function GetSelectValues(CONTROL) {
+    var strTemp = "";
+    for (var i = 0; i < CONTROL.length -1; i++) {
+        if (CONTROL.options[i].selected == true) {
+            strTemp += "1,";
+        } else {
+            strTemp += "0,";
+        }
+    }
+    return strTemp;
+}
+
+function GetCurrentListValues(CONTROL) {
+    var strValues = "";
+    strValues = GetSelectValues(CONTROL);
+    arrOldValues = strValues.split(",")
+}
+
+
 jQuery(function ($) {
 	var initset=new Array('0');
 	var choosepromo = {
@@ -22,11 +84,11 @@ jQuery(function ($) {
 							$('#basic-modal-content').html(data);
 							
 							
-							$('.basic-send').live('click', function() { 
+							$('.basic-send').bind('click', function() { 
 							  choosepromo.send();
 							  return false;
 							});
-							$('.basic-cancel').live('click', function() { 
+							$('.basic-cancel').bind('click', function() { 
 							  choosepromo.close();
 							  return false;
 							});
@@ -57,49 +119,33 @@ jQuery(function ($) {
 		
 		},
 		close: function () {
-			var google1 = $("#google1").val();
-			//alert(google1);
 			$.modal.close();
-		},		
-		change: function (e) {
-			$.get("xls_admin_js.php?item=google" + e + "&lv=" + e + "&selected=" + encodeURIComponent($("#google" + e).val()), function(data){
-				var $el = $("#google" + (e+1));
-				$el.removeAttr("disabled"); 
-				$('#google' + (e+1) + ' option:gt(0)').remove();
-				$.each(data, function(key, value) {
-				  $el.append($("<option></option>")
-				     .attr("value", value).text(key));
-				});
-				
-				if(initset[(e)]) {
-					$("#google" + (e+1)).val(initset[(e)]);
-					choosepromo.change((e+1));
-
-				}
-				
-				for(q=(e+2); q<=7; q++) {
-					var $el = $("#google" + q);
-					$('#google' + (q) + ' option:gt(0)').remove();
-					$el.attr("disabled","disabled");
-				}
-
-				
-				
-			}, 'json');
-		},		
-		send: function () {
-			var googlestring = '';
-			for(q=1; q<=7; q++) {
-				var $el = $("#google" + q);
-				if ($el.val()>'0')
-					if (q>1) googlestring = googlestring + ' > ' + $el.val();
-						else googlestring = $el.val();		
-			}
-			if (googlestring > '') {
-				$('#GoogleCatEdit').val(googlestring);
-				$('#googlecat').html(googlestring.substring(0,15) + '...');
-			}
+		},				
+		send: function () {	
+			var categories = []; 
+			var families = [];
+			var classes = [];
+			var keywords = [];
+			var products = [];
+			$('#ctlCategories :selected').each(function(i, selected){ categories[i] = 'category:' + $(selected).val(); });
+			$('#ctlFamilies :selected').each(function(i, selected){ families[i] = 'family:' + $(selected).val(); });
+			$('#ctlClasses :selected').each(function(i, selected){ classes[i] = 'class:' + $(selected).val(); });
+			$('#ctlKeywords :selected').each(function(i, selected){ keywords[i] = 'keyword:' + $(selected).val(); });
+			$('#ctlProducts :selected').each(function(i, selected){ products[i] = $(selected).val(); });
 			
+			var Lscodes = categories;
+			$.merge(Lscodes,families);
+			$.merge(Lscodes,classes);
+			$.merge(Lscodes,keywords);
+			$.merge(Lscodes,products);
+			$('#LsCodesEdit').val(Lscodes);
+			
+			var intMatch = $("#ctlMatchWhen").val();
+			if (typeof(intMatch) != "undefined")
+				$('#ExceptEdit').val(intMatch);
+			if (typeof(Lscodes) != "undefined" && Lscodes=='')
+				$('#ExceptEdit').val('0');
+				
 			$.modal.close();
 			return;
 		}

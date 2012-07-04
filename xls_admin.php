@@ -4454,7 +4454,7 @@
 			$this->arrExtraFields['LscodesD'] = array('Name' => 'Product<br>Restrictions');
 			$this->arrExtraFields['LscodesD']['Field'] = new QButton($this,'LscodesD');
 			$this->arrExtraFields['LscodesD']['DisplayFunc'] = "LscodesD_Render";
-			$this->arrExtraFields['LscodesD']['Width'] = 10;
+			//$this->arrExtraFields['LscodesD']['Width'] = 10;
 			
 			
 
@@ -4465,27 +4465,17 @@
 			$this->arrExtraFields['Lscodes']['Width'] = 2;
 
 
-
-
-			$this->arrFields['Except'] = array('Name' => '');
-			$this->arrFields['Except']['Field'] = new QLabel($this);	
-			$this->arrFields['Except']['Width'] = 1;
-			$this->arrFields['Except']['DefaultValue'] = 0;
-			$this->arrFields['Except']['DisplayFunc'] = "RenderBlank";
-
-
-
 			$this->arrFields['QtyRemaining'] = array('Name' => '# Uses Remain<br>(blank = unlimited)');
 			$this->arrFields['QtyRemaining']['Field'] = new XLSTextBox($this); 	
 			$this->arrFields['QtyRemaining']['Width'] = "80";
 			$this->arrFields['QtyRemaining']['DisplayFunc'] = "RenderQtyRemaining";
-			$this->arrFields['QtyRemaining']['Width'] = 40;
+			$this->arrFields['QtyRemaining']['Width'] = 80;
 
 			$this->arrFields['Threshold'] = array('Name' => 'Good Above $<br>(blank = any)');
 			$this->arrFields['Threshold']['Field'] = new XLSTextBox($this); 	
 			$this->arrFields['Threshold']['Width'] = "80";
 			$this->arrFields['Threshold']['DisplayFunc'] = "RenderThreshold";
-			$this->arrFields['Threshold']['Width'] = 40;
+			$this->arrFields['Threshold']['Width'] = 80;
 			
 			$this->HelperRibbon = "Need help setting up Promo Codes? Read our configuration guide at http://lightspeedretail.com/training for info. Please note the Free Shipping promo code is configured separately within the Free Shipping module.";
 			
@@ -4514,13 +4504,7 @@
 		public function Lscodes_Render($objItem) { //Hidden field for Restrictions that we use to actually write to db
 			if($objItem->Rowid == $this->intEditRowid ) {
 				$strRetVal = "<input type='hidden' name='LsCodesEdit' id='LsCodesEdit' value='".$objItem->Lscodes."'>"; 
-				/*if ($objItem->GoogleId==0 && $objItem->Rowid != $objItem->Parent) {
-					$arrTree = $objItem->GetTrail();
-					$objCat = Category::Load($arrTree[0]['key']);
-					$strRetVal .= "<input type='hidden' name='GoogleCatParentEdit' id='GoogleCatParentEdit' value='".$objCat->GoogleId."'>";
-					
-				}
-				*/
+				$strRetVal .= "<input type='hidden' name='ExceptEdit' id='ExceptEdit' value='".$objItem->Except."'>";
 				$strRetVal .= "<input type='hidden' name='PromoId' id='PromoId' value='".$objItem->Rowid."'>";
 			}
 			else $strRetVal= "";
@@ -4616,16 +4600,14 @@
 		}		
 		
 		// Anything to do before save?
-		protected function beforeSave($objItem ){
+		protected function beforeSave($objItem){
 			if ($this->arrFields['QtyRemaining']['Field']->Text=='')
 				$objItem->QtyRemaining = '-1';
-				
-			if (is_null($objItem->Except))
-				$objItem->Except = 0;
-				
-			if (is_null($objItem->Lscodes))
-				$objItem->Lscodes = '';	
-				
+
+			if (isset($_POST['LsCodesEdit'])) $objItem->Lscodes = $_POST['LsCodesEdit'];
+			if (isset($_POST['ExceptEdit'])) $objItem->Except = $_POST['ExceptEdit'];
+
+			
 			return $objItem;			
 		}
 		
@@ -4691,21 +4673,21 @@
 		protected function listPages(){
 
 			
-			$page = new CustomPage();
-			$page->Title = _sp('Set Promo Code Product Restrictions');
-			$page->Key = "promo_restrict";
-			$page->Page = 'promocodes';
-			$this->configPnls[0] = new xlsws_admin_task_promorestrict_panel($this, $this , $page , "pageDone");
+			//$page = new CustomPage();
+			//$page->Title = _sp('Set Promo Code Product Restrictions');
+			//$page->Key = "promo_restrict";
+			//$page->Page = 'promocodes';
+			//$this->configPnls[0] = new xlsws_admin_task_promorestrict_panel($this, $this , $page , "pageDone");
 
 			$page = new CustomPage();
 			$page->Title = _sp('Batch Create Promo Codes');
 			$page->Key = "promo_create_batch";
-			$this->configPnls[1] = new xlsws_admin_task_panel($this, $this , $page , "pageDone");
+			$this->configPnls[0] = new xlsws_admin_task_panel($this, $this , $page , "pageDone");
 
 			$page = new CustomPage();
 			$page->Title = _sp('Batch Delete Promo Codes');
 			$page->Key = "promo_delete_batch";
-			$this->configPnls[2] = new xlsws_admin_task_panel($this, $this , $page , "pageDone");
+			$this->configPnls[1] = new xlsws_admin_task_panel($this, $this , $page , "pageDone");
 			
 			
 		}
