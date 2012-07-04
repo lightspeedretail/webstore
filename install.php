@@ -2848,7 +2848,7 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 				
 					//Run database upgrade beyond what is included in install
 					
-					$this->upgrade_database();
+					$this->upgrade_database(true);
 
 				
 					echo "<BR/><b>Don't forget to change permissions on your /includes folder back to read only, and specifically set the file includes/configuration.inc.php to 644 or world readable only! Your /includes/qcodo/cache folders need to remain writable.</b><BR/><BR/>";
@@ -3030,8 +3030,16 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 		}	
 		
 				
-		protected function upgrade_database() {
+		protected function upgrade_database($passingdb =  null) {
 		
+			if (!is_null($passingdb)) {
+				$dbhost = $this->GetControl('dbhost');
+					$dbuser = $this->GetControl('dbuser');
+					$dbpass = $this->GetControl('dbpass');
+					$dbport = $this->GetControl('dbport');
+					$db = $this->GetControl('db');	
+				}
+				
 			//Bootstrap the QCodo DB object so we can use our functions
 			define('DB_CONNECTION_1', serialize(array( 
 			'adapter' => 'MySqli5',
