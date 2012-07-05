@@ -419,7 +419,7 @@
 			$strToReturn = sprintf('<types><schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="%s" ' .
 				'xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">',
 				$this->strNamespace);
-			$strToReturn .= '<import namespace="http://schemas.xmlsoap.org/soap/encoding/" schemaLocation="http://schemas.xmlsoap.org/soap/encoding/"/>';
+			$strToReturn .= '<import namespace="http://schemas.xmlsoap.org/soap/encoding/" />';
 		
 			foreach ($strComplexTypesArray as $strComplexType)
 				$strToReturn .= $strComplexType;
