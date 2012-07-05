@@ -42,12 +42,12 @@ $this->txtSearchBox->CssClass="searchTextBox";
 
 $this->misc_components['search_img'] = new QImageButton($this->searchPnl);
 $this->misc_components['search_img']->ImageUrl = templateNamed("css/images/search_go.png");
-$this->misc_components['search_img']->AddAction(new QClickEvent(), new QJavaScriptAction("document.location.href='+ $('#xlsSearch').val() + '/s/';"));
+$this->misc_components['search_img']->AddAction(new QClickEvent(), new QJavaScriptAction("document.location.href=searchresults/pg/?q='+ $('#xlsSearch').val();"));
 $this->misc_components['search_img']->CssClass= 'searchButton';
 $this->misc_components['search_img']->SetCustomStyle('float','left');
 
 $this->misc_components['advanced_search'] = new QImageButton($this->searchPnl, 'xlsAdvancedSearch');
 $this->misc_components['advanced_search']->ImageUrl = templateNamed("css/images/adv_search.png");
 $this->misc_components['advanced_search']->CssClass= 'searchButton';
-$this->misc_components['advanced_search']->AddAction(new QClickEvent(), new QJavaScriptAction("document.location.href='index.php?xlspg=advanced_search&c=".$_GET['c']."'"));
+$this->misc_components['advanced_search']->AddAction(new QClickEvent(), new QJavaScriptAction("document.location.href='advanced_search/pg/?c=".$_GET['c']."'"));
 $this->misc_components['advanced_search']->SetCustomStyle('float','left');

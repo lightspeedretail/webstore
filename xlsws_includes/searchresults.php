@@ -75,11 +75,8 @@ class xlsws_searchresult extends xlsws_product_listing {
      */
     protected function GetSearchCriteria() {
 
-
     	$objUrl = _xls_url_object();    
-		$strCriteria = $objUrl->RouteId;
-
-        $strCriteria = strip_tags($strCriteria);
+        $strCriteria = strip_tags($objUrl->ProductSearch);
         $strCriteria = trim($strCriteria);
         $strCriteria = addslashes($strCriteria);
 
@@ -311,7 +308,7 @@ class xlsws_searchresult extends xlsws_product_listing {
 		$strCriteria = $objUrl->RouteId;
 		
         $this->crumbs[] = array(
-            'link'=>$objUrl->RouteId . "/s/",
+            'link'=>$objUrl->RouteId . "/".XLSURL::KEY_PAGE."/?q=".$objUrl->ProductSearch,
             'case'=> '',
             'name'=>_sp('Search Results')
         );
@@ -328,8 +325,16 @@ class xlsws_searchresult extends xlsws_product_listing {
     protected function dtrProducts_Bind() {
         parent::dtrProducts_Bind();
 
-        if ($this->dtrProducts->TotalItemCount == 0)
-            _xls_display_msg(_sp('Sorry no product was found'));
+        if ($this->dtrProducts->TotalItemCount == 0) {
+           // _xls_display_msg(_sp('Sorry no product was found'));
+            //$this->msg = "Sorry no product was found";
+
+			//$this->mainPnl = new QPanel($this,'MainPanel');
+			//$this->mainPnl->Template = templateNamed('msg.tpl.php');
+			$objUrl = _xls_url_object();
+			$this->custom_page_content = _sp("Sorry, no products were found for the search")." <strong>".$objUrl->ProductSearch."</strong>";
+
+        }
     }
 }
 

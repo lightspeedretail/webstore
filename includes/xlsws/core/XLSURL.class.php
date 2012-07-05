@@ -53,7 +53,8 @@ class XLSURL {
 	protected $intStatus; //200 for OK, 301 for redirect, 404 for error. Use HTTP codes to determine result of parsing
 	protected $strRedirectUrl; //if a redirect, the URL to redirect to
 	protected $arrUrlSegments;
-	protected $strQueryString; //query string
+	protected $strQueryString; //full URL query string (everything after ?)
+	protected $strProductSearch; //for our on-site search, save our q= query
 	
 	function __construct( $strPhpSelf ) {
 
@@ -142,6 +143,7 @@ class XLSURL {
 				$this->strRouteId = str_replace("-","_",$this->arrUrlSegments[0]);
 				$this->strRouteController = "xlspg";
 				$this->intStatus=200;
+				if ($this->strRouteId=="searchresults") $this->strProductSearch=$_GET['q'];
 				break;
 
 			case XLSURL::KEY_SEARCH: //Search Results
@@ -181,9 +183,9 @@ class XLSURL {
 			//The first xlspg code is now our first URL segment, but any appended GET variables still need to carry
 			$strRemaining = str_replace("search=".$_GET['search'],"",$_SERVER['REQUEST_URI']);
 			$strRemaining = strstr($strRemaining,'?');	
-			$strRemaining = str_replace("?&","?",$strRemaining);
+			$strRemaining = str_replace("?&","&",$strRemaining);
 			if ($strRemaining=="?") $strRemaining='';	
-			$this->strRedirectUrl = basename($_GET['search'])."/".XLSURL::KEY_SEARCH."/".$strRemaining;
+			$this->strRedirectUrl = "searchresults/".XLSURL::KEY_CUSTOMPAGE."/?q=".basename($_GET['search']).$strRemaining;
 			$this->strRedirectUrl = _xls_site_url($this->strRedirectUrl);
 			$this->intStatus=301;
 			return true;
@@ -303,6 +305,8 @@ class XLSURL {
 				return $this->arrUrlSegments;
 			case 'QueryString':
 				return $this->strQueryString;
+			case 'ProductSearch':
+				return $this->strProductSearch;
 			case 'RouteController':
 				return $this->strRouteController;
 			case 'Status':

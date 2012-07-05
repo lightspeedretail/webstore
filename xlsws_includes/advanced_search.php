@@ -100,13 +100,13 @@ class xlsws_advanced_search extends xlsws_index {
 	protected function butSubmit_click($strFormId, $strControlId, $strParameter){
 		$cat_arr = explode(".",$_GET['c']);
 		$cat = array_pop($cat_arr);
-		_rd(
-			"index.php?advsearch=true&search=" . urlencode($this->txtSearch->Text) .
+		_rd(_xls_site_url(
+			"searchresults/".XLSURL::KEY_PAGE."/?advsearch=true&q=" . urlencode($this->txtSearch->Text) .
 			"&startprice=" . $this->txtStartPrice->Text .
 			"&endprice=" . $this->txtEndPrice->Text .
 			"&filter=" . $this->lstFilters->SelectedValue .
 			"&c=".$cat
-		);
+		));
 	}
 }
 
