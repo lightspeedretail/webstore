@@ -44,6 +44,7 @@ class XLSURL {
 	const KEY_FEEDS = "feeds"; //Note changing this one will break .htaccess if not also updated
 	const KEY_PAGE = "pg"; //formerly anything that was xlspg=
 	const KEY_SEARCH = "search";
+	const KEY_IMAGE = "img";
 
 	protected $strUri; //URL before parsing
 	protected $strRouteCode; //p for product, c for category, checkout for checkout, etc. can be customized

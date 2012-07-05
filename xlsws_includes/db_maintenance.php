@@ -542,7 +542,10 @@ class xlsws_db_maintenance extends xlsws_index {
 				'SLIDER_IMAGE_WIDTH', '120', 'Slider on custom pages', 17, 11, NOW(), NOW(), 'INT');");	
 			$this->add_config_key('SLIDER_IMAGE_HEIGHT' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Slider Image Height', 
-				'SLIDER_IMAGE_HEIGHT', '120', 'Slider on custom pages', 17, 12, NOW(), NOW(), 'INT');");	
+				'SLIDER_IMAGE_HEIGHT', '120', 'Slider on custom pages', 17, 12, NOW(), NOW(), 'INT');");
+			$this->add_config_key('IMAGE_FORMAT' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Image Format', 
+				'IMAGE_FORMAT', 'jpg', 'Use .jpg or .png format for images. JPG files are smaller but slightly lower quality. PNG is higher quality and supports transparency, but has a larger file size.', 17, 18, NOW(), NOW(), 'IMAGE_FORMAT');");	
 			
 			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=17, `sort_order`=15 
 				where `key`='PRODUCT_ENLARGE_SHOW_LIGHTBOX'");	

@@ -389,7 +389,7 @@
                 $objImage->Created = new QDateTime(QDateTime::Now);
 
             $objImage->SaveImageData(
-                Images::GetImageName(substr($objProduct->RequestUrl,0,60)), $blbRawImage
+                Images::GetImageName(substr($objProduct->RequestUrl,0,60)), $blbImage
             );
             $objImage->Save();
 
@@ -791,8 +791,8 @@ EOS;
             $objImage->Height = imagesy($blbImage);
             $objImage->Created = new QDateTime(QDateTime::Now);
             $objImage->SaveImageData(
-                Images::GetImageName($objProduct->RequestUrl, 0, 0, $intIndex, 'add'),
-                $blbRawImage
+                Images::GetImageName(substr($objProduct->RequestUrl,0,60), 0, 0, $intIndex, 'add'),
+                $blbImage
             );
             $objImage->Save(true);
 
@@ -1129,7 +1129,7 @@ EOS;
             
             if($blbImage  &&  ($blbImage = base64_decode($blbImage))){
                 
-                $filename = "photos/header.jpg";
+                $filename = "photos/header.png";
                 
                 if(!file_put_contents($filename , $blbImage)){
                     _xls_log("SOAP ERROR : Unable to save header image in $filename.");
@@ -1256,7 +1256,7 @@ EOS;
          * Save/Add a category with ID.
          * Rowid and ParentId are RowID of the current category and parentIDs
          * Category is the category name
-         * blbImage is base64encoded jpeg
+         * blbImage is base64encoded png
          * meta keywords and descriptions are for meta tags displayed for SEO improvement
          * Custom page is a page-key defined in Custom Pages in admin panel
          * Position defines the sorting position of category. Lower number comes first
@@ -1422,7 +1422,7 @@ EOS;
         /**
          * Save/Add a category.
          * CategoryPath to contain category names seperated by path as they are supposed to be traversed.
-         * blbImage is base64encoded jpeg
+         * blbImage is base64encoded png
          * meta keywords and descriptions are for meta tags displayed for SEO improvement
          * Custom page is a page-key defined in Custom Pages in admin panel
          * Position defines the sorting position of category. Lower number comes first

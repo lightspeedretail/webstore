@@ -82,8 +82,11 @@ class Images extends ImagesGen {
 
 		if (!empty($intWidth) && !empty($intHeight))
 			$strName .= '-' . $intWidth . 'px-' . $intHeight . "px";
+		
+		$fileExt =  strtolower(_xls_get_conf('IMAGE_FORMAT','jpg'));
+		if ($intWidth==0 && $intHeight==0) $fileExt="png"; //The file from LS is always png
 
-		return $strSection . "/" . $strName[0] . "/" . $strName . '.jpg';
+		return $strSection . "/" . $strName[0] . "/" . $strName . '.' . $fileExt;
 	}
 
 	public static function GetImagePath($strFile) {
@@ -242,7 +245,13 @@ class Images extends ImagesGen {
 						QApplication::Log(E_ERROR, 'Images', "Error attempting to create ".$strPathToCreate);
 				}
 
-			if (file_put_contents($strPath, $blbImage)) {
+
+			if (!is_writable($strPathToCreate))
+				QApplication::Log(E_ERROR, 'str', "Directory $strPathToCreate is not writable");
+
+			if (  ($arrPath['extension']=="jpg" && imagejpeg($blbImage,$strPath)) ||
+				  ($arrPath['extension']=="png" && imagepng($blbImage,$strPath))
+				) {
 				$this->strImagePath = $strName;
 				$this->strImageData = null;
 			}
@@ -268,13 +277,13 @@ class Images extends ImagesGen {
 			else $this->ShowFallback();
 
 		if ($this->ImageFileExists()) {
-			_rd(Images::GetImageUri($this->ImagePath));
+			_xls_301(Images::GetImageUri($this->ImagePath));
 			exit();
 		}
 		else {
-			header('Content-Type: image/jpeg');
+			header('Content-Type: image/png');
 			$img = imagecreatefromstring($this->ImageData);
-			echo imagejpeg($img, NULL, 100);
+			echo imagepng($img, NULL, 100);
 			exit();
 		}
 	}
@@ -312,8 +321,8 @@ class Images extends ImagesGen {
 				$rawImage = Images::Resize(
 					$rawImage, $intWidth, $intHeight);
 
-		header('Content-Type: image/jpeg');
-		imagejpeg($rawImage, NULL, 100);
+		header('Content-Type: image/png');
+		imagepng($rawImage, NULL, 100);
 		exit();
 	}
 
@@ -326,33 +335,30 @@ class Images extends ImagesGen {
 				$objImage->Delete();
 		}
 
-		if ($this->ImageFileExists())
-			$rawImage = imagecreatefromstring(
-				file_get_contents(Images::GetImagePath($this->ImagePath)));
+		if ($this->ImageFileExists()) { 
+				$rawImage = imagecreatefrompng(Images::GetImagePath($this->ImagePath));
+			}
 		else
 			$rawImage = imagecreatefromstring($this->ImageData);
+
 
 		$rawNewImage = Images::Resize(
 			$rawImage, $intNewWidth, $intNewHeight);
 
 		if (!$this->Rowid) {
 			// if it is the no product image, just output
-			header('Content-Type: image/jpeg');
-			imagejpeg($rawNewImage, NULL, 100);
+			header('Content-Type: image/png');
+			imagepng($rawNewImage, NULL, 100);
 			return null;
 		}
-		
+	
 		$strExistingName=$this->strImagePath;
 		$strImageName = Images::GetImageName(
 			$strExistingName, $intNewWidth, $intNewHeight);
-
+		
+		//We save it, then pass back to do a redir immediately
 		$objNew = new Images();
-
-		ob_start();
-		imagejpeg($rawNewImage, NULL, 100);
-		$objNew->SaveImageData($strImageName, ob_get_contents());
-		ob_end_clean();
-
+		$objNew->ImagePath=$strImageName;
 		$objNew->Created = QDateTime::Now(true);
 		$objNew->Parent = $this->Rowid;
 		$objNew->intWidth = $intNewWidth;
@@ -360,6 +366,10 @@ class Images extends ImagesGen {
 
 		$objNew->Save(true);
 
+		$objNew->SaveImageData(
+                $strImageName, $rawNewImage
+            );
+            
 		imagedestroy($rawNewImage);
 		imagedestroy($rawImage);
 

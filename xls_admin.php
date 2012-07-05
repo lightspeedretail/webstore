@@ -649,6 +649,8 @@
 
 				case 'ENABLE_SLASHED_PRICES':
 					return array(0 => _sp("Off") , 1 => _sp("Only on Details Page") , 2 => _sp("On Grid and Details Pages"));											
+				case 'IMAGE_FORMAT':
+					return array('jpg' => "JPG" , 'png' => "PNG");											
 
 
 				case 'INVENTORY_OUT_ALLOW_ADD':
