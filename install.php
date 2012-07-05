@@ -223,8 +223,6 @@ if(!defined('__DOCROOT__'))
 					$this->btnNext->Display = false;
 					$lbox = $this->iControl('agreement' , 'QPanel');
 					//$lbox->TextMode = QTextMode::MultiLine;
-					$lbox->Width = 800;
-					$lbox->Height = 400;
 					//$lbox->ReadOnly = true;
 					$lbox->DisplayStyle = QDisplayStyle::Block;
 					$lbox->CssClass = "install_agreement";
@@ -318,8 +316,6 @@ if(!defined('__DOCROOT__'))
 				$this->btnNext->Display = false;
 				$lbox = $this->iControl('agreement' , 'QPanel');
 				//$lbox->TextMode = QTextMode::MultiLine;
-				$lbox->Width = 500;
-				$lbox->Height = 400;
 				//$lbox->ReadOnly = true;
 				$lbox->DisplayStyle = QDisplayStyle::Block;
 				$lbox->CssClass = "install_agreement";
@@ -340,8 +336,6 @@ if(!defined('__DOCROOT__'))
 				
 				$lbox = $this->iControl('agreement' , 'QPanel');
 				//$lbox->TextMode = QTextMode::MultiLine;
-				$lbox->Width = 800;
-				$lbox->Height = 400;
 				//$lbox->ReadOnly = true;
 				$lbox->DisplayStyle = QDisplayStyle::Block;
 				$lbox->CssClass = "install_agreement";
@@ -1265,18 +1259,30 @@ EOT;
 					}
 					
 				
+				$this->hideControls();
+				
+				$this->pnlStep->Text = "<img src=\"templates/install/step_05.png\" />";
+				
+				$lbox = $this->iControl('agreement' , 'QPanel');
+				//$lbox->TextMode = QTextMode::MultiLine;
+				//$lbox->ReadOnly = true;
+				$lbox->DisplayStyle = QDisplayStyle::Block;
+				$lbox->CssClass = "install_agreement";
 				
 				//ToDo: Check for existance of tables and if they exist, skip this and go to the end. 
 				//This way we can run an install in a new folder with an existing db without destroying everything
 				
-				echo "<html>";
-				echo "<body>";
-				echo "<pre>";
+				$strReturn = "";
 				
 					
-				
-				
-				
+				$sql = "SELECT * 
+                 FROM INFORMATION_SCHEMA.TABLES 
+                 WHERE TABLE_SCHEMA = '".$db->Text."' 
+                 AND TABLE_NAME = 'xlsws_configuration'";
+				$result = mysql_query($sql);
+				$numRows = mysql_num_rows( $result );
+
+				if ($numRows==0) {
 				
 				$sql = "CREATE TABLE `xlsws_cart` (
   `rowid` int(11) NOT NULL auto_increment,
@@ -1354,7 +1360,7 @@ EOT;
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
-				echo "Creating table Cart.<br/>";
+				$strReturn .= "Creating table Cart.<br/>";
 				$this->mysql_query("SET NAMES utf8");
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_cart`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);
@@ -1385,7 +1391,7 @@ $sql = "CREATE TABLE `xlsws_cart_item` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
-				echo "Creating table Cart Items.<br/>";
+				$strReturn .= "Creating table Cart Items.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_cart_item`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);
 				
@@ -1409,7 +1415,7 @@ $sql = "CREATE TABLE `xlsws_cart_item` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
-				echo "Creating table Category.<br/>";
+				$strReturn .= "Creating table Category.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_category`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);
 				
@@ -1446,7 +1452,7 @@ $sql = "CREATE TABLE `xlsws_cart_item` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
-				echo "Creating table Configration.<br/>";
+				$strReturn .= "Creating table Configration.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_configuration`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);
 
@@ -1547,7 +1553,7 @@ $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Uploader should delete
 
 //$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug LightSpeed Soap Call', 'DEBUG_LS_SOAP_CALL', '1', 'If selected, all soap calls will be logged in the database. It is advised that you do not enable this unless advised by XSilva', 1, 16, NOW(), NOW(), 'BOOL');";
 				
-				echo "Entering Configuration values<br/>";
+				$strReturn .= "Entering Configuration values<br/>";
 
 				foreach($sql as $s)
 					$db_ok = $db_ok && $this->mysql_query($s);
@@ -1569,7 +1575,7 @@ $sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Uploader should delete
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
-				echo "Creating country Table.<br/>";
+				$strReturn .= "Creating country Table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_country`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);			
 
@@ -1823,7 +1829,7 @@ $sql[] = "INSERT INTO `xlsws_country` VALUES (242, 'EU', '', '', 'Y', 10, 'Europ
 				
 
 
-				echo "Installing Countries<br/>";
+				$strReturn .= "Installing Countries<br/>";
 
 				foreach($sql as $s)
 					$db_ok = $db_ok && $this->mysql_query($s);
@@ -1846,7 +1852,7 @@ $sql[] = "INSERT INTO `xlsws_country` VALUES (242, 'EU', '', '', 'Y', 10, 'Europ
 				
 				
 					
-				echo "Creating credit card types Table.<br/>";
+				$strReturn .= "Creating credit card types Table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_credit_card`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);			
 				
@@ -1871,7 +1877,7 @@ $sql[] = "INSERT INTO `xlsws_credit_card` VALUES (12, 'Visa Electron', '16', '41
 
 
 
-				echo "Installing Credit Card Types<br/>";
+				$strReturn .= "Installing Credit Card Types<br/>";
 
 				foreach($sql as $s)
 					$db_ok = $db_ok && $this->mysql_query($s);
@@ -1927,7 +1933,7 @@ $sql[] = "INSERT INTO `xlsws_credit_card` VALUES (12, 'Visa Electron', '16', '41
 				
 				
 					
-				echo "Creating Customer Table.<br/>";
+				$strReturn .= "Creating Customer Table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_customer`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);			
 				
@@ -1951,7 +1957,7 @@ $sql[] = "INSERT INTO `xlsws_credit_card` VALUES (12, 'Visa Electron', '16', '41
   UNIQUE KEY `key` (`key`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
-				echo "Creating Custom pages Table.<br/>";
+				$strReturn .= "Creating Custom pages Table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_custom_page`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);			
 
@@ -1973,7 +1979,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
 				
 		
 				
-				echo "Entering Custom pages<br/>";
+				$strReturn .= "Entering Custom pages<br/>";
 
 				foreach($sql as $s)
 					$db_ok = $db_ok && $this->mysql_query($s);
@@ -2002,7 +2008,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
   PRIMARY KEY  (`rowid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
-				echo "Creating Destinations Table.<br/>";
+				$strReturn .= "Creating Destinations Table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_destination`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);					
 				
@@ -2015,7 +2021,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
   UNIQUE KEY `Family` (`family`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
-				echo "Creating Families Table.<br/>";
+				$strReturn .= "Creating Families Table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_family`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);	
 
@@ -2037,7 +2043,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
   KEY `customer_id` (`customer_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
-				echo "Creating Gift Registry Table.<br/>";
+				$strReturn .= "Creating Gift Registry Table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_gift_registry`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);				
 				
@@ -2061,7 +2067,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
-				echo "Creating Gift Registry Items table.<br/>";
+				$strReturn .= "Creating Gift Registry Items table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_gift_registry_items`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);				
 
@@ -2082,7 +2088,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
-				echo "Creating Gift Registry Receipients table.<br/>";
+				$strReturn .= "Creating Gift Registry Receipients table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_gift_registry_receipents`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);				
 
@@ -2106,7 +2112,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
 				
 				
 				
-				echo "Creating images table.<br/>";
+				$strReturn .= "Creating images table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_images`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);					
 				
@@ -2123,7 +2129,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
-				echo "Creating System Logs table.<br/>";
+				$strReturn .= "Creating System Logs table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_log`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);					
 				
@@ -2142,7 +2148,7 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
-				echo "Creating Modules table.<br/>";
+				$strReturn .= "Creating Modules table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_modules`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);					
 							
@@ -2154,7 +2160,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (49, 'xlsws_class_payment.php', 'pa
 $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sidebar', 3, NULL, NOW(), NULL);";
 
 				
-				echo "Entering Sample Modules<br/>";
+				$strReturn .= "Entering Sample Modules<br/>";
 
 				foreach($sql as $s)
 					$db_ok = $db_ok && $this->mysql_query($s);
@@ -2213,7 +2219,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
-				echo "Creating Products table.<br/>";
+				$strReturn .= "Creating Products table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_product`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);
 				
@@ -2228,7 +2234,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 				
 				
-				echo "Creating Product-Category Relation table.<br/>";
+				$strReturn .= "Creating Product-Category Relation table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_product_category_assn`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);
 
@@ -2242,7 +2248,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 				
 				
-				echo "Creating Product-Image Relation table.<br/>";
+				$strReturn .= "Creating Product-Image Relation table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_product_image_assn`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);
 				
@@ -2259,7 +2265,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
   KEY product_id_2 (product_id,pricing_level)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 				
-				echo "Creating Qty Pricing table.<br/>";
+				$strReturn .= "Creating Qty Pricing table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_product_qty_pricing`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);			
 				
@@ -2281,7 +2287,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
-				echo "Creating Related Product table.<br/>";
+				$strReturn .= "Creating Related Product table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_product_related`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);					
 				
@@ -2310,7 +2316,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 				
-				echo "Creating SRO table.<br/>";
+				$strReturn .= "Creating SRO table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_sro`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);					
 				
@@ -2330,7 +2336,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;";
 				
 				
-				echo "Creating SRO Repair table.<br/>";
+				$strReturn .= "Creating SRO Repair table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_sro_repair`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);					
 				
@@ -2350,7 +2356,7 @@ $sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sideb
   KEY `country_code` (`country_code`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
-				echo "Creating State/Region table.<br/>";
+				$strReturn .= "Creating State/Region table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_state`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);	
 				
@@ -2631,7 +2637,7 @@ $sql[] = "INSERT INTO `xlsws_state` VALUES (283, 'GB', 'WORCS', 'Y', 10, 'Worces
 $sql[] = "INSERT INTO `xlsws_state` VALUES (284, 'GB', 'WRX', 'Y', 10, 'Wrexham');";
 				
 				
-				echo "Installing States/Regions<br/>";
+				$strReturn .= "Installing States/Regions<br/>";
 
 				foreach($sql as $s)
 					$db_ok = $db_ok && $this->mysql_query($s);				
@@ -2649,7 +2655,7 @@ $sql[] = "INSERT INTO `xlsws_state` VALUES (284, 'GB', 'WRX', 'Y', 10, 'Wrexham'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 					
-				echo "Creating tax table.<br/>";
+				$strReturn .= "Creating tax table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_tax`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);						
 					
@@ -2669,7 +2675,7 @@ $sql[] = "INSERT INTO `xlsws_state` VALUES (284, 'GB', 'WRX', 'Y', 10, 'Wrexham'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 					
-				echo "Creating tax code.<br/>";
+				$strReturn .= "Creating tax code.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_tax_code`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);					
 				
@@ -2687,7 +2693,7 @@ $sql[] = "INSERT INTO `xlsws_state` VALUES (284, 'GB', 'WRX', 'Y', 10, 'Wrexham'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 					
-				echo "Creating tax status.<br/>";
+				$strReturn .= "Creating tax status.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_tax_status`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);				
 				
@@ -2712,7 +2718,7 @@ $sql[] = "INSERT INTO `xlsws_state` VALUES (284, 'GB', 'WRX', 'Y', 10, 'Wrexham'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 					
-				echo "Creating View Log.<br/>";
+				$strReturn .= "Creating View Log.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_view_log`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);				
 				
@@ -2730,7 +2736,7 @@ $sql[] = "INSERT INTO `xlsws_state` VALUES (284, 'GB', 'WRX', 'Y', 10, 'Wrexham'
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8";
 				
 					
-				echo "Creating Promo Codes.<br/>";
+				$strReturn .= "Creating Promo Codes.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_promo_code`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);
 				
@@ -2743,7 +2749,7 @@ $sql[] = "INSERT INTO `xlsws_state` VALUES (284, 'GB', 'WRX', 'Y', 10, 'Wrexham'
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8";
 				
 					
-				echo "Creating Shipping Tiers.<br/>";
+				$strReturn .= "Creating Shipping Tiers.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_shipping_tiers`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);	
 				
@@ -2759,7 +2765,7 @@ $sql[] = "INSERT INTO `xlsws_state` VALUES (284, 'GB', 'WRX', 'Y', 10, 'Wrexham'
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8";
 				
 					
-				echo "Creating Sessions Table.<br/>";
+				$strReturn .= "Creating Sessions Table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_sessions`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);	
 
@@ -2772,7 +2778,7 @@ $sql[] = "INSERT INTO `xlsws_state` VALUES (284, 'GB', 'WRX', 'Y', 10, 'Wrexham'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 					
-				echo "Creating View Log Types.<br/>";
+				$strReturn .= "Creating View Log Types.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_view_log_type`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);				
 				
@@ -2802,7 +2808,7 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 
 				
 				
-				echo "Installing View Log Types<br/>";
+				$strReturn .= "Installing View Log Types<br/>";
 
 				foreach($sql as $s)
 					$db_ok = $db_ok && $this->mysql_query($s);				
@@ -2824,20 +2830,25 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 				
 					
-				echo "Creating Visitor.<br/>";
+				$strReturn .= "Creating Visitor.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_visitor`;");
 				$db_ok = $db_ok && $this->mysql_query($sql);					
 				
 				
+				}
+				else $strReturn .= "A previous database was detected, so table installs were skipped.<p>";
+
+
+				
 				// update store password
-				echo "Updating store password.<br/>";
+				$strReturn .= "Updating store password.<br/>";
 				$pass = $this->GetControl('storepass');
 				$sql = "UPDATE xlsws_configuration SET value='" .  strtolower(md5($pass->Text))  . "' WHERE `key`='LSKEY'";
 				$db_ok = $db_ok && $this->mysql_query($sql);
 
 				
 				// update store timezone
-				echo "Updating store timezone.<br/>";
+				$strReturn .= "Updating store timezone.<br/>";
 				$tz = $this->GetControl('storetz');
 				$sql = "UPDATE xlsws_configuration SET value='" . $tz->SelectedValue  . "' WHERE `key`='TIMEZONE'";
 				$db_ok = $db_ok && $this->mysql_query($sql);
@@ -2848,21 +2859,26 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 				
 					//Run database upgrade beyond what is included in install
 					
-					$this->upgrade_database(true);
+					$strReturn .= $this->upgrade_database(true);
 
 				
-					echo "<BR/><b>Don't forget to change permissions on your /includes folder back to read only, and specifically set the file includes/configuration.inc.php to 644 or world readable only! Your /includes/qcodo/cache folders need to remain writable.</b><BR/><BR/>";
+					$strReturn .= "<BR/><b>Don't forget to change permissions on the file includes/configuration.inc.php to 644 or world readable only! Other folders should remain writable.</b><BR/><BR/>";
 					
-					echo "Done!<BR/><BR/>";
+					$strReturn .= "Done!<BR/><BR/>";
 					
-					echo "<a href=\"index.php\">Click here</a> to see your store.";
+					$strReturn .= "<h1>Important: Rename the file htaccess to .htaccess (adding a period in front of the filename) in your Webstore root folder</h1>";
+					
+					
+					$strReturn .= "<a href=\"index.php\">Click here</a> to see your store.";
 				}else{
 					file_put_contents("includes/configuration.inc.php" , $old_config_file);	
 				}
 				
-				echo "</pre>";
-				echo "</body>";
-				echo "</html>";
+				
+				$lbox->Text = $strReturn;	
+				$lbox->HtmlEntities = false;
+				
+				echo $strReturn;
 				
 				exit();
 				
@@ -3069,8 +3085,6 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 			$this->btnNext->Display = false;
 			$lbox = $this->iControl('agreement' , 'QPanel');
 			//$lbox->TextMode = QTextMode::MultiLine;
-			$lbox->Width = 500;
-			$lbox->Height = 400;
 			//$lbox->ReadOnly = true;
 			$lbox->DisplayStyle = QDisplayStyle::Block;
 			$lbox->CssClass = "install_agreement";
@@ -3080,7 +3094,8 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 			
 							
 			$this->pnlInstall->CssClass = '';
-				
+			
+			return $retVal;	
 					
 		}
 			
@@ -3141,6 +3156,7 @@ margin: 0;
 
 .install_agreement{
 	height: 400px;
+	width: 500px;
 	overflow-y: scroll;
 	background-color: #ffffff;
 	border: 1px solid #666;

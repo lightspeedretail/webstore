@@ -173,10 +173,8 @@ class xlsws_db_maintenance extends xlsws_index {
 		
 		
 			_dbx("ALTER TABLE xlsws_family MODIFY COLUMN family varchar (255)");
-			$strUpgradeText .= "<br/>2.1.4 patch: Changed family column to 255 characters in xlsws_family";
 
 			_dbx("ALTER TABLE xlsws_product MODIFY COLUMN family varchar (255)");
-			$strUpgradeText .= "<br/>2.1.4 patch: Changed family column to 255 characters in xlsws_product";
 
 
 			$sql = "UPDATE xlsws_configuration SET `options`='INVENTORY_DISPLAY_LEVEL' WHERE `key`='INVENTORY_DISPLAY_LEVEL'";
