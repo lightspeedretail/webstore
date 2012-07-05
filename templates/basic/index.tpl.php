@@ -59,11 +59,7 @@
 	<!--[if lte IE 7]>
 	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/ie7.css" />
 	<![endif]-->
-	
-	<!--[if lt IE 7]>
-	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/ie6.css" />	
-	<![endif]-->
- 			
+	 			
  	<link rel="stylesheet" type="text/css" href="assets/css/search.css" id="searchcss"  />
 	<link rel="stylesheet" type="text/css" href="assets/css/dummy.css" id="dummy_css"  />
 	<link rel="stylesheet" type="text/css" href="assets/css/datepicker.css" />
