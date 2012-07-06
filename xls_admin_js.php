@@ -43,7 +43,7 @@ function GetResetButtonHtml($ctlId) {
 		}
 						
 require('includes/prepend.inc.php');
-
+if (!$_SESSION['admin_auth']) die(); //This file can only be called from a current Admin panel session
 switch($_GET['item']) {
 	
 	
