@@ -166,7 +166,7 @@ switch($_GET['item']) {
 		
 	case 'google':
 		$strRequestUrl = preg_replace('/[^a-z0-9\-\.]/i', '', $_GET['rurl']);
-		echo '<h4>Editing: '.$strRequestUrl.'</h4><h4>Choose the most appropriate Google Category for this item. Only the first level is required. If you receive a blank dropdown, that means there are no additional levels for that category.</h4>';
+		echo '<h4>Editing: '.$strRequestUrl.'</h4><h4>Choose the most appropriate Google Category for this item. Only the first level is required. If the next dropdown remains dark, that means there are no additional levels for that category.</h4>';
 		echo '<form>';
 		echo '<select name="google1" id="google1" class="tinyfont googleselect" >';
 		echo '<option value="0">--Choose--';

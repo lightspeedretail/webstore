@@ -26,18 +26,18 @@ jQuery(function ($) {
 							$('#google4').live('change', function() { choosegoogle.change(4); });
 							$('#google5').live('change', function() { choosegoogle.change(5); });
 							$('#google6').live('change', function() { choosegoogle.change(6); });
-							$('.basic-send').live('click', function() { 
+							$('.basic-send').bind('click', function() { 
 							  choosegoogle.send();
 							  return false;
 							});
-							$('.basic-cancel').live('click', function() { 
+							$('.basic-cancel').bind('click', function() { 
 							  choosegoogle.close();
 							  return false;
 							});
-							
-							if ($('#GoogleCatEdit').val()>0)
+							alert($('#GoogleCatEdit').val());
+							if ($('#GoogleCatEdit').val() != '')
 								choosegoogle.setup($('#GoogleCatEdit').val());
-							else if ($('#GoogleCatParentEdit').val()>0)
+							else if ($('#GoogleCatParentEdit').val() != '')
 								choosegoogle.setup($('#GoogleCatParentEdit').val());
 							
 						});
@@ -74,21 +74,26 @@ jQuery(function ($) {
 				var $el = $("#google" + (e+1));
 				$el.removeAttr("disabled"); 
 				$('#google' + (e+1) + ' option:gt(0)').remove();
+				var count=0;
 				$.each(data, function(key, value) {
+				  count=count+1;
 				  $el.append($("<option></option>")
 				     .attr("value", value).text(key));
+				  $el.val('');
 				});
+				if (count<1) $el.attr("disabled",'disabled');
 				
 				if(initset[(e)]) {
 					$("#google" + (e+1)).val(initset[(e)]);
 					choosegoogle.change((e+1));
+					initset[(e)]=0;
 
 				}
 				
 				for(q=(e+2); q<=7; q++) {
 					var $el = $("#google" + q);
 					$('#google' + (q) + ' option:gt(0)').remove();
-					$el.attr("disabled","disabled");
+					$el.attr("disabled",'disabled');
 				}
 
 				
@@ -103,10 +108,8 @@ jQuery(function ($) {
 					if (q>1) googlestring = googlestring + ' > ' + $el.val();
 						else googlestring = $el.val();		
 			}
-			if (googlestring > '') {
-				$('#GoogleCatEdit').val(googlestring);
-				$('#googlecat').html(googlestring.substring(0,15) + '...');
-			}
+			$('#GoogleCatEdit').val(googlestring);
+			$('#googlecat').html(googlestring.substring(0,15));
 			
 			$.modal.close();
 			return;

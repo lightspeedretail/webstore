@@ -3895,9 +3895,9 @@
 			}
 			
 			$objItem = $this->beforeSave($objItem);
-			
+			error_log(print_r($objItem,true));
 			$objItem->Save();
-
+			$objItem->Refresh();
 			$this->intEditRowid = null;
 		}
 		
