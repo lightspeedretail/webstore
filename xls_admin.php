@@ -5138,9 +5138,7 @@
 		
 		
 		protected function beforeSave($objItem) {
-			$objGoogleCategory = GoogleCategories::LoadByName($_POST['GoogleCatEdit']);
-			if ($objGoogleCategory) 
-				$objItem->GoogleId = $objGoogleCategory->Rowid;
+			$objItem->GoogleId = $_POST['GoogleCatEdit'];
 
 			return $objItem;
 		}

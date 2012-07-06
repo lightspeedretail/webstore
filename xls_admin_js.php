@@ -206,6 +206,14 @@ switch($_GET['item']) {
 		echo json_encode($arrCats);
 	break;
 	
+	case 'googlesave':
+		$strSelected = $_GET['selected'];
+		$objGoogleCategory = GoogleCategories::LoadByName($strSelected);
+		$arrCats=array();
+		$arrCats[$objGoogleCategory->Rowid] = $objGoogleCategory->Name;
+		echo json_encode($arrCats);
+	break;
+
 	case 'current':
 		$intVal = _xls_number_only($_GET['val']);
 		$objGoogleCategory = GoogleCategories::Load($intVal);

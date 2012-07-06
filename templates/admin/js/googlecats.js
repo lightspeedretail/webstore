@@ -34,7 +34,7 @@ jQuery(function ($) {
 							  choosegoogle.close();
 							  return false;
 							});
-							alert($('#GoogleCatEdit').val());
+
 							if ($('#GoogleCatEdit').val() != '')
 								choosegoogle.setup($('#GoogleCatEdit').val());
 							else if ($('#GoogleCatParentEdit').val() != '')
@@ -108,8 +108,13 @@ jQuery(function ($) {
 					if (q>1) googlestring = googlestring + ' > ' + $el.val();
 						else googlestring = $el.val();		
 			}
-			$('#GoogleCatEdit').val(googlestring);
-			$('#googlecat').html(googlestring.substring(0,15));
+			$.get("xls_admin_js.php?item=googlesave&selected=" + encodeURIComponent(googlestring), function(data){
+					$.each(data, function(key, value) {
+					$('#GoogleCatEdit').val(key);
+					$('#googlecat').html(value.substring(0,15));
+				
+					});
+				}, 'json');
 			
 			$.modal.close();
 			return;
