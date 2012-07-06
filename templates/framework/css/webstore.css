@@ -86,23 +86,26 @@ overflow:hidden;
 width:765px;
 }
 
-#nav li {
-display:inline;
-list-style:none;
-width:100%;
-}
 
 #nav a {
 font-size:12px;
 font-weight:700;
-height:57px;
-overflow:hidden;
-padding:18px 0 12px;
-text-align:center;
-text-decoration:none;
+height: 45px;
+text-shadow: none;
+display: table;
+float: left;
+margin: 0px;
+text-align: center;
 }
 
 .arrow {position: absolute; right: -50px;}
+
+#nav .innertab{
+        display: table-cell;
+        vertical-align: middle;
+}
+#nav a.productmenu { min-width: 105px; width: 105px; max-width: 105px;}
+
 
 #products a {
 display:block;
@@ -179,52 +182,12 @@ left:auto;
 /* Formatting for automated tabs. Note these do NOT refer to 1st, 2nd, 3rd and 4th tabs */
 /* Instead, these are used WHEN there are 4 tabs, or 3 tabs, etc. So #tab4 is used for all */
 /* tabs when four are turned on, since width is proportional to the count() */
-
-#tab1 a {
-display:block;
-float:left;
-height:24px;
-width:226px;
-}
-
-#tab2 a {
-display:block;
-float:left;
-height:24px;
-width:226px;
-}
-
-#tab3 a {
-display:block;
-float:left;
-height:24px;
-width:150px;
-}
-
-#tab4 a {
-display:block;
-float:left;
-height:24px;
-width:112px;
-}
-
-#tab5 a {
-display:block;
-float:left;
-height:24px;
-width:90px;
-}
-
-#tab6 a {
-display:block;
-float:left;
-height:24px;
-width:75px;
-}
-
-#tab1 a.tabvcenter,#tab2 a.tabvcenter,#tab3 a.tabvcenter,#tab4 a.tabvcenter,#tab5 a.tabvcenter,#tab6 a.tabvcenter {
-padding:5px 0;
-}
+#nav a.tab1 { width:182px; }
+#nav a.tab2 { width:182px; }
+#nav a.tab3 { width:142px; }
+#nav a.tab4 { width:112px; }
+#nav a.tab5 { width:90px; }
+#nav a.tab6 { width:75px; }
 
 #searchedge {
 border-left:1px solid #fff;

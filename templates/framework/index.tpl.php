@@ -126,22 +126,15 @@
 		<div id="body">
 		<div id="content" class="rounded-top">
 		
-		<?php $this->menuPnl->Render() ?>
+		<?php $this->menuPnl->Render(); ?>
 		
-		<div id="nav" class="rounded-top">
-			<ul>
-				<li id="products"><a href="index.php"></a></li>
-				<?php
-				//For tabs, how many characters before we have to handle wrap and valign
-				//Qty of tabs, from 1 to 6
-				$arrTabWrap = array(37,37,19,15,14,8);
-				foreach ($this->arrTopTabs as $arrTab) {
-					echo '<li id="tab'.count($this->arrTopTabs).'" ><a ';
-					if (strlen($arrTab->Title)>$arrTabWrap[count($this->arrTopTabs)-1]) echo 'class="tabvcenter"'; 
-					echo ' href="'.$arrTab->Link.'">'.$arrTab->Title.'</a></li>';
-				}
-				?>					
-			</ul><div id="searchentry"><?php $this->searchPnl->Render(); ?></div>				
+    	<div id="nav" class="rounded-top">  	
+			<?php
+			echo '<a class="productmenu" href="'._xls_site_url().'"><span class="innertab">&nbsp;</span></a>'; //will be covered up by products menu
+				foreach ($this->arrTopTabs as $arrTab)
+					echo '<a class="tab'.count($this->arrTopTabs).'" href="'.$arrTab->Link.'"><span class="innertab">'.$arrTab->Title.'</span></a>';
+			?>			
+			<div id="searchentry"><?php $this->searchPnl->Render(); ?></div>				
 		</div>
 
 			<?php $this->crumbTrail->Render(); ?>
