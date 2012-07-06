@@ -103,6 +103,9 @@ background:url(images/title_bg.png) repeat-x;
 color:#111;
 text-shadow:#FFF -1px -1px -2px;
 }
+#listOrder {
+margin: 0px;
+}
 
 #listOrder li {
 background:#d9d9d9;
@@ -115,9 +118,9 @@ width:505px;
 
 #options {
 background:#d9d9d9;
-color:#222;
+color:#222222;
 margin:0 auto;
-text-shadow:#FFF -1px -1px -2px;
+text-shadow:none;
 width:960px;
 }
 
@@ -924,4 +927,42 @@ font-size: 0px;
 line-height: 0px;
 clear: both;
 } 
+
+#mainNav{
+        background-color: #ffffff;
+        display: block;
+        width: 960px;
+        margin:0 auto;
+       
+}
+.mainNavItem{
+		background:url('images/tab_bg.png') repeat-x;
+        color: #ffffff;
+		text-shadow: none;
+        display: table;
+        float: right;
+        font-weight: bold;
+        height: 48px;
+        text-align: center;
+        width: 140px;
+        text-decoration: none;
+        font-size: 14px;
+		font-weight: 700;
+		-webkit-border-radius: 5px 5px 0 0;
+		border:1px solid #888;
+
+}
+.mainNavItem:hover {
+background:url(images/tab_bg_hover.png) repeat-x;
+}
+
+.mainNavItem.active {
+background:url(images/title_bg.png) repeat-x;
+color:#111;
+}
+.innertab{
+        display: table-cell;
+        vertical-align: middle;
+        
+}
 

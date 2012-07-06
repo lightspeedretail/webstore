@@ -77,40 +77,31 @@
 <?php include_once(adminTemplate('pages.tpl.php')); ?>
 
 <?php $this->RenderBegin(); ?>
-
-
-
-		<br /><br />
-			
-		<div id="options" class="accord rounded"> 
-		<div id="tabs">
-			<ul>
-				<?php foreach($this->arrTabs as $type=>$label): ?>
-				<a href="<?= $this->get_uri($type); ?>" >
-					<li class="rounded 
-						<?php if($type == $this->currentTab): ?>
-							active
-						<?php endif; ?> {5px top transparent}" style="display:block; float: left">
-						<?= $label; ?>
-					</li>
-				</a>
-				<?php endforeach; ?>
-			</ul>
+		<div id="mainNav">
+		<?php
+		$this->arrTabs = array_reverse($this->arrTabs);
+		foreach($this->arrTabs as $type=>$label)
+			echo '<a class="mainNavItem'.($type == $this->currentTab ? " active" : "").'" href="'.$this->get_uri($type).'"><span class="innertab">'.$label.'</span></a>';
+		?>
 		</div>
+		<br clear="both">
+		
+<div id="options"  style="width:960px;" >
+	<div class="content">	
 <?php
 
 if(isset($this->HelperRibbon)) 
 	if (strlen($this->HelperRibbon)>0)
 		echo '<div style="padding: 5px;"><img style="padding-right: 5px;width:44px; height:35px;" align="left" src="'.adminTemplate('css/images/questionmark.png').'"> '.$this->HelperRibbon.'</div>';
-
+	
 ?>			
-		<ul id="listOrder"> 
+	<ul id="listOrder"> 
 			<?php  foreach($this->configPnls as $pnlKey=>$panel): ?>
 					<?php $panel->Render(); ?>
 			<?php endforeach; ?>
-		</ul>
-		</div> 
-
+	</ul>
+	</div> 
+</div>
 
 
 
