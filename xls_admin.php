@@ -5529,14 +5529,17 @@
 	* class to create the credit card types tab under payment methods
 	* see class xlsws_admin_generic_edit_form for further specs
 	*/				
-	class xlsws_admin_dbincomplete extends xlsws_admin_dbpendingorders {
-	
-		protected function Form_Create() {
-			
-			parent::Form_Create();
-			
+	class xlsws_admin_dbincomplete extends xlsws_admin_generic_edit_form {
+		
+		protected $default_sort_index = 0;
+		protected $default_sort_direction = 1;
+		protected $hideID = true;
+		
+		protected function Form_Create(){
+		
 			$this->arrTabs = $GLOBALS['arrDbAdminTabs'];
 			$this->currentTab = 'incomplete';
+			
 			
 			$this->appName = _sp("Incomplete Orders");
 			$this->default_items_per_page = 10;
@@ -5544,15 +5547,108 @@
 			$this->blankObj = new Cart();
 			$this->qqn = QQN::Cart();
 			$this->qqcondition = QQ::Equal(QQN::Cart()->Type, 7);
-			$this->edit_override=true;
+			$this->qqcondition = 
+				QQ::AndCondition(
+				QQ::Equal(QQN::Cart()->Type, 7),
+				QQ::Equal(QQN::Cart()->Downloaded, 0));
+			$this->edit_override=true;			
 			
 			$this->HelperRibbon = "This screen lists orders that have been Submitted but payment was not completed. This is normally a result of declined credit cards.";
+		
+			$this->arrFields = array();
+
+			
+			$this->arrFields['IdStr'] = array('Name' => 'WO');
+			$this->arrFields['IdStr']['Field'] = new XLSTextBox($this);
+			$this->arrFields['IdStr']['Width'] = 70;	
+			
+			$this->arrFields['Contact'] = array('Name' => 'Customer');
+			$this->arrFields['Contact']['Field'] = new QLabel($this);
+			$this->arrFields['Contact']['Width'] = 70;	
+			
+			$this->arrFields['Email'] = array('Name' => 'Email');
+			$this->arrFields['Email']['Field'] = new QLabel($this);
+			$this->arrFields['Email']['Width'] = 80;	
+			
+			$this->arrFields['Count'] = array('Name' => 'Items');
+			$this->arrFields['Count']['Field'] = new QLabel($this);
+			$this->arrFields['Count']['Width'] = 50;	
+			
+			
+			$this->arrFields['Total'] = array('Name' => 'Total');
+			$this->arrFields['Total']['Field'] = new QLabel($this);
+			$this->arrFields['Total']['Width'] = 40;	
+			$this->arrFields['Total']['DisplayFunc'] = "RenderMoney";
+
+		
+			$this->arrFields['PaymentModule'] = array('Name' => 'Payment Method');
+			$this->arrFields['PaymentModule']['Field'] = new XLSListBox($this);
+			$this->arrFields['PaymentModule']['Width'] = 120;	
+			
+			$allModules = Modules::QueryArray(QQ::Equal(QQN::Modules()->Type, 'payment' ), 
+				QQ::Clause(QQ::OrderBy(QQN::Modules()->File)));				
+			foreach($allModules as $code) {			
+					$values = $code->GetConfigValues();
+					$this->arrFields['PaymentModule']['Field']->AddItem( $values['label'],$code->File );
+			}		
+			$this->arrFields['PaymentModule']['DisplayFunc'] = "RenderPaymentModule";
+
+			$this->arrFields['PaymentData'] = array('Name' => 'Last Activity');
+			$this->arrFields['PaymentData']['Field'] = new QLabel($this);
+			$this->arrFields['PaymentData']['Width'] = 140;	
 
 
-			}
-	
+			parent::Form_Create();
+			
+			
+		}
+		protected function RenderMoney($val) {
+			return _xls_currency($val);
+		}
+		
+		protected function RenderTax($val) {
+			
+			if($val=== '')  return ' ';
+			
+			$tax = TaxCode::Load($val);
+			if(!$tax) return '';
+						
+			return $tax->Code;			
+		}	
+		
+		protected function RenderShippingModule($val) {
+			
+			$code = Modules::LoadByFileType($val , 'shipping');
+			if (!$code) return "NOT FOUND";
+			
+			$values = $code->GetConfigValues();
+			return $values['label'];
+
+		}
+		protected function RenderPaymentModule($val) {
+			
+			$code = Modules::LoadByFileType($val , 'payment');
+			if (!$code) return "NOT FOUND";
+			
+			$values = $code->GetConfigValues();
+			return $values['label'];
+
+		}
+		
+		protected function RenderCheck($intType) {
+            if ($intType==1) return "✓";
+            else return "Pending";
+		}
+		
+		public function CanDelete() {
+			return false;
+		}
+		
+		public function canNew(){
+			return false;
+		}
+		
 	}
-	
 	
 	
 			
