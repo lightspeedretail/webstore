@@ -451,6 +451,7 @@ class xlsws_db_maintenance extends xlsws_index {
 				"ALTER TABLE xlsws_family ADD COLUMN `request_url` varchar (255) AFTER `family`"))
 			Family::ConvertSEO();
 			$this->add_index('xlsws_family','request_url');
+			$this->add_index('xlsws_product','image_id');
 
 			
 			$this->add_config_key('SHOW_TEMPLATE_CODE' , 

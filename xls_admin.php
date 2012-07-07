@@ -5084,7 +5084,7 @@
 			$this->arrFields['Parent']['Field'] = new QLabel($this);
 			$this->arrFields['Parent']['DisplayFunc'] = "RenderParent";
 			$this->arrFields['Parent']['UTF8'] = true;
-			$this->arrFields['Parent']['Width'] = 180;	
+			$this->arrFields['Parent']['Width'] = 80;	
 
 
 			$this->arrFields['MetaDescription'] = array('Name' => 'Meta Description');
@@ -5100,6 +5100,15 @@
 			$this->arrFields['MetaKeywords']['DisplayFunc'] = "RenderMeta";
 			$this->arrFields['MetaKeywords']['Width'] = 120;
 			*/
+			
+			if (_xls_get_conf('ENABLE_CATEGORY_IMAGE',0)) {
+				$this->arrFields['ImageId'] = array('Name' => 'Use image from<br>Product Code');
+				$this->arrFields['ImageId']['Field'] = new XLSTextBox($this,'ImageId');
+				$this->arrFields['ImageId']['UTF8'] = true;
+				$this->arrFields['ImageId']['DisplayFunc'] = "RenderImage";
+				$this->arrFields['ImageId']['Width'] = 90;	
+				$this->arrFields['ImageId']['MaxLength'] = 100;			
+			}
 						
 			$this->arrFields['CustomPage'] = array('Name' => 'Custom Page Text');
 			$this->arrFields['CustomPage']['Field'] = new XLSListBox($this);		
@@ -5123,10 +5132,10 @@
 			$this->arrExtraFields['GoogleId']['Field'] = new XLSTextBox($this);
 			$this->arrExtraFields['GoogleId']['UTF8'] = true;
 			$this->arrExtraFields['GoogleId']['DisplayFunc'] = "GoogleId_Render";
-			$this->arrExtraFields['GoogleId']['Width'] = 2;
+			$this->arrExtraFields['GoogleId']['Width'] = 50;
 			
 
-			$this->HelperRibbon = "Only Top Tier categories are required to be filled out with Meta Description information. Lower tiers will automatically pull from their parent if left blank. Meta Keywords are no longer used by search engines and have been removed.";
+			$this->HelperRibbon = "Only Primary categories are <b>required</b> to be filled out with Meta Description information. Lower tiers will automatically pull from their parent if left blank. Meta Keywords are no longer used by search engines and have been removed.";
 			
 			$this->usejQuery = 'googlecats';
 			
@@ -5140,6 +5149,16 @@
 		protected function beforeSave($objItem) {
 			$objItem->GoogleId = $_POST['GoogleCatEdit'];
 
+			if (!empty($_POST['ImageId'])) {
+				$objProduct = Product::LoadByCode($_POST['ImageId']);
+				if ($objProduct)
+					$objItem->ImageId=$objProduct->ImageId;
+				else
+					$objItem->ImageId=null;
+			}
+			else
+				$objItem->ImageId=null;
+			
 			return $objItem;
 		}
 		
@@ -5187,9 +5206,9 @@
 		public function RenderState($val){
 			return $val;
 		}		
-		
+
 		public function RenderParent($val){
-			if ($val==0) return "<b>Top Tier</b>"; else return "";
+			if ($val==0) return "<b>Primary</b>"; else return "";
 		}
 		
 		public function RenderPath($val){
@@ -5197,7 +5216,11 @@
 		}
 		
 		public function RenderImage($val){
-			if ($val>0) return "<b>Set</b>"; else return;
+			if ($val>1) {
+				$objProduct = Product::LoadByImageId($val);
+				 return $objProduct->Code; 
+				}
+				else return "";
 		}
 		public function canNew(){
 			return false;
