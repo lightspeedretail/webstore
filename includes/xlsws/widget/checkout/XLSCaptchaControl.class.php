@@ -2,7 +2,7 @@
 
 class XLSCaptchaControl extends XLSCompositeControl {
     protected $arrRegisteredChildren = array(
-         'Input','Code'
+         'Wait','Input','Code'
     );
 
     protected $strLabelForInput = 'Enter the text from the above image.';
@@ -179,6 +179,24 @@ class XLSCaptchaControl extends XLSCompositeControl {
         }
     }
 
+	 
+	protected function BuildWaitControl() {
+	    $objControl = new QWaitIcon($this, $this->GetChildName('Wait'));
+
+        $this->UpdateWaitControl();
+        $this->BindWaitControl();
+
+        return $objControl;
+    }
+
+    protected function UpdateWaitControl() {
+        return $this->GetChildByName('Wait');
+    }
+
+    protected function BindWaitControl() {
+        return $this->GetChildByName('Wait');
+    }
+    
     public function __get($strName) {
         switch ($strName) {
             case 'CodeControl': return $this->objCodeControl;

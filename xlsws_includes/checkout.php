@@ -107,19 +107,19 @@ class xlsws_checkout extends xlsws_index {
 		$this->errSpan->CssClass='customer_reg_err_msg';
 
 		// Wait
-		$this->pnlWait = new QPanel($this->mainPnl);
+		$this->pnlWait = new QPanel($this->mainPnl,'pnlWait');
 		$this->pnlWait->Visible = false;
 		$this->pnlWait->AutoRenderChildren = true;
 
-		$this->lblWait = new QLabel($this->pnlWait);
+		$this->lblWait = new QLabel($this->pnlWait,'lblWait');
 		$this->lblWait->Text = _sp("Please wait while we process your order");
 		$this->lblWait->CssClass = "checkout_process_label";
 
-		$this->icoWait = new QWaitIcon($this->pnlWait);
+		$this->icoWait = new QWaitIcon($this->pnlWait,'icoWait');
 		
 		
 		//$this->pnlWait = new QWaitIcon($this,'Icon1');
-		$this->objDefaultWaitIcon = $this->ShippingControl->Wait;
+		//$this->objDefaultWaitIcon = $this->CaptchaControl->SubmitWait;
 		
 		_xls_add_formatted_page_title('Checkout');
 		
@@ -656,7 +656,7 @@ class xlsws_checkout extends xlsws_index {
 
     protected function BindSubmitControl() {
         $objControl = $this->SubmitControl;
-
+		
         if (!$objControl)
             return;
             
@@ -665,7 +665,8 @@ class xlsws_checkout extends xlsws_index {
             new QClickEvent(),
             array(
             	new QToggleEnableAction($objControl, false),
-                new QAjaxAction('ToggleCheckoutControls',false),
+            	new QJavaScriptAction("this.value='"._sp('Please Wait')."'"),
+                new QAjaxControlAction('ToggleCheckoutControls',false,$this->CaptchaControl->Wait),
                 new QServerAction('DoSubmitControlClick')
             )
         );

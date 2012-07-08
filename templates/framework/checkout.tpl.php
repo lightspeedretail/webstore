@@ -51,7 +51,7 @@
 <?php endif; ?>
 
 <?php $this->pnlShipping->Render(); ?>
-<?php $this->pnlWait->Render('CssClass=center'); ?>
+
 <br style="clear: both;"/>
 
 <?php $this->pnlCart->Render(); ?>
