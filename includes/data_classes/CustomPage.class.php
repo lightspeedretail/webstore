@@ -62,7 +62,12 @@ class CustomPage extends CustomPageGen {
 			);
 	}
 
-
+	public static function LoadByKey($strName) {
+		return CustomPage::QuerySingle(
+			QQ::Equal(QQN::CustomPage()->Key, $strName)
+			);
+	}
+	
 	public static function GetLinkByKey($strKey) {
 	
 		$cpage = CustomPage::LoadByKey($strKey);

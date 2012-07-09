@@ -151,13 +151,20 @@ class XLSURL {
 				$this->intStatus=200;
 				break;
 			
-			default:
-				//Because we allow custom pages and categories to both be keyless (without /dp etc)
-				//Check to see if it's a category first, and if not, custom page
+			default:			
 				$this->strRouteId = $this->arrUrlSegments[0];
-				if (empty($this->strRouteId))
-					$this->strRouteController = "category";
+				if (empty($this->strRouteId)) {
+					$objCp = CustomPage::LoadByKey('index');
+					if ($objCp) {
+						$this->strRouteId=$objCp->RequestUrl;
+						$this->strRouteController = "custom_page";
+					}
+					else $this->strRouteController = "category";
+					
+				}
 				else {
+					//Because we allow custom pages and categories to both be keyless (without /dp etc)
+					//Check to see if it's a category first, and if not, custom page
 					$objCat = Category::LoadByRequestUrl($this->strRouteId);
 					if ($objCat) 
 						$this->strRouteController = "category";
@@ -187,7 +194,7 @@ class XLSURL {
 			$strRemaining = strstr($strRemaining,'?');	
 			$strRemaining = str_replace("?&","?",$strRemaining);
 			if ($strRemaining=="?") $strRemaining='';	
-			$this->strRedirectUrl = str_replace("_","-",basename($_GET['xlspg']))."/".XLSURL::KEY_PAGE."/".$strRemaining;
+			$this->strRedirectUrl = str_replace("_","-",basename($_GET['xlspg']))."/".XLSURL::KEY_PAGE.$strRemaining;
 			$this->strRedirectUrl = _xls_site_url($this->strRedirectUrl);
 			$this->intStatus=301;
 			return true;
@@ -201,7 +208,7 @@ class XLSURL {
 			$strRemaining = strstr($strRemaining,'?');	
 			$strRemaining = str_replace("?&","&",$strRemaining);
 			if ($strRemaining=="?") $strRemaining='';	
-			$this->strRedirectUrl = "searchresults/".XLSURL::KEY_CUSTOMPAGE."/?q=".basename($_GET['search']).$strRemaining;
+			$this->strRedirectUrl = "searchresults/".XLSURL::KEY_CUSTOMPAGE."?q=".basename($_GET['search']).$strRemaining;
 			$this->strRedirectUrl = _xls_site_url($this->strRedirectUrl);
 			$this->intStatus=301;
 			return true;

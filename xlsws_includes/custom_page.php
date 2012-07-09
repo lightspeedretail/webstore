@@ -53,14 +53,20 @@ class xlsws_custom_page extends xlsws_index {
 			return;
 		}
 
-		$this->crumbs[] = array( 'key' => $objPage->Rowid , 'tag' => 'cp' , 'name' => $objPage->Title , 'link' => $objPage->Link);
 
 		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->content = $objPage->Page;
 
 		_xls_stack_put('xls_canonical_url',$objPage->CanonicalUrl);
-		_xls_add_meta_desc($objPage->MetaDescription);
-		_xls_add_page_title($objPage->PageTitle);
+		if (!empty($objPage->MetaDescription))
+			_xls_add_meta_desc($objPage->MetaDescription);		
+		
+		//If we are not using an index override
+		if ($objPage->Key != "index") {
+			_xls_add_page_title($objPage->PageTitle);
+			$this->crumbs[] = array( 'key' => $objPage->Rowid , 'tag' => 'cp' , 'name' => $objPage->Title , 'link' => $objPage->Link);
+			
+		}
 		_xls_remember_url($objUrl->Url);
 
 		$this->productTag = $objPage->ProductTag;
