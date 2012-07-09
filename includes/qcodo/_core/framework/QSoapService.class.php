@@ -416,7 +416,7 @@
 		}
 
 		public function GetWsdlTypes($strComplexTypesArray) {
-			$strToReturn = sprintf('<types><schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="%s">',
+			$strToReturn = sprintf('<types><schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" targetNamespace="%s">',
 				$this->strNamespace);
 			$strToReturn .= '<import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>';
 		
