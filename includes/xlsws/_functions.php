@@ -810,12 +810,8 @@ function _xls_site_dir($ssl_attempt = true) {
 */
 function _xls_site_url($strUrlPath =  '') {
 	if (substr($strUrlPath,0,4)=="http") return $strUrlPath; //we've passed through twice, don't double up
-	$blnSeo = _xls_get_conf('ENABLE_SEO_URL', false);
-	if (stristr($strUrlPath,'xls_admin.php')) $blnSeo=true; //this is an admin panel link that doesn't get run through index.php
-	if (stristr($strUrlPath,'xls_jumper.php')) $blnSeo=true; //this is a payment jumper that doesn't get run through index.php
-	if (substr($strUrlPath,0,strlen(__PHOTOS__))==__PHOTOS__) $blnSeo=true; //this is a photo link that doesn't get run through index.php
 	if (substr($strUrlPath,0,1)=="/") $strUrlPath = substr($strUrlPath,1,999); //remove a leading / so we don't // by accident
-	return _xls_site_dir() . '/' . ($blnSeo ? "" : "index.php/").$strUrlPath;
+	return _xls_site_dir() . '/' . $strUrlPath;
 }
 
 //Makes our SEO hypenated string from passed string

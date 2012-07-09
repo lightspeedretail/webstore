@@ -736,12 +736,6 @@
 		protected function beforeSave($key,$field){
 		
 			switch ($key) {
-				case 'ENABLE_SEO_URL':
-					if ($field->Checked)
-					if (!file_exists(__DOCROOT__ .  __SUBDIRECTORY__ . '/.htaccess')) {
-						_qalert("'Remove index.php from SEO-Friendly URLs' requires the file .htaccess in your Web Store root before turning this option on. There is a file named htaccess (without the period) already in that folder. Rename this file with a period to activate it, then turn this option on. Please see documentation for additional help.");
-					return false;
-				}
 			
 				case 'FEATURED_KEYWORD':
 					//If we've changed our featured keyword, reset the db flagging here
