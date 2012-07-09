@@ -60,7 +60,7 @@ class xlsws_cart extends xlsws_index {
 		if(isset($XLSWS_VARS['getcart'])) {
 			try {
 				Cart::LoadCartByLink($XLSWS_VARS['getcart']);
-				_rd(_xls_site_url("cart/pg/"));
+				_rd(_xls_site_url("cart/pg"));
 			} catch (Exception $objExc) {
 				_xls_display_msg($objExc->getMessage());
 			}
@@ -76,7 +76,7 @@ class xlsws_cart extends xlsws_index {
 		$this->mainPnl->Template = templateNamed('cart.tpl.php');
 		$this->mainPnl->AutoRenderChildren = false;
 
-		$this->crumbs[] = array('link'=>'cart/pg/',
+		$this->crumbs[] = array('link'=>'cart/pg',
 			'case'=> '',
 			'name'=> _sp('Edit Cart'));
 
@@ -206,7 +206,7 @@ class xlsws_cart extends xlsws_index {
 	protected function check_out_customer_register($strFormId, $strControlId, $strParameter){
 		$customer = Customer::GetCurrent();
 
-		_rd("checkout/pg/");
+		_rd("checkout/pg");
 
 		return;
 

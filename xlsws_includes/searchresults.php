@@ -308,7 +308,7 @@ class xlsws_searchresult extends xlsws_product_listing {
 		$strCriteria = $objUrl->RouteId;
 		
         $this->crumbs[] = array(
-            'link'=>$objUrl->RouteId . "/".XLSURL::KEY_PAGE."/?q=".$objUrl->ProductSearch,
+            'link'=>$objUrl->RouteId . "/".XLSURL::KEY_PAGE."?q=".$objUrl->ProductSearch,
             'case'=> '',
             'name'=>_sp('Search Results')
         );

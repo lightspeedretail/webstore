@@ -29,7 +29,7 @@
 
 
 <div class="registry_row">
-		<p class="title"><a href="<? echo _xls_site_url("/gift-search-detail/pg/"); ?>?gift_code=<?= $_ITEM->GiftCode ?>" alt="<?php _xt('View') ?>"><?= $_ITEM->RegistryName ?></a></p>
+		<p class="title"><a href="<? echo _xls_site_url("/gift-search-detail/pg"); ?>?gift_code=<?= $_ITEM->GiftCode ?>" alt="<?php _xt('View') ?>"><?= $_ITEM->RegistryName ?></a></p>
 		<div class="right">
 			<p class="expiry"><?= $_ITEM->Customer->Mainname ?></p>
 			<p class="expiry"><?= $_ITEM->EventDate ?></p>

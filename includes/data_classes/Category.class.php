@@ -143,7 +143,7 @@ class Category extends CategoryGen {
 	}
 
 	protected function GetLink() {
-		return _xls_site_url($this->strRequestUrl."/c/");
+		return _xls_site_url($this->strRequestUrl);
 	}
 
 
@@ -473,7 +473,7 @@ EOS;
 				return $this->GetSlug();
 				
 			case 'CanonicalUrl':
-				return _xls_site_dir().'/'.$this->RequestUrl."/c/";
+				return _xls_site_dir().'/'.$this->RequestUrl;
 
 			case 'HasChildren':
 				return $this->HasChildren();

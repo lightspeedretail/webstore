@@ -21,7 +21,7 @@
 /**
  * Framework template View Order details 
  * Calls each element that makes up the detail display
- * called from order-track/pg/
+ * called from order-track/pg
  *
  */
 

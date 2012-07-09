@@ -21,7 +21,7 @@
 /**
  * Deluxe template: View order header details (id, date, status, notes) 
  * calls other views
- * Called from /order-track/pg/?getuid=xxxxxxxxxx
+ * Called from /order-track/pg?getuid=xxxxxxxxxx
  *
  */
 

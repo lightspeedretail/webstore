@@ -142,7 +142,7 @@ class xlsws_track_sro extends xlsws_index {
 		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('sro_track.tpl.php');
 
-		$this->crumbs[] = array('link'=>'sro-track/pg/' , 'case'=> '' , 'name'=> _sp('My Repairs'));
+		$this->crumbs[] = array('link'=>'sro-track/pg' , 'case'=> '' , 'name'=> _sp('My Repairs'));
 
 		$this->errSpan = new QLabel($this->mainPnl);
 		$this->errSpan->CssClass='modal_reg_err_msg';
@@ -257,7 +257,7 @@ class xlsws_track_sro extends xlsws_index {
 
 		$this->butBack = new QButton($this->sroViewPartsPnl);
 		$this->butBack->Text = _sp("Back");
-		$this->butBack->AddAction(new QClickEvent() , new QJavaScriptAction("document.location.href='"._xls_site_url("sro-track/pg/")."'"));
+		$this->butBack->AddAction(new QClickEvent() , new QJavaScriptAction("document.location.href='"._xls_site_url("sro-track/pg")."'"));
 
 		$this->lblSubTotal = new QLabel($this->dtgPart , "subtotal");
 		$this->lblSubTotal->Text ='';

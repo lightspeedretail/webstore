@@ -91,7 +91,7 @@ class sidebar_order_lookup_qp extends QPanel {
 				);
 	
 				if($objOrder)
-					_rd(_xls_site_url('order-track/pg/') . "?getuid=".$objOrder->Linkid);
+					_rd(_xls_site_url('order-track/pg') . "?getuid=".$objOrder->Linkid);
 				break;
 				
 			case 'S':
@@ -106,7 +106,7 @@ class sidebar_order_lookup_qp extends QPanel {
 				);
 		
 				if($sro)
-					_rd(_xls_site_url('sro-track/pg/') . "?dosearch=true&orderid=" . $this->txtSKOrderId->Text . "&emailphone=" . $this->txtEmailPhone->Text);
+					_rd(_xls_site_url('sro-track/pg') . "?dosearch=true&orderid=" . $this->txtSKOrderId->Text . "&emailphone=" . $this->txtEmailPhone->Text);
 				break;
 				
 				

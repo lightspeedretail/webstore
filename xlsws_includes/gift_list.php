@@ -55,7 +55,7 @@ class xlsws_glist extends xlsws_index {
 		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('gift_list.tpl.php');
 
-		$this->crumbs[] = array('link'=>'gift-list/pg/' , 'case'=> '' , 'name'=> _sp('Gift List'));
+		$this->crumbs[] = array('link'=>'gift-list/pg' , 'case'=> '' , 'name'=> _sp('Gift List'));
 
 		$this->txtGListPassword = new QTextBox($this);
 		$this->txtGListPassword->TextMode =QTextMode::Password;

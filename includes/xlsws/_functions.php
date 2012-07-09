@@ -466,7 +466,7 @@ function _xls_stack_removeall() {
 function _xls_display_msg($msg) {
 	_xls_stack_add('msg', _sp($msg));
 
-	_rd(_xls_site_url('msg/'.XLSURL::KEY_PAGE.'/'));
+	_rd(_xls_site_url('msg/'.XLSURL::KEY_PAGE));
 }
 
 /**

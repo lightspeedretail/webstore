@@ -91,7 +91,7 @@ class xlsws_track_order extends xlsws_index {
 		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('order_track.tpl.php');
 
-		$this->crumbs[] = array('link'=>'myaccount/pg/' , 'case'=> '' , 'name'=> _sp('My Orders'));
+		$this->crumbs[] = array('link'=>'myaccount/pg' , 'case'=> '' , 'name'=> _sp('My Orders'));
 
 		$this->errSpan = new QLabel($this->mainPnl);
 		$this->errSpan->CssClass='modal_reg_err_msg';

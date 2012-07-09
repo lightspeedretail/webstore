@@ -20,7 +20,7 @@
 
 /**
  * Basic template: Order Track individual item details 
- * only comes up directly with order-track/pg/
+ * only comes up directly with order-track/pg
  * when logged in
  *
  */
@@ -30,7 +30,7 @@
     <b>ID #</b><?php _xt($_ITEM->IdStr); ?><br/>
     Date: <b><?php _xt($_ITEM->DatetimePosted); ?></b><br/>
     Status: <span class="<?= $this->order_status_css($_ITEM->Status); ?>"><?php _xt($_ITEM->Status); ?></span><br/>
-    <a href="order_track/pg/?getuid=<?php _xt($_ITEM->Linkid); ?>"><?php _xt("View"); ?></a>
+    <a href="order_track/pg?getuid=<?php _xt($_ITEM->Linkid); ?>"><?php _xt("View"); ?></a>
 </div>
 
 <?php

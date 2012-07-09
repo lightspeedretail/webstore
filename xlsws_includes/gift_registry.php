@@ -258,7 +258,7 @@ class xlsws_gregistry extends xlsws_index {
 	 */
 	protected function bind_widgets() {
 		$this->btnGRSave->AddAction(new QClickEvent(),new QServerAction('btnGRSave_Click'));
-		$this->btnGRCancel->AddAction(new QClickEvent(),new QJavaScriptAction("document.location.href='"._xls_site_url("gift-registry/pg/")."'"));
+		$this->btnGRCancel->AddAction(new QClickEvent(),new QJavaScriptAction("document.location.href='"._xls_site_url("gift-registry/pg")."'"));
 		$this->pxyGREdit->AddAction(new QClickEvent(),new QServerAction('btnGRForm_Click'));
 		$this->pxyGREdit->AddAction(new QClickEvent(),new QJavaScriptAction('return false;'));
 		$this->pxyGiftItemDelete->AddAction(new QClickEvent(),new QServerAction('btnGiftItemDelete_Click'));
@@ -288,7 +288,7 @@ class xlsws_gregistry extends xlsws_index {
 		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('gift_detail.tpl.php');
 
-		$this->crumbs[] = array('link'=>'gift-registry/pg/' , 'case'=> '' , 'name'=> _sp('My Wish Lists'));
+		$this->crumbs[] = array('link'=>'gift-registry/pg' , 'case'=> '' , 'name'=> _sp('My Wish Lists'));
 
 		if(!$this->isLoggedIn())
 			_xls_require_login("Sorry, you have to be logged in to use the Wish List.");
@@ -897,7 +897,7 @@ class xlsws_gregistry extends xlsws_index {
 		foreach($objItemArray as $objItem)
 			$objItem->Delete();
 
-		_rd(_xls_site_url("gift-registry/pg/"));
+		_rd(_xls_site_url("gift-registry/pg"));
 	}
 
 	/**

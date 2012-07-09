@@ -49,7 +49,7 @@ class xlsws_gsearch extends xlsws_index {
 		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('gift_search.tpl.php');
 
-		$this->crumbs[] = array('key'=>'gift-search/pg/' , 'case'=> '' , 'name'=> _sp('Wish Lists'));
+		$this->crumbs[] = array('key'=>'gift-search/pg' , 'case'=> '' , 'name'=> _sp('Wish Lists'));
 
 		$this->txtEmail = new XLSTextBox($this->mainPnl , 'gemail');
 		$this->txtEmail->AddAction(new QEnterKeyEvent() , new QServerAction('dosearch'));

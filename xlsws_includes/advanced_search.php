@@ -53,7 +53,7 @@ class xlsws_advanced_search extends xlsws_index {
 		$this->mainPnl->Template = templateNamed('search_advanced.tpl.php');
 
 		$this->crumbs[] = array(
-			'link'=>'advanced-search/pg/',
+			'link'=>'advanced-search/pg',
 			'case'=> '',
 			'name'=> _sp("Advanced Search")
 		);
@@ -101,7 +101,7 @@ class xlsws_advanced_search extends xlsws_index {
 		$cat_arr = explode(".",$_GET['c']);
 		$cat = array_pop($cat_arr);
 		_rd(_xls_site_url(
-			"searchresults/".XLSURL::KEY_PAGE."/?advsearch=true&q=" . urlencode($this->txtSearch->Text) .
+			"searchresults/".XLSURL::KEY_PAGE."?advsearch=true&q=" . urlencode($this->txtSearch->Text) .
 			"&startprice=" . $this->txtStartPrice->Text .
 			"&endprice=" . $this->txtEndPrice->Text .
 			"&filter=" . $this->lstFilters->SelectedValue .

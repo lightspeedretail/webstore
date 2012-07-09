@@ -20,7 +20,7 @@
 
 /**
  * Framework template SRO Track individual item details 
- * only comes up directly with sro-track/pg/
+ * only comes up directly with sro-track/pg
  * when logged in
  *
  */

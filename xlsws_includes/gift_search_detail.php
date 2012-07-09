@@ -29,7 +29,7 @@ global $XLSWS_VARS;
 require(__QCODO__.'/qform/QJsCalendar.class.php');
 
 if(!isset($XLSWS_VARS['gift_code']) && !isset($XLSWS_VARS['gift_token'])) {
-	header("location: "._xls_site_url("gift-search/pg/"));
+	header("location: "._xls_site_url("gift-search/pg"));
 	exit;
 }
 
@@ -63,7 +63,7 @@ class xlsws_glist extends xlsws_index {
 		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('gift_search_detail.tpl.php');
 
-		$this->crumbs[] = array('link'=>'gift-search/pg/' , 'case'=> '' , 'name'=> _sp('Wish List'));
+		$this->crumbs[] = array('link'=>'gift-search/pg' , 'case'=> '' , 'name'=> _sp('Wish List'));
 
 		$this->txtGListPassword = new XLSTextBox($this);
 		$this->txtGListPassword->TextMode =QTextMode::Password;
@@ -92,7 +92,7 @@ class xlsws_glist extends xlsws_index {
 		if(_xls_stack_get('GIFT_REGISTRY_AUTHED') == $this->objGiftDetail->Rowid)
 			$this->logTrack =1;
 
-		$this->crumbs[] = array('link'=>'gift-search-detail/pg/?gift_code='.$XLSWS_VARS['gift_code'] , 'case'=> '' , 'name'=> $this->objGiftDetail->RegistryName);
+		$this->crumbs[] = array('link'=>'gift-search-detail/pg?gift_code='.$XLSWS_VARS['gift_code'] , 'case'=> '' , 'name'=> $this->objGiftDetail->RegistryName);
 
 		$this->dtrGiftList = new QDataRepeater($this);
 		$this->dtrGiftList->Template = templateNamed('gift_search_detail_item.tpl.php');

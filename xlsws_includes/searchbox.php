@@ -42,7 +42,7 @@ $this->txtSearchBox->CssClass="searchTextBox";
 
 $this->misc_components['search_img'] = new QImageButton($this->searchPnl);
 $this->misc_components['search_img']->ImageUrl = templateNamed("css/images/search_go.png");
-$this->misc_components['search_img']->AddAction(new QClickEvent(), new QJavaScriptAction("document.location.href=searchresults/pg/?q='+ $('#xlsSearch').val();"));
+$this->misc_components['search_img']->AddAction(new QClickEvent(), new QJavaScriptAction("document.location.href=searchresults/pg?q='+ $('#xlsSearch').val();"));
 $this->misc_components['search_img']->CssClass= 'searchButton';
 $this->misc_components['search_img']->SetCustomStyle('float','left');
 
@@ -50,5 +50,5 @@ $strCat = preg_replace('/[^0-9\.]/', '', $_GET['c']);
 $this->misc_components['advanced_search'] = new QImageButton($this->searchPnl, 'xlsAdvancedSearch');
 $this->misc_components['advanced_search']->ImageUrl = templateNamed("css/images/adv_search.png");
 $this->misc_components['advanced_search']->CssClass= 'searchButton';
-$this->misc_components['advanced_search']->AddAction(new QClickEvent(), new QJavaScriptAction("document.location.href='advanced_search/pg/?c=".$strCat."'"));
+$this->misc_components['advanced_search']->AddAction(new QClickEvent(), new QJavaScriptAction("document.location.href='advanced_search/pg?c=".$strCat."'"));
 $this->misc_components['advanced_search']->SetCustomStyle('float','left');

@@ -54,7 +54,7 @@ class xlsws_myaccount extends xlsws_index {
 		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('myaccount.tpl.php');
 
-		$this->crumbs[] = array('link'=>'myaccount/pg/' , 'case'=> '' , 'name'=> _sp('My account'));
+		$this->crumbs[] = array('link'=>'myaccount/pg' , 'case'=> '' , 'name'=> _sp('My account'));
 
 		$this->get_orders();
 		$this->get_repairs();

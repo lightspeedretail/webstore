@@ -90,10 +90,10 @@ class xlsws_checkout extends xlsws_index {
 		$this->mainPnl->Template = templateNamed('checkout.tpl.php');
         //$this->objDefaultWaitIcon = new QWaitIcon($this,'WaitIcon');
 
-		$this->crumbs[] = array('link'=>'cart/pg/' , 'case'=> '' , 'name'=> _sp('Edit Cart'));
+		$this->crumbs[] = array('link'=>'cart/pg' , 'case'=> '' , 'name'=> _sp('Edit Cart'));
 	
         $this->crumbs[] = array(
-            'link' => 'checkout/pg/',
+            'link' => 'checkout/pg',
             'case' => '',
             'name' => _sp('Check Out')
         );
@@ -603,7 +603,7 @@ class xlsws_checkout extends xlsws_index {
     }
 
     public function DoLoginControlClick($strFormId, $strControlId, $strParam) {
-        _xls_stack_add('login_redirect_uri', _xls_site_url('checkout/pg/'));
+        _xls_stack_add('login_redirect_uri', _xls_site_url('checkout/pg'));
        
         $this->dxLogin->doShow();
     }
@@ -635,8 +635,8 @@ class xlsws_checkout extends xlsws_index {
     }
 
     public function DoRegisterControlClick($strFormId, $strControlId, $strParam) {
-        _xls_stack_add('register_redirect_uri' , "checkout/pg/");
-        _rd("customer-register/pg/");
+        _xls_stack_add('register_redirect_uri' , "checkout/pg");
+        _rd("customer-register/pg");
     }
 
     protected function BuildSubmitControl() {
@@ -1226,7 +1226,7 @@ class xlsws_checkout extends xlsws_index {
             if (_xls_get_conf('ALLOW_GUEST_CHECKOUT', 1) != 1)
                 _xls_display_msg(
                     _sp('You have to login to check out'),
-                    'checkout/pg/'
+                    'checkout/pg'
                 );
 
 		if ($_SESSION['customer']->Country1=='')

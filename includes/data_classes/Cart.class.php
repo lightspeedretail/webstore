@@ -834,8 +834,8 @@ class Cart extends CartGen {
 		//$strUrl = _xls_site_dir();
 		//$strUrl .= (_xls_get_conf('ENABLE_SEO_URL', false) ? "" : "/index.php");
 		
-		if ($blnTracking) $strUrl =  'order-track/'.XLSURL::KEY_PAGE.'/?getuid=';
-		else $strUrl = 'cart/'.XLSURL::KEY_PAGE.'/?getcart=';
+		if ($blnTracking) $strUrl =  'order-track/'.XLSURL::KEY_PAGE.'?getuid=';
+		else $strUrl = 'cart/'.XLSURL::KEY_PAGE.'?getcart=';
 
 		$strUrl .= $this->Linkid;
 		return _xls_site_url($strUrl);
