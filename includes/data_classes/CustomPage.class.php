@@ -47,6 +47,11 @@ class CustomPage extends CustomPageGen {
 			$strUrl = 'contact_us/'.XLSURL::KEY_PAGE;
 		else $strUrl = $this->strRequestUrl;
 		
+		$objCatTest = Category::LoadByRequestUrl($strUrl);
+		if ($objCatTest)
+			$strUrl .= "/".XLSURL::KEY_CUSTOMPAGE; //avoid conflicting Custom Page and Product URL
+
+
 		return _xls_site_url($strUrl);
 		
 	}

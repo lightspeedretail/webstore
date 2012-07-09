@@ -153,13 +153,17 @@ class XLSURL {
 			
 			default:
 				//Because we allow custom pages and categories to both be keyless (without /dp etc)
-				//Check to see if it's a custom page first, and if not, category
+				//Check to see if it's a category first, and if not, custom page
 				$this->strRouteId = $this->arrUrlSegments[0];
-				$objCP = CustomPage::LoadByRequestUrl($this->strRouteId);
-				if ($objCP) 
-					$this->strRouteController = "custom_page";
-				else
+				if (empty($this->strRouteId))
 					$this->strRouteController = "category";
+				else {
+					$objCat = Category::LoadByRequestUrl($this->strRouteId);
+					if ($objCat) 
+						$this->strRouteController = "category";
+					else
+						$this->strRouteController = "custom_page";
+					}
 				$this->intStatus=200;
 				break;
 				
