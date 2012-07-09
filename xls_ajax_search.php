@@ -51,8 +51,8 @@ $matches = $db->Query(
 	<?php while ($row = $matches->FetchArray()): ?>
 		<li class="search_item" onmouseout="clearList()">
 			<a href="javascript:{}"
-			   style="border: none;"
-			   onclick="document.getElementById('xlsSearch').value = '<?=addslashes(str_replace("\n","",urlencode($row[$SQL_WHERE])))?>';document.getElementById('searchoptions').style.display='none';document.location.href='<?= $row['request_url']; ?>/dp/<?= $row['rowid']; ?>'; return false;">
+			   style="border: none;background-image:none;"
+			   onclick="document.location.href='<?= $row['request_url']; ?>/dp/<?= $row['rowid']; ?>'; return false;">
 				<?php echo $row[$SQL_WHERE]; ?>
 			</a>
 		</li>
