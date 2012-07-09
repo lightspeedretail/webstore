@@ -237,6 +237,7 @@
 		protected $pxyPanelClick;
 		
 		public $HelperRibbon = ""; //top ribbon for additional information
+		public $AlertRibbon = ""; //top above all tabs showing critical system info
 		
 		protected $arrTabs;
 		protected $arrPanels;
@@ -278,6 +279,9 @@
 			$this->pxyPanelClick->AddAction(new QClickEvent() , new QTerminateAction());
 						
 		
+			if (!file_exists(__DOCROOT__ .  __SUBDIRECTORY__ . '/.htaccess'))
+						$this->AlertRibbon = "<b>WARNING: Missing .htaccess file.</b> There is a file named htaccess (without the period) in your webstore root folder. Rename this file with a period (as .htaccess) to enable store URLs to work properly. Please see documentation for additional help.";
+						
 		
 		}
 	
