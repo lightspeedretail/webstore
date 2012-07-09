@@ -43,12 +43,13 @@ function GetResetButtonHtml($ctlId) {
 		}
 						
 require('includes/prepend.inc.php');
-if (!$_SESSION['admin_auth']) die(); //This file can only be called from a current Admin panel session
+
 switch($_GET['item']) {
 	
 	
 	case 'promorestrict' :
-		$objPromoCode = PromoCode::Load($_GET['id']);
+		$objPromoCode = PromoCode::Load(_xls_number_only($_GET['id']));
+		if (!$objPromoCode) die();
 		$strRestrictions =  $objPromoCode->Lscodes;		
 		$arrRestrictions = explode(",",$strRestrictions);
 		
@@ -193,7 +194,7 @@ switch($_GET['item']) {
 
 		$arrCats = array();
 		$intLevel = _xls_number_only($_GET['lv']);
-		$strSelected = $_GET['selected'];
+		$strSelected = preg_replace('/[^a-zA-Z0-9êàéèîüûôóò,\-\.\ \>\&]/i', '', $_GET['selected']);
 		if ($intLevel<1 || $intLevel>9) $intLevel=1;
 		$strNext = "name".($intLevel+1);
 		
@@ -207,8 +208,9 @@ switch($_GET['item']) {
 	break;
 	
 	case 'googlesave':
-		$strSelected = $_GET['selected'];
+		$strSelected = preg_replace('/[^a-zA-Z0-9êàéèîüûôóò,\-\.\ \>\&]/i', '', $_GET['selected']);
 		$objGoogleCategory = GoogleCategories::LoadByName($strSelected);
+		if (!$objGoogleCategory) die(); 
 		$arrCats=array();
 		$arrCats[$objGoogleCategory->Rowid] = $objGoogleCategory->Name;
 		echo json_encode($arrCats);
@@ -217,6 +219,7 @@ switch($_GET['item']) {
 	case 'current':
 		$intVal = _xls_number_only($_GET['val']);
 		$objGoogleCategory = GoogleCategories::Load($intVal);
+		if (!$objGoogleCategory) die();
 		$arrCats=array();
 		for ($x=1; $x<=7; $x++) {
 			$strName = "Name".$x;
