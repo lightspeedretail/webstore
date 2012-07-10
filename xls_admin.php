@@ -4774,11 +4774,7 @@
 			$page->Key = "ship_define_tiers";
 			$this->configPnls[1] = new xlsws_admin_edittiers_panel($this, $this , $page , "pageDone");
 
-			$page = new CustomPage();
-			$page->Title = _sp('Batch Change Countries and States/Regions');
-			$page->Key = "ship_modify_cities_countries";
-			$this->configPnls[2] = new xlsws_admin_task_panel($this, $this , $page , "pageDone");
-			
+		
 			
 		}
 	
