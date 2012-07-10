@@ -86,7 +86,7 @@
 ?>
 		<div id="mainNav">
 		<?php
-		$this->arrTabs = array_reverse($this->arrTabs);
+		
 		foreach($this->arrTabs as $type=>$label)
 			echo '<a class="mainNavItem'.($type == $this->currentTab ? " active" : "").'" href="'.$this->get_uri($type).'"><span class="innertab">'.$label.'</span></a>';
 		?>

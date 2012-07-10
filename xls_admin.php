@@ -211,19 +211,19 @@
 	//THE VARIOUS ITEMS IN THE ADMIN DROPDOWN PANEL - CONFIGURATION, SHIPPING, PAYMENT, STATS AND SYSTEM
 	$strPend = Cart::GetPending() > 0 ? "(".Cart::GetPending().")" : "";
 	
-	$arrShipTabs = array('shipping' => _sp('Shipping') , 'methods' => _sp('Methods') , 
+	$arrShipTabs = array_reverse(array('shipping' => _sp('Shipping') , 'methods' => _sp('Methods') , 
 		'destinations' =>_sp('Destinations') ,'shippingtasks' =>_sp('Shipping Tasks') ,
-		'countries' =>_sp('Countries') , 'states' =>_sp('States/Regions') );
-	$arrConfigTabs = array('store' => _sp('Store') , 'appear' => _sp('Appearance') , 'sidebars' =>_sp('Sidebars'));
+		'countries' =>_sp('Countries') , 'states' =>_sp('States/Regions') ));
+	$arrConfigTabs = array_reverse(array('store' => _sp('Store') , 'appear' => _sp('Appearance') , 'sidebars' =>_sp('Sidebars')));
 	$arrCustomPagesTabs = array('pages' => _sp('Edit Pages'));
-	$arrPaymentTabs = array('methods' => _sp('Methods') , 'cc' => _sp('Credit Card Types'), 
-		'promo' => _sp('Promo Codes'),'promotasks' => _sp('Promo Code Tasks'));
-	$arrSeoTabs = array('general' => _sp('General') , 'meta' => _sp('Meta'), 'categories' => _sp('Categories'));
-	$arrDbAdminTabs = array('dborders' => _sp('Orders'), 'dbpending' => _sp('Pending to<br>Download '.$strPend)  , 'incomplete' => _sp('Incomplete<br>Orders'));
-	$arrSystemTabs = array('config' => _sp('Setup') , 'task' => _sp('Tasks')  , 'slog' => _sp('System Log'));
+	$arrPaymentTabs = array_reverse(array('methods' => _sp('Methods') , 'cc' => _sp('Credit Card Types'), 
+		'promo' => _sp('Promo Codes'),'promotasks' => _sp('Promo Code Tasks')));
+	$arrSeoTabs = array_reverse(array('general' => _sp('General') , 'meta' => _sp('Meta'), 'categories' => _sp('Categories')));
+	$arrDbAdminTabs = array_reverse(array('dborders' => _sp('Orders'), 'dbpending' => _sp('Pending to<br>Download '.$strPend)  , 'incomplete' => _sp('Incomplete<br>Orders')));
+	$arrSystemTabs = array_reverse(array('config' => _sp('Setup') , 'task' => _sp('Tasks')  , 'slog' => _sp('System Log')));
 	
 	
-	
+
 	
 	
 	/* class xlsws_admin
