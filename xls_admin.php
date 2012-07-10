@@ -1344,9 +1344,7 @@
 			
             $this->build_list();
 			
-			if ($this->currentModuleType != "sidebar")
-				$this->HelperRibbon = "To activate a new ".$this->currentModuleType." module, turn it to ON, then click the Gear icon to configure options. You must click Save to fully activate a module. Advanced Integration modules require an installed SSL security certificate.";
-				
+			
 
 		}
 		
@@ -1650,6 +1648,13 @@
 			
 			$files = array_merge($dbfiles , $files , $files2);
 
+	
+			if ($selected ==  "shipping")
+				$this->HelperRibbon = "To activate a new ".$selected." module, turn it to ON, then click the Gear icon to configure options. You must click Save to fully activate a module.";
+				
+			if ($selected ==  "payment")
+				$this->HelperRibbon = "To activate a new ".$selected." module, turn it to ON, then click the Gear icon to configure options. You must click Save to fully activate a module. Advanced Integration modules require an installed SSL security certificate.";	
+				
 			foreach($files as $file) {
 
 				$id = md5($file);
