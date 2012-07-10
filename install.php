@@ -110,7 +110,7 @@ if (!file_exists('includes/qcodo/cache/soap'))
 //////////////////////////////////////////////////////////////////
 // Set up initial pathing so install can continue
 define ('__SUBDIRECTORY__', preg_replace('/\/?\w+\.php$/', '', $_SERVER['PHP_SELF']));
-define ('__DOCROOT__', str_replace(__SUBDIRECTORY__,"",dirname(__FILE__)));
+define ('__DOCROOT__', substr(dirname(__FILE__),0,strlen(dirname(__FILE__))-strlen(__SUBDIRECTORY__)));
 define ('__VIRTUAL_DIRECTORY__', '');
 
 // read the config file
@@ -123,7 +123,7 @@ if(stristr($content , "define ('__DOCROOT__'")
 }
 
 
-// include our prepend.inc which'll give us access to useful classes like QForm, used below
+//// include our prepend.inc which'll give us access to useful classes like QForm, used below
 require_once('includes/prepend.inc.php');
 
 
