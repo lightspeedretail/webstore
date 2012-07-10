@@ -238,7 +238,9 @@ class Images extends ImagesGen {
 
 			$arrPath = pathinfo($strName);
 			if ($arrPath['dirname'] != '') {
-				$strPathToCreate = __PHOTOS__ . '/' . $arrPath['dirname'];
+				$subFolder =  __PHOTOS__;
+				if (__SUBDIRECTORY__) $subFolder = substr($subFolder,strlen(__SUBDIRECTORY__),999);
+				$strPathToCreate = $subFolder. '/' . $arrPath['dirname'];
 				if ($strPathToCreate[0]=='/') $strPathToCreate=substr($strPathToCreate,1,999);
 				if (!file_exists($strPathToCreate))
 					if (!mkdir($strPathToCreate,0777,true))
