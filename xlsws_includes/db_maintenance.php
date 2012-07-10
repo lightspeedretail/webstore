@@ -469,7 +469,10 @@ class xlsws_db_maintenance extends xlsws_index {
 				'GOOGLE_ANALYTICS', '', 'Google Analytics code for tracking', 20, 1, NOW(), NOW(), 'NULL');");		
 			$this->add_config_key('GOOGLE_ADWORDS' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Google AdWords ID (format: 000000000)', 
-				'GOOGLE_ADWORDS', '', 'Google AdWords Conversion ID (found in line \'var google_conversion_id\' when viewing code from Google AdWords setup)', 20, 2, NOW(), NOW(), 'NULL');");		
+				'GOOGLE_ADWORDS', '', 'Google AdWords Conversion ID (found in line \'var google_conversion_id\' when viewing code from Google AdWords setup)', 20, 2, NOW(), NOW(), 'NULL');");	
+			$this->add_config_key('GOOGLE_VERIFY' , 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Google Site Verify ID (format: _PRasdu8f9a8F9A..etc)', 
+				'GOOGLE_VERIFY', '', 'Google Verify Code (found in google-site-verification meta header)', 20, 3, NOW(), NOW(), 'NULL');");		
 
 
 			_dbx("DELETE FROM `xlsws_configuration` where `key`='ENABLE_SEO_URL'");

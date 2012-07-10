@@ -49,6 +49,7 @@
 	<meta property="og:description" content="<?php echo _xls_stack_pop('xls_meta_desc'); ?>" />
 	<meta property="og:image" content="<?php echo _xls_stack_pop('xls_meta_image'); ?>" />
 	
+	<meta name="google-site-verification" content="<?php echo _xls_get_conf('GOOGLE_VERIFY'); ?>" />
 	
 	<link rel="Shortcut Icon" href="favicon.ico" type="image/x-icon" />
 

@@ -723,9 +723,9 @@
 		 		}elseif($field instanceof QFileAsset )
 		 			$config->Value = $field->File;
 		 		
-		 		if ($this->beforeSave($key,$field))	
+		 		if ($this->beforeSave($key,$field))
 		 			$config->Save();
-		 		else return false;
+		 		
 			}
 			
 			
@@ -741,12 +741,28 @@
 		
 			switch ($key) {
 			
+			
+				case 'GOOGLE_VERIFY':
+					if (substr($field->Text,0,47)=='<meta name="google-site-verification" content="') {
+						//Customer pasted in meta tag, so just extract the key we need
+						$strPiece = strstr($field->Text, 'content="');
+						$strPiece = preg_replace("/^.*=.*\"(.+)\".*$/", "$1", $strPiece);
+						$config = Configuration::LoadByKey($key);
+						$config->Value = $strPiece;
+						$config->Save();
+						return false;
+					}	
+					return true;
+				break;
+						
+						
 				case 'FEATURED_KEYWORD':
 					//If we've changed our featured keyword, reset the db flagging here
 					if ($field->Text != _xls_get_conf('FEATURED_KEYWORD')) {
 						Product::SetFeaturedByKeyword($field->Text);
 						}
-			
+					return true;
+				break;
 			
 				default:
 					return true;		
