@@ -64,7 +64,13 @@ class XLSURL {
 			$this->strUri = $_SERVER['PATH_INFO'];
 
 		$this->strQueryString = $_SERVER['QUERY_STRING'];
-		
+		if ($this->strQueryString[0]=="/") {
+			//our URL construction is on the first element
+			$arrParts = explode('&',$this->strQueryString);
+			$this->strUri = array_shift($arrParts);
+			$this->strQueryString = implode('&',$arrParts);
+		}
+	
 		if (!$this->ExplodeSegments()) 	return false; 
 		if (!$this->ReindexSegments())	return false;
 		
