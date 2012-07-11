@@ -2153,10 +2153,10 @@ $sql[] = "INSERT INTO `xlsws_custom_page` VALUES (9, 'contactus', 'Contact Us', 
 							
 				$sql = array();
 				
-$sql[] = "INSERT INTO `xlsws_modules` VALUES (14, 'store_pickup.php', 'shipping', 1, 'a:4:{s:5:\"label\";s:12\"Store Pickup\";s:3:\"msg\";s:73:\"Please present order ID %s with photo ID at the reception for collection.\";s:7:\"product\";s:8:\"SHIPPING\";s:6:\"markup\";s:1:\"2\";}', NOW(), NULL);";
-$sql[] = "INSERT INTO `xlsws_modules` VALUES (42, 'sidebar_order_lookup.php', 'sidebar', 2, NULL, NOW(), NULL);";
-$sql[] = "INSERT INTO `xlsws_modules` VALUES (49, 'xlsws_class_payment.php', 'payment', 9, 'a:1:{s:5:\"label\";s:16:\"Cash On Delivery\";}', NOW(), NULL);";
-$sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist.php', 'sidebar', 3, NULL, NOW(), NULL);";
+$sql[] = "INSERT INTO `xlsws_modules` VALUES (14, 'store_pickup', 'shipping', 1, 'a:4:{s:5:\"label\";s:12\"Store Pickup\";s:3:\"msg\";s:73:\"Please present order ID %s with photo ID at the reception for collection.\";s:7:\"product\";s:8:\"SHIPPING\";s:6:\"markup\";s:1:\"2\";}', NOW(), NULL);";
+$sql[] = "INSERT INTO `xlsws_modules` VALUES (42, 'sidebar_order_lookup', 'sidebar', 2, NULL, NOW(), NULL);";
+$sql[] = "INSERT INTO `xlsws_modules` VALUES (49, 'xlsws_class_payment', 'payment', 9, 'a:1:{s:5:\"label\";s:16:\"Cash On Delivery\";}', NOW(), NULL);";
+$sql[] = "INSERT INTO `xlsws_modules` VALUES (53, 'sidebar_wishlist', 'sidebar', 3, NULL, NOW(), NULL);";
 
 				
 				$strReturn .= "Entering Sample Modules<br/>";

@@ -1666,6 +1666,8 @@
 			}
 			
 			$files = array_merge($dbfiles , $files , $files2);
+			unset($files['credit_card.php']);
+			unset($files['xlsws_class_shipping.php']);
 
 	
 			if ($selected ==  "shipping")
