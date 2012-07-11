@@ -54,8 +54,11 @@ function _xt($strMsg) {
  */
 function _rd($url = '') {
 
-	if(empty($url))
+	if(empty($url)) {
 		$url = $_SERVER["REQUEST_URI"];
+		//_xls_site_url will append subfolder again so get rid of it here
+		if (__SUBDIRECTORY__) $url = substr($url,strlen(__SUBDIRECTORY__),999);
+	}
 		
 	QApplicationBase::Redirect(_xls_site_url($url));
 }
