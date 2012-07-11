@@ -113,13 +113,16 @@
 	}
 	
 	
-	
-	if(!isset($XLSWS_VARS['page']))
-		$XLSWS_VARS['page'] = 'config';
+	//$XLSWS_VARS['page'] = 'config';
+		
 	
 		
 	//add custom includes as well..
 	require_once(CUSTOM_INCLUDES . 'prepend.inc.php');
+
+	if(!isset($XLSWS_VARS['page']))
+		_rd("xls_admin.php?page=config&subpage=store".admin_sid());
+
 	
 	/* class XLS_OnOff
 	* class to create iTouch like on/off toggles in the Admin Panel
