@@ -81,28 +81,24 @@ if(isset($this->AlertRibbon))
 
 include_once(adminTemplate('pages.tpl.php')); ?>
 
-<?php $this->RenderBegin(); ?>				
+<?php $this->RenderBegin(); ?>
+		<div id="mainNav">
+		<?php
+		
+		foreach($this->arrTabs as $type=>$label) {
+			echo '<a class="mainNavItem'.($type == $this->currentTab ? " active" : "").'" href="'.$this->get_uri($type).'"><span class="innertab">'.$label;
+			 if($type == $this->currentTab)
+				$this->objDefaultWaitIcon->Render();			
+			echo '</span></a>';
+		}
+		?>
+		</div>
+		<br clear="both">
+		
+<div id="options"  style="width:960px;" >
+	<div class="content">	
 
-		<br /><br />
-			
-		<div id="options" class="accord rounded"> 
-		<div id="tabs">
-			<ul>
-				<?php foreach($this->arrTabs as $type=>$label): ?>
-				<a href="<?= $this->get_uri($type); ?>" >
-					<li class="rounded {5px top transparent} 
-						<?php if($type == $this->currentTab): ?>
-							active
-						<?php endif; ?> " style="display:block; float: left">
-						<?= $label; ?>
-						<?php if($type == $this->currentTab): ?>
-						<?php $this->objDefaultWaitIcon->Render() ?>
-						<?php endif; ?>
-					</li>
-				</a>
-				<?php endforeach; ?>
-			</ul>
-		</div><?php
+<?php
 
 if(isset($this->HelperRibbon)) 
 	if (strlen($this->HelperRibbon)>0)
