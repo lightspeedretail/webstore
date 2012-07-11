@@ -86,7 +86,7 @@ while ($objItem = $arrProducts->FetchObject()) {
 	   		echo chr(9).'<g:availability>out of stock</g:availability>'.chr(13);
 	   
 		echo chr(9).'<g:price>'.$objProduct->Price.'</g:price>'.chr(13);
-		echo chr(9).'<g:brand>'.$objProduct->Family.'</g:brand>'.chr(13);
+		echo chr(9).'<g:brand><![CDATA['.$objProduct->Family.']]></g:brand>'.chr(13);
 		echo chr(9).'<g:gtin>'.$objProduct->Upc.'</g:gtin>'.chr(13);
 	   
 		echo '<product_color>'.$objProduct->ProductColor.'</product_color>'.chr(13);
