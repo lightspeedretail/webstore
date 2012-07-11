@@ -64,6 +64,10 @@ class XLSURL {
 			$this->strUri = $_SERVER['PATH_INFO'];
 
 		$this->strQueryString = $_SERVER['QUERY_STRING'];
+		
+		$this->strUri = preg_replace('/<(style|script).*?<\/\1>/xmsi', '', $this->strUri);
+		$this->strQueryString = preg_replace('/<(style|script).*?<\/\1>/xmsi', '', $this->strQueryString);
+
 		if ($this->strQueryString[0]=="/") {
 			//our URL construction is on the first element
 			$arrParts = explode('&',$this->strQueryString);
