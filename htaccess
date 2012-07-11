@@ -15,9 +15,15 @@ RewriteBase /
 Options +FollowSymLinks
 
 RewriteCond $1 !^(index\.php|xls_admin\.php|xls_image_upload\.php|xls_soap\.php|xls_jumper\.php|xls_payment_capture\.php|xlsws_ws_service\.php|test\.php|assets|photos|templates|css|js|favicon\.ico|robots\.txt)
-RewriteRule (.*)\.xml(.*) index.php/$1/feeds [QSA,L]
+RewriteRule (.*)\.xml(.*) index.php?/$1/feeds [QSA,L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php/$1 [QSA,L]
+RewriteRule ^(.*)$ index.php?/$1 [QSA,L]
 
 
+# block all templates (no reason to have these exposed)
+RedirectMatch 410 ^/.*\.tpl$ 
+
+# block all .log (log files), .sql (sql dump/export) and .conf (config files) files
+# in case some day these files move to another directory
+RedirectMatch 410 ^.*\.(sql|log|conf)$ 
