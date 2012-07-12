@@ -93,7 +93,7 @@ class xlsws_checkout extends xlsws_index {
 		$this->crumbs[] = array('link'=>'cart/pg' , 'case'=> '' , 'name'=> _sp('Edit Cart'));
 	
         $this->crumbs[] = array(
-            'link' => 'checkout/pg',
+            'link' =>  _xls_site_url("checkout/pg"),
             'case' => '',
             'name' => _sp('Check Out')
         );

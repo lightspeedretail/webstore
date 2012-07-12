@@ -811,7 +811,9 @@ function _xls_site_dir($ssl_attempt = true) {
 function _xls_site_url($strUrlPath =  '') {
 	if (substr($strUrlPath,0,4)=="http") return $strUrlPath; //we've passed through twice, don't double up
 	if (substr($strUrlPath,0,1)=="/") $strUrlPath = substr($strUrlPath,1,999); //remove a leading / so we don't // by accident
-	return _xls_site_dir() . '/' . $strUrlPath;
+	
+	$usessl = strstr($strUrlPath,"checkout") === false ?  false : true;
+	return _xls_site_dir($usessl) . '/' . $strUrlPath;
 }
 
 //Makes our SEO hypenated string from passed string

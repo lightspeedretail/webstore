@@ -69,7 +69,7 @@ $items = $cart->GetCartItemArray();
 				
 <?php if($cart->Count > 0):  ?>			
 				<a href="cart/pg" class="review rounded"><?php _xt("Edit Cart"); ?></a>
-				<a href="checkout/pg" class="gocheckout rounded"><?php _xt("Check Out"); ?></a>
+				<a href="<? echo _xls_site_url("checkout/pg");?>" class="gocheckout rounded"><?php _xt("Check Out"); ?></a>
 
 <?php endif; ?>					
 			</div>
