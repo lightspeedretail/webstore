@@ -71,8 +71,14 @@ class free_shipping extends xlsws_class_shipping {
 		$ret['qty_remaining']->Text = '';
 		$ret['qty_remaining']->ToolTip = _sp('If using Promo Code, how many times can this be used (blank=unlimited).');
 
-
-			
+		$ret['restrictcountry'] = new XLSListBox($objParent);
+		$ret['restrictcountry']->Name = _sp('Only allow Free Shipping To');
+		$ret['restrictcountry']->AddItem('Everywhere (no restriction)', null);
+		$ret['restrictcountry']->AddItem('My Country ('. _xls_get_conf('DEFAULT_COUNTRY').')', _xls_get_conf('DEFAULT_COUNTRY'));
+		if (_xls_get_conf('DEFAULT_COUNTRY')=="US")
+			$ret['restrictcountry']->AddItem('Continental US', 'CUS'); //Really common request, so make a special entry
+		$ret['restrictcountry']->Enabled = true;
+		$ret['restrictcountry']->SelectedIndex = 0;
            		
 		$ret['product'] = new XLSTextBox($objParent);
 		$ret['product']->Name = _sp('LightSpeed Product Code (case sensitive)');
@@ -152,6 +158,20 @@ class free_shipping extends xlsws_class_shipping {
 		$vals = $this->getConfigValues(get_class($this));
 		
 		//Check possible scenarios why we would not offer free shipping
+		if ($vals['restrictcountry']) { //we have a country restriction
+			
+			switch($vals['restrictcountry']) {
+				case 'CUS':
+					if ($_SESSION['XLSWS_CART']->ShipCountry=="US" && 
+						($_SESSION['XLSWS_CART']->ShipState =="AK" || $_SESSION['XLSWS_CART']->ShipState=="HI"))
+						return false;
+				break;
+			
+				default:
+					if ($vals['restrictcountry']!=$_SESSION['XLSWS_CART']->ShipCountry) return false;
+			}
+		}
+		
 		if (strlen($vals['startdate'])>0 && $vals['startdate'] != "0000-00-00")
 			if ($vals['startdate']>date("Y-m-d")) return false;
 		if (strlen($vals['enddate'])>0 && $vals['enddate'] != "0000-00-00")
