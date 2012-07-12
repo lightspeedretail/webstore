@@ -260,10 +260,13 @@ class xlsws_db_maintenance extends xlsws_index {
 				1, 23, NOW(), NOW(), 'BOOL');");
 			$this->add_config_key('LOG_ROTATE_DAYS' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Log Rotate Days', 
-				'LOG_ROTATE_DAYS', '30', 'How many days System Log should be retained.', 1, 25, NOW(), NOW(), 'INT');");					
+				'LOG_ROTATE_DAYS', '30', 'How many days System Log should be retained.', 1, 30, NOW(), NOW(), 'INT');");					
 			$this->add_config_key('UPLOADER_TIMESTAMP' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Last timestamp uploader ran', 
 				'UPLOADER_TIMESTAMP', '0', 'Internal', 0, 0, NOW(), NOW(), 'NULL');");
+
+			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=1,`sort_order`=24 where `key`='IMAGE_STORE'");
+
 
 			//Families menu labeling
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Show Families on Product Menu?',`configuration_type_id`=19,`sort_order`=3,
