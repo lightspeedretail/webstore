@@ -31,10 +31,11 @@
  */
 class xlsws_db_maintenance extends xlsws_index {
 
-	public function RunUpdateSchema() {		
+	public function RunUpdateSchema($shownotes = true) {		
 
-		return $this->perform_schema_changes();
- 
+		$strRetVal = $this->perform_schema_changes();
+		
+ 		if ($shownotes) return $strRetVal; else return;
 	}
 
 	
@@ -678,7 +679,8 @@ class xlsws_db_maintenance extends xlsws_index {
 					
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			
-			$strUpgradeText .= "<h2>Please run the steps MIGRATE PHOTOS (if available) and RECALCULATE PENDING ORDERS after running this Upgrade.</h2>";
+			
+				$strUpgradeText .= "<h2>Please run the steps MIGRATE PHOTOS (if available) and RECALCULATE PENDING ORDERS after running this Upgrade.</h2>";
 			
 			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
 			$config->Value="220";

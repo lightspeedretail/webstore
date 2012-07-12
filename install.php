@@ -3047,12 +3047,15 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 				
 		protected function upgrade_database($passingdb =  null) {
 		
+			$blnShowNotes = true;
+			
 			if (!is_null($passingdb)) {
 				$dbhost = $this->GetControl('dbhost');
 					$dbuser = $this->GetControl('dbuser');
 					$dbpass = $this->GetControl('dbpass');
 					$dbport = $this->GetControl('dbport');
 					$db = $this->GetControl('db');	
+					$blnShowNotes = false;
 				}
 				
 			//Bootstrap the QCodo DB object so we can use our functions
@@ -3070,13 +3073,14 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 
 			include(XLSWS_INCLUDES . 'db_maintenance.php');
 			$objDbMaint = new xlsws_db_maintenance;
-			$retVal = $objDbMaint->RunUpdateSchema();
+			$retVal = $objDbMaint->RunUpdateSchema($blnShowNotes);
 			
 			//Since an upgrade may accompany SOAP changes, clear the SOAP cache here. It will simply be rebuilt on the next Upload process
 			foreach(glob(__DOCROOT__ .  __SUBDIRECTORY__ . '/includes/qcodo/cache/soap/*.*') as $v)
 				unlink($v);
 			
-			$retVal .= "<P>Further Database updates may be done by logging into Admin Panel and choosing System->Tasks to complete any remaining steps shown above.";
+			if ($blnShowNotes)
+				$retVal .= "<P>Further Database updates may be done by logging into Admin Panel and choosing System->Tasks to complete any remaining steps shown above.";
 			
 			$this->hideControls();
 				
