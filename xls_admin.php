@@ -211,20 +211,50 @@
 	}
 	
 	
-	//THE VARIOUS ITEMS IN THE ADMIN DROPDOWN PANEL - CONFIGURATION, SHIPPING, PAYMENT, STATS AND SYSTEM
+	/*  Dropdown menu items for Admin Panel
+	 *  We reverse the array because of the CSS formatting which is right-aligning tabs, so they build backwards
+	 */
 	$strPend = Cart::GetPending() > 0 ? "(".Cart::GetPending().")" : "";
-	
-	$arrShipTabs = array_reverse(array('shipping' => _sp('Shipping') , 'methods' => _sp('Methods') , 
-		'destinations' =>_sp('Destinations') ,'shippingtasks' =>_sp('Shipping Tasks') ,
-		'countries' =>_sp('Countries') , 'states' =>_sp('States/Regions') ));
-	$arrConfigTabs = array_reverse(array('store' => _sp('Store') , 'appear' => _sp('Appearance') , 'sidebars' =>_sp('Sidebars')));
-	$arrCustomPagesTabs = array('pages' => _sp('Edit Pages'));
-	$arrPaymentTabs = array_reverse(array('methods' => _sp('Methods') , 'cc' => _sp('Credit Card Types'), 
-		'promo' => _sp('Promo Codes'),'promotasks' => _sp('Promo Code Tasks')));
-	$arrSeoTabs = array_reverse(array('general' => _sp('General') , 'meta' => _sp('Meta'), 'categories' => _sp('Categories')));
-	$arrDbAdminTabs = array_reverse(array('dborders' => _sp('Orders'), 'dbpending' => _sp('Pending to<br>Download '.$strPend)  , 'incomplete' => _sp('Incomplete<br>Orders')));
-	$arrSystemTabs = array_reverse(array('config' => _sp('Setup') , 'task' => _sp('Tasks')  , 'slog' => _sp('System Log')));
-	
+		
+		$arrShipTabs = array_reverse(array(
+			'shipping' => _sp('Shipping'),
+			'methods' => _sp('Methods'), 
+			'destinations' =>_sp('Destinations'),
+			'shippingtasks' =>_sp('Shipping Tasks'),
+			'countries' =>_sp('Countries'),
+			'states' =>_sp('States/Regions')
+			));
+		$arrConfigTabs = array_reverse(array(
+			'store' => _sp('Store'),
+			'appear' => _sp('Appearance'),
+			'sidebars' =>_sp('Sidebars')
+			));
+		$arrCustomPagesTabs = array_reverse(array(
+			'pages' => _sp('Edit Pages')
+			));
+		$arrPaymentTabs = array_reverse(array(
+			'methods' => _sp('Methods'),
+			'cc' => _sp('Credit Card Types'), 
+			'promo' => _sp('Promo Codes'),
+			'promotasks' => _sp('Promo Code Tasks')
+			));
+		$arrSeoTabs = array_reverse(array(
+			'general' => _sp('General'),
+			'meta' => _sp('Meta'),
+			'categories' => _sp('Categories')
+			));
+		$arrDbAdminTabs = array_reverse(array(
+			'dborders' => _sp('Orders'), 
+			'dbpending' => _sp('Pending to<br>Download '.$strPend),
+			'incomplete' => _sp('Incomplete<br>Orders'),
+			'products' => _sp('Edit Products')
+			));
+		$arrSystemTabs = array_reverse(array(
+			'config' => _sp('Setup'),
+			'task' => _sp('Tasks'),
+			'slog' => _sp('System Log')
+			));
+		
 	
 
 	
@@ -6093,6 +6123,237 @@
 	}
 	
 	
+	class xlsws_admin_productedit extends xlsws_admin {
+					
+		protected $btnCancel;
+		protected $btnSave;
+		protected $btnDelete;
+		
+		protected $configPnls;
+		
+		public $page;
+		
+		public $pxyAddNewPage;
+		
+		public $HelperRibbon;
+		
+		protected $intRowId; //Cart row we're editing
+		protected $objProduct;
+	    protected $CustomerControl;
+	
+		protected $arrFields = array('Rowid','OriginalCode','Name','Current','Web','MasterModel','FkProductMasterId','Modified');
+	
+		protected $ctlProductCode;
+		protected $ctlSearchResult;
+		protected $btnSearch;
+	
+		protected $arrProducts;
+
+		protected $arrDelete;
+		
+		
+		protected function Form_Create(){
+			parent::Form_Create();
+			
+			$this->arrTabs = $GLOBALS['arrDbAdminTabs'];
+			$this->currentTab = 'products';
+
+			global $XLSWS_VARS;
+			
+			if (isset($XLSWS_VARS['rowid'])) {
+				$this->objProduct = $objProduct = Product::Load($XLSWS_VARS['rowid']);
+				$this->intRowId = $objProduct->Rowid;		
+			}
+			
+			$this->page = new CustomPage();
+			
+			
+			$this->pxyAddNewPage = new QControlProxy($this);
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QServerAction('NewPage'));
+			$this->pxyAddNewPage->AddAction( new QClickEvent() , new QTerminateAction());
+			
+	        
+			
+			//$this->btnEdit = new QButton($this->dtrConfigs);
+			//$this->btnEdit->Text = _sp("Edit");
+			$this->btnCancel = new QButton($this);
+			$this->btnCancel->Text = _sp("Cancel");
+			$this->btnCancel->CssClass = 'admin_cancel';
+			$this->btnCancel->AddAction( new QClickEvent() , new QAjaxAction('btnCancel_Click'));
+			
+			
+			
+			$this->btnSave = new QButton($this);
+			$this->btnSave->Text = _sp("Save");
+			$this->btnSave->CssClass = 'admin_save';
+			$this->btnSave->AddAction( new QClickEvent() , new QServerAction('btnSave_Click'));
+			$this->btnSave->CausesValidation = true;
+			
+			$this->HelperRibbon = "Please use extreme caution with this option, and contact technical support for assistance. Use this screen to make changes for products which are orphaned. You can also view pending orders including a product to determine issues with inventory levels.";
+
+
+			$this->ctlProductCode = new XLSTextBox($this,'ProductCode');
+			//$this->ctlProductCode->CssClass="smallfont";
+			$this->btnSearch = new QButton($this,'ProductSearch');
+			$this->btnSearch->Text = _sp("Search");
+			$this->btnSearch->CssClass = 'smallfont';
+			$this->btnSearch->AddAction( new QClickEvent() , new QServerAction('btnSearch_Click'));
+			$this->btnSearch->CausesValidation = true;
+			$this->ctlSearchResult = new QLabel($this,'SearchResult');
+
+			if (isset($XLSWS_VARS['rowid'])) $this->BuildPopulateItemGrid();
+
+
+		}
+		
+		
+		function pageDone(){
+			$this->listPages();
+		}
+		
+		
+		public function NewPage(){
+			
+		}
+	
+        protected function BuildPopulateItemGrid() {
+        	
+        	$intRowid = $this->objProduct->Rowid;
+        	$arrItems = Product::QueryArray(
+				QQ::OrCondition(
+					QQ::Equal(QQN::Product()->FkProductMasterId, $intRowid),
+					QQ::Equal(QQN::Product()->Rowid, $intRowid)
+					),
+				QQ::Clause(
+					QQ::OrderBy(QQN::Product()->Code)
+			 ));
+        	
+        	$intCounter = 1;
+        	
+        	foreach ($arrItems as $item) {
+        	
+        		$arrRow = array();
+
+				foreach ($this->arrFields as $field) {
+       		
+       				$this->arrDelete[$item->Rowid]=0;
+       				
+       				switch ($field) {
+       				
+       					case 'MasterModel':
+       					case 'Web':
+       					case 'Current':
+       						if ($item->$field == 1) $value = "Y"; else $value = "N";
+       					break;
+       						
+       					
+       					default:
+       						$value = $item->$field;
+       				
+       				
+       				}
+       				
+        			$arrRow[$field]=new QLabel($this,$field.$item->Rowid);
+        			$arrRow[$field]->Text = $value; 
+        			$arrRow[$field]->CssClass = "largefont";
+        		
+				}
+ 
+         		$arrRow['Delete']=new QCheckbox($this,'Delete'.$item->Rowid);
+        		$arrRow['Delete']->Width = 50;
+        		$arrRow['Delete']->CssClass = "smallfont";
+				$arrRow['Delete']->AddAction( new QClickEvent() , new QAjaxAction('doChange'));
+
+        		
+        		$this->arrProducts[$item->Rowid] = $arrRow;
+        		$intCounter++;
+        		
+        	}
+        	
+        
+        
+        }
+        
+		
+		public function btnSearch_Click($strFormId, $strControlId, $strParameter){
+		
+			$ctlCode = QForm::GetControl('ProductCode');		
+			$ctlResult = QForm::GetControl('SearchResult');		
+
+			$objProduct = Product::LoadByCode($ctlCode->Text);
+			if ($objProduct)
+				_rd($_SERVER["SCRIPT_NAME"]  . '?page=dbadmin&subpage=products&rowid='.$objProduct->Rowid. admin_sid());	
+			else
+				$ctlResult->Text = $ctlCode->Text . ' not found';
+			
+			
+			
+			
+			
+		
+		}
+	    
+	    public function btnCancel_click($strFormId, $strControlId, $strParameter) {
+	    	_rd($_SERVER["SCRIPT_NAME"]  . '?page=dbadmin&subpage=dbpending' . admin_sid());
+	    }
+    
+    	public function btnSave_click($strFormId, $strControlId, $strParameter){
+
+    		
+			$intRowid = $this->objProduct->Rowid;
+        	$arrItems = Product::QueryArray(
+				QQ::OrCondition(
+					QQ::Equal(QQN::Product()->FkProductMasterId, $intRowid),
+					QQ::Equal(QQN::Product()->Rowid, $intRowid)
+					),
+				QQ::Clause(
+					QQ::OrderBy(QQN::Product()->Code)
+			 ));
+        	
+        	$intCounter = 1;
+        	
+        	foreach ($arrItems as $item) {
+
+    			$ctlDelete = QForm::GetControl('Delete'.$item->Rowid);
+
+       			if ($ctlDelete->Checked) {
+       				_xls_log("PRODUCT DELETE: ".$item->OriginalCode." was manually deleted from Web Store",true);
+       				$item->Delete();
+     			}
+        			
+        	}
+		
+    		
+    	
+    		_rd($_SERVER["SCRIPT_NAME"]  . '?page=dbadmin&subpage=products&rowid=' . $intRowid.admin_sid());
+    	}
+    
+    
+    	public function doChange($strFormId, $strControlId, $strParameter){
+		
+        	$intItem = _xls_number_only($strControlId);
+        	$strField = _xls_letters_only($strControlId);
+        	
+        	if ($this->arrDelete[$intItem]==0) {
+        		$this->arrDelete[$intItem] = 1;
+        		QApplication::ExecuteJavaScript("$('#row".$intItem."').css('background-color','#aa3333');");
+        		QApplication::ExecuteJavaScript("$('#row".$intItem."').css('color','#ffffff');");
+        	} else {
+        		$this->arrDelete[$intItem]=0;
+        		QApplication::ExecuteJavaScript("$('#row".$intItem."').css('background-color','#e2e2e2');");
+        		QApplication::ExecuteJavaScript("$('#row".$intItem."').css('color','#000000');");
+        	}
+ 
+ 		
+		
+		}
+		
+		
+    
+
+	}
+	
+	
 	/* class xlsws_admin_maintenance
 	* class to create the tasks tab
 	* see class xlsws_admin for more specs
@@ -6781,11 +7042,14 @@
 					break;
 				
 				case "dbedit":
-					xlsws_admin_dbedit::Run('xlsws_admin_dbedit' , adminTemplate('dbedit.tpl.php'));
+					xlsws_admin_dbedit::Run('xlsws_admin_dbedit' , adminTemplate('editdb.tpl.php'));
 					break;					
 				case "incomplete":
 					xlsws_admin_dbincomplete::Run('xlsws_admin_dbincomplete' , adminTemplate('edit.tpl.php'));
 					break;					
+				case "products":
+					xlsws_admin_dbedit::Run('xlsws_admin_productedit' , adminTemplate('editproduct.tpl.php'));
+					break;	
 				case "dborders":
 				default:
 					xlsws_admin_dborders::Run('xlsws_admin_dborders' , adminTemplate('edit.tpl.php'));

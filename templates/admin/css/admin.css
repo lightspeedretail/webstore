@@ -888,8 +888,12 @@ padding-top: 3px;
 #editcontainer .mrnumber { width: 40px; text-align:right; }
 #editcontainer .w300 { width: 300px; }
 #editcontainer .w70 { width: 70px; }
+#editcontainer .w120 { width: 120px; }
+#editcontainer .w50 { width: 50px; }
 
+.w200 { width:200px; }
 .w100 { width:100px; }
+.w120 { width:120px; }
 .w70 { width:70px; }
 .ml10 { margin-left: 10px }
 .mr10 { margin-right: 10px }
