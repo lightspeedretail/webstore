@@ -790,9 +790,8 @@ function _xls_site_dir($ssl_attempt = true) {
 	$strSsl = 'http://';
 	$strHost = $_SERVER['HTTP_HOST'] . dirname(QApplication::$ScriptName);
 	
-    if (_xls_get_conf('ENABLE_SSL',0) && 
-    	($ssl_attempt || (isset($_SERVER['HTTPS']) && 
-        	(($_SERVER['HTTPS'] == 'on') || $_SERVER['HTTPS'] == '1'))))
+    if ($ssl_attempt || (isset($_SERVER['HTTPS']) && 
+        	(($_SERVER['HTTPS'] == 'on') || $_SERVER['HTTPS'] == '1')))
     		$strSsl = 'https://';
     
     if (substr($strHost,-1)=="/") $strHost = substr($strHost, 0, -1);
@@ -811,7 +810,13 @@ function _xls_site_url($strUrlPath =  '') {
 	if (substr($strUrlPath,0,4)=="http") return $strUrlPath; //we've passed through twice, don't double up
 	if (substr($strUrlPath,0,1)=="/") $strUrlPath = substr($strUrlPath,1,999); //remove a leading / so we don't // by accident
 	
-	$usessl = strstr($strUrlPath,"checkout") === false ?  false : true;
+	$usessl=false;
+	
+	if (_xls_get_conf('ENABLE_SSL',0)) {
+		if (_xls_get_conf('SSL_NO_NEED_FORWARD',0) != 1)
+			 $usessl = true;
+		elseif (strstr($strUrlPath,"checkout") !== false) $usessl = true;
+	}
 	return _xls_site_dir($usessl) . '/' . $strUrlPath;
 }
 

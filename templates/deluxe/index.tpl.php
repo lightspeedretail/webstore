@@ -107,17 +107,8 @@
 			
 				
 			</div>	
-			<a href="<?php echo _xls_site_dir() ?>">
-				<img src="<?php
-			     $img =  _xls_get_conf('HEADER_IMAGE' ,  false ); 
-			     
-			     if(!$img)
-			      $img = templateNamed('images') . '/webstore_installation.png';
-			     else{
-			      $img = _xls_get_url_resource($img);
-			     }
-			     echo $img;
-			     ?>" />
+			<a href="<?php echo _xls_site_url() ?>">
+				<img src="<? echo _xls_get_conf('HEADER_IMAGE' ,  false ); ?>" />
 			</a>
 		</div>
 
