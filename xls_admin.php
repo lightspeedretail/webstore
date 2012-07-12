@@ -6285,7 +6285,7 @@
 
 			$objProduct = Product::LoadByCode($ctlCode->Text);
 			if ($objProduct)
-				_rd($_SERVER["SCRIPT_NAME"]  . '?page=dbadmin&subpage=products&rowid='.$objProduct->Rowid. admin_sid());	
+				_rd('xls_admin.php?page=dbadmin&subpage=products&rowid='.$objProduct->Rowid. admin_sid());	
 			else
 				$ctlResult->Text = $ctlCode->Text . ' not found';
 			
@@ -6297,7 +6297,7 @@
 		}
 	    
 	    public function btnCancel_click($strFormId, $strControlId, $strParameter) {
-	    	_rd($_SERVER["SCRIPT_NAME"]  . '?page=dbadmin&subpage=dbpending' . admin_sid());
+	    	_rd('xls_admin.php?page=dbadmin&subpage=dbpending' . admin_sid());
 	    }
     
     	public function btnSave_click($strFormId, $strControlId, $strParameter){
