@@ -790,9 +790,9 @@ function _xls_site_dir($ssl_attempt = true) {
 	$strSsl = 'http://';
 	$strHost = $_SERVER['HTTP_HOST'] . dirname(QApplication::$ScriptName);
 	
-    if ($ssl_attempt && 
+    if ($ssl_attempt || ( 
         isset($_SERVER['HTTPS']) && 
-        (($_SERVER['HTTPS'] == 'on') || $_SERVER['HTTPS'] == '1'))
+        (($_SERVER['HTTPS'] == 'on') || $_SERVER['HTTPS'] == '1')))
     		$strSsl = 'https://';
     
     if (substr($strHost,-1)=="/") $strHost = substr($strHost, 0, -1);
@@ -802,8 +802,7 @@ function _xls_site_dir($ssl_attempt = true) {
 
 //
 /**
-* Returns full qualfied URL, based on sitedir and also
-* Determines whether we should append index.php
+* Returns fully qualified URL, based on sitedir
 *
 * @param string $strUrlPath optional
 * @return string url
@@ -816,14 +815,14 @@ function _xls_site_url($strUrlPath =  '') {
 	return _xls_site_dir($usessl) . '/' . $strUrlPath;
 }
 
-//Makes our SEO hypenated string from passed string
+//Makes our SEO hyphenated string from passed string
 //Used to build anything that will be in a URL. 
 //Same as seo_name plus lower case conversion and removing spaces
 function _xls_seo_url($string) {
 	return strtolower(trim(_xls_seo_name($string), '-'));
 }
 
-//Makes our SEO hypenated string from passed string
+//Makes our SEO hyphenated string from passed string
 //Used to build anything that will be in a Name. Allows spaces
 function _xls_seo_name($string) {
 	$string = str_replace('\'','',$string);
@@ -837,7 +836,7 @@ function _xls_seo_name($string) {
 	return trim($string, '- ');
 }
 
-//Makes our SEO hypenated string from passed string
+//Makes our SEO hyphenated string from passed string
 //Used to build anything that will be in a Name. Allows spaces
 function _xls_jssafe_name($string) {
 	$string = str_replace('\'','\\\'',$string);
