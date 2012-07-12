@@ -110,8 +110,8 @@
 			
 				
 			</div>	
-			<a href="<?php echo _xls_site_dir() ?>">
-				<img src="<? echo _xls_get_conf('HEADER_IMAGE' ,  false ); ?>" />
+			<a href="<?php echo _xls_site_url(); ?>">
+				<img src="<? echo _xls_site_url(_xls_get_conf('HEADER_IMAGE' ,  false )); ?>" />
 			</a>
 		</div>
 
