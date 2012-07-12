@@ -51,9 +51,9 @@ class store_pickup extends xlsws_class_shipping {
 		$ret['msg'] = new XLSTextBox($objParent);
 		$ret['msg']->Name = _sp('Store Pickup Message');
 		$ret['msg']->Text = 'Please quote order ID %s with photo ID at the reception for collection.';
-
+           		
 		$ret['product'] = new XLSTextBox($objParent);
-		$ret['product']->Name = _sp('LightSpeed Product Code');
+		$ret['product']->Name = _sp('LightSpeed Product Code (case sensitive)');
 		$ret['product']->Required = true;
 
 		$ret['markup'] = new XLSTextBox($objParent);

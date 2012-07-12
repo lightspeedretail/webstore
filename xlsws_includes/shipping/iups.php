@@ -162,16 +162,30 @@ class iups extends xlsws_class_shipping {
 	protected $strModuleName = "IUPS";
 
 	public function check() {
-		if(defined('XLSWS_ADMIN_MODULE'))
-			return true;
-
 		$vals = $this->getConfigValues(get_class($this));
-
+		
 		// if nothing has been configed return null
 		if(!$vals || count($vals) == 0)
 			return false;
+			
+		//Check possible scenarios why we would not offer free shipping
+		if ($vals['restrictcountry']) { //we have a country restriction
+			
+			switch($vals['restrictcountry']) {
+				case 'CUS':
+					if ($_SESSION['XLSWS_CART']->ShipCountry=="US" && 
+						($_SESSION['XLSWS_CART']->ShipState =="AK" || $_SESSION['XLSWS_CART']->ShipState=="HI"))
+						return false;
+				break;
+			
+				default:
+					if ($vals['restrictcountry']!=$_SESSION['XLSWS_CART']->ShipCountry) return false;
+			}
+		}
+
 		return true;
 	}
+
 
 	protected function make_iups_products($field) {
 		$config = $this->getConfigValues(get_class($this));
@@ -271,8 +285,17 @@ class iups extends xlsws_class_shipping {
 		$ret['package']->AddItem('UPS Worldwide 25 kilo', 'UW25');
 		$ret['package']->AddItem('UPS Worldwide 10 kilo', 'UW10');
 
+		$ret['restrictcountry'] = new XLSListBox($objParent);
+		$ret['restrictcountry']->Name = _sp('Only allow '.$this->strModuleName.' to');
+		$ret['restrictcountry']->AddItem('Everywhere (no restriction)', null);
+		$ret['restrictcountry']->AddItem('My Country ('. _xls_get_conf('DEFAULT_COUNTRY').')', _xls_get_conf('DEFAULT_COUNTRY'));
+		if (_xls_get_conf('DEFAULT_COUNTRY')=="US")
+			$ret['restrictcountry']->AddItem('Continental US', 'CUS'); //Really common request, so make a special entry
+		$ret['restrictcountry']->Enabled = true;
+		$ret['restrictcountry']->SelectedIndex = 0;
+           		
 		$ret['product'] = new XLSTextBox($objParent);
-		$ret['product']->Name = _sp('LightSpeed Product Code');
+		$ret['product']->Name = _sp('LightSpeed Product Code (case sensitive)');
 		$ret['product']->Required = true;
 		$ret['product']->Text = 'SHIPPING';
 

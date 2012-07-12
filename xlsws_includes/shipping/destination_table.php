@@ -54,9 +54,9 @@ class destination_table extends xlsws_class_shipping {
 		$ret['per']->AddItem('Item Count' , 'item');
 		$ret['per']->AddItem('Weight' , 'weight');
 		$ret['per']->AddItem('Volume' , 'volume');
-
+           		
 		$ret['product'] = new XLSTextBox($objParent);
-		$ret['product']->Name = _sp('LightSpeed Product Code');
+		$ret['product']->Name = _sp('LightSpeed Product Code (case sensitive)');
 		$ret['product']->Required = true;
 		$ret['product']->Text = 'SHIPPING';
 

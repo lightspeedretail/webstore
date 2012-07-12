@@ -38,6 +38,7 @@ class free_shipping extends xlsws_class_shipping {
 
 	// return the keys for this module
 	public function config_fields($objParent) {
+		
 		$ret= array();
 
 		$ret['label'] = new XLSTextBox($objParent);
@@ -72,7 +73,7 @@ class free_shipping extends xlsws_class_shipping {
 		$ret['qty_remaining']->ToolTip = _sp('If using Promo Code, how many times can this be used (blank=unlimited).');
 
 		$ret['restrictcountry'] = new XLSListBox($objParent);
-		$ret['restrictcountry']->Name = _sp('Only allow Free Shipping To');
+		$ret['restrictcountry']->Name = _sp('Only allow '.$this->strModuleName.' to');
 		$ret['restrictcountry']->AddItem('Everywhere (no restriction)', null);
 		$ret['restrictcountry']->AddItem('My Country ('. _xls_get_conf('DEFAULT_COUNTRY').')', _xls_get_conf('DEFAULT_COUNTRY'));
 		if (_xls_get_conf('DEFAULT_COUNTRY')=="US")

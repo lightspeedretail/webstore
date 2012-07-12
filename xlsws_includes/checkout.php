@@ -948,6 +948,7 @@ class xlsws_checkout extends xlsws_index {
 				$objCustomer->Lastname = trim($this->txtCRLName->Text);
 				$objCustomer->Mainname = (($this->customer) && ($this->customer->Mainname != '')) ? 
 					$this->customer->Mainname : (trim($this->txtCRFName->Text) . " " . trim($this->txtCRLName->Text));
+				$objCustomer->Mainphone = trim($this->txtCRMPhone->Text);
 				$objCustomer->Company = trim($this->txtCRCompany->Text);
 				$objCustomer->Address11 = trim($this->txtCRBillAddr1->Text);
 				$objCustomer->Address12 = trim($this->txtCRBillAddr2->Text);
