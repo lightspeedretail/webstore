@@ -786,11 +786,11 @@ function _xls_url_object() {
 * @param boolean ssl_attempt
 * @return string url
 */
-function _xls_site_dir($ssl_attempt = true) {
+function _xls_site_dir($ssl_attempt = false) {
 	$strSsl = 'http://';
 	$strHost = $_SERVER['HTTP_HOST'] . dirname(QApplication::$ScriptName);
 	
-    if ($ssl_attempt &&  (isset($_SERVER['HTTPS']) && 
+    if ($ssl_attempt ||  (isset($_SERVER['HTTPS']) && 
         	(($_SERVER['HTTPS'] == 'on') || $_SERVER['HTTPS'] == '1')))
     		$strSsl = 'https://';
     
@@ -806,7 +806,7 @@ function _xls_site_dir($ssl_attempt = true) {
 * @param string $strUrlPath optional
 * @return string url
 */
-function _xls_site_url($strUrlPath =  '',$bnlSsl = -1) {
+function _xls_site_url($strUrlPath =  '') {
 	if (substr($strUrlPath,0,4)=="http") return $strUrlPath; //we've passed through twice, don't double up
 	if (substr($strUrlPath,0,1)=="/") $strUrlPath = substr($strUrlPath,1,999); //remove a leading / so we don't // by accident
 	
@@ -820,7 +820,6 @@ function _xls_site_url($strUrlPath =  '',$bnlSsl = -1) {
 					strstr($strUrlPath,"customer-register") !== false
 		
 					) $usessl = true;
-		elseif ($bnlSsl != -1) $usessl = $bnlSsl;
 	}
 
 	
