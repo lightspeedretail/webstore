@@ -5845,6 +5845,10 @@
         	foreach ($arrItems as $item) {
         	
         		$arrRow = array();
+
+        		$arrRow['Rowid']=new QLabel($this,'Rowid'.$item->Rowid);
+        		$arrRow['Rowid']->Text = $item->Rowid;
+        		$arrRow['Rowid']->CssClass = "largefont";
         		
         		$arrRow['Code']=new QLabel($this,'Code'.$item->Rowid);
         		$arrRow['Code']->Text = $item->Code;
@@ -6011,19 +6015,18 @@
         		}
 				
    		
-        	} else  $this->arrProducts[$intItem][$strField]->CssClass = 'smallfont';
+        	} else
+        		$this->arrProducts[$intItem][$strField]->CssClass = 'smallfont';
   
 
 			//Recalculate line
 			if ($ctlQty->Text==0) {
-				$ctlCode->CssClass = 'largefont strikeout'; 
-				$ctlDescription->CssClass = 'largefont strikeout';
-				$ctlQty->CssClass = 'largefont strikeout';
+	       		QApplication::ExecuteJavaScript("$('#row".$intItem."').css('background-color','#aa3333');");
+        		QApplication::ExecuteJavaScript("$('#row".$intItem."').css('color','#ffffff');");
 			}
 			else {
-				$ctlDescription->CssClass = 'largefont';
-				$ctlCode->CssClass = 'largefont'; 
-				$ctlQty->CssClass = 'largefont';
+        		QApplication::ExecuteJavaScript("$('#row".$intItem."').css('background-color','#e2e2e2');");
+        		QApplication::ExecuteJavaScript("$('#row".$intItem."').css('color','#000000');");
 			}
 		
 		}

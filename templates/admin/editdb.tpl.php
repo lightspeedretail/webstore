@@ -183,7 +183,7 @@ if(isset($this->HelperRibbon))
 	<? 
 		foreach ($this->arrProducts as $arrProduct) { ?>
 		
-			<div class="basic_row rowbg">
+			<div class="basic_row rowbg" id="row<? echo $arrProduct['Rowid']->Text; ?>">
 				<div class="colfield ml10"><?php $arrProduct['Code']->Render(); ?></div>
 				<div class="colfield w70"><?php $arrProduct['Qty']->Render(); ?></div>
 				<div class="colfield w300"><?php $arrProduct['Description']->Render(); ?></div>
