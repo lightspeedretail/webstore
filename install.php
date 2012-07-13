@@ -1072,7 +1072,7 @@ EOT;
 				$checked['GD Library PNG']= ($phpinfo['gd']['PNG Support']=="enabled" ? "pass" : "fail");
 				$checked['GD Library Freetype Support']= ($phpinfo['gd']['FreeType Support']=="enabled" ? "pass" : "fail");
 				$checked['MCrypt Encryption Library']= isset($phpinfo['mcrypt']) ? "pass" : "fail";
-				$checked['Session use_only_cookies must be turned Off']= ($phpinfo['session']['session.use_only_cookies']=="Off" ? "pass" : "fail");
+				$checked['session.use_only_cookies must be turned Off']= ($phpinfo['session']['session.use_only_cookies']=="Off" ? "pass" : "fail");
 				$checked['Soap Library']= ($phpinfo['soap']['Soap Client']=="enabled" ? "pass" : "fail");
 				$checked['OpenSSL']= ($phpinfo['openssl']['OpenSSL support']=="enabled" ? "pass" : "fail");
 
