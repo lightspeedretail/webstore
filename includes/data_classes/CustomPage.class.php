@@ -52,7 +52,7 @@ class CustomPage extends CustomPageGen {
 			$strUrl .= "/".XLSURL::KEY_CUSTOMPAGE; //avoid conflicting Custom Page and Product URL
 
 
-		return _xls_site_url($strUrl);
+		return _xls_site_url($strUrl,false);
 		
 	}
 

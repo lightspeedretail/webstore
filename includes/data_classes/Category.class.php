@@ -473,7 +473,7 @@ EOS;
 				return $this->GetSlug();
 				
 			case 'CanonicalUrl':
-				return _xls_site_dir().'/'.$this->RequestUrl;
+				return _xls_site_dir(false).'/'.$this->RequestUrl;
 
 			case 'HasChildren':
 				return $this->HasChildren();

@@ -790,9 +790,12 @@ function _xls_site_dir($ssl_attempt = false) {
 	$strSsl = 'http://';
 	$strHost = $_SERVER['HTTP_HOST'] . dirname(QApplication::$ScriptName);
 	
-    if ($ssl_attempt ||  (isset($_SERVER['HTTPS']) && 
-        	(($_SERVER['HTTPS'] == 'on') || $_SERVER['HTTPS'] == '1')))
-    		$strSsl = 'https://';
+    if ($ssl_attempt || 
+    	  isset($_SERVER['HTTPS']) && 
+        	
+        		($_SERVER['HTTPS'] == 'on') || $_SERVER['HTTPS'] == '1'
+        )
+    	$strSsl = 'https://';
     
     if (substr($strHost,-1)=="/") $strHost = substr($strHost, 0, -1);
 
@@ -801,7 +804,7 @@ function _xls_site_dir($ssl_attempt = false) {
 
 //
 /**
-* Returns fully qualified URL, based on sitedir
+* Returns fully qualified URL, based on sitedir. Used to generate a link.
 *
 * @param string $strUrlPath optional
 * @return string url
@@ -816,13 +819,10 @@ function _xls_site_url($strUrlPath =  '') {
 		if (_xls_get_conf('SSL_NO_NEED_FORWARD',0) != 1)
 			 $usessl = true;
 		elseif (	strstr($strUrlPath,"checkout") !== false ||
-					strstr($strUrlPath,"login") !== false ||
 					strstr($strUrlPath,"customer-register") !== false
 		
 					) $usessl = true;
 	}
-
-	
 	
 	return _xls_site_dir($usessl) . '/' . $strUrlPath;
 }
