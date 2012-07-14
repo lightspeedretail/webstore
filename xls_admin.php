@@ -698,7 +698,7 @@
 
 
 				case 'SSL_NO_NEED_FORWARD':
-					return array(1 => _sp("Only when going to Checkout or pages involving passwords"),0 => _sp("At all times including browsing product pages"));											
+					return array(1 => _sp("Only when going to Checkout"),0 => _sp("At all times including browsing product pages"));											
 				case 'ALLOW_GUEST_CHECKOUT':
 					return array(1 => _sp("without first registering for an account (default)"),0 => _sp("only after creating an account"));										
 					
@@ -972,7 +972,8 @@
 
 			$this->configPnls['security'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Security , "configDone");
 			$this->configPnls['security']->Name = _sp('Security');
-			$this->configPnls['security']->Info = _sp('Secure your store.');			
+			$this->configPnls['security']->Info = _sp('Secure your store.');
+			$this->configPnls['security']->ConfigurationGuide = "Note that Enabling SSL will not work before you have actually ordered and installed your SSL certificate. Turning this option on without the certificate actually installed<br>on your site will cause Web Store to be non-functional.";			
 			
 		}
 		
