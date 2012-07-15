@@ -85,6 +85,7 @@
 	</head>
 	
 	<?php $this->RenderBegin(); ?>
+	<?php $this->lblSharingHeader->Render(); ?>
 
 	
 	<?php $this->dxLogin->Render(); ?>
@@ -187,5 +188,7 @@
 		window.setTimeout("document.location.href='<?= _xls_site_dir() ?>/index.php'" , <?= $expires ?> * 1000 + 5000 );
 	</script>
 <?php endif; ?>
+
+<?php $this->lblSharingFooter->Render(); ?>
 <?php $this->RenderEnd(); ?>
 </html>
