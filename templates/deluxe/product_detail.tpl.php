@@ -27,6 +27,7 @@
 
 ?>
 <div>
+<?php $this->pnlSharingTools->Render(); ?>
 			<div class="product_details border rounded" style="display: block; float: left; margin-left: 12px;">
 				
 				<div class="left">
@@ -60,7 +61,7 @@
 				
 				
 				 <h1><?php $this->lblTitle->Render(); ?></h1> 
-				<?php $this->pnlSharingTools->Render(); ?>
+				
 				<?php if(_xls_get_conf('SHOW_TEMPLATE_CODE' , 1)): ?>
 				 <h2><?= $this->prod->Code ?></h2>
 				<?php endif; ?>	
