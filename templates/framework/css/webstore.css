@@ -773,12 +773,13 @@ padding:3px 7px 3px 0;
 }
 
 #sharingtools {
-display:relative;
+display:absolute;
 height: 28px;
-margin-top: -30px;
+margin-top: -53px;
+margin-left: 500px;
 text-align: right;
-width: 450px;
-z-index: 100;
+width: 250px;
+z-index: 1100;
 }
 
 /***** Invoice Cart *****/

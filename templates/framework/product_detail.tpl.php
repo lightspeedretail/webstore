@@ -26,8 +26,8 @@
  */
 
 ?>
-
 <div>
+<?php $this->pnlSharingTools->Render(); ?>
 			<div class="product_details border rounded" style="display: block; float: left;">
 				
 				<div class="left">
@@ -62,12 +62,6 @@
 				
 				
 				 <h1><?php $this->lblTitle->Render(); ?></h1>
-				 <?php if(_xls_get_conf('SHOW_SHARING' , 0)): ?>
-				<div id="sharingtools">
-				<div class="fb-like" data-href="<? echo $this->prod->CanonicalUrl; ?>" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false"></div>
-				<a href="https://pinterest.com/pin/create/button/?url=<? echo $this->prod->CanonicalUrl; ?>&media=<? echo _xls_site_dir().$this->prod->SmallImage; ?>&description=<? echo urlencode($this->prod->Name); ?>" class="pin-it-button" count-layout="horizontal"><img border="0" src="//assets.pinterest.com/images/PinExt.png" title="Pin It" /></a>
-				</div>
-				<?php endif; ?>	
 				 <?php if(_xls_get_conf('SHOW_TEMPLATE_CODE' , 1)): ?>
 				 <h2><?= $this->prod->Code ?></h2>
 				<?php endif; ?>	
