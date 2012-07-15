@@ -679,6 +679,12 @@ class xlsws_db_maintenance extends xlsws_index {
 				'SHIP_SAME_BILLSHIP', '0', 'Locks the Shipping and Billing are same checkbox to not allow separate shipping address.', 25, 2, NOW(), NOW(), 'BOOL');");	
 			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=25, `sort_order`=1 
 				where `key`='SHIP_RESTRICT_DESTINATION'");	
+			if ($this->add_column('xlsws_shipping_tiers' , 'class_name' ,
+				"ALTER TABLE `xlsws_shipping_tiers` ADD `class_name` VARCHAR(255)  NULL  DEFAULT NULL  AFTER `rate`;"))
+			_dbx("update xlsws_shipping_tiers set `class_name`='tier_table'");
+			
+
+			
 					
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			
