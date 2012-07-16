@@ -1107,31 +1107,19 @@ EOT;
 				$checked['<b>--Upgrade Check RESULTS BELOW--</b>']= "pass";
 				
 				//Have we run the Upgrade Database to add new fields to the database?				
-				$result = _dbx_first_cell("select `key` from xlsws_configuration where `key`='SESSION_HANDLER'");
-				$checked['Upgrade Database command has been run from Admin Panel'] = ($result=="SESSION_HANDLER" ? "pass" : "fail");								
-				//Have new 2.1 templates been added
+				$result = _dbx_first_cell("select `key` from xlsws_configuration where `key`='GOOGLE_VERIFY'");
+				$checked['Upgrade Database command has been run from Admin Panel'] = ($result=="GOOGLE_VERIFY" ? "pass" : "fail");								
+				//Have new 2.2 templates been added
 				$template = _dbx_first_cell("select `value` from xlsws_configuration where `key`='DEFAULT_TEMPLATE'");
-				$checked['search_advanced.tpl.php added to your templates'] = file_exists("templates/".$template."/search_advanced.tpl.php") ? "pass" : "fail";
-				$checked['slider.tpl.php added to your templates'] = file_exists("templates/".$template."/slider.tpl.php") ? "pass" : "fail";				
-				$checked['promo_code.tpl.php added to your templates'] = file_exists("templates/".$template."/promo_code.tpl.php") ? "pass" : "fail";
-				$checked['adv_search.png added to your templates css/images'] = file_exists("templates/".$template."/css/images/adv_search.png") ? "pass" : "fail";
-
+				$checked['2.2 Templates added'] = file_exists("templates/".$template."/sharing.tpl.php") ? "pass" : "fail";
+				
 				//Has CSS been updated
 				$filename = "templates/".$template."/css/webstore.css";
                 $handle = fopen($filename, "r");
                 $contents = fread($handle, filesize($filename));
                 fclose($handle);               
-                $checked['products_sliber_theme_bg removed from your templates/css'] = !preg_match('/products_sliber_theme_bg/', $contents) ? "pass" : "fail";
-				
-				//Has configuration_inc.php either been replaced or modified correctly
-				$filename = "includes/configuration.inc.php";
-                $handle = fopen($filename, "r");
-                $contents = fread($handle, filesize($filename));
-                fclose($handle);               
-                $checked['configuration.inc.php removed DEVTOOLS_CLI line'] = !preg_match('/__DEVTOOLS_CLI__/', $contents) ? "pass" : "fail";
-                $checked['configuration.inc.php removed ERROR_PAGE_PATH line'] = !preg_match('/ERROR_PAGE_PATH/', $contents) ? "pass" : "fail";
-                $checked['configuration.inc.php has utf8 on db connect'] = preg_match('/\'encoding\' => \'utf8\',/', $contents) ? "pass" : "fail";
-             
+                $checked['2.2 CSS changes made'] = preg_match('/sharingtools/', $contents) ? "pass" : "fail";
+				             
 				$checked['<b>Note: Specific template code changes are not checked.</b>']= "pass";
              
                 return $checked;
@@ -1143,20 +1131,34 @@ EOT;
 				
 				include("includes/signatures.php");
 
-
+				$template = _dbx_first_cell("select `value` from xlsws_configuration where `key`='DEFAULT_TEMPLATE'");
+	
 				$fn=unserialize($signatures);
 				if(!isset($signatures)) $checked['Signature File in /includes']="fail";
+				
 				foreach($fn as $key=>$value) {
-					if(!file_exists($key))
-						$checked[$key] = "MISSING";
-					else {
-				    $hashes=explode(",",$value);
-				    $hashfile=md5_file($key);
-				    if (!in_array($hashfile,$hashes))
-				        $checked[$key] = "modified";
-				    elseif(_xls_version() != $versions[array_search($hashfile,$hashes)] || $complete)
-				        $checked[$key] = $versions[array_search($hashfile,$hashes)];
-				   } 
+				
+					if (strstr($key,'/templates') && !strstr($key,'/templates/'.$template))
+					{
+						//skip not our template
+					}
+					else
+					{
+					
+						if(!file_exists($key))
+							$checked[$key] = "MISSING";
+						else {
+					    $hashes=explode(",",$value);
+					    $hashfile=md5_file($key);
+					    if (!in_array($hashfile,$hashes))
+					        $checked[$key] = "modified";
+					    elseif(_xls_version() != $versions[array_search($hashfile,$hashes)] || $complete)
+					        $checked[$key] = $versions[array_search($hashfile,$hashes)];
+					   } 
+					
+					}
+					
+					
 				}         
                 return $checked;
 			}
