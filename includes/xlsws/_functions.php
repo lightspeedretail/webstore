@@ -239,8 +239,8 @@ function _xls_get_ip() {
 }
 
 function _xls_latest_release() {
-    $ghclass = new Github;
-    return $ghclass->getLatestRelease();
+    $objVersion = new XLSVersion;
+    return $objVersion->getLatestRelease();
 }
 
 /**

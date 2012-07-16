@@ -25,34 +25,32 @@
  */
 
 
-class Github {
+class XLSVersion {
 
 	var $LatestTag;
 	
 	private function getJson($url){
-	    $base = "https://api.github.com/";
+	    /*$base = "http://www.example.com/";
 	    $curl = curl_init();
 	    curl_setopt($curl, CURLOPT_URL, $base . $url);
 	    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 	    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 	    $content = curl_exec($curl);
 	    curl_close($curl);
+	    */
+	    $content = '[{"result":"OK"}]';
 	    return $content;
+	   
 	}
 	
 	private function getTags(){
 	    // Get the name of the repo that we'll use in the request url
-	    return json_decode($this->getJson("repos/lightspeedretail/webstore/tags"),true);
+	    return json_decode($this->getJson(),true);
 	} 
 	
 	public function getLatestRelease() {
-		$arrGitTags = $this->getTags();
-		foreach($arrGitTags as $arrTag)
-			$tag[] = $arrTag['name'];
-		rsort($tag);
-	
-		$this->LatestTag=$tag[0];
-		return $this->LatestTag;
+		$arrTags = $this->getTags();
+		return $arrTags[0];
 	}
 	
 	
