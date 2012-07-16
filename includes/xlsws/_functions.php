@@ -238,6 +238,11 @@ function _xls_get_ip() {
 	return $hname;
 }
 
+function _xls_latest_release() {
+    $ghclass = new Github;
+    return $ghclass->getLatestRelease();
+}
+
 /**
  * Return values of an array as value and key (itself)
  *

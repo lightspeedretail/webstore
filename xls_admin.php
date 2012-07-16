@@ -32,6 +32,7 @@
 
 	ob_start(); // These includes may spit content which we need to ignore
 	require_once('includes/prepend.inc.php');
+	include('includes/xlsws/core/XLSGithub.php');
 	_xls_lang_init(_xls_get_conf('LANGUAGE_DEFAULT' , 'en'));
 	ob_end_clean();	
 
@@ -311,9 +312,14 @@
 			$this->pxyPanelClick->AddAction(new QClickEvent() , new QServerAction('ChangePanel'));
 			$this->pxyPanelClick->AddAction(new QClickEvent() , new QTerminateAction());
 						
-		
+			/*$ghver = _xls_latest_release();
+			$curver=_xls_version();
+			 if($curver<>$ghver && _xls_get_conf('LIGHTSPEED_HOSTING',0)==0)
+				$this->AlertRibbon = "<b>Web Store Alert: Version ".$ghver." has been released. Your current version is ".$curver.". Please visit lightspeedretail.com/release-notes for details.</b>";
+			*/
+				
 			if (!file_exists(__DOCROOT__ .  __SUBDIRECTORY__ . '/.htaccess'))
-						$this->AlertRibbon = "<b>WARNING: Missing .htaccess file.</b> There is a file named htaccess (without the period) in your webstore root folder. Rename this file with a period (as .htaccess) to enable store URLs to work properly. Please see documentation for additional help.";
+				$this->AlertRibbon = "<b>WARNING: Missing .htaccess file.</b> There is a file named htaccess (without the period) in your webstore root folder. Rename this file with a period (as .htaccess) to enable store URLs to work properly. Please see documentation for additional help.";
 						
 		
 		}
