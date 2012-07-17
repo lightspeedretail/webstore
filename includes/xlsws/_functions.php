@@ -238,10 +238,6 @@ function _xls_get_ip() {
 	return $hname;
 }
 
-function _xls_latest_release() {
-    $objVersion = new XLSVersion;
-    return $objVersion->getLatestRelease();
-}
 
 /**
  * Return values of an array as value and key (itself)

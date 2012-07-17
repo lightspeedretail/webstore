@@ -32,7 +32,6 @@
 
 	ob_start(); // These includes may spit content which we need to ignore
 	require_once('includes/prepend.inc.php');
-	include('includes/xlsws/core/XLSVersion.php');
 	_xls_lang_init(_xls_get_conf('LANGUAGE_DEFAULT' , 'en'));
 	ob_end_clean();	
 
@@ -312,12 +311,6 @@
 			$this->pxyPanelClick->AddAction(new QClickEvent() , new QServerAction('ChangePanel'));
 			$this->pxyPanelClick->AddAction(new QClickEvent() , new QTerminateAction());
 						
-			$arrVer = _xls_latest_release(_xls_version(),_xls_get_conf('LIGHTSPEED_HOSTING',0)); 
-			 if($arrVer['result']=="NEW")
-				$this->AlertRibbon = $arrVer['message'];
-			 if($arrVer['result']=="ERROR")
-				QApplication::Log(E_ERROR, 'str', "Version check error");
-			
 				
 			if (!file_exists(__DOCROOT__ .  __SUBDIRECTORY__ . '/.htaccess'))
 				$this->AlertRibbon = "<b>WARNING: Missing .htaccess file.</b> There is a file named htaccess (without the period) in your webstore root folder. Rename this file with a period (as .htaccess) to enable store URLs to work properly. Please see documentation for additional help.";
