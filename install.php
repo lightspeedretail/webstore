@@ -3144,21 +3144,6 @@ margin: 0;
 	vertical-align: middle;
 }
 
-<?php if (isset($_GET['upgrade'])) { ?>
-.install_content {
-	width: 820px;
-}
-#content {
-	width: 812px;
-	min-width: 812px;
-	max-width: 812px;
-}
-<? } ?>
-
-.header	{
-	margin: 5px 0 45px -70px;
-}
-
 .install_agreement{
 	height: 400px;
 	width: 500px;
@@ -3168,6 +3153,26 @@ margin: 0;
 	padding: 5px 2px 2px 10px;
 	margin: 20px 0 10px 0;
 }
+
+
+<?php if (isset($_GET['upgrade'])) { ?>
+.install_content {
+	width: 820px;
+}
+#content {
+	width: 812px;
+	min-width: 812px;
+	max-width: 812px;
+}
+.install_agreement {
+	width: 800px;
+}
+<? } ?>
+
+.header	{
+	margin: 5px 0 45px -70px;
+}
+
 
 .install_agreement input {
 border:1px solid #acacac;
