@@ -943,11 +943,17 @@ class xlsws_checkout extends xlsws_index {
 			if ($this->PasswordControl->Password1->Text != '' &&
 				$this->PasswordControl->Password2->Text != '' &&
 				$this->PasswordControl->Password1->Text == $this->PasswordControl->Password2->Text) {
-						
 				
+				$strEmail = strtolower(trim($this->BillingContactControl->Email));
+					
+				$objTestCustomer = Customer::LoadByEmail($strEmail);
+				if ($objTestCustomer) {
+					$this->errSpan->Text = _sp("Cannot create new account. An account with the email ".$strEmail." already exists.");
+					return "exists";
+				}
 				$objCustomer = new Customer();
 				
-				$objCustomer->Email= strtolower(trim($this->BillingContactControl->Email));
+				$objCustomer->Email= $strEmail;
 				$objCustomer->Password = md5(trim($this->PasswordControl->Password1->Text));
 				$objCustomer->Firstname = trim($this->txtCRFName->Text);
 				$objCustomer->Lastname = trim($this->txtCRLName->Text);
@@ -1020,7 +1026,12 @@ class xlsws_checkout extends xlsws_index {
 
     protected function CompleteCheckout() {
 
-        $objCustomer = $this->CompleteUpdateCustomer();
+        $retMixValue= $this->CompleteUpdateCustomer();
+        if ($retMixValue == "exists")
+        	return;
+        else
+        	$objCustomer = $retMixValue;
+        
         $objPromo = $this->CompleteUpdatePromoCode();
         $objCart = $this->CompleteUpdateCart();
 
