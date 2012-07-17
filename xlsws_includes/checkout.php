@@ -223,7 +223,11 @@ class xlsws_checkout extends xlsws_index {
     public function DoCalculateShippingClick($strFormId, $strControlId, 
         $strParameter) {
 
-        return $this->UpdateAfterShippingAddressChange();
+        $blnValid =  $this->UpdateAfterShippingAddressChange();
+
+        if ($strControlId=="CalculateShippingCtrl" && !$blnValid)
+			QApplication::ExecuteJavaScript("alert('"._sp("Unable to calculate shipping. Check form entry blanks for errors.")."')");
+        return $blnValid;
     }
 
     protected function BuildPreviousAddressControl() {
@@ -758,6 +762,7 @@ class xlsws_checkout extends xlsws_index {
         
         $this->UpdateCartControl();
         
+        return $blnValid;
        // $this->pnlWait->Visible = false;
 
     }
@@ -1023,6 +1028,16 @@ class xlsws_checkout extends xlsws_index {
 
         if (!$this->PrePaymentHooks())
             return false;
+
+		if (!$objCart->PaymentModule) {
+			$this->errSpan->Text = _sp("Shipping error. Please choose a valid payment method.");
+			return false;
+		}
+		
+		if (!$objCart->ShippingModule) {
+			$this->errSpan->Text = _sp("Shipping error. Please choose a valid shipping method.");
+			return false;
+		}
 
         $objPaymentModule = $this->loadModule(
             $objCart->PaymentModule . '.php',
