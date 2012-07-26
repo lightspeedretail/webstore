@@ -1123,7 +1123,7 @@ function _xls_set_crumbtrail($arrCrumbs = null) {
  */
 function _xls_get_crumbtrail($type = 'full') {
 
-	if (!isset($_SESSION['crumbtrail'])) return false;
+	if (!isset($_SESSION['crumbtrail'])) return array();
 	
 	if ($type=='full') return $_SESSION['crumbtrail'];
 	
