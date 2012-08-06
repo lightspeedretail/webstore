@@ -554,8 +554,7 @@ class xlsws_db_maintenance extends xlsws_index {
 			
 			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=17, `sort_order`=15 
 				where `key`='PRODUCT_ENLARGE_SHOW_LIGHTBOX'");	
-			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=17, `sort_order`=16 
-				where `key`='IMAGE_STORE'");	
+
 			$this->add_config_key('ENABLE_CATEGORY_IMAGE' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Display Image on Category Page (when set)', 
 				'ENABLE_CATEGORY_IMAGE', '0', 'Requires a defined Category image under SEO settings', 17, 13, NOW(), NOW(), 'BOOL');");				
