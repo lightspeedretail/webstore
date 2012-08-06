@@ -109,7 +109,7 @@ class Images extends ImagesGen {
 			return Images::GetImageUri($objImage->ImagePath);
 
 		$strType = ImagesType::ToString($intType);
-		return "index.php?$strType=$intRowid";
+		return _xls_site_url("ctn/photo?$strType=$intRowid");
 	}
 
 	// LEGACY
@@ -190,7 +190,7 @@ class Images extends ImagesGen {
 	public function GetLink() {
 		if ($this->ImageFileExists())
 			return Images::GetImageUri($this->ImagePath);
-		return "index.php?image=$this->intRowid";
+		return _xls_site_url("ctn/photo?image=$this->intRowid");
 	}
 
 	public function GetPath() {

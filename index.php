@@ -109,6 +109,10 @@ switch ($objUrl->RouteController)
 	case 'xlspg':
 		$strFile = $objUrl->RouteId.".php";
 		break;
+
+	case 'photo': //only when thumbnail is missing
+		//do not set $strFile so we skip down to images
+		break;
 	
 }
 
@@ -132,35 +136,36 @@ if (isset($strFile)) {
 			}
 }
 
+if ($objUrl->RouteController=="photo") {
+	//If we are directly trying to get photos, process those here.
+	foreach (ImagesType::$NameArray as $strType) {
+		if (!isset($_GET[$strType]))
+			continue;
 
-//If we are directly trying to get photos, process those here.
-foreach (ImagesType::$NameArray as $strType) {
-	if (!isset($_GET[$strType]))
-		continue;
+		$intType = ImagesType::ToToken($strType);
 
-	$intType = ImagesType::ToToken($strType);
+		$imgid = $_GET[$strType];
+		$imgid = trim($imgid);
 
-	$imgid = $_GET[$strType];
-	$imgid = trim($imgid);
+		if (!empty($imgid))
+			$img = Images::Load($imgid);
 
-	if (!empty($imgid))
-		$img = Images::Load($imgid);
+		if (!$img) {
+			$img = new Images();
+			if ($intType == ImagesType::normal)
+				$img->Width = $img->Height = 256;
+		}
 
-	if (!$img) {
-		$img = new Images();
-		if ($intType == ImagesType::normal)
-			$img->Width = $img->Height = 256;
+		if ($intType == ImagesType::normal) {
+			$img->Show();
+			exit;
+		}
+
+		list($intWidth, $intHeight) = ImagesType::GetSize($intType);
+		$img->ShowThumb($intWidth, $intHeight);
+
+		break;
 	}
-
-	if ($intType == ImagesType::normal) {
-		$img->Show();
-		exit;
-	}
-
-	list($intWidth, $intHeight) = ImagesType::GetSize($intType);
-	$img->ShowThumb($intWidth, $intHeight);
-
-	break;
 }
 
 

@@ -45,6 +45,7 @@ class XLSURL {
 	const KEY_PAGE = "pg"; //formerly anything that was xlspg=
 	const KEY_SEARCH = "search";
 	const KEY_IMAGE = "img";
+	const KEY_PHOTO = "photo";
 
 	protected $strUri; //URL before parsing
 	protected $strRouteCode; //p for product, c for category, checkout for checkout, etc. can be customized
@@ -160,8 +161,13 @@ class XLSURL {
 				$this->strRouteController = "searchresults";
 				$this->intStatus=200;
 				break;
+
+			case XLSURL::KEY_PHOTO: //Photo url to trigger thumbnail creation
+				$this->strRouteController = "photo";
+				$this->intStatus=200;
+				break;
 			
-			default:			
+			default:
 				$this->strRouteId = $this->arrUrlSegments[0];
 				if (empty($this->strRouteId)) {
 					$objCp = CustomPage::LoadByKey('index');

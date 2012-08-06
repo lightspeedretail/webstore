@@ -52,7 +52,9 @@ class XLSImagePopup extends QDialogBox {
 		else
 			$this->current_image = $prod->ImageId;
 
-		$this->pnlImage->Text = '<img src="index.php?image=' . $this->current_image . '" alt="" class="" />';
+		$this->pnlImage->Text = '<img src="'._xls_site_url('ctn/photo?image=' . $this->current_image) . '"
+		alt="" class=""
+		/>';
 
 		$img = Images::Load($this->current_image);
 
