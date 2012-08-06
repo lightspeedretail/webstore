@@ -919,8 +919,8 @@
 			
 			
 			$this->configPnls['image'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Images , "configDone");
-			$this->configPnls['image']->Name = _sp('Images');
-			$this->configPnls['image']->Info = _sp('Image dimensions and other image related options');
+			$this->configPnls['image']->Name = _sp('Product Photos');
+			$this->configPnls['image']->Info = _sp('Photo dimensions and other image related options');
 			
 			
 			$this->configPnls['cart'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Cart , "configDone");
