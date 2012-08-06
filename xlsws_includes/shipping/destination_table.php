@@ -98,7 +98,7 @@ class destination_table extends xlsws_class_shipping {
 	 * No return value, since it updates the passed reference
 	 */
 	public function total($fields, $cart, $country = '', $zipcode = '', $state = '', $city = '', $address2 = '', $address1= '', $company = '', $lname = '', $fname = '') {
-		$config = $this->getConfigValues('destination_table');
+		$config = $this->getConfigValues(get_class($this));
 
 		$unit = 1;
 

@@ -126,7 +126,7 @@ class eway_cvn_aus extends credit_card {
 	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
-		$config = $this->getConfigValues('eway_cvn_aus');
+		$config = $this->getConfigValues(get_class($this));
 
 		$ewayCustomerID	= $config['login'];
 		$amount			= $cart->Total;
@@ -182,7 +182,7 @@ class eway_cvn_aus extends credit_card {
 	 * @return $xmlResponse
 	 */
 	function sendTransactionToEway($xmlRequest) {
-		$config = $this->getConfigValues('eway_cvn_aus');
+		$config = $this->getConfigValues(get_class($this));
 
 		if($config['live'] == 'live')
 			$eway_cvn_aus_url = "https://www.eway.com.au/gateway_cvn/xmlpayment.asp";

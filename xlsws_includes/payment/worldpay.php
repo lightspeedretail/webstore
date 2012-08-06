@@ -126,7 +126,7 @@ class worldpay extends xlsws_class_payment {
 	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
-		$config = $this->getConfigValues('worldpay');
+		$config = $this->getConfigValues(get_class($this));
 
 		$installation_id = $config['login'];
 		$worldpay_url = "";
@@ -180,7 +180,7 @@ class worldpay extends xlsws_class_payment {
 		if(!isset($XLSWS_VARS['instId']))
 			return false;
 
-		$config = $this->getConfigValues('worldpay');
+		$config = $this->getConfigValues(get_class($this));
 
 		if($XLSWS_VARS['instId'] != $config['login']) // it's not the same!
 			return false;

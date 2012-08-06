@@ -338,7 +338,7 @@ class intershipper extends xlsws_class_shipping {
 	public function total($fields, $cart, $country = '', $zipcode = '', $state = '',
 		$city = '', $address2 = '', $address1 = '', $company = '', $lname = '', $fname = '') {
 
-		$config = $this->getConfigValues('intershipper');
+		$config = $this->getConfigValues(get_class($this));
 
 		if(empty($config['origincountry'])  ||  empty($config['originpostcode'])  ||  empty($config['username'])  ||  empty($config['password']) )
 			return false;

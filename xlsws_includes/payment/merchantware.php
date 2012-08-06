@@ -109,7 +109,7 @@ class merchantware extends credit_card {
 	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
-		$config = $this->getConfigValues('merchantware');
+		$config = $this->getConfigValues(get_class($this));
 
 		// Credential configuration
 		$cred_site_id = $config['site_id'];

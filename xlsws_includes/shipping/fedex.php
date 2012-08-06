@@ -219,7 +219,7 @@ class fedex extends xlsws_class_shipping {
 	 */
 	public function customer_fields($objParent) {
 		$ret = array();
-		$config = $this->getConfigValues('fedex');
+		$config = $this->getConfigValues(get_class($this));
 
 		$ret['service'] = new XLSListBox($objParent,'ModuleMethod');
 		$this->make_Fedex_services($ret['service']);
@@ -311,7 +311,7 @@ class fedex extends xlsws_class_shipping {
 	public function total($fields, $cart, $country = '', $zipcode = '', $state = '',
 			$city = '', $address2 = '', $address1= '', $company = '', $lname = '', $fname = '') {
 
-		$config = $this->getConfigValues('fedex');
+		$config = $this->getConfigValues(get_class($this));
 
 		$weight = $cart->Weight;
 

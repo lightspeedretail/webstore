@@ -40,7 +40,7 @@ class beanstream_sim extends xlsws_class_payment {
 	 *
 	 */
 	public function name() {
-		$config = $this->getConfigValues('beanstream_sim');
+		$config = $this->getConfigValues(get_class($this));
 
 		if(isset($config['label']))
 			return $config['label'];
@@ -133,7 +133,7 @@ class beanstream_sim extends xlsws_class_payment {
 	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
-		$config = $this->getConfigValues('beanstream_sim');
+		$config = $this->getConfigValues(get_class($this));
 
 		$merchantId		= $config['login'];
 		$hashval		= $config['md5hash'];

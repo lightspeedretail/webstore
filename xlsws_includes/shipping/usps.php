@@ -227,7 +227,7 @@ class usps extends xlsws_class_shipping {
 		if(!$selected)
 			$selected = _xls_stack_pop('usps_method');
 
-		$config = $this->getConfigValues('USPS');
+		$config = $this->getConfigValues(get_class($this));
 
 		$weight = $cart->total_weight();
 
@@ -396,7 +396,7 @@ class usps extends xlsws_class_shipping {
 	public function getRate($showall=false) {
 		if (($this->ounces + $this->pounds) == 0)
 			$this->pounds=1;
-        $config = $this->getConfigValues('usps');
+        $config = $this->getConfigValues(get_class($this));
 		$request = ($this->isDomestic()) ? $this->buildDomesticRateRequest() : $this->buildInternationalRateRequest() ;
 		$this->response = $this->sendUSPSRateRequest($request);
 

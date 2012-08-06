@@ -143,7 +143,7 @@ class authorize_dot_net_aim extends credit_card {
 	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
-		$config = $this->getConfigValues('authorize_dot_net_aim');
+		$config = $this->getConfigValues(get_class($this));
 
 		$auth_net_login_id = $config['login'];
 		$auth_net_tran_key = $config['trans_key'];

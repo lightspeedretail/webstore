@@ -38,7 +38,7 @@ class credit_card extends xlsws_class_payment {
 	 * @return string
 	 */
 	public function name() {
-		$config = $this->getConfigValues('credit_card');
+		$config = $this->getConfigValues(get_class($this));
 
 		return "Sample Credit Card. Reference only access";
 	}

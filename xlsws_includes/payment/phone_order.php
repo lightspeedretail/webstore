@@ -122,7 +122,7 @@ class phone_order extends xlsws_class_payment {
 	public function customer_fields($parentObj) {
 		$ret= array();
 
-		$config = $this->getConfigValues('phone_order');
+		$config = $this->getConfigValues(get_class($this));
 		$ret['phone'] = new QLabel($parentObj);
 		$ret['phone']->Text = $config['phone'];
 		return $ret;

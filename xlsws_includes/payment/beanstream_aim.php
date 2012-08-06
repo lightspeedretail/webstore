@@ -130,7 +130,7 @@ class beanstream_aim extends credit_card {
 	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
-		$config = $this->getConfigValues('beanstream_aim');
+		$config = $this->getConfigValues(get_class($this));
 
 		$merchantId = $config['login'];
 		$amount = $cart->Total;

@@ -128,7 +128,7 @@ class flat_rate extends xlsws_class_shipping {
 	public function total($fields, $cart, $country = '', $zipcode = '', $state = '',
 		$city = '', $address2 = '', $address1= '', $company = '', $lname = '', $fname = '') {
 
-		$config = $this->getConfigValues('flat_rate');
+		$config = $this->getConfigValues(get_class($this));
 
 		$price = 0;
 

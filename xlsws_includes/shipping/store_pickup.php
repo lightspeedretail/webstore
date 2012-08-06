@@ -104,7 +104,7 @@ class store_pickup extends xlsws_class_shipping {
 	 *
 	 */
 	public function message($cart) { 
-		$config = $this->getConfigValues('store_pickup');
+		$config = $this->getConfigValues(get_class($this));
 
 		return sprintf( $config['msg'], $cart->IdStr);
 	}

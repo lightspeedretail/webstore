@@ -137,7 +137,7 @@ class paypal extends xlsws_class_payment {
 	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
-		$config = $this->getConfigValues('paypal');
+		$config = $this->getConfigValues(get_class($this));
 
 		$paypal_email	= $config['login'];
 		$paypal_url = "";
@@ -190,7 +190,7 @@ class paypal extends xlsws_class_payment {
 		$paypal_url = "";
 		$order_id = "";
 
-		$config = $this->getConfigValues('paypal');
+		$config = $this->getConfigValues(get_class($this));
 		if($config['live'] == 'live')
 			$paypal_url = "https://www.paypal.com/cgi-bin/webscr";
 		else

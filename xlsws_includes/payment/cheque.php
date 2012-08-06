@@ -121,7 +121,7 @@ class cheque extends xlsws_class_payment {
 	public function customer_fields($parentObj) {
 		$ret= array();
 
-		$config = $this->getConfigValues('cheque');
+		$config = $this->getConfigValues(get_class($this));
 		$ret['adde'] = new QLabel($parentObj);
 		$ret['adde']->Text = $config['adde'];
 
