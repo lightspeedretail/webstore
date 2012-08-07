@@ -1145,10 +1145,12 @@ class xlsws_checkout extends xlsws_index {
 		$blnSend=true;
         if (_xls_get_conf('EMAIL_SEND_STORE',0)==1)
         	$blnSend = xlsws_index::SendOwnerEmail($objCart, $objCustomer);
-		if (_xls_get_conf('EMAIL_SEND_CUSTOMER',0)==1 && $bnlSend) //if we failed to send store email, email is down and skip this one
+	    if (!$blnSend)
+		    QApplication::Log(E_ERROR, 'mail', 'SendOwnerEmail failed');
+		if (_xls_get_conf('EMAIL_SEND_CUSTOMER',0)==1 && $blnSend) //if we failed to send store email, email is down and skip this one
         	xlsws_index::SendCustomerEmail($objCart, $objCustomer);
-        	
-        	
+
+
         if ($blnForward)
             {
             	_rd($objCart->Link."&final=1"); 

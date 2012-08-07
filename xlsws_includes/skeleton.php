@@ -1108,15 +1108,15 @@ EOS;
 	public static function SendCustomerEmail($objCart, $objCustomer) { 
 	
 		$strSubject = _xls_format_email_subject('EMAIL_SUBJECT_CUSTOMER',$objCart->Name,$objCart->IdStr);
-       	if (!_xls_mail(
-            $objCart->Email,
-            $strSubject,
-            _xls_mail_body_from_template(
-                templateNamed('email_order_notification.tpl.php'),
-                array(
-                    'cart' => $objCart, 
-                    'customer' => $objCustomer
-                )
+		if (!_xls_mail(
+			$objCart->Email,
+			$strSubject,
+			_xls_mail_body_from_template(
+				templateNamed('email_order_notification.tpl.php'),
+				array(
+					'cart' => $objCart,
+					'customer' => $objCustomer
+				)
             ),
             _xls_get_conf('ORDER_FROM')
         )) {
