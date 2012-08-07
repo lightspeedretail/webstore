@@ -1062,6 +1062,7 @@ EOT;
 				if ($checked['cURL Support']=="pass")
 						$checked['cURL SSL Support']= (
 							(stripos($phpinfo['curl']['cURL Information'],"OpenSSL") !== false ||
+								stripos($phpinfo['curl']['cURL Information'],"NSS") !== false ||
 							$phpinfo['curl']['SSL']=="Yes") ? "pass" : "fail");
 				$checked['Multi-Byte String Library']= ($phpinfo['mbstring']['Multibyte Support']=="enabled" ? "pass" : "fail");
 				$checked['GD Library']= ($phpinfo['gd']['GD Support']=="enabled" ? "pass" : "fail");
