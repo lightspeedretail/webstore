@@ -31,7 +31,7 @@
 	<head>
 		
 		<meta http-equiv="Content-Type" content="text/html; charset=<?php _xt(QApplication::$EncodingType); ?>" />
-		<base href="<?= _xls_site_url();?>/"/>
+		<base href="<?= _xls_site_url();?>"/>
 		<title><?= _xls_get_conf('STORE_NAME') ?> <?php _xt("Email") ?></title>
 		
 
