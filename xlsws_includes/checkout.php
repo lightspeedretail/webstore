@@ -1136,8 +1136,9 @@ class xlsws_checkout extends xlsws_index {
             $objProduct->InventoryAvail=$objProduct->Inventory;
 			$objProduct->Save();
 		}
-		
-        Cart::ClearCart();
+
+	    //Remove cart from session
+	    unset($_SESSION['XLSWS_CART']);
 
         self::PostFinalizeHooks($objCart, $objCustomer);
 

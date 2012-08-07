@@ -356,9 +356,10 @@ EOS;
 			$cart = Cart::Load($cart->Rowid);
 
 		// if cart is that of a order or processed - get out!
+
 		if (!$cart || in_array($cart->Type,
 			array(CartType::invoice, CartType::order, CartType::sro)))
-				Cart::ClearCart();
+			Cart::ClearCart();
 		
 		if ($cart->UpdateMissingProducts())
 			$cart->Reload();
@@ -520,7 +521,7 @@ EOS;
 	}
 
 	/**
-	 * performLogout - Logs a customer out and redirects if neccessary
+	 * performLogout - Logs a customer out and redirects if necessary
 	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
 	 * @return none
 	 */
