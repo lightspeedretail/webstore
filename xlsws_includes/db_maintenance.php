@@ -331,7 +331,8 @@ class xlsws_db_maintenance extends xlsws_index {
 			}
 
 
-			_dbx("UPDATE `xlsws_country` SET `country`='Russia' where `code`='RU'");
+			_dbx("UPDATE `xlsws_country` SET `country`='Russia' WHERE `code`='RU'");
+			_dbx("DELETE FROM `xlsws_country` WHERE `code`='FX'");
 
 			//ReCaptcha Keys
 			$this->add_config_key('RECAPTCHA_PUBLIC_KEY' , 
