@@ -30,33 +30,28 @@ ob_start(); // These includes may spit content which we need to ignore
 require('includes/prepend.inc.php');
 ob_end_clean();
 
-$db = Product::GetDatabase();
-
-$SQL_FROM = 'xlsws_product';
-$SQL_WHERE = 'name';
 
 $searchq = _xls_escape(strip_tags($_GET['q']));
-$matches = $db->Query(
-	'SELECT ' . $SQL_WHERE . ',request_url,rowid ' .
-	' FROM ' . $SQL_FROM .
-	' WHERE ' . $SQL_WHERE . ' LIKE "%' .$searchq . '%"' .
-	' AND web=1' .
-	' AND fk_product_master_id=0 limit 15'
-);
 
-// Begin Return Display ?>
-<?php if (strlen($searchq) > 0): ?>
-	<ul class="autocomplete rounded" id="autocompletor">
+	$arrProducts = _dbx('SELECT name,request_url,rowid ' .
+			' FROM  xlsws_product '.
+			' WHERE name LIKE "%' .$searchq . '%"' .
+			' AND web=1' .
+			' AND fk_product_master_id=0 limit 15', "Query");
 
-	<?php while ($row = $matches->FetchArray()): ?>
-		<li class="search_item" onmouseout="clearList()">
-			<a href="javascript:{}"
-			   style="border: none;background-image:none;"
-			   onclick="document.location.href='<?= $row['request_url']; ?>/dp/<?= $row['rowid']; ?>'; return false;">
-				<?php echo $row[$SQL_WHERE]; ?>
-			</a>
-		</li>
-	<?php endwhile; ?>
+	$intCt=0;
+	while ($objItem = $arrProducts->FetchObject()) {
 
-	</ul>
-<?php endif; ?>
+		$objProduct = Product::Load($objItem->rowid);
+
+		if ($intCt++ == 0)
+			echo "<ul class='autocomplete rounded' id='autocompletor'>";
+
+		echo '<li class="search_item" onmouseout="clearList()">';
+				echo '<a href="javascript:{}" style="border: none;background-image:none;" onclick="document.location.href=\''.$objProduct->Link.'\'; return false;">';
+				echo $objProduct->Name;
+				echo '</a>';
+			echo '</li>';
+	}
+
+	if ($intCt>0) echo '</ul>';
