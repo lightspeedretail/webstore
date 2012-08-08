@@ -119,7 +119,13 @@ function recaptcha_get_html ($pubkey, $error = null, $use_ssl = false)
         if ($error) {
            $errorpart = "&amp;error=" . $error;
         }
-        return '<script type="text/javascript" src="'. $server . '/challenge?k=' . $pubkey . $errorpart . '"></script>
+        return '<script type="text/javascript">
+var RecaptchaOptions = {
+   theme : \''._xls_get_conf('CAPTCHA_THEME','red').'\'
+};
+</script><script type="text/javascript" src="'. $server . '/challenge?lang='.strtolower(_xls_get_conf
+        ('LANGUAGE_DEFAULT','EN')).'&k=' . $pubkey
+         . $errorpart . '"></script>
 
 	<noscript>
   		<iframe src="'. $server . '/noscript?k=' . $pubkey . $errorpart . '" height="300" width="500" frameborder="0"></iframe><br/>

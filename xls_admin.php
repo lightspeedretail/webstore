@@ -682,9 +682,12 @@
 				case 'CAPTCHA_CHECKOUT':
 					return array(2 => _sp("ON for Everyone"), 1 => _sp("OFF for Logged-in Users") ,0 => _sp("OFF for Everyone")  );											
 				case 'CAPTCHA_STYLE':
-					return array(0 => _sp("Google ReCAPTCHA") , 1 => _sp("Integrated Captcha (DEPRECATED)"));											
+					return array(0 => _sp("Google ReCAPTCHA") , 1 => _sp("Integrated Captcha (DEPRECATED)"));
+				case 'CAPTCHA_THEME':
+					return array('red' => _sp("Red") , 'white' => _sp("White"), 'blackglass' => _sp("Blackglass"),
+						'clean' => _sp("Clean"));
 
-				case 'ENABLE_SLASHED_PRICES':
+			case 'ENABLE_SLASHED_PRICES':
 					return array(0 => _sp("Off") , 1 => _sp("Only on Details Page") , 2 => _sp("On Grid and Details Pages"));											
 				case 'IMAGE_FORMAT':
 					return array('jpg' => "JPG" , 'png' => "PNG");											

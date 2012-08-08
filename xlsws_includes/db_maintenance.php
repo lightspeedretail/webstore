@@ -348,13 +348,16 @@ class xlsws_db_maintenance extends xlsws_index {
 
 			$this->add_config_key('CAPTCHA_CHECKOUT' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Captcha on Checkout', 
-				'CAPTCHA_CHECKOUT', '1', '', 18, 4, NOW(), NOW(), 'CAPTCHA_CHECKOUT');");
+				'CAPTCHA_CHECKOUT', '1', '', 18, 6, NOW(), NOW(), 'CAPTCHA_CHECKOUT');");
 			$this->add_config_key('CAPTCHA_CONTACTUS' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Captcha on Contact Us', 
-				'CAPTCHA_CONTACTUS', '1', '', 18, 5, NOW(), NOW(), 'CAPTCHA_CONTACTUS');");
+				'CAPTCHA_CONTACTUS', '1', '', 18, 7, NOW(), NOW(), 'CAPTCHA_CONTACTUS');");
 			$this->add_config_key('CAPTCHA_REGISTRATION' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Captcha on Registration', 
-				'CAPTCHA_REGISTRATION', '1', '', 18, 6, NOW(), NOW(), 'CAPTCHA_REGISTRATION');");
+				'CAPTCHA_REGISTRATION', '1', '', 18, 8, NOW(), NOW(), 'CAPTCHA_REGISTRATION');");
+			$this->add_config_key('CAPTCHA_THEME' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'ReCaptcha Theme',
+				'CAPTCHA_THEME', 'blackglass', 'See https://developers.google.com/recaptcha/docs/customization#Standard_Themes', 18, 4, NOW(), NOW(), 'CAPTCHA_THEME');");
 
 
 			//Email options
