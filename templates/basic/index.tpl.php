@@ -57,8 +57,8 @@
 	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/webstore.css" />
 	<link rel="stylesheet" type="text/css" href="assets/css/pushup.css" />
 	
-	<!--[if lte IE 7]>
-	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/ie7.css" />
+	<!--[if IE]>
+	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/ie.css" />
 	<![endif]-->
 	 			
  	<link rel="stylesheet" type="text/css" href="assets/css/search.css" id="searchcss"  />

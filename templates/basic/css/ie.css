@@ -1,0 +1,209 @@
+/*
+  LightSpeed Web Store
+ 
+  NOTICE OF LICENSE
+ 
+  This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to support@lightspeedretail.com <mailto:support@lightspeedretail.com>
+ * so we can send you a copy immediately.
+   
+ * @copyright  Copyright (c) 2011 Xsilva Systems, Inc. http://www.lightspeedretail.com
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ 
+ */
+
+/**
+ * ie.css contains overrides for Internet Explorer for items where 
+ * webstore.css causes issues
+ * 
+ *
+ */
+
+body {
+    margin-bottom:0;
+}
+
+
+input.login_input {
+    font-size:16px;
+    font-weight:bold;
+    padding:2px;
+    height:20px;
+}
+
+.box_close {
+    position:relative;
+    margin-bottom:-25px;
+}
+
+.msg {
+    color:#111;
+}
+
+#shipstreet2_ctl {
+    clear:both;
+}
+
+#htmlmail_ctl,.opt {
+    margin-left:25px;
+    position:releative;
+    top:15px;
+}
+
+.cbtext {
+    position:relative;
+    top:-25px;
+    left:25px;
+}
+
+.cbhtml {
+    position:relative;
+    top:15px;
+}
+
+.shipping {
+    position:relative;
+    top:15px;
+}
+
+li#search {
+    display:block;
+    float:right;
+    position:relative;
+    left:0;
+    padding:8px 10px 0 18px;
+    width:180px;
+}
+
+#applesearch .sbox input {
+    background:#fff;
+    border:1px solid #222;
+    height:12px;
+    padding:0 0 -10px;
+    position:relative;
+}
+
+#applesearch .sbox_l,#applesearch .sbox_r,.wishlist img, {
+    display:none;
+}
+
+.wishlist, .wishlist a {
+    cursor:hand
+}
+
+.addcart, .addcart a {
+    cursor:hand
+}
+
+#breadcrumbs img {
+    margin-top:-4px;
+}
+
+#pagination li {
+    padding-top:8px;
+    width:10px;
+}
+
+#pagination img {
+    position:relative;
+    top:-5px;
+}
+
+.receipt_row .qty input {
+    height:13px;
+}
+
+.receipt_total {
+    margin-top:15px;
+    width:235px;
+    z-index:100;
+    border:none;
+    float:right;
+}
+
+.receipt_checkout {
+    height:10px;
+    margin:0 0 50px;
+    float:right;
+    padding:20px 0 20px 5px;
+    width:245px;
+}
+
+.receipt_subtotals {
+    margin:0 0 -5px 1px;
+    width:235px;
+}
+
+.receipt_checkout_continue {
+    position: relative;
+    top: 50px;
+    left: 20px;
+}
+
+.cwl {
+    position:relative;
+    top:-6px;
+    border:none;
+}
+
+.psubmit {
+    position:relative;
+    top:-25px;
+    right:-225px;
+    height:24px;
+    width:78px;
+    display:block;
+}
+
+.grl {
+    width:500px;
+}
+
+.registry_row input.invitee_name,.registry_row input.invitee_email {
+    margin:0;
+}
+
+.registry_row .invitee_save,.registry_row .invitee_edit {
+    margin-top:14px;
+}
+
+.cart {
+    margin-top:50px;
+    margin-bottom:-50px;
+}
+
+.modal_reg_box_body {
+    width:425px;
+}
+
+.modal_reg_input_wrap textarea {
+    width:168px;
+    height:10px;
+}
+
+.modal_reg_draw_verify {
+    position:relative;
+    top:-30px;
+    left:-30px;
+}
+
+
+.model_reg_buttons input.button {
+    margin-left:15px;
+}
+
+#sharingtools {
+    display:absolute;
+    height: 28px;
+    margin-top: -39px;
+    margin-left: 500px;
+    margin-bottom: 10px;
+    text-align: right;
+    width: 250px;
+    z-index: 1100;
+}
