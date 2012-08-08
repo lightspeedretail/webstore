@@ -932,9 +932,14 @@
 
 			$this->configPnls['gr'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::GiftRegistry , "configDone");
 			$this->configPnls['gr']->Name = _sp('Wish List');
-			$this->configPnls['gr']->Info = _sp('Wish List related options');			
-			
-			
+			$this->configPnls['gr']->Info = _sp('Wish List related options');
+
+			$this->configPnls['sro'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::SRO , "configDone");
+			$this->configPnls['sro']->Name = _sp('SRO');
+			$this->configPnls['sro']->Info = _sp('SRO options');
+
+
+
 		}
 		
 		

@@ -673,7 +673,7 @@ class xlsws_db_maintenance extends xlsws_index {
 				fclose($file);
 			for ($x=1; $x<=9; $x++)
 				_dbx("update xlsws_google_categories set `name".$x."`=null where `name".$x."`=''");
-			_dbx("delete from xlsws_google_categories where `name1` is null");
+			_dbx("DELETE FROM xlsws_google_categories WHERE `name1` IS NULL");
 			
 			
 			//Shipping options
@@ -686,13 +686,17 @@ class xlsws_db_maintenance extends xlsws_index {
 				"ALTER TABLE `xlsws_shipping_tiers` ADD `class_name` VARCHAR(255)  NULL  DEFAULT NULL  AFTER `rate`;"))
 			_dbx("update xlsws_shipping_tiers set `class_name`='tier_table'");
 			
+			//Drop some unused keys
+			_dbx("DELETE FROM `xlsws_configuration` WHERE `key`='SRO_ADDITIONAL_ITEMS'");
+			_dbx("DELETE FROM `xlsws_configuration` WHERE `key`='SRO_WARRANTY_OPTIONS'");
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Display My Repairs (SROs) under My Account',
+				helper_text='If your store uses SROs for repairs and uploads them to Web Store, turn this option on to allow customers to view pending repairs.'
+				where `key`='ENABLE_SRO'");
 
-			
-					
 			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
 			
 			
-				$strUpgradeText .= "<h2>Please run the steps MIGRATE PHOTOS (if available) and RECALCULATE PENDING ORDERS after running this Upgrade.</h2>";
+			$strUpgradeText .= "<h2>Please run the steps MIGRATE PHOTOS (if available) and RECALCULATE PENDING ORDERS after running this Upgrade.</h2>";
 			
 			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
 			$config->Value="220";

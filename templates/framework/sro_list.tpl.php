@@ -35,7 +35,7 @@
 </div>
 
 <?php
-    if ((($_CONTROL->CurrentItemIndex % 2) != 0) ||
-        ($_CONTROL->CurrentItemIndex == count($_CONTROL->DataSource) - 1))
-        _xt('<br style="clear:both;"/>', false);
+if ((($_CONTROL->CurrentItemIndex % 2) != 0) ||
+	($_CONTROL->CurrentItemIndex == count($_CONTROL->DataSource) - 1))
+	echo '<br style="clear:both;"/>';
 ?>

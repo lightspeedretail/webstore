@@ -112,7 +112,7 @@
 		<div class="padding">
 		<?php if(count($this->repairs) > 0): ?>
 			<?php foreach($this->repairs as $repair): ?>
-					<a href="<?= _xls_site_url("sro-track/pg") ?>?dosearch=&zipcode=<?= $repair->Zipcode ?>&orderid=<?= $repair->LsId ?>"><?=  $repair->LsId  ?></a><br/>
+				<a href="<?= _xls_site_url("sro-track/pg") ?>?dosearch=true&emailphone=<?= $repair->CustomerEmailPhone ?>&orderid=<?= $repair->LsId ?>"><?=  $repair->LsId  ?></a><br/>
 			<?php endforeach; ?>
 		<?php else: ?>
 				<?php _xt("You have not placed any repair orders with us yet"); ?>
