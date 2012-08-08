@@ -357,7 +357,7 @@ class xlsws_db_maintenance extends xlsws_index {
 				'CAPTCHA_REGISTRATION', '1', '', 18, 8, NOW(), NOW(), 'CAPTCHA_REGISTRATION');");
 			$this->add_config_key('CAPTCHA_THEME' ,
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'ReCaptcha Theme',
-				'CAPTCHA_THEME', 'blackglass', 'See https://developers.google.com/recaptcha/docs/customization#Standard_Themes', 18, 4, NOW(), NOW(), 'CAPTCHA_THEME');");
+				'CAPTCHA_THEME', 'white', '', 18, 4, NOW(), NOW(), 'CAPTCHA_THEME');");
 
 
 			//Email options
