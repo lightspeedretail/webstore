@@ -292,7 +292,7 @@ class Images extends ImagesGen {
 
     public function ShowThumb($intWidth, $intHeight) {
         // If either dimension matches we are not looking for a thumbnail
-        if ($this->Width == $intWidth || $this->Height == $intHeight)
+        if ($this->Width == $intWidth && $this->Height == $intHeight)
             $this->Show();
 
 		$thumb = Images::LoadByWidthHeightParent(
