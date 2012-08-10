@@ -139,7 +139,7 @@ class beanstream_aim extends credit_card {
 		$exp_year = $yearArr[2] . $yearArr[3];
 		$strState = $customer->State1;
 		if ($customer->Country1 != "US" && $customer->Country1 != "CA") $strState="--";
-		$strShipState = $cart->ShipState
+		$strShipState = $cart->ShipState;
 		if ($cart->ShipCountry != "US" && $cart->ShipCountry != "CA") $strShipState="--";
 		$beanstream_values = array (
 			"requestType"		=> "BACKEND",
