@@ -137,7 +137,10 @@ class beanstream_aim extends credit_card {
 		$beanstream_url = "https://www.beanstream.com/scripts/process_transaction.asp";
 		$yearArr = toCharArray($fields['ccexpyr']->SelectedValue);
 		$exp_year = $yearArr[2] . $yearArr[3];
-
+		$strState = $customer->State1;
+		if ($customer->Country1 != "US" && $customer->Country1 != "CA") $strState="--";
+		$strShipState = $cart->ShipState
+		if ($cart->ShipCountry != "US" && $cart->ShipCountry != "CA") $strShipState="--";
 		$beanstream_values = array (
 			"requestType"		=> "BACKEND",
 			"merchant_id"		=> $merchantId,
@@ -155,7 +158,7 @@ class beanstream_aim extends credit_card {
 			"ordEmailAddress"	=> $customer->Email,
 			"ordPhoneNumber"	=> $cart->Phone,
 			"ordCity"			=> $customer->City1,
-			"ordProvince"		=> $customer->State1,
+			"ordProvince"		=> $strState,
 			"ordCountry"		=> $customer->Country1,
 			
 			
@@ -163,7 +166,7 @@ class beanstream_aim extends credit_card {
 			"shipAddress1"		=> $cart->ShipAddress1,
 			"shipAddress2"		=> $cart->ShipAddress2,
 			"shipCity"			=> $cart->ShipCity,
-			"shipProvince"		=> $cart->ShipState,
+			"shipProvince"		=> $strShipState,
 			"shipPostalCode"	=> $cart->ShipZip,
 			"shipCountry"		=> $cart->ShipCountry,
 			"shippingMethod"	=> $cart->ShippingData
