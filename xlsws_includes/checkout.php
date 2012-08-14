@@ -670,7 +670,6 @@ class xlsws_checkout extends xlsws_index {
             array(
             	new QToggleEnableAction($objControl, false),
             	new QJavaScriptAction("this.value='"._sp('Please Wait')."'"),
-                new QAjaxControlAction('ToggleCheckoutControls',false,$this->CaptchaControl->Wait),
                 new QServerAction('DoSubmitControlClick')
             )
         );
@@ -898,9 +897,9 @@ class xlsws_checkout extends xlsws_index {
         ));
 
         $objCart->Zipcode = $objCart->ShipZip;
-        $objCart->PrintedNotes = $this->CommentControl->Text;
-    
-        return $objCart;
+        $objCart->PrintedNotes .= $this->CommentControl->Text;
+
+	    $objCart->Save();
     }
 
     protected function CompleteUpdatePromoCode() {
@@ -930,8 +929,7 @@ class xlsws_checkout extends xlsws_index {
 				$objPromo->Save();
 			}
 		}
-
-        return $objPromo;
+		$objCart->Save();
     }
 
     protected function CompleteUpdateCustomer() {
@@ -1031,11 +1029,10 @@ class xlsws_checkout extends xlsws_index {
         	return;
         else
         	$objCustomer = $retMixValue;
-        
-        $objPromo = $this->CompleteUpdatePromoCode();
-        $objCart = $this->CompleteUpdateCart();
 
-        $objCart->Save();
+	    $this->CompleteUpdatePromoCode();
+        $this->CompleteUpdateCart();
+        $objCart = Cart::GetCart();
 
         if (!$this->PrePaymentHooks())
             return false;
