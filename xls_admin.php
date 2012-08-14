@@ -4572,8 +4572,12 @@
 				$strRetVal .= "<input type='hidden' name='ExceptEdit' id='ExceptEdit' value='".$objItem->Except."'>";
 				$strRetVal .= "<input type='hidden' name='PromoId' id='PromoId' value='".$objItem->Rowid."'>";
 			}
-			else $strRetVal= "";
-			
+			elseif($objItem->Rowid == "") {
+				$strRetVal = "<input type='hidden' name='LsCodesEdit' id='LsCodesEdit' value=''>";
+				$strRetVal .= "<input type='hidden' name='ExceptEdit' id='ExceptEdit' value='0'>";
+				$strRetVal .= "<input type='hidden' name='PromoId' id='PromoId' value=''>";
+			}
+
 			return $strRetVal;
 		}
 
@@ -4671,7 +4675,8 @@
 
 			if (isset($_POST['LsCodesEdit'])) $objItem->Lscodes = $_POST['LsCodesEdit'];
 			if (isset($_POST['ExceptEdit'])) $objItem->Except = $_POST['ExceptEdit'];
-
+			//if (empty($objItem->Except)) $objItem->Except=0;
+			//if (empty($objItem->Lscodes)) $objItem->Lscodes = '';
 			
 			return $objItem;			
 		}
