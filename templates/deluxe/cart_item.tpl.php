@@ -32,7 +32,7 @@
 				<a href="<?= $_ITEM->Prod->Link ?>">
 				<img src="<?= $_ITEM->Prod->SmallImage ?>" />
 				<p class="product">
-				<?= _xls_truncate($_ITEM->Prod->Name, 63) ?>
+				<?= _xls_truncate($_ITEM->Description, 63) ?>
 					<!--  <br/>
 					<?php if($_ITEM->Prod->ProductSize != ''): ?>
 						<?= $_ITEM->Prod->SizeLabel ?> : <?= $_ITEM->Prod->ProductSize; ?>
