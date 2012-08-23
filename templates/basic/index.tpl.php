@@ -53,25 +53,25 @@
 	
 	<link rel="Shortcut Icon" href="favicon.ico" type="image/x-icon" />
 
-	<link rel="stylesheet" type="text/css" href="assets/css/reset.css" />
-	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/webstore.css" />
-	<link rel="stylesheet" type="text/css" href="assets/css/pushup.css" />
+	<link rel="stylesheet" type="text/css" href="/assets/css/reset.css" />
+	<link rel="stylesheet" type="text/css" href="/<?= templateNamed('css') ; ?>/webstore.css" />
+	<link rel="stylesheet" type="text/css" href="/assets/css/pushup.css" />
 	
 	<!--[if IE]>
-	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/ie.css" />
+	<link rel="stylesheet" type="text/css" href="/<?= templateNamed('css') ; ?>/ie.css" />
 	<![endif]-->
 	 			
- 	<link rel="stylesheet" type="text/css" href="assets/css/search.css" id="searchcss"  />
-	<link rel="stylesheet" type="text/css" href="assets/css/dummy.css" id="dummy_css"  />
-	<link rel="stylesheet" type="text/css" href="assets/css/datepicker.css" />
+ 	<link rel="stylesheet" type="text/css" href="/assets/css/search.css" id="searchcss"  />
+	<link rel="stylesheet" type="text/css" href="/assets/css/dummy.css" id="dummy_css"  />
+	<link rel="stylesheet" type="text/css" href="/assets/css/datepicker.css" />
 	
-	<script type="text/javascript" src="assets/js/jquery.min.js"></script>
-	<script type="text/javascript" src="assets/js/fancybox/jquery.fancybox-1.3.4.js"></script>	
-	<script type="text/javascript" src="assets/js/fancybox/jquery.easing-1.4.pack.js"></script>	
-	<link rel="stylesheet" href="assets/js/fancybox/jquery.fancybox-1.3.4.css" type="text/css" media="screen" />
+	<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/assets/js/fancybox/jquery.fancybox-1.3.4.js"></script>
+	<script type="text/javascript" src="/assets/js/fancybox/jquery.easing-1.4.pack.js"></script>
+	<link rel="stylesheet" href="/assets/js/fancybox/jquery.fancybox-1.3.4.css" type="text/css" media="screen" />
 	
-	<script type="text/javascript" src="assets/js/webstore.js"></script>
-	<script type="text/javascript" src="assets/js/pushup.js"></script>
+	<script type="text/javascript" src="/assets/js/webstore.js"></script>
+	<script type="text/javascript" src="/assets/js/pushup.js"></script>
 	
 	<script type="text/javascript">	
 		var XLSTemplate = "<?= templateNamed(''); ?>";
