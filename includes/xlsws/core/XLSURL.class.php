@@ -224,7 +224,7 @@ class XLSURL {
 			$strRemaining = strstr($strRemaining,'?');	
 			$strRemaining = str_replace("?&","&",$strRemaining);
 			if ($strRemaining=="?") $strRemaining='';	
-			$this->strRedirectUrl = "searchresults/".XLSURL::KEY_CUSTOMPAGE."?q=".basename($_GET['search']).$strRemaining;
+			$this->strRedirectUrl = "searchresults/".XLSURL::KEY_PAGE."?q=".basename($_GET['search']).$strRemaining;
 			$this->strRedirectUrl = _xls_site_url($this->strRedirectUrl);
 			$this->intStatus=301;
 			return true;
