@@ -725,6 +725,15 @@ padding:10px 8px 10px 14px;
 }
 
 /***** Product Details *****/
+.product_details {
+    display: block;
+    float: left;
+    margin-left: 2px;
+    margin-top: 5px;
+    width: 762px;
+    clear: both;
+}
+
 .product_details .img {
 border:1px solid #999;
 display:block;
@@ -887,10 +896,10 @@ padding:3px 7px 3px 0;
 }
 
 #sharingtools {
-display:absolute;
+display:relative;
 height: 28px;
-margin-top: -53px;
-margin-left: 500px;
+margin-top: -26px;
+margin-left: 155px;
 text-align: right;
 width: 250px;
 z-index: 1100;
@@ -1562,8 +1571,6 @@ padding-left:3px;
 
 .border,.registry,.cart {
 border:1px solid #cdcdcd;
-margin:0 auto 15px auto;
-width:764px;
 }
 
 .table4 li,.table6 li {

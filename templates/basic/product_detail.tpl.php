@@ -27,8 +27,8 @@
 
 ?>
 <div>
-<?php $this->pnlSharingTools->Render(); ?>
-			<div class="product_details border rounded" style="display: block; float: left;">
+
+			<div class="product_details border rounded">
 				
 				<div class="left">
 					<?php $this->pnlImgHolder->Render(); ?><br style="clear: both;" />
@@ -76,8 +76,9 @@
 				<?php $this->lstColor->Render(); ?>
 					
 				<div class="price_reg"><?php $this->lblOriginalPrice->Render(); ?></div>
-				<div class="price"><?php _xt("Price"); ?>: <?php $this->lblPrice->Render(); ?></div>		
-				
+				<div class="price"><?php _xt("Price"); ?>: <?php $this->lblPrice->Render(); ?></div>
+				<?php $this->pnlSharingTools->Render(); ?>
+
 				<div class="description"><?php $this->lblDescription->Render() ; ?></div>
 				
 				<?php if(count($this->arrAutoAddProducts)>0): ?>
