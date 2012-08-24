@@ -211,14 +211,50 @@ class free_shipping extends xlsws_class_shipping {
 	}
 	
 	public function install() {
-	
+
+		$config = $this->getConfigValues(get_class($this));
+		//If there's a promo code entered from last time, is it one already in the table?
+		if (strlen($config['promocode'])>0)
+			$objPromoCode = PromoCode::LoadByCodeShipping($config['promocode']);
+
+		//If not, do we have one with the class name we need to update?
+		if (!$objPromoCode)
+			$objPromoCode = PromoCode::LoadByCodeShipping(get_class($this).":");
+
+
+		if (!$objPromoCode) { //If we're this far without an object, create one
+			$objPromoCode = new PromoCode;
+			$objPromoCode->Lscodes = "shipping:,";
+			$objPromoCode->Except = 0;
+			$objPromoCode->Enabled = 1;
+		}
+
+		$objPromoCode->Enabled=1;
+		$objPromoCode->Save();
 	
 	}
 	public function remove() {
 	
 		//When we're turning this module off, on our way out the door....
-		PromoCode::DeleteShippingPromoCodes();
+		$config = $this->getConfigValues(get_class($this));
+		//If there's a promo code entered from last time, is it one already in the table?
+		if (strlen($config['promocode'])>0)
+			$objPromoCode = PromoCode::LoadByCodeShipping($config['promocode']);
 
+		//If not, do we have one with the class name we need to update?
+		if (!$objPromoCode)
+			$objPromoCode = PromoCode::LoadByCodeShipping(get_class($this).":");
+
+
+		if (!$objPromoCode) { //If we're this far without an object, create one
+			$objPromoCode = new PromoCode;
+			$objPromoCode->Lscodes = "shipping:,";
+			$objPromoCode->Except = 0;
+			$objPromoCode->Enabled = 1;
+		}
+
+		$objPromoCode->Enabled=0;
+		$objPromoCode->Save();
 	}
 
 	private function syncPromoCode($vals) {
@@ -234,31 +270,19 @@ class free_shipping extends xlsws_class_shipping {
 		if (!$objPromoCode) 
 			$objPromoCode = PromoCode::LoadByCodeShipping(get_class($this).":");
 
-					
-		//Test for the scenario we've blanked out the fields, and we don't have any restrictions set
-		//If this passes, we want to just delete the promo code entry completely	
-		if (	strlen($vals['promocode']->Text)==0 &&
-				strlen($vals['startdate']->Text)==0 &&
-				strlen($vals['enddate']->Text)==0 &&
-				strlen($vals['qty_remaining']->Text)==0) {
-			if ($objPromoCode)
-				if ($objPromoCode->Lscodes=="shipping:,") {
-					$objPromoCode->Enabled=0;
-				}
-			
-		}
-		
-			
-		if ($strPromoCode=='')
-			$strPromoCode=get_class($this).":";
-
 
 		if (!$objPromoCode) { //If we're this far without an object, create one
 			$objPromoCode = new PromoCode;
 			$objPromoCode->Lscodes = "shipping:,";
 			$objPromoCode->Except = 0;
-			$objPromoCode->Enabled = 1; 
+			$objPromoCode->Enabled = 1;
 		}
+
+		//Sync any fields with the promo code table
+		if (strlen($vals['promocode']->Text)==0)
+			$strPromoCode=get_class($this).":";
+		else
+			$strPromoCode=$vals['promocode']->Text;
 
 					
 		$objPromoCode->ValidFrom = $vals['startdate']->Text;
