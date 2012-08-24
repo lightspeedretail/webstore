@@ -94,10 +94,30 @@ class Product extends ProductGen {
 		return false;
 	}
 
-
+	/**
+	 * Checks to see if the item has Sell on Web checked and also has inventory ready to order
+	 * Note, this will return false for an item out of stock even with Allow Backorders enabled
+	 * Use IsDisplayable() to determine visibility with out of stock items
+	 * @return bool
+	 */
 	protected function IsAvailable() {
 		if ($this->Web && $this->HasInventory(true))
 			return true;
+		return false;
+	}
+
+	/**
+	 * Checks to see if product should be displayed to the user, based on Sell on Web checkbox and
+	 * if we show out of stock products
+	 * @return bool
+	 */
+	protected function IsDisplayable() {
+
+	if($this->IsAvailable)
+		return true;
+	if ($this->Web && _xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0)>0)
+		return true;
+
 		return false;
 	}
 
@@ -900,6 +920,9 @@ class Product extends ProductGen {
 
 			case 'IsAvailable':
 				return $this->IsAvailable();
+
+			case 'IsDisplayable':
+				return $this->IsDisplayable();
 
 			case 'Slug':
 				return $this->GetSlug();

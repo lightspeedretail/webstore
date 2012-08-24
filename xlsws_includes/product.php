@@ -484,7 +484,7 @@ class xlsws_product extends xlsws_index {
             if (in_array($strSize, $strOptionsArray))
                 continue;
 
-            if (!$objProduct->IsAvailable) 
+            if (!$objProduct->IsDisplayable)
                 continue;
 
             $strOptionsArray[] = $strSize;
@@ -516,7 +516,7 @@ class xlsws_product extends xlsws_index {
             if (in_array($strColor, $strOptionsArray))
                 continue;
 
-            if (!$objProduct->IsAvailable) 
+            if (!$objProduct->IsDisplayable)
                 continue;
 
             $strOptionsArray[] = $strColor;
