@@ -420,10 +420,9 @@ EOS;
 						if ($objCategory) $this->crumbs = $objCategory->GetTrail();
 						break;
 					case "product":
-						$objProduct = Product::LoadByRequestUrl($objUrl->RouteId);
+						$objProduct = Product::Load($objUrl->RouteId);
 						if ($objProduct) $this->crumbs = Category::GetTrailByProductId($objProduct->Rowid);
-					
-					
+
 						break;
 						
 					
