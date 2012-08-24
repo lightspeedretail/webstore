@@ -266,7 +266,10 @@ class Images extends ImagesGen {
 			$strSaveFunc = 'imagepng';
 
 			if ($arrPath['extension'] == 'jpg')
-				$strSaveFunc = 'imagepng';
+				$strSaveFunc = 'imagejpeg';
+
+			if ($arrPath['extension'] == 'gif')
+				$strSaveFunc = 'imagegif';
 
 			if ($this->SaveImageFolder($strFolder) &&
 				$strSaveFunc($blbImage, $strPath))
