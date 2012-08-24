@@ -82,7 +82,7 @@ class Images extends ImagesGen {
 
 		if (!empty($intWidth) && !empty($intHeight))
 			$strName .= '-' . $intWidth . 'px-' . $intHeight . "px";
-		
+
 		$fileExt =  strtolower(_xls_get_conf('IMAGE_FORMAT','jpg'));
 		if ($intWidth==0 && $intHeight==0) $fileExt="png"; //The file from LS is always png
 
@@ -168,18 +168,21 @@ class Images extends ImagesGen {
 
 		$rawNewImage = ImageCreateTrueColor($intNewWidth , $intNewHeight);
 
+		if (!$rawNewImage)
+			return $rawImage;
+
 		if(!imagecopyresampled(
 			$rawNewImage, $rawImage, 0, 0, 0, 0,
 			$intNewWidth, $intNewHeight,
 			$intWidth, $intHeight))
-				return $rawImage;
+			return $rawImage;
 
 		return $rawNewImage;
 	}
 
 	/**
 	 * Class methods
-	*/
+	 */
 
 	public function IsPrimary() {
 		if ($this->intRowid && ($this->intRowid == $this->intParent))
@@ -208,7 +211,7 @@ class Images extends ImagesGen {
 	public function ImageFileExists() {
 		if ($this->ImagePath &&
 			file_exists(Images::GetImagePath($this->ImagePath)))
-				return true;
+			return true;
 		return false;
 	}
 
@@ -230,30 +233,44 @@ class Images extends ImagesGen {
 		return $this->SaveImageData($strName, $blbImage);
 	}
 
+	public function SaveImageFolder($strFolder) {
+		if (!$strFolder)
+			return true;
+
+		if (!file_exists($strFolder)) {
+			if (!mkdir($strFolder, 0755, true)) {
+				QApplication::Log(E_ERROR, 'Images',
+					'Error creating : ' . $strFolder);
+				return false;
+			}
+		}
+
+		if (!is_writable($strFolder)) {
+			QApplication::Log(E_ERROR, 'Images',
+				'Path is not writeable : ' . $strFolder);
+			return false;
+		}
+
+		return true;
+	}
+
+
 	public function SaveImageData($strName, $blbImage) {
 		if ($strName && (_xls_get_conf('IMAGE_STORE' , 'FS') == 'FS')) {
+			$this->DeleteImage();
+
 			$strPath = Images::GetImagePath($strName);
+			$arrPath = pathinfo($strPath);
 
-            $this->DeleteImage();
+			$strFolder = $arrPath['dirname'];
+			$strSaveFunc = 'imagepng';
 
-			$arrPath = pathinfo($strName);
-			if ($arrPath['dirname'] != '') {
-				$subFolder =  __PHOTOS__;
-				if (__SUBDIRECTORY__) $subFolder = substr($subFolder,strlen(__SUBDIRECTORY__),999);
-				$strPathToCreate = $subFolder. '/' . $arrPath['dirname'];
-				if ($strPathToCreate[0]=='/') $strPathToCreate=substr($strPathToCreate,1,999);
-				if (!file_exists($strPathToCreate))
-					if (!mkdir($strPathToCreate,0777,true))
-						QApplication::Log(E_ERROR, 'Images', "Error attempting to create ".$strPathToCreate);
-				}
+			if ($arrPath['extension'] == 'jpg')
+				$strSaveFunc = 'imagepng';
 
-
-			if (!is_writable($strPathToCreate))
-				QApplication::Log(E_ERROR, 'str', "Directory $strPathToCreate is not writable");
-
-			if (  ($arrPath['extension']=="jpg" && imagejpeg($blbImage,$strPath)) ||
-				  ($arrPath['extension']=="png" && imagepng($blbImage,$strPath))
-				) {
+			if ($this->SaveImageFolder($strFolder) &&
+				$strSaveFunc($blbImage, $strPath))
+			{
 				$this->strImagePath = $strName;
 				$this->strImageData = null;
 			}
@@ -262,8 +279,7 @@ class Images extends ImagesGen {
 				QApplication::Log(E_USER_ERROR, 'image',
 					"Failed to save file $strName");
 			}
-		}
-		else {
+		} else {
 			$this->strImageData = $blbImage;
 		}
 
@@ -290,10 +306,10 @@ class Images extends ImagesGen {
 		}
 	}
 
-    public function ShowThumb($intWidth, $intHeight) {
-        // If either dimension matches we are not looking for a thumbnail
-        if ($this->Width == $intWidth && $this->Height == $intHeight)
-            $this->Show();
+	public function ShowThumb($intWidth, $intHeight) {
+		// If either dimension matches we are not looking for a thumbnail
+		if ($this->Width == $intWidth && $this->Height == $intHeight)
+			$this->Show();
 
 		$thumb = Images::LoadByWidthHeightParent(
 			$intWidth, $intHeight, $this->intRowid);
@@ -313,15 +329,14 @@ class Images extends ImagesGen {
 			$intHeight = $this->Height;
 		}
 
-
 		$rawImage = file_get_contents(
 			Images::GetImageFallbackPath());
 		$rawImage = imagecreatefromstring($rawImage);
 
 		if (array($intWidth, $Height) !=
 			ImagesType::GetSize(ImagesType::normal))
-				$rawImage = Images::Resize(
-					$rawImage, $intWidth, $intHeight);
+			$rawImage = Images::Resize(
+				$rawImage, $intWidth, $intHeight);
 
 		header('Content-Type: image/png');
 		imagepng($rawImage, NULL, 100);
@@ -329,35 +344,43 @@ class Images extends ImagesGen {
 	}
 
 	public function CreateThumb($intNewWidth, $intNewHeight) {
-		// Delete previous thumbbnail
+		// Delete previous thumbnail
 		if ($this->intRowid) {
 			$objImage = Images::LoadByWidthParent(
 				$intNewWidth, $this->intRowid);
 			if ($objImage)
 				$objImage->Delete();
+
 		}
 
-		if ($this->ImageFileExists()) { 
-				$rawImage = imagecreatefrompng(Images::GetImagePath($this->ImagePath));
+		if ($this->ImageFileExists()) {
+			$rawImage = imagecreatefrompng(Images::GetImagePath($this->ImagePath));
+			if (!$rawImage){
+				QApplication::Log(E_ERROR, 'CreateThumb', "Failure on Create PNG on ".$this->ImagePath);
+				//PNG failed, test for other types of files
+				$intImgType = exif_imagetype(Images::GetImagePath($this->ImagePath));
+				if ($intImgType==IMAGETYPE_JPEG)
+					$rawImage = imagecreatefromjpeg(Images::GetImagePath($this->ImagePath));
+				if (!$rawImage) {
+					QApplication::Log(E_ERROR, 'CreateThumb', "Failure on imagetype ".(!empty($intImgType) ? $intImageType : "UNKNOWN")." on ".$this->ImagePath);
+					$rawImage = imagecreatefromstring(file_get_contents(Images::GetImageFallbackPath()));
+				}
 			}
+		}
 		else
 			$rawImage = imagecreatefromstring($this->ImageData);
 
-
-		$rawNewImage = Images::Resize(
-			$rawImage, $intNewWidth, $intNewHeight);
-
 		if (!$this->Rowid) {
 			// if it is the no product image, just output
-			header('Content-Type: image/png');
-			imagepng($rawNewImage, NULL, 100);
-			return null;
+			$rawImage = imagecreatefromstring(file_get_contents(
+				Images::GetImageFallbackPath()));
 		}
-	
+		$rawNewImage = Images::Resize($rawImage, $intNewWidth, $intNewHeight);
+
 		$strExistingName=$this->strImagePath;
 		$strImageName = Images::GetImageName(
 			$strExistingName, $intNewWidth, $intNewHeight);
-		
+
 		//We save it, then pass back to do a redir immediately
 		$objNew = new Images();
 		$objNew->ImagePath=$strImageName;
@@ -369,9 +392,9 @@ class Images extends ImagesGen {
 		$objNew->Save(true);
 
 		$objNew->SaveImageData(
-                $strImageName, $rawNewImage
-            );
-            
+			$strImageName, $rawNewImage
+		);
+
 		imagedestroy($rawNewImage);
 		imagedestroy($rawImage);
 
@@ -429,23 +452,23 @@ class Images extends ImagesGen {
 
 	public function __set($strName, $mixValue) {
 		switch ($strName) {
-			case 'ImagePath':
-				try {
-					$this->DeleteImage();
-					return parent::__set($strName, $mixValue);
-				}
-				catch (QCallerException $objExc) {
-					$objExc->IncrementOffset();
-					throw $objExc;
-				}
-			default:
-				try {
-					return parent::__set($strName, $mixValue);
-				}
-				catch (QCallerException $objExc) {
-					$objExc->IncrementOffset();
-					throw $objExc;
-				}
+		case 'ImagePath':
+			try {
+				$this->DeleteImage();
+				return parent::__set($strName, $mixValue);
+			}
+			catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		default:
+			try {
+				return parent::__set($strName, $mixValue);
+			}
+			catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
 		}
 	}
 }
