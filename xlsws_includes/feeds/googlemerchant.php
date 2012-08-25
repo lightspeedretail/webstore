@@ -35,7 +35,7 @@ require('includes/prepend.inc.php');
 $intStockHandling = _xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0);
 $strQueryAddl = ($intStockHandling == 0 ? " and inventory_avail>0" : "");
 
-header ("content-type: text/xml");
+header ("content-type: text/xml;charset=UTF-8");
 
 echo '<?xml version="1.0" encoding="UTF-8"?>'.chr(13);
 echo ' <rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">'.chr(13);

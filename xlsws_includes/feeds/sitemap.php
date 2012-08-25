@@ -23,7 +23,13 @@
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  
  */
- 
+
+//Load some information we'll use within the loops
+$intStockHandling = _xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0);
+$strQueryAddl = ($intStockHandling == 0 ? " and inventory_avail>0" : "");
+
+
+
  function _xls_sitemap_xml_url2($url , $lastmod = false , $changefreq = 'weekly', $priority = '0.8') {
 	
 	return  
@@ -69,33 +75,21 @@
 
 	}
 
-	$products = Product::QueryArray(
-		QQ::AndCondition(QQ::Equal(QQN::Product()->Web, 1),
-			QQ::IsNotNull(QQN::Product()->RequestUrl),
-			QQ::OrCondition(
-				QQ::Equal(QQN::Product()->MasterModel, 1),
-				QQ::AndCondition(
-					QQ::Equal(QQN::Product()->MasterModel, 0),
-					QQ::Equal(QQN::Product()->FkProductMasterId, 0)
-				)
-			)
-		),
-		QQ::Clause(QQ::OrderBy(QQN::Product()->Code))
-	);
 
-	foreach($products as $product) {
-		$ret .=  _sp("Generating URL for product") . " $product->Code " . "\n";
+	$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 ".$strQueryAddl." ORDER BY rowid", "Query");
 
+		while ($objItem = $arrProducts->FetchObject()) {
+			$objProduct = Product::Load($objItem->rowid);
 
-			echo(_xls_sitemap_xml_url2($product->Link,
-				date("c",strtotime($product->Modified)),
+			echo(_xls_sitemap_xml_url2($objProduct->Link,
+				date("c",strtotime($objProduct->Modified)),
 					'daily',
-					($product->Featured ? '0.8' : '0.5')));
+					($objProduct->Featured ? '0.8' : '0.5')));
 		
 	}
 
 	$pages = CustomPage::QueryArray(
-		QQ::IsNotNull(QQN::CustomPage()->RequestUrl),
+		QQ::GreaterThan(QQN::CustomPage()->TabPosition,0),
 			
 		QQ::Clause(QQ::OrderBy(QQN::CustomPage()->Title))
 	);
