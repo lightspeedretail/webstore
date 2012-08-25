@@ -217,7 +217,7 @@ class XLSURL {
 		
 			
 		}
-	
+
 		if (isset($_GET['search'])) {
 			//The first xlspg code is now our first URL segment, but any appended GET variables still need to carry
 			$strRemaining = str_replace("search=".$_GET['search'],"",$_SERVER['REQUEST_URI']);
@@ -230,6 +230,31 @@ class XLSURL {
 			return true;
 		
 			
+		}
+
+		if (isset($_GET['product'])) {
+			//This is an old product link
+			$ObjProduct = Product::LoadByCode($_GET['product']);
+			if ($ObjProduct)
+				$strLink = $ObjProduct->Link;
+			else $strLink = '';
+			$this->strRedirectUrl = _xls_site_url($strLink);
+			$this->intStatus=301;
+			return true;
+
+
+		}
+
+		if (isset($_GET['c'])) {
+			//This is an old category link
+			$objCategory = Category::Load(_xls_number_only($_GET['c']));
+			if ($objCategory)
+				$strLink = $objCategory->Link;
+			else $strLink = '';
+			$this->strRedirectUrl = _xls_site_url($strLink);
+			$this->intStatus=301;
+			return true;
+
 		}
 
 		if (substr($this->Uri,-5)==".html") {
