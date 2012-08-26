@@ -179,7 +179,7 @@ class XLSURL {
 					
 				}
 				else {
-					//Because we allow custom pages and categories to both be keyless (without /dp etc)
+					//Because we allow custom pages and categories to both be keyless (without /cp etc)
 					//Check to see if it's a category first, and if not, custom page
 					$objCat = Category::LoadByRequestUrl($this->strRouteId);
 					if ($objCat) 
@@ -236,9 +236,9 @@ class XLSURL {
 			//This is an old product link
 			$ObjProduct = Product::LoadByCode($_GET['product']);
 			if ($ObjProduct)
-				$strLink = $ObjProduct->Link;
-			else $strLink = '';
-			$this->strRedirectUrl = _xls_site_url($strLink);
+				$strLink = _xls_site_url($ObjProduct->Link);
+			else $strLink =  _xls_site_url();
+			$this->strRedirectUrl = $strLink;
 			$this->intStatus=301;
 			return true;
 
@@ -348,7 +348,7 @@ class XLSURL {
 				}
 				else {
 					_rd(_xls_site_dir() .
-						"/index.php?seo_forward=true&search=$uriPath");
+						"?seo_forward=true&search=$uriPath");
 				}
 			}
 		

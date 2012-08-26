@@ -791,12 +791,13 @@ function _xls_site_dir($ssl_attempt = false) {
 	$strSsl = 'http://';
 	$strHost = $_SERVER['HTTP_HOST'] . dirname(QApplication::$ScriptName);
 	
-    if ($ssl_attempt || 
+    if ($ssl_attempt ||
     	  (isset($_SERVER['HTTPS']) &&
         		($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == '1')))
     	$strSsl = 'https://';
-    
-    if (substr($strHost,-1)=="/") $strHost = substr($strHost, 0, -1);
+	//if ($ssl_attempt) $strSsl = 'https://';
+
+	if (substr($strHost,-1)=="/") $strHost = substr($strHost, 0, -1);
 
 	return $strSsl . $strHost;
 }
@@ -822,7 +823,7 @@ function _xls_site_url($strUrlPath =  '') {
 		
 					) $usessl = true;
 	}
-	
+
 	return _xls_site_dir($usessl) . '/' . $strUrlPath;
 }
 

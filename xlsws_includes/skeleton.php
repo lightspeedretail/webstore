@@ -636,6 +636,7 @@ EOS;
 
         $this->Form_PreLoad();
 
+		//TODO: This should be migrated to the XLSCore management
 		// manage SSL forwarding
 		if($this->require_ssl() && _xls_get_conf( 'ENABLE_SSL' , false)) {
 			if(!(isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 1 || $_SERVER['HTTPS'] == 'on'))) {
@@ -647,16 +648,18 @@ EOS;
 		}
 
 		// forward to non SSL if not required
-		if(!$this->require_ssl() && isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 1 || $_SERVER['HTTPS'] == 'on') && _xls_get_conf( 'SSL_NO_NEED_FORWARD' , true)) {
+		if(!$this->require_ssl() && isset($_SERVER['HTTPS']) &&
+			($_SERVER['HTTPS'] == 1 || $_SERVER['HTTPS'] == 'on') &&
+			_xls_get_conf( 'SSL_NO_NEED_FORWARD' , true)) {
 
-			if(isset($XLSWS_VARS['seo_rewrite'])){ // WS.2.0.1 Bug fix for handling rewrite in SSL
-				$url = "http://".$_SERVER['HTTP_HOST'] . $_SERVER["REQUEST_URI"];   // WS.2.0.1 Bug fix for handling rewrite
-			} else {
-				$url = "http://".$_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
-				$url.="?".$_SERVER['QUERY_STRING'];
-			}
+			$objUrl = _xls_url_object();
+			$url = _xls_site_url($objUrl->Uri);
+			if (strlen($objUrl->QueryString))
+				$url .= "?".$objUrl->QueryString;
+			$url = str_replace("https:","http:",$url);
 
-			header("Location: $url");
+			_xls_301($url);
+
 			exit();
 		}
 
