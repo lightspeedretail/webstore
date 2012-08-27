@@ -121,6 +121,7 @@ class XLSShippingContactControl extends XLSCustomerContactControl {
                 'LastName' => $objControl->LastName->Value,
                 'Company' => $objControl->Company->Value,
                 'Email' => $objControl->Email->Value,
+	            'EmailConfirm' => $objControl->Email->Value,
                 'Phone' => $objControl->Phone->Value
             );
             
