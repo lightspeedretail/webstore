@@ -136,10 +136,9 @@ class free_shipping extends xlsws_class_shipping {
 		$price = 0;
 
 		if ($cart->Subtotal < $config['rate']) {
-			_xls_log("FREE SHIPPING: Cart subtotal does not qualify for free shipping");
 			$userMsg = _sp("Subtotal does not qualify for free shipping, you must purchase at least " . _xls_currency($config['rate']) . " worth of merchandise.");
-			QApplication::ExecuteJavaScript("alert('".$userMsg."')");
-			return false;
+			return array('price' => -1, 'error' => $userMsg);
+
 		}
 
 		return array('price' => $price, 'product' => $config['product']);
