@@ -375,24 +375,29 @@ class XLSShippingControl extends XLSCompositeControl {
 	            $mixTotal = false;
 	        }
 
-	        if ($mixTotal === false) {
+	        if ($mixTotal === false) { //Legacy false for shipping modules that don't specify error in array
 	            $this->ValidationError = _sp($this->strLabelForError);
 	        }
 	        else if (is_numeric($mixTotal)) {
 	            $fltShippingPrice = $mixTotal; 
 	        }
 	        else if (is_array($mixTotal)) {
-	            if (isset($mixTotal['price']) && is_numeric($mixTotal['price']))
-	                $fltShippingPrice = $mixTotal['price'];
-	
-	            if (isset($mixTotal['msg']))
-	                $strShippingData = $mixTotal['msg'];
-	
-	            if (isset($mixTotal['product']))
-	                $strShippingMethod = $mixTotal['product'];
-	
-	            if (isset($mixTotal['markup']))
-	                $fltShippingMarkup = $mixTotal['markup'];
+
+		        if (isset($mixTotal['error'])) {
+			        $this->ValidationError = $mixTotal['error'];
+		        } else {
+		            if (isset($mixTotal['price']) && is_numeric($mixTotal['price']))
+		                $fltShippingPrice = $mixTotal['price'];
+
+		            if (isset($mixTotal['msg']))
+		                $strShippingData = $mixTotal['msg'];
+
+		            if (isset($mixTotal['product']))
+		                $strShippingMethod = $mixTotal['product'];
+
+		            if (isset($mixTotal['markup']))
+		                $fltShippingMarkup = $mixTotal['markup'];
+		        }
 	        }
 	        else { 
 	            $this->ValidationError = _sp($this->strLabelForError);

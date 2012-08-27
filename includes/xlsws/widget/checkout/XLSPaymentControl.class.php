@@ -14,7 +14,7 @@ class XLSPaymentControl extends XLSCompositeControl {
 
     // Messages
     protected $strLabelForPlaceholder = '';
-    protected $strLabelForError = 'Error: Unable to get shipping rates';
+    protected $strLabelForError = 'Error: Unable to process payment';
 
     // Objects
     protected $objModuleControl;
