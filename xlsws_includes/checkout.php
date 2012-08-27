@@ -1264,10 +1264,15 @@ class xlsws_checkout extends xlsws_index {
 			$_SESSION['XLSWS_CART']->ShipFirstname = $_SESSION['customer']->Firstname;
 			$_SESSION['XLSWS_CART']->ShipLastname = $_SESSION['customer']->Lastname;
 		}
-			
 
     }
 
+	protected function Form_Load() {
+		error_log("load runninig");
+		$objControl = $this->SubmitControl;
+	    $objControl->Enabled = true;
+
+	}
 	protected function Form_Validate() {
 		$this->errSpan->Text='';
 		$this->errSpan->CssClass='customer_reg_err_msg';
