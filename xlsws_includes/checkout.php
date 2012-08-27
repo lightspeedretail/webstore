@@ -1268,7 +1268,6 @@ class xlsws_checkout extends xlsws_index {
     }
 
 	protected function Form_Load() {
-		error_log("load runninig");
 		$objControl = $this->SubmitControl;
 	    $objControl->Enabled = true;
 
