@@ -40,6 +40,13 @@
         public static $SessionObject;
         public static $SessionEvents = array();
 
+		/** For debugging, when you get blank pages with no errors, uncomment this line
+		 * and run again to see what caused it. Should not be left active in production
+		 *
+		 */
+	    //protected static function InitializeOutputBuffering() {}
+
+
         /*
          * Redefine the function InitializeAutoload configured as the 
          * PHP autoloader. This provides us with a configurable listing of 
