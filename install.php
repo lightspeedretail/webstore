@@ -2854,7 +2854,21 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 				$tz = $this->GetControl('storetz');
 				$sql = "UPDATE xlsws_configuration SET value='" . $tz->SelectedValue  . "' WHERE `key`='TIMEZONE'";
 				$db_ok = $db_ok && $this->mysql_query($sql);
-				
+
+
+				//Update path in robots.txt
+				$origText = "www.example.com/store/sitemap.xml";
+				$replText = $_SERVER['SERVER_NAME'].$_SERVER['SCRIPT_NAME']."/sitemap.xml";
+				$replText = str_replace("/install.php","",$replText);
+				$strFileContents=file_get_contents('robots.txt');
+				$fp=@fopen('robots.txt','w');
+				if ($fp) {
+					$str=str_replace($origText,$replText,$strFileContents);
+					fwrite($fp,$str,strlen($str));
+					fclose($fp);
+				} else {
+					$strReturn .= "<h3>Could not update robots.txt due to write permissions error. Please manually modify this file and correct the URL to Sitemap with your Web Store URL</h3>";
+				}
 				
 				if($db_ok){
 				
@@ -2869,8 +2883,7 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 					$strReturn .= "Done!<BR/><BR/>";
 					
 					$strReturn .= "<h1>Important: Rename the file htaccess to .htaccess (adding a period in front of the filename) in your Webstore root folder</h1>";
-					
-					
+
 					$strReturn .= "<a href=\"index.php\">Click here</a> to see your store.";
 				}else{
 					file_put_contents("includes/configuration.inc.php" , $old_config_file);	
