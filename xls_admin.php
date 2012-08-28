@@ -6497,20 +6497,20 @@
 
 		protected function RecalculateAvail(){
 			if($this->arrMPnls['RecalculateAvail']->Visible){
-					$this->arrMPnls['RecalculateAvail']->Visible = false;		
+					$this->arrMPnls['RecalculateAvail']->Visible = false;
 					return;
 			}
-			
+
 			$objProdCondition = QQ::AndCondition(
-            QQ::Equal(QQN::Product()->Web,1),             
-            QQ::OrCondition(            
-                QQ::Equal(QQN::Product()->MasterModel, 1),                               
+            QQ::Equal(QQN::Product()->Web,1),
+            QQ::OrCondition(
+                QQ::Equal(QQN::Product()->MasterModel, 1),
                 QQ::AndCondition(
-                    QQ::Equal(QQN::Product()->MasterModel, 0), 
+                    QQ::Equal(QQN::Product()->MasterModel, 0),
                     QQ::Equal(QQN::Product()->FkProductMasterId, 0)
-                ))  
+                ))
 	        );
-	
+
 	    	$arrProducts = Product::QueryArray(QQ::Equal(QQN::Product()->Web,1),
 					QQ::Clause(
 						QQ::OrderBy(QQN::Product()->Rowid)
@@ -6521,8 +6521,8 @@
 				//just pass it to the Avail so we have it for queries elsewhere
 	            $objProduct->InventoryAvail=$objProduct->Inventory;
 				$objProduct->Save();
-			
-			}	
+
+			}
 			
 			
 			$this->arrMPnls['RecalculateAvail']->Text = _sp("Inventory availability has been recalculated.");
@@ -6531,89 +6531,12 @@
 		}
 		
 		protected function MigratePhotos(){
+			set_time_limit(1200);
+			//Include db_maint class to access update functions
+			include_once(XLSWS_INCLUDES . 'db_maintenance.php');
+			$objDbMaint = new xlsws_db_maintenance;
+			$this->arrMPnls['MigratePhotos']->Text = $objDbMaint->MigratePhotos();//Include db_maint class to access update functions
 
-			//First make sure we have our new names set
-			Product::ConvertSEO();
-			
-			//Then switch to file system if it's not already
-			_xls_set_conf('IMAGE_STORE','FS');
-			
-			
-			$objCondition = QQ::AndCondition(
-           		QQ::NotLike(QQN::Images()->ImagePath, '%/%' )
-	        );
-	
-	    	$arrImages = Images::QueryArray($objCondition);
-	    	
-			foreach ($arrImages as $objImage) {
-			
-				//We only care about the master photos, we'll delete the thumbnails and regenerate
-				if ($objImage->Rowid == $objImage->Parent) {
-				
-					$strExistingPath = $objImage->ImagePath;
-					$strName = pathinfo($strExistingPath, PATHINFO_FILENAME);
-					
-					$intPos = strpos($strName, '_');
-					
-					if ($intPos !== false) {
-						$arrFileParts = explode("_",$strName);
-						$intRowId=substr($strName,0,$intPos);
-						if (count($arrFileParts)==2) { //just add with no index
-							$strAdd = "add";
-							$intIndex = null;
-						}
-						if (count($arrFileParts)==3) { //add with index
-							$strAdd = "add";
-							$intIndex = $arrFileParts[1];
-						}
-					} else {
-						$intRowId=$strName;
-						$strAdd=null;
-						$intIndex=null;
-					}
-						
-					//echo $strName." ".$intRowId." ".$strAdd." ".$intIndex."<br>";
-					$objProduct = Product::Load($intRowId);
-					if ($objProduct && $objProduct->RequestUrl != '') {
-						$strNewImageName = Images::GetImageName(substr($objProduct->RequestUrl,0,60), 0, 0, $intIndex, $strAdd);
-					
-					$blbImage = $objImage->GetImageData();
-					if (empty($blbImage)) {
-						//We have missing photo data and/or bad file, clean up. Worse case we have to reupload.
-						$objProduct->ImageId = null;
-						$objProduct->Save();
-						$objImage->Delete();
-					} else {
-						$objImage->SaveImageData($strNewImageName, $blbImage);
-						$objImage->Reload();
-						$objImage->ImagePath=$strNewImageName;
-						$objImage->ImageData=null;
-						$objImage->Save();
-					}
-					
-					}
-
-				}
-
-			
-			}	
-			
-			//Now we remove all the thumbnails because our browsing will recreate them
-			$objCondition = QQ::AndCondition(
-           		QQ::NotLike(QQN::Images()->ImagePath, '%/%' ),
-           		QQ::NotEqual(QQN::Images()->Rowid,QQN::Images()->Parent)
-	        );
-	
-	    	$arrImages = Images::QueryArray($objCondition);
-	    	
-			foreach ($arrImages as $objImage) {
-				$objImage->DeleteImage();
-				//We delete directly because our class would attempt to remove the parent which we don't want
-				_dbx('DELETE FROM `xlsws_images` WHERE `rowid` = ' . $objImage->Rowid . '');				
-			}
-			
-			
-			$this->arrMPnls['MigratePhotos']->Text = _sp("Photos have been migrated and renamed to SEO names.");
 			$this->arrMPnls['MigratePhotos']->Visible = true;
 			$this->arrMPnls['MigratePhotos']->Refresh();
 		}
@@ -6661,7 +6584,7 @@
 		
 		
 		protected function UpgradeWS(){
-
+			set_time_limit(1200);
 			if($this->arrMPnls['UpgradeWS']->Visible){
 					$this->arrMPnls['UpgradeWS']->Visible = false;		
 					return;
@@ -6672,7 +6595,7 @@
 			$this->arrMPnls['UpgradeWS']->Refresh();	
 			
 			//Include db_maint class to access update functions
-			include(XLSWS_INCLUDES . 'db_maintenance.php');
+			include_once(XLSWS_INCLUDES . 'db_maintenance.php');
 			$objDbMaint = new xlsws_db_maintenance;
 			$this->arrMPnls['UpgradeWS']->Text = $objDbMaint->RunUpdateSchema();
 			

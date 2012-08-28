@@ -142,7 +142,7 @@ class Product extends ProductGen {
 		//so we just have to do this directly with the db
 		$db = Product::GetDatabase();
 
-		$matches = $db->Query('SELECT rowid,name,code from xlsws_product order by rowid');
+		$matches = $db->Query("SELECT rowid,name,code from xlsws_product where coalesce(request_url,'') = '' order by rowid");
 			
 		while ($row = $matches->FetchArray()) {
 			_dbx("UPDATE xlsws_product SET request_url='".

@@ -29,7 +29,7 @@
  * Controller class for various database maintenance functions
  * For modifying Schema structure
  */
-class xlsws_db_maintenance extends xlsws_index {
+class xlsws_db_maintenance {
 
 	public function RunUpdateSchema($shownotes = true) {		
 
@@ -920,7 +920,108 @@ class xlsws_db_maintenance extends xlsws_index {
 			_dbx($sql);
 			$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s updated record %s with value %s.") , $version , $table , $key , $value);
 		}
+
+
+		public function MigratePhotos() {
+
+			//First make sure we have our new names set
+			Product::ConvertSEO();
+
+			//Then switch to file system if it's not already
+			_xls_set_conf('IMAGE_STORE','FS');
+
+			$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE image_path NOT like '%/%' and rowid=parent ORDER BY rowid", "Query");
+			while ($objItem = $arrProducts->FetchObject()) {
+				$objImage = Images::Load($objItem->rowid);
+				echo $objImage->ImagePath." ".$objImage->Rowid." ".$objImage->Parent."<br>";
+
+				//We only care about the master photos, we'll delete the thumbnails and regenerate
+				if ($objImage->Rowid == $objImage->Parent) {
+
+					$strExistingPath = $objImage->ImagePath;
+					$strName = pathinfo($strExistingPath, PATHINFO_FILENAME);
+
+					$intPos = strpos($strName, '_');
+
+					if ($intPos !== false) {
+						$arrFileParts = explode("_",$strName);
+						$intRowId=substr($strName,0,$intPos);
+						if (count($arrFileParts)==2) { //just add with no index
+							$strAdd = "add";
+							$intIndex = null;
+						}
+						if (count($arrFileParts)==3) { //add with index
+							$strAdd = "add";
+							$intIndex = $arrFileParts[1];
+						}
+					} else {
+						$intRowId=$strName;
+						$strAdd=null;
+						$intIndex=null;
+					}
+
+					//echo $strName." ".$intRowId." ".$strAdd." ".$intIndex."<br>";
+					$objProduct = Product::Load($intRowId);
+					if ($objProduct && $objProduct->RequestUrl != '') {
+						$strNewImageName = Images::GetImageName(substr($objProduct->RequestUrl,0,60), 0, 0, $intIndex, $strAdd);
+
+
+						//If the image already exists, we just have to rename and move it, and update the db record
+
+						if ($objImage->ImageFileExists()) {
+							if (exif_imagetype(Images::GetImagePath($strNewImageName)) == IMAGETYPE_JPEG)
+								$strNewImageName = substr($strNewImageName,0,-4) . ".jpg";
+							//echo "renaming ".$strExistingPath." to ".$strNewImageName."<br>";
+							$strPath = Images::GetImagePath($strNewImageName);
+							$arrPath = pathinfo($strPath);
+							$strFolder = $arrPath['dirname']; echo $strFolder."<br>";
+							if (!$objImage->SaveImageFolder($strFolder))
+								return "Halting: error creating folder ".$strFolder;
+
+							if (!rename(Images::GetImagePath($strExistingPath), Images::GetImagePath($strNewImageName)))
+								return "Halting: error trying to rename ".$strExistingPath." to ".$strNewImageName;
+							$objImage->ImagePath=$strNewImageName;
+							$objImage->ImageData=null;
+							$objImage->Save();
+
+						} else {
+							//echo Images::GetImagePath($objImage->ImagePath)." doesn't exist<br>";
+							$blbImage = $objImage->GetImageData();
+							if (empty($blbImage)) {
+								//We have missing photo data and/or bad file, clean up. Worse case we have to reupload.
+								$objProduct->ImageId = null;
+								$objProduct->Save();
+								$objImage->Delete();
+							} else {
+								$objImage->SaveImageData($strNewImageName, $blbImage);
+								$objImage->Reload();
+								$objImage->ImagePath=$strNewImageName;
+								$objImage->ImageData=null;
+								$objImage->Save();
+							}
+						}
+
+					}
+
+				}
+
+
+			}
+
+			//Now we remove all the thumbnails because our browsing will recreate them
+			$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE image_path NOT like '%/%' and rowid <> parent ORDER BY rowid", "Query");
+			while ($objItem = $arrProducts->FetchObject()) {
+				$objImage = Images::Load($objItem->rowid);
+				$objImage->DeleteImage();
+				//We delete directly because our class would attempt to remove the parent which we don't want
+				_dbx('DELETE FROM `xlsws_images` WHERE `rowid` = ' . $objImage->Rowid . '');
+			}
+
+
+			return "Photos have been migrated and renamed to SEO names.";
+
+		}
+
+
 		
-		
-		
-}
+	}
