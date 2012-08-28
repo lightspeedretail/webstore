@@ -6420,16 +6420,17 @@
 			$this->arrMPnls['UpgradeWS']->HtmlEntities = false;				
 			$this->arrMPnls['UpgradeWS']->ToolTip= _sp('Upgrade webstore with latest patches/bug fixes');
 
-			$ctPic = _dbx("select count(*) as thecount from xlsws_images where left(image_path,8) != 'product/';",'Query');
-			$arrTotal = $ctPic->FetchArray();
-			if ($arrTotal['thecount']>0) {
-				$this->arrMPnls['MigratePhotos'] = new QPanel($this);
-				$this->arrMPnls['MigratePhotos']->Visible = false;
-				$this->arrMPnls['MigratePhotos']->Name = _sp('Migrate Photos to SEO friendly structure');
-				$this->arrMPnls['MigratePhotos']->HtmlEntities = false;				
-				$this->arrMPnls['MigratePhotos']->ToolTip= _sp('Migrate Photos to SEO file structure with paths and names');
+			if (_xls_get_conf('LIGHTSPEED_HOSTING' , '0')=='0') {
+				$ctPic = _dbx("select count(*) as thecount from xlsws_images where left(image_path,8) != 'product/';",'Query');
+				$arrTotal = $ctPic->FetchArray();
+				if ($arrTotal['thecount']>0) {
+					$this->arrMPnls['MigratePhotos'] = new QPanel($this);
+					$this->arrMPnls['MigratePhotos']->Visible = false;
+					$this->arrMPnls['MigratePhotos']->Name = _sp('Migrate Photos to SEO friendly structure');
+					$this->arrMPnls['MigratePhotos']->HtmlEntities = false;
+					$this->arrMPnls['MigratePhotos']->ToolTip= _sp('Migrate Photos to SEO file structure with paths and names');
+				}
 			}
-
 			
 			$this->arrMPnls['RecalculateAvail'] = new QPanel($this);
 			$this->arrMPnls['RecalculateAvail']->Visible = false;
