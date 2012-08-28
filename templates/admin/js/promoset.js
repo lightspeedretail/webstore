@@ -55,7 +55,7 @@ function FillListValues(CONTROL) {
 
 function GetSelectValues(CONTROL) {
     var strTemp = "";
-    for (var i = 0; i < CONTROL.length -1; i++) {
+    for (var i = 0; i < CONTROL.length; i++) {
         if (CONTROL.options[i].selected == true) {
             strTemp += "1,";
         } else {

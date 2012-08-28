@@ -17,7 +17,7 @@
 #simplemodal-overlay {background-color:#000; cursor:wait;}
 
 /* Container */
-#simplemodal-container {height:295px; width:780px; color:#111; background-color:#eeeeee; border:4px solid #444; padding:5px;text-shadow: none;}
+#simplemodal-container {height:295px; width:880px; color:#111; background-color:#eeeeee; border:4px solid #444; padding:5px;text-shadow: none;}
 #simplemodal-container .simplemodal-data {padding:8px;}
 #simplemodal-container code {background:#141414; border-left:3px solid #65B43D; color:#bbb; display:block; font-size:12px; margin-bottom:12px; padding:4px 0px 6px;}
 #simplemodal-container a {color:#222;}
