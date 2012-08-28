@@ -3033,16 +3033,40 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 				
 				
 			}
-		
+
+			$strtext = "";
+
+			//Update path in robots.txt
+			$origText = "www.example.com/store/sitemap.xml";
+			$replText = $_SERVER['SERVER_NAME'].$_SERVER['SCRIPT_NAME']."/sitemap.xml";
+			$replText = str_replace("/install.php","",$replText);
+			$strFileContents=file_get_contents('robots.txt');
+			$fp=@fopen('robots.txt','w');
+			if ($fp) {
+				$str=str_replace($origText,$replText,$strFileContents);
+				fwrite($fp,$str,strlen($str));
+				fclose($fp);
+			} else {
+				$strtext .= "<h3>Could not update robots.txt due to write permissions error. Please manually modify this file and correct the URL to Sitemap with your Web Store URL</h3>";
+			}
+
+
+
+
 			//Step 3 - Show any output
-			$strtext = "<h1>Finished with ".($intCount-$errCount)." of $intCount files updated. $errCount errors.</h1><P>";
+			$strtext .= "<h1>Finished with ".($intCount-$errCount)." of $intCount files updated. $errCount errors.</h1><P>";
 			if ($errCount) $strtext .= "Any files listed below were not updated and you will need to make changes manually, per the upgrade guide.<P>";
 			
 			foreach ($arrErrors as $key=>$val)
 				$strtext .= $key. " ".$val."<br>";
 			
 			if ($errCount==0) $strtext .= "<P><h3>Upgrade to <b>$VersionTo</b> successful. The next step is to update your database. You can click <a href=install.php?upgradedb>THIS LINK</a> to upgrade now. (Be patient, the update may take a few moments.)</h3>";
-			
+
+			$fp=@fopen('upgrade/results.html','w');
+			if ($fp) {
+				fwrite($fp,$strtext,strlen($strtext));
+				fclose($fp);
+			}
 			return $strtext;
 			
 		}	
