@@ -78,6 +78,7 @@ class free_shipping extends xlsws_class_shipping {
 		$ret['restrictcountry']->AddItem('My Country ('. _xls_get_conf('DEFAULT_COUNTRY').')', _xls_get_conf('DEFAULT_COUNTRY'));
 		if (_xls_get_conf('DEFAULT_COUNTRY')=="US")
 			$ret['restrictcountry']->AddItem('Continental US', 'CUS'); //Really common request, so make a special entry
+		$ret['restrictcountry']->AddItem('North America (US/CA)', 'NORAM');
 		$ret['restrictcountry']->Enabled = true;
 		$ret['restrictcountry']->SelectedIndex = 0;
            		
@@ -166,7 +167,12 @@ class free_shipping extends xlsws_class_shipping {
 						($_SESSION['XLSWS_CART']->ShipState =="AK" || $_SESSION['XLSWS_CART']->ShipState=="HI"))
 						return false;
 				break;
-			
+
+				case 'NORAM':
+					if ($_SESSION['XLSWS_CART']->ShipCountry != "US" && $_SESSION['XLSWS_CART']->ShipCountry != "CA")
+						return false;
+				break;
+
 				default:
 					if ($vals['restrictcountry']!=$_SESSION['XLSWS_CART']->ShipCountry) return false;
 			}
