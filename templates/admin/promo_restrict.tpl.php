@@ -87,7 +87,7 @@
         arrOldValues = strValues.split(",")
     }
 </script>
-<li class="rounded" <?php if($_CONTROL->EditMode): ?>style="height:350px;"<?php endif; ?>> 
+<li class="rounded" <?php if($_CONTROL->EditMode): ?>style="height:350px;"<?php endif; ?>>
 						<div class="title rounded"> 
 							<div class="name" style="cursor:pointer;" <?php $_CONTROL->pxyAddNewPage->RenderAsEvents(); ?>><?= $_CONTROL->page->Title; ?></div> 
 							<div style="float:right">
@@ -117,7 +117,7 @@
 	<td class="label left">Product Codes:<br><?php $_CONTROL->ctlProductCodes->RenderWithError(); ?></td>
 </table>
 
-	<div class="tip">Tip: Click in the scrollbar area to avoid accidentally clicking items.</div>
+	<div>Tip: Click in the scrollbar area to avoid accidentally clicking items.</div>
 								
 </div>
 <?php endif; ?>

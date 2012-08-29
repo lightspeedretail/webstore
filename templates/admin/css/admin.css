@@ -26,9 +26,9 @@
 
 body {
 background:#000 url(images/bg.png)repeat-x;
-color:#fff;
+color:#000;
 font-family:Arial, Helvetica, sans-serif;
-font-size:12px;
+font-size:10px;
 margin:0;
 text-shadow:#333 1px 1px 1px;
 }
@@ -43,6 +43,7 @@ display:block;
 float:left;
 font-size:16px;
 margin:0 auto;
+    color: #ffffff;
 }
 
 #dropdown {
@@ -167,14 +168,21 @@ margin-top:5px;
 }
 
 #options .title .btns {
-display:inline;
-float:right;
-margin-right:20px;
+    display: inline;
+    float: left;
+    clear: left;
+    margin-top: 8px;
+
 }
 
 #options .title .updown {
-display:inline;
-float:left;
+    display: inline;
+    float: left;
+    width: 20px;
+    height: 30px;
+    margin-top: -5px;
+    /*vertical-align: middle;*/
+    /*margin-bottom: 5px;*/
 }
 
 #options .chart {
@@ -522,6 +530,7 @@ text-shadow:none;
 background:url(images/title_bg.png) repeat-x;
 height:47px;
 overflow-y:hidden;
+    font-size: 12px;
 }
 
 .rowtall {
@@ -572,7 +581,7 @@ color: #fff;
 text-shadow: 1px 1px 1px #000;
 }
 
-.table_base a, .table_base .page a { 
+.table_base a, .table_base .page a {
 color: #fff;
 text-shadow: 1px 1px 1px #000;
 }
@@ -661,18 +670,18 @@ font-size: 10px;
 
 .dtg_column { border-bottom: 1px solid #CCCCCC; }
 
-.dtg_header { 
+.dtg_header {
 	font-weight:bold;
 	background-color:#aaaaaa;
-	border-top: 1px solid #CCCCCC; 
-	border-bottom: 1px solid #a2b6ff; 
+	border-top: 1px solid #CCCCCC;
+	border-bottom: 1px solid #a2b6ff;
 	background-image: url(images/title_bg.png);
 	background-repeat: repeat-x;
 	background-position: bottom;
 }
 
 
-/* Order Editing, based on checkout */
+ Order Editing, based on checkout
 .edit_height {
 height: 600px;
 }
@@ -930,14 +939,14 @@ margin-bottom: 10px;
 font-size: 0px;
 line-height: 0px;
 clear: both;
-} 
+}
 
 #mainNav{
         background-color: #ffffff;
         display: block;
         width: 960px;
         margin:0 auto;
-       
+
 }
 .mainNavItem{
 		background:url('images/tab_bg.png') repeat-x;
@@ -967,6 +976,6 @@ color:#111;
 .innertab{
         display: table-cell;
         vertical-align: middle;
-        
+
 }
 

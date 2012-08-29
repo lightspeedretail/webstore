@@ -27,8 +27,9 @@
 
 ?>					<li class="rounded"> 
 						<div class="title rounded"> 
-							<div class="updown" style="width: 10px; vertical-align: middle; display:inline;">
-							<?php $_CONTROL->btnUp->Render(); ?><?php $_CONTROL->btnDown->Render(); ?>
+							<div class="updown">
+							<?php $_CONTROL->btnUp->Render('CssClass=btns'); ?>
+							<?php $_CONTROL->btnDown->Render('CssClass=btns'); ?>
 							</div>
 							<!--  
 							<a href="#" class="tooltip" title="<?= $_CONTROL->strFileLocation; ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" alt="Key: STORE_NAME" class="info" /></a>
