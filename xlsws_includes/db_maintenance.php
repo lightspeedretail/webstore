@@ -486,7 +486,7 @@ class xlsws_db_maintenance {
 			_dbx("DELETE FROM `xlsws_configuration` where `key`='ENABLE_SEO_URL'");
 			$this->add_config_key('STORE_TAGLINE' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Store Tagline', 
-				'STORE_TAGLINE', 'Amazing products available to order online!', 'Used as default for Title bar for home page', 2, 4, NOW(), NOW(), 'NULL');");		
+				'STORE_TAGLINE', 'Amazing products available to order online!', 'Slogan which follows your store name on the Title bar', 2, 4, NOW(), NOW(), 'NULL');");
 			
 	
 			//URL and Description Formatting
