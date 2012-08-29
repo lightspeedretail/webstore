@@ -45,7 +45,7 @@ include_once(adminTemplate('header.tpl.php'));
 
 if(isset($this->HelperRibbon)) 
 	if (strlen($this->HelperRibbon)>0)
-		echo '<div style="padding: 5px;"><img style="padding-right: 5px;width:44px; height:35px;" align="left" src="'.adminTemplate('css/images/questionmark.png').'"> '.$this->HelperRibbon.'</div>';
+		echo '<div class="helperribbon"><img style="padding-right: 5px;width:44px; height:35px;" align="left" src="'.adminTemplate('css/images/questionmark.png').'"> '.$this->HelperRibbon.'</div>';
 
 ?>	
 <div id="options" class="accord rounded"> 

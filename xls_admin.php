@@ -4542,7 +4542,7 @@
 			$this->arrFields['Threshold']['DisplayFunc'] = "RenderThreshold";
 			$this->arrFields['Threshold']['Width'] = 80;
 			
-			$this->HelperRibbon = "Need help setting up Promo Codes? Read our configuration guide at http://lightspeedretail.com/training for info. Please note the Free Shipping promo code is configured separately within the Free Shipping module.";
+			$this->HelperRibbon = "Please note the Free Shipping promo code is configured separately within the Free Shipping module (and Shipping Tasks->Set Restrictions).";
 			
 			$this->usejQuery = 'promoset';
 						
