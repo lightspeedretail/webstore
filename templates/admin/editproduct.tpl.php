@@ -35,6 +35,8 @@
     <script type="text/javascript" src="<?=  adminTemplate('js/jquery.ui.js');  ?>"></script>     
 	<script type="text/javascript" src="<?=  adminTemplate('js/admin.js'); ?>"></script>
 	<script type="text/javascript" src="<?=  adminTemplate('js/corners.js'); ?>"></script>
+	<link rel="stylesheet" type="text/css" href="<?=  adminTemplate('css/admin.css'); ?>" id="admincss"  />
+	<link rel="stylesheet" type="text/css" href="<?=  adminTemplate('css/superfish.css'); ?>" id="superfishcss"  />
 
 	<script type="text/javascript"> 
     $(document).ready(function(){ 
@@ -56,14 +58,7 @@
     $($('#featureElementsc_info .feature')[n]).show();
   }
   </script>
-	
-	<style type="text/css" xml:space="preserve">
-		/*<![CDATA[*/
-		      @import url(<?= adminTemplate('css/admin.css') ?>) all;
-			  @import url(<?= adminTemplate('css/superfish.css') ?>) all;
-		/*]]>*/
-	</style>
-	
+
 </head>
 <body>
 <?php 
