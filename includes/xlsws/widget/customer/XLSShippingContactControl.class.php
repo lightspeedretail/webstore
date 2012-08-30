@@ -1,6 +1,7 @@
 <?php
 
-class XLSShippingContactControl extends XLSCustomerContactControl { 
+class XLSShippingContactControl extends XLSCustomerContactControl {
+
     public function UpdateFieldsFromCustomer($objCustomer = null) {
         if (is_null($objCustomer))
             $objCustomer = Customer::GetCurrent();
@@ -11,7 +12,10 @@ class XLSShippingContactControl extends XLSCustomerContactControl {
         if ($objInfo) {
             $mixValueArray = array(
                 'Company' => $objCustomer->Company,
-                'Phone' => $objCustomer->Mainphone
+                'Phone' => $objCustomer->Mainphone,
+	            'FirstName' => $objCustomer->Firstname,
+	            'LastName' => $objCustomer->Lastname
+
             );
 
             $objInfo->UpdateFieldsFromArray($mixValueArray);
@@ -19,7 +23,7 @@ class XLSShippingContactControl extends XLSCustomerContactControl {
 
         if ($objAddress) {
             $mixValueArray = array(
-                'Street1' => $objCustomer->Address21,
+	            'Street1' => $objCustomer->Address21,
                 'Street2' => $objCustomer->Address22,
                 'City' => $objCustomer->City2,
                 'Country' => $objCustomer->Country2,

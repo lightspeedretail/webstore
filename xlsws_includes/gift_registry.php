@@ -158,7 +158,6 @@ class xlsws_gregistry extends xlsws_index {
 		$this->txtGRShipOption = new XLSListBox($this->pnlGRForm);
 		$this->txtGRShipOption->AddItem('-- Select a Option --', null);
 		$this->txtGRShipOption->AddItem(_sp('Ship to me'), 'Ship to me');
-		$this->txtGRShipOption->AddItem(_sp('Keep in store'), 'Keep in store');
 		$this->txtGRShipOption->AddItem(_sp('Ship to buyer'), 'Ship to buyer');
 		$this->txtGRShipOption->Name = _sp("Ship to");
 	}

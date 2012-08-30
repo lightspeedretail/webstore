@@ -19,14 +19,13 @@
  */
 
 /**
- * Framework template CheckOut screen (calls other elements)
+ * CheckOut screen (calls other elements)
  *
  * 
  *
  */
 
 ?>
-
 
 <div id="checkout">
 			
@@ -38,7 +37,6 @@
 
 <?php $this->pnlLoginRegister->Render(); ?>
 
-
 <?php $this->pnlCustomer->Render(); ?>
 <?php $this->PasswordControlWrapper->Render(); ?>
 <?php $this->pnlBillingAdde->Render(); ?>
@@ -47,12 +45,21 @@
 
 <br style="clear: both;"/>
 <?php if(isset($this->pnlPromoCode) && ($this->pnlPromoCode->Visible)): ?>
+
 <?php $this->pnlPromoCode->Render() ?>
 <?php endif; ?>
 
-<?php $this->pnlShipping->Render(); ?>
+	<div class="left">
+	<?php $this->pnlShipping->Render(); ?>
+</div>
+	<div class="left shippingbutton">
+		<?php
+	if(isset($this->butCalcShipping) && ($this->butCalcShipping->Visible))
+		$this->butCalcShipping->Render()
+	?>
+	</div>
 
-<br style="clear: both;"/>
+	<br style="clear: both;"/>
 
 <?php $this->pnlCart->Render(); ?>
 		  
@@ -66,5 +73,5 @@
 			
 <?php $this->pnlVerify->Render(); ?>		  			
 
-
+<?php $this->LoadActionProxy->Render(); ?>
 </div>			

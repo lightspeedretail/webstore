@@ -19,7 +19,7 @@
  */
 
 /**
- * Basic template: Shipping address block for new registration 
+ * Shipping address block for new registration
  *
  * 
  *
@@ -43,23 +43,21 @@
 		</div>
 <?php  endif; ?>
 
-
 <?php  if(isset($this->blnShowShippingNames)):   ?>
-<div class="left margin">
-	<dl>
-		<dt><label for="First Name"><?php _xt("First Name") ?></label></dt>
-		<dd><?php $this->txtCRShipFirstname->RenderWithError(); ?></dd>
-	</dl>
-</div>
+		<div class="left margin">
+			<dl>
+				<dt><label for="First Name"><?php _xt("First Name") ?></label></dt>
+				<dd><?php $this->txtCRShipFirstname->RenderWithError(); ?></dd>
+			</dl>
+		</div>
 
-<div class="left margin">
-	<dl class="left">
-		<dt><label for="Last Name"><?php _xt("Last Name") ?></label></dt>
-		<dd><?php $this->txtCRShipLastname->RenderWithError(); ?></dd>
-	</dl>
-</div>
+		<div class="left margin">
+			<dl class="left">
+				<dt><label for="Last Name"><?php _xt("Last Name") ?></label></dt>
+				<dd><?php $this->txtCRShipLastname->RenderWithError(); ?></dd>
+			</dl>
+		</div>
 <?php  endif; ?>
-
 
 <?php  if(isset($this->txtCRShipPhone)):   ?>
 		<div class="left margin">
@@ -121,17 +119,10 @@
 		<dl>
 			<dt><label for="Zip" class="zip"><?php _xt("Zip/Postal Code") ?></label></dt>
 		
-			<dd><?php $this->txtCRShipZip->Render() ?></dd>
+			<dd><?php $this->txtCRShipZip->RenderWithError() ?></dd>
 		</dl>
 		</div>
-		
-	<?php if(isset($this->butCalcShipping) && ($this->butCalcShipping->Visible)): ?>
-	<dl>
-	<dd style="margin-top: 20px;"><?php $this->butCalcShipping->Render() ?></dd>
-	</dl>
-	</fieldset>
-	<?php endif; ?>		
-		
+
 </fieldset>
 
 <div style="clear:both"></div>

@@ -19,7 +19,7 @@
  */
 
 /**
- * Deluxe template: Shipping address block for new registration 
+ * Shipping address block for new registration
  *
  * 
  *
@@ -122,14 +122,7 @@
 			<dd><?php $this->txtCRShipZip->RenderWithError() ?></dd>
 		</dl>
 		</div>
-		
-	<?php if(isset($this->butCalcShipping) && ($this->butCalcShipping->Visible)): ?>
-	<dl>
-	<dd style="margin-top: 20px;"><?php $this->butCalcShipping->Render() ?></dd>
-	</dl>
-	</fieldset>
-	<?php endif; ?>		
-		
+
 </fieldset>
 
 <div style="clear:both"></div>

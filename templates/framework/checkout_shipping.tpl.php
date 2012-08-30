@@ -1,6 +1,10 @@
 
 <fieldset class="xlsfset">
-    <legend> <?= _sp($_CONTROL->Name) ?></legend>
+    <legend> <?= _sp($_CONTROL->Name) ?> <?php 
+            if ($_CONTROL->Wait) 
+                $_CONTROL->Wait->Render();
+        ?></legend>
+
 
     <div class="left">
         <?php 

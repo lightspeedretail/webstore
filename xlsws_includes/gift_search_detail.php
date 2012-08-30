@@ -265,7 +265,6 @@ class xlsws_glist extends xlsws_index {
 			return;
 		}
 
-		$cart = Cart::GetCart();
 
 		$this->cartPnl->RemoveChildControls(true);
 

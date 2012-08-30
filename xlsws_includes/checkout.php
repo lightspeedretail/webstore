@@ -159,8 +159,8 @@ class xlsws_checkout extends xlsws_index {
         if ($objRegistry->ShipOption == 'Ship to buyer')
             return $objRegistry;
 
-        // TODO :: Posible security / privacy risk
-        $objRecipient = Customer::Load($objRegistry->CustomerId);
+        // TODO :: Possible security / privacy risk
+        $objRecipient = Customer::Load($objRegistry->CustomerId,true);
         if (!$objRecipient)
             return $objRegistry;
 
@@ -168,7 +168,7 @@ class xlsws_checkout extends xlsws_index {
             return $objRegistry;
 
         $this->ShippingContactControl->UpdateFieldsFromCustomer($objRecipient);
-
+		$this->ShippingContactControl->SaveFieldsToCart();
         if ($this->CustomerControl->CheckSame) {
             $this->CustomerControl->CheckSame->Visible = false;
             $this->CustomerControl->CheckSame->Checked = false;
@@ -214,19 +214,23 @@ class xlsws_checkout extends xlsws_index {
 
     protected function BindCalculateShippingControl() {
         $objControl = $this->CalculateShippingControl;
-        $objControl->AddAction(
+	    $objControl->AddActionArray(
             new QClickEvent(),
-            new QAjaxAction('DoCalculateShippingClick')
+            array(
+	            new QJavascriptAction("if(typeof document.getElementById('ShippingWait_ctl') !='undefined') document.getElementById('ShippingWait_ctl').style.display='inline'"),
+                new QAjaxAction('DoCalculateShippingClick')
+            )
         );
     }
 
     public function DoCalculateShippingClick($strFormId, $strControlId, 
         $strParameter) {
-
         $blnValid =  $this->UpdateAfterShippingAddressChange();
+
 
         if ($strControlId=="CalculateShippingCtrl" && !$blnValid)
 			QApplication::ExecuteJavaScript("alert('"._sp("Unable to calculate shipping. Check form entry blanks for errors.")."')");
+	    QApplication::ExecuteJavaScript("if(typeof document.getElementById('ShippingWait_ctl') !='undefined') document.getElementById('ShippingWait_ctl').style.display='none';");
         return $blnValid;
     }
 
@@ -1260,10 +1264,6 @@ class xlsws_checkout extends xlsws_index {
 			$_SESSION['customer']->Country1=_xls_get_conf('DEFAULT_COUNTRY');  
 		if ($_SESSION['customer']->Country2=='')
 			$_SESSION['customer']->Country2=_xls_get_conf('DEFAULT_COUNTRY');  
-		if ($objCustomer) {
-			$_SESSION['XLSWS_CART']->ShipFirstname = $_SESSION['customer']->Firstname;
-			$_SESSION['XLSWS_CART']->ShipLastname = $_SESSION['customer']->Lastname;
-		}
 
     }
 

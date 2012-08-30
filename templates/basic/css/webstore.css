@@ -2716,3 +2716,8 @@ margin-top: -30px;
 -moz-border-radius-bottomright: 5px;
 -webkit-border-bottom-right-radius: 5px;
 }
+
+.shippingbutton {
+    margin-left: 15px;
+    margin-top: 25px;
+}

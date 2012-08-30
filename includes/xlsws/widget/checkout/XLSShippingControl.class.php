@@ -137,6 +137,12 @@ class XLSShippingControl extends XLSCompositeControl {
         return $this->GetChildByName('Wait');
     }
 
+	public function DisplayWaitControl($blnShow = true) {
+		$objWait = $this->GetChildByName('Wait');
+		if ($objWait)
+			$objWait->Display = $blnShow;
+	}
+
     protected function BuildModuleControl() {
         $objControl = new XLSListControl($this, $this->GetChildName('Module'));
         $objControl->Name = _sp('Choose Shipping Method');

@@ -4,7 +4,8 @@
             if ($_CONTROL->Wait) 
                 $_CONTROL->Wait->Render();
         ?></legend>
-	
+
+
     <div class="left">
         <?php 
             if ($_CONTROL->Module) 
