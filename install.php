@@ -3078,7 +3078,7 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 			foreach ($arrErrors as $key=>$val)
 				$strtext .= $key. " ".$val."<br>";
 			
-			if ($errCount==0) $strtext .= "<P><h3>Upgrade to <b>$VersionTo</b> successful. The next step is to update your database. You can click <a href=install.php?upgradedb>THIS LINK</a> to upgrade now. (Be patient, the update may take a few moments.)</h3>";
+			$strtext .= "<P><h3>Upgrade to <b>$VersionTo</b> successful. The next step is to update your database. You can click <a href=install.php?upgradedb>THIS LINK</a> to upgrade now. (Be patient, the update may take a few moments.)</h3>";
 
 			$fp=@fopen('upgrade/results.html','w');
 			if ($fp) {
