@@ -3029,10 +3029,15 @@ $sql[] = "INSERT INTO `xlsws_view_log_type` VALUES (19, 'familyview')";
 						//These are easy, just remove old file
 						if (!@unlink($v->filename))
 							{ $arrErrors[]=$v->filename." could not be removed"; $errCount++; }
-					
-					
 					break;
-				
+
+					case 'rename':
+						//Less destructive than a delete
+						if (!@rename($v->filename,$v->filename.'-old'))
+							{ $arrErrors[]=$v->filename." could not be renamed"; $errCount++; }
+					break;
+
+
 					case 'skip':
 						//Only exists if the original has been removed
 					break;
