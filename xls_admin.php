@@ -6521,7 +6521,7 @@
 				//Since $objProduct->Inventory isn't the real inventory column, it's a calculation,
 				//just pass it to the Avail so we have it for queries elsewhere
 	            $objProduct->InventoryAvail=$objProduct->Inventory;
-				$objProduct->Save();
+				$objProduct->Save(false,true);
 
 			}
 			
