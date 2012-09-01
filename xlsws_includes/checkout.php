@@ -1126,17 +1126,9 @@ class xlsws_checkout extends xlsws_index {
         $objCart->Type = CartType::order;
         $objCart->Submitted = QDateTime::Now(true);
         $objCart->Save();
-        
-        //Set reserved inventory numbers since we now have a new pending order
-        $arrItems = $objCart->GetCartItemArray(); 
-		foreach($arrItems as $objItem) {
-			$objProduct = Product::Load($objItem->ProductId);
-			$objProduct->InventoryReserved=$objProduct->CalculateReservedInventory();
-			//Since $objProduct->Inventory isn't the real inventory column, it's a calculation,
-			//just pass it to the Avail so we have it for queries elsewhere
-            $objProduct->InventoryAvail=$objProduct->Inventory;
-			$objProduct->Save();
-		}
+
+	    $objCart->RecalculateInventoryOnCartItems();
+
 
 	    //Remove cart from session
 	    unset($_SESSION['XLSWS_CART']);

@@ -210,6 +210,23 @@ class Cart extends CartGen {
          
     }
 
+	/** For any cart items, recalculate the inventory available. Always needs to be done after
+	 * an order is completed
+	 *
+	 */
+	public function RecalculateInventoryOnCartItems() {
+
+		$arrItems = $this->GetCartItemArray();
+		foreach($arrItems as $objItem) {
+			$objProduct = Product::Load($objItem->ProductId);
+			$objProduct->InventoryReserved=$objProduct->CalculateReservedInventory();
+			//Since $objProduct->Inventory isn't the real inventory column, it's a calculation,
+			//just pass it to the Avail so we have it for queries elsewhere
+			$objProduct->InventoryAvail=$objProduct->Inventory;
+			$objProduct->Save();
+		}
+	}
+
     public function SetIdStr() {
         $strQueryFormat = 'SELECT COUNT(rowid) FROM xlsws_cart WHERE '.
             '`id_str` = "%s" AND `rowid` != "%s";';

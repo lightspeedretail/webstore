@@ -40,7 +40,7 @@ $payModules = Modules::QueryArray(
 		QQ::Equal(QQN::Modules()->Active, 1),
 		QQ::Equal(QQN::Modules()->Type, 'payment' )),
 	QQ::Clause(QQ::OrderBy(QQN::Modules()->SortOrder)));
-				
+
 // load the modules
 foreach($payModules as $module) {
 	xlsws_index::loadModule($module->File , 'payment');
@@ -68,32 +68,42 @@ foreach($payModules as $module) {
 
 		$order_id = $pay_info['order_id'];
 
-		$cart = Cart::LoadByIdStr($order_id);
+		$objCart = Cart::LoadByIdStr($order_id);
 
-		if(!$cart || ($cart->Type != CartType::awaitpayment)) {
+		if(!$objCart || ($objCart->Type != CartType::awaitpayment)) {
 			_xls_log("Payment process capture error. $module->File did not return a valid order id $order_id . " . print_r($XLSWS_VARS , true));
 			continue;
 		}
 
-		if($cart->PaymentModule != $module->File) {
-			_xls_log("Payment process capture error. $module->File tried returning for $order_id when it was actually processed with $cart->PaymentModule . " . print_r($XLSWS_VARS , true));
+		if($objCart->PaymentModule != $module->File) {
+			_xls_log("Payment process capture error. $module->File tried returning for $order_id when it was actually processed with $objCart->PaymentModule . " . print_r($XLSWS_VARS , true));
 			continue;
 		}
 
-		$cart->PaymentAmount = isset($pay_info['amount']) ? $pay_info['amount'] : 0;
+		$objCart->PaymentAmount = isset($pay_info['amount']) ? $pay_info['amount'] : 0;
 
 		if(isset($pay_info['data']))
-			$cart->PaymentData = $pay_info['data'];
+			$objCart->PaymentData = $pay_info['data'];
 
-		Cart::SaveCart($cart);
+		Cart::SaveCart($objCart);
 
         if(!isset($pay_info['success']) || ( isset($pay_info['success']) && $pay_info['success']))
-            xlsws_checkout::FinalizeCheckout($cart, null, false);
+        {
+	        if(class_exists('xlsws_checkout')) //If we're hitting this during a normal checkout
+		            xlsws_checkout::FinalizeCheckout($objCart, null, false);
+	        else { //External update process, so class isn't available, just mark as paid
+		        $objCart->Type = CartType::order;
+		        $objCart->Submitted = QDateTime::Now(true);
+		        $objCart->Save();
+
+		        $objCart->RecalculateInventoryOnCartItems();
+	        }
+        }
 
 		if(isset($pay_info['output']))
 			exit($pay_info['output']);
 		else {
-			$url = _xls_site_url("order-track/pg") . "?getuid=" . $cart->Linkid;
+			$url = _xls_site_url("order-track/pg") . "?getuid=" . $objCart->Linkid;
 			exit("<html><head><meta http-equiv=\"refresh\" content=\"1;url=$url\"></head><body><a href=\"$url\">Click here to confirm your order</a></body></html>");
 		}
 	}
