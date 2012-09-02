@@ -124,7 +124,8 @@ class merchantware extends credit_card {
         $trans_info_transactionid = '';     // Transaction id
         $trans_info_allow_duplicate = '';   // Turn duplicate checking on or off
         $trans_info_register_num = '';      // Register number
-        
+
+		$card_info_number = _xls_number_only($fields['ccnum']->Text);
         //MerchantWARE expects expiry in 4 digit format
         $card_info_expiry = $fields['ccexpmon']->SelectedValue.substr($fields['ccexpyr']->SelectedValue,2,2);
         
@@ -145,7 +146,7 @@ class merchantware extends credit_card {
                         <strKey>'.$config['trans_key'].'</strKey>
                         <strOrderNumber>'.$wo.'</strOrderNumber>
                         <strAmount>'.$cart->Total.'</strAmount>
-                        <strPAN>'.$fields['ccnum']->Text.'</strPAN>
+                        <strPAN>'.$card_info_number.'</strPAN>
                         <strExpDate>'.$card_info_expiry.'</strExpDate>
                         <strCardHolder>'.$customer->Firstname.' '.$customer->Lastname.'</strCardHolder>
                         <strAVSStreetAddress>'.$customer->Address11.'</strAVSStreetAddress>
