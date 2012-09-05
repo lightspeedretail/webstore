@@ -932,7 +932,7 @@ EOS;
 	}
 
 	/**
-	 * bind_result_images - binds images to a list of produts
+	 * bind_result_images - binds images to a list of products
 	 * @param array Product - an array of product objects to bind
 	 * @return none
 	 */
