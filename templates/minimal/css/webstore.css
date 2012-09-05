@@ -1,0 +1,114 @@
+h1, h2, h3, h4, h5, h6 {
+    color: #181818;
+    font-family: "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: normal;
+}
+
+/***** Navigation *****/
+#nav {
+    height: 45px;
+    overflow: hidden;
+    width: 765px;
+}
+
+#nav a {
+    font-size: 12px;
+    font-weight: 700;
+    height: 45px;
+    text-shadow: none;
+    display: table;
+    float: left;
+    margin: 0px;
+    text-align: center;
+}
+
+.arrow {
+    position: absolute;
+    right: -50px;
+}
+
+#nav .innertab {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+#nav a.productmenu {
+    min-width: 105px;
+    width: 105px;
+    max-width: 105px;
+}
+
+#products a {
+    display: block;
+    float: left;
+    height: 22px;
+    width: 100px;
+}
+
+#nav_products {
+    font-size: 12px;
+    font-weight: 700;
+    height: 40px;
+    margin: 4px 0 15px;
+    padding: 15px 0 0 4px;
+    position: absolute;
+    text-decoration: none;
+    top: 130px;
+    width: 105px;
+    z-index: 998;
+}
+
+#nav_products a {
+    border: none;
+    display: block;
+    margin-right: 3px;
+    padding: 15px 7px 16px 10px;
+    text-decoration: none;
+}
+
+#nav_products ul {
+    border: none;
+    line-height: 1;
+    list-style: none;
+    list-style-type: none;
+    margin: 0 0 0 1px;
+    padding: 0;
+}
+
+#nav_products li {
+    float: left;
+    width: 10em;
+}
+
+#nav_products li ul {
+    left: -999em;
+    position: absolute;
+    width: 10em;
+}
+
+#nav_products li ul ul {
+    margin: -30px 0 0 180px;
+}
+
+#nav_products ul li ul li a {
+    background: #fff;
+    font-size: 1em;
+    font-weight: 700;
+    padding: 8px 10px;
+    width: 160px;
+}
+
+#nav_products ul li ul li a:hover {
+    background: #fff;
+}
+
+#nav_products li:hover ul ul, #nav_products li:hover ul ul ul, #nav_products li.sfhover ul ul, #nav_products li.sfhover ul ul ul {
+    left: -999em;
+}
+
+#nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul, #nav_products li li li.sfhover ul, #nav_products li:hover ul, #nav_products li:hover ul, #nav_products li.sfhover ul, #nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul {
+    left: auto;
+}
+
+.product_cell h2 { font-size: .8em; }
+.product_cell a { font-size: 1.1em; text-decoration: none;}
