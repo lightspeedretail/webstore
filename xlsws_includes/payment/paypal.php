@@ -170,6 +170,7 @@ class paypal extends xlsws_class_payment {
 		$str .= _xls_make_hidden('no_shipping',   '2');
 
 		$str .= _xls_make_hidden('notify_url',   _xls_site_dir() . "/" . "xls_payment_capture.php");
+		$str .= _xls_make_hidden('return',   $cart->Link);
 
 		$str .= _xls_make_hidden('amount',  round($cart->Total , 2));
 
