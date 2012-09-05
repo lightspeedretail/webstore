@@ -167,11 +167,12 @@ class paypal extends xlsws_class_payment {
 		$str .= _xls_make_hidden('cartId',  $cart->IdStr);
 		$str .= _xls_make_hidden('phone1',   $customer->Mainphone);
 		$str .= _xls_make_hidden('rm',   '2');
-		$str .= _xls_make_hidden('no_shipping',   '2');
+		$str .= _xls_make_hidden('no_shipping',   '1');
+		$str .= _xls_make_hidden('no_note',   '1');
 
 		$str .= _xls_make_hidden('notify_url',   _xls_site_dir() . "/" . "xls_payment_capture.php");
 		$str .= _xls_make_hidden('return',   $cart->Link);
-
+		$str .= _xls_make_hidden('cancel_return',   _xls_site_url('checkout/pg'));
 		$str .= _xls_make_hidden('amount',  round($cart->Total , 2));
 
 		$str .=  ('</FORM>');
