@@ -89,15 +89,24 @@ foreach($payModules as $module) {
 
         if(!isset($pay_info['success']) || ( isset($pay_info['success']) && $pay_info['success']))
         {
-	        if(class_exists('xlsws_checkout')) //If we're hitting this during a normal checkout
-		            xlsws_checkout::FinalizeCheckout($objCart, null, false);
-	        else { //External update process, so class isn't available, just mark as paid
-		        $objCart->Type = CartType::order;
-		        $objCart->Submitted = QDateTime::Now(true);
-		        $objCart->Save();
+	        if(!class_exists('xlsws_checkout')) {
 
-		        $objCart->RecalculateInventoryOnCartItems();
+		        //We need to load the checkout file but we don't run the class like normal, we just need
+		        //access to the functions.
+		        $strFile = "checkout.php";
+		        define('CUSTOM_STOP_XLSWS','stop');
+		        if(file_exists(CUSTOM_INCLUDES . $strFile))
+			        include_once(CUSTOM_INCLUDES . $strFile);
+		        elseif(file_exists('xlsws_includes/'.$strFile))
+			        include_once('xlsws_includes/'.$strFile);
+
+		        if(!class_exists('xlsws_checkout'))
+			        QApplication::Log(E_ERROR, 'payment_capture', "Error loading checkout class, can't continue");
+
 	        }
+
+	        xlsws_checkout::FinalizeCheckout($objCart, null, false);
+
         }
 
 		if(isset($pay_info['output']))

@@ -58,7 +58,7 @@ class paypal extends xlsws_class_payment {
 		$config = $this->getConfigValues(get_class($this));
 		$strName = "PayPal";
 		if (!$this->uses_jumper())$strName .= "&nbsp;&nbsp;&nbsp;<font size=2>Advanced Integration</font>";
-		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		if ($config['live']=="test") $strName .= " **IN TEST (SANDBOX) MODE**";
 		return $strName;
 	}
 	/**
@@ -81,9 +81,9 @@ class paypal extends xlsws_class_payment {
 		$ret['login']->Name = _sp('Business Email');
 
 		$ret['live'] = new QListBox($objParent);
-		$ret['live']->Name = _sp('Live/Test');
-		$ret['live']->AddItem('test' , 'test'); // TODO before distribute make live
+		$ret['live']->Name = _sp('Live/Sandbox');
 		$ret['live']->AddItem('live' , 'live');
+		$ret['live']->AddItem('sandbox' , 'test');
 
 		$ret['ls_payment_method'] = new XLSTextBox($objParent);
 		$ret['ls_payment_method']->Name = _sp('LightSpeed Payment Method');
@@ -175,7 +175,11 @@ class paypal extends xlsws_class_payment {
 
 		$str .=  ('</FORM>');
 
-		return $str;
+
+		if(_xls_get_conf('DEBUG_PAYMENTS' , false))
+			_xls_log(get_class($this) . " sending ".$cart->IdStr." in ".$config['live']." mode ".$str,true);
+
+			return $str;
 	}
 
 	/**
@@ -189,6 +193,10 @@ class paypal extends xlsws_class_payment {
 
 		$paypal_url = "";
 		$order_id = "";
+
+
+		if(_xls_get_conf('DEBUG_PAYMENTS' , false))
+			_xls_log(get_class($this) . " IPN Transaction ".print_r($XLSWS_VARS,true),true);
 
 		$config = $this->getConfigValues(get_class($this));
 		if($config['live'] == 'live')
@@ -210,7 +218,10 @@ class paypal extends xlsws_class_payment {
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE); // uncomment this line if you get no gateway response.
 		$resp = curl_exec($ch); //execute post and get results
 		curl_close ($ch);
-		
+
+		if(_xls_get_conf('DEBUG_PAYMENTS' , false))
+			_xls_log(get_class($this) . " IPN Verify Response ".$resp,true);
+
 		if (strpos($resp,"VERIFIED") !== FALSE) {
 		
 			if ($XLSWS_VARS['payment_status']=="Completed")
@@ -221,7 +232,6 @@ class paypal extends xlsws_class_payment {
 					'success' => true,
 					'data' => $XLSWS_VARS['txn_id'],
 				);
-				QApplication::Log(E_ERROR, 'Paypal', "Paypal ".$XLSWS_VARS['payment_status']." " . print_r($retarr , true));
 				return $retarr;
 			}
 			else
