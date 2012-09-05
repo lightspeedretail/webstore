@@ -107,11 +107,19 @@ class Cart extends CartGen {
 	 * Remove cart items from session
 	 * @return
 	 */
-	public static function ClearCart(){
+	public static function ClearCart() {
+
 		$cart = Cart::GetCart();
-		$items = $cart->GetCartItemArray();
-		foreach ($items as $item)
-			$item->Delete();
+
+		//If the cart is a completed invoice, order or SRO, we never want to delete a completed
+		//order, so we just drop the session instead
+		if (!in_array($cart->Type,array(CartType::invoice, CartType::order, CartType::sro)))
+		{
+			$items = $cart->GetCartItemArray();
+			foreach ($items as $item)
+				$item->Delete();
+		}
+
 		unset($_SESSION['XLSWS_CART']);
 	}
 
