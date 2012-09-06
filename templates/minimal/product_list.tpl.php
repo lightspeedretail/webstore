@@ -28,17 +28,17 @@
 ?>
 
 
-<div style="clear:both; padding-left:30px;">
+<div>
 
 <?php if(isset($this->custom_page_content)): ?>
-	<p style="margin-bottom: 15px;">
-	<?= $this->custom_page_content; ?>
-	</p>
+	<div id="custom_content">
+		<?= $this->custom_page_content; ?>
+	</div>
 <?php endif; ?>
 
 <?php if( _xls_get_conf('ENABLE_CATEGORY_IMAGE',0) && isset($this->category) && $this->category->ImageExist): ?>
-	<div style="float:left; display:inline;">
-	<img src="<?= $this->category->CategoryImage; ?>" />
+	<div id="category_image">
+		<img src="<?= $this->category->CategoryImage; ?>" />
 	</div>
 <?php endif; ?>
 

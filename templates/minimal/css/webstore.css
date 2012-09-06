@@ -1,3 +1,10 @@
+
+
+/* Note to web designers:
+this layout is designed with the Skeleton grid system. You should not hard-code point sizes for fonts,
+you should use em or percentages so it degrades gracefully on smaller screens. See
+http://pxtoem.com/ for conversion. See base.css for base point sizes used. */
+
 h1, h2, h3, h4, h5, h6 {
     color: #181818;
     font-family: "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -110,5 +117,38 @@ h1, h2, h3, h4, h5, h6 {
     left: auto;
 }
 
-.product_cell h2 { font-size: .8em; }
-.product_cell a { font-size: 1.1em; text-decoration: none;}
+.product_cell { border: 1px #e4e0d8 solid; min-height: 300px; max-height: 300px; vertical-align: baseline;}
+.product_cell_graphic { height: 225px; margin: auto;}
+.product_cell img { max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; margin-top: 10px;}
+.product_cell_label  { clear: both; margin: auto; padding-left: 0.375em; padding-top: 0; color: #ffffff; background: #262626; text-transform:uppercase; height: 65px; vertical-align: bottom;  text-align: center;}
+.product_cell h2 { font-size: .8em; color: #ffffff; margin-bottom: 0px; padding-top: 8px; line-height: 1.4em;}
+.product_cell_label a { font-size: 1.273em; text-decoration: none; color: #9c9c9c; font-weight: 500; }
+
+#breadcrumbs { height: 29px; margin: 15px auto; overflow: hidden; text-align: left; width: 765px; }
+#breadcrumbs ul { display: block; float: left; height: 31px; margin: 0; }
+#breadcrumbs li { display: block; float: left; height: 28px; list-style: none; margin: -23px 0 0; padding: 31px 30px 16px 15px; }
+#breadcrumbs img, #pagination img { margin: -8px 2px 0 3px; }
+#pagination { display: block; float: right; margin: 0 -5px 0 0; }
+#pagination li { display: block; float: left; list-style: none; margin: 0; overflow: hidden; padding: 8px 15px 8px 10px; }
+#pagination li .active { padding: 4px 7px; }
+
+#shoppingcart { text-transform: uppercase; padding-top: 10px; padding-left: 4px; padding-right: 4px; }
+#shoppingcarttop .title {
+    font-size: 1.429em;
+    height: auto;
+    min-height: 220px;
+    width: 100%;
+    z-index: 500;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+#shoppingcarttop .carticon { float: right; }
+#shoppingcarttop .minicart_itemlist { margin-top: 5px; margin-bottom: 5px; }
+#shoppingcarttop .minicart_item img { padding: 5px;}
+#shoppingcarttop .minicart_item { padding-top: 5px; padding-bottom: 5px; border-top: 1px dotted #dddddd; font-size: 0.8em; border-bottom: 1px dotted #dddddd; font-size: 0.8em;  font-weight: 500; line-height: 1em; clear: both;}
+#shoppingcarttop .minicart_item a { text-decoration: none; margin-top: 5px;}
+#shoppingcarttop .emptymessage { height: 113px; width: 128px; margin: 50px auto 0 auto; padding: 45px 20px 0 12px; text-align: center; color: #000; }
+
+#shoppingcarttop .minicart_image {float:left; width: 40px; border: 1px solid red;}
+#shoppingcarttop .minicart_descqty{ float:left; width: 130px; border: 1px solid red;}
+#shoppingcarttop .minicart_price{ float:left;border: 1px solid red; font-size: 1.5em }

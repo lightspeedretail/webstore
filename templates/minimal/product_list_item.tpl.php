@@ -26,13 +26,32 @@
  */
 
 	//Determine if we need to use an extra CSS keyword for our skeleton formatting
-	if ((2+$_CONTROL->CurrentItemIndex) % 4 == 0) $xtra=" alpha"; //Beginning of full row
-    if ((1+$_CONTROL->CurrentItemIndex) % 4 == 0 || $_CONTROL->CurrentItemIndex == count($_CONTROL->DataSource) - 1)
-	    $xtra = " omega"; //end of full row
+	//This is set for default 4 across, but resizing the screen will collapse down to single column automatically
+	$intDefaultWide = 3;
+	if (($intDefaultWide + $_CONTROL->CurrentItemIndex) % $intDefaultWide == 0 || $_CONTROL->CurrentItemIndex == 0) {
+		$rowcode = '<div class="row">';
+		$xtra = " alpha";
+	} //Beginning of full row
+	if ((1 + $_CONTROL->CurrentItemIndex) % $intDefaultWide == 0
+		|| $_CONTROL->CurrentItemIndex == count($_CONTROL->DataSource) - 1
+	) {
+		$rowcode2 = '</div>';
+		$xtra = " omega";
+	} //end of full row
 
-?>
-	<div class="four columns <?=$xtra?> product_cell">
-		<a href="<?php echo $_ITEM->Link; ?>"><img src="<?php echo $_ITEM->SmallImage; ?>"></a>
+	?>
+	<?= $rowcode ?>
+		<div class="four columns <?=$xtra?> product_cell">
+			<div class="product_cell_graphic" onclick="window.location='<?php echo $_ITEM->Link; ?>'">
+				<a href="<?php echo $_ITEM->Link; ?>"><img src="<?php echo $_ITEM->SmallImage; ?>"></a>
+			</div>
+			<div class="product_cell_label" onclick="window.location='<?php echo $_ITEM->Link; ?>'">
+				<h2><a href="<?php echo $_ITEM->Link; ?>"><?= _xls_truncate(_sp($_ITEM->Name) , 50); ?></a></h2>
+				<span class="product_cell_price"><?= _xls_currency($_ITEM->Price); ?></span>
+			</div>
+		</div>
+	<?= $rowcode2 ?>
+
 <!--						--><?php
 //						if(_xls_get_conf('ENABLE_SLASHED_PRICES' , 0)==2 &&
 //							$_ITEM->SellWeb != 0 &&
@@ -41,11 +60,3 @@
 //								_xls_currency($_ITEM->Sell).'</strike></div>';
 //							else echo '<div class="price_reg">&nbsp;</div>';
 //							?>
-		<div class="product_cell_price">
-			<a href="<?php echo $_ITEM->Link; ?>"><h2><?= _xls_truncate(_sp($_ITEM->Name) , 50); ?></h2>
-			<?= _xls_currency($_ITEM->Price); ?></a>
-		</div>
-
-
-	</div>
-

@@ -103,61 +103,15 @@
 			</a>
 		</div>
 	</div>
-<!---->
-<!--		<div id="login">-->
-<!--			--><?php //if (!$this->isLoggedIn()): ?>
-<!---->
-<!--			<div class="text">-->
-<!--				<div class="left">--><?php //_xt("Welcome!"); ?><!--</div>-->
-<!--				<div class="right"><a href="#"-->
-<!--				                      --><?php //$this->pxyLoginLogout->RenderAsEvents() ?><!--class="loginbox">--><?php //_xt(
-//					"Login"
-//				); ?><!--</a> &nbsp;|&nbsp; <a href="--><?// echo _xls_site_url('customer-register/pg'); ?><!--">--><?php //_xt(
-//					"Register"
-//				); ?><!--</a></div>-->
-<!--			</div>-->
-<!---->
-<!--			--><?php //else: ?>
-<!--			<div class="text">-->
-<!--				<div><a-->
-<!--					href="--><?// echo _xls_site_url('myaccount/pg'); ?><!--">--><?//= _xt("My Account"); ?><!--</a>-->
-<!--				</div> --><?php //$this->lblLogout->Render(); ?><!--</div>-->
-<!--			--><?php //endif; ?>
-<!---->
-<!---->
-<!--		</div>-->
 
 
-	<div id="body">
-		<div id="content">
 
-			<?php $this->menuPnl->Render(); ?>
 
-			<div id="nav">
-				<?php
-				echo'<a class="productmenu" href="' . _xls_site_url()
-					. '"><span class="innertab">&nbsp;</span></a>'; //will be covered up by products menu
-				foreach ($this->arrTopTabs as $arrTab) {
-					echo'<a class="tab' . count($this->arrTopTabs) . '" href="' . $arrTab->Link
-						. '"><span class="innertab">' . $arrTab->Title . '</span></a>';
-				}
-				?>
-				<div id="searchentry"><?php $this->searchPnl->Render(); ?></div>
-			</div>
-
-			<?php $this->crumbTrail->Render(); ?>
-		</div>
-		<?php $this->ctlFlashMessages->Render(); ?>
-		<noscript>
-			<?php  _xt('This store requires you to have a JavaScript enabled web browser.'); ?>
-		</noscript>
-
+	<div class="twelve columns content">
 		<?php $this->mainPnl->Render(); ?>
 	</div>
 
-
-	<div id="rightside">
-
+	<div class="four columns sidebar">
 		<?php if ($this->showCart()) {
 		$this->cartPnl->Render();
 	} ?>
@@ -167,39 +121,39 @@
 			$this->sidePnl->Render();
 		} ?>
 		</div>
-
 	</div>
-</div>
 
-<div id="footer">
-	<div class="left">&copy; <?php _xt('Copyright'); ?> <?= date("Y"); ?> <?= _xls_get_conf(
-		'STORE_NAME', 'Your Store'
-	) ?>. <?php _xt('All Rights Reserved'); ?>.
+	<div class="sixteen columns clearfix">
+
+		<div id="footer">
+			<div class="left">&copy; <?php _xt('Copyright'); ?> <?= date("Y"); ?> <?= _xls_get_conf(
+				'STORE_NAME', 'Your Store'
+			) ?>. <?php _xt('All Rights Reserved'); ?>.
+			</div>
+			<div class="right">
+				<?php
+				foreach ($this->arrBottomTabs as $arrTab) {
+					echo '<a href="' . $arrTab->Link . '">' . _sp($arrTab->Title) . '</a> |';
+				}
+				echo '<a href="'._xls_site_url('sitemap/pg').'">'._xt('Sitemap').'</a>';
+				?>
+			</div>
+		</div>
+
+		<?php $this->lblGoogleAnalytics->Render(); ?>
+
+		<?php if ($expires = _xls_page_session_expiry_duration()): ?>
+		<script type="text/javascript">
+				<?php
+				// in case of session expiry, reload the page so we don't get ajax/javascript errors.
+				// the added 5 seconds will ensure that user will be logged out due to inactivity
+				?>
+			window.setTimeout("document.location.href='<?= _xls_site_url() ?>'", <?= $expires ?> * 1000 + 5000
+			)
+			;
+		</script>
+			<?php endif; ?>
 	</div>
-	<div class="right">
-		<?php
-		foreach ($this->arrBottomTabs as $arrTab) {
-			echo '<a href="' . $arrTab->Link . '">' . _sp($arrTab->Title) . '</a> |';
-		}
-		echo '<a href="'._xls_site_url('sitemap/pg').'">'._xt('Sitemap').'</a>';
-		?>
-	</div>
-</div>
-
-<?php $this->lblGoogleAnalytics->Render(); ?>
-
-<?php if ($expires = _xls_page_session_expiry_duration()): ?>
-<script type="text/javascript">
-		<?php
-		// in case of session expiry, reload the page so we don't get ajax/javascript errors.
-		// the added 5 seconds will ensure that user will be logged out due to inactivity
-		?>
-	window.setTimeout("document.location.href='<?= _xls_site_url() ?>'", <?= $expires ?> * 1000 + 5000
-	)
-	;
-</script>
-	<?php endif; ?>
-
 <?php $this->lblSharingFooter->Render(); ?>
 <?php $this->RenderEnd(); ?>
 </html>
