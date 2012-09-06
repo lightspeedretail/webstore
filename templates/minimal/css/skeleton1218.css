@@ -9,18 +9,18 @@
 
 /* Table of Contents
 ==================================================
-    #Base 960 Grid
+    #Base 1218 Grid
     #Tablet (Portrait)
     #Mobile (Portrait)
     #Mobile (Landscape)
     #Clearing */
 
-/* #Base 960 Grid
+/* #Base 1218 Grid
 ================================================== */
 
 .container {
     position: relative;
-    width: 960px;
+    width: 1218px;
     margin: 0 auto;
     padding: 0;
 }
@@ -51,67 +51,67 @@
 /* Base Grid */
 .container .one.column,
 .container .one.columns {
-    width: 40px;
+    width: 48px;
 }
 
 .container .two.columns {
-    width: 100px;
+    width: 126px;
 }
 
 .container .three.columns {
-    width: 160px;
+    width: 204px;
 }
 
 .container .four.columns {
-    width: 220px;
+    width: 282px;
 }
 
 .container .five.columns {
-    width: 280px;
+    width: 360px;
 }
 
 .container .six.columns {
-    width: 340px;
+    width: 438px;
 }
 
 .container .seven.columns {
-    width: 400px;
+    width: 516px;
 }
 
 .container .eight.columns {
-    width: 460px;
+    width: 594px;
 }
 
 .container .nine.columns {
-    width: 520px;
+    width: 672px;
 }
 
 .container .ten.columns {
-    width: 580px;
+    width: 750px;
 }
 
 .container .eleven.columns {
-    width: 640px;
+    width: 828px;
 }
 
 .container .twelve.columns {
-    width: 700px;
+    width: 906px;
 }
 
 .container .thirteen.columns {
-    width: 760px;
+    width: 984px;
 }
 
 .container .fourteen.columns {
-    width: 820px;
+    width: 1062px;
 }
 
 .container .fifteen.columns {
-    width: 880px;
+    width: 1140px;
 }
 
 .container .sixteen.columns {
-    width: 940px;
+    width: 1218px;
 }
 
 .container .one-third.column {
@@ -124,63 +124,63 @@
 
 /* Offsets */
 .container .offset-by-one {
-    padding-left: 60px;
+    padding-left: 68px;
 }
 
 .container .offset-by-two {
-    padding-left: 120px;
+    padding-left: 146px;
 }
 
 .container .offset-by-three {
-    padding-left: 180px;
+    padding-left: 224px;
 }
 
 .container .offset-by-four {
-    padding-left: 240px;
+    padding-left: 302px;
 }
 
 .container .offset-by-five {
-    padding-left: 300px;
+    padding-left: 380px;
 }
 
 .container .offset-by-six {
-    padding-left: 360px;
+    padding-left: 458px;
 }
 
 .container .offset-by-seven {
-    padding-left: 420px;
+    padding-left: 536px;
 }
 
 .container .offset-by-eight {
-    padding-left: 480px;
+    padding-left: 614px;
 }
 
 .container .offset-by-nine {
-    padding-left: 540px;
+    padding-left: 692px;
 }
 
 .container .offset-by-ten {
-    padding-left: 600px;
+    padding-left: 770px;
 }
 
 .container .offset-by-eleven {
-    padding-left: 660px;
+    padding-left: 848px;
 }
 
 .container .offset-by-twelve {
-    padding-left: 720px;
+    padding-left: 926px;
 }
 
 .container .offset-by-thirteen {
-    padding-left: 780px;
+    padding-left: 1004px;
 }
 
 .container .offset-by-fourteen {
-    padding-left: 840px;
+    padding-left: 1082px;
 }
 
 .container .offset-by-fifteen {
-    padding-left: 900px;
+    padding-left: 1160px;
 }
 
 /* #Tablet (Portrait)

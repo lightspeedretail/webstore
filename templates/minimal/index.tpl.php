@@ -97,21 +97,19 @@
 <?php $this->dxLogin->Render(); ?>
 <div class="container">
 	<div class="sixteen columns">
-		<div id="header">
 			<a href="<?php echo _xls_site_url(); ?>">
 				<img src="<? echo _xls_site_url(_xls_get_conf('HEADER_IMAGE', false)); ?>"/>
 			</a>
-		</div>
 	</div>
 
-
-
-
-	<div class="twelve columns content">
+	<div class="twelve columns content clearfix">
 		<?php $this->mainPnl->Render(); ?>
 	</div>
 
-	<div class="four columns sidebar">
+	<div class="four columns alpha omega sidebar">
+
+		<div id="searchentry"><?php $this->searchPnl->Render(); ?></div>
+		
 		<?php if ($this->showCart()) {
 		$this->cartPnl->Render();
 	} ?>

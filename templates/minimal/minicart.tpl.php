@@ -49,7 +49,7 @@ $items = $cart->GetCartItemArray();
 									     width="<?php echo _xls_get_conf('MINI_IMAGE_WIDTH'); ?>px"/>
 									</a>
 								</span>
-								<span class="minicart_descqty">
+								<span class="minicart_desc">
 									<a href="<?= $item->Prod->Link; ?>">
 										<?= _xls_truncate($item->Description , 24) ?>
 										<!--<?php if($item->Prod->ProductSize != ''): ?>
@@ -58,8 +58,8 @@ $items = $cart->GetCartItemArray();
 										<?php if($item->Prod->ProductColor != ''): ?>
 											<br/><?= $item->Prod->ColorLabel ?> : <?= $item->Prod->ProductColor; ?>
 										<?php endif; ?>-->
-
-										<p><?php _xt('Quantity'); ?>: <?= $item->Qty ?></p>
+										<br>
+										<span class="minicart_qty"><?php _xt('Quantity'); ?>: <?= $item->Qty ?></span>
 									</a>
 								</span>
 								<span class="minicart_price">
@@ -76,7 +76,7 @@ $items = $cart->GetCartItemArray();
 
 	</div>
 
-	<div id="shoppingcartbottom" class="rounded-bottom">
+	<div id="shoppingcartbottom">
 		<p class="subtotal"><?php _xt("Subtotal"); ?></p>
 		<p class="total"><?= _xls_currency($cart->Subtotal) ?></p>
 
