@@ -776,7 +776,33 @@
 		protected function beforeSave($key,$field){
 		
 			switch ($key) {
-			
+
+				case 'DEFAULT_TEMPLATE':
+
+					if (_xls_get_conf('DEFAULT_TEMPLATE') != $field->SelectedValue) {
+
+						error_log("we're going to swap out template information ".$field->SelectedValue);
+						$objCurrentSettings = Modules::LoadByFileType(_xls_get_conf('DEFAULT_TEMPLATE') , 'template');
+						if (!$objCurrentSettings)
+							$objCurrentSettings = new Modules;
+
+						$objCurrentSettings->File = _xls_get_conf('DEFAULT_TEMPLATE');
+						$objCurrentSettings->Type = 'template';
+						//ToDo: query config for anything IMAGE_WIDTH and IMAGE_HEight, write to config and then load changed
+						
+						$arr = unserialize($this->Configuration);
+
+					}
+
+//					// Parse xml for response values
+//					$oXML = new SimpleXMLElement($this->response);
+//
+//					if($oXML->Package->Error) {
+//
+//					}
+				break;
+
+
 			
 				case 'GOOGLE_VERIFY':
 					if (substr($field->Text,0,47)=='<meta name="google-site-verification" content="') {
