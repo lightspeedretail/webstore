@@ -780,26 +780,65 @@
 				case 'DEFAULT_TEMPLATE':
 
 					if (_xls_get_conf('DEFAULT_TEMPLATE') != $field->SelectedValue) {
+						//we're going to swap out template information
 
-						error_log("we're going to swap out template information ".$field->SelectedValue);
 						$objCurrentSettings = Modules::LoadByFileType(_xls_get_conf('DEFAULT_TEMPLATE') , 'template');
 						if (!$objCurrentSettings)
 							$objCurrentSettings = new Modules;
 
 						$objCurrentSettings->File = _xls_get_conf('DEFAULT_TEMPLATE');
 						$objCurrentSettings->Type = 'template';
-						//ToDo: query config for anything IMAGE_WIDTH and IMAGE_HEight, write to config and then load changed
-						
-						$arr = unserialize($this->Configuration);
 
+						$objItems= Configuration::QueryArray(
+							QQ::OrCondition(
+								QQ::Like(QQN::Configuration()->Key, '%_IMAGE_WIDTH'),
+								QQ::Like(QQN::Configuration()->Key, '%_IMAGE_HEIGHT')
+
+							),
+							QQ::Clause(QQ::OrderBy(QQN::Configuration()->Rowid)));
+
+						$arrDimensions = array();
+						foreach ($objItems as $objItem) {
+							$arrDimensions[$objItem->Key] = $objItem->Value;
+
+
+						}
+						$objCurrentSettings->Configuration = serialize($arrDimensions);
+						$objCurrentSettings->Active = 0;
+						$objCurrentSettings->Save();
+
+						//Now that we've saved the current settings, see if there are new ones to load
+						$objNewSettings = Modules::LoadByFileType($field->SelectedValue , 'template');
+						if ($objNewSettings) {
+							//We found settings, load them
+
+							$arrDimensions = unserialize($objNewSettings->Configuration);
+							foreach($arrDimensions as $key=>$val)
+								_xls_set_conf($key,$val);
+						}
+						else {
+							//If we don't have old settings saved already, then we can do two things. First, we see
+							//if there is an Options.xml for defaults we create. If not, then we just leave the Config table
+							//as is and use those settings, we'll save it next time.
+							$fnOptions = "templates/".$field->SelectedValue."/options.xml";
+							if (file_exists($fnOptions)) {
+								$strXml = file_get_contents($fnOptions);
+
+								// Parse xml for response values
+								$oXML = new SimpleXMLElement($strXml);
+								if($oXML->image) {
+									foreach ($oXML->image as $item)
+										_xls_set_conf($item->keystring,$item->valuestring);
+								}
+							}
+
+
+
+
+						}
 					}
 
-//					// Parse xml for response values
-//					$oXML = new SimpleXMLElement($this->response);
-//
-//					if($oXML->Package->Error) {
-//
-//					}
+
 				break;
 
 
