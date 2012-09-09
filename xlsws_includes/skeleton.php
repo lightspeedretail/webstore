@@ -355,8 +355,7 @@ EOS;
 		if ($cart->Rowid)
 			$cart = Cart::Load($cart->Rowid);
 
-		// if cart is that of a order or processed - get out!
-
+		// if cart is that of a order or processed, it should not be in our session
 		if (!$cart || in_array($cart->Type,
 			array(CartType::invoice, CartType::order, CartType::sro)))
 			Cart::ClearCart();

@@ -204,7 +204,7 @@ class paypal extends xlsws_class_payment {
 		if($config['live'] == 'live')
 			$paypal_url = "https://www.paypal.com/cgi-bin/webscr";
 		else
-			$paypal_url = "https://www.sandbox.paypal.com/cgi-bin/webscrl";
+			$paypal_url = "https://www.sandbox.paypal.com/cgi-bin/webscr";
 
 		$paypal_fields = 'cmd=_notify-validate';
 
