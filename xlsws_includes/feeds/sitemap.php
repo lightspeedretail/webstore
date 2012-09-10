@@ -66,7 +66,7 @@ $strQueryAddl = ($intStockHandling == 0 ? " and inventory_avail>0" : "");
 	$categories = Category::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Category()->Rowid)));
 
 	foreach($categories as $category){
-		$ret .=  _sp("Generating URL for category") .
+		$ret .=  _sp("Generating URL for category ") .
 			$category->Name . "\n";
 
 		echo(_xls_sitemap_xml_url2($category->Link,
