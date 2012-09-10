@@ -42,10 +42,5 @@
 		<?php endforeach; ?>
 </ul>
 
-<?php
 
-if($this->dtrProducts && $this->dtrProducts->Paginator)
-	$this->dtrProducts->Paginator->Render();
-	
-?>
 

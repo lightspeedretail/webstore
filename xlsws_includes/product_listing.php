@@ -61,7 +61,7 @@ class xlsws_product_listing extends xlsws_index {
     	global $XLSWS_VARS;
         $this->dtrProducts = $objRepeater = new QDataRepeater($this->mainPnl,'ProductCell');
         $this->CreatePaginator();
-        $this->CreatePaginator(true);
+        if (_xls_get_conf('SECOND_PAGINATOR' , false)) $this->CreatePaginator(true);
 
         $objRepeater->ItemsPerPage =  _xls_get_conf('PRODUCTS_PER_PAGE' , 8);
 		$objRepeater->Template = templateNamed('product_list_item.tpl.php');
@@ -90,6 +90,8 @@ class xlsws_product_listing extends xlsws_index {
         }
 
         $objRepeater->$strProperty = new XLSPaginator($this->mainPnl , $strName);
+
+
         return $objRepeater->$strProperty;
     }
 

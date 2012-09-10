@@ -706,7 +706,7 @@ class xlsws_checkout extends xlsws_index {
     			{
 		    	$blnReturn = $this->CompleteCheckout();
 		    	if (!$blnReturn)
-		    		QApplication::Log(E_USER_NOTICE, 'checkout', "Checkout halted, likely due to payment decline.");    	
+		    		QApplication::Log(E_USER_NOTICE, 'checkout', "Checkout halted, either form submit validation failed or payment declined.");
 			} else $this->errSpan->Text = "Captcha Validation Error";
 
         }

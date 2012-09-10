@@ -41,13 +41,13 @@
 
 	?>
 	<?= $rowcode ?>
-		<div class="four columns <?=$xtra?> product_cell">
+		<div class="four columns<?=$xtra?> product_cell">
 			<div class="product_cell_graphic" onclick="window.location='<?php echo $_ITEM->Link; ?>'">
 				<a href="<?php echo $_ITEM->Link; ?>"><img src="<?php echo $_ITEM->SmallImage; ?>"></a>
 			</div>
 			<div class="product_cell_label" onclick="window.location='<?php echo $_ITEM->Link; ?>'">
 				<h2><a href="<?php echo $_ITEM->Link; ?>"><?= _xls_truncate(_sp($_ITEM->Name) , 50); ?></a></h2>
-				<span class="product_cell_price"><?= _xls_currency($_ITEM->Price); ?></span>
+				<span class="product_cell_price"><span class="product_cell_price_slash"><?= _xls_currency($_ITEM->SlashedPrice); ?></span><?= _xls_currency($_ITEM->Price); ?></span>
 			</div>
 		</div>
 	<?= $rowcode2 ?>

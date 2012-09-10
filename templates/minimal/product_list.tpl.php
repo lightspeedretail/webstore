@@ -21,49 +21,53 @@
 /**
  * template Template to create product grid outline
  * calls product_list_item
- * 
+ *
  *
  */
 
+//Our paginator is currently hardcoded to use breadcrumb arrows for Previous and Next, so we override it in the template here
+if($this->dtrProducts->Paginator) {
+	$this->dtrProducts->Paginator->LabelForPrevious = _sp('previous');
+	$this->dtrProducts->Paginator->LabelForNext = _sp('next');
+}
 ?>
 
 
-<div>
+	<div>
 
-<?php if(isset($this->custom_page_content)): ?>
-	<div id="custom_content">
-		<?= $this->custom_page_content; ?>
+		<?php if (isset($this->custom_page_content)): ?>
+			<div id="custom_content">
+				<?= $this->custom_page_content; ?>
+			</div>
+		<?php endif; ?>
+
+		<?php if (_xls_get_conf('ENABLE_CATEGORY_IMAGE', 0) && isset($this->category) && $this->category->ImageExist): ?>
+			<div id="category_image">
+				<img src="<?= $this->category->CategoryImage; ?>"/>
+			</div>
+		<?php endif; ?>
+
+
+		<?php  if ($this->subcategories && (count($this->subcategories) > 0)): ?>
+			<div class="subcategories">
+
+				<?php _xt("Browse subcategories"); ?>
+				<ul >
+					<?php  foreach ($this->subcategories as $categ): ?>
+					<li><a href="<?= $categ['link']; ?>"><?= $categ['name']; ?></a></li>
+					<?php endforeach; ?>
+				</ul>
+
+			</div>
+		<?php endif; ?>
+
+		<h1><?php echo _xls_stack_get('override_category') != '' ? _xls_stack_pop('override_category') : $this->category->Name; ?></h1>
 	</div>
-<?php endif; ?>
 
-<?php if( _xls_get_conf('ENABLE_CATEGORY_IMAGE',0) && isset($this->category) && $this->category->ImageExist): ?>
-	<div id="category_image">
-		<img src="<?= $this->category->CategoryImage; ?>" />
-	</div>
-<?php endif; ?>
+	<?php if ($this->dtrProducts->TotalItemCount > 0) : ?>
+		<div class="sixteen columns clearfix">
+			<?php $this->dtrProducts->Render(); ?>
+			<?php if($this->dtrProducts->Paginator) {  $this->dtrProducts->Paginator->Render(); } ?>
+		</div>
+	<?php endif; ?>
 
-
-<?php  if($this->subcategories  && (count($this->subcategories) > 0)): ?> 
-<div style="display:inline; float:left;"><br />
-<p style="font-weight: bold; margin: -10px 0 8px 15px; "><?php _xt("Browse subcategories"); ?></strong></p>
-<ul style="margin: 0 0 15px 0;">
-<?php  foreach($this->subcategories as $categ): ?> 
-<li style="margin: 0 0 3px 15px;"><a href="<?= $categ['link']; ?>">&nbsp;<?= $categ['name']; ?></a></li> 
-<?php endforeach; ?> 
-</ul>
-</div>
-<br style="clear:both"/>
-<?php endif; ?> 
-<h1><?php echo _xls_stack_get('override_category') != '' ? _xls_stack_pop('override_category') : $this->category->Name; ?></h1>
-</div>
-<?php if ($this->dtrProducts->TotalItemCount>0) : ?>
-
-<div class="sixteen columns">
-
-	<?php $this->dtrProducts->Render(); ?>
-</div>
-
-
-    <br style="clear:both"/>
-	</div>
-<?php endif; ?>
