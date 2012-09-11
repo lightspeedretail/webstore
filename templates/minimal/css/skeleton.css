@@ -18,6 +18,11 @@
 /* #Base 960 Grid
 ================================================== */
 
+/* Note, this file has been modified by LightSpeed from the original
+shipping version. The overall width was expanded to 978
+instead of 960. Some half columns have been added for special
+formatting.
+*/
 .container {
     position: relative;
     width: 978px;
@@ -31,8 +36,8 @@
     display: inline;
     margin-left: 5px;
     margin-right: 5px;
-    /*hint: for development, uncomment the following line to see where your columns are falling */
-    /*border: 0px solid blue;*/
+    /* hint: for development, uncomment the following line to see where your columns are falling */
+    /*border: 1px solid blue;*/
 }
 
 .row {
@@ -56,6 +61,10 @@
 
 .container .two.columns {
     width: 102px;
+}
+
+.container .twohalf.columns {
+    width: 124px;
 }
 
 .container .three.columns {
@@ -223,6 +232,10 @@
         width: 76px;
     }
 
+    .container .twohalf.columns {
+        width: 96px;
+    }
+
     .container .three.columns {
         width: 124px;
     }
@@ -367,6 +380,7 @@
     .container .one.column,
     .container .one.columns,
     .container .two.columns,
+    .container .twohalf.columns,
     .container .three.columns,
     .container .four.columns,
     .container .five.columns,
@@ -425,6 +439,7 @@
     .container .one.column,
     .container .one.columns,
     .container .two.columns,
+    .container .twohalf.columns,
     .container .three.columns,
     .container .four.columns,
     .container .five.columns,

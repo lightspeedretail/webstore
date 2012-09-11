@@ -10,24 +10,29 @@ h1, h2, h3, h4, h5, h6 {
     font-family: "Proxima Nova", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: normal;
 }
-
+#headerimage { padding-bottom: 20px;}
 /***** Navigation *****/
-#nav { height: 45px; overflow: hidden; width: 765px; }
-#nav a { font-size: 12px; font-weight: 700; height: 45px; text-shadow: none; display: table; float: left; margin: 0px; text-align: center; }
-.arrow { position: absolute; right: -50px; }
-#nav .innertab { display: table-cell; vertical-align: middle; }
-#nav a.productmenu { min-width: 105px; width: 105px; max-width: 105px; }
-#products a { display: block; float: left; height: 22px; width: 100px; }
-#nav_products { font-size: 12px; font-weight: 700; height: 40px; margin: 4px 0 15px; padding: 15px 0 0 4px; position: absolute; text-decoration: none; top: 130px; width: 105px; z-index: 998; }
-#nav_products a { border: none; display: block; margin-right: 3px; padding: 15px 7px 16px 10px; text-decoration: none; }
-#nav_products ul { border: none; line-height: 1; list-style: none; list-style-type: none; margin: 0 0 0 1px; padding: 0; }
-#nav_products li { float: left; width: 10em; }
-#nav_products li ul { left: -999em; position: absolute; width: 10em; }
-#nav_products li ul ul { margin: -30px 0 0 180px; }
-#nav_products ul li ul li a { background: #fff; font-size: 1em; font-weight: 700; padding: 8px 10px; width: 160px; }
-#nav_products ul li ul li a:hover { background: #fff; }
+#menubar { margin-bottom: 10px; height: 47px; border-bottom: 1px dotted #aaaaaa; }
+
+#nav_products { font-weight: 500; height: 47px; text-decoration: none; z-index: 2000; border-bottom: 0px; text-align: left; cursor: pointer;}
+#nav_products a { display: block; margin-right: 3px; padding: 0 0 0 0 ; text-decoration: none;  }
+#nav_products ul { border: none; line-height: 1; list-style: none; list-style-type: none; margin: 5px 0 0 0px; }
+#nav_products ul a { color: white; border-bottom: 1px dotted #cccccc; }
+#nav_products li { float: left; width: 10em; height: 29px;  }
+#nav_products li ul { left: -999em; position: absolute; width: 10em; height: 29px; }
+#nav_products li ul ul { margin: -33px 0 0 180px; }
+#nav_products ul li ul li a { background: #2c2c2c; font-size: 1em; font-weight: 700; padding: 8px 10px; width: 160px; border-bottom: 1px dotted #cccccc; }
+#nav_products ul li ul li a:hover { background: #2c2c2c; border-bottom: 1px dotted #cccccc; }
 #nav_products li:hover ul ul, #nav_products li:hover ul ul ul, #nav_products li.sfhover ul ul, #nav_products li.sfhover ul ul ul { left: -999em; }
 #nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul, #nav_products li li li.sfhover ul, #nav_products li:hover ul, #nav_products li:hover ul, #nav_products li.sfhover ul, #nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul {     left: auto; }
+.menutab {  font-size: 1.1em; font-weight: 500; text-align: center; text-transform: uppercase; }
+.innertab a { text-decoration: none;}
+.menuheight { height: 43px; }
+.menuunderline { }
+.menuunderline:hover { border-bottom: 5px solid #000000;}
+
+#gridheader h1 { line-height: 40px; margin-top: 12px; margin-bottom: 3px; }
+.subcategories { margin-left: 10px;margin-bottom: 15px;}
 
 .product_cell { border: 1px #e4e0d8 solid; min-height: 300px; max-height: 300px; vertical-align: baseline; cursor: pointer;}
 .product_cell_graphic { height: 225px; margin: auto;}
@@ -109,51 +114,5 @@ h1, h2, h3, h4, h5, h6 {
 #footer .copyright { text-align: center; text-transform: uppercase; color: #b7b7b7; font-size: 0.8em; }
 
 
+#viewport { clear: both; }
 
-
-/***** Navigation *****/
-#nav { height: 45px; overflow: hidden; width: 765px; }
-#nav a { font-size: 12px; font-weight: 700; height: 45px; text-shadow: none; display: table; float: left; margin: 0px; text-align: center; }
-.arrow { position: absolute; right: -50px; }
-#nav .innertab { display: table-cell; vertical-align: middle; }
-#nav a.productmenu { min-width: 105px; width: 105px; max-width: 105px; }
-#products a { display: block; float: left; height: 22px; width: 100px; }
-#nav_products { font-size: 12px; font-weight: 700; height: 40px; margin: 4px 0 15px; padding: 15px 0 0 4px; position: absolute; text-decoration: none; top: 130px; width: 105px; z-index: 998; }
-#nav_products a { border: none; display: block; margin-right: 3px; padding: 15px 7px 16px 10px; text-decoration: none; }
-#nav_products ul { border: none; line-height: 1; list-style: none; list-style-type: none; margin: 0 0 0 1px; padding: 0; }
-#nav_products li { float: left; width: 10em; }
-#nav_products li ul { left: -999em; position: absolute; width: 10em; }
-#nav_products li ul ul { margin: -30px 0 0 180px; }
-#nav_products ul li ul li a { background: #fff; font-size: 1em; font-weight: 700; padding: 8px 10px; width: 160px; }
-#nav_products ul li ul li a:hover { background: #fff; }
-
-#nav_products li:hover ul ul, #nav_products li:hover ul ul ul, #nav_products li.sfhover ul ul, #nav_products li.sfhover ul ul ul {    left: -999em;}
-
-#nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul, #nav_products li li li.sfhover ul, #nav_products li:hover ul, #nav_products li:hover ul, #nav_products li.sfhover ul, #nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul {    left: auto;}
-
-/* Formatting for automated tabs. Note these do NOT refer to 1st, 2nd, 3rd and 4th tabs */
-/* Instead, these are used WHEN there are 4 tabs, or 3 tabs, etc. So #tab4 is used for all */
-/* tabs when four are turned on, since width is proportional to the count() */
-#nav a.tab1 {
-    width: 182px;
-}
-
-#nav a.tab2 {
-    width: 182px;
-}
-
-#nav a.tab3 {
-    width: 142px;
-}
-
-#nav a.tab4 {
-    width: 112px;
-}
-
-#nav a.tab5 {
-    width: 90px;
-}
-
-#nav a.tab6 {
-    width: 75px;
-}

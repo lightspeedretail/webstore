@@ -25,7 +25,7 @@
  *
  */
 
-function print_childs($categ){
+function print_childs($categ) {
 	
 	$childs = $categ->categ_childs;
 	
@@ -34,25 +34,19 @@ function print_childs($categ){
 		return;
 	}
 		
-		echo "<img src=\"" . templateNamed('css')  . "/images/arrow-right.gif\" class=\"arrow\" /></a><ul>\n";
+	echo "<img src=\"" . templateNamed('css')  . "/images/arrow-right.gif\" class=\"arrow\" /></a><ul>\n";
 	foreach($childs as $category){
 		
 		if(!$category->HasChildOrProduct())
 			continue;
-		
 		?>
-		
 			<li><a href="<?= $category->Link; ?>"><?= $category->Name; ?><?php print_childs($category); ?></li>
 		<?php
-		
 	}
 	echo "</ul>\n";
-	
-	
 }
 
-function print_families(){
-
+function print_families() {
 	$strLabel=_xls_get_conf('ENABLE_FAMILIES_MENU_LABEL' , 'By Manufacturer');
 	echo '<li><a href="#">'.$strLabel;
 	echo '<img src="'.templateNamed('css').'/images/arrow-right.gif" class="arrow"  alt="'.$strLabel.'" /></a>';
@@ -62,29 +56,41 @@ function print_families(){
 		echo '<li><a href="'.$family->RequestUrl.'/f/">'.$family->Family.'</a></li>';
 	}
 	echo '</ul></li>';	
-
 }
 ?>
-		
-		<div id="nav_products">
+	<div class="three columns alpha menuheight">
+		<div id="nav_products" class="menutab">
 			<ul>
-				<li><a href="javascript:{}"><?php _xt('Products'); ?></a>
+				<li><?php _xt('Products'); echo '<img src="'.templateNamed('css').'/images/arrow-down.png" class="arrow"  alt="" />'; ?>
 					<ul>
 						<?php if(_xls_get_conf('ENABLE_FAMILIES', 0)==2)
 							print_families();
 						?>
-						<?php foreach($this->menu_categories as $category):  ?>	
+						<?php foreach($this->menu_categories as $category): ?>
 							<li><a href="<?= $category->Link; ?>"><?= $category->Name; ?><?php print_childs($category); ?></li>
 						<?php endforeach; ?>
-					
+
 						<?php if(_xls_get_conf('ENABLE_FAMILIES', 0)==1)
 							print_families();
 						?>
-
 					</ul>
 				</li>
 			</ul>
 		</div>
+	</div>
 
 
-	
+
+		<?php
+		$ct = 0;
+		foreach ($this->arrTopTabs as $arrTab) {
+			if (++$ct == count($this->arrTopTabs))
+				echo '<div class="twohalf columns omega menutab menuheight menuunderline">';
+			else
+				echo '<div class="twohalf columns menutab menuheight menuunderline">';
+			echo '<span class="innertab"><a href="'.$arrTab->Link.'">'.$arrTab->Title.'</a></span>'; //class="menutab tab'.count($this->arrTopTabs).'"
+			echo '</div>';
+		}
+		?>
+
+

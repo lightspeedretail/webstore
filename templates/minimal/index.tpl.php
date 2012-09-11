@@ -96,26 +96,20 @@
 <?php $this->dxLogin->Render(); ?>
 	<div class="container">
 		<div class="sixteen columns">
+			<div id="headerimage">
 				<a href="<?php echo _xls_site_url(); ?>">
 					<img src="<? echo _xls_site_url(_xls_get_conf('HEADER_IMAGE', false)); ?>"/>
 				</a>
+			</div>
 		</div>
 
 		<div class="twelve columns content clearfix">
-
-			<?php $this->menuPnl->Render(); ?>
-
-			<div id="nav">
-				<?php
-				echo '<a class="productmenu" href="'._xls_site_url().'"><span class="innertab">&nbsp;</span></a>'; //will be covered up by products menu
-				foreach ($this->arrTopTabs as $arrTab)
-					echo '<a class="tab'.count($this->arrTopTabs).'" href="'.$arrTab->Link.'"><span class="innertab">'.$arrTab->Title.'</span></a>';
-				?>
-
+			<div id="menubar">
+				<?php $this->menuPnl->Render(); ?>
 			</div>
-
-
-			<?php $this->mainPnl->Render(); ?>
+			<div id="viewport">
+				<?php $this->mainPnl->Render(); ?>
+			</div>
 		</div>
 
 		<div class="four columns alpha omega sidebar">

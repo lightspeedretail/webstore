@@ -33,13 +33,9 @@ if($this->dtrProducts->Paginator) {
 ?>
 
 
-	<div>
+	<div id="gridheader">
 
-		<?php if (isset($this->custom_page_content)): ?>
-			<div id="custom_content">
-				<?= $this->custom_page_content; ?>
-			</div>
-		<?php endif; ?>
+
 
 		<?php if (_xls_get_conf('ENABLE_CATEGORY_IMAGE', 0) && isset($this->category) && $this->category->ImageExist): ?>
 			<div id="category_image">
@@ -47,21 +43,27 @@ if($this->dtrProducts->Paginator) {
 			</div>
 		<?php endif; ?>
 
+		<h1><?php echo _xls_stack_get('override_category') != '' ? _xls_stack_pop('override_category') : $this->category->Name; ?></h1>
 
-		<?php  if ($this->subcategories && (count($this->subcategories) > 0)): ?>
-			<div class="subcategories">
+		<div class="subcategories">
+			<?php  if ($this->subcategories && (count($this->subcategories) > 0)): ?>
 
-				<?php _xt("Browse subcategories"); ?>
-				<ul >
+				<?php echo _sp("Subcategories"); ?>:
 					<?php  foreach ($this->subcategories as $categ): ?>
-					<li><a href="<?= $categ['link']; ?>"><?= $categ['name']; ?></a></li>
+					<a href="<?= $categ['link']; ?>"><?= $categ['name']; ?></a>
 					<?php endforeach; ?>
-				</ul>
 
-			</div>
+			<?php endif; ?>
+		</div>
+
+
+		<?php if (isset($this->custom_page_content)): ?>
+		<div id="custom_content">
+			<?= $this->custom_page_content; ?>
+		</div>
 		<?php endif; ?>
 
-		<h1><?php echo _xls_stack_get('override_category') != '' ? _xls_stack_pop('override_category') : $this->category->Name; ?></h1>
+
 	</div>
 
 	<?php if ($this->dtrProducts->TotalItemCount > 0) : ?>
