@@ -29,7 +29,7 @@ h1, h2, h3, h4, h5, h6 {
 #nav_products li:hover ul ul, #nav_products li:hover ul ul ul, #nav_products li.sfhover ul ul, #nav_products li.sfhover ul ul ul { left: -999em; }
 #nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul, #nav_products li li li.sfhover ul, #nav_products li:hover ul, #nav_products li:hover ul, #nav_products li.sfhover ul, #nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul {     left: auto; }
 
-.product_cell { border: 1px #e4e0d8 solid; min-height: 300px; max-height: 300px; vertical-align: baseline;}
+.product_cell { border: 1px #e4e0d8 solid; min-height: 300px; max-height: 300px; vertical-align: baseline; cursor: pointer;}
 .product_cell_graphic { height: 225px; margin: auto;}
 .product_cell img { max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; margin-top: 10px;}
 .product_cell_label  { clear: both; margin: auto;  padding-top: 0; color: #ffffff; background: #262626; text-transform:uppercase; height: 65px; vertical-align: bottom;  text-align: center;}
@@ -46,6 +46,9 @@ h1, h2, h3, h4, h5, h6 {
 #breadcrumbs li { display: block; float: left; height: 28px; list-style: none; margin: -23px 0 0; padding: 31px 30px 16px 15px; }
 #breadcrumbs img, #pagination img { margin: -4px 2px 0 3px; }
 
+#nav_products .arrow { margin: 1px 0 0 10px; }
+
+
 .paginator { font-weight: 700; text-align: center; text-transform:uppercase; margin-left: auto; margin-right: auto;}
 #pagination { display: block;  }
 #pagination a {text-decoration: none; color: #888888; }
@@ -54,6 +57,17 @@ h1, h2, h3, h4, h5, h6 {
 #pagination li .active { padding: 4px 7px; }
 #pagination .table { display: table;   /* Allow the centering to work */ margin: 0 auto; }
 
+
+#searchentry { text-transform: uppercase; border-bottom: 4px solid black; margin-bottom: 5px; width: 268px; clear:both; height: 28px; }
+#searchentry .search_left img { padding-top: 3px; padding-right:5px; float: left; }
+#searchentry .search_left .spyglass { width: 16px; height:16px; }
+#searchentry .search_box  { float: left; }
+#searchentry .search_box input { font-size: 1.0em; color: #aaaaaa; width: 225px; border: 0px; border-color: transparent; border-collapse: collapse; margin-bottom: 4px; -webkit-appearance:textfield; }
+
+
+#searchentry .searchTextBox .searched { color: #000000; }
+#searchentry .search_advanced { clear: both; }
+#searchentry .search_advanced img { padding-left: 8px; padding-top: 6px;}
 
 #shoppingcart { text-transform: uppercase; padding-top: 10px; padding-left: 4px; padding-right: 4px; width: 268px; clear:both;}
 #shoppingcarttop .title { font-size: 1.429em; height: auto; min-height: 220px; width: 100%; z-index: 500; padding-top: 10px; padding-bottom: 10px; }
@@ -82,3 +96,64 @@ h1, h2, h3, h4, h5, h6 {
 #shoppingcarteditcart { width: 268px; clear:both; background-color: #7f7f7f; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center;margin-bottom: 10px; cursor: pointer;}
 #shoppingcarteditcart .editlink {  margin: auto;  text-align: center; }
 #shoppingcarteditcart .editlink a { margin-top: 20px; text-decoration: none; color: white; }
+
+/***** Sidebar Modules *****/
+#sidebar { display: block; float: left; height: auto; margin: 60px 0 10px 0; overflow: hidden; width: 268px; padding-left: 4px; padding-right: 4px; }
+#sidebar .clickbar {   margin: 5px 0px 0px 0px; padding: 11px; color: #555555; border: 1px dotted #999999; font-weight: 700; text-transform: uppercase; text-align: center; cursor: pointer;}
+#sidebar .containers { border-top: none; font-size: 12px; height: auto; left: -5px; margin: -3px 0 5px; padding: 14px; width: 204px; display: none;}
+
+#footer { clear: both;}
+#footer .addresshours { height: 148px; background-color: #e9e9e9; margin: 30px 0 30px 0;}
+#footer .bottomtabs { text-transform: uppercase; text-align: center; font-size: 0.9em;  }
+#footer .bottomtabs a { text-decoration: none; font-size: 1.1em; font-weight: 400; }
+#footer .copyright { text-align: center; text-transform: uppercase; color: #b7b7b7; font-size: 0.8em; }
+
+
+
+
+/***** Navigation *****/
+#nav { height: 45px; overflow: hidden; width: 765px; }
+#nav a { font-size: 12px; font-weight: 700; height: 45px; text-shadow: none; display: table; float: left; margin: 0px; text-align: center; }
+.arrow { position: absolute; right: -50px; }
+#nav .innertab { display: table-cell; vertical-align: middle; }
+#nav a.productmenu { min-width: 105px; width: 105px; max-width: 105px; }
+#products a { display: block; float: left; height: 22px; width: 100px; }
+#nav_products { font-size: 12px; font-weight: 700; height: 40px; margin: 4px 0 15px; padding: 15px 0 0 4px; position: absolute; text-decoration: none; top: 130px; width: 105px; z-index: 998; }
+#nav_products a { border: none; display: block; margin-right: 3px; padding: 15px 7px 16px 10px; text-decoration: none; }
+#nav_products ul { border: none; line-height: 1; list-style: none; list-style-type: none; margin: 0 0 0 1px; padding: 0; }
+#nav_products li { float: left; width: 10em; }
+#nav_products li ul { left: -999em; position: absolute; width: 10em; }
+#nav_products li ul ul { margin: -30px 0 0 180px; }
+#nav_products ul li ul li a { background: #fff; font-size: 1em; font-weight: 700; padding: 8px 10px; width: 160px; }
+#nav_products ul li ul li a:hover { background: #fff; }
+
+#nav_products li:hover ul ul, #nav_products li:hover ul ul ul, #nav_products li.sfhover ul ul, #nav_products li.sfhover ul ul ul {    left: -999em;}
+
+#nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul, #nav_products li li li.sfhover ul, #nav_products li:hover ul, #nav_products li:hover ul, #nav_products li.sfhover ul, #nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul {    left: auto;}
+
+/* Formatting for automated tabs. Note these do NOT refer to 1st, 2nd, 3rd and 4th tabs */
+/* Instead, these are used WHEN there are 4 tabs, or 3 tabs, etc. So #tab4 is used for all */
+/* tabs when four are turned on, since width is proportional to the count() */
+#nav a.tab1 {
+    width: 182px;
+}
+
+#nav a.tab2 {
+    width: 182px;
+}
+
+#nav a.tab3 {
+    width: 142px;
+}
+
+#nav a.tab4 {
+    width: 112px;
+}
+
+#nav a.tab5 {
+    width: 90px;
+}
+
+#nav a.tab6 {
+    width: 75px;
+}

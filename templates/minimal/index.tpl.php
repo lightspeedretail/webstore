@@ -20,8 +20,8 @@
 
 /**
  * template index - home page (unless overridden by a custom homepage with keyword)
- *
- *
+ * Note, this template was build using a grid system from getskeleton.com
+ * Please consult their website for formatting information.
  *
  */
 
@@ -60,7 +60,6 @@
 	<link rel="stylesheet" type="text/css" href="assets/css/reset.css"/>
 	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/base.css">
 	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/skeleton.css">
-	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/layout.css">
 	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/webstore.css"/>
 	<link rel="stylesheet" type="text/css" href="assets/css/pushup.css"/>
 
@@ -95,63 +94,82 @@
 
 
 <?php $this->dxLogin->Render(); ?>
-<div class="container">
-	<div class="sixteen columns">
-			<a href="<?php echo _xls_site_url(); ?>">
-				<img src="<? echo _xls_site_url(_xls_get_conf('HEADER_IMAGE', false)); ?>"/>
-			</a>
-	</div>
-
-	<div class="twelve columns content clearfix">
-		<?php $this->mainPnl->Render(); ?>
-	</div>
-
-	<div class="four columns alpha omega sidebar">
-
-		<div id="searchentry"><?php $this->searchPnl->Render(); ?></div>
-		
-		<?php if ($this->showCart()) {
-		$this->cartPnl->Render();
-	} ?>
-
-		<div>
-			<?php if ($this->showSideBar()) {
-			$this->sidePnl->Render();
-		} ?>
+	<div class="container">
+		<div class="sixteen columns">
+				<a href="<?php echo _xls_site_url(); ?>">
+					<img src="<? echo _xls_site_url(_xls_get_conf('HEADER_IMAGE', false)); ?>"/>
+				</a>
 		</div>
-	</div>
 
-	<div class="sixteen columns clearfix">
+		<div class="twelve columns content clearfix">
 
-		<div id="footer">
-			<div class="left">&copy; <?php _xt('Copyright'); ?> <?= date("Y"); ?> <?= _xls_get_conf(
-				'STORE_NAME', 'Your Store'
-			) ?>. <?php _xt('All Rights Reserved'); ?>.
-			</div>
-			<div class="right">
+			<?php $this->menuPnl->Render(); ?>
+
+			<div id="nav">
 				<?php
-				foreach ($this->arrBottomTabs as $arrTab) {
-					echo '<a href="' . $arrTab->Link . '">' . _sp($arrTab->Title) . '</a> |';
-				}
-				echo '<a href="'._xls_site_url('sitemap/pg').'">'._xt('Sitemap').'</a>';
+				echo '<a class="productmenu" href="'._xls_site_url().'"><span class="innertab">&nbsp;</span></a>'; //will be covered up by products menu
+				foreach ($this->arrTopTabs as $arrTab)
+					echo '<a class="tab'.count($this->arrTopTabs).'" href="'.$arrTab->Link.'"><span class="innertab">'.$arrTab->Title.'</span></a>';
 				?>
+
+			</div>
+
+
+			<?php $this->mainPnl->Render(); ?>
+		</div>
+
+		<div class="four columns alpha omega sidebar">
+
+			<div id="searchentry">
+				<?php $this->searchPnl->Render(); ?>
+			</div>
+
+			<?php if ($this->showCart()) {
+			$this->cartPnl->Render();
+			} ?>
+
+			<div>
+				<?php if ($this->showSideBar()) {
+				$this->sidePnl->Render();
+			} ?>
 			</div>
 		</div>
 
-		<?php $this->lblGoogleAnalytics->Render(); ?>
+		<div id="footer" class="sixteen columns">
 
-		<?php if ($expires = _xls_page_session_expiry_duration()): ?>
-		<script type="text/javascript">
-				<?php
-				// in case of session expiry, reload the page so we don't get ajax/javascript errors.
-				// the added 5 seconds will ensure that user will be logged out due to inactivity
-				?>
-			window.setTimeout("document.location.href='<?= _xls_site_url() ?>'", <?= $expires ?> * 1000 + 5000
-			)
-			;
-		</script>
-			<?php endif; ?>
+			<div class="addresshours">
+
+
+			</div>
+				<div class="bottomtabs">
+					<?php
+					foreach ($this->arrBottomTabs as $arrTab) {
+						echo '<a href="' . $arrTab->Link . '">' . _sp($arrTab->Title) . '</a> / ';
+					}
+					echo '<a href="'._xls_site_url('sitemap/pg').'">'._sp('Sitemap').'</a>';
+					?>
+				</div>
+				<div class="copyright">
+					&copy; <?php _xt('Copyright'); ?> <?= date("Y"); ?> <?= _xls_get_conf('STORE_NAME', 'Your Store') ?>. <?php _xt('All Rights Reserved'); ?>.
+				</div>
+			</div>
+
+			<?php $this->lblGoogleAnalytics->Render(); ?>
+
+			<?php if ($expires = _xls_page_session_expiry_duration()): ?>
+			<script type="text/javascript">
+					<?php
+					// in case of session expiry, reload the page so we don't get ajax/javascript errors.
+					// the added 5 seconds will ensure that user will be logged out due to inactivity
+					?>
+				window.setTimeout("document.location.href='<?= _xls_site_url() ?>'", <?= $expires ?> * 1000 + 5000
+				)
+				;
+			</script>
+				<?php endif; ?>
+
 	</div>
+
 <?php $this->lblSharingFooter->Render(); ?>
 <?php $this->RenderEnd(); ?>
 </html>

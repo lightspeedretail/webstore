@@ -24,17 +24,10 @@
  *
  *
  */
-
-if (QApplication::IsBrowser(QBrowserType::Firefox)) {
-	$this->misc_components['search_img']->SetCustomStyle('margin-left', '-5px');
-} //specifically only for basic template
 ?>
-
-<span class="sbox_l"></span>
-<span class="sbox">
-		<?php $this->txtSearchBox->Render(); ?></span>
-<span class="sbox_r" id="srch_clear"></span>
-<span style=""><?= $this->misc_components['search_img']->Render(); ?>
+<span class="search_left"><img class="spyglass" src="<?= templateNamed('css/images/spyglass.png') ; ?>"></span>
+<span class="search_box"><?php $this->txtSearchBox->Render(); ?></span>
+<span class="search_advanced">
 	<?= $this->misc_components['advanced_search']->Render(); ?>
 </span>
-<div id="searchoptions"></div>
+
