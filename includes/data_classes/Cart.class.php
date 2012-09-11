@@ -128,6 +128,11 @@ class Cart extends CartGen {
 	 * @return
 	 */
 	public static function SaveCart($objCart){
+
+		if (_xls_get_conf('DEBUG_CART', 0) == 1)
+			QApplication::Log(E_ERROR, 'SaveCart', _xls_whereCalled());
+
+
 		if ($objCart->intRowid) {
 			$objCart->SaveUpdatedCartItems();
 			$objCart->Save(false, true);
@@ -136,6 +141,12 @@ class Cart extends CartGen {
 			$objCart->Save(true);
 
 		$_SESSION['XLSWS_CART'] = $objCart;
+	}
+
+	public function Save($blnForceInsert = false, $blnForceUpdate = false) {
+		if (_xls_get_conf('DEBUG_CART', 0) == 1)
+			QApplication::Log(E_ERROR, 'savingcart', $_SERVER['REMOTE_ADDR'].' '._xls_whereCalled().' '.print_r($this,true));
+		return parent::Save($blnForceInsert,$blnForceUpdate);
 	}
 
 	/**
