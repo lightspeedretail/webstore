@@ -1,4 +1,4 @@
-<div class="left margin clear">
+<div>
 	<dl>
 		<dt><label for="Promo Code" class="city"><?php _xt(
 			"Enter a Promotional Code here to receive a discount"
@@ -9,4 +9,4 @@
 		<dd><?php $this->lblPromoErr->Render() ?></dd>
 	</dl>
 </div>
-<br style="clear: both;"/>
+

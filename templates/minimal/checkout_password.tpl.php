@@ -26,26 +26,26 @@
  */
 if (!$this->isLoggedIn()) { 
 ?>
-	<fieldset style="display: block; float: left; width:300px;">
+	<fieldset>
 	<legend><?php _xt('Create a Free Account!') ?></legend>
 
 <?php _xt('To save your information, enter a password here to create an account, or leave blank to check out as a guest.') ?><br>
 
-	<div class="left margin clear">
+	<div>
 	        <dl>
 	        	<dt><label for="Password"><?php _xt("Password"); ?></label></dt>
 	            <dd><?php $this->PasswordControl->Password1->RenderWithError() ?></dd>
 	        </dl>
 		</div>
 
-		<div class="left margin">
+		<div>
 			<dl class="left">
 	        	<dt><label for="cPassword"><?php _xt("Confirm Password"); ?></label></dt>
 	            <dd><?php $this->PasswordControl->Password2->RenderWithError() ?></dd>
 			</dl>
 		</div>
-		<div class="left margin clear">
-        	<dl class="left">
+		<div>
+        	<dl>
 	            <dd>
 	                <?php $this->PasswordControl->NewsletterSubscribe->Render() ?><label for="newsletter" class="opt"><?php _xt("Receive emails about special offers") ?></label>
 	            </dd>

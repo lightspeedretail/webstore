@@ -26,26 +26,26 @@
  */
 
 ?>
-	<fieldset style="display: block; float: left; width:300px;">
+	<fieldset>
 	<legend><?php $this->isLoggedIn() ?  _xt('Change Password') :  _xt('Set Password') ?></legend>
 
 <?php $this->isLoggedIn() ?  _xt('To set a new password, enter it here. Otherwise, leave these blank.') :  "" ?><br>
 
-	<div class="left margin clear">
+	<div>
 	        <dl>
 	        	<dt><label for="Password1"><?php _xt("Password"); ?></label></dt>
 	            <dd><?php $this->txtCRPass->RenderWithError() ?></dd>
 	        </dl>
 		</div>
 
-		<div class="left margin">
-			<dl class="left">
+		<div>
+			<dl>
 	        	<dt><label for="Password2"><?php _xt("Confirm Password"); ?></label></dt>
 	            <dd><?php $this->txtCRConfPass->RenderWithError() ?></dd>
 			</dl>
 		</div><br />
-		<div class="left margin clear">
-        	<dl class="left">
+		<div>
+        	<dl>
 	            <dd>
 	                <?php $this->PasswordControl->NewsletterSubscribe->Render() ?><label for="newsletter" class="opt"><?php _xt("Receive emails about special offers") ?></label>
 	            </dd>

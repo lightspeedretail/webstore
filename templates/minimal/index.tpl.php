@@ -95,11 +95,21 @@
 
 <?php $this->dxLogin->Render(); ?>
 	<div class="container">
-		<div class="sixteen columns">
+		<div class="thirteen columns alpha">
 			<div id="headerimage">
 				<a href="<?php echo _xls_site_url(); ?>">
 					<img src="<? echo _xls_site_url(_xls_get_conf('HEADER_IMAGE', false)); ?>"/>
 				</a>
+			</div>
+		</div>
+		<div class="three columns omega">
+			<div id="login">
+				<?php if($this->isLoggedIn()): ?>
+					<a href="<? echo _xls_site_url('myaccount/pg'); ?>"><img class="loginhead" src="<?= templateNamed("css/images/loginhead.png"); ?>"><?= _xls_get_current_customer_name(); ?></a>&nbsp;&nbsp;/&nbsp;&nbsp;<?php $this->lblLogout->Render(); ?>
+				<?php else: ?>
+					<a href="#" <?php $this->pxyLoginLogout->RenderAsEvents() ?> class="loginbox"><?php _xt("Login"); ?></a>&nbsp;/&nbsp;
+					<a href="<? echo _xls_site_url('customer-register/pg'); ?>"><?php _xt("Register"); ?></a>
+				<?php endif; ?>
 			</div>
 		</div>
 
@@ -118,9 +128,13 @@
 				<?php $this->searchPnl->Render(); ?>
 			</div>
 
-			<?php if ($this->showCart()) {
-			$this->cartPnl->Render();
-			} ?>
+			<?php   //Note this commented out code was left in purposely
+				    //to show where we normally evaluate this function.
+
+					//if ($this->showCart()) {
+				$this->cartPnl->Render();
+			//}
+			?>
 
 			<div>
 				<?php if ($this->showSideBar()) {

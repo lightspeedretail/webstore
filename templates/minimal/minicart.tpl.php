@@ -87,15 +87,18 @@ $items = $cart->GetCartItemArray();
 		<span class="subtotal_price"><?= _xls_currency($cart->Subtotal) ?></span>
 	</div>
 
-	<div id="shoppingcartcheckout" onclick="window.location='<?php echo _xls_site_url("checkout/pg"); ?>'">
-		<div class="checkoutlink"><a href="<? echo _xls_site_url("checkout/pg");?>"><?php _xt("Check Out"); ?></a></div>
-		<div class="checkoutarrow"><img src="<?= templateNamed("css/images/checkoutarrow.png"); ?>"></div>
+	<?php
+		//In other templates, we test for showCart() in index.tpl.php to hide the minicart when checking out
+		//For this template set, we keep the side cart on checkout and just hide the checkout button
+		//since that would be redundant
 
+	 if($this->showCart()) : ?>
+		<div id="shoppingcartcheckout" onclick="window.location='<?php echo _xls_site_url("checkout/pg"); ?>'">
+			<div class="checkoutlink"><a href="<? echo _xls_site_url("checkout/pg");?>"><?php _xt("Check Out"); ?></a></div>
+			<div class="checkoutarrow"><img src="<?= templateNamed("css/images/checkoutarrow.png"); ?>"></div>
+		</div>
 
-	</div>
-
-	<div id="shoppingcarteditcart">
-		<div class="editlink"><a href="<? echo _xls_site_url("cart/pg");?>"><?php _xt("Edit Cart"); ?></a></div>
-	</div>
-
-
+		<div id="shoppingcarteditcart">
+			<div class="editlink"><a href="<? echo _xls_site_url("cart/pg");?>"><?php _xt("Edit Cart"); ?></a></div>
+		</div>
+    <?php endif;  ?>

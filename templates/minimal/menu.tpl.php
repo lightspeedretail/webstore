@@ -58,11 +58,11 @@ function print_families() {
 	echo '</ul></li>';	
 }
 ?>
-	<div class="three columns alpha menuheight">
+	<div class="two columns alpha menuheight">
 		<div id="nav_products" class="menutab">
 			<ul>
-				<li><?php _xt('Products'); echo '<img src="'.templateNamed('css').'/images/arrow-down.png" class="arrow"  alt="" />'; ?>
-					<ul>
+				<li class="productstab"><?php _xt('Products'); echo '<img src="'.templateNamed('css').'/images/arrow-down.png" class="arrow"  alt="" />'; ?>
+					<ul class="dropspace">
 						<?php if(_xls_get_conf('ENABLE_FAMILIES', 0)==2)
 							print_families();
 						?>

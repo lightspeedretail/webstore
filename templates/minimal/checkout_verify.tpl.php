@@ -35,27 +35,27 @@
         ?></legend>
 
 <?	if (_xls_show_captcha('checkout')) { ?>
-		<div class="block margin">
+		<div>
 			<dl>
 				<dt><label for="Name"><?php $this->lblVerifyImage->Render(); ?></label></dt>
 			</dl>
 		</div>
 
-		<div class="block margin">
+		<div>
 			<dl class="left">
 				<dd><?php $this->txtCRVerify->RenderWithError(); ?></dd>
 			</dl>
 		</div>
 <? } ?>
 
-		<div class="block margin">
+		<div>
 			<dl>
 				<dt><label for="Notes"><?php _xt("Comments"); ?></label></dt>
 				<dd><?php $this->txtNotes->Render('Width=300' , 'Height=80') ?></dd>
 			</dl><br />
 		</div>
 
-		<div class="left margin clear">
+		<div>
 			<dl>
 				<dd><?php $this->chkAgree->Render(); ?><label for="cConfirm"
        class="opt"><?php printf(_sp("I hereby agree to the")." <a href=\"%s\" target=\"_new\">"._sp("Terms and Conditions")."</a> "._sp("of shopping with")." %s" , _xls_site_url("terms-and-conditions") , _xls_get_conf('STORE_NAME' , $_SERVER['HTTP_HOST']) ); ?>
@@ -64,7 +64,7 @@
 		</div>
 
 
-		<div class="left margin clear">
+		<div>
 			<dl>
 				<dd><?php $this->btnSubmit->Render('CssClass=button rounded') ?></dd>
 			</dl>	

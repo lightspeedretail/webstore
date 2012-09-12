@@ -37,7 +37,7 @@ formatting.
     margin-left: 5px;
     margin-right: 5px;
     /* hint: for development, uncomment the following line to see where your columns are falling */
-    /*border: 1px solid blue;*/
+    border: 1px solid blue;
 }
 
 .row {
@@ -64,7 +64,7 @@ formatting.
 }
 
 .container .twohalf.columns {
-    width: 124px;
+    width: 134px;
 }
 
 .container .three.columns {

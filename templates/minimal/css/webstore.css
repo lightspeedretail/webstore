@@ -5,19 +5,31 @@ this layout is designed with the Skeleton grid system. You should not hard-code 
 you should use em or percentages so it degrades gracefully on smaller screens. Use
 http://pxtoem.com/ for conversion. See base.css for base point sizes used. */
 
+/**** Global settings ******/
 h1, h2, h3, h4, h5, h6 {
     color: #181818;
     font-family: "Proxima Nova", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: normal;
 }
-#headerimage { padding-bottom: 20px;}
-#menubar { margin-bottom: 10px; height: 47px; border-bottom: 1px dotted #aaaaaa; }
+input { font-family: inherit; color: #232323; font-size: 1.1em; line-height: 1.2em; background-color: #e5e5e5;; border: 10px solid #e5e5e5; text-transform: uppercase;}
+select, input[type="text"], input[type="password"], input[type="email"] { font-family: inherit; color: #232323; font-size: 1.1em; line-height: 1.2em; background-color: #e5e5e5;; border: 10px solid #e5e5e5; text-transform: uppercase;}
+
+
+/***** Heady *****/
+#headerimage { padding-bottom: 30px;}
 #viewport { clear: both; }
 
+/***** Login/Logout *****/
+#login, #login a { width: 268px; background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; text-decoration: none; text-transform: uppercase; cursor: pointer; }
+#login .loginhead { margin-right: 10px; vertical-align: middle; }
+
 /***** Navigation *****/
+#menubar { margin-bottom: 10px; height: 47px; border-bottom: 1px dotted #aaaaaa; }
 #nav_products { font-weight: 500; height: 47px; text-decoration: none; z-index: 2000; border-bottom: 0px; text-align: left; cursor: pointer;}
+#nav_products .productstab { height: 45px; }
+#nav_products .dropspace { margin-top: 25px; } /* push dropdown menu down from underneath PRODUCTS tab */
 #nav_products a { display: block; margin-right: 3px; padding: 0 0 0 0 ; text-decoration: none;  }
-#nav_products ul { border: none; line-height: 1; list-style: none; list-style-type: none; margin: 5px 0 0 0px; }
+#nav_products ul { border: none; line-height: 1; list-style: none; list-style-type: none; margin: 5px 0 0px 0px; padding-bottom: 20px;}
 #nav_products ul a { color: white; border-bottom: 1px dotted #cccccc; }
 #nav_products li { float: left; width: 10em; height: 29px;  }
 #nav_products li ul { left: -999em; position: absolute; width: 10em; height: 29px; }
@@ -68,9 +80,8 @@ h1, h2, h3, h4, h5, h6 {
 #searchentry { text-transform: uppercase; border-bottom: 4px solid black; margin-bottom: 5px; width: 268px; clear:both; height: 28px; }
 #searchentry .search_left img { padding-top: 3px; padding-right:5px; float: left; }
 #searchentry .search_left .spyglass { width: 16px; height:16px; }
-#searchentry .search_box  { float: left; }
-#searchentry .search_box input { font-size: 1.0em; color: #aaaaaa; width: 225px; border: 0px; border-color: transparent; border-collapse: collapse; margin-bottom: 4px; -webkit-appearance:textfield; }
-
+#searchentry .search_box  { float: left;   }
+#searchentry .search_box input { font-size: 1.0em; color: #aaaaaa; width: 225px; border: 0px; border-color: transparent; border-collapse: collapse; margin-bottom: 4px; -webkit-appearance:textfield; background-color: white; text-transform: none; }
 
 #searchentry .searchTextBox .searched { color: #000000; }
 #searchentry .search_advanced { clear: both; }
@@ -95,11 +106,12 @@ h1, h2, h3, h4, h5, h6 {
 #shoppingcartbottom .subtotal_label  { padding-top: 20px; padding-bottom: 20px; float:left; width: 172px; font-size: 0.95em; text-align: right; font-weight: 500;}
 #shoppingcartbottom .subtotal_price { padding-top: 20px; padding-bottom: 20px; float:left; width: 80px; font-size: 1.1em; text-align: right; font-weight: 500;}
 
+  /* checkout button */
 #shoppingcartcheckout { width: 268px; clear:both; background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center;margin-bottom: 10px; cursor: pointer;}
 #shoppingcartcheckout .checkoutlink {  margin: auto;  text-align: center; }
 #shoppingcartcheckout .checkoutlink a { margin-top: 20px; text-decoration: none; color: white; }
 #shoppingcartcheckout .checkoutarrow { margin-right: 15px; position: relative; text-align: right; top: -16px; }
-
+  /* edit cart button */
 #shoppingcarteditcart { width: 268px; clear:both; background-color: #7f7f7f; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center;margin-bottom: 10px; cursor: pointer;}
 #shoppingcarteditcart .editlink {  margin: auto;  text-align: center; }
 #shoppingcarteditcart .editlink a { margin-top: 20px; text-decoration: none; color: white; }
@@ -111,6 +123,27 @@ h1, h2, h3, h4, h5, h6 {
 #sidebar .containers { border-top: none; font-size: 12px; height: auto; left: -5px; margin: -3px 0 5px; padding: 14px; width: 204px; display: none;}
 
 
+/***** Product Details Page *****/
+#product_details h1 { line-height: 30px; margin-bottom: 3px;}
+#product_details h2 { line-height: 20px; padding: 0px; text-transform: uppercase; text-decoration: underline; font-weight: 400; font-size: 0.9em;}
+#product_details h3 { line-height: 20px; padding: 0px; text-transform: uppercase; color: #a1a1a1; font-style: italic; font-weight: 300; font-size: 0.9em;}
+#product_details .stock { font-size: 0.9em; margin-top: 10px; margin-bottom: 10px;}
+#product_details .price { font-size: 1.8em; margin-top: 20px; }
+#product_details .price_reg { font-size: 0.8em; color: #555555;}
+#product_details .price_slash { text-decoration: line-through; }
+
+#product_details .addcart { width: 198px; clear:both; background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; margin-right: 10px; text-align: center;margin-bottom: 10px; cursor: pointer; float: left;}
+#product_details .addcart a { margin-top: 20px; text-decoration: none; color: white; text-transform: uppercase; font-size: 1.1em;}
+
+#product_details .wishlist { width: 198px; background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center;margin-bottom: 10px; cursor: pointer; float: left;}
+#product_details .wishlist a { margin-top: 20px; text-decoration: none; color: white; text-transform: uppercase; font-size: 1.1em;}
+
+#product_details #SelectSize, #SelectColor { max-width: 188px; }
+
+#product_details #SelectSize { float: left; margin-right: 10px;}
+
+
+/***** Footy *****/
 #footer { clear: both;}
 #footer .addresshours { height: 148px; background-color: #e9e9e9; margin: 30px 0 30px 0;}
 #footer .bottomtabs { text-transform: uppercase; text-align: center; font-size: 0.9em;  }

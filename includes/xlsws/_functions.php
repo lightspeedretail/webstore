@@ -869,6 +869,18 @@ function _xls_get_current_customer_id() {
 }
 
 /**
+ * Get the Full Name of the current customer object
+ * @return string
+ */
+function _xls_get_current_customer_name() {
+	$customer = Customer::GetCurrent();
+	if($customer)
+		return $customer->Mainname;
+
+	return "My Account";
+}
+
+/**
  * Convert a filesystem path to a URL
  *
  * @param string $filename (path)

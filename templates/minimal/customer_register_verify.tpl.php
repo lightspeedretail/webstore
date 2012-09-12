@@ -27,27 +27,27 @@
 
 ?>
 
-<fieldset style="display: block; float: left;">
+<fieldset>
 	<legend><?php $this->isLoggedIn() ? _xt('Update Profile') : _xt('Complete Registration') ?></legend>
 
 	<?    if (_xls_show_captcha('register')) { ?>
-	<div class="block margin">
+	<div>
 		<dl>
 			<dt><label for="Name"><?php $this->lblVerifyImage->Render(); ?></label></dt>
 		</dl>
 	</div>
 
-	<div class="block margin">
-		<dl class="left">
+	<div>
+		<dl>
 			<dd><?php $this->txtCRVerify->RenderWithError(); ?></dd>
 		</dl>
 	</div>
 	<? } ?>
 
 
-	<div class="left margin clear">
+	<div>
 		<dl>
-			<dd><?php $this->btnSubmit->Render('CssClass=button rounded') ?></dd>
+			<dd><?php $this->btnSubmit->Render() ?></dd>
 		</dl>
 	</div>
 

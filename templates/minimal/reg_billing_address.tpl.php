@@ -27,10 +27,10 @@
 
 ?>
 
-	<fieldset style="display: block; float: left; width:300px;">
+	<fieldset>
 	<legend><span class="red">*</span> <?php _xt("Billing Address") ?></legend>
 
-	<div class="block margin">
+	<div>
 	<dl>
 		<dt><label for="Name"><?php _xt("Address") ?></label></dt>
 
@@ -39,7 +39,7 @@
 	</dl>
 	</div>
 	
-	<div class="left margin clear">
+	<div>
 	<dl>
 	<dt><label for="City" class="city"><?php _xt("City") ?></label></dt>
 	
@@ -47,7 +47,7 @@
 	</dl>
 	</div>
 
-	<div class="block margin clear">
+	<div>
 	<dl>
 	<dt><label for="Country"><?php _xt("Country") ?></label></dt>
 	
@@ -55,7 +55,7 @@
 	</dl>
 	</div><br />
 
-	<div class="block margin clear">
+	<div>
 	<dl>
 	<dt><label for="State"><?php _xt("State/Province") ?></label></dt>
 	
@@ -63,7 +63,7 @@
 	</dl>
 	</div><br />
 
-	<div class="left margin clear">
+	<div>
 	<dl>
 	<dt><label for="Zip" class="zip"><?php _xt("Zip") ?></label></dt>
 	
@@ -72,7 +72,7 @@
 	</div>
 	
 	<dl>
-	<dd style="margin-top: 20px;"><?php $this->chkSame->Render() ?></dd>
+	<dd><?php $this->chkSame->Render() ?></dd>
 	</dl>
 
 </fieldset>

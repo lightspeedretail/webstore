@@ -28,50 +28,29 @@
 ?>
 
 <div id="checkout">
-			
-<?php $this->errSpan->Render() ?>
 
+	<div class="row"><?php $this->errSpan->Render() ?></div>
 
-
-<br style="clear: both;"/>
-
-<?php $this->pnlLoginRegister->Render(); ?>
-
-<?php $this->pnlCustomer->Render(); ?>
-<?php $this->PasswordControlWrapper->Render(); ?>
-<?php $this->pnlBillingAdde->Render(); ?>
-
-<div style="display: block; float: left; clear: right;"><?php $this->pnlShippingAdde->Render(); ?></div>
-
-<br style="clear: both;"/>
-<?php if(isset($this->pnlPromoCode) && ($this->pnlPromoCode->Visible)): ?>
-
-<?php $this->pnlPromoCode->Render() ?>
-<?php endif; ?>
-
-	<div class="left">
-	<?php $this->pnlShipping->Render(); ?>
-</div>
-	<div class="left shippingbutton">
-		<?php
-	if(isset($this->butCalcShipping) && ($this->butCalcShipping->Visible))
-		$this->butCalcShipping->Render()
-	?>
+	<div class="row">
+		<div class="six columns alpha"><?php $this->pnlCustomer->Render(); ?></div>
+		<div class="five columns omega"><?php $this->PasswordControlWrapper->Render(); ?></div>
 	</div>
 
-	<br style="clear: both;"/>
+	<div class="row">
+		<div class="six columns alpha"><?php $this->pnlBillingAdde->Render(); ?></div>
+		<div class="five columns omega"><?php $this->pnlShippingAdde->Render(); ?></div>
+	</div>
 
-<?php $this->pnlCart->Render(); ?>
-		  
-<br style="clear: both;"/>		  
+	<?php if (isset($this->pnlPromoCode) && ($this->pnlPromoCode->Visible)): ?>
+		<div class="row"><?php $this->pnlPromoCode->Render() ?></div>
+	<?php endif; ?>
 
-<?php $this->pnlPayment->Render(); ?>		  			
-			
-			
-<br style="clear: both;"/>
+	<div class="row"><?php $this->pnlShipping->Render(); $this->butCalcShipping->Render(); ?></div>
 
-			
-<?php $this->pnlVerify->Render(); ?>		  			
 
-<?php $this->LoadActionProxy->Render(); ?>
+	<div class="row"><?php $this->pnlPayment->Render(); ?></div>
+	<div class="row"><?php $this->pnlVerify->Render(); ?></div>
+
+	<div class="row"><?php $this->LoadActionProxy->Render(); ?></div>
+
 </div>			

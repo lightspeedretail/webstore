@@ -177,7 +177,7 @@ class xlsws_product extends xlsws_index {
 			if ($this->prod->MasterModel && _xls_get_conf('MATRIX_PRICE') == 1)
 				$this->lblOriginalPrice->Text = '';
 			elseif ($this->prod->SellWeb != 0 && $this->prod->SellWeb < $this->prod->Sell)
-				$this->lblOriginalPrice->Text = _sp("Regular Price").": <strike>"._xls_currency($this->prod->Sell)."</strike>";
+				$this->lblOriginalPrice->Text = _sp("Regular Price").": <span class='price_slash'>"._xls_currency($this->prod->Sell)."</span>";
 		}
 		$this->lblOriginalPrice->HtmlEntities = false;	
 
@@ -293,7 +293,7 @@ class xlsws_product extends xlsws_index {
 	 * @return none
 	 */
 	protected function build_size_widget() {
-		$this->lstSize  = new XLSListBox($this->mainPnl);
+		$this->lstSize  = new XLSListBox($this->mainPnl,'SelectSize');
         $this->PopulateMatrixSize();
 	}
 
@@ -303,7 +303,7 @@ class xlsws_product extends xlsws_index {
 	 * @return none
 	 */
 	protected function build_color_widget() {
-        $this->lstColor  = new XLSListBox($this->mainPnl);
+        $this->lstColor  = new XLSListBox($this->mainPnl,'SelectColor');
         $this->PopulateMatrixColor();
 	}
 
@@ -624,7 +624,7 @@ class xlsws_product extends xlsws_index {
 		$this->update_qty_price($strFormId, $strControlId, $strParameter);
 		if(_xls_get_conf('ENABLE_SLASHED_PRICES' , 0)>0 )
 			if ($this->prod->SellWeb != 0 && $this->prod->SellWeb < $this->prod->Sell)
-				$this->lblOriginalPrice->Text = _sp("Regular Price").": <strike>"._xls_currency($this->prod->Sell)."</strike>";
+				$this->lblOriginalPrice->Text = _sp("Regular Price").": <span class='price_slash'>"._xls_currency($this->prod->Sell)."</span>";
 				else $this->lblOriginalPrice->Text='';
 		else $this->lblOriginalPrice->Text='';
 	

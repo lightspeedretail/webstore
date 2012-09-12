@@ -26,7 +26,7 @@
  */
 
 ?>
-	<fieldset class="shipping">
+	<fieldset>
 		<legend><span class="red">*</span> <?php _xt("Shipping Address") ?></legend>
 
 
@@ -35,7 +35,7 @@
 
 <?php  if(isset($this->lstCRShipPrevious) && $this->lstCRShipPrevious->Visible):   ?>
 
-		<div class="left margin">
+		<div>
 			<dl>
 				<dt><label for="Previously shipped to"><?php _xt("Previous shipped address") ?></label></dt>
 				<dd><?php $this->lstCRShipPrevious->Render(); ?></dd>
@@ -44,15 +44,15 @@
 <?php  endif; ?>
 
 <?php  if(isset($this->blnShowShippingNames)):   ?>
-		<div class="left margin">
+		<div>
 			<dl>
 				<dt><label for="First Name"><?php _xt("First Name") ?></label></dt>
 				<dd><?php $this->txtCRShipFirstname->RenderWithError(); ?></dd>
 			</dl>
 		</div>
 
-		<div class="left margin">
-			<dl class="left">
+		<div>
+			<dl>
 				<dt><label for="Last Name"><?php _xt("Last Name") ?></label></dt>
 				<dd><?php $this->txtCRShipLastname->RenderWithError(); ?></dd>
 			</dl>
@@ -60,7 +60,7 @@
 <?php  endif; ?>
 
 <?php  if(isset($this->txtCRShipPhone)):   ?>
-		<div class="left margin">
+		<div>
 			<dl>
 				<dt><label for="Phone"><?php _xt("Phone") ?></label></dt>
 				<dd><?php $this->txtCRShipPhone->RenderWithError(); ?></dd>
@@ -69,7 +69,7 @@
 <?php  endif; ?>
 
 <?php  if(isset($this->txtCRShipCompany)):   ?>
-		<div class="left margin">
+		<div>
 			<dl>
 				<dt><label for="Company"><?php _xt("Company") ?></label></dt>
 				<dd><?php $this->txtCRShipCompany->RenderWithError(); ?></dd>
@@ -79,19 +79,19 @@
 
 		
 
-		<div class="block margin">
+		<div>
 		<dl>
 			<dt><label for="Address"><?php _xt("Address") ?></label></dt>
 		
 			<dd><?php $this->txtCRShipAddr1->RenderWithError() ?></dd>
 			
-			<dd style="margin-top: 5px;"><?php $this->txtCRShipAddr2->RenderWithError() ?></dd>
+			<dd><?php $this->txtCRShipAddr2->RenderWithError() ?></dd>
 		</dl>
 		
 		
 		</div>
 		
-		<div class="block margin clear">
+		<div>
 		<dl>
 			<dt><label for="City" class="city2"><?php _xt("City") ?></label></dt>
 		
@@ -99,7 +99,7 @@
 		</dl>
 		</div>
 		
-		<div class="block margin clear">
+		<div>
 		<dl>
 			<dt><label for="Country"><?php _xt("Country") ?></label></dt>
 		
@@ -107,7 +107,7 @@
 		</dl>
 		</div><br />
 		
-		<div class="block margin clear">
+		<div>
 		<dl>
 			<dt><label for="State"><?php _xt("State/Province") ?></label></dt>
 		
@@ -115,7 +115,7 @@
 		</dl>
 		</div><br />
 		
-		<div class="left margin clear">
+		<div>
 		<dl>
 			<dt><label for="Zip" class="zip"><?php _xt("Zip/Postal Code") ?></label></dt>
 		
@@ -125,4 +125,4 @@
 
 </fieldset>
 
-<div style="clear:both"></div>
+

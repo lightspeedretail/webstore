@@ -31,42 +31,42 @@
 		<fieldset>
 		<legend><?php _xt('Customer Contact') ?></legend>
 
-		<div class="left margin">
+		<div>
 			<dl>
 				<dt><label for="Name"><span class="red">*</span> <?php _xt("First Name"); ?></label></dt>
 				<dd><?php $this->txtCRFName->RenderWithError() ?></dd>
 			</dl>
 		</div>
 
-		<div class="left margin">
+		<div>
 			<dl class="left">
 				<dt><label for="Name"><span class="red">*</span> <?php _xt("Last Name"); ?></label></dt>
 				<dd><?php $this->txtCRLName->RenderWithError() ?></dd>
 			</dl>
 		</div>
 
-		<div class="left margin clear">
+		<div>
 			<dl>
 				<dt><label for="Company"><?php _xt("Company"); ?></label></dt>
 				<dd><?php $this->txtCRCompany->Render() ?></dd>
 			</dl><br />
 		</div>
 
-		<div class="left margin clear">
+		<div>
 			<dl>
 				<dt><label for="Phone"><span class="red">*</span> <?php _xt("Phone"); ?></label></dt>
 				<dd><?php $this->txtCRMPhone->RenderWithError() ?></dd>
 			</dl>	
 		</div>
 
-		<div class="left margin clear">
+		<div>
 			<dl>
 				<dt><label for="Email"><span class="red">*</span> <span class="red">*</span><?php _xt("Email"); ?></label></dt>
 				<dd><?php $this->txtCREmail->RenderWithError() ?></dd>
 			</dl>	
 		</div>
 		<?php if (!$this->isLoggedIn()) { ?>
-		<div class="left margin clear">
+		<div>
 			<dl>
 				<dt><label for="EmailConfirm"><span class="red">*</span> <?php _xt("Email (Confirm)"); ?></label></dt>
 				<dd><?php $this->txtCRConfEmail->RenderWithError() ?></dd>
