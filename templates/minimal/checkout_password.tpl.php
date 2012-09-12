@@ -24,33 +24,28 @@
  * 
  *
  */
-if (!$this->isLoggedIn()) { 
 ?>
-	<fieldset>
-	<legend><?php _xt('Create a Free Account!') ?></legend>
+			<fieldset>
+				<legend><?php echo _sp('Create a Free Account!') ?></legend>
+				<div class="row">
+					<?php _xt('To save your information, enter a password here to create an account, or leave blank to check out as a guest.') ?>
+				</div>
+				<div class="row">
+					<div class="five columns alpha">
+						<span class="label"><?php echo _sp("Password"); ?></span> <span class="red">*</span>
+						<?php $this->PasswordControl->Password1->RenderWithError(); ?>
+					</div>
+					<div class="five columns omega">
+						<span class="label"><?php echo _sp("Confirm Password"); ?></span> <span class="red">*</span>
+						<?php $this->PasswordControl->Password2->RenderWithError(); ?>
+					</div>
+				</div>
 
-<?php _xt('To save your information, enter a password here to create an account, or leave blank to check out as a guest.') ?><br>
-
-	<div>
-	        <dl>
-	        	<dt><label for="Password"><?php _xt("Password"); ?></label></dt>
-	            <dd><?php $this->PasswordControl->Password1->RenderWithError() ?></dd>
-	        </dl>
-		</div>
-
-		<div>
-			<dl class="left">
-	        	<dt><label for="cPassword"><?php _xt("Confirm Password"); ?></label></dt>
-	            <dd><?php $this->PasswordControl->Password2->RenderWithError() ?></dd>
-			</dl>
-		</div>
-		<div>
-        	<dl>
-	            <dd>
-	                <?php $this->PasswordControl->NewsletterSubscribe->Render() ?><label for="newsletter" class="opt"><?php _xt("Receive emails about special offers") ?></label>
-	            </dd>
-            </dl>
-         </div>
+				<div class="row">
+					<div class="four columns alpha omega">
+						<?php $this->PasswordControl->NewsletterSubscribe->Render() ?>
+						<span class="label"><?php _xt("Receive emails about special offers") ?></span>
+					</div>
+				</div>
 
 		</fieldset>
-<? } ?>

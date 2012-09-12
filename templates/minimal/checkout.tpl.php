@@ -31,14 +31,14 @@
 
 	<div class="row"><?php $this->errSpan->Render() ?></div>
 
-	<div class="row">
-		<div class="six columns alpha"><?php $this->pnlCustomer->Render(); ?></div>
-		<div class="five columns omega"><?php $this->PasswordControlWrapper->Render(); ?></div>
-	</div>
+	<div id="customercontact" class="ten columns alpha omega"><?php $this->pnlCustomer->Render(); ?></div>
+	<?php if (!$this->isLoggedIn()) { ?>
+		<div id="createaccount" class="ten columns alpha omega"><?php $this->PasswordControlWrapper->Render(); ?></div>
+	<?php } ?>
 
 	<div class="row">
-		<div class="six columns alpha"><?php $this->pnlBillingAdde->Render(); ?></div>
-		<div class="five columns omega"><?php $this->pnlShippingAdde->Render(); ?></div>
+		<div id="billingaddress" class="six columns alpha"><?php $this->pnlBillingAdde->Render(); ?></div>
+		<div id="shippingaddress" class="five columns omega"><?php $this->pnlShippingAdde->Render(); ?></div>
 	</div>
 
 	<?php if (isset($this->pnlPromoCode) && ($this->pnlPromoCode->Visible)): ?>
@@ -51,6 +51,6 @@
 	<div class="row"><?php $this->pnlPayment->Render(); ?></div>
 	<div class="row"><?php $this->pnlVerify->Render(); ?></div>
 
-	<div class="row"><?php $this->LoadActionProxy->Render(); ?></div>
+	<div style="display: none;"><?php $this->LoadActionProxy->Render(); ?></div>
 
 </div>			

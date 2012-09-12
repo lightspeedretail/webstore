@@ -873,9 +873,9 @@
 				$strOutput = $this->GetControlHtml();
 
 				if ($this->strValidationError)
-					$strOutput .= sprintf('<br /><span class="warning">%s</span>', $this->strValidationError);
+					$strOutput .= sprintf('<span class="warning">%s</span>', $this->strValidationError);
 				else if ($this->strWarning)
-					$strOutput .= sprintf('<br /><span class="warning">%s</span>', $this->strWarning);
+					$strOutput .= sprintf('<span class="warning">%s</span>', $this->strWarning);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;

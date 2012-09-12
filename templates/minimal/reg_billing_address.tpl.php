@@ -28,51 +28,46 @@
 ?>
 
 	<fieldset>
-	<legend><span class="red">*</span> <?php _xt("Billing Address") ?></legend>
+		<legend><?php echo _sp('Billing Address') ?><span class="red">*</span></legend>
 
-	<div>
-	<dl>
-		<dt><label for="Name"><?php _xt("Address") ?></label></dt>
+		<div class="row">
+			<div class="ten columns alpha omega">
+				<span class="label"><?php echo _sp("Address"); ?></span>
+				<?php $this->txtCRBillAddr1->RenderWithError();
+					  $this->txtCRBillAddr2->RenderWithError(); ?>
+			</div>
+		</div>
+		<div class="row">
+			<div class="ten columns alpha omega">
+				<span class="label"><?php echo _sp("City"); ?></span>
+				<?php $this->txtCRBillCity->RenderWithError(); ?>
+			</div>
+		</div>
 
-		<dd><?php $this->txtCRBillAddr1->RenderWithError() ?></dd>
-		<dd style="margin-top: 5px;"><?php $this->txtCRBillAddr2->RenderWithError() ?></dd>
-	</dl>
-	</div>
-	
-	<div>
-	<dl>
-	<dt><label for="City" class="city"><?php _xt("City") ?></label></dt>
-	
-	<dd><?php $this->txtCRBillCity->RenderWithError() ?></dd>
-	</dl>
-	</div>
+		<div class="row">
+			<div class="ten columns alpha omega">
+				<span class="label"><?php echo _sp("Country"); ?></span>
+				<?php $this->txtCRBillCountry->RenderWithError(); ?>
+			</div>
+		</div>
 
-	<div>
-	<dl>
-	<dt><label for="Country"><?php _xt("Country") ?></label></dt>
-	
-	<dd><?php $this->txtCRBillCountry->RenderWithError() ?></dd>
-	</dl>
-	</div><br />
+		<div class="row">
+			<div class="two columns alpha">
+				<span class="label"><?php echo _sp("ST/PR"); ?></span> <span class="red">*</span>
+				<?php $this->txtCRBillState->RenderWithError(); ?>
+			</div>
+			<div class="five columns omega">
+				<span class="label"><?php echo _sp("Zip/Postal"); ?></span> <span class="red">*</span>
+				<?php $this->txtCRBillZip->RenderWithError(); ?>
+			</div>
+		</div>
 
-	<div>
-	<dl>
-	<dt><label for="State"><?php _xt("State/Province") ?></label></dt>
-	
-	<dd><?php $this->txtCRBillState->RenderWithError() ?></dd>
-	</dl>
-	</div><br />
 
-	<div>
-	<dl>
-	<dt><label for="Zip" class="zip"><?php _xt("Zip") ?></label></dt>
-	
-	<dd><?php $this->txtCRBillZip->Render() ?></dd>
-	</dl>
-	</div>
-	
-	<dl>
-	<dd><?php $this->chkSame->Render() ?></dd>
-	</dl>
+		<div class="row">
+			<div class="four columns alpha omega">
+				<?php $this->chkSame->Render(); ?>
+			</div>
+		</div>
 
-</fieldset>
+
+	</fieldset>

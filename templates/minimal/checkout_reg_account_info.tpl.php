@@ -29,49 +29,45 @@
 
 
 		<fieldset>
-		<legend><?php _xt('Customer Contact') ?></legend>
+		<legend><?php echo _sp('Customer Contact') ?></legend>
 
-		<div>
-			<dl>
-				<dt><label for="Name"><span class="red">*</span> <?php _xt("First Name"); ?></label></dt>
-				<dd><?php $this->txtCRFName->RenderWithError() ?></dd>
-			</dl>
-		</div>
+			<div class="row">
+				<div class="five columns alpha">
+					<span class="label"><?php echo _sp("First Name"); ?></span> <span class="red">*</span>
+					<?php $this->txtCRFName->RenderWithError(); ?>
+				</div>
+				<div class="five columns omega">
+					<span class="label"><?php echo _sp("Last Name"); ?></span> <span class="red">*</span>
+					<?php $this->txtCRLName->RenderWithError(); ?>
+				</div>
+			</div>
 
-		<div>
-			<dl class="left">
-				<dt><label for="Name"><span class="red">*</span> <?php _xt("Last Name"); ?></label></dt>
-				<dd><?php $this->txtCRLName->RenderWithError() ?></dd>
-			</dl>
-		</div>
+			<div class="row">
+				<div class="ten columns alpha omega">
+					<span class="label"><?php echo _sp("Company"); ?></span>
+					<?php $this->txtCRCompany->RenderWithError(); ?>
+				</div>
+			</div>
 
-		<div>
-			<dl>
-				<dt><label for="Company"><?php _xt("Company"); ?></label></dt>
-				<dd><?php $this->txtCRCompany->Render() ?></dd>
-			</dl><br />
-		</div>
+			<div class="row">
+				<div class="five columns alpha omega">
+					<span class="label"><?php echo _sp("Phone"); ?></span> <span class="red">*</span>
+					<?php $this->txtCRMPhone->RenderWithError(); ?>
+				</div>
+			</div>
 
-		<div>
-			<dl>
-				<dt><label for="Phone"><span class="red">*</span> <?php _xt("Phone"); ?></label></dt>
-				<dd><?php $this->txtCRMPhone->RenderWithError() ?></dd>
-			</dl>	
-		</div>
+			<div class="row">
+				<div class="five columns alpha">
+					<span class="label"><?php echo _sp("Email"); ?></span> <span class="red">*</span>
+					<?php $this->txtCREmail->RenderWithError(); ?>
+				</div>
+				<?php if (!$this->isLoggedIn()) { ?>
+				<div class="five columns omega">
+					<span class="label"><?php echo _sp("Email (Confirm)"); ?></span> <span class="red">*</span>
+					<?php $this->txtCRConfEmail->RenderWithError(); ?>
+				</div>
+				<? } ?>
+			</div>
 
-		<div>
-			<dl>
-				<dt><label for="Email"><span class="red">*</span> <span class="red">*</span><?php _xt("Email"); ?></label></dt>
-				<dd><?php $this->txtCREmail->RenderWithError() ?></dd>
-			</dl>	
-		</div>
-		<?php if (!$this->isLoggedIn()) { ?>
-		<div>
-			<dl>
-				<dt><label for="EmailConfirm"><span class="red">*</span> <?php _xt("Email (Confirm)"); ?></label></dt>
-				<dd><?php $this->txtCRConfEmail->RenderWithError() ?></dd>
-			</dl>	
-		</div>
-		<? } ?>
 		</fieldset>	
 			
