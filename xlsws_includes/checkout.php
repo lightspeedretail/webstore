@@ -1366,8 +1366,16 @@ class xlsws_checkout extends xlsws_index {
 
 	}
 
-	/*Functions below are overloaded in extended versions only, defaults set below*/
-	public function showCart() {
+	protected function showCart() {
+		return false;
+	}
+
+	/**
+	 * showCheckout - shows the checkout buttons on the minicart
+	 * @param none
+	 * @return boolean
+	 */
+	protected function showCheckout() {
 		return false;
 	}
 

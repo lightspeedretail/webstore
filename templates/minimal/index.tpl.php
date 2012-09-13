@@ -125,12 +125,9 @@
 				<?php $this->searchPnl->Render(); ?>
 			</div>
 
-			<?php   //Note this commented out code was left in purposely
-				    //to show where we normally evaluate this function.
-
-					//if ($this->showCart()) {
+			<?php  if ($this->showCart()) {
 				$this->cartPnl->Render();
-			//}
+			}
 			?>
 
 			<div>
@@ -140,7 +137,7 @@
 			</div>
 		</div>
 
-		<div id="footer" class="sixteen columns">
+		<div id="footer" class="sixteen columns alpha omega">
 
 			<div class="addresshours">
 

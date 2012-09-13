@@ -189,7 +189,7 @@ class canadapost extends xlsws_class_shipping {
 
 		$ret['service'] = new XLSListBox($objParent,'ModuleMethod');
 		$this->make_CanadaPost_services($ret['service']);
-		$ret['service']->Name = _sp('Preference:');
+		////$ret['service']->Name = _sp('Preference:');
 		$ret['service']->SelectedValue = $config['defaultproduct'];
 		return $ret;
 	}

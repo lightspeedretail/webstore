@@ -67,7 +67,7 @@ if($this->dtrProducts->Paginator) {
 	</div>
 
 	<?php if ($this->dtrProducts->TotalItemCount > 0) : ?>
-		<div class="sixteen columns clearfix">
+		<div class="sixteen columns alpha omega clearfix">
 			<?php $this->dtrProducts->Render(); ?>
 			<?php if($this->dtrProducts->Paginator) {  $this->dtrProducts->Paginator->Render(); } ?>
 		</div>

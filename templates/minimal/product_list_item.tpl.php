@@ -36,12 +36,12 @@
 		|| $_CONTROL->CurrentItemIndex == count($_CONTROL->DataSource) - 1
 	) {
 		$rowcode2 = '</div>';
-		$xtra = " omega";
+		//$xtra = " omega";
 	} //end of full row
 
 	?>
 	<?= $rowcode ?>
-		<div class="four columns<?=$xtra?> product_cell">
+		<div class="four columns<?=$xtra?> omega product_cell">
 			<div class="product_cell_graphic" onclick="window.location='<?php echo $_ITEM->Link; ?>'">
 				<a href="<?php echo $_ITEM->Link; ?>"><img src="<?php echo $_ITEM->SmallImage; ?>"></a>
 			</div>

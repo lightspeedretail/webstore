@@ -68,7 +68,7 @@
 
 	<div class="row">
 		<div class="two columns alpha">
-			<span class="label"><?php echo _sp("ST/PR"); ?></span> <span class="red">*</span>
+			<span class="label"><?php echo _sp("State/Prov"); ?></span> <span class="red">*</span>
 			<?php $this->ShippingContactControl->State->RenderWithError(); ?>
 		</div>
 		<div class="three columns omega">

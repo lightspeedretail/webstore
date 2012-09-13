@@ -145,7 +145,7 @@ class XLSShippingControl extends XLSCompositeControl {
 
     protected function BuildModuleControl() {
         $objControl = new XLSListControl($this, $this->GetChildName('Module'));
-        $objControl->Name = _sp('Choose Shipping Method');
+        //$objControl->Name = _sp('Choose Shipping Method');
         $objControl->CssClass = 'checkout_shipping_select';
         $objControl->RenderMethod = 'RenderAsDefinition';
 
@@ -231,7 +231,7 @@ class XLSShippingControl extends XLSCompositeControl {
 
     protected function BuildMethodControl() {
         $objControl = new QPanel($this, $this->GetChildName('Method'));
-        $objControl->Name = _sp('Preference:');
+        //$objControl->Name = _sp('Preference:');
         $objControl->AutoRenderChildren = true;
         $objControl->RenderMethod = 'RenderAsDefinition';
 

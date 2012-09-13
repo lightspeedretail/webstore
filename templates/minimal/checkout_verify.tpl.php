@@ -26,49 +26,31 @@
  */
 
 ?>
+<fieldset>
+	<legend><?php _xt('Submit your order') ?> <?php
+		if ($this->CaptchaControl->Wait)
+			$this->CaptchaControl->Wait->Render();
+		?></legend>
+
+	<?	if (_xls_show_captcha('checkout')) { ?>
+	<div class="row">
+		<?php $this->lblVerifyImage->Render(); ?>
+		<?php $this->txtCRVerify->RenderWithError(); ?>
+	</div>
+	<? } ?>
+
+	<div class="row">
+		<span class="label"><?php echo _sp("Comments"); ?></span>
+		<?php $this->txtNotes->Render('Width=300' , 'Height=80') ?>
+	</div>
+
+	<div class="row">
+		<?php $this->chkAgree->Render(); ?><?php printf(_sp("I hereby agree to the")." <a href=\"%s\" target=\"_new\">"._sp("Terms and Conditions")."</a> "._sp("of shopping with")." %s" , _xls_site_url("terms-and-conditions") , _xls_get_conf('STORE_NAME' , $_SERVER['HTTP_HOST']) ); ?></span>
+	</div>
+
+	<div class="four columns alpha">
+		<?php $this->btnSubmit->Render('CssClass=button rounded') ?>
+	</div>
 
 
-	<fieldset>
-		<legend><?php _xt('Submit your order') ?> <?php 
-            if ($this->CaptchaControl->Wait)
-                 $this->CaptchaControl->Wait->Render();
-        ?></legend>
-
-<?	if (_xls_show_captcha('checkout')) { ?>
-		<div>
-			<dl>
-				<dt><label for="Name"><?php $this->lblVerifyImage->Render(); ?></label></dt>
-			</dl>
-		</div>
-
-		<div>
-			<dl class="left">
-				<dd><?php $this->txtCRVerify->RenderWithError(); ?></dd>
-			</dl>
-		</div>
-<? } ?>
-
-		<div>
-			<dl>
-				<dt><label for="Notes"><?php _xt("Comments"); ?></label></dt>
-				<dd><?php $this->txtNotes->Render('Width=300' , 'Height=80') ?></dd>
-			</dl><br />
-		</div>
-
-		<div>
-			<dl>
-				<dd><?php $this->chkAgree->Render(); ?><label for="cConfirm"
-       class="opt"><?php printf(_sp("I hereby agree to the")." <a href=\"%s\" target=\"_new\">"._sp("Terms and Conditions")."</a> "._sp("of shopping with")." %s" , _xls_site_url("terms-and-conditions") , _xls_get_conf('STORE_NAME' , $_SERVER['HTTP_HOST']) ); ?>
-       			</label></dd>
-			</dl>
-		</div>
-
-
-		<div>
-			<dl>
-				<dd><?php $this->btnSubmit->Render('CssClass=button rounded') ?></dd>
-			</dl>	
-		</div>
-
-
-	</fieldset>
+</fieldset>

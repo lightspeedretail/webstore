@@ -27,75 +27,54 @@
 
 ?>
 
-<div class="cart rounded">
-	<div class="cart_header">
-		<?php _xt('Description'); ?>
+<div id="genericcart">
+	<div class="row">
+		<div class="five columns alpha"><span class="cart_header"><?php _xt('Description'); ?></span></div>
+		<div class="one column rightitem"><span class="cart_header"><?php _xt('Price'); ?></span></div>
+		<div class="one column">&nbsp;</div>
+		<div class="one column centeritem"><span class="cart_header"><?php _xt('Qty'); ?></span></div>
+		<div class="one column">&nbsp;</div>
+		<div class="two columns omega rightitem"><span class="cart_header"><?php _xt('Total'); ?></span></div>
+
+		<?php $this->dtrGenericCart->Render(); ?>
+
 	</div>
 
-	<div class="receipt_titles rounded-top">
-		<p><?php _xt('Price'); ?></p>
+	<div class="row">
 
-		<p><?php _xt('Quantity'); ?></p>
+		<?php if(isset($this->misc_components['order_subtotal'])  &&  ($this->misc_components['order_subtotal'] instanceOf QControl) ): ?>
 
-		<p><?php _xt('Total'); ?></p>
-	</div>
+			<div class="two columns offset-by-seven cart_price"><span class="cart_label"><?php _xt('Subtotal'); ?></span></div>
+			<div class="two columns omega cart_price"><?php $this->misc_components['order_subtotal']->Render() ?></div>
 
-	<?php
+		<?php endif; ?>
 
-	$this->dtrGenericCart->Render();
+		<?php if(isset($this->misc_components['order_taxes'])  ): ?>
 
-
-	?>
-
-
-	<div class="cart_notes">
-		<p><!--  --></p>
-
-		<div class="receipt_subtotals rounded">
-
-			<?php if (isset($this->misc_components['order_subtotal'])
-			&& ($this->misc_components['order_subtotal'] instanceOf QControl)
-		): ?>
-			<?php _xt('Subtotal'); ?> <?php $this->misc_components['order_subtotal']->Render() ?> <br/>
-			<?php endif; ?>
-
-
-			<?php if (isset($this->misc_components['order_shipping_cost'])
-			&& ($this->misc_components['order_shipping_cost'] instanceOf QControl)
-		): ?>
-			<?php if (_xls_get_conf('TAX_INCLUSIVE_PRICING', '') != '1'): ?>
-				<?php _xt('Shipping'); ?> <?php $this->misc_components['order_shipping_cost']->Render() ?> <br/>
-				<?php elseif (_xls_get_conf('SHIPPING_TAXABLE', '') == '1'): ?>
-				<?php _xt('Shipping (tax included)'); ?> <?php $this->misc_components['order_shipping_cost']->Render(
-				) ?> <br/>
-				<?php else: ?>
-				<?php _xt('Shipping'); ?> <?php $this->misc_components['order_shipping_cost']->Render() ?> <br/>
-				<?php endif; ?>
-			<?php endif; ?>
-
-
-
-
-			<?php if (isset($this->misc_components['order_taxes'])): ?>
-			<?php foreach ($this->misc_components['order_taxes'] as $tax): ?>
-				<?php if ($tax->Visible): ?>
-					<?php _xt($tax->Name); ?> <?php $tax->Render() ?> <br/>
+			<?php foreach($this->misc_components['order_taxes'] as $tax): ?>
+				<?php if($tax->Visible): ?>
+						<div class="two columns offset-by-seven cart_price"><span class="cart_label"><?php _xt($tax->Name); ?></span></div>
+						<div class="two columns omega cart_price"><?php $tax->Render() ?></div>
 					<?php endif; ?>
 				<?php endforeach; ?>
-			<?php endif; ?>
 
-		</div>
+		<?php endif; ?>
+
+		<?php if(isset($this->misc_components['order_shipping_cost'])  &&  ($this->misc_components['order_shipping_cost'] instanceOf QControl) ): ?>
+
+			<div class="two columns offset-by-seven cart_price"><span class="cart_label"><?php _xt("Shipping"); ?></span></div>
+			<div class="two columns omega cart_price"><?php $this->misc_components['order_shipping_cost']->Render() ?></div>
+
+		<?php endif; ?>
+
+		<?php if(isset($this->misc_components['order_total'])  &&  ($this->misc_components['order_total'] instanceOf QControl) ): ?>
+
+			<div class="two columns offset-by-seven cart_price"><?php _xt("Total"); ?></div>
+			<div class="two columns omega cart_price"><?php $this->misc_components['order_total']->Render() ?></div>
+
+		<?php endif; ?>
 	</div>
 
-
-
-	<?php if (
-	isset($this->misc_components['order_total']) && ($this->misc_components['order_total'] instanceOf QControl)
-): ?>
-	<div class="receipt_total rounded">
-		<?php _xt('Total'); ?> <?php $this->misc_components['order_total']->Render() ?>
-	</div>
-	<?php endif; ?>
 
 </div>
-	
+

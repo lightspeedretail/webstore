@@ -1,48 +1,30 @@
 
-<fieldset class="xlsfset">
-    <legend> <?= _sp($_CONTROL->Name) ?> <?php 
-            if ($_CONTROL->Wait) 
-                $_CONTROL->Wait->Render();
-        ?></legend>
 
 
-    <div class="left">
-        <?php 
-            if ($_CONTROL->Module) 
-                $_CONTROL->Module->RenderAsDefinition();
-        ?>
-    </div>
+	<legend><?= _sp($_CONTROL->Name) ?> <?php if ($_CONTROL->Wait) $_CONTROL->Wait->Render(); ?></legend>
 
-    <div class="left clear">
-        <?php 
-            if ($_CONTROL->Method) 
-                $_CONTROL->Method->RenderAsDefinition();
-        ?>
-    </div>
+		<div class="four columns alpha">
+			<span class="label"><?php echo _sp("Shipping Method"); ?></span>
+			<?php if ($_CONTROL->Module) $_CONTROL->Module->RenderAsDefinition(); ?>
+		</div>
 
-    <div class="left clear">
-        <dl>
-            <dt>
-                <?php
-                if ($_CONTROL->Enabled) {
-                    $_CONTROL->Price->Render();
+		<div class="four columns alpha omega">
+			<span class="label"><?php echo _sp("Delivery Speed"); ?></span>
+			<?php if ($_CONTROL->Method) $_CONTROL->Method->RenderAsDefinition(); ?>
+			<?php
+			if ($_CONTROL->Enabled) {
+				$_CONTROL->Price->Render();
 
-                    if ($_CONTROL->Label->Visible)
-                        print("&nbsp;&ndash;&nbsp;");
-                }
-    
-                $_CONTROL->Label->Render();
-                ?>
-                <?php if ($_CONTROL->ValidationError): ?>
-                <br>
-                <span class="warning">
+				if ($_CONTROL->Label->Visible)
+					print("&nbsp;&ndash;&nbsp;");
+			}
+
+			$_CONTROL->Label->Render();
+			?>
+			<?php if ($_CONTROL->ValidationError): ?>
+				<span class="warning">
                     <?= $_CONTROL->ValidationError ?>
                 </span>
-                <?php
-                endif;
-                ?> 
-            </dt>
-        </dl>
-    </div>
-</fieldset>
+			<?php endif; ?>
+		</div>
 

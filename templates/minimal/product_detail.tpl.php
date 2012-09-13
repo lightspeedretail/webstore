@@ -72,15 +72,15 @@
 
 				<?php if (!_xls_get_conf('DISABLE_CART', false)): ?>
 
-					<div class="addcart">
-						<a href="#" <?php $this->misc_components['add_to_cart']->RenderAsEvents($this->prod->Code) ?>><?php _xt("Add to Cart"); ?></a>
-					</div>
-
 					<?php if (_xls_get_conf('ENABLE_GIFT_REGISTRY', 0)): ?>
 						<div class="wishlist">
 							<a href="#" <?php  $this->misc_components['show_gift_registry']->RenderAsEvents('show') ?>><?php _xt("Add to Wish List"); ?></a>
 						</div>
 					<?php endif; ?>
+
+					<div class="addcart">
+						<a href="#" <?php $this->misc_components['add_to_cart']->RenderAsEvents($this->prod->Code) ?>><?php _xt("Add to Cart"); ?></a>
+					</div>
 
 				<?php endif; ?>
 

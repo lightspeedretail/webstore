@@ -85,8 +85,7 @@
 	</div>
 
 	<?php if (
-	isset($this->misc_components['order_total']) && ($this->misc_components['order_total'] instanceOf QControl)
-): ?>
+	isset($this->misc_components['order_total']) && ($this->misc_components['order_total'] instanceOf QControl)): ?>
 	<div class="receipt_total rounded">
 		<?php _xt('Total'); ?>:&nbsp; <?php $this->misc_components['order_total']->Render() ?>
 	</div>

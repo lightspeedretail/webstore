@@ -33,7 +33,7 @@ $items = $cart->GetCartItemArray();
 		
 
 	<div id="shoppingcarttop" class="rounded-top">
-		<span class="title"><?=  _sp("Shopping Cart"); ?></span><img src="<?= templateNamed("css/images/shoppingcart.png"); ?>" class="carticon">
+		<span class="title"><a href="<?php echo _xls_site_url('/cart/pg'); ?>"><?=  _sp("Shopping Cart"); ?></a></span><img src="<?= templateNamed("css/images/shoppingcart.png"); ?>" class="carticon">
 
 		<div class="minicart_itemlist">
 			<?php if($cart->Count > 0):  ?>
@@ -82,17 +82,18 @@ $items = $cart->GetCartItemArray();
 
 	</div>
 
-	<div id="shoppingcartbottom">
-		<span class="subtotal_label"><?php _xt("Subtotal"); ?></span>
-		<span class="subtotal_price"><?= _xls_currency($cart->Subtotal) ?></span>
-	</div>
+
 
 	<?php
-		//In other templates, we test for showCart() in index.tpl.php to hide the minicart when checking out
 		//For this template set, we keep the side cart on checkout and just hide the checkout button
-		//since that would be redundant
+		//when checking out since that would be redundant. We show our tax, shipping and total fields instead.
 
-	 if($this->showCart()) : ?>
+	 if($this->showCheckout()): ?>
+		 <div id="shoppingcartbottom">
+			 <span class="cart_label"><?php _xt("Subtotal"); ?></span>
+			 <span class="cart_price"><?= _xls_currency($cart->Subtotal) ?></span>
+		 </div>
+
 		<div id="shoppingcartcheckout" onclick="window.location='<?php echo _xls_site_url("checkout/pg"); ?>'">
 			<div class="checkoutlink"><a href="<? echo _xls_site_url("checkout/pg");?>"><?php _xt("Check Out"); ?></a></div>
 			<div class="checkoutarrow"><img src="<?= templateNamed("css/images/checkoutarrow.png"); ?>"></div>
@@ -101,4 +102,33 @@ $items = $cart->GetCartItemArray();
 		<div id="shoppingcarteditcart">
 			<div class="editlink"><a href="<? echo _xls_site_url("cart/pg");?>"><?php _xt("Edit Cart"); ?></a></div>
 		</div>
+	<?php else: ?>
+	 <div id="shoppingcartbottom">
+
+		 <?php if(isset($this->misc_components['order_subtotal'])  &&  ($this->misc_components['order_subtotal'] instanceOf QControl) ): ?>
+			 <span class="cart_label"><?php _xt('Subtotal'); ?></span>
+			 <span class="cart_price"><?php $this->misc_components['order_subtotal']->Render() ?></span>
+		 <?php endif; ?>
+
+		 <?php if(isset($this->misc_components['order_taxes'])  ): ?>
+		 <?php foreach($this->misc_components['order_taxes'] as $tax): ?>
+			 <?php if($tax->Visible): ?>
+				 <span class="cart_label"><?php _xt($tax->Name); ?></span>
+				 <span class="cart_price"><?php $tax->Render() ?></span>
+				 <?php endif; ?>
+			 <?php endforeach; ?>
+		 <?php endif; ?>
+
+		 <?php if(isset($this->misc_components['order_shipping_cost'])  &&  ($this->misc_components['order_shipping_cost'] instanceOf QControl) ): ?>
+			 <span class="cart_label"><?php _xt("Shipping"); ?></span>
+			 <span class="cart_price"><?php $this->misc_components['order_shipping_cost']->Render() ?></span>
+		 <?php endif; ?>
+
+		 <?php if(isset($this->misc_components['order_total'])  &&  ($this->misc_components['order_total'] instanceOf QControl) ): ?>
+				<span class="cart_label"><?php _xt("Total"); ?></span>
+		        <span class="cart_price"><?php $this->misc_components['order_total']->Render() ?></span>
+		 <?php endif; ?>
+
+	 </div>
     <?php endif;  ?>
+

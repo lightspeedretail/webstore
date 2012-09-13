@@ -202,7 +202,7 @@ class usps extends xlsws_class_shipping {
 	public function customer_fields($objParent) {
 		$ret = array();
 		$ret['service'] = new XLSListBox($objParent,'ModuleMethod');
-		$ret['service']->Name = _sp('Preference:');
+		//$ret['service']->Name = _sp('Preference:');
 		return $ret;
 	}
 

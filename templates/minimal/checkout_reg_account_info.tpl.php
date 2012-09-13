@@ -36,7 +36,7 @@
 					<span class="label"><?php echo _sp("First Name"); ?></span> <span class="red">*</span>
 					<?php $this->BillingContactControl->FirstName->RenderWithError(); ?>
 				</div>
-				<div class="five columns omega">
+				<div class="five columns alpha omega">
 					<span class="label"><?php echo _sp("Last Name"); ?></span> <span class="red">*</span>
 					<?php $this->BillingContactControl->LastName->RenderWithError(); ?>
 				</div>
@@ -62,7 +62,7 @@
 					<?php $this->BillingContactControl->Email->RenderWithError(); ?>
 				</div>
 				<?php if (!$this->isLoggedIn()) { ?>
-				<div class="five columns omega">
+				<div class="five columns alpha omega">
 					<span class="label"><?php echo _sp("Email (Confirm)"); ?></span> <span class="red">*</span>
 					<?php $this->BillingContactControl->EmailConfirm->RenderWithError(); ?>
 				</div>

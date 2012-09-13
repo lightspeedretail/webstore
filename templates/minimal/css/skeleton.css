@@ -9,188 +9,73 @@
 
 /* Table of Contents
 ==================================================
-    #Base 960 Grid
+    #Base 978 Grid
     #Tablet (Portrait)
     #Mobile (Portrait)
     #Mobile (Landscape)
     #Clearing */
 
-/* #Base 960 Grid
+
+/* #Base 978 Grid
 ================================================== */
 
 /* Note, this file has been modified by LightSpeed from the original
 shipping version. The overall width was expanded to 978
 instead of 960. Some half columns have been added for special
-formatting.
+formatting. The original for comparison is skeleton_original.css
 */
-.container {
-    position: relative;
-    width: 978px;
-    margin: 0 auto;
-    padding: 0;
-}
 
+.container                                  { position: relative; width: 978px; margin: 0 auto; padding: 0; }
 .container .column,
-.container .columns {
-    float: left;
-    display: inline;
-    margin-left: 5px;
-    margin-right: 5px;
-    /* hint: for development, uncomment the following line to see where your columns are falling */
+.container .columns                         { float: left; display: inline; margin-left: 5px; margin-right: 5px;
+/* hint: for development, uncomment the following line to see where your columns are falling */
     /*border: 1px solid blue;*/
 }
-
-.row {
-    margin-bottom: 20px;
-}
+.row                                        { margin-bottom: 20px; }
 
 /* Nested Column Classes */
-.column.alpha, .columns.alpha {
-    margin-left: 0;
-}
-
-.column.omega, .columns.omega {
-    margin-right: 0;
-}
+.column.alpha, .columns.alpha               { margin-left: 0; }
+.column.omega, .columns.omega               { margin-right: 0; }
 
 /* Base Grid */
 .container .one.column,
-.container .one.columns {
-    width: 41px;
-}
+.container .one.columns                     { width: 51px;  }
+.container .two.columns                     { width: 112px; }
+.container .twohalf.columns                 { width: 137px; }
+.container .three.columns                   { width: 176px; }
+.container .four.columns                    { width: 234px; }
+.container .five.columns                    { width: 295px; }
+.container .six.columns                     { width: 356px; }
+.container .seven.columns                   { width: 417px; }
+.container .eight.columns                   { width: 478px; }
+.container .nine.columns                    { width: 539; }
+.container .ten.columns                     { width: 600px; }
+.container .eleven.columns                  { width: 661px; }
+.container .twelve.columns                  { width: 722px; }
+.container .thirteen.columns                { width: 783px; }
+.container .fourteen.columns                { width: 844px; }
+.container .fifteen.columns                 { width: 905px; }
+.container .sixteen.columns                 { width: 966px; }
 
-.container .two.columns {
-    width: 102px;
-}
-
-.container .twohalf.columns {
-    width: 134px;
-}
-
-.container .three.columns {
-    width: 163px;
-}
-
-.container .four.columns {
-    width: 224px;
-}
-
-.container .five.columns {
-    width: 285px;
-}
-
-.container .six.columns {
-    width: 346px;
-}
-
-.container .seven.columns {
-    width: 407px;
-}
-
-.container .eight.columns {
-    width: 468px;
-}
-
-.container .nine.columns {
-    width: 529px;
-}
-
-.container .ten.columns {
-    width: 590px;
-}
-
-.container .eleven.columns {
-    width: 651px;
-}
-
-.container .twelve.columns {
-    width: 712px;
-}
-
-.container .thirteen.columns {
-    width: 773px;
-}
-
-.container .fourteen.columns {
-    width: 834px;
-}
-
-.container .fifteen.columns {
-    width: 895px;
-}
-
-.container .sixteen.columns {
-    width: 956px;
-}
-
-.container .one-third.column {
-    width: 300px;
-}
-
-.container .two-thirds.column {
-    width: 620px;
-}
+.container .one-third.column                { width: 322px; }
+.container .two-thirds.column               { width: 644px; }
 
 /* Offsets */
-.container .offset-by-one {
-    padding-left: 60px;
-}
-
-.container .offset-by-two {
-    padding-left: 120px;
-}
-
-.container .offset-by-three {
-    padding-left: 180px;
-}
-
-.container .offset-by-four {
-    padding-left: 240px;
-}
-
-.container .offset-by-five {
-    padding-left: 300px;
-}
-
-.container .offset-by-six {
-    padding-left: 360px;
-}
-
-.container .offset-by-seven {
-    padding-left: 420px;
-}
-
-.container .offset-by-eight {
-    padding-left: 480px;
-}
-
-.container .offset-by-nine {
-    padding-left: 540px;
-}
-
-.container .offset-by-ten {
-    padding-left: 600px;
-}
-
-.container .offset-by-eleven {
-    padding-left: 660px;
-}
-
-.container .offset-by-twelve {
-    padding-left: 720px;
-}
-
-.container .offset-by-thirteen {
-    padding-left: 780px;
-}
-
-.container .offset-by-fourteen {
-    padding-left: 840px;
-}
-
-.container .offset-by-fifteen {
-    padding-left: 900px;
-}
+.container .offset-by-one                   { padding-left: 61px;  }
+.container .offset-by-two                   { padding-left: 122px; }
+.container .offset-by-three                 { padding-left: 183px; }
+.container .offset-by-four                  { padding-left: 244px; }
+.container .offset-by-five                  { padding-left: 305px; }
+.container .offset-by-six                   { padding-left: 366px; }
+.container .offset-by-seven                 { padding-left: 427px; }
+.container .offset-by-eight                 { padding-left: 488px; }
+.container .offset-by-nine                  { padding-left: 549px; }
+.container .offset-by-ten                   { padding-left: 610px; }
+.container .offset-by-eleven                { padding-left: 671px; }
+.container .offset-by-twelve                { padding-left: 732px; }
+.container .offset-by-thirteen              { padding-left: 793px; }
+.container .offset-by-fourteen              { padding-left: 854px; }
+.container .offset-by-fifteen               { padding-left: 915px; }
 
 /* #Tablet (Portrait)
 ================================================== */

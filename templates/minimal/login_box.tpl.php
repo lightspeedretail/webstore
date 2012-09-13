@@ -30,16 +30,22 @@
 
 <div class="box_close"  <?php $_CONTROL->pxyCancel->RenderAsEvents(); ?>><!--  --></div>
 <div class="login">
-			<h1>Login <a href="customer-register/pg" style="font-size: 14px;"><?php _xt('Create an Account') ?></a></h1>
-		
-			<p align="center"><?php $_CONTROL->lblErr->Render('CssClass=red') ?></p>
-			<p><?php _xt('Email Address') ?></p>
-			<?php $_CONTROL->txtEmail->Render('CssClass=login_input') ?><br />
-							
-			<?php _xt('Password') ?><a href="#" <?php $_CONTROL->pxyForgotPwd->RenderAsEvents(); ?> class="lfp"><?php _xt('Forgot Password?') ?></a>
-			<?php $_CONTROL->txtPwd->Render('CssClass=login_input'); ?>
+			<h1>Login <a href="customer-register/pg"><?php _xt('Create an Account') ?></a></h1>
+
+
+			<div class="errormessage"><?php $_CONTROL->lblErr->Render('CssClass=red') ?></div>
+
+			<div class="five columns alpha omega">
+				<span class="label"><?php _xt('Email Address') ?></span>
+				<?php $_CONTROL->txtEmail->Render('CssClass=login_input') ?>
+			</div>
+
+			<div class="five columns alpha omega">
+				<span class="label"><?php _xt('Password') ?></span>
+				<?php $_CONTROL->txtPwd->Render('CssClass=login_input'); ?>
+			</div>
+
+			<a href="#" <?php $_CONTROL->pxyForgotPwd->RenderAsEvents(); ?>><?php _xt('Forgot Password?') ?></a>
 			
-			
-			
-			<?php $_CONTROL->btnLogin->Render('CssClass=right button rounded'); ?><br /><br /><br />
+			<?php $_CONTROL->btnLogin->Render('CssClass=right button rounded'); ?>
 </div>	

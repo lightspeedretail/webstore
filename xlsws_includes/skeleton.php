@@ -333,18 +333,27 @@ EOS;
 	}
 
 	/**
-	 * showCart - shows the shopping cart by default, can be overloaded to do other checks
+	 * showCart - shows the minicart by default, can be overloaded to do other checks
 	 * @param none
-	 * @return none
+	 * @return boolean
 	 */
 	protected function showCart() {
 		return true;
 	}
 
 	/**
-	 * showCart - shows the sidebars by default, can be overloaded to do other checks
+	 * showCheckout - shows the checkout buttons on the minicart
 	 * @param none
-	 * @return none
+	 * @return boolean
+	 */
+	protected function showCheckout() {
+		return true;
+	}
+
+	/**
+	 * showSideBar - shows the sidebars by default, can be overloaded to do other checks
+	 * @param none
+	 * @return boolean
 	 */
 	protected function showSideBar() {
 		return true;
@@ -703,10 +712,6 @@ EOS;
 	 */
 	protected function build_dummy_dragdrop() {
 		$this->dummy_drag_drop = new QLabel($this);
-		$this->dummy_drag_drop->AddControlToMove($this->dummy_drag_drop);
-		$this->dummy_drag_drop->RemoveAllDropZones();
-		$this->dummy_drag_drop->AddDropZone($this);
-		$this->dummy_drag_drop->AddAction(new QMoveEvent() , new QJavaScriptAction("void(null);"));
 	}
 
 	//may be overloaded by extended classes
@@ -834,7 +839,7 @@ EOS;
 	}
 
 	// Create widgets to display Shipping cost data
-	protected function build_shippingcost_display($objCart, $objPanel) {
+	protected function build_shippingcost_display($objCart, $objPanel) { error_log("shipping sell is ".$objCart->ShippingSell);
 		if (!is_null($objCart->ShippingSell)) {
 			$this->misc_components['order_shipping_cost'] =
 				new QLabel($objPanel);
@@ -846,16 +851,14 @@ EOS;
 	}
 
 	// Update widgets to display Shipping cost data
-	protected function update_shippingcost_display($objCart) {
+	protected function update_shippingcost_display($objCart) { error_log(__class__.' '.__function__);
 		if (!isset($this->misc_components['order_shipping_cost']))
 			return false;
-		if ((strpos($objCart->IdStr,"WO-") === false || $objCart->Status != "Awaiting Processing")
-			&& $_GET['xlspg'] != "checkout" && $objCart->ShippingSell==0)
-				$this->misc_components['order_shipping_cost']->Text =
-					_sp("(Included Above)");
-		else
 			$this->misc_components['order_shipping_cost']->Text =
 				_xls_currency($objCart->ShippingSell);
+		if ($this->misc_components['order_shipping_cost'] instanceof QControl) {
+			$this->misc_components['order_shipping_cost']->Refresh();
+		error_log("refresh control set to ".$this->misc_components['order_shipping_cost']->Text); }
 	}
 
 	/**
@@ -868,7 +871,7 @@ EOS;
 	 * @param boolean - ignore the generic cart page when refreshing
 	 * @return none
 	 */
-	protected function update_order_display($objCart, $ignore_generic = false) {
+	protected function update_order_display($objCart, $ignore_generic = false) { error_log(__class__.' '.__function__);
 		if (!isset($this->dtrGenericCart) && !$ignore_generic)
 			$this->order_display($objCart);
 

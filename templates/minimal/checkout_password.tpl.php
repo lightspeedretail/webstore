@@ -35,17 +35,15 @@
 						<span class="label"><?php echo _sp("Password"); ?></span> <span class="red">*</span>
 						<?php $this->PasswordControl->Password1->RenderWithError(); ?>
 					</div>
-					<div class="five columns omega">
+					<div class="five columns alpha omega">
 						<span class="label"><?php echo _sp("Confirm Password"); ?></span> <span class="red">*</span>
 						<?php $this->PasswordControl->Password2->RenderWithError(); ?>
 					</div>
 				</div>
 
 				<div class="row">
-					<div class="four columns alpha omega">
 						<?php $this->PasswordControl->NewsletterSubscribe->Render() ?>
 						<span class="label"><?php _xt("Receive emails about special offers") ?></span>
-					</div>
 				</div>
 
 		</fieldset>

@@ -25,6 +25,9 @@
  *
  */
 
+	//Note, the <fieldset> for the Shipping panel is in this file because our CalcButton is not part of
+	//the rest of the control, so this allows us to place it inline.
+
 ?>
 
 <div id="checkout">
@@ -38,16 +41,29 @@
 
 	<div class="row">
 		<div id="billingaddress" class="six columns alpha"><?php $this->pnlBillingAdde->Render(); ?></div>
-		<div id="shippingaddress" class="five columns omega"><?php $this->pnlShippingAdde->Render(); ?></div>
+		<div id="shippingaddress" class="six columns alpha omega"><?php $this->pnlShippingAdde->Render(); ?></div>
 	</div>
 
 	<?php if (isset($this->pnlPromoCode) && ($this->pnlPromoCode->Visible)): ?>
 		<div class="row"><?php $this->pnlPromoCode->Render() ?></div>
 	<?php endif; ?>
 
-	<div class="row"><?php $this->pnlShipping->Render(); $this->butCalcShipping->Render(); ?></div>
+	<div class="row">
+		<fieldset>
+		<?php $this->pnlShipping->Render();?>
+		<div class="three columns alpha omega">
+			<span class="label">&nbsp;</span>
+			<?$this->butCalcShipping->Render(); ?>
+		</div>
+		</fieldset>
+	</div>
 
-
+	<div class="row">
+		<fieldset>
+			<legend><?php echo _sp('Shopping Cart'); ?></legend>
+				<?php $this->pnlCart->Render(); ?>
+		</fieldset>
+	</div>
 	<div class="row"><?php $this->pnlPayment->Render(); ?></div>
 	<div class="row"><?php $this->pnlVerify->Render(); ?></div>
 

@@ -245,7 +245,7 @@ class fedex extends xlsws_class_shipping {
 
 		$ret['service'] = new XLSListBox($objParent,'ModuleMethod');
 		$this->make_Fedex_services($ret['service']);
-		$ret['service']->Name = _sp('Preference:');
+		//$ret['service']->Name = _sp('Preference:');
 		return $ret;
 	}
 
