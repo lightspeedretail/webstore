@@ -26,103 +26,57 @@
  */
 
 ?>
-	<fieldset>
-		<legend><span class="red">*</span> <?php _xt("Shipping Address") ?></legend>
 
+<fieldset>
+	<legend><?php echo _sp('Shipping Address') ?><span class="red">*</span></legend>
 
-
-
-
-<?php  if(isset($this->lstCRShipPrevious) && $this->lstCRShipPrevious->Visible):   ?>
-
-		<div>
-			<dl>
-				<dt><label for="Previously shipped to"><?php _xt("Previous shipped address") ?></label></dt>
-				<dd><?php $this->lstCRShipPrevious->Render(); ?></dd>
-			</dl>
+	<?php  if(isset($this->blnShowShippingNames)):   ?>
+	<div class="row">
+		<div class="five columns alpha omega">
+			<span class="label"><?php echo _sp("First Name"); ?></span> <span class="red">*</span>
+			<?php $this->ShippingContactControl->FirstName->RenderWithError(); ?>
 		</div>
-<?php  endif; ?>
+	</div>
+	<div class="row">
+		<div class="five columns alpha omega">
+			<span class="label"><?php echo _sp("Last Name"); ?></span> <span class="red">*</span>
+			<?php $this->ShippingContactControl->LastName->RenderWithError(); ?>
+		</div>
+	</div>
+	<?php endif; ?>
 
-<?php  if(isset($this->blnShowShippingNames)):   ?>
-		<div>
-			<dl>
-				<dt><label for="First Name"><?php _xt("First Name") ?></label></dt>
-				<dd><?php $this->txtCRShipFirstname->RenderWithError(); ?></dd>
-			</dl>
+	<div class="row">
+		<div class="five columns alpha omega">
+			<span class="label"><?php echo _sp("Address"); ?></span>
+			<?php   $this->ShippingContactControl->Street1->RenderWithError();
+			$this->ShippingContactControl->Street2->RenderWithError(); ?>
 		</div>
+	</div>
+	<div class="row">
+		<div class="five columns alpha omega">
+			<span class="label"><?php echo _sp("City"); ?></span>
+			<?php $this->ShippingContactControl->City->RenderWithError(); ?>
+		</div>
+	</div>
 
-		<div>
-			<dl>
-				<dt><label for="Last Name"><?php _xt("Last Name") ?></label></dt>
-				<dd><?php $this->txtCRShipLastname->RenderWithError(); ?></dd>
-			</dl>
+	<div class="row">
+		<div class="five columns alpha omega">
+			<span class="label"><?php echo _sp("Country"); ?></span>
+			<?php $this->ShippingContactControl->Country->RenderWithError(); ?>
 		</div>
-<?php  endif; ?>
+	</div>
 
-<?php  if(isset($this->txtCRShipPhone)):   ?>
-		<div>
-			<dl>
-				<dt><label for="Phone"><?php _xt("Phone") ?></label></dt>
-				<dd><?php $this->txtCRShipPhone->RenderWithError(); ?></dd>
-			</dl><br />
+	<div class="row">
+		<div class="two columns alpha">
+			<span class="label"><?php echo _sp("ST/PR"); ?></span> <span class="red">*</span>
+			<?php $this->ShippingContactControl->State->RenderWithError(); ?>
 		</div>
-<?php  endif; ?>
+		<div class="three columns omega">
+			<span class="label"><?php echo _sp("Zip/Postal"); ?></span> <span class="red">*</span>
+			<?php $this->ShippingContactControl->Zip->RenderWithError(); ?>
+		</div>
+	</div>
 
-<?php  if(isset($this->txtCRShipCompany)):   ?>
-		<div>
-			<dl>
-				<dt><label for="Company"><?php _xt("Company") ?></label></dt>
-				<dd><?php $this->txtCRShipCompany->RenderWithError(); ?></dd>
-			</dl><br />
-		</div>
-<?php  endif; ?>
-
-		
-
-		<div>
-		<dl>
-			<dt><label for="Address"><?php _xt("Address") ?></label></dt>
-		
-			<dd><?php $this->txtCRShipAddr1->RenderWithError() ?></dd>
-			
-			<dd><?php $this->txtCRShipAddr2->RenderWithError() ?></dd>
-		</dl>
-		
-		
-		</div>
-		
-		<div>
-		<dl>
-			<dt><label for="City" class="city2"><?php _xt("City") ?></label></dt>
-		
-			<dd><?php $this->txtCRShipCity->RenderWithError() ?></dd>
-		</dl>
-		</div>
-		
-		<div>
-		<dl>
-			<dt><label for="Country"><?php _xt("Country") ?></label></dt>
-		
-			<dd><?php $this->txtCRShipCountry->RenderWithError() ?></dd>
-		</dl>
-		</div><br />
-		
-		<div>
-		<dl>
-			<dt><label for="State"><?php _xt("State/Province") ?></label></dt>
-		
-			<dd><?php $this->txtCRShipState->RenderWithError() ?></dd>
-		</dl>
-		</div><br />
-		
-		<div>
-		<dl>
-			<dt><label for="Zip" class="zip"><?php _xt("Zip/Postal Code") ?></label></dt>
-		
-			<dd><?php $this->txtCRShipZip->RenderWithError() ?></dd>
-		</dl>
-		</div>
 
 </fieldset>
-
 

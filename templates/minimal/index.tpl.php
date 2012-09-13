@@ -63,6 +63,11 @@
 	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/webstore.css"/>
 	<link rel="stylesheet" type="text/css" href="assets/css/pushup.css"/>
 
+	<?php if($this->Route=="checkout"): ?>
+		<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/follow.css"/>
+		<script type="text/javascript" src="<?= templateNamed('css') ; ?>/follow.js"></script>
+	<?php endif; ?>
+
 	<!--[if lt IE 9]>
 	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
@@ -78,15 +83,7 @@
 	<script type="text/javascript" src="assets/js/webstore.js"></script>
 	<script type="text/javascript" src="assets/js/pushup.js"></script>
 
-	<script type="text/javascript">
-		var XLSTemplate = "<?= templateNamed(''); ?>";
 
-		//<![CDATA[
-		window.onload = function () {
-			applesearch.init();
-		}
-		//]]>
-	</script>
 </head>
 
 <?php $this->RenderBegin(); ?>

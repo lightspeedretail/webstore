@@ -127,8 +127,7 @@ class xlsws_checkout extends xlsws_index {
 		//Force to opt out by presenting checkbox as checked
 		if(!$this->isLoggedIn())
 			$this->PasswordControl->NewsletterSubscribe->Checked = true;
-	
-	
+
 	
         QApplication::ExecuteJavaScript("document.getElementById('LoadActionProxy').click();");
     }

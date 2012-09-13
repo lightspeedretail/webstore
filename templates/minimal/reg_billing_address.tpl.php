@@ -31,41 +31,41 @@
 		<legend><?php echo _sp('Billing Address') ?><span class="red">*</span></legend>
 
 		<div class="row">
-			<div class="ten columns alpha omega">
+			<div class="five columns alpha omega">
 				<span class="label"><?php echo _sp("Address"); ?></span>
-				<?php $this->txtCRBillAddr1->RenderWithError();
-					  $this->txtCRBillAddr2->RenderWithError(); ?>
+				<?php   $this->BillingContactControl->Street1->RenderWithError();
+						$this->BillingContactControl->Street2->RenderWithError(); ?>
 			</div>
 		</div>
 		<div class="row">
-			<div class="ten columns alpha omega">
+			<div class="five columns alpha omega">
 				<span class="label"><?php echo _sp("City"); ?></span>
-				<?php $this->txtCRBillCity->RenderWithError(); ?>
+				<?php $this->BillingContactControl->City->RenderWithError(); ?>
 			</div>
 		</div>
 
 		<div class="row">
-			<div class="ten columns alpha omega">
+			<div class="five columns alpha omega">
 				<span class="label"><?php echo _sp("Country"); ?></span>
-				<?php $this->txtCRBillCountry->RenderWithError(); ?>
+				<?php $this->BillingContactControl->Country->RenderWithError(); ?>
 			</div>
 		</div>
 
 		<div class="row">
 			<div class="two columns alpha">
 				<span class="label"><?php echo _sp("ST/PR"); ?></span> <span class="red">*</span>
-				<?php $this->txtCRBillState->RenderWithError(); ?>
+				<?php $this->BillingContactControl->State->RenderWithError(); ?>
 			</div>
-			<div class="five columns omega">
+			<div class="three columns omega">
 				<span class="label"><?php echo _sp("Zip/Postal"); ?></span> <span class="red">*</span>
-				<?php $this->txtCRBillZip->RenderWithError(); ?>
+				<?php $this->BillingContactControl->Zip->RenderWithError(); ?>
 			</div>
 		</div>
 
 
 		<div class="row">
 			<div class="four columns alpha omega">
-				<?php $this->chkSame->Render(); ?>
+				<?php $this->CustomerControl->CheckSame->Render(); ?>
 			</div>
 		</div>
 

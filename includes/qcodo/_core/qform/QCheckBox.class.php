@@ -99,7 +99,7 @@
 						$strTabIndex
 					);				
 				} else {
-					$strToReturn = sprintf('<table cellspacing="0" cellpadding="0" border="0"><tr><td><input type="checkbox" id="%s" name="%s" %s%s%s%s%s /></td><td %s%s%s%s%s><label for="%s">%s</label></td></tr></table>',
+					$strToReturn = sprintf('<tablex cellspacing="0" cellpadding="0" border="0"><tr><td><input type="checkbox" id="%s" name="%s" %s%s%s%s%s /></td><td %s%s%s%s%s><label for="%s">%s</label></td></tr></tablex>',
 						$this->strControlId,
 						$this->strControlId,
 						$strDisabled,

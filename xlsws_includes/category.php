@@ -58,7 +58,9 @@ class xlsws_category extends xlsws_product_listing {
 			
 			
 		}
-	}
+
+
+    }
 	
 	
     /**

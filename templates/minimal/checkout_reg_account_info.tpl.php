@@ -34,37 +34,37 @@
 			<div class="row">
 				<div class="five columns alpha">
 					<span class="label"><?php echo _sp("First Name"); ?></span> <span class="red">*</span>
-					<?php $this->txtCRFName->RenderWithError(); ?>
+					<?php $this->BillingContactControl->FirstName->RenderWithError(); ?>
 				</div>
 				<div class="five columns omega">
 					<span class="label"><?php echo _sp("Last Name"); ?></span> <span class="red">*</span>
-					<?php $this->txtCRLName->RenderWithError(); ?>
+					<?php $this->BillingContactControl->LastName->RenderWithError(); ?>
 				</div>
 			</div>
 
 			<div class="row">
 				<div class="ten columns alpha omega">
 					<span class="label"><?php echo _sp("Company"); ?></span>
-					<?php $this->txtCRCompany->RenderWithError(); ?>
+					<?php $this->BillingContactControl->Company->RenderWithError(); ?>
 				</div>
 			</div>
 
 			<div class="row">
 				<div class="five columns alpha omega">
 					<span class="label"><?php echo _sp("Phone"); ?></span> <span class="red">*</span>
-					<?php $this->txtCRMPhone->RenderWithError(); ?>
+					<?php $this->BillingContactControl->Phone->RenderWithError(); ?>
 				</div>
 			</div>
 
 			<div class="row">
 				<div class="five columns alpha">
 					<span class="label"><?php echo _sp("Email"); ?></span> <span class="red">*</span>
-					<?php $this->txtCREmail->RenderWithError(); ?>
+					<?php $this->BillingContactControl->Email->RenderWithError(); ?>
 				</div>
 				<?php if (!$this->isLoggedIn()) { ?>
 				<div class="five columns omega">
 					<span class="label"><?php echo _sp("Email (Confirm)"); ?></span> <span class="red">*</span>
-					<?php $this->txtCRConfEmail->RenderWithError(); ?>
+					<?php $this->BillingContactControl->EmailConfirm->RenderWithError(); ?>
 				</div>
 				<? } ?>
 			</div>

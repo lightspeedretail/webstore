@@ -112,8 +112,7 @@ class XLSCustomerControl extends XLSCompositeControl {
     protected function BuildCheckSameControl() {
         $objControl =
             new QCheckBox($this, $this->GetChildName('CheckSame'));
-        $objControl->Text = _sp('Shipping Address is the same' . 
-            ' as Billing Address');
+        $objControl->Text = _sp('Shipping Address is the same as Billing Address');
 	
 		if (_xls_get_conf('SHIP_SAME_BILLSHIP','0')=='1')
 			 $objControl->Text = _sp('This merchant requires Shipping and Billing Address to match');

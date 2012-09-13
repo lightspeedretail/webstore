@@ -79,6 +79,7 @@ class xlsws_index extends QForm {
 	protected $lblSharingHeader;
 	protected $lblSharingFooter;
 
+	protected $Route;
     /**
 	 * build_menu - builds the category tree
 	 * @param none
@@ -143,7 +144,13 @@ class xlsws_index extends QForm {
 			$this->strEmptyCartMessage = _sp("Drag Selections Here"); 
 		else
 	  		$this->strEmptyCartMessage = _sp("Your cart is empty");
-	  
+
+
+
+		$objUrl = _xls_url_object();
+		if ($objUrl->RouteController=="xlspg")
+			$this->Route = $objUrl->RouteId;
+
 	}
 
 	

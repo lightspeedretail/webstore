@@ -153,8 +153,11 @@ select, input[type="text"], input[type="password"], input[type="email"] { font-f
 
   /* tweaks for specific checkout fields. They all have IDs so it makes it easy */
 #checkout #CustomerContactBillingAddressState { width: 100px;}
-#checkout #CustomerContactBillingAddressZip { width: 150px; }
+#checkout #CustomerContactBillingAddressZip { width: 135px; }
+#checkout #CustomerContactShippingAddressState { width: 100px;}
+#checkout #CustomerContactShippingAddressZip { width: 135px; }
 #checkout #CustomerContactBillingAddressStreet1 { margin-bottom: 3px; }
+#checkout #CustomerContactShippingAddressStreet1 { margin-bottom: 3px; }
 
 
 /***** Footy *****/
