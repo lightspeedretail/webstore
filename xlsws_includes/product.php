@@ -205,9 +205,12 @@ class xlsws_product extends xlsws_index {
 			$this->render_detail_lightbox();
 		
 		//Sharing Tools
+
 		$this->pnlSharingTools = new QLabel($this->mainPnl,'sharingtools');	
-		if(_xls_get_conf('SHOW_SHARING' , 0))
+		if(_xls_get_conf('SHOW_SHARING' , 0)) {
+			$this->blnLoadSharing = true;
 			$this->pnlSharingTools->Template = templateNamed('sharing.tpl.php');
+		}
 				
 
 	}

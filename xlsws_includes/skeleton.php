@@ -78,6 +78,7 @@ class xlsws_index extends QForm {
 	protected $strEmptyCartMessage;
 	protected $lblSharingHeader;
 	protected $lblSharingFooter;
+	protected $blnLoadSharing;
 
 	protected $Route;
     /**
@@ -137,6 +138,7 @@ class xlsws_index extends QForm {
 		if(_xls_get_conf('SHOW_SHARING' , 0)) {
 			$this->lblSharingHeader->Template = templateNamed('sharing_header.tpl.php');
 			$this->lblSharingFooter->Template = templateNamed('sharing_footer.tpl.php');
+			$this->blnLoadSharing = false; //make this true for controllers where we use the buttons
 		}
 		
 		
@@ -1151,4 +1153,19 @@ EOS;
         	return false;
         } else return true;
     }
+
+	public function __get($strName) {
+		switch ($strName) {
+		case 'LoadSharing':
+			return $this->blnLoadSharing;
+
+		default:
+			try {
+				return parent::__get($strName);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
+	}
 }

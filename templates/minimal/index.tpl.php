@@ -88,7 +88,7 @@
 </head>
 
 <?php $this->RenderBegin(); ?>
-<?php $this->lblSharingHeader->Render(); ?>
+<?php if($this->LoadSharing) $this->lblSharingHeader->Render(); ?>
 
 
 <?php $this->dxLogin->Render(); ?>
@@ -175,6 +175,6 @@
 
 	</div>
 
-<?php $this->lblSharingFooter->Render(); ?>
+<?php if($this->LoadSharing) $this->lblSharingFooter->Render(); ?>
 <?php $this->RenderEnd(); ?>
 </html>
