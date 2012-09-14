@@ -38,9 +38,9 @@ function sitemap_print_children($childs)
 		return;
 
 	?>
-<ul style="margin-left:10px; list-style-type: square; line-height: 20px;">
+<ul>
 	<?php foreach ($childs as $child): ?>
-	<li style="padding-left:5px;"><a href="<?= $child['link'] ?>"><?php _xt(
+	<li><a href="<?= $child['link'] ?>"><?php _xt(
 		$child['name']
 	) ?></a><?php sitemap_print_children($child['children']) ?></li>
 	<?php endforeach; ?>
@@ -52,26 +52,24 @@ function sitemap_print_children($childs)
 
 ?>
 
-<br style="clear:both"/>
+<div id="sitemap">
+	<div class="five columns">
+		<h5><?php _xt("Site pages") ?></h5>
+		<ul>
+			<?php foreach ($this->sitemap_pages as $page): ?>
+			<li><a href="<?= $page['link'] ?>"><?php _xt($page['name']) ?></a><?php sitemap_print_children($page['children']) ?></li>
+			<?php endforeach; ?>
+		</ul>
+	</div>
 
-<div style="float:left; margin-left:15px; padding: 15px; display:inline;">
-	<h5><?php _xt("Site pages") ?></h5><br/>
-	<ul style="margin-left:20px; list-style-type: square; line-height: 20px;">
-		<?php foreach ($this->sitemap_pages as $page): ?>
-		<li style="padding-left:5px;"><a href="<?= $page['link'] ?>"><?php _xt(
-			$page['name']
-		) ?></a><?php sitemap_print_children($page['children']) ?></li>
-		<?php endforeach; ?>
-	</ul>
-</div>
+	<div class="five columns">
+		<h5><?php _xt("Products") ?></h5>
+		<ul>
+			<?php foreach ($this->sitemap_categories as $categ): ?>
+			<li><a href="<?= $categ['link'] ?>"><?php _xt($categ['name']) ?></a>
 
-<div style="float:left; margin-left:90px; padding: 15px; display:inline; ">
-	<h5><?php _xt("Products") ?></h5><br/>
-	<ul style="margin-left:20px; list-style-type: square; line-height: 20px;">
-		<?php foreach ($this->sitemap_categories as $categ): ?>
-		<li style="padding-left:5px;"><a href="<?= $categ['link'] ?>"><?php _xt($categ['name']) ?></a>
-
-			<!-- <?php sitemap_print_children($categ['children']) ?> --></li>
-		<?php endforeach; ?>
-	</ul>
+				<?php sitemap_print_children($categ['children']) ?></li>
+			<?php endforeach; ?>
+		</ul>
+	</div>
 </div>

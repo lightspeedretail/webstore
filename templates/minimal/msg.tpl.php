@@ -27,10 +27,7 @@
 
 ?>
 
-<br style="clear:both"/>
-
-<div class="msg">
+<div class="twelve columns msg">
 	<?php _xt($this->msg); ?>.
 </div>
 
-<br style="clear:both"/>

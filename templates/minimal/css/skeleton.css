@@ -20,9 +20,9 @@
 ================================================== */
 
 /* Note, this file has been modified by LightSpeed from the original
-shipping version. The overall width was expanded to 978
-instead of 960. Some half columns have been added for special
-formatting. The original for comparison is skeleton_original.css
+version. The overall width was expanded to 978 instead of 960. Some
+half columns have been added for special formatting. The original
+for comparison is skeleton_original.css
 */
 
 .container                                  { position: relative; width: 978px; margin: 0 auto; padding: 0; }

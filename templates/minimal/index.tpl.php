@@ -61,6 +61,7 @@
 	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/base.css">
 	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/skeleton.css">
 	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/webstore.css"/>
+	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/webstorecustom.css"/>
 	<link rel="stylesheet" type="text/css" href="assets/css/pushup.css"/>
 
 	<?php if($this->Route=="checkout"): ?>
@@ -115,6 +116,7 @@
 				<?php $this->menuPnl->Render(); ?>
 			</div>
 			<?php $this->crumbTrail->Render(); ?>
+			<?php $this->ctlFlashMessages->Render(); ?>
 			<div id="viewport">
 				<?php $this->mainPnl->Render(); ?>
 			</div>

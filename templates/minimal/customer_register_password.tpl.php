@@ -26,29 +26,26 @@
  */
 
 ?>
-	<fieldset>
+
+<fieldset>
 	<legend><?php $this->isLoggedIn() ?  _xt('Change Password') :  _xt('Set Password') ?></legend>
-
-<?php $this->isLoggedIn() ?  _xt('To set a new password, enter it here. Otherwise, leave these blank.') :  "" ?><br>
-
-	<div>
-	        <dl>
-	        	<dt><label for="Password1"><?php _xt("Password"); ?></label></dt>
-	            <dd><?php $this->txtCRPass->RenderWithError() ?></dd>
-	        </dl>
+	<div class="row">
+		<?php $this->isLoggedIn() ?  _xt('To set a new password, enter it here. Otherwise, leave these blank.') :  "" ?><br>
+	</div>
+	<div class="row">
+		<div class="five columns alpha">
+			<span class="label"><?php echo _sp("Password"); ?></span> <span class="red">*</span>
+			<?php $this->PasswordControl->Password1->RenderWithError(); ?>
 		</div>
+		<div class="five columns alpha omega">
+			<span class="label"><?php echo _sp("Confirm Password"); ?></span> <span class="red">*</span>
+			<?php $this->PasswordControl->Password2->RenderWithError(); ?>
+		</div>
+	</div>
 
-		<div>
-			<dl>
-	        	<dt><label for="Password2"><?php _xt("Confirm Password"); ?></label></dt>
-	            <dd><?php $this->txtCRConfPass->RenderWithError() ?></dd>
-			</dl>
-		</div><br />
-		<div>
-        	<dl>
-	            <dd>
-	                <?php $this->PasswordControl->NewsletterSubscribe->Render() ?><label for="newsletter" class="opt"><?php _xt("Receive emails about special offers") ?></label>
-	            </dd>
-            </dl>
-         </div>
-		</fieldset>
+	<div class="row">
+		<?php $this->PasswordControl->NewsletterSubscribe->Render() ?>
+		<span class="label"><?php _xt("Receive emails about special offers") ?></span>
+	</div>
+
+</fieldset>

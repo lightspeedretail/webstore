@@ -27,7 +27,6 @@
 ?>
 <span class="search_left"><img class="spyglass" src="<?= templateNamed('css/images/spyglass.png') ; ?>"></span>
 <span class="search_box"><?php $this->txtSearchBox->Render(); ?></span>
-<span class="search_advanced">
-	<?= $this->misc_components['advanced_search']->Render(); ?>
-</span>
+<span class="search_advanced"><a href="<?php echo _xls_site_url('advanced_search/pg'); ?>"><img class="spyglass" src="<?= templateNamed('css/images/adv_search.png') ; ?>"></a></span>
+
 

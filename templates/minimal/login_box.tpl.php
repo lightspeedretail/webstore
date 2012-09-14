@@ -33,16 +33,18 @@
 			<h1>Login <a href="customer-register/pg"><?php _xt('Create an Account') ?></a></h1>
 
 
-			<div class="errormessage"><?php $_CONTROL->lblErr->Render('CssClass=red') ?></div>
+			<div class="customer_reg_err_msg"><?php $_CONTROL->lblErr->Render() ?></div>
 
-			<div class="five columns alpha omega">
-				<span class="label"><?php _xt('Email Address') ?></span>
-				<?php $_CONTROL->txtEmail->Render('CssClass=login_input') ?>
-			</div>
+			<div class="row">
+				<div class="five columns alpha omega">
+					<span class="label"><?php _xt('Email Address') ?></span>
+					<?php $_CONTROL->txtEmail->Render() ?>
+				</div>
 
-			<div class="five columns alpha omega">
-				<span class="label"><?php _xt('Password') ?></span>
-				<?php $_CONTROL->txtPwd->Render('CssClass=login_input'); ?>
+				<div class="five columns alpha omega">
+					<span class="label"><?php _xt('Password') ?></span>
+					<?php $_CONTROL->txtPwd->Render(); ?>
+				</div>
 			</div>
 
 			<a href="#" <?php $_CONTROL->pxyForgotPwd->RenderAsEvents(); ?>><?php _xt('Forgot Password?') ?></a>

@@ -27,49 +27,60 @@
 
 ?>
 
-<div class="rounded" style="margin-left: 20px; border:1px sold #eee;">
-<?php echo $this->page;  ?>
-</div><br />
 
-	<fieldset class="contact">
-		
-			<p align=center>
-				<?php $this->lblError->Render(); ?>
-			</p>
-			<p>
-			  <label for="name"><?php _xt('Name') ?>:</label><br />
-			  <?php $this->txtName->RenderWithError(); ?>
-			</p>
-			<p>
-			  <label for="email"><?php _xt('Email') ?>:</label><br />
-			  <?php $this->txtEmail->RenderWithError(); ?>
-			</p>
-			<p>
-			  <label for="phone"><?php _xt('Phone') ?>:</label><br />
-			  <?php $this->txtPhone->RenderWithError(); ?>
-			</p>
+<fieldset>
+	<legend><?php echo _sp('Contact').' '._xls_get_conf('STORE_NAME'); ?></legend>
 
-			<p>
-			  <label for="subject"><?php _xt('Subject') ?>:</label><br />
-			  <?php $this->txtSubject->RenderWithError(); ?>
-			</p>
-			<label for="message"><?php _xt('Message') ?>:</label><br />
+	<?php $this->lblError->Render(); ?>
+
+	<div class="row">
+		<div class="five columns alpha >
+			<span class="label"><?php echo _sp("Name"); ?></span>
+			<?php   $this->txtName->RenderWithError(); ?>
+		</div>
+		<div class="five columns omega">
+			<span class="label"><?php echo _sp("Email"); ?></span>
+			<?php $this->txtEmail->RenderWithError(); ?>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="five columns alpha omega">
+			<span class="label"><?php echo _sp("Phone"); ?></span>
+			<?php $this->txtPhone->RenderWithError(); ?>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="five columns alpha omega">
+			<span class="label"><?php echo _sp("Subject"); ?></span>
+			<?php $this->txtSubject->RenderWithError(); ?>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="five columns alpha omega">
+			<span class="label"><?php echo _sp("Message"); ?></span>
 			<?php $this->txtMsg->RenderWithError('Width=315' , 'Height=150'); ?>
-			
-		<?	if (_xls_show_captcha('contactus')) { ?>
-			<div class="block margin">
-				<dl>
-					<dt><label for="Name"><?php $this->lblVerifyImage->Render(); ?></label></dt>
-				</dl>
+		</div>
+	</div>
+
+
+	<?	if (_xls_show_captcha('contactus')) { ?>
+		<div class="row">
+			<div class="five columns alpha omega">
+				<?php $this->lblVerifyImage->Render(); ?>
+				<?php $this->txtCRVerify->RenderWithError(); ?>
 			</div>
-	
-			<div class="block margin">
-				<dl class="left">
-					<dd><?php $this->txtCRVerify->RenderWithError(); ?></dd>
-				</dl>
-			</div>
-		<? } ?>
-						
-		<p style="margin-top:40px;"><?php $this->btnSubmit->Render('CssClass=button rounded'); ?></p>
+		</div>
+	<? } ?>
+
+	<div class="row">
+		<?php $this->btnSubmit->Render('CssClass=button rounded'); ?>
+	</div>
+
+</fieldset>
+
+
+
 			
-		</fieldset>

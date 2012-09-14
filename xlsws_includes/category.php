@@ -140,7 +140,7 @@ class xlsws_category extends xlsws_product_listing {
      * Create the paginator(s) for the DataRepeater
      * - Extended from xlsws_product_listing
      */
-    protected function CreatePaginator($blnAlternate = false) {
+    protected function CreatePaginator($blnAlternate = false) { error_log(__class__.' '.__function__);
         $objPaginator = parent::CreatePaginator($blnAlternate);
         
         if ($this->category) 

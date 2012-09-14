@@ -26,10 +26,8 @@
  */
 
 $_CONTROL->txtSKOrderId->Render();
-echo "<br /><br />";
 $_CONTROL->txtSKZipCode->Render();
 $_CONTROL->txtEmailPhone->Render();
-echo "<br /><br /><br />";
-$_CONTROL->btnSKOrderLookup->Render('CssClass=button white rounded');
+$_CONTROL->btnSKOrderLookup->Render();
 
 ?>

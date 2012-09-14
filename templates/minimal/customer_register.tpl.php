@@ -25,30 +25,26 @@
  *
  */
 
+	//We purposely use the "checkout" ID here as well as checkout.tpl.php since it's basically the same form
 ?>
 
+<div id="checkout">
 
-<div id="customer_registration">
-<?php $this->errSpan->Render() ?>
+	<div class="row"><?php $this->errSpan->Render() ?></div>
 
+	<div id="customercontact" class="ten columns alpha omega"><?php $this->pnlCustomer->Render(); ?></div>
 
-<?php $this->pnlCustomer->Render(); ?>
-
-<?php $this->pnlPassword->Render(); ?>
-<br style="clear: both;"/>
-
-<?php $this->pnlBillingAdde->Render(); ?>
-
-<div style="display: block; float: left; clear: right;"><?php $this->pnlShippingAdde->Render(); ?></div>
-
-<br style="clear: both;"/>
-
-<?php $this->pnlVerify->Render(); ?>		  			
+	<div id="createaccount" class="ten columns alpha omega"><?php $this->pnlPassword->Render(); ?></div>
 
 
+	<div class="row">
+		<div id="billingaddress" class="six columns alpha"><?php $this->pnlBillingAdde->Render(); ?></div>
+		<div id="shippingaddress" class="six columns alpha omega"><?php $this->pnlShippingAdde->Render(); ?></div>
+	</div>
 
 
+	<div class="row"><?php $this->pnlVerify->Render(); ?></div>
 
-			
-			
+
 </div>
+

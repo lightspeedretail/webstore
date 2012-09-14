@@ -1,100 +1,112 @@
 <?php
-/*
-  LightSpeed Web Store
- 
-  NOTICE OF LICENSE
- 
-  This source file is subject to the Open Software License (OSL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to support@lightspeedretail.com <mailto:support@lightspeedretail.com>
- * so we can send you a copy immediately.
-   
- * @copyright  Copyright (c) 2011 Xsilva Systems, Inc. http://www.lightspeedretail.com
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- 
- */
+	/*
+	  LightSpeed Web Store
 
-/**
- * template Replacement index page when store has been taken offline
- * in LightSpeed Web Admin panel
- * 
- *
- */
+	  NOTICE OF LICENSE
 
-?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	  This source file is subject to the Open Software License (OSL 3.0)
+	 * that is bundled with this package in the file LICENSE.txt.
+	 * It is also available through the world-wide-web at this URL:
+	 * http://opensource.org/licenses/osl-3.0.php
+	 * If you did not receive a copy of the license and are unable to
+	 * obtain it through the world-wide-web, please send an email
+	 * to support@lightspeedretail.com <mailto:support@lightspeedretail.com>
+	 * so we can send you a copy immediately.
 
+	 * @copyright  Copyright (c) 2011 Xsilva Systems, Inc. http://www.lightspeedretail.com
+	 * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?= _xls_get_conf('LANG_CODE' , 'en') ?>" dir="ltr">
-	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=<?= _xls_get_conf('CHARSET' , 'utf-8') ?>" />
-	<meta name="Author" content="<?= _xls_get_conf('STORE_NAME' , 'Xsilva Inc.') ?>" />
-	<meta name="Copyright" content="<?= _xls_get_conf('COPYRIGHT_MSG' , 'Xsilva Inc.') ?>" />
-	<meta name="Generator" content="LightSpeed Webstore <?= _xls_version(); ?>" />
+	 */
 
+	/**
+	 * Framework template Replacement index page when store has been taken offline
+	 * in LightSpeed Web Admin panel
+	 *
+	 *
+	 */
+
+?><!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="<?= _xls_get_conf('LANG_CODE', 'en') ?>"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="<?= _xls_get_conf('LANG_CODE', 'en') ?>"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="<?= _xls_get_conf('LANG_CODE', 'en') ?>"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="<?= _xls_get_conf('LANG_CODE', 'en') ?>"> <!--<![endif]-->
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=<?= _xls_get_conf('ENCODING', 'utf-8') ?>"/>
+	<?php
+	$redirect = _xls_stack_pop('xls_meta_redirect');
+	if ($redirect && isset($redirect['url']) && isset($redirect['delay'])) {
+		echo '<meta http-equiv="refresh" content="' . $redirect['delay'] . ';URL=' . $redirect['url'] . '"/>';
+	}
+	?>
+	<meta name="Author" content="<?= _xls_get_conf('STORE_NAME', 'Web Store.') ?>"/>
+	<meta name="Copyright" content="<?= _xls_get_conf('COPYRIGHT_MSG', 'Xsilva Inc.') ?>"/>
+	<meta name="Generator" content="LightSpeed Webstore <?= _xls_version(); ?>"/>
+	<meta http-equiv="imagetoolbar" content="false"/>
 	<base href="<?= _xls_site_dir(); ?>/"/>
 
-	<title><?=  _xls_get_conf('STORE_NAME', _sp('Shopping cart'));   ?>: Temporarily offline</title>
+	<title><?php echo _xls_stack_get('xls_page_title'); ?></title>
+	<link rel="canonical" href="<?php echo _xls_stack_pop('xls_canonical_url'); ?>"/>
 
-    <link rel="Shortcut Icon" href="favicon.ico" type="image/x-icon" />
+	<meta name="description" content="<?php echo _xls_stack_get('xls_meta_desc'); ?>">
+	<meta property="og:title" content="<?php echo _xls_stack_pop('xls_page_title'); ?>"/>
+	<meta property="og:description" content="<?php echo _xls_stack_pop('xls_meta_desc'); ?>"/>
+	<meta property="og:image" content="<?php echo _xls_stack_pop('xls_meta_image'); ?>"/>
 
-	<link rel="stylesheet" type="text/css" href="assets/css/reset.css" />
-	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/webstore.css" />
-	
-	<!--[if lt IE 8]>
-	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/ie7.css" />
-	<script src="http://ie7-js.googlecode.com/svn/version/2.0(beta3)/IE8.js" type="text/javascript"></script>
+	<meta name="google-site-verification" content="<?php echo _xls_get_conf('GOOGLE_VERIFY'); ?>"/>
+
+	<link rel="Shortcut Icon" href="favicon.ico" type="image/x-icon"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link rel="stylesheet" type="text/css" href="assets/css/reset.css"/>
+	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/base.css">
+	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/skeleton.css">
+	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/webstore.css"/>
+	<link rel="stylesheet" type="text/css" href="assets/css/pushup.css"/>
+
+	<!--[if lt IE 9]>
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
- 	
-	<!--[if lt IE 7]>
-	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/ie6.css" />
-	<![endif]-->
- 			
-	<script type="text/javascript">	
-		var XLSTemplate = "<?= templateNamed(''); ?>";
-	</script> 			
- 	 			
-	</head>
-	
-		<div id="offline">		
-		
-			<img src="assets/images/sticky_offline.png" style="display: block; float: left; margin: 25px;" />
-		
-			<div class="left">
-				<img src="<?php
-			     $img =  _xls_get_conf('HEADER_IMAGE' ,  false ); 
-			     
-			     if(!$img)
-			      $img = templateNamed('images') . '/webstore_installation.png';
-			     else{
-			      $img = _xls_get_url_resource($img);
-			     }
-			     echo $img;
-			     ?>" />
-				<span class="border: none; color: #111;">
-				<h1><?php _xt("Please check back later."); ?></h1>
-				<h2><?php _xt("Feel free to contact us at"); ?> <strong><?= _xls_get_conf('STORE_PHONE') ?></strong> <?php _xt("or by email at"); ?>  <a href="mailto:<?= _xls_get_conf('EMAIL_FROM'); ?>"><?= _xls_get_conf('EMAIL_FROM'); ?></a></h2>
-				</span>
+	<link rel="stylesheet" type="text/css" href="assets/css/search.css" id="searchcss"/>
+	<link rel="stylesheet" type="text/css" href="assets/css/dummy.css" id="dummy_css"/>
+	<link rel="stylesheet" type="text/css" href="assets/css/datepicker.css"/>
+
+	<script type="text/javascript" src="assets/js/jquery.min.js"></script>
+	<script type="text/javascript" src="assets/js/fancybox/jquery.fancybox-1.3.4.js"></script>
+	<script type="text/javascript" src="assets/js/fancybox/jquery.easing-1.4.pack.js"></script>
+	<link rel="stylesheet" href="assets/js/fancybox/jquery.fancybox-1.3.4.css" type="text/css" media="screen"/>
+
+	<script type="text/javascript" src="assets/js/webstore.js"></script>
+	<script type="text/javascript" src="assets/js/pushup.js"></script>
+
+
+</head>
+<body>
+		<div class="container">
+
+			<div class="sixteen columns alpha omega">
+				<div id="headerimage">
+					<a href="<?php echo _xls_site_url(); ?>">
+						<img src="<? echo _xls_site_url(_xls_get_conf('HEADER_IMAGE' ,  false )); ?>" />
+					</a>
+				</div>
 			</div>
+
+			<div class="row">
+
+				<div class="four columns alpha">
+					<img src="assets/images/sticky_offline.png">
+				</div>
+
+
+				<div class="twelve columns omega">
+					<h1><?php _xt("Please check back later."); ?></h1>
+					<h2><?php _xt("Feel free to contact us at"); ?> <strong><?= _xls_get_conf('STORE_PHONE') ?></strong> <?php _xt("or by email at"); ?>  <a href="mailto:<?= _xls_get_conf('EMAIL_FROM'); ?>"><?= _xls_get_conf('EMAIL_FROM'); ?></a></h2>
+				</div>
+			</div>
+
 		</div>
-		
 
-<?php if(_xls_get_conf('DEBUG_TEMPLATE' , false)):  ?>
- 	<?php $files = array();  ?>
-<!-- 
-	Template files used
-	<?php while($filename = _xls_stack_pop('template_used')): ?>
-		<?php $files[] = $filename; ?><?= $filename; ?> 
-	<?php endwhile; ?>
--->	
- 	<?php _xls_log(sprintf(_sp("Template files used %s") , implode(", " , $files)));  ?>
-<?php endif; ?>
-
-	</body>
+</body>
 </html>
 
 

@@ -52,11 +52,3 @@
 		</div>
 	<?= $rowcode2 ?>
 
-<!--						--><?php
-//						if(_xls_get_conf('ENABLE_SLASHED_PRICES' , 0)==2 &&
-//							$_ITEM->SellWeb != 0 &&
-//							$_ITEM->SellWeb < $_ITEM->Sell)
-//							echo '<div class="price_reg">'._sp("Regular Price").' : <strike>'.
-//								_xls_currency($_ITEM->Sell).'</strike></div>';
-//							else echo '<div class="price_reg">&nbsp;</div>';
-//							?>

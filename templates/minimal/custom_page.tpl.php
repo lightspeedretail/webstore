@@ -28,17 +28,14 @@
 ?>
 
 
-<div style="padding: 15px 25px; line-height: 1.5em;"><?php echo $this->content;  ?></div>
-
+<div class="twelve columns">
+	<?php echo $this->content;  ?>
+</div>
 
 <?php if (isset($this->pnlSlider)): ?>
-<br style="clear:both"/>
-
-<?php $this->pnlSlider->Render(); ?>
-
-<br style="clear:both"/>
-
-
+	<div class="twelve columns clearfix">
+		<?php $this->pnlSlider->Render(); ?>
+	</div>
 <?php endif; ?>
 
 

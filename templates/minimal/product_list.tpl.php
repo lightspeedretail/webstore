@@ -26,16 +26,17 @@
  */
 
 //Our paginator is currently hardcoded to use breadcrumb arrows for Previous and Next, so we override it in the template here
+//Note that the paginator is automatically added to the bottom of the grid if you don't manually place a Render() command elsewhere
+
 if($this->dtrProducts->Paginator) {
 	$this->dtrProducts->Paginator->LabelForPrevious = _sp('previous');
 	$this->dtrProducts->Paginator->LabelForNext = _sp('next');
 }
+	$strPaginator = $this->dtrProducts->Paginator->Render(false);
 ?>
 
 
 	<div id="gridheader">
-
-
 
 		<?php if (_xls_get_conf('ENABLE_CATEGORY_IMAGE', 0) && isset($this->category) && $this->category->ImageExist): ?>
 			<div id="category_image">
@@ -56,20 +57,19 @@ if($this->dtrProducts->Paginator) {
 			<?php endif; ?>
 		</div>
 
-
-		<?php if (isset($this->custom_page_content)): ?>
+		<?php if(isset($this->custom_page_content)): ?>
 		<div id="custom_content">
-			<?= $this->custom_page_content; ?>
+			<? echo $this->custom_page_content; ?>
 		</div>
 		<?php endif; ?>
 
 
 	</div>
 
+
 	<?php if ($this->dtrProducts->TotalItemCount > 0) : ?>
-		<div class="sixteen columns alpha omega clearfix">
+		<div class="twelve columns alpha omega clearfix">
 			<?php $this->dtrProducts->Render(); ?>
-			<?php if($this->dtrProducts->Paginator) {  $this->dtrProducts->Paginator->Render(); } ?>
+			<?php if($this->dtrProducts->Paginator) {  echo $strPaginator; } ?>
 		</div>
 	<?php endif; ?>
-
