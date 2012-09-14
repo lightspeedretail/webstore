@@ -376,22 +376,17 @@ class xlsws_cart extends xlsws_index {
 	}
 
 	/**
-	 * showCart - Default function meant to be overriden by other functions to show the cart, default is false
+	 * showCart - Show side Minicart
 	 * @param none
 	 * @return none
 	 */
 	protected function showCart(){
-		return false;
-	}
-
-	/**
-	 * showDark - Default function meant to be overriden by other functions to show the darkness in the cart
-	 * @param none
-	 * @return none
-	 */
-	protected function showDark(){
 		return true;
 	}
+	protected function showCheckout(){
+		return true;
+	}
+
 }
 
 if(!defined('CUSTOM_STOP_XLSWS'))

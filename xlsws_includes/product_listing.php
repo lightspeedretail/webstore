@@ -57,21 +57,21 @@ class xlsws_product_listing extends xlsws_index {
     /**
      * Create the view's DataRepeater control
      */
-    protected function CreateDataRepeater() {
-    	global $XLSWS_VARS;
+    protected function CreateDataRepeater() { error_log(__class__.' '.__function__);
+
         $this->dtrProducts = $objRepeater = new QDataRepeater($this->mainPnl,'ProductCell');
         $this->CreatePaginator();
-        $this->CreatePaginator(true);
+        if (_xls_get_conf('SECOND_PAGINATOR' , false)) $this->CreatePaginator(true);
 
         $objRepeater->ItemsPerPage =  _xls_get_conf('PRODUCTS_PER_PAGE' , 8);
 		$objRepeater->Template = templateNamed('product_list_item.tpl.php');
 		$objRepeater->CssClass = "product_list rounded";
         $objRepeater->UseAjax = _xls_get_conf('DEBUG_DISABLE_AJAX' , 0) ? false : true;
 
-		if (isset($XLSWS_VARS['page']))
-			$objRepeater->PageNumber = intval($XLSWS_VARS['page']);
+		if (QApplication::QueryString('page'))
+			$objRepeater->PageNumber = _xls_number_only(QApplication::QueryString('page'));
         
-        // Bind the method providing Products to the Repater
+        // Bind the method providing Products to the Repeater
         $objRepeater->SetDataBinder('dtrProducts_Bind');
         return $objRepeater;
     }
@@ -79,7 +79,7 @@ class xlsws_product_listing extends xlsws_index {
     /**
      * Create the paginator(s) for the DataRepeater
      */
-    protected function CreatePaginator($blnAlternate = false) {
+    protected function CreatePaginator($blnAlternate = false) { error_log(_xls_whereCalled());
         $objRepeater = $this->dtrProducts;
         $strProperty = 'Paginator';
         $strName = 'pagination';
@@ -90,6 +90,8 @@ class xlsws_product_listing extends xlsws_index {
         }
 
         $objRepeater->$strProperty = new XLSPaginator($this->mainPnl , $strName);
+
+
         return $objRepeater->$strProperty;
     }
 
@@ -220,12 +222,11 @@ class xlsws_product_listing extends xlsws_index {
 	 * @param none
 	 * @return none
 	 */
-    protected function dtrProducts_Bind() {
+    protected function dtrProducts_Bind() { error_log("binding "._xls_whereCalled());
         $objCondition = $this->GetCondition();
         $objClause = $this->GetClause();
 
-        $this->dtrProducts->TotalItemCount = 
-            Product::QueryCount($objCondition);
+        $this->dtrProducts->TotalItemCount = Product::QueryCount($objCondition);
 
         $objProductArray = Product::QueryArray(
             $objCondition, 

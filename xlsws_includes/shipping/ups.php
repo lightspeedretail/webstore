@@ -164,7 +164,7 @@ class ups extends xlsws_class_shipping {
 
 		$ret['service'] = new XLSListBox($objParent,'ModuleMethod');
 		$this->make_ups_products($ret['service']);
-		$ret['service']->Name = _sp('Preference:');
+		//$ret['service']->Name = _sp('Preference:');
 		$ret['service']->SelectedValue = $config['defaultproduct'];
 		return $ret;
 	}

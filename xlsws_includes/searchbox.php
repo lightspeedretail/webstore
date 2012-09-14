@@ -35,10 +35,11 @@ $this->searchPnl->Template = templateNamed('searchbox.tpl.php');
 
 $this->txtSearchBox = new XLSAutoCompleteTextBox($this->searchPnl , 'xlsSearch');
 
-if(isset($XLSWS_VARS['search']))
-	$this->txtSearchBox->Text = $XLSWS_VARS['search'];
+if(isset($XLSWS_VARS['q'])) {
+	$this->txtSearchBox->Text = $XLSWS_VARS['q'];
+	$this->txtSearchBox->CssClass="searchTextBox searched";
+} else $this->txtSearchBox->CssClass="searchTextBox";
 
-$this->txtSearchBox->CssClass="searchTextBox";
 
 $this->misc_components['search_img'] = new QImageButton($this->searchPnl);
 $this->misc_components['search_img']->ImageUrl = templateNamed("css/images/search_go.png");

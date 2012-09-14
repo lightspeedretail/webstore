@@ -127,8 +127,7 @@ class xlsws_checkout extends xlsws_index {
 		//Force to opt out by presenting checkbox as checked
 		if(!$this->isLoggedIn())
 			$this->PasswordControl->NewsletterSubscribe->Checked = true;
-	
-	
+
 	
         QApplication::ExecuteJavaScript("document.getElementById('LoadActionProxy').click();");
     }
@@ -706,7 +705,7 @@ class xlsws_checkout extends xlsws_index {
     			{
 		    	$blnReturn = $this->CompleteCheckout();
 		    	if (!$blnReturn)
-		    		QApplication::Log(E_USER_NOTICE, 'checkout', "Checkout halted, likely due to payment decline.");    	
+		    		QApplication::Log(E_USER_NOTICE, 'checkout', "Checkout halted, either form submit validation failed or payment declined.");
 			} else $this->errSpan->Text = "Captcha Validation Error";
 
         }
@@ -1367,8 +1366,16 @@ class xlsws_checkout extends xlsws_index {
 
 	}
 
-	/*Functions below are overloaded in extended versions only, defaults set below*/
-	public function showCart() {
+	protected function showCart() {
+		return false;
+	}
+
+	/**
+	 * showCheckout - shows the checkout buttons on the minicart
+	 * @param none
+	 * @return boolean
+	 */
+	protected function showCheckout() {
 		return false;
 	}
 

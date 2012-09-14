@@ -53,7 +53,7 @@ function _xls_fopen_w($filename) {
 function templateNamed($name) {
     if (_xls_get_conf('DEBUG_TEMPLATE', 0) == 1)
         if (stristr($name, '.tpl'))
-            xls_stack_add('template_used', $name);
+            _xls_stack_add('template_used', $name);
 
 	$file = 'templates/' . _xls_get_conf('DEFAULT_TEMPLATE' , 'xsilva') . '/'.$name;
 	if(!file_exists($file) && stristr($name , ".tpl")) {
@@ -866,6 +866,18 @@ function _xls_get_current_customer_id() {
 		return $customer->Rowid;
 
 	return null;
+}
+
+/**
+ * Get the Full Name of the current customer object
+ * @return string
+ */
+function _xls_get_current_customer_name() {
+	$customer = Customer::GetCurrent();
+	if($customer)
+		return $customer->Mainname;
+
+	return "My Account";
 }
 
 /**

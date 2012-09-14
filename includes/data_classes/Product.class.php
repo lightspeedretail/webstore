@@ -237,6 +237,21 @@ class Product extends ProductGen {
 	}
 
 	/**
+	 * Get and display master description if a product is child. Useful for cart display
+	 * When we just want to show the master
+	 * @return string
+	 */
+	protected function GetMasterName() {
+		if ($this->IsChild())
+		$objProd = $this->GetMaster();
+		else
+			$objProd = $this;
+
+		return $objProd->Name;
+
+	}
+
+	/**
 	 * Return a boolean representing whether the Product has available Inv.
 	 * @return bool
 	 */
@@ -507,6 +522,69 @@ class Product extends ProductGen {
 
 		}
 		else return $this->GetPrice($intQuantity, $taxExclusive);
+	}
+
+	/**
+	 * GetSlashedPrice will return
+	 * that it will optionally return a message for Master products.
+	 * @param integer defaults to 1
+	 * @return float or string
+	 */ //4 => _sp("Show Highest Price"),3 => _sp("Show Price Range"), 2 => _sp("Show \"Click for Pricing\"") ,1 => _sp("Show Lowest Price"),0 => _sp("Show Master Item Price")
+	public function GetSlashedPrice($intQuantity = 1, $taxExclusive = false) {
+
+		if (_xls_get_conf('PRICE_REQUIRE_LOGIN',0) == 1 && !xlsws_index::isLoggedIn())
+			return '';
+
+		if ($this->IsMaster()) {
+
+			$objProdCondition = QQ::AndCondition(
+				QQ::Equal(QQN::Product()->Web, 1),
+				QQ::Equal(QQN::Product()->FkProductMasterId, $this->Rowid)
+			);
+
+			if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) == 0) {
+				$objAvailCondition =
+					QQ::OrCondition(
+						QQ::GreaterThan(QQN::Product()->InventoryAvail, 0),
+						QQ::Equal(QQN::Product()->Inventoried, 0)
+					);
+
+				$objCondition = QQ::AndCondition(
+					$objProdCondition,
+					$objAvailCondition
+				);
+			}
+			else
+				$objCondition = $objProdCondition;
+
+			$arrMaster = Product::QueryArray($objCondition,
+				QQ::Clause(
+					QQ::OrderBy(QQN::Product()->Sell))
+			);
+
+			if (count($arrMaster)==0) return '';
+
+			switch (_xls_get_conf('MATRIX_PRICE')) {
+
+			case 4: //Show Highest Price
+			case 3:
+				return ( $arrMaster[count($arrMaster)-1]->Sell > $arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive)) ? $arrMaster[count($arrMaster)-1]->Sell : "";
+			case 2: //Show "Click for Pricing"
+				return '';
+
+			case 1: //Show Lowest Price
+				return $arrMaster[0]->Sell;
+				return ( $arrMaster[0]->Sell > $arrMaster[0]->GetPrice($intQuantity, $taxExclusive)) ? $arrMaster[0]->Sell : "";
+
+			case 0: //Show Master Item Price
+			default:
+				return ($this->Sell != $this->GetPrice($intQuantity, $taxExclusive)) ? $this->Sell : "";;
+
+
+			}
+
+		}
+		else return ($this->Sell != $this->GetPrice($intQuantity, $taxExclusive)) ? $this->Sell : "";
 	}
 
 	/**
@@ -909,6 +987,10 @@ class Product extends ProductGen {
 	
 	public function __get($strName) {
 		switch ($strName) {
+
+		case 'MasterName':
+			return $this->GetMasterName();
+
 			case 'IsMaster':
 				return $this->IsMaster();
 
@@ -974,6 +1056,9 @@ class Product extends ProductGen {
 
 			case 'Price':
 				return $this->GetPriceDisplay();
+
+			case 'SlashedPrice':
+				return $this->GetSlashedPrice();
 
 			case 'PriceValue':
 				return $this->GetPrice();
