@@ -27,38 +27,22 @@
 
 ?>
 
-<div class="cart_row">
-	<a href="<?= $_ITEM->Prod->Link ?>">
-		<img src="<?= $_ITEM->Prod->SmallImage ?>"/>
 
-		<p class="product">
-			<?= _xls_truncate($_ITEM->Description, 63) ?>
-			<!--  <br/>
-					<?php if ($_ITEM->Prod->ProductSize != ''): ?>
-						<?= $_ITEM->Prod->SizeLabel ?> : <?= $_ITEM->Prod->ProductSize
-				; ?>
-					<?php endif; ?>
-					<?php if ($_ITEM->Prod->ProductColor != ''): ?>
-						<?= $_ITEM->Prod->ColorLabel ?> : <?= $_ITEM->Prod->ProductColor
-				; ?>
-					<?php endif; ?>
-					 -->
-		</p>
-
-		<p><?= $_ITEM->Prod->Code ?></p>
-	</a>
-
-	<div class="receipt_row">
-		<p class="price"><?= _xls_currency($_ITEM->Sell) ?><?= ($_ITEM->Discounted) ? sprintf(
-			"<br/><strike>%s</strike>", _xls_currency($_ITEM->SellBase)
-		) : "";  ?></p>
-
-		<p class="qty"><?= $_FORM->qtyBox($_ITEM) ?></p>
-
-		<p class="total"><?= _xls_currency($_ITEM->SellTotal) ?></p>
-		<a href="#" <?= $_FORM->minusIcon($_ITEM) ?>>
-			<div class="minus_icon"></div>
-		</a>
-	</div>
+<br clear="left">
+<div class="four columns alpha">
+	<a href="<?php echo $_ITEM->Prod->Link; ?>"><?=  _xls_truncate($_ITEM->Description, 65, "...\n", true); ?></a>
 </div>
+
+<div class="two columns cart_price"><?= ($_ITEM->Discounted) ? sprintf("<strike>%s</strike> ", _xls_currency($_ITEM->SellBase))._xls_currency($_ITEM->SellDiscount)
+	: _xls_currency($_ITEM->Sell);  ?></div>
+
+<div class="one columns centeritem cartdecor">x</div>
+
+<div class="one columns centeritem"><span class="cart_qty"><?= $_FORM->qtyBox($_ITEM) ?></span></div>
+
+<div class="one columns centeritem cartdecor">=</div>
+
+<div class="two columns omega cart_price"><?= _xls_currency($_ITEM->SellTotal) ?></div>
+
+
 

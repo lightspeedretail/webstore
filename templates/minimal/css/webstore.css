@@ -13,7 +13,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: normal;
 }
 input { font-family: inherit; color: #232323; font-size: 1.1em; line-height: 1.2em; background-color: #e5e5e5;; border: 10px solid #e5e5e5; text-transform: uppercase;}
-select, input[type="text"], input[type="password"], input[type="email"] { font-family: inherit; color: #232323; font-size: 1.1em; line-height: 1.2em; background-color: #e5e5e5;; border: 10px solid #e5e5e5; text-transform: uppercase;}
+select, input[type="text"], input[type="password"], input[type="email"] { font-family: inherit; color: #232323; font-size: 1.1em; line-height: 1.2em; background-color: #e5e5e5; border: 10px solid #e5e5e5; text-transform: uppercase;}
 .right { text-align: right;}
 @media only screen and (max-width: 767px) {
     select, input[type="text"], input[type="password"], input[type="email"] { max-width: 250px; }
@@ -50,8 +50,15 @@ select, input[type="text"], input[type="password"], input[type="email"] { font-f
 .menuunderline { }
 .menuunderline:hover { border-bottom: 5px solid #000000;}
 
+/***** Breadcrumbs ******/
+.breadcrumbs { text-transform: uppercase; color: #bbbbbb;  padding-bottom: 30px;}
+.breadcrumbs .homebutton { padding-bottom: 0px; margin: auto; height: 29px; width: 25px; float: left; }
+.breadcrumbs img { width: 16px; height: 29px; float: left;  }
+.breadcrumbs a { text-decoration: none; color: #bbbbbb; }
+.breadcrumbs .crumbtrail { padding-top: 5px; }
+
 /***** Product Grid *****/
-#gridheader h1 { line-height: 40px; margin-top: 12px; margin-bottom: 3px; }
+#gridheader h1 { line-height: 40px; margin-top: 0px; margin-bottom: 3px; }
 .subcategories { margin-left: 10px;margin-bottom: 15px;}
 .product_cell { border: 1px #e4e0d8 solid; min-height: 300px; max-height: 300px; vertical-align: baseline; cursor: pointer;}
 .product_cell_graphic { height: 225px; margin: auto;}
@@ -110,17 +117,23 @@ select, input[type="text"], input[type="password"], input[type="email"] { font-f
 #shoppingcartbottom .cart_price { padding-bottom: 2px;float:left; width: 80px; font-size: 1.1em; text-align: right; font-weight: 500;}
 
   /* checkout button */
-#shoppingcartcheckout { width: 268px; clear:both; background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-top: 30px; margin-bottom: 10px; cursor: pointer;}
+#shoppingcartcheckout { width: 268px; clear:both; background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
 #shoppingcartcheckout .checkoutlink {  margin: auto;  text-align: center; }
 #shoppingcartcheckout .checkoutlink a { margin-top: 20px; text-decoration: none; color: white; }
 #shoppingcartcheckout .checkoutarrow { margin-right: 15px; position: relative; text-align: right; top: -16px; }
 
-  /* edit cart button */
-#shoppingcarteditcart { width: 268px; clear:both; background-color: #7f7f7f; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center;margin-bottom: 10px; cursor: pointer;}
+/* edit cart button */
+#shoppingcarteditcart { width: 268px; clear:both; background-color: #7f7f7f; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center;margin-bottom: 10px; cursor: pointer;  text-transform: uppercase; }
 #shoppingcarteditcart .editlink {  margin: auto;  text-align: center; }
 #shoppingcarteditcart .editlink a { margin-top: 20px; text-decoration: none; color: white; }
 
+/* continue shopping button */
+#shoppingcartcontinue { width: 268px; clear:both; background-color: #7f7f7f; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center;margin-bottom: 10px; cursor: pointer;  text-transform: uppercase; }
+#shoppingcartcontinue .editlink {  margin: auto;  text-align: center; }
+#shoppingcartcontinue .editlink a { margin-top: 20px; text-decoration: none; color: white; }
+
 /**** Generic Cart is used both on checkout and on the Edit Cart screen ****/
+#genericcart a { text-decoration: none; }
 #genericcart .cart_header { font-weight: 600; text-transform: uppercase; }
 #genericcart .cart_label  { font-size: 0.95em; text-align: right; font-weight: 500;}
 #genericcart .cart_price { font-size: 1.1em; text-align: right; font-weight: 500;}
@@ -129,6 +142,9 @@ select, input[type="text"], input[type="password"], input[type="email"] { font-f
 #genericcart .cartdecor { color: #aaaaaa; }
 #genericcart .centeritem { text-align: center; }
 #genericcart .rightitem { text-align: right; }
+ /* when editing cart */
+#genericcart input[type="text"],input[type="text"]:focus { font-size: 1.1em; margin-bottom: 7px; background-color: white; border: 3px; border-bottom: 1px solid black; text-align: center; padding: 2px; height: 15px; }
+
 
 /***** Sidebar Modules *****/
 #sidebar { display: block; float: left; height: auto; margin: 60px 0 10px 0; overflow: hidden; width: 268px; padding-left: 4px; padding-right: 4px; }
@@ -176,6 +192,7 @@ select, input[type="text"], input[type="password"], input[type="email"] { font-f
 #checkout #CalculateShippingCtrl { width: 200px; }
 #checkout #recaptcha_response_field { border: 1px; width: 150px; text-transform: none;}
 #checkout #PromoLabel { color: #007700; }
+
 
 
 /***** login_box.tpl.php *****/

@@ -28,19 +28,15 @@
 ?>
 
 
-<div id="breadcrumbs" class="rounded">
-	<a href="<?php echo _xls_site_url(); ?>"><img src="<?php echo templateNamed('css'); ?>/images/breadcrumbs_home.png"	style="display: block; float: left; margin: 0 10px 0 12px;"></a>
-	<img src="<?php echo templateNamed('css'); ?>/images/breadcrumbs_separrow.png" style="display: block; float: left; margin: 0 0 0 -2px;">
-
-<ul>
-		<?php foreach($this->crumbs as $crumb): ?>
-			<li>
-				<a href="<?= _xls_site_url($crumb['link']); ?>" title="<?= $crumb['name']; ?>" >			
-					<?= _xls_truncate($crumb['name'], 45, "...", true); ?>
-				</a>
-			</li>
-		<?php endforeach; ?>
-</ul>
-
-
+<?php if(count($this->crumbs)): ?>
+	<div class="breadcrumbs">
+		<div class="homebutton"><a href="<?php echo _xls_site_url(); ?>"><img src="<?php echo templateNamed('css'); ?>/images/breadcrumbs_home.png" alt="<?php echo _sp('Home'); ?>"></a></div>
+		<div class="crumbtrail">
+			<?php foreach($this->crumbs as $crumb): ?>
+			&nbsp;&#8725;&nbsp;
+				<a href="<?= _xls_site_url($crumb['link']); ?>" title="<?= $crumb['name']; ?>" ><?= _xls_truncate($crumb['name'], 45, "...", true); ?></a>
+			<?php endforeach; ?>
+		</div>
+	</div>
+<?php endif; ?>
 

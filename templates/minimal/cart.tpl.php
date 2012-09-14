@@ -27,81 +27,90 @@
 
 ?>
 
-<div class="cart rounded">
-	<div class="cart_header">
-		<?php _xt('Description'); ?>
-	</div>
-
-	<div class="receipt_titles rounded-top">
-		<p><?php _xt('Price'); ?></p>
-
-		<p><?php _xt('Quantity'); ?></p>
-
-		<p><?php _xt('Total'); ?></p>
-	</div>
-
-	<?php
-
-	$this->dtgCart->Render();
-
-	?>
 
 
-	<div class="cart_notes">
-		<p>
-			<?php $this->btn_update->Render('CssClass=button rounded'); ?>
-			<?php if ($this->btn_sendCart) {
-			$this->btn_sendCart->Render('CssClass=button padding rounded');
-		} ?>
-			<?php $this->btn_clearCart->Render('CssClass=button rounded'); ?>
-		</p>
+	<div id="genericcart">
+		<div class="row">
+			<div class="five columns alpha"><span class="cart_header"><?php _xt('Description'); ?></span></div>
+			<div class="one column rightitem"><span class="cart_header"><?php _xt('Price'); ?></span></div>
+			<div class="one column">&nbsp;</div>
+			<div class="one column centeritem"><span class="cart_header"><?php _xt('Qty'); ?></span></div>
+			<div class="one column">&nbsp;</div>
+			<div class="two columns omega rightitem"><span class="cart_header"><?php _xt('Total'); ?></span></div>
 
-		<div class="receipt_subtotals">
-			<?php if (isset($this->misc_components['order_subtotal'])
-			&& ($this->misc_components['order_subtotal'] instanceOf QControl)
-			&& $this->misc_components['order_subtotal']->Display
-		): ?>
-			<?php _xt('Subtotal'); ?>:&nbsp; <?php $this->misc_components['order_subtotal']->Render() ?>  <br/>
-			<?php endif; ?>
-
-			<?php if (isset($this->misc_components['order_shipping_cost'])
-			&& ($this->misc_components['order_shipping_cost'] instanceOf QControl)
-		): ?>
-			<?php _xt('Shipping'); ?>:&nbsp; <?php $this->misc_components['order_shipping_cost']->Render() ?> <br/>
-			<?php endif; ?>
-
-
-
-
-			<?php if (isset($this->misc_components['order_taxes'])): ?>
-			<?php foreach ($this->misc_components['order_taxes'] as $tax): ?>
-				<?php if ($tax->Visible): ?>
-					<?php _xt($tax->Name); ?>:&nbsp; <?php $tax->Render() ?> <br/>
-					<?php endif; ?>
-				<?php endforeach; ?>
-			<?php endif; ?>
+			<?php $this->dtgCart->Render(); ?>
 
 		</div>
+
+		<div class="row">
+
+			<?php if(isset($this->misc_components['order_subtotal'])  &&  ($this->misc_components['order_subtotal'] instanceOf QControl) ): ?>
+
+			<div class="two columns offset-by-seven cart_price"><span class="cart_label"><?php _xt('Subtotal'); ?></span></div>
+			<div class="two columns omega cart_price"><?php $this->misc_components['order_subtotal']->Render() ?></div>
+
+			<?php endif; ?>
+
+			<?php if(isset($this->misc_components['order_taxes'])  ): ?>
+
+			<?php foreach($this->misc_components['order_taxes'] as $tax): ?>
+				<?php if($tax->Visible): ?>
+					<div class="two columns offset-by-seven cart_price"><span class="cart_label"><?php _xt($tax->Name); ?></span></div>
+					<div class="two columns omega cart_price"><?php $tax->Render() ?></div>
+					<?php endif; ?>
+				<?php endforeach; ?>
+
+			<?php endif; ?>
+
+			<?php if(isset($this->misc_components['order_shipping_cost'])  &&  ($this->misc_components['order_shipping_cost'] instanceOf QControl) ): ?>
+
+			<div class="two columns offset-by-seven cart_price"><span class="cart_label"><?php _xt("Shipping"); ?></span></div>
+			<div class="two columns omega cart_price"><?php $this->misc_components['order_shipping_cost']->Render() ?></div>
+
+			<?php endif; ?>
+
+			<?php if(isset($this->misc_components['order_total'])  &&  ($this->misc_components['order_total'] instanceOf QControl) ): ?>
+
+			<div class="two columns offset-by-seven cart_price"><?php _xt("Total"); ?></div>
+			<div class="two columns omega cart_price"><?php $this->misc_components['order_total']->Render() ?></div>
+
+			<?php endif; ?>
+		</div>
+
+
+		<div class="row">
+
+		</div>
+
+
+		<div class="row">
+			<div class="two columns alpha">
+				<?php $this->btn_update->Render(); ?>
+			</div>
+
+			<div class="two columns">
+				<?php $this->btn_clearCart->Render(); ?>
+			</div>
+
+			<?php if ($this->btn_sendCart): ?>
+			<div class="two columns">
+				<?php $this->btn_sendCart->Render(); ?>
+			</div>
+			<?php endif; ?>
+
+			<div class="five columns omega">
+				<div id="shoppingcartcontinue" <?php $this->pxyBackToCart->RenderAsEvents(); ?>>
+					<div class="checkoutlink"><?php _xt("Continue Shopping"); ?></div>
+				</div>
+			</div>
+
+
+		</div>
+
+
 	</div>
 
-	<?php if (
-	isset($this->misc_components['order_total']) && ($this->misc_components['order_total'] instanceOf QControl)): ?>
-	<div class="receipt_total rounded">
-		<?php _xt('Total'); ?>:&nbsp; <?php $this->misc_components['order_total']->Render() ?>
-	</div>
-	<?php endif; ?>
 
 
-	<div class="receipt_checkout rounded-bottom" <?php $this->pxyCheckOut->RenderAsEvents(); ?>><?php _xt(
-		'Submit Order'
-	); ?></div>
 
-	<div class="receipt_checkout_continue rounded-bottom">
-		<a href="#" <?php $this->pxyBackToCart->RenderAsEvents(); ?>>
-			<div class="button_large_right rounded" <?php $this->pxyBackToCart->RenderAsEvents(); ?>><?php _xt(
-				'Continue Shopping'
-			); ?></div>
-		</a>
-	</div>
 
-</div>

@@ -114,6 +114,7 @@
 			<div id="menubar">
 				<?php $this->menuPnl->Render(); ?>
 			</div>
+			<?php $this->crumbTrail->Render(); ?>
 			<div id="viewport">
 				<?php $this->mainPnl->Render(); ?>
 			</div>

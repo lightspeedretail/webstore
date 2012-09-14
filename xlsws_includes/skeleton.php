@@ -714,11 +714,6 @@ EOS;
 		$this->dummy_drag_drop = new QLabel($this);
 	}
 
-	//may be overloaded by extended classes
-	protected function showDark() {
-		return false;
-	}
-
 	/**
 	 * loadModule
 	 * @param string filename of module
