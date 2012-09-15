@@ -26,11 +26,7 @@
  */
 
 	$this->orderSearchPnl->Render();
-	echo "<br/>";
-
 	$this->errSpan->Render();
-	echo "<br/>";
-	
 	$this->orderResultPnl->Render();
 	$this->orderViewPnl->Render();
 	

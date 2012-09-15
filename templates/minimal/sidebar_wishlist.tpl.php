@@ -26,10 +26,10 @@
  */
  
 if(xlsws_index::isLoggedIn()): ?>
-<a href="<?php echo _xls_site_url("gift-registry/pg"); ?>"><strong><?php _xt('Wish List Management'); ?></strong></a>
-<br />
-<br />
+	<a href="<?php echo _xls_site_url("gift-registry/pg"); ?>"><strong><?php _xt('My Wish Lists'); ?></strong></a>
+	<br />
+	<br />
 <?php endif; ?>
-<a href="<?php echo _xls_site_url("gift-search/pg"); ?>"><strong><?php _xt('Wish Lists'); ?></strong></a>
-<br />
-<br />
+
+<a href="<?php echo _xls_site_url("gift-search/pg"); ?>"><strong><?php _xt('Search for a Wish List'); ?></strong></a>
+

@@ -27,36 +27,41 @@
 
 ?>
 
+<div class="orderdisplay">
 
-<div class="registry rounded">
-	<div class="registry_header">
-		<p class="left"><?php _xt('Invitees') ?></p>
+	<h1><?php _xt('Invitees') ?></h1>
 
-		<div class="right">
-			<p style="margin: 0 289px 0 0;"><?php _xt('Email') ?></p>
+	<div class="row">
+		<div class="four columns alpha">
+			<?php _xt('Email') ?>
+		</div>
+		<div class="two columns">
+			<?php _xt('Send Email') ?>
+		</div>
 
-			<p style="margin: 0 20px 0 0;"><?php _xt('Send Email') ?></p>
+		<div class="two columns">
+			<?php _xt('Edit') ?>
+		</div>
 
-			<p style="margin: 0 20px 0 0;"><?php _xt('Edit') ?></p>
-
-			<p style="margin: 0 15px 0 0;"><?php _xt('Delete') ?></p>
+		<div class="two columns omega">
+			<?php _xt('Delete') ?>
 		</div>
 	</div>
 
-	<?php  $this->dtrEmail->Render(); ?>
 
-	<div class="registry_header">
-		<p class="addinvitee">
-			<a href="#" <?php $this->pxyRecNew->RenderAsEvents(); ?>><img
-				src="<?= templateNamed('css/images/btn_add.png') ?>" alt="<?php _xt('Add Invitee') ?>"/> <?php _xt(
-				'Add Invitee'
-			) ?></a>
-		</p>
 
-		<p class="mailall"><a href="#"  <?php $this->pxyMailAll->RenderAsEvents(); ?>><img
-			src="<?= templateNamed('css/images/btn_email.png') ?>" alt="<?php _xt('Send Mail To All') ?>"
-			style="margin: 0 10px -3px 0;"/><?php _xt('Send Mail To All') ?></a>
-		</p>
+	<?php $this->dtrEmail->Render(); ?>
+
+	<div class="row">
+
+		<div class="four columns alpha">
+			<a href="#" <?php $this->pxyRecNew->RenderAsEvents(); ?>><?php _xt('Add Invitee') ?></a>
+		</div>
+
+		<div class="four columns omega">
+			<a href="#" <?php $this->pxyMailAll->RenderAsEvents(); ?>><?php _xt('Send Mail To All') ?></a>
+		</div>
+
 	</div>
 
 </div>

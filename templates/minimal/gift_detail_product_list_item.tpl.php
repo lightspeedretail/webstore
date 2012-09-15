@@ -27,27 +27,17 @@
 
 ?>
 
-<div class="gregistry_row">
-	<a href="<?= $_ITEM->Prod->Link ?>"><img src="<?= $_ITEM->Prod->SmallImage ?>" class="gregistry_img"/></a>
-
-	<p class="product"><a href="<?= $_ITEM->Prod->Link ?>"><?= _xls_truncate(
-		$_ITEM->Prod->Name, 60, "...\n", true
-	); ?></a>
-		<?php if ($_ITEM->Prod->ProductSize != ''): ?>
-			<br/><?= $_ITEM->Prod->SizeLabel ?> : <?= $_ITEM->Prod->ProductSize
-			; ?>
-			<?php endif; ?>
-		<?php if ($_ITEM->Prod->ProductColor != ''): ?>
-			<br/><?= $_ITEM->Prod->ColorLabel ?> : <?= $_ITEM->Prod->ProductColor
-			; ?>
-			<?php endif; ?>
-	</p>
-
-	<div class="right">
-		<p class="qty" style="margin: 0 65px 0 0;"><?= $_FORM->QtyColumn_Render($_ITEM); ?></p>
-		<!-- 				<p class="status"><?= $_FORM->PurchaseColumn_Render($_ITEM); ?></p>  -->
-		<p class="delete" style="margin: 0 15px 0 0;"><a href="#" <?php $_FORM->pxyGiftItemDelete->RenderAsEvents(
-			$_ITEM->Rowid
-		); ?>><img src="<?= templateNamed('css/images/btn_remove.png') ?>" alt="<?php _xt('Delete') ?>"/></a></p>
+<div class="row">
+	<div class="four columns alpha">
+		<a href="<?php echo $_ITEM->Prod->Link; ?>"><?=  _xls_truncate($_ITEM->Prod->Name, 65, "...\n", true); ?></a>
 	</div>
+
+	<div class="two columns cart_price"><span class="cart_qty"><?= $_FORM->QtyColumn_Render($_ITEM); ?></span></div>
+
+	<div class="two columns"><?= $_FORM->PurchaseColumn_Render($_ITEM); ?></div>
+
+	<div class="two columns centeritem omega"><a href="#" <?php $_FORM->pxyGiftItemDelete->RenderAsEvents($_ITEM->Rowid); ?>>
+		<img src="<?= templateNamed('css/images/btn_remove.png') ?>" alt="<?php _xt('Delete') ?>"/></a></div>
+
 </div>
+

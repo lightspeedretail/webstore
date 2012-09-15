@@ -29,31 +29,23 @@
 // fix up the purchase or added qty of the item
 $_ITEM->getPurchaseStatus();
 ?>
-<div class="gregistry_row">
-	<a href="index.php?product=<?=$_ITEM->Prod->Code?>&ajax=true" class="iframe"><img
-		src="<?= $_ITEM->Prod->SmallImage ?>" class="gregistry_img"/></a>
 
-	<p class="product"><a href="index.php?product=<?=$_ITEM->Prod->Code?>&ajax=true" class="iframe"><?= _xls_truncate(
-		$_ITEM->Prod->Name, 50
-	) ?></a>
-		<?php if ($_ITEM->Prod->ProductSize != ''): ?>
-			<br/><?= $_ITEM->Prod->SizeLabel ?> : <?= $_ITEM->Prod->ProductSize
-			; ?>
-			<?php endif; ?>
-		<?php if ($_ITEM->Prod->ProductColor != ''): ?>
-			<br/><?= $_ITEM->Prod->ColorLabel ?> : <?= $_ITEM->Prod->ProductColor
-			; ?>
-			<?php endif; ?>
-	</p>
 
-	<div class="right">
-		<p style="margin-right:85px;"><?= _xls_currency($_ITEM->Prod->Price) ?></p>
+	<div class="row">
+		<div class="six columns alpha omega">
+			<a href="<?php echo $_ITEM->Prod->Link; ?>"><?=  _xls_truncate($_ITEM->Prod->Name, 65, "...\n", true); ?></a>
+		</div>
 
-		<p style="margin-right:95px;"><?= $_ITEM->Qty ?></p>
 
-		<p style="margin-right:20px;"><?= (($_ITEM->PurchasedQty + $_ITEM->AddedQty) >= $_ITEM->Qty) ? 0
-			: ($_ITEM->Qty - ($_ITEM->PurchasedQty + $_ITEM->AddedQty)) ?></p>
+		<div class="one column alpha omega"><?= _xls_currency($_ITEM->Prod->Price); ?></div>
 
-		<p style="margin-left:35px;"><?= $_FORM->Purchase_now($_ITEM) ?></p>
+		<div class="one columns alpha omega center"><?= $_ITEM->Qty ?></div>
+
+		<div class="one columns alpha omega center"><?= (($_ITEM->PurchasedQty + $_ITEM->AddedQty) >= $_ITEM->Qty) ? 0
+			: ($_ITEM->Qty - ($_ITEM->PurchasedQty + $_ITEM->AddedQty)) ?></div>
+
+
+		<div class="three columns alpha omega"><?= $_FORM->Purchase_now($_ITEM) ?></div>
+
 	</div>
-</div>
+

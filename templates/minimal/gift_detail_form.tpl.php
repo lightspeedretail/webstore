@@ -28,38 +28,46 @@
 ?>
 
 
-<div class="registry rounded">
-	<div class="registry_header">
+<div class="orderdisplay">
+
 		<?php _xt('Create New Wish List'); ?>
-	</div>
 
-	<fieldset style="border: none;">
-		<div class="left" class="gregistry_form">
-			<dt><label class="grl"><?php _xt('Name your Wish List') ?></label></dt>
-			<dd><?php $this->txtGRName->RenderWithError('CssClass=grinput'); ?></dd>
 
-			<dt style="clear:both;"><label class="grl"><?php _xt('Choose a password') ?></label></dt>
-			<dd><?php $this->txtGRPassword->RenderWithError('CssClass=grinput'); ?></dd>
+	<fieldset>
+		<div class="row">
+			<span class="label"><?php _xt('Name your Wish List') ?></span>
+			<?php $this->txtGRName->RenderWithError(); ?>
+		</div>
+		
+		<div class="row">
 
-			<dt style="clear:both;"><label class="grl"><?php _xt('Confirm the Password') ?></label></dt>
-			<dd><?php $this->txtGRConfPassword->RenderWithError('CssClass=grinput'); ?></dd>
-
-			<dt style="clear:both;"><label class="grl"><?php _xt(
-				'When should your Wish List expire? (mm/dd/yyyy)'
-			) ?></label></dt>
-			<dd><?php $this->txtGRDate->RenderWithError('CssClass=grinput'); ?></dd>
-
-			<dt style="clear:both;"><label class="grl"><?php _xt('Where should the items ship to?') ?></label></dt>
-			<dd><?php $this->txtGRShipOption->RenderWithError('CssClass=grinput'); ?></dd>
+			<span class="label"><?php _xt('Choose a password') ?></span>
+			<?php $this->txtGRPassword->RenderWithError(); ?>
 		</div>
 
-		<div class="left" style="width: 350px; text-align: left; padding: 15px 0 0 0;">
-			<dt><label class="left"><?php _xt('Create a description for your Wish List:') ?></label></dt>
-			<dd><?php $this->txtGRHtmlContent->RenderWithError(); ?></dd>
+		<div class="row">
+			<span class="label"><?php _xt('Confirm the Password') ?></span>
+			<?php $this->txtGRConfPassword->RenderWithError(); ?>
 		</div>
-		<div class="left">
-			<?php $this->btnGRSave->Render('CssClass=button rounded'); ?>
-			<?php $this->btnGRCancel->Render('CssClass=button rounded'); ?>
+
+		<div class="row">
+			<span class="label"><?php _xt('When should your Wish List expire? (mm/dd/yyyy)') ?></span>
+			<?php $this->txtGRDate->RenderWithError(); ?>
+		</div>
+
+		<div class="row">
+			<span class="label"><?php _xt('Where should the items ship to?') ?></span>
+			<?php $this->txtGRShipOption->RenderWithError(); ?>
+		</div>
+
+		<div class="row">
+			<label class="left"><?php _xt('Create a description for your Wish List:') ?></span>
+			<?php $this->txtGRHtmlContent->RenderWithError(); ?>
+		</div>
+		<div class="row">
+			<?php $this->btnGRSave->Render(); ?>
+			<?php $this->btnGRCancel->Render(); ?>
 		</div>
 	</fieldset>
+
 </div>

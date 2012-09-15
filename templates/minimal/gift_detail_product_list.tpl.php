@@ -27,17 +27,20 @@
 
 ?>
 
-<div class="registry rounded">
-	<div class="registry_header">
-		<p class="left"><?php _xt('Wish List Products') ?></p>
-
-		<div class="right">
-			<p style="margin: 0 65px 0 0;"><?php _xt('Qty') ?></p>
-			<!-- 				<p style="margin: 0 175px 0 0;"><?php _xt('Status') ?></p> -->
-			<p style="margin: 0 15px 0 0;"><?php _xt('Delete') ?></p>
+<h1><?php _xt('Wish List Products') ?></h1>
+<div id="orderdisplay" class="twelve column alpha omega">
+	<div class="row">
+		<div class="four columns alpha">
+			<span class="label"><?php _xt('Item') ?></span>
 		</div>
-	</div>
 
-	<?php  $this->dtrGiftProduct->Render(); ?>
+		<div class="two columns cart_price"><span class="label"><?php _xt('Qty') ?></span></div>
+
+		<div class="two columns"><span class="label"><?php _xt('Purchased') ?></span></div>
+
+		<div class="two columns centeritem omega"><span class="label"><?php _xt('Delete') ?></span></div>
+
+	</div>
+	<?php $this->dtrGiftProduct->Render(); ?>
 
 </div>

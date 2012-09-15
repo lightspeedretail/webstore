@@ -24,34 +24,37 @@
  *
  *
  */
-
 ?>
 
-<div class="registry rounded">
-	<div class="registry_header">
-		<p class="left"><?php _xt('Search'); ?></p>
-	</div>
-	<p style="margin: 15px auto; text-align: center;">Email Address: <?php $this->txtEmail->RenderWithError(
-	); ?> <?php $this->btnSearch->Render('CssClass= button rounded search'); ?>    </p>
-
-</div>
+<div id="orderdisplay" class="twelve column alpha omega">
+	<h1><?php _xt('Wish Lists'); ?></h1>
 
 
 
-<?php if ($this->dtrGiftRegistry->Visible): ?>
-<div class="registry rounded">
-	<div class="registry_header">
-		<p class="left"><?php _xt('Wish List'); ?></p>
-
-		<div class="right">
-			<p style="margin: 0 115px 0 0;"><?php _xt('Who'); ?></p>
-
-			<p style="margin: 0 91px 0 0;"><?php _xt('Expiry'); ?></p>
+	<div class="row">
+		<div class="four columns alpha">
+			<span class="label"><?php _xt('List Name'); ?></span>
 		</div>
+
+		<div class="three columns">
+			<span class="label"><?php _xt('Customer'); ?></span>
+		</div>
+
+		<div class="three columns omega">
+			<span class="label"><?php _xt('Expiry'); ?></span>
+		</div>
+
 	</div>
+
 
 	<?php $this->dtrGiftRegistry->Render(); ?>
 
+		<h3><?php _xt('Search for wish list'); ?></h3>
+		<div class="row">
+			<span class="label">Email Address:</span><?php $this->txtEmail->Render(); ?> <?php $this->btnSearch->Render(); ?>
+		</div>
+
+
+
+
 </div>
-<?php endif; ?>
-<br style="clear: both;"/>

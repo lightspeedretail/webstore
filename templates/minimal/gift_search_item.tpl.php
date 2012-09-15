@@ -27,11 +27,16 @@
 
 ?>
 
-<div class="registry_row">
-		<p class="title"><a href="<? echo _xls_site_url("/gift-search-detail/pg"); ?>?gift_code=<?= $_ITEM->GiftCode ?>" alt="<?php _xt('View') ?>"><?= $_ITEM->RegistryName ?></a></p>
-		<div class="right">
-			<p class="expiry"><?= $_ITEM->Customer->Mainname ?></p>
-			<p class="expiry"><?= $_ITEM->EventDate ?></p>
-		</div>
+<div class="row">
+	<div class="four columns alpha">
+		<a href="<? echo _xls_site_url("/gift-search-detail/pg"); ?>?gift_code=<?= $_ITEM->GiftCode ?>" alt="<?php _xt('View') ?>"><?= $_ITEM->RegistryName ?></a></span>
+	</div>
+
+	<div class="three columns">
+		<?= $_ITEM->Customer->Mainname ?>
+	</div>
+
+	<div class="three columns omega">
+		<?= $_ITEM->EventDate ?>
+	</div>
 </div>
-		

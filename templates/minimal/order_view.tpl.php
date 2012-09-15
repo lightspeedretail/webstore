@@ -27,43 +27,37 @@
 
 
 if($this->order): ?>
-<br style="clear:both"/>
+	<div id="orderdisplay" class="twelve column alpha omega">
+		<h1 class="center"><?php $this->lblOrderMsg->Render(); ?></h1>
 
-	
-
-<h1 style="text-align: center; margin: -25px 0 25px 0;"><?php $this->lblOrderMsg->Render(); ?></h1>	
-
-
-	<div class="border rounded">
-		<div class="border_header">
-			<p class="left"><?php _xt('Information') ?></p>
+		<div class="row">
+			<div class="two columns alpha"><span class="label"><?php _xt('Order ID') ?>:</span></div>
+				<div class="four columns"><?php $this->lblIdStr->Render() ?></div>
+			<div class="two columns alpha"><span class="label"><?php _xt('Date') ?>:</span></div>
+				<div class="four columns"><?php $this->lblOrderDate->Render() ?></div><br clear="left">
+			<div class="two columns alpha"><span class="label"><?php _xt('Status') ?>:</span></div>
+				<div class="four columns"><?php $this->lblOrderStatus->Render() ?></div>
+			<div class="two columns alpha"><span class="label"><?php _xt('Payment') ?>:</span></div>
+				<div class="four columns"><?php $this->lblPaymentNotes->Render() ?></div><br clear="left">
+			<div class="two columns alpha"><span class="label"><?php _xt('Shipping') ?>:</span></div>
+				<div class="four columns"><?php $this->lblShippingNotes->Render() ?></div>
+			<div class="two columns alpha"><span class="label"><?php _xt('Authorization') ?>:</span></div>
+				<div class="four columns"><?php $this->lblOrderPaymentData->Render() ?></div><br clear="left">
 		</div>
-		<p class="borderp">
-		<?php _xt('Order ID') ?>: <?php $this->lblIdStr->Render() ?><br />
-		<?php _xt('Date') ?>: <?php $this->lblOrderDate->Render() ?><br />
-		<?php _xt('Status') ?>: <?php $this->lblOrderStatus->Render() ?><br />
-		<?php _xt('Payment Transaction #') ?>: <?php $this->lblOrderPaymentData->Render() ?>
-		</p>
-	</div>
-	
-	<div class="border rounded">
-		<div class="border_header">
-			<p class="left">Notes</p>
+
+		<div class="row">
+			<div class="ten column alpha omega"><span class="label"><?php _xt('Notes') ?>:</span></div>
+			<div class="ten column offset-by-one"><?= nl2br($this->order->PrintedNotes) ?></div>
 		</div>
-		<p class="borderp">
-			<?php _xt('Notes') ?>: <?= nl2br($this->order->PrintedNotes) ?><br />
-			<?php _xt('Shipping Details') ?>: <?= $this->lblShippingNotes->Render() ?><br />
-			<?php _xt('Payment Details') ?>: <?= $this->lblPaymentNotes->Render(); ?>
-		</p>
+
+		<div class="row">
+			<?php $this->orderViewItemsPnl->Render(); ?>
+		</div>
+
+
+		<?php $this->lblConversionCode->Render(); ?>
+
 	</div>
-	
-	
-<br style="clear:both"/>
-
-<?php $this->orderViewItemsPnl->Render(); ?>	
 
 
-
-<br style="clear:both"/>
-<?php $this->lblConversionCode->Render(); ?>
 <?php endif; ?>

@@ -27,17 +27,18 @@
 
 ?>
 
+	<div class="row">
+		<div class="four columns alpha">
+			<a href="<?php echo _xls_site_url('/gift-registry/pg?registry_id='.$_ITEM->Rowid); ?>"><?= $_ITEM->RegistryName ?></a>
+		</div>
 
-<div class="registry_row">
-	<p class="title" style="cursor: pointer;" <?php $this->pxyGRView->RenderAsEvents(
-		$_ITEM->Rowid
-	); ?> ><?= $_ITEM->RegistryName ?></p>
+		<div class="three columns">
+			<?= $_ITEM->EventDate ?>
+		</div>
 
-	<div class="right">
-		<p class="expiry"><?= $_ITEM->EventDate ?></p>
+		<div class="three columns omega">
+			<a href="<?php echo _xls_site_url('/gift-registry/pg?registry_id='.$_ITEM->Rowid); ?>"><?php _xt('Edit') ?></a>
+		</div>
 
-		<p class="edit"><a href="#"<?php $this->pxyGREdit->RenderAsEvents($_ITEM->Rowid); ?>><img
-			src="<?= templateNamed('css/images/btn_edit.png') ?>" alt="<?php _xt('View') ?>"/></a></p>
 	</div>
-</div>
 		

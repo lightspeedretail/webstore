@@ -18,6 +18,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 input, input:focus { font-family: inherit; color: #232323; font-size: 1.1em; line-height: 1.2em; background-color: #e5e5e5;; border: 10px solid #e5e5e5;}
 select, input[type="text"], input[type="password"], input[type="email"],input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus { font-family: inherit; color: #232323; font-size: 1.1em; line-height: 1.2em; background-color: #e5e5e5; border: 10px solid #e5e5e5;}
+.left { text-align: left;}
+.center { text-align: center;}
 .right { text-align: right;}
 select { text-transform: uppercase; }
 @media only screen and (max-width: 767px) {
@@ -206,6 +208,12 @@ a:hover { text-decoration: underline; }
 
 /***** Messages from system *****/
 .msg { text-align:  center; font-size: 1.2em; color: #252525; font-weight: 600; padding-top: 30px; padding-bottom: 20px;}
+
+/***** Order/SRO/Quote Display *****/
+#orderdisplay {}
+#orderdisplay .label { text-transform: uppercase; font-size: 0.9em; font-weight: 600; }
+#orderdisplay input[type="text"],#genericcart input[type="text"]:focus { font-size: 1.1em; margin-bottom: 7px; background-color: white; border: 3px; border-bottom: 1px solid black; text-align: center; padding: 2px; height: 15px; }
+#orderdisplay .qtybox { width: 30px;}
 
 /***** Footy *****/
 #footer { clear: both;}

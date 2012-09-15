@@ -161,18 +161,6 @@
 
 			<?php $this->lblGoogleAnalytics->Render(); ?>
 
-			<?php if ($expires = _xls_page_session_expiry_duration()): ?>
-			<script type="text/javascript">
-					<?php
-					// in case of session expiry, reload the page so we don't get ajax/javascript errors.
-					// the added 5 seconds will ensure that user will be logged out due to inactivity
-					?>
-				window.setTimeout("document.location.href='<?= _xls_site_url() ?>'", <?= $expires ?> * 1000 + 5000
-				)
-				;
-			</script>
-				<?php endif; ?>
-
 	</div>
 
 <?php if($this->LoadSharing) $this->lblSharingFooter->Render(); ?>

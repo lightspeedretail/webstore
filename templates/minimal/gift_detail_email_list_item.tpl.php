@@ -27,19 +27,20 @@
 
 ?>
 
-
-<div class="registry_row">
-	<p class="invitee_name"><?= $_FORM->RecNameColumn_Render($_ITEM) ?></p>
-
-	<?php if ($_ITEM->EmailSent): ?>
-	<p class="invitee_email"><?= $_FORM->RecEmailColumn_Render($_ITEM) ?></p>
-	<?php else: ?>
-	<p><?= $_FORM->RecEmailColumn_Render($_ITEM) ?></p>
-	<?php endif; ?>
-	<div class="invitee_tasks">
-		<?= $_FORM->MailColumn_Render($_ITEM) ?>
-		<?= $_FORM->EditRecColumn_Render($_ITEM) ?>
-		<?= $_FORM->DelRecColumn_Render($_ITEM) ?>
+<div class="row">
+	<div class="four columns alpha">
+		<?= $_FORM->RecEmailColumn_Render($_ITEM) ?>
 	</div>
 
+	<div class="two columns">
+		<?= $_FORM->MailColumn_Render($_ITEM) ?>
+	</div>
+
+	<div class="two columns">
+		<?= $_FORM->EditRecColumn_Render($_ITEM) ?>
+	</div>
+
+	<div class="two columns omega">
+		<?= $_FORM->DelRecColumn_Render($_ITEM) ?>
+	</div>
 </div>

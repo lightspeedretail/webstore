@@ -25,98 +25,88 @@
  *
  */
 
-
-	global $customer;
-	
 ?>
+<div id="orderdisplay" class="twelve column alpha omega">
 
-
-
-<br style="clear: both;"/>
-
-
-	<div class="border rounded">
-		<div class="border_header">
-			<p class="left"><?php _xt('Welcome'); ?> <?= $this->customer->Firstname ?>
-			<p class="right" style="margin: -2px 15px 0 0;"><a href="customer-register/pg"><img src="<?= templateNamed('css/images/btn_edit.png') ?>" onclick="document.location.href='<?= _xls_site_url("customer-register/pg") ?>'" alt="<?php _xt('Edit') ?>"/></a></p>
+		<div class="row">
+			<div class="ten columns alpha">
+				<h1><?php _xt('Welcome'); ?> <?= $this->customer->Firstname ?></h1>
+			</div>
+			<div class="two columns omega">
+				<a href="customer-register/pg">Edit Profile</a>
+			</div>
 		</div>
-		<div class="padding">
-			<p>Name : <?= $this->customer->Firstname . " " . $this->customer->Lastname ?></p>
-			<p>Phone : <?= $this->customer->Mainphone ?></p>
-			<p>Address : <?= $this->customer->Address11 ?>, <?= $this->customer->Address12 ?> <?= $this->customer->City1 ?>, <?= $this->customer->State1 ?> <?= $this->customer->Zip1 ?></p>
-			
+
+		<div class="row">
+			<div class="two columns alpha"><span class="label"><?php _xt('Name') ?>:</span></div>
+				<div class="four columns"><?php echo $this->customer->Firstname . " " . $this->customer->Lastname ?></div>
+			<div class="two columns alpha"><span class="label"><?php _xt('Phone') ?>:</span></div>
+				<div class="four columns"><?php echo $this->customer->Mainphone ?></div><br clear="left">
+			<div class="two columns alpha"><span class="label"><?php _xt('Address') ?>:</span></div>
+				<div class="four columns"><?= $this->customer->Address11 ?>,
+					<?= $this->customer->Address12 ?><br clear="left"><?= $this->customer->City1 ?>,
+					<?= $this->customer->State1 ?> <?= $this->customer->Zip1 ?></div>
 		</div>
-	</div>
 
-
-<br style="clear: both;"/>
-
-
-	<div class="border rounded">
-		<div class="border_header">
-			<p class="left"><?php _xt("My Orders"); ?></p>
+		<div class="row">
+			<div class="two columns alpha"><span class="label"><?php _xt('My Orders') ?>:</span></div>
 		</div>
-		<div class="padding">
-		<?php if(count($this->orders) > 0): ?>
-			<table width='100%'>
-			<?php foreach($this->orders as $order): ?>
-				<tr>
-				<td><a href="<?php echo _xls_site_url("order-track/pg"); ?>?getuid=<?php _xt($order->Linkid); ?>"><?php _xt($order->IdStr);?></a></td>
-				<!--
-					<td><?php _xt($order->DatetimePosted); ?></td>
-					<td><?php _xt($order->Status); ?></td>
-				-->
-				</tr>			
-			<?php endforeach; ?>
-			</table>
-		<?php else: ?>
-				<?php _xt("You have not placed any orders with us yet"); ?>
-		<?php endif; ?>
+		<div class="row">
+			<?php if(count($this->orders) > 0): ?>
+				<?php foreach($this->orders as $order): ?>
+				<div class="row">
+					<div class="two columns alpha omega">
+						<a href="<?php echo _xls_site_url("order-track/pg"); ?>?getuid=<?= $order->Linkid; ?>"><?= $order->IdStr; ?></a>
+					</div>
+					<div class="two columns">
+						<?= $order->DatetimePosted; ?>
+					</div>
+					<div class="four columns omega">
+						<?php _xt($order->Status); ?>
+					</div>
+				</div>
+				<?php endforeach; ?>
+				<?php else: ?>
+					<?php _xt("You have not placed any orders with us yet"); ?>
+			<?php endif; ?>
 		</div>
-	</div>
 
-
-
-<br style="clear: both;"/>
-
-
-<?php if(_xls_get_conf('ENABLE_GIFT_REGISTRY')):   ?>
-	<div class="border rounded">
-		<div class="border_header">
-			<p class="left"><?php _xt("My Wish lists"); ?></p>
+	<?php if(_xls_get_conf('ENABLE_GIFT_REGISTRY')):   ?>
+		<div class="row">
+			<div class="two columns alpha"><span class="label"><a href="<?php echo _xls_site_url('gift-registry/pg'); ?>"><?php _xt('My Wish lists') ?></a>:</span></div>
 		</div>
-		
-		<div class="padding">
-		<?php if(count($this->giftregistries) > 0): ?>
+		<div class="row">
+			<?php if(count($this->giftregistries) > 0): ?>
 			<?php foreach($this->giftregistries as $registry): ?>
-					<a href="<?php echo _xls_site_url("gift-registry/pg"); ?>?registry_id=<?=  $registry->Rowid  ?>"><?=  $registry->RegistryName  ?></a><br/>
-			<?php endforeach; ?>
-		<?php else: ?>
-				<?php _xt("You have not created any wish list yet."); ?><br/>
-				<a href="<?php echo _xls_site_url("gift-registry/pg"); ?>"><?php _xt('Click here') ?></a> to create a wish list.
-		<?php endif; ?>
-		</div>
-		
 
+				<div class="two columns alpha omega">
+					<a href="<?php echo _xls_site_url("gift-registry/pg"); ?>?registry_id=<?= $registry->Rowid; ?>"><?=  $registry->RegistryName  ?></a>
+				</div>
+				<?php endforeach; ?>
+			<?php else: ?>
+			<?php _xt("You have not created any wish list yet."); ?><br>
+				<a href="<?php echo _xls_site_url("gift-registry/pg"); ?>"><?php _xt('Click here to create a wish list.') ?></a>
+			<?php endif; ?>
+		</div>
+	<?php endif;  ?>
+
+
+
+	<?php if(_xls_get_conf('ENABLE_SRO')):   ?>
+	<div class="row">
+		<div class="two columns alpha"><span class="label"><?php _xt('My Repairs') ?>:</span></div>
 	</div>
-<?php endif;  ?>
-
-
-
-<?php if(_xls_get_conf('ENABLE_SRO')):   ?>
-	<div class="border rounded">
-		<div class="border_header">
-			<p class="left"><?php _xt("My Repairs"); ?></p>
-		</div>
-		
-		<div class="padding">
+	<div class="row">
 		<?php if(count($this->repairs) > 0): ?>
-			<?php foreach($this->repairs as $repair): ?>
-				<a href="<?= _xls_site_url("sro-track/pg") ?>?dosearch=true&emailphone=<?= $repair->CustomerEmailPhone ?>&orderid=<?= $repair->LsId ?>"><?=  $repair->LsId  ?></a><br/>
+		<?php foreach($this->repairs as $repair): ?>
+			<div class="two columns alpha omega">
+				<a href="<?= _xls_site_url("sro-track/pg") ?>?dosearch=true&emailphone=<?= $repair->CustomerEmailPhone ?>&orderid=<?= $repair->LsId ?>"><?=  $repair->LsId  ?></a>
+			</div>
 			<?php endforeach; ?>
 		<?php else: ?>
-				<?php _xt("You have not placed any repair orders with us yet"); ?>
+			<?php _xt("You have not placed any repair orders with us."); ?><br>
 		<?php endif; ?>
-		</div>
 	</div>
-<?php endif;  ?>
+	<?php endif;  ?>
+
+</div>
