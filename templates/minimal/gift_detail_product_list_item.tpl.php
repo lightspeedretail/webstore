@@ -27,12 +27,21 @@
 
 ?>
 
-<div class="row">
-	<div class="four columns alpha">
+<div class="row rowborder">
+	<div class="two columns alpha">
+		<span class="minicart_image">
+			<a href="<?= $_ITEM->Prod->Link; ?>">
+				<img src="<?= $_ITEM->Prod->MiniImage ?>"
+				     height="<?php echo _xls_get_conf('MINI_IMAGE_HEIGHT'); ?>px"
+					/>
+			</a>
+		</span>
+	</div>
+	<div class="four columns">
 		<a href="<?php echo $_ITEM->Prod->Link; ?>"><?=  _xls_truncate($_ITEM->Prod->Name, 65, "...\n", true); ?></a>
 	</div>
 
-	<div class="two columns cart_price"><span class="cart_qty"><?= $_FORM->QtyColumn_Render($_ITEM); ?></span></div>
+	<div class="two columns"><span class="cart_qty"><?= $_FORM->QtyColumn_Render($_ITEM); ?></span></div>
 
 	<div class="two columns"><?= $_FORM->PurchaseColumn_Render($_ITEM); ?></div>
 

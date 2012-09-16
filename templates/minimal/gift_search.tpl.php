@@ -26,7 +26,7 @@
  */
 ?>
 
-<div id="orderdisplay" class="twelve column alpha omega">
+<div id="wishlistdisplay" class="twelve column alpha omega">
 	<h1><?php _xt('Wish Lists'); ?></h1>
 
 

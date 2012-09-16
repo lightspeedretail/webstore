@@ -82,13 +82,15 @@ function print_families() {
 
 
 		<?php
-		$ct = 0;
+		$ct = count($this->arrTopTabs);
+		switch ($ct){
+			case 6:case 5: $strW = "two"; break;
+			case 4: case 3: $strW = "twohalf"; break;
+			default: $strW = "three";
+		}
 		foreach ($this->arrTopTabs as $arrTab) {
-			if (++$ct == count($this->arrTopTabs))
-				echo '<div class="twohalf columns omega menutab menuheight menuunderline">';
-			else
-				echo '<div class="twohalf columns menutab menuheight menuunderline">';
-			echo '<span class="innertab"><a href="'.$arrTab->Link.'">'.$arrTab->Title.'</a></span>'; //class="menutab tab'.count($this->arrTopTabs).'"
+				echo "<div class='".$strW." columns omega menutab menuheight menuunderline' onclick=\"window.location='".$arrTab->Link."'\" >";
+			echo '<span class="innertab"><a href="'.$arrTab->Link.'">'.$arrTab->Title.'</a></span>';
 			echo '</div>';
 		}
 		?>

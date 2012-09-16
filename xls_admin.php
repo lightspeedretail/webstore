@@ -2012,7 +2012,7 @@ class xlsws_admin_cpage_panel extends QPanel {
 		$this->txtTabPosition->AddItem('3rd Position Top', 13);
 		$this->txtTabPosition->AddItem('4th Position Top', 14);
 		$this->txtTabPosition->AddItem('5th Position Top', 15);
-		$this->txtTabPosition->AddItem('6th Position Top', 16);
+		//$this->txtTabPosition->AddItem('6th Position Top', 16);
 		$this->txtTabPosition->AddItem('1st Position Bottom', 21);
 		$this->txtTabPosition->AddItem('2nd Position Bottom', 22);
 		$this->txtTabPosition->AddItem('3rd Position Bottom', 23);

@@ -28,7 +28,7 @@
 
 $this->dlgGiftQty->Render(); ?>
 
-	<div id="orderdisplay" class="twelve column alpha omega">
+	<div id="wishlistdisplay" class="twelve column alpha omega">
 
 		<? if (!$this->logTrack): ?>
 
@@ -56,7 +56,7 @@ $this->dlgGiftQty->Render(); ?>
 				Note: Purchases must be made from this screen to properly deduct from the Wish List. Choosing Add To Cart from the product details page will not show as purchased on this list.
 			</div>
 
-			<div class="row">
+			<div class="row rowborder">
 				<div class="six columns alpha omega">
 					<span class="label"><?php _xt("Item") ?></span>
 				</div>

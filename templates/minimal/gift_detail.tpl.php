@@ -25,14 +25,11 @@
  *
  */
 
-
-$this->pnlGRGift->Render();
-$this->pnlGRForm->Render();
-$this->pnlGRView->Render();
-$this->pnlGRProduct->Render();
-$this->pnlGREmail->Render();
-
 ?>
+	<div class="row"><?php $this->pnlGRGift->Render(); ?></div>
+	<div class="row"><?php $this->pnlGRForm->Render(); ?></div>
+	<div class="row"><?php $this->pnlGRView->Render(); $this->pnlGRProduct->Render(); ?></div>
+	<div class="row"><?php $this->pnlGREmail->Render(); ?></div>
 
 
 	

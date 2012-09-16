@@ -28,17 +28,14 @@
 ?>
 
 	<div class="row">
-		<div class="four columns alpha">
-			<a href="<?php echo _xls_site_url('/gift-registry/pg?registry_id='.$_ITEM->Rowid); ?>"><?= $_ITEM->RegistryName ?></a>
-		</div>
-
-		<div class="three columns">
-			<?= $_ITEM->EventDate ?>
+		<div class="eight columns alpha">
+			<span class="label"><a href="<?php echo _xls_site_url('/gift-registry/pg?registry_id='.$_ITEM->Rowid); ?>"><?= $_ITEM->RegistryName ?></a></span><br><a href="<?php echo _xls_site_url('/gift-registry/pg?registry_id='.$_ITEM->Rowid); ?>"><span class="label light"><?php _xt('Edit') ?></span></a>
 		</div>
 
 		<div class="three columns omega">
-			<a href="<?php echo _xls_site_url('/gift-registry/pg?registry_id='.$_ITEM->Rowid); ?>"><?php _xt('Edit') ?></a>
+			<?= $_ITEM->EventDate ?>
 		</div>
+
 
 	</div>
 		

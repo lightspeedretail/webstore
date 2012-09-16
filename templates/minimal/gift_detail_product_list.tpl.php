@@ -27,18 +27,17 @@
 
 ?>
 
-<h1><?php _xt('Wish List Products') ?></h1>
-<div id="orderdisplay" class="twelve column alpha omega">
-	<div class="row">
-		<div class="four columns alpha">
-			<span class="label"><?php _xt('Item') ?></span>
+<div id="wishlistdisplay" class="twelve column alpha omega">
+	<div class="row rowborder">
+		<div class="six columns alpha">
+			<span class="label heading light"><?php _xt('Wish List Products') ?></span>
 		</div>
 
-		<div class="two columns cart_price"><span class="label"><?php _xt('Qty') ?></span></div>
+		<div class="two columns cart_price"><span class="label heading light"><?php _xt('Qty') ?></span></div>
 
-		<div class="two columns"><span class="label"><?php _xt('Purchased') ?></span></div>
+		<div class="two columns"><span class="label heading light"><?php _xt('Purchased') ?></span></div>
 
-		<div class="two columns centeritem omega"><span class="label"><?php _xt('Delete') ?></span></div>
+		<div class="two columns centeritem omega"><span class="label heading light"><?php _xt('Delete') ?></span></div>
 
 	</div>
 	<?php $this->dtrGiftProduct->Render(); ?>

@@ -28,7 +28,7 @@
 ?>
 
 
-<div style="margin: 5px 0 0 125px;">
+<div class="four columns alpha omega">
 
 	<?php $this->misc_components['select_gift_registry']->Render(); ?><br/>
 	<?php $this->misc_components['add_gift_registry']->Render();

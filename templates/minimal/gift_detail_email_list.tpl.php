@@ -27,39 +27,41 @@
 
 ?>
 
-<div class="orderdisplay">
+<div id="wishlistdisplay">
 
-	<h1><?php _xt('Invitees') ?></h1>
-
-	<div class="row">
+	<div class="row rowborder">
 		<div class="four columns alpha">
-			<?php _xt('Email') ?>
+			<span class="label"><?php _xt('Invitees') ?></span>
+		</div>
+		<div class="four columns">
+			<span class="label"><?php _xt('Email') ?></span>
+		</div>
+		<div class="one columns">
+			<span class="label"><?php _xt('Send') ?></span>
 		</div>
 		<div class="two columns">
-			<?php _xt('Send Email') ?>
+			<span class="label"><?php _xt('Edit') ?></span>
 		</div>
-
-		<div class="two columns">
-			<?php _xt('Edit') ?>
-		</div>
-
-		<div class="two columns omega">
-			<?php _xt('Delete') ?>
+		<div class="one columns omega">
+			<span class="label"><?php _xt('Delete') ?></span>
 		</div>
 	</div>
-
-
 
 	<?php $this->dtrEmail->Render(); ?>
 
 	<div class="row">
+		</div>
+	<div class="row">
 
-		<div class="four columns alpha">
-			<a href="#" <?php $this->pxyRecNew->RenderAsEvents(); ?>><?php _xt('Add Invitee') ?></a>
+		<div class="three columns alpha lightbutton">
+			<a href="#" <?php $this->pxyRecNew->RenderAsEvents(); ?>><span class="label"><?php _xt('Add Invitee') ?></span></a>
 		</div>
 
-		<div class="four columns omega">
-			<a href="#" <?php $this->pxyMailAll->RenderAsEvents(); ?>><?php _xt('Send Mail To All') ?></a>
+		<div class="five columns">
+		&nbsp;
+		</div>
+		<div class="three columns omega lightbutton">
+			<a href="#" <?php $this->pxyMailAll->RenderAsEvents(); ?>><span class="label"><?php _xt('Send Mail To All') ?></span></a>
 		</div>
 
 	</div>

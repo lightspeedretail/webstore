@@ -28,9 +28,9 @@
 ?>
 
 
-<div class="orderdisplay">
+<div id="wishlistdisplay">
 
-		<?php _xt('Create New Wish List'); ?>
+		<h1><?php _xt('Create New Wish List'); ?></h1>
 
 
 	<fieldset>
@@ -61,13 +61,15 @@
 		</div>
 
 		<div class="row">
-			<label class="left"><?php _xt('Create a description for your Wish List:') ?></span>
+			<span class="label"><?php _xt('Create a description for your Wish List') ?></span>
 			<?php $this->txtGRHtmlContent->RenderWithError(); ?>
 		</div>
+
 		<div class="row">
 			<?php $this->btnGRSave->Render(); ?>
 			<?php $this->btnGRCancel->Render(); ?>
 		</div>
+
 	</fieldset>
 
 </div>

@@ -26,14 +26,14 @@
  */
 ?>
 
-	<div id="orderdisplay" class="twelve column alpha omega">
+	<div id="wishlistdisplay" class="twelve columns alpha omega">
 
 		<div class="row">
-			<div class="ten columns alpha">
+			<div class="eight columns alpha">
 				<h1><?php $this->misc_components['lblGRName']->Render(); ?></h1>
 			</div>
-			<div class="two columns omega">
-				<a href="#" <?php $this->pxyGREdit->RenderAsEvents(); ?>><?php _xt('Edit') ?></a>
+			<div class="four columns alpha omega darkbutton">
+				<a href="#" <?php $this->pxyGREdit->RenderAsEvents(); ?>><?php _xt('Edit Settings') ?></a>
 			</div>
 		</div>
 

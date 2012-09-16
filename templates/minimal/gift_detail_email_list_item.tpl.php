@@ -27,12 +27,17 @@
 
 ?>
 
-<div class="row">
+<div class="row thin rowborder">
 	<div class="four columns alpha">
-		<?= $_FORM->RecEmailColumn_Render($_ITEM) ?>
+		<?= $_FORM->RecNameColumn_Render($_ITEM) ?>
 	</div>
-
-	<div class="two columns">
+	<div class="four columns">
+		<?= $_FORM->RecEmailColumn_Render($_ITEM) ?>
+		<?php if($_ITEM->EmailSent): ?>
+		 <?php _xt('SENT'); ?>
+		<?php endif; ?>
+	</div>
+	<div class="one columns">
 		<?= $_FORM->MailColumn_Render($_ITEM) ?>
 	</div>
 
@@ -40,7 +45,8 @@
 		<?= $_FORM->EditRecColumn_Render($_ITEM) ?>
 	</div>
 
-	<div class="two columns omega">
+	<div class="one columns omega">
 		<?= $_FORM->DelRecColumn_Render($_ITEM) ?>
 	</div>
 </div>
+

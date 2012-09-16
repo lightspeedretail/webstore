@@ -26,30 +26,30 @@
  */
 
 ?>
-<div id="orderdisplay" class="twelve column alpha omega">
+<div id="wishlistdisplay" class="twelve columns alpha omega">
 	<div class="row">
 		<div class="eight columns alpha">
 			<h1><?php _xt('Wish Lists'); ?></h1>
 		</div>
-		<div class="four columns omega">
-			<a href="#" <?= $this->pxyGRCreate->RenderAsEvents(); ?>><?php _xt('Create New Wish List'); ?></a>
-		</div>
+
 	</div>
 
-	<div class="row">
-		<div class="four columns alpha">
-			<span class="label"><?php _xt('Name'); ?></span>
+	<div class="row rowborder">
+		<div class="eight columns alpha heading">
+			<span class="label light"><?php _xt('Name'); ?></span>
 		</div>
 
-		<div class="three columns">
-			<span class="label"><?php _xt('Expiry'); ?></span>
-		</div>
-
-		<div class="three columns omega">
-
+		<div class="three columns omega heading">
+			<span class="label light"><?php _xt('Expiry'); ?></span>
 		</div>
 
 	</div>
 
 	<?php $this->dtrGiftRegistry->Render(); ?>
+
+	<div class="row">
+		<div class="five columns alpha omega darkbutton">
+			<a href="#" <?= $this->pxyGRCreate->RenderAsEvents(); ?>><?php _xt('New Wish List'); ?></a>
+		</div>
+	</div>
 </div>

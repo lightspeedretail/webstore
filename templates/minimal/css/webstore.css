@@ -22,11 +22,18 @@ select, input[type="text"], input[type="password"], input[type="email"],input[ty
 .center { text-align: center;}
 .right { text-align: right;}
 select { text-transform: uppercase; }
+a { text-decoration: none; }
+a:hover { text-decoration: underline; }
+.darkbutton, .darkbutton a { width: 268px; background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
+.lightbutton, .lightbutton a { width: 268px; background-color: #7f7f7f; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
+
+/***** Global adjustments as we resize down ******/
 @media only screen and (max-width: 767px) {
     select, input[type="text"], input[type="password"], input[type="email"] { max-width: 250px; }
 }
-a { text-decoration: none; }
-a:hover { text-decoration: underline; }
+/*@media only screen and (max-width: 960px) {*/
+/*h1, h2, h3 { font-size: 10px; }*/
+/*}*/
 
 
 /***** Heady *****/
@@ -40,11 +47,18 @@ a:hover { text-decoration: underline; }
 
 /***** Navigation (Products dropdown) and tabs *****/
 #menubar { margin-bottom: 10px; height: 47px; border-bottom: 1px dotted #aaaaaa; }
+.menutab {  font-size: 1.1em; font-weight: 500; text-align: center; text-transform: uppercase; cursor: pointer; }
+.innertab a { text-decoration: none;}
+.menuheight { height: 43px; }
+.menuunderline { }
+.menuunderline:hover { border-bottom: 5px solid #000000;}
+
 #nav_products { font-weight: 500; height: 47px; text-decoration: none; z-index: 2000; border-bottom: 0px; text-align: left; cursor: pointer;}
 #nav_products .productstab { height: 45px; }
 #nav_products .dropspace { margin-top: 25px; } /* push dropdown menu down from underneath PRODUCTS tab */
+ /* all this to create dropdown and popout menu effects */
 #nav_products a { display: block; margin-right: 3px; padding: 0 0 0 0 ; text-decoration: none;  }
-#nav_products ul { border: none; line-height: 1; list-style: none; list-style-type: none; margin: 5px 0 0px 0px; padding-bottom: 20px;}
+#nav_products ul { border: none; line-height: 1; list-style: none; list-style-type: none; margin: 0px 0 0px 0px; padding-bottom: 20px;}
 #nav_products ul a { color: white; border-bottom: 1px dotted #cccccc; }
 #nav_products li { float: left; width: 10em; height: 29px;  }
 #nav_products li ul { left: -999em; position: absolute; width: 10em; height: 29px; }
@@ -54,12 +68,6 @@ a:hover { text-decoration: underline; }
 #nav_products li:hover ul ul, #nav_products li:hover ul ul ul, #nav_products li.sfhover ul ul, #nav_products li.sfhover ul ul ul { left: -999em; }
 #nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul, #nav_products li li li.sfhover ul, #nav_products li:hover ul, #nav_products li:hover ul, #nav_products li.sfhover ul, #nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul {     left: auto; }
 #nav_products .arrow { margin: 1px 0 0 10px; }
-.menutab {  font-size: 1.1em; font-weight: 500; text-align: center; text-transform: uppercase; }
-.innertab a { text-decoration: none;}
-.menuheight { height: 43px; }
-.menuunderline { }
-.menuunderline:hover { border-bottom: 5px solid #000000;}
-
 
 /***** Breadcrumbs ******/
 .breadcrumbs { text-transform: uppercase; color: #bbbbbb;  padding-bottom: 20px;}
@@ -176,8 +184,7 @@ a:hover { text-decoration: underline; }
 #checkout input[type="text"], #checkout input[type="password"], #checkout input[type="email"], #checkout input[type="select"],#checkout input[type="text"]:focus,#checkout input[type="password"]:focus, #checkout input[type="email"]:focus, #checkout input[type="select"]:focus { font-size: 1.2em; border: 7px solid #E5E5E5; text-transform: none; padding: 2px; margin: 0px; width: 250px;}
 #checkout .red, .customer_reg_err_msg { color: #dd0000; font-size: 1.1em;text-transform: uppercase; }
 #checkout fieldset { border-bottom: 2px dotted #e7e7e7; }
-
-  /* tweaks for specific checkout fields. They all have IDs so it makes it easy */
+  /* tweaks for specific fields. They all have IDs so it makes it easy */
 #checkout #CustomerContactBillingAddressState { width: 100px;}
 #checkout #CustomerContactBillingAddressZip { width: 135px; }
 #checkout #CustomerContactShippingAddressState { width: 100px;}
@@ -191,8 +198,6 @@ a:hover { text-decoration: underline; }
 #checkout #CalculateShippingCtrl { width: 200px; }
 #checkout #recaptcha_response_field { border: 1px; width: 150px; text-transform: none;}
 #checkout #PromoLabel { color: #007700; }
-
-
 
 /***** Login popup box login_box.tpl.php *****/
 .login { background: #fff; padding: 20px; width: 303px; z-index: 1000; }
@@ -214,6 +219,15 @@ a:hover { text-decoration: underline; }
 #orderdisplay .label { text-transform: uppercase; font-size: 0.9em; font-weight: 600; }
 #orderdisplay input[type="text"],#genericcart input[type="text"]:focus { font-size: 1.1em; margin-bottom: 7px; background-color: white; border: 3px; border-bottom: 1px solid black; text-align: center; padding: 2px; height: 15px; }
 #orderdisplay .qtybox { width: 30px;}
+
+/***** Order/SRO/Quote Display *****/
+#wishlistdisplay .rowborder { border-bottom: 1px dotted #aaaaaa; }
+#wishlistdisplay .label { text-transform: uppercase; font-size: 0.9em; font-weight: 600; }
+#wishlistdisplay .qtybox { width: 30px; font-size: 1.1em; margin-bottom: 7px; background-color: white; border: 3px; border-bottom: 1px solid black; text-align: center; padding: 2px; height: 15px;}
+#wishlistdisplay .light { font-weight: 300; }
+#wishlistdisplay .heading { font-size: 1.3em; }
+#wishlistdisplay .thin { margin-bottom: 4px; }
+#wishlistdisplay .minicart_image {float:left;  height: 36px; width: 36px; margin:auto; padding-right: 6px;}
 
 /***** Footy *****/
 #footer { clear: both;}
