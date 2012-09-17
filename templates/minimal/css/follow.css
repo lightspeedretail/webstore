@@ -1,8 +1,0 @@
-
-/* This only exists for checkout so our follow shopping cart works
- We don't do a follow on small screens ie iPhone because the cart
- is already collapsed */
-
-@media only screen and (min-width: 768px) {
-    #shoppingcart_ctl { position: absolute; }
-}

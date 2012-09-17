@@ -23,6 +23,14 @@
  
  */
 
+
+if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)) || (navigator.userAgent.match(/iPad/i))) {
+    $("#nav_products li a").click(function(){  // Update class to point at the head of the list
+    });
+}
+
+
+
 /* ---------------------------- */
 /* XMLHTTPRequest Enable 		*/
 /* ---------------------------- */

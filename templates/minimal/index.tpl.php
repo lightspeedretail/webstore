@@ -64,11 +64,6 @@
 	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/webstorecustom.css"/>
 	<link rel="stylesheet" type="text/css" href="assets/css/pushup.css"/>
 
-	<?php if($this->Route=="checkout"): ?>
-		<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/follow.css"/>
-		<script type="text/javascript" src="<?= templateNamed('css') ; ?>/follow.js"></script>
-	<?php endif; ?>
-
 	<!--[if lt IE 9]>
 	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
