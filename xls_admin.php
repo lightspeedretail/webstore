@@ -103,7 +103,7 @@ if ((trim($ips) != '')){
 
 
 	if($found == false){
-		$msg = " Unauthorised WebKit Access from " . $_SERVER['REMOTE_ADDR'] . " - IP address is not in authorized list.";
+		$msg = " Unauthorized WebKit Access from " . $_SERVER['REMOTE_ADDR'] . " - IP address is not in authorized list.";
 		_xls_log($msg);
 
 		die($msg);
@@ -474,20 +474,22 @@ class xlsws_admin_config_panel extends QPanel{
 				$evaledOptionControl = $this->evalOption($config->Options);
 			}
 
+			$strControlName = preg_replace('/[^0-9A-Za-z]/', '', $config->Key);
+
 			$optType = trim(strtoupper($config->Options));
 			if($optType  == 'BOOL'){
-				$this->fields[$config->Key] = new XLS_OnOff($this);
+				$this->fields[$config->Key] = new XLS_OnOff($this,$strControlName);
 				$this->fields[$config->Key]->Enabled = true;
 				$this->fields[$config->Key]->Checked = intval($config->Value)?true:false;
 			}elseif($evaledOptionControl instanceof QControl){
 				$this->fields[$config->Key] = $evaledOptionControl;
 			}elseif($optType == 'PINT'){
-				$this->fields[$config->Key] = new XLSIntegerBox($this);
+				$this->fields[$config->Key] = new XLSIntegerBox($this,$strControlName);
 				$this->fields[$config->Key]->Required = true;
 				$this->fields[$config->Key]->Minimum = 0;
 				$this->fields[$config->Key]->Required = true;
 			}elseif(is_array($evaledOptionControl) && $optType != ""){
-				$this->fields[$config->Key] = new XLSListBox($this);
+				$this->fields[$config->Key] = new XLSListBox($this,$strControlName);
 
 				$this->fields[$config->Key]->RemoveAllItems();
 
@@ -500,12 +502,12 @@ class xlsws_admin_config_panel extends QPanel{
 				// creation of the XLSTextBox()) in evalOption causes failure
 				// (the box doesn't appear)... sticking it here as a 
 				// quickfix for release
-				$this->fields[$config->Key] = new XLSTextBox($this);
+				$this->fields[$config->Key] = new XLSTextBox($this,$strControlName);
 				$this->fields[$config->Key]->Text = $config->Value;
 				$this->fields[$config->Key]->Required = true;
 				$this->fields[$config->Key]->Width=250;
 			}else{
-				$this->fields[$config->Key] = new XLSTextBox($this);
+				$this->fields[$config->Key] = new XLSTextBox($this,$strControlName);
 				$this->fields[$config->Key]->Text = $config->Value;
 				if($config->Key=="EMAIL_SMTP_PASSWORD") $this->fields[$config->Key]->TextMode = QTextMode::Password;
 				if (isset( $config->MaxLength))
@@ -515,8 +517,11 @@ class xlsws_admin_config_panel extends QPanel{
 			}
 
 
-
-
+			//Special things that happen for certain files
+			if($optType == 'TEMPLATE')
+				$this->fields[$config->Key]->AddAction(
+					new QChangeEvent(),new QAjaxAction('DoChangeTemplate')
+				);
 
 			$this->fields[$config->Key]->Name = _sp($config->Title);
 			// $this->fields[$config->Key]->CssClass .= " admin_config_field";
@@ -618,6 +623,25 @@ class xlsws_admin_config_panel extends QPanel{
 			}
 			$d->close();
 			return $arr;
+
+
+		case 'DEFAULT_TEMPLATE_THEME':
+			$fnOptions = "templates/"._xls_get_conf('DEFAULT_TEMPLATE')."/themes.xml";
+			$arr = array();
+
+			if (file_exists($fnOptions)) {
+				$strXml = file_get_contents($fnOptions);
+
+				// Parse xml for response values
+				$oXML = new SimpleXMLElement($strXml);
+				if($oXML->theme) {
+					foreach ($oXML->theme as $item) {
+						$arr[(string)$item->valuestring] = (string)$item->keystring;
+					}
+				}
+			} else $arr['webstore']="n/a";
+			return $arr;
+			break;
 
 		case 'COUNTRY':
 			$arr = array();
@@ -789,17 +813,12 @@ class xlsws_admin_config_panel extends QPanel{
 				$objCurrentSettings->File = _xls_get_conf('DEFAULT_TEMPLATE');
 				$objCurrentSettings->Type = 'template';
 
-				$objItems= Configuration::QueryArray(
-					QQ::OrCondition(
-						QQ::Like(QQN::Configuration()->Key, '%_IMAGE_WIDTH'),
-						QQ::Like(QQN::Configuration()->Key, '%_IMAGE_HEIGHT')
-
-					),
-					QQ::Clause(QQ::OrderBy(QQN::Configuration()->Rowid)));
-
 				$arrDimensions = array();
-				foreach ($objItems as $objItem) {
-					$arrDimensions[$objItem->Key] = $objItem->Value;
+				//We can't use the ORM because template_specific doesn't exist there (due to upgrade problems)
+				$arrItems = _dbx("SELECT * FROM xlsws_configuration where template_specific=1 ORDER BY rowid", "Query");
+				while ($objItem = $arrItems->FetchObject()) {
+					$objConf = Configuration::Load($objItem->rowid);
+					$arrDimensions[$objConf->Key] = $objConf->Value;
 
 
 				}
@@ -826,8 +845,8 @@ class xlsws_admin_config_panel extends QPanel{
 
 						// Parse xml for response values
 						$oXML = new SimpleXMLElement($strXml);
-						if($oXML->image) {
-							foreach ($oXML->image as $item)
+						if($oXML->entry) {
+							foreach ($oXML->entry as $item)
 								_xls_set_conf($item->keystring,$item->valuestring);
 						}
 					}
@@ -1007,6 +1026,35 @@ class xlsws_admin_appear_config extends xlsws_admin{
 
 	}
 
+
+	public function DoChangeTemplate($strFormId, $strControlId, $strParameter) {
+
+		$control = $this->GetControl($strControlId);
+
+		$controlTH = $this->GetControl('DEFAULTTEMPLATETHEME');
+		$controlTH->RemoveAllItems();
+
+		$fnOptions = "templates/".$control->SelectedValue."/themes.xml";
+		$arr = array();
+
+		if (file_exists($fnOptions)) {
+			$strXml = file_get_contents($fnOptions);
+
+			// Parse xml for response values
+			$oXML = new SimpleXMLElement($strXml);
+			if($oXML->theme) {
+				foreach ($oXML->theme as $item) {
+					$arr[(string)$item->valuestring] = (string)$item->keystring;
+				}
+			}
+		} else $arr['webstore']="n/a";
+
+		foreach($arr as $key=>$val)
+			$controlTH->AddItem($val,$key);
+
+
+		return true;
+	}
 
 
 
