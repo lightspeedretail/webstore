@@ -49,7 +49,7 @@ $items = $cart->GetCartItemArray();
 									     />
 									</a>
 								</span>
-								<span class="minicart_desc">
+								<span class="two columns minicart_desc">
 									<a href="<?= $item->Prod->Link; ?>">
 										<?= _xls_truncate($item->Prod->MasterName , 30) ?>
 										<!--<?php if($item->Prod->ProductSize != ''): ?>
@@ -68,7 +68,7 @@ $items = $cart->GetCartItemArray();
 											?></span>
 									</a>
 								</span>
-								<span class="minicart_price">
+								<span class="one column alpha omega minicart_price">
 									<?= _xls_currency($item->SellTotalTaxIncIfSet) ?>
 								</span>
 							</div>
@@ -90,8 +90,8 @@ $items = $cart->GetCartItemArray();
 
 	 if($this->showCheckout()): ?>
 		 <div id="shoppingcartbottom">
-			 <span class="cart_label"><?php _xt("Subtotal"); ?></span>
-			 <span class="cart_price"><?= _xls_currency($cart->Subtotal) ?></span>
+			 <div class="cart_label two columns"><?php _xt("Subtotal"); ?></div>
+			 <div class="cart_price one column omega"><?= _xls_currency($cart->Subtotal) ?></div>
 		 </div>
 
 		<div id="shoppingcartcheckout" onclick="window.location='<?php echo _xls_site_url("checkout/pg"); ?>'">

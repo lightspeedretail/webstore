@@ -29,7 +29,7 @@
 	foreach ($this->arrSidePanels as $name => $pnl) {
 		?>
 
-	<div class="clickbar" onclick="$('#<?= $pnl->ControlId ?>_container').slideToggle('slow');"><?= $name; ?></div>
+	<div class="four columns alpha omega clickbar" onclick="$('#<?= $pnl->ControlId ?>_container').slideToggle('slow');"><?= $name; ?></div>
 	<div class="containers" id="<?= $pnl->ControlId ?>_container">
 		<?php $pnl->Render(); ?>
 	</div>

@@ -25,8 +25,10 @@
  *
  */
 ?>
-<span class="search_left"><img class="spyglass" src="<?= templateNamed('css/images/spyglass.png') ; ?>"></span>
-<span class="search_box"><?php $this->txtSearchBox->Render(); ?></span>
-<span class="search_advanced"><a href="<?php echo _xls_site_url('advanced_search/pg'); ?>"><img class="spyglass" src="<?= templateNamed('css/images/adv_search.png') ; ?>"></a></span>
-
-
+	<div class="three columns alpha omega">
+		<span class="search_left"><img class="spyglass" src="<?= templateNamed('css/images/spyglass.png') ; ?>"></span>
+		<span class="search_box"><?php $this->txtSearchBox->Render(); ?></span>
+	</div>
+	<div class="one column alpha omega">
+		<span class="search_advanced right"><a href="<?php echo _xls_site_url('advanced_search/pg'); ?>"><img class="spyglass" src="<?= templateNamed('css/images/adv_search.png') ; ?>"></a></span>
+	</div>

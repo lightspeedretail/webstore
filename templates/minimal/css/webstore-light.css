@@ -18,14 +18,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 input, input:focus { font-family: inherit; color: #232323; font-size: 1.1em; line-height: 1.2em; background-color: #e5e5e5;; border: 10px solid #e5e5e5;}
 select, input[type="text"], input[type="password"], input[type="email"],input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus { font-family: inherit; color: #232323; font-size: 1.1em; line-height: 1.2em; background-color: #e5e5e5; border: 10px solid #e5e5e5;}
+input[type="checkbox"] { width: 20px; height: 20px; }
 .left { text-align: left;}
 .center { text-align: center;}
 .right { text-align: right;}
 select { text-transform: uppercase; }
 a { text-decoration: none; }
 a:hover { text-decoration: underline; }
-.darkbutton, .darkbutton a { width: 268px; background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
-.lightbutton, .lightbutton a { width: 268px; background-color: #7f7f7f; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
+.darkbutton, .darkbutton a { background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
+.lightbutton, .lightbutton a {  background-color: #7f7f7f; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
 .label { text-transform: uppercase; }
 /***** Global adjustments as we resize down ******/
 @media only screen and (max-width: 767px) {
@@ -42,7 +43,7 @@ a:hover { text-decoration: underline; }
 
 
 /***** Login/Logout button *****/
-#login, #login a { width: 220px; background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; text-decoration: none; text-transform: uppercase; cursor: pointer; }
+#login, #login a { background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; text-decoration: none; text-transform: uppercase; cursor: pointer; }
 #login .loginhead { margin-right: 10px; vertical-align: middle; }
 
 /***** Navigation (Products dropdown) and tabs *****/
@@ -100,42 +101,41 @@ a:hover { text-decoration: underline; }
 #pagination .table { display: table; margin: 0 auto; }
 
 /***** Search Box *****/
-#searchentry { text-transform: uppercase; border-bottom: 4px solid black; margin-bottom: 5px; width: 268px; clear:both; height: 28px; }
+#searchentry { text-transform: uppercase; border-bottom: 4px solid black; margin-bottom: 5px;  clear:both; height: 28px; }
 #searchentry .search_left img { padding-top: 3px; padding-right:5px; float: left; }
 #searchentry .search_left .spyglass { width: 16px; height:16px; }
 #searchentry .search_box  { float: left;   }
-#searchentry .search_box input { font-size: 1.0em; color: #aaaaaa; width: 225px; border: 0px; border-color: transparent; border-collapse: collapse; margin-bottom: 4px; -webkit-appearance:textfield; background-color: white; text-transform: none; }
+#searchentry .search_box input { width: 155px; font-size: 1.0em; color: #aaaaaa; border: 0px; border-color: transparent; border-collapse: collapse; margin-bottom: 4px; -webkit-appearance:textfield; background-color: white; text-transform: none; }
 #searchentry .searchTextBox .searched { color: #000000; }
-#searchentry .search_advanced { clear: both; }
-#searchentry .search_advanced img { padding-left: 8px; padding-top: 6px;}
+#searchentry .search_advanced img { padding-left: 32px; padding-top: 6px;}
 
 /***** Mini Cart (right side shopping cart) *****/
-#shoppingcart { text-transform: uppercase; padding-top: 10px; padding-left: 4px; padding-right: 4px; width: 268px; clear:both;}
+#shoppingcart { text-transform: uppercase; padding-top: 10px; padding-left: 4px; padding-right: 4px;  clear:both;}
 #shoppingcarttop .title a { font-size: 1.429em; height: auto; min-height: 220px; width: 100%; z-index: 500; padding-top: 10px; padding-bottom: 10px; }
 #shoppingcarttop .carticon { float: right; }
 #shoppingcarttop .minicart_itemlist { margin-top: 15px; margin-bottom: 5px; }
 #shoppingcarttop .minicart_item { padding-top: 15px; padding-bottom: 25px; border-top: 1px dotted #bbbbbb;  height: 30px; line-height: 1em; clear: both;}
 #shoppingcarttop .minicart_image {float:left;  height: 36px; width: 36px; margin:auto; padding-right: 6px;}
 #shoppingcarttop .minicart_item img {max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; }
-#shoppingcarttop .minicart_desc { float:left; width: 130px; font-size: 0.8em; font-weight: 700;}
-#shoppingcarttop .minicart_price { float:left; width: 80px; font-size: 1.1em; text-align: right; font-weight: 500;}
+#shoppingcarttop .minicart_desc { float:left; font-size: 0.8em; font-weight: 700;}
+#shoppingcarttop .minicart_price { float:left; font-size: 1.1em; text-align: right; font-weight: 500;}
 #shoppingcarttop .minicart_qty { clear: left; font-size: 0.9em; font-weight: 400;}
 #shoppingcarttop .minicart_item a { margin-top: 5px;}
 #shoppingcarttop .emptymessage { height: 113px; width: 128px; margin: 50px auto 0 auto; padding: 45px 20px 0 12px; text-align: center; color: #000; }
 #shoppingcartbottom { border-top: 1px dotted #bbbbbb;  height: 30px; line-height: 1em; clear: both; padding-top: 20px; padding-bottom: 20px;}
-#shoppingcartbottom .cart_label  { padding-bottom: 2px; float:left; width: 172px; font-size: 0.95em; text-align: right; font-weight: 500;}
+#shoppingcartbottom .cart_label  { padding-bottom: 2px; float:left; font-size: 0.95em; text-align: right; font-weight: 500;}
 #shoppingcartbottom .cart_price { padding-bottom: 2px;float:left; width: 80px; font-size: 1.1em; text-align: right; font-weight: 500;}
     /* checkout button */
-#shoppingcartcheckout { width: 268px; clear:both; background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
+#shoppingcartcheckout {  clear:both; background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
 #shoppingcartcheckout .checkoutlink {  margin: auto;  text-align: center; }
 #shoppingcartcheckout .checkoutlink a { margin-top: 20px; color: white; text-decoration: none;}
 #shoppingcartcheckout .checkoutarrow { margin-right: 15px; position: relative; text-align: right; top: -16px; }
     /* edit cart button */
-#shoppingcarteditcart { width: 268px; clear:both; background-color: #7f7f7f; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center;margin-bottom: 10px; cursor: pointer;  text-transform: uppercase; }
+#shoppingcarteditcart {  clear:both; background-color: #7f7f7f; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center;margin-bottom: 10px; cursor: pointer;  text-transform: uppercase; }
 #shoppingcarteditcart .editlink {  margin: auto;  text-align: center; }
 #shoppingcarteditcart .editlink a { margin-top: 20px; color: white; text-decoration: none;}
     /* continue shopping button */
-#shoppingcartcontinue { width: 268px; clear:both; background-color: #7f7f7f; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center;margin-bottom: 10px; cursor: pointer;  text-transform: uppercase; }
+#shoppingcartcontinue {  clear:both; background-color: #7f7f7f; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center;margin-bottom: 10px; cursor: pointer;  text-transform: uppercase; }
 #shoppingcartcontinue .editlink {  margin: auto;  text-align: center; }
 #shoppingcartcontinue .editlink a { margin-top: 20px; color: white; text-decoration: none;}
 
@@ -154,8 +154,8 @@ a:hover { text-decoration: underline; }
 
 
 /***** Sidebar Modules *****/
-#sidebar { display: block; float: left; height: auto; margin: 60px 0 10px 0; overflow: hidden; width: 268px; padding-left: 4px; padding-right: 4px; }
-#sidebar .clickbar {   margin: 5px 0px 0px 0px; padding: 11px; color: #555555; border: 1px dotted #999999; font-weight: 700; text-transform: uppercase; text-align: center; cursor: pointer;}
+#sidebar { display: block; float: left; height: auto; margin: 60px 0 0px 0; overflow: hidden; }
+#sidebar .clickbar {   margin: 5px 0px 0px 0px; padding-top: 11px; padding-bottom: 11px; color: #555555; border: 1px dotted #999999; font-weight: 700; text-transform: uppercase; text-align: center; cursor: pointer;}
 #sidebar .containers { border-top: none; font-size: 12px; height: auto; left: -5px; margin: -3px 0 5px; padding: 14px; width: 204px; display: none;}
 
 
