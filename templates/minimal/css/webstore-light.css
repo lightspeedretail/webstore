@@ -61,6 +61,7 @@ a:hover { text-decoration: underline; }
 #nav_products ul li ul li a:hover { background: #2c2c2c; border-bottom: 1px dotted #cccccc; }
 #nav_products li:hover ul ul, #nav_products li:hover ul ul ul, #nav_products li.sfhover ul ul, #nav_products li.sfhover ul ul ul { left: -999em; }
 #nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul, #nav_products li li li.sfhover ul, #nav_products li:hover ul, #nav_products li:hover ul, #nav_products li.sfhover ul, #nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul {     left: auto; }
+
 #nav_products .arrow { margin: 1px 0 0 10px; }
 
 /***** Breadcrumbs ******/
@@ -260,11 +261,14 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
     .innertab, .innertab a { font-size: 0.9em; }
     #headerimage img { width: 50em; }
     .checkoutarrow { display: none; }
+    #nav_products .arrow { margin: 1px 0 0 3px; }
 }
 @media only screen and (max-width: 767px) {
     select, input[type="text"], input[type="password"], input[type="email"] { max-width: 200px; }
     #searchentry .search_box input { width: 75px; }
     #headerimage img { width: 30em; }
+    .menuheight { height: 30px; }
+    #menubar { border-bottom: 0px;}
 }
 
 

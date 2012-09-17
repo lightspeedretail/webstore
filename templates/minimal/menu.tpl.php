@@ -57,9 +57,18 @@ function print_families() {
 	}
 	echo '</ul></li>';	
 }
-?>
+
+if(_xls_is_idevice()): ?>
+	<script language="javascript">
+		function showdropdown()	{
+			$("#nav_products li ul").style.left = "auto";
+			$("#nav_products li ul ul").style.left = "-999em";
+		}
+	</script>
+<?php endif; ?>
+
 	<div class="two columns alpha menuheight">
-		<div id="nav_products" class="menutab">
+		<div id="nav_products" class="menutab" onClick="showdropdown();">
 			<ul>
 				<li class="productstab"><?php _xt('Products'); echo '<img src="'.templateNamed('css').'/images/arrow-down.png" class="arrow"  alt="" />'; ?>
 					<ul class="dropspace">
@@ -67,7 +76,7 @@ function print_families() {
 							print_families();
 						?>
 						<?php foreach($this->menu_categories as $category): ?>
-							<li><a href="<?= $category->Link; ?>"><?= $category->Name; ?><?php print_childs($category); ?></li>
+							<li><a href="<?= $category->Link; ?>"><?= $category->Name; ?><?php if(!_xls_is_idevice()) print_childs($category); else echo "</a>"; ?></li>
 						<?php endforeach; ?>
 
 						<?php if(_xls_get_conf('ENABLE_FAMILIES', 0)==1)
