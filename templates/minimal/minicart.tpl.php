@@ -99,7 +99,7 @@ $items = $cart->GetCartItemArray();
 			<div class="checkoutarrow"><img src="<?= templateNamed("css/images/checkoutarrow.png"); ?>"></div>
 		</div>
 
-		<div id="shoppingcarteditcart">
+		<div id="shoppingcarteditcart" onclick="window.location='<?php echo _xls_site_url("cart/pg"); ?>'">
 			<div class="editlink"><a href="<? echo _xls_site_url("cart/pg");?>"><?php _xt("Edit Cart"); ?></a></div>
 		</div>
 	<?php else: ?>

@@ -28,7 +28,7 @@ for comparison is skeleton_original.css
 .container                                  { position: relative; width: 978px; margin: 0 auto; padding: 0; }
 .container .column,
 .container .columns                         { float: left; display: inline; margin-left: 5px; margin-right: 5px;
-/* hint: for development, uncomment the following line to see where your columns are falling */
+/* hint: for development, uncomment the following line to see where your columns are falling. May cause wrapping on some elements while turned on. */
     /*border: 1px solid blue;*/
 }
 .row                                        { margin-bottom: 20px; }

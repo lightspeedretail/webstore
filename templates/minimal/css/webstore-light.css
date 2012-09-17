@@ -159,6 +159,27 @@ a:hover { text-decoration: underline; }
 #sidebar .containers { border-top: none; font-size: 12px; height: auto; left: -5px; margin: -3px 0 5px; padding: 14px; width: 204px; display: none;}
 
 
+/***************** Slider ***********************/
+.products_slider { overflow: hidden; position: relative; border: 2px solid #262626; margin-top: 30px;}
+.products_slider .label { text-transform: uppercase; font-size: 1.1em; font-weight: 700; margin-left: 25px;}
+.products_slider li, .products_slider p { font-size: .8em; margin: 0; padding: 0; }
+p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; color: #000; }
+.products_slider li p { font-size: 1em; }
+.products_slider .javascript_css { padding: 10px; position: relative; z-index: 3; }
+.products_slider .back { left: 0; position: absolute; top: 0; z-index: 2; }
+.products_slider .back a, .products_slider .next a { display: none; outline: none; }
+.products_slider .next { position: absolute; right: 0; top: 0; z-index: 2; }
+.products_slider ul { left: 0; list-style-type: none; margin: 20px 10px 0; padding: 0; position: relative; width: auto; z-index: 1; }
+.products_slider li { display: inline; float: left; }
+.products_slider_theme { height: 190px; }
+.products_slider_theme .back { height: 58px; width: 61px; }
+.products_slider_theme .next { height: 58px; left: 540px; width: 61px; }
+.products_slider_theme .next a { background: url(images/scroll_right.png) no-repeat top right; padding-left: 120px; height: 40px; line-height: 30px;  }
+.products_slider_theme .back a { background: url(images/scroll_left.png) no-repeat; height: 40px; left: 0; line-height: 30px; }
+.products_slider_theme li { overflow: hidden; padding: 5px 0px; text-align: center; }
+.products_slider_theme li img { margin: 0 0 0px; }
+.products_slider_theme li p {height: 45px; margin: 0; overflow: hidden; width: 162px; }
+
 /***** Product Details Page *****/
 #product_details h1 { line-height: 30px; margin-bottom: 3px;}
 #product_details h2 { line-height: 20px; padding: 0px; text-transform: uppercase; font-weight: 400; font-size: 0.9em;}
