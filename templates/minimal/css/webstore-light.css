@@ -17,7 +17,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: normal;
 }
 input, input:focus { font-family: inherit; color: #232323; font-size: 1.1em; line-height: 1.2em; background-color: #e5e5e5;; border: 10px solid #e5e5e5;}
-select, input[type="text"], input[type="password"], input[type="email"],input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus { font-family: inherit; color: #232323; font-size: 1.1em; line-height: 1.2em; background-color: #e5e5e5; border: 10px solid #e5e5e5;}
+select, input[type="text"], input[type="password"], input[type="email"],input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus { font-family: inherit; color: #232323; font-size: 1.1em; line-height: 1.2em; background-color: #e5e5e5; border: 10px solid #e5e5e5; width: 200px;}
 input[type="checkbox"] { width: 20px; height: 20px; }
 .left { text-align: left;}
 .center { text-align: center;}
@@ -28,13 +28,6 @@ a:hover { text-decoration: underline; }
 .darkbutton, .darkbutton a { background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
 .lightbutton, .lightbutton a {  background-color: #7f7f7f; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
 .label { text-transform: uppercase; }
-/***** Global adjustments as we resize down ******/
-@media only screen and (max-width: 767px) {
-    select, input[type="text"], input[type="password"], input[type="email"] { max-width: 250px; }
-}
-/*@media only screen and (max-width: 960px) {*/
-/*h1, h2, h3 { font-size: 10px; }*/
-/*}*/
 
 
 /***** Heady *****/
@@ -105,7 +98,7 @@ a:hover { text-decoration: underline; }
 #searchentry .search_left img { padding-top: 3px; padding-right:5px; float: left; }
 #searchentry .search_left .spyglass { width: 16px; height:16px; }
 #searchentry .search_box  { float: left;   }
-#searchentry .search_box input { width: 155px; font-size: 1.0em; color: #aaaaaa; border: 0px; border-color: transparent; border-collapse: collapse; margin-bottom: 4px; -webkit-appearance:textfield; background-color: white; text-transform: none; }
+#searchentry .search_box input { width: 145px; font-size: 1.0em; color: #aaaaaa; border: 0px; border-color: transparent; border-collapse: collapse; margin-bottom: 4px; -webkit-appearance:textfield; background-color: white; text-transform: none; }
 #searchentry .searchTextBox .searched { color: #000000; }
 #searchentry .search_advanced img { padding-left: 32px; padding-top: 6px;}
 
@@ -202,7 +195,7 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
 #checkout legend { margin-bottom: 4px; text-transform: uppercase; color: #a1a1a1; }
 #checkout .label { text-transform: uppercase; font-size: 0.9em; }
 #checkout .warning { color: #dd0000; text-transform: uppercase; font-size: 0.8em; line-height: 14px;}
-#checkout input[type="text"], #checkout input[type="password"], #checkout input[type="email"], #checkout input[type="select"],#checkout input[type="text"]:focus,#checkout input[type="password"]:focus, #checkout input[type="email"]:focus, #checkout input[type="select"]:focus { font-size: 1.2em; border: 7px solid #E5E5E5; text-transform: none; padding: 2px; margin: 0px; width: 250px;}
+#checkout input[type="text"], #checkout input[type="password"], #checkout input[type="email"], #checkout input[type="select"],#checkout input[type="text"]:focus,#checkout input[type="password"]:focus, #checkout input[type="email"]:focus, #checkout input[type="select"]:focus { font-size: 1.2em; border: 7px solid #E5E5E5; text-transform: none; padding: 2px; margin: 0px; }
 #checkout .red, .customer_reg_err_msg { color: #dd0000; font-size: 1.1em;text-transform: uppercase; }
 #checkout fieldset { border-bottom: 2px dotted #e7e7e7; }
   /* tweaks for specific fields. They all have IDs so it makes it easy */
@@ -258,5 +251,17 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
 #footer .bottomtabs a { font-size: 1.1em; font-weight: 400; }
 #footer .copyright { text-align: center; text-transform: uppercase; color: #b7b7b7; font-size: 0.8em;  }
 
+
+/***** Global adjustments as we resize down ******/
+@media only screen and (max-width: 960px) {
+    body { font-size: 12px; }
+    h1, h2, h3 { font-size: 16px; }
+    #searchentry .search_box input { width: 100px; }
+    .innertab, .innertab a { font-size: 0.9em; }
+}
+@media only screen and (max-width: 767px) {
+    select, input[type="text"], input[type="password"], input[type="email"] { max-width: 200px; }
+    #searchentry .search_box input { width: 75px;
+}
 
 
