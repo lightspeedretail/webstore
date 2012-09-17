@@ -1,0 +1,12 @@
+<themes>
+	<theme>
+		<keystring>Light theme</keystring>
+		<valuestring>webstore-light</valuestring>
+	</theme>
+	<theme>
+		<keystring>Dark theme</keystring>
+		<valuestring>webstore-dark</valuestring>
+	</theme>
+</themes>
+
+

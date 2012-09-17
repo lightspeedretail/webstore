@@ -1,52 +1,56 @@
 <defaults>
-	<image>
+	<entry>
 		<keystring>CATEGORY_IMAGE_HEIGHT</keystring>
 		<valuestring>180</valuestring>
-	</image>
-	<image>
+	</entry>
+	<entry>
 		<keystring>CATEGORY_IMAGE_WIDTH</keystring>
 		<valuestring>180</valuestring>
-	</image>
-	<image>
+	</entry>
+	<entry>
 		<keystring>DETAIL_IMAGE_HEIGHT</keystring>
 		<valuestring>256</valuestring>
-	</image>
-	<image>
+	</entry>
+	<entry>
 		<keystring>DETAIL_IMAGE_WIDTH</keystring>
 		<valuestring>256</valuestring>
-	</image>
-	<image>
+	</entry>
+	<entry>
 		<keystring>LISTING_IMAGE_HEIGHT</keystring>
 		<valuestring>190</valuestring>
-	</image>
-	<image>
+	</entry>
+	<entry>
 		<keystring>LISTING_IMAGE_WIDTH</keystring>
 		<valuestring>180</valuestring>
-	</image>
-	<image>
+	</entry>
+	<entry>
 		<keystring>MINI_IMAGE_HEIGHT</keystring>
 		<valuestring>30</valuestring>
-	</image>
-	<image>
+	</entry>
+	<entry>
 		<keystring>MINI_IMAGE_WIDTH</keystring>
 		<valuestring>30</valuestring>
-	</image>
-	<image>
+	</entry>
+	<entry>
 		<keystring>PREVIEW_IMAGE_HEIGHT</keystring>
 		<valuestring>30</valuestring>
-	</image>
-	<image>
+	</entry>
+	<entry>
 		<keystring>PREVIEW_IMAGE_WIDTH</keystring>
 		<valuestring>30</valuestring>
-	</image>
-	<image>
+	</entry>
+	<entry>
 		<keystring>SLIDER_IMAGE_HEIGHT</keystring>
 		<valuestring>90</valuestring>
-	</image>
-	<image>
+	</entry>
+	<entry>
 		<keystring>SLIDER_IMAGE_WIDTH</keystring>
 		<valuestring>90</valuestring>
-	</image>
+	</entry>
+	<entry>
+		<keystring>DEFAULT_TEMPLATE_THEME</keystring>
+		<valuestring>webstore-light</valuestring>
+	</entry>
 </defaults>
 
 

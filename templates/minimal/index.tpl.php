@@ -142,9 +142,23 @@
 
 		<div id="footer" class="sixteen columns alpha omega">
 
-			<div class="addresshours">
-
-
+			<div class="row>">
+				<div class="addresshours">
+					<div class="eight columns omega label">
+					<?php
+						echo _xls_get_conf('STORE_NAME')."<br>";
+						echo _xls_get_conf('STORE_ADDRESS1')."<br>";
+						echo _xls_get_conf('STORE_ADDRESS2');
+					?>
+					</div>
+					<div class="eight columns alpha right label">
+						<?php
+						echo _xls_get_conf('STORE_HOURS')."<br>";
+						echo _xls_get_conf('STORE_PHONE')."<br>";
+						echo _xls_get_conf('EMAIL_FROM');
+						?>
+					</div>
+				</div>
 			</div>
 				<div class="bottomtabs">
 					<?php
