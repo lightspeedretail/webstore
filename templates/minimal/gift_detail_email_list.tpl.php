@@ -29,7 +29,7 @@
 
 <div id="wishlistdisplay">
 
-	<div class="row rowborder">
+	<div class="row rowborder thin">
 		<div class="four columns alpha">
 			<span class="label"><?php _xt('Invitees') ?></span>
 		</div>

@@ -93,7 +93,7 @@
 
 <?php $this->dxLogin->Render(); ?>
 	<div class="container">
-		<div class="thirteen columns alpha">
+		<div class="thirteen columns alpha omega">
 			<div id="headerimage">
 				<a href="<?php echo _xls_site_url(); ?>">
 					<img src="<? echo _xls_site_url(_xls_get_conf('HEADER_IMAGE', false)); ?>"/>

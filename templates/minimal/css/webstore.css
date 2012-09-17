@@ -42,7 +42,7 @@ a:hover { text-decoration: underline; }
 
 
 /***** Login/Logout button *****/
-#login, #login a { width: 268px; background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; text-decoration: none; text-transform: uppercase; cursor: pointer; }
+#login, #login a { width: 220px; background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; text-decoration: none; text-transform: uppercase; cursor: pointer; }
 #login .loginhead { margin-right: 10px; vertical-align: middle; }
 
 /***** Navigation (Products dropdown) and tabs *****/
@@ -200,7 +200,7 @@ a:hover { text-decoration: underline; }
 #checkout #PromoLabel { color: #007700; }
 
 /***** Login popup box login_box.tpl.php *****/
-.login { background: #fff; padding: 20px; width: 303px; z-index: 1000; }
+.login { background: #fff; padding: 20px; width: 303px; z-index: 1000; border: 1px solid black; -moz-box-shadow: 3px 3px 5px 6px #ccc; -webkit-box-shadow: 3px 3px 5px 6px #ccc; box-shadow:         3px 3px 5px 6px #ccc;}
 .login a { float: right; font-size: 0.6em; }
 .login input[type="text"],.login input[type="password"],.login input[type="text"]:focus { font-size: 1.2em; border: 3px solid #E5E5E5; text-transform: none; padding: 2px; margin: 0px; width: 200px;}
 .xlogin_input { border: 1px solid #555; font-size: 18px; height: 30px; margin: 0 0 20px; padding: 3px 0 0 5px; width: 300px; }
@@ -221,13 +221,15 @@ a:hover { text-decoration: underline; }
 #orderdisplay .qtybox { width: 30px;}
 
 /***** Order/SRO/Quote Display *****/
-#wishlistdisplay .rowborder { border-bottom: 1px dotted #aaaaaa; }
+#wishlistdisplay .rowborder { border-bottom: 1px dotted #aaaaaa;}
 #wishlistdisplay .label { text-transform: uppercase; font-size: 0.9em; font-weight: 600; }
 #wishlistdisplay .qtybox { width: 30px; font-size: 1.1em; margin-bottom: 7px; background-color: white; border: 3px; border-bottom: 1px solid black; text-align: center; padding: 2px; height: 15px;}
 #wishlistdisplay .light { font-weight: 300; }
 #wishlistdisplay .heading { font-size: 1.3em; }
 #wishlistdisplay .thin { margin-bottom: 4px; }
-#wishlistdisplay .minicart_image {float:left;  height: 36px; width: 36px; margin:auto; padding-right: 6px;}
+#wishlistdisplay .list_itemx {   line-height: 1em;}
+#wishlistdisplay .list_image {float:left;  height: 36px; width: 36px; margin:auto; padding-top: 5px; padding-bottom: 5px; padding-right: 6px;}
+#wishlistdisplay .list_item img {max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; }
 
 /***** Footy *****/
 #footer { clear: both;}

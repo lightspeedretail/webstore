@@ -28,8 +28,8 @@
 ?>
 
 <div class="row rowborder">
-	<div class="two columns alpha">
-		<span class="minicart_image">
+	<div class="two columns alpha list_item">
+		<span class="list_image">
 			<a href="<?= $_ITEM->Prod->Link; ?>">
 				<img src="<?= $_ITEM->Prod->MiniImage ?>"
 				     height="<?php echo _xls_get_conf('MINI_IMAGE_HEIGHT'); ?>px"
