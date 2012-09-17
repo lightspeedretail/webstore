@@ -31,7 +31,7 @@ a:hover { text-decoration: underline; }
 
 
 /***** Heady *****/
-#headerimage { padding-bottom: 30px;}
+#headerimage { padding-bottom: 30px; overflow: hidden;}
 #viewport { clear: both; }
 
 
@@ -258,10 +258,13 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
     h1, h2, h3 { font-size: 16px; }
     #searchentry .search_box input { width: 100px; }
     .innertab, .innertab a { font-size: 0.9em; }
+    #headerimage img { width: 50em; }
+    .checkoutarrow { display: none; }
 }
 @media only screen and (max-width: 767px) {
     select, input[type="text"], input[type="password"], input[type="email"] { max-width: 200px; }
-    #searchentry .search_box input { width: 75px;
+    #searchentry .search_box input { width: 75px; }
+    #headerimage img { width: 30em; }
 }
 
 
