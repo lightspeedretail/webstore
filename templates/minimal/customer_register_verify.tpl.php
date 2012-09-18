@@ -27,28 +27,19 @@
 
 ?>
 
+
 <fieldset>
 	<legend><?php $this->isLoggedIn() ? _xt('Update Profile') : _xt('Complete Registration') ?></legend>
 
-	<?    if (_xls_show_captcha('register')) { ?>
-	<div>
-		<dl>
-			<dt><label for="Name"><?php $this->lblVerifyImage->Render(); ?></label></dt>
-		</dl>
-	</div>
-
-	<div>
-		<dl>
-			<dd><?php $this->txtCRVerify->RenderWithError(); ?></dd>
-		</dl>
+	<?	if (_xls_show_captcha('register')) { ?>
+	<div class="row">
+		<?php $this->lblVerifyImage->Render(); ?>
+		<?php $this->txtCRVerify->RenderWithError(); ?>
 	</div>
 	<? } ?>
 
-
-	<div>
-		<dl>
-			<dd><?php $this->btnSubmit->Render() ?></dd>
-		</dl>
+	<div class="four columns alpha">
+		<?php $this->btnSubmit->Render() ?>
 	</div>
 
 

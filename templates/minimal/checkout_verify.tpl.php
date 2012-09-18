@@ -49,7 +49,7 @@
 	</div>
 
 	<div class="four columns alpha">
-		<?php $this->btnSubmit->Render('CssClass=button rounded') ?>
+		<?php $this->btnSubmit->Render() ?>
 	</div>
 
 
