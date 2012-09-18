@@ -155,7 +155,7 @@ a:hover { text-decoration: underline; }
 
 /***************** Slider ***********************/
 .products_slider { overflow: hidden; position: relative; border: 1px dotted #262626; margin-top: 30px;}
-.products_slider .label { text-transform: uppercase; font-size: 1.1em; font-weight: 700; margin-left: 25px;}
+.products_slider .label { text-transform: uppercase; font-size: 1.1em; font-weight: 600; }
 .products_slider li, .products_slider p { font-size: .8em; margin: 0; padding: 0; }
 p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; color: #000; }
 .products_slider li p { font-size: 1em; }
