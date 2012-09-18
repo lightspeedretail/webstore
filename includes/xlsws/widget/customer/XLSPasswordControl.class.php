@@ -64,7 +64,16 @@ class XLSPasswordControl extends XLSCompositeControl {
     }
 
     protected function UpdateNewsletterSubscribeControl() {
-    $objControl->Text='';
+        $objControl->Text='';
+
+	    if (is_null($objCustomer))
+		    $objCustomer = Customer::GetCurrent();
+
+	    if ($objCustomer) {
+		    $objNews = $this->GetChildByName('NewsletterSubscribe');
+		    $objNews->Checked = $objCustomer->NewsletterSubscribe;
+        }
+
     }
 
     protected function BindNewsletterSubscribeControl() {
