@@ -112,7 +112,8 @@ class XLSStateControl extends XLSListControl {
 			//so pass the validation
 			if (is_null($this->SelectedValue) && count($this->objItemsArray)==1)
 				return true;
-
+			if (!is_null($this->SelectedValue))
+				return true;
 		}
 
 		$this->ValidationError = _sp("State is Required");
