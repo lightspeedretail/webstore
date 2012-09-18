@@ -3,7 +3,7 @@
 class XLSStateControl extends XLSListControl {
     protected $blnFilterDestinations = false;
     protected $strLabelForSelect = '--';
-    protected $strLabelForNone = '--';
+    protected $strLabelForNone = 'n/a';
 
     protected $strCountryControlId = null;
 
@@ -96,11 +96,30 @@ class XLSStateControl extends XLSListControl {
                 	$this->AddItem($objState->Code, $objState->Code);
                 else $this->AddItem($objState->State, $objState->Code);
         }
-        else { 
-            $this->AddItem(_sp($this->strLabelForNone), null);
+        else {
+            $this->AddItem(_sp("n/a"), null);
         }
     }
 
+	public function Validate() {
+
+		$objCountry = $this->GetCountryControl();
+
+		if (!is_null($objCountry->SelectedValue)) {
+			//Country is selected, verify state was picked off the list
+
+			//If we only have one option on the state list, we've picked a country that doesn't use states
+			//so pass the validation
+			if (is_null($this->SelectedValue) && count($this->objItemsArray)==1)
+				return true;
+
+		}
+
+		$this->ValidationError = _sp("State is Required");
+		return false;
+
+
+	}
     public function __get($strName) {
         switch ($strName) {
             case 'FilterDestinations':
