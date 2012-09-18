@@ -27,7 +27,7 @@
 ?>
 <div id="sharingtools">
 	<a href="http://pinterest.com/pin/create/button/?url=<? echo $this->prod->CanonicalUrl; ?>&media=<? echo
-	_xls_site_dir($this->prod->SmallImage,true); ?>&description=<? echo urlencode($this->prod->Name); ?>"
+	_xls_site_url($this->prod->SmallImage,true); ?>&description=<? echo urlencode($this->prod->Name); ?>"
 	   class="pin-it-button" count-layout="none"><img border="0" src="//assets.pinterest.com/images/PinExt.png"
 	                                                  title="Pin It"/></a>
 
