@@ -505,7 +505,7 @@ class xlsws_cregister extends xlsws_index {
 	
 			//We are changing password
 			if (strlen($this->txtCRPass->Text)>0)
-				if ($this->txtCRPass->Text != $this->txtCRPassConf->Text)
+				if ($this->txtCRPass->Text != $this->txtCRConfPass->Text)
 					$errors[] .= _sp("Passwords do not match.");
 		}
 		
