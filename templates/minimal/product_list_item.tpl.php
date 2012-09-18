@@ -26,17 +26,14 @@
  */
 
 	//Determine if we need to use an extra CSS keyword for our skeleton formatting
-	//This is set for default 4 across, but resizing the screen will collapse down to single column automatically
+	//This is set for default 3 across, but resizing the screen will collapse down to single column automatically
 	$intDefaultWide = 3;
 	if (($intDefaultWide + $_CONTROL->CurrentItemIndex) % $intDefaultWide == 0 || $_CONTROL->CurrentItemIndex == 0) {
 		$rowcode = '<div class="row">';
 		$xtra = " alpha";
 	} //Beginning of full row
-	if ((1 + $_CONTROL->CurrentItemIndex) % $intDefaultWide == 0
-		|| $_CONTROL->CurrentItemIndex == count($_CONTROL->DataSource) - 1
-	) {
+	if ((1 + $_CONTROL->CurrentItemIndex) % $intDefaultWide == 0 || $_CONTROL->CurrentItemIndex == count($_CONTROL->DataSource) - 1) {
 		$rowcode2 = '</div>';
-		//$xtra = " omega";
 	} //end of full row
 
 	?>
