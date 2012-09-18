@@ -152,7 +152,13 @@ class xlsws_cregister extends xlsws_index {
     }
 
     protected function UpdatePasswordControl() {
-    	
+
+	    if($this->isLoggedIn()) {
+		    $objCustomer = Customer::LoadByRowId($this->customer->Rowid);
+		    $this->PasswordControl->NewsletterSubscribe->Checked= $objCustomer->NewsletterSubscribe;
+	    }
+
+
         return $this->PasswordControl;
     }
 
