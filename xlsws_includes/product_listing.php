@@ -57,7 +57,7 @@ class xlsws_product_listing extends xlsws_index {
     /**
      * Create the view's DataRepeater control
      */
-    protected function CreateDataRepeater() { error_log(__class__.' '.__function__);
+    protected function CreateDataRepeater() {
 
         $this->dtrProducts = $objRepeater = new QDataRepeater($this->mainPnl,'ProductCell');
         $this->CreatePaginator();
@@ -79,7 +79,7 @@ class xlsws_product_listing extends xlsws_index {
     /**
      * Create the paginator(s) for the DataRepeater
      */
-    protected function CreatePaginator($blnAlternate = false) { error_log(_xls_whereCalled());
+    protected function CreatePaginator($blnAlternate = false) {
         $objRepeater = $this->dtrProducts;
         $strProperty = 'Paginator';
         $strName = 'pagination';
@@ -222,7 +222,7 @@ class xlsws_product_listing extends xlsws_index {
 	 * @param none
 	 * @return none
 	 */
-    protected function dtrProducts_Bind() { error_log("binding "._xls_whereCalled());
+    protected function dtrProducts_Bind() {
         $objCondition = $this->GetCondition();
         $objClause = $this->GetClause();
 

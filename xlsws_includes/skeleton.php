@@ -847,14 +847,14 @@ EOS;
 	}
 
 	// Update widgets to display Shipping cost data
-	protected function update_shippingcost_display($objCart) { error_log(__class__.' '.__function__);
+	protected function update_shippingcost_display($objCart) {
 		if (!isset($this->misc_components['order_shipping_cost']))
 			return false;
 			$this->misc_components['order_shipping_cost']->Text =
 				_xls_currency($objCart->ShippingSell);
 		if ($this->misc_components['order_shipping_cost'] instanceof QControl) {
 			$this->misc_components['order_shipping_cost']->Refresh();
-		error_log("refresh control set to ".$this->misc_components['order_shipping_cost']->Text); }
+		}
 	}
 
 	/**
@@ -867,7 +867,7 @@ EOS;
 	 * @param boolean - ignore the generic cart page when refreshing
 	 * @return none
 	 */
-	protected function update_order_display($objCart, $ignore_generic = false) { error_log(__class__.' '.__function__);
+	protected function update_order_display($objCart, $ignore_generic = false) {
 		if (!isset($this->dtrGenericCart) && !$ignore_generic)
 			$this->order_display($objCart);
 

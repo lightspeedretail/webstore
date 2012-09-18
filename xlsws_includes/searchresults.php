@@ -328,7 +328,7 @@ class xlsws_searchresult extends xlsws_product_listing {
      */
     protected function dtrProducts_Bind() {
         parent::dtrProducts_Bind();
-		error_log("the quty returned is ".$this->dtrProducts->TotalItemCount);
+
         if ($this->dtrProducts->TotalItemCount == 0) {
            // _xls_display_msg(_sp('Sorry no product was found'));
             //$this->msg = "Sorry no product was found";
