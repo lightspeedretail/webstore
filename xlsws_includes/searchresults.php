@@ -46,7 +46,7 @@ class xlsws_searchresult extends xlsws_product_listing {
 
         $objCategory = false;
 
-        if (!isset($XLSWS_VARS['filter']) || $XLSWS_VARS['filter'] != 1)
+        if (!isset($XLSWS_VARS['filter']) || $XLSWS_VARS['filter'] == 0)
             return false;
 
         if (isset($XLSWS_VARS['c'])) {
@@ -61,6 +61,10 @@ class xlsws_searchresult extends xlsws_product_listing {
             $strCategory = array_pop($arrCategories);
             $objCategory = Category::$Manager->GetByKey($strCategory);
         }
+
+	    if (isset($XLSWS_VARS['filter'])) {
+		    $objCategory = Category::Load($XLSWS_VARS['filter']);
+	    }
 
         if (!$objCategory)
             return false;

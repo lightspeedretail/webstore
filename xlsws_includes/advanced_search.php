@@ -72,8 +72,9 @@ class xlsws_advanced_search extends xlsws_index {
 
 		$this->lstFilters = new XLSListBox($this->mainPnl);
 		$this->lstFilters->Name = _sp('Search Filters');
-		$this->lstFilters->AddItem("Current Category", "1");
-		$this->lstFilters->AddItem("Entire Store", "2");
+		$this->lstFilters->AddItem("Entire Store", 0);
+		foreach($this->menu_categories as $category)
+			$this->lstFilters->AddItem($category->Name, $category->Rowid);
 
 		$this->btnSearch = new QButton($this->mainPnl);
 		$this->btnSearch->Text = _sp('Search');
@@ -98,15 +99,12 @@ class xlsws_advanced_search extends xlsws_index {
 	 * @return none
 	 */
 	protected function butSubmit_click($strFormId, $strControlId, $strParameter){
-		$cat_arr = explode(".",$_GET['c']);
-		$cat = array_pop($cat_arr);
-		_rd(_xls_site_url(
-			"searchresults/".XLSURL::KEY_PAGE."?advsearch=true&q=" . urlencode($this->txtSearch->Text) .
+		$strUrl = "searchresults/".XLSURL::KEY_PAGE."?advsearch=true&q=" . urlencode($this->txtSearch->Text) .
 			"&startprice=" . $this->txtStartPrice->Text .
 			"&endprice=" . $this->txtEndPrice->Text .
-			"&filter=" . $this->lstFilters->SelectedValue .
-			"&c=".$cat
-		));
+			"&filter=" . $this->lstFilters->SelectedValue;
+		_rd(_xls_site_url($strUrl));
+
 	}
 }
 
