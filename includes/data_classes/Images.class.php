@@ -102,7 +102,7 @@ class Images extends ImagesGen {
 	}
 
 	public static function GetImageLink($intRowid,
-		$intType = ImagesTypes::normal) {
+		$intType = ImagesType::normal) {
 
 		$objImage = Images::LoadByRowidSize($intRowid, $intType);
 		if ($objImage && $objImage->ImageFileExists())

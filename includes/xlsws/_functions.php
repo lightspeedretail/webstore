@@ -787,10 +787,13 @@ function _xls_url_object() {
 * @param boolean ssl_attempt
 * @return string url
 */
-function _xls_site_dir($ssl_attempt = false) {
+function _xls_site_dir($ssl_attempt = false, $blnOnlyHost = false) {
 	$strSsl = 'http://';
-	$strHost = $_SERVER['HTTP_HOST'] . dirname(QApplication::$ScriptName);
-	
+	if ($blnOnlyHost)
+		$strHost = $_SERVER['HTTP_HOST'];
+	else
+		$strHost = $_SERVER['HTTP_HOST'] . dirname(QApplication::$ScriptName);
+
     if ($ssl_attempt ||
     	  (isset($_SERVER['HTTPS']) &&
         		($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == '1')))
@@ -807,9 +810,10 @@ function _xls_site_dir($ssl_attempt = false) {
 * Returns fully qualified URL, based on sitedir. Used to generate a link.
 *
 * @param string $strUrlPath optional
+* @param boolean $strUrlPath optional
 * @return string url
 */
-function _xls_site_url($strUrlPath =  '') {
+function _xls_site_url($strUrlPath =  '', $blnOnlyHost = false) {
 	if (substr($strUrlPath,0,4)=="http") return $strUrlPath; //we've passed through twice, don't double up
 	if (substr($strUrlPath,0,1)=="/") $strUrlPath = substr($strUrlPath,1,999); //remove a leading / so we don't // by accident
 	
@@ -824,7 +828,10 @@ function _xls_site_url($strUrlPath =  '') {
 					) $usessl = true;
 	}
 
-	return _xls_site_dir($usessl) . '/' . $strUrlPath;
+
+	return _xls_site_dir($usessl,$blnOnlyHost) . '/' . $strUrlPath;
+
+
 }
 
 //Makes our SEO hyphenated string from passed string

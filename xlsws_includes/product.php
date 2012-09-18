@@ -137,7 +137,7 @@ class xlsws_product extends xlsws_index {
 		_xls_stack_put('xls_canonical_url',$this->prod->CanonicalUrl);
 		_xls_add_meta_desc($this->prod->PageDescription);
 		_xls_add_page_title($this->prod->PageTitle);
-		_xls_stack_put('xls_meta_image',_xls_site_url($this->prod->SmallImage));
+		_xls_stack_put('xls_meta_image',_xls_site_url($this->prod->SmallImage,true));
 		_xls_remember_url($objUrl->Url);
 		
 		$this->crumbs[] = array(
