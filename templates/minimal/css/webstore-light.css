@@ -161,7 +161,7 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
 .products_slider li p { font-size: 1em; }
 .products_slider .javascript_css { padding: 10px; position: relative; }
 .products_slider .back a, .products_slider .next a { display: none; outline: none; }
-.products_slider ul { left: 0; list-style-type: none; margin: 20px 10px 0; padding: 0; position: relative; width: auto; }
+.products_slider ul { left: 0; list-style-type: none; margin: 20px 0px 0; padding: 0; position: relative; width: auto; }
 .products_slider li { display: inline; float: left; }
 .products_slider_theme { height: 190px; }
 .products_slider_theme .back { height: 16px;  }
