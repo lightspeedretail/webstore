@@ -39,7 +39,7 @@ class xlsws_msg extends xlsws_index {
 		global $XLSWS_VARS;
 
 		$this->msg = _xls_stack_pop('msg');
-		$this->msg->HtmlEntities= false;
+
 		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('msg.tpl.php');
 	}
