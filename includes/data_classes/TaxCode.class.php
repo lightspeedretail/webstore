@@ -69,4 +69,29 @@ class TaxCode extends TaxCodeGen {
 
 		return false;
 	}
+
+	public static function VerifyAnyDestination() {
+
+		$blnAnyExists = false;
+		$objAnyDest = Destination::LoadByCountry('*');
+		if ($objAnyDest) {
+			foreach($objAnyDest as $objAny)
+				if ($objAny->State=='*') $blnAnyExists=true;
+
+		}
+		if ($blnAnyExists ==false) {
+			$objTax = TaxCode::GetNoTaxCode();
+			if ($objTax) {
+				$objNewAny = new Destination;
+				$objNewAny->Country='*';
+				$objNewAny->State='*';
+				$objNewAny->Zipcode1='';
+				$objNewAny->Zipcode2='';
+				$objNewAny->Taxcode=$objTax->Rowid;
+				$objNewAny->Name = "Any";
+				$objNewAny->Save();
+			}
+		}
+
+	}
 }

@@ -2621,6 +2621,7 @@ EOS;
         
         /**
          * Update all webstore orders before a timestamp ***DEPRECIATED - DO NOT USE, USED ONLY AS A WRAPPER FOR LIGHTSPEED DOWNLOAD REQUESTS, DO NOT DELETE****
+         * We also piggyback on this statement for pseudo-cron jobs since we know it's triggered at least once an hour
          *
          * @param string $passkey
          * @param int $intDttSubmitted
@@ -2628,7 +2629,9 @@ EOS;
          * @return string
          */
         public function update_order_downloaded_status_by_ts($passkey , $intDttSubmitted , $intDownloaded){
-        
+
+			//Make sure we have our Any/Any default tax set in Destinations
+			TaxCode::VerifyAnyDestination();
         	
         	
             return self::OK;
