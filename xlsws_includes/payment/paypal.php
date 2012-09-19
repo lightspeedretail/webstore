@@ -80,6 +80,13 @@ class paypal extends xlsws_class_payment {
 		$ret['login']->Required = true;
 		$ret['login']->Name = _sp('Business Email');
 
+		$ret['address'] = new QListBox($objParent);
+		$ret['address']->Name = _sp('Prompt for shipping address again on PayPal');
+		$ret['address']->AddItem('off' , 1);
+		$ret['address']->AddItem('on' , 0);
+		$ret['address']->ToolTip = "Turns on shipping address on PayPal checkout. Turn on if you wish to receive PayPal's Confirmed Address from the user account. May be confusing to user to be prompted for shipping info twice.";
+
+
 		$ret['live'] = new QListBox($objParent);
 		$ret['live']->Name = _sp('Live/Sandbox');
 		$ret['live']->AddItem('live' , 'live');
@@ -167,7 +174,7 @@ class paypal extends xlsws_class_payment {
 		$str .= _xls_make_hidden('cartId',  $cart->IdStr);
 		$str .= _xls_make_hidden('phone1',   $customer->Mainphone);
 		$str .= _xls_make_hidden('rm',   '2');
-		$str .= _xls_make_hidden('no_shipping',   '1');
+		$str .= _xls_make_hidden('no_shipping',   $config['address']);
 		$str .= _xls_make_hidden('no_note',   '1');
 
 		$str .= _xls_make_hidden('notify_url',   _xls_site_dir() . "/" . "xls_payment_capture.php");
