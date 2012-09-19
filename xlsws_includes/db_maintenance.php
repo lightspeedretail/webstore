@@ -357,7 +357,7 @@ class xlsws_db_maintenance {
 				'CAPTCHA_CONTACTUS', '1', '', 18, 7, NOW(), NOW(), 'CAPTCHA_CONTACTUS',0);");
 			$this->add_config_key('CAPTCHA_REGISTRATION' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Captcha on Registration', 
-				'CAPTCHA_REGISTRATION', '1', '', 18, 8, NOW(), NOW(), 'CAPTCHA_REGISTRATION',,0);");
+				'CAPTCHA_REGISTRATION', '1', '', 18, 8, NOW(), NOW(), 'CAPTCHA_REGISTRATION',0);");
 			$this->add_config_key('CAPTCHA_THEME' ,
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'ReCaptcha Theme',
 				'CAPTCHA_THEME', 'white', '', 18, 4, NOW(), NOW(), 'CAPTCHA_THEME',1);");
@@ -576,6 +576,7 @@ class xlsws_db_maintenance {
 				'ENABLE_CATEGORY_IMAGE', '0', 'Requires a defined Category image under SEO settings', 17, 13, NOW(), NOW(), 'BOOL',1);");
 			_dbx("update `xlsws_configuration` set template_specific=1 where `key` like '%_IMAGE_WIDTH'");
 			_dbx("update `xlsws_configuration` set template_specific=1 where `key` like '%_IMAGE_HEIGHT'");
+			_dbx("update `xlsws_configuration` set template_specific=1 where `key` = 'DEFAULT_TEMPLATE_THEME'");
 
 			//Because of a change to the width display in Admin panel, make sure the option type is set so numbers aren't huge fields
 			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='QUOTE_EXPIRY'");		
