@@ -3072,14 +3072,14 @@ EOT;
 				$replText = str_replace("/install.php", "", $replText);
 				$strFileContents = file_get_contents('htaccess');
 				if ($strFileContents) {
-					$fp = @fopen('htaccess', 'w');
+					$fp = @fopen('.htaccess', 'w');
 				}
 				if ($fp) {
 					$str = str_replace($origText, $replText, $strFileContents);
 					fwrite($fp, $str, strlen($str));
 					fclose($fp);
 				} else {
-					$strReturn .= "<h3>Could not update RewriteBase in htaccess. Please manually modify this file if you have Web store in a subfolder</h3>";
+					$strReturn .= "<h3>Important: Rename the file htaccess to .htaccess (adding a period in front of the filename) in your Webstore root folder. (We attempted to do this for you but a previous .htaccess already existed.) Please manually modify the RewriteBase line inside if you have Web store in a subfolder</h3>";
 				}
 
 
@@ -3095,9 +3095,6 @@ EOT;
 						$strReturn .= "<BR/><b>Don't forget to change permissions on the file includes/configuration.inc.php to 644 or world readable only! Other folders should remain writable to allow updates.</b><BR/><BR/>";
 
 					$strReturn .= "Done!<BR/><BR/>";
-
-					if (!copy("htaccess",".htaccess"))
-						$strReturn .= "<h1>Important: Rename the file htaccess to .htaccess (adding a period in front of the filename) in your Webstore root folder. (We attempted to do this for you but a previous .htaccess already existed.)</h1>";
 
 					$strUrl = $_SERVER['SCRIPT_NAME'];
 					$strUrl = str_replace("install.php","",$strUrl);
