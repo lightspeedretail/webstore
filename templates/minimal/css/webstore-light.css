@@ -115,7 +115,7 @@ a:hover { text-decoration: underline; }
 #shoppingcarttop .minicart_price { float:left; font-size: 1.1em; text-align: right; font-weight: 500;}
 #shoppingcarttop .minicart_qty { clear: left; font-size: 0.9em; font-weight: 400;}
 #shoppingcarttop .minicart_item a { margin-top: 5px;}
-#shoppingcarttop .emptymessage { height: 113px; width: 128px; margin: 50px auto 0 auto; padding: 45px 20px 0 12px; text-align: center; color: #000; }
+#shoppingcarttop .emptymessage { height: 113px; margin: 50px auto 0 auto; padding: 45px 20px 0 12px; text-align: center; color: #000; }
 #shoppingcartbottom { border-top: 1px dotted #bbbbbb;  height: 30px; line-height: 1em; clear: both; padding-top: 20px; padding-bottom: 20px;}
 #shoppingcartbottom .cart_label  { padding-bottom: 2px; float:left; font-size: 0.95em; text-align: right; font-weight: 500;}
 #shoppingcartbottom .cart_price { padding-bottom: 2px;float:left; width: 80px; font-size: 1.1em; text-align: right; font-weight: 500;}
