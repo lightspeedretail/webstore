@@ -832,7 +832,7 @@ EOS;
 	}
 
 	// Create widgets to display Shipping cost data
-	protected function build_shippingcost_display($objCart, $objPanel) { error_log("shipping sell is ".$objCart->ShippingSell);
+	protected function build_shippingcost_display($objCart, $objPanel) {
 		if (!is_null($objCart->ShippingSell)) {
 			$this->misc_components['order_shipping_cost'] =
 				new QLabel($objPanel);
