@@ -49,6 +49,6 @@
 <?php
 if(isset($this->AlertRibbon))
 	if (strlen($this->AlertRibbon)>0)
-		echo '<div style="margin: 10px 70px 5px 70px; padding: 4px; background:  url('.adminTemplate('css/images/header.png').'); height: 28px;"><img style="padding-right: 5px;width:18px; height:17px;" align="left" src="'.adminTemplate('css/images/btn_info.png').'">'.$this->AlertRibbon.'</div>';
+		echo '<div style="margin: 10px 70px 5px 70px; padding: 4px; background:  url('.adminTemplate('css/images/header.png').'); height: 28px;"><img style="padding-right: 5px;width:18px; height:17px;" align="left" src="'.adminTemplate('css/images/btn_info.png').'"><span style="color: white; text-shadow: 0px; ">'.$this->AlertRibbon.'</span></div>';
 
 include_once(adminTemplate('pages.tpl.php'));

@@ -313,7 +313,7 @@ class xlsws_admin extends QForm{
 
 
 		if (!file_exists(__DOCROOT__ .  __SUBDIRECTORY__ . '/.htaccess'))
-			$this->AlertRibbon = "<b>WARNING: Missing .htaccess file.</b> There is a file named htaccess (without the period) in your webstore root folder. Rename this file with a period (as .htaccess) to enable store URLs to work properly. Please see documentation for additional help.";
+			$this->AlertRibbon = "<b>WARNING: Missing .htaccess file.</b> There is a file named htaccess (without the period) in your webstore root folder. Rename this file with a period (as .htaccess) to enable store URLs to work properly. (All links will currently generate 404 Not Found errors). Please see documentation for additional help.";
 
 
 	}
