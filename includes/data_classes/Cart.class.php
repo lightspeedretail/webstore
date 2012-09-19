@@ -463,8 +463,8 @@ class Cart extends CartGen {
 		$intNoTax = 999;
 		if ($objNoTax) $intNoTax = $objNoTax->Rowid;
 
-		// Dont want taxes, so return
-		if ($this->FkTaxCodeId == $intNoTax)
+		// Don't want taxes, so return
+		if ($this->FkTaxCodeId == $intNoTax || $this->FkTaxCodeId==-1)
 			return;
 
 		foreach($this->GetCartItemArray() as $objItem) {
