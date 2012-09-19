@@ -28,6 +28,6 @@
 ?>
 
 <div class="twelve columns msg">
-	<?php _xt($this->msg); ?>.
+	<?php echo $this->msg; ?>
 </div>
 

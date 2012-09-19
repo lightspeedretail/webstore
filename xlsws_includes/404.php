@@ -26,7 +26,7 @@
 
 /**
  * xlsws_404 class
- * We use this as a display page for 404 error messaages for things like unfound products or categories
+ * We use this as a display page for 404 error messages for things like not-found products or categories
  * Should only be returned with 404 error code
  */
 class xlsws_404 extends xlsws_index {
@@ -37,7 +37,7 @@ class xlsws_404 extends xlsws_index {
 	 * @return none
 	 */
 	protected function build_main() {
-		$this->msg->HtmlEntities= false;
+
 		$this->msg = "<p>404 Document Not Found</p>The page you are looking for is not valid. Please try going to the <a href='"._xls_site_url()."'> home page</a>.";
 
 		$this->mainPnl = new QPanel($this,'MainPanel');
