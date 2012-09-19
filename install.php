@@ -1104,12 +1104,11 @@ EOT;
 					$phpinfo['Core']['magic_quotes_gpc'] == "Off" ? "pass" : "fail");
 					$checked['allow_call_time_pass_reference in Php.ini must be turned On'] = (
 					$phpinfo['Core']['allow_call_time_pass_reference'] == "On" ? "pass" : "fail");
+					$checked['short_open_tag in Php.ini must be turned On'] = ($phpinfo['Core']['short_open_tag'] == "On" ? "pass" : "fail");
 				}
 
-				$checked['register_globals in Php.ini must be turned Off'] = (
-				$phpinfo['Core']['register_globals'] == "Off" ? "pass" : "fail");
-				$checked['short_open_tag in Php.ini must be turned On'] = (
-				$phpinfo['Core']['short_open_tag'] == "On" ? "pass" : "fail");
+				$checked['register_globals in Php.ini must be turned Off'] = ($phpinfo['Core']['register_globals'] == "Off" ? "pass" : "fail");
+
 
 
 				//Check folder permissions
@@ -1134,23 +1133,27 @@ EOT;
 			protected function xls_check_upgrades()
 			{
 				$checked = array();
+				$strFolder =str_replace("/install.php","",$_SERVER['SCRIPT_NAME']);
+				$strConfig = file_get_contents("includes/configuration.inc.php");
+				$intSub = strpos($strConfig, '__SUBDIRECTORY__');
+				$intBegin = strpos($strConfig, '\'',$intSub+18);
+				$intEnd = strpos($strConfig, '\'',$intBegin+1);
+				$subF = substr($strConfig,$intBegin+1,$intEnd-$intBegin-1);
+
+				if ($strFolder != $subF) {
+					$checked['SUBDIRECTORY in configuration.inc.php shows "'.$subF. '" but system detects "'.$strFolder."'"] = "fail";
+				}
+
 				$checked['<b>--Upgrade Check RESULTS BELOW--</b>'] = "pass";
 
 				//Have we run the Upgrade Database to add new fields to the database?				
-				$result = _dbx_first_cell("select `key` from xlsws_configuration where `key`='GOOGLE_VERIFY'");
+				$result = _dbx_first_cell("select `key` from xlsws_configuration where `key`='DEFAULT_TEMPLATE_THEME'");
 				$checked['Upgrade Database command has been run from Admin Panel'] = (
-				$result == "GOOGLE_VERIFY" ? "pass" : "fail");
-				//Have new 2.2 templates been added
-				$template = _dbx_first_cell("select `value` from xlsws_configuration where `key`='DEFAULT_TEMPLATE'");
-				$checked['2.2 Templates added'] = file_exists("templates/" . $template . "/sharing.tpl.php") ? "pass"
-					: "fail";
+				$result == "DEFAULT_TEMPLATE_THEME" ? "pass" : "fail");
+				//Have new 2.5 templates been added
 
-				//Has CSS been updated
-				$filename = "templates/" . $template . "/css/webstore.css";
-				$handle = fopen($filename, "r");
-				$contents = fread($handle, filesize($filename));
-				fclose($handle);
-				$checked['2.2 CSS changes made'] = preg_match('/sharingtools/', $contents) ? "pass" : "fail";
+				$checked['2.5 Templates added'] = file_exists("templates/minimal/index.tpl.php") ? "pass"
+					: "fail";
 
 				$checked['<b>Note: Specific template code changes are not checked.</b>'] = "pass";
 
