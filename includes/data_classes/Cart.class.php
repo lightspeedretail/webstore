@@ -326,7 +326,7 @@ class Cart extends CartGen {
 		$blnResult=false;
 		foreach ($this->GetCartItemArray() as $objItem) {
 		
-			if (!$objItem->Product) {
+			if (!$objItem->Product || $objItem->Product->Web==0) {
 				CartMessages::CreateMessage($this->Rowid,_sp('The product') .
 					' "'.$objItem->Description . '" ' . _sp('is no longer available on this site and has been removed from your cart'));
 				$objItem->Delete();
