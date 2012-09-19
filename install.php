@@ -1541,7 +1541,7 @@ EOT;
 					$sql[]
 						= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Enable Families?', 'ENABLE_FAMILIES', '', '', 8, 5, NOW(), NOW(), 'BOOL');";
 					$sql[]
-						= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Products Per Page', 'PRODUCTS_PER_PAGE', '8', 'Number of products per page to display in product listing or search', 8, 3, NOW(), NOW(), NULL);";
+						= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Products Per Page', 'PRODUCTS_PER_PAGE', '9', 'Number of products per page to display in product listing or search', 8, 3, NOW(), NOW(), NULL);";
 					$sql[]
 						= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Products Sorting', 'PRODUCT_SORT_FIELD', 'Code', 'By which field products will sorted in result', 8, 4, NOW(), NOW(), 'PRODUCT_SORT');";
 					$sql[]
