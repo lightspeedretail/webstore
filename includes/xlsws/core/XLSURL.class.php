@@ -63,7 +63,7 @@ class XLSURL {
 			$this->strUri = $_SERVER['ORIG_PATH_INFO'];
 		else
 			$this->strUri = $_SERVER['PATH_INFO'];
-
+		$this->strUri = str_replace($_SERVER['SCRIPT_NAME'],"",$this->strUri);
 		$this->strQueryString = $_SERVER['QUERY_STRING'];
 		
 		$this->strUri = preg_replace('/<(style|script).*?<\/\1>/xmsi', '', $this->strUri);
