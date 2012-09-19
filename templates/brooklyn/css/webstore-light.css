@@ -23,7 +23,7 @@ input[type="checkbox"] { width: 20px; height: 20px; }
 .center { text-align: center;}
 .right { text-align: right;}
 select { text-transform: uppercase; }
-a { text-decoration: none; }
+a, a:visited { text-decoration: none; }
 a:hover { text-decoration: underline; }
 .darkbutton, .darkbutton a { background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
 .lightbutton, .lightbutton a {  background-color: #7f7f7f; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
@@ -48,24 +48,24 @@ a:hover { text-decoration: underline; }
 .menuunderline:hover { border-bottom: 5px solid #000000;}
 
 #nav_products { font-weight: 500; height: 47px; text-decoration: none; z-index: 2000; border-bottom: 0px; text-align: left; cursor: pointer;}
-#nav_products .productstab { height: 45px; }
+#nav_products .productstab { height: 45px; margin-top: 2px;}
 #nav_products .dropspace { margin-top: 25px; } /* push dropdown menu down from underneath PRODUCTS tab */
  /* all this to create dropdown and popout menu effects */
-#nav_products a { display: block; margin-right: 3px; padding: 0 0 0 0 ; text-decoration: none;  }
-#nav_products ul { border: none; line-height: 1; list-style: none; list-style-type: none; margin: 0px 0 0px 0px; padding-bottom: 20px;}
-#nav_products ul a { color: white; border-bottom: 1px dotted #cccccc; }
-#nav_products li { float: left; width: 10em; height: 29px;  }
-#nav_products li ul { left: -999em; position: absolute; width: 10em; height: 29px; }
-#nav_products li ul ul { margin: -33px 0 0 180px; }
-#nav_products ul li ul li a { background: #2c2c2c; font-size: 1em; font-weight: 700; padding: 8px 10px; width: 160px; border-bottom: 1px dotted #cccccc; }
-#nav_products ul li ul li a:hover { background: #2c2c2c; border-bottom: 1px dotted #cccccc; }
-#nav_products li:hover ul ul, #nav_products li:hover ul ul ul, #nav_products li.sfhover ul ul, #nav_products li.sfhover ul ul ul { left: -999em; }
-#nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul, #nav_products li li li.sfhover ul, #nav_products li:hover ul, #nav_products li:hover ul, #nav_products li.sfhover ul, #nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul {     left: auto; }
+#nav_products a { display: block; margin-right: 3px; padding: 0 0 0 0 ; text-decoration: none;  z-index: 2000;}
+#nav_products ul { border: none; line-height: 1; list-style: none; list-style-type: none; margin: 0px 0 0px 0px; padding-bottom: 20px;z-index: 2000;}
+#nav_products ul a { color: white; border-bottom: 1px dotted #cccccc; z-index: 2000;}
+#nav_products li { float: left; width: 10em; height: 29px;  z-index: 2000;}
+#nav_products li ul { left: -999em; position: absolute; width: 10em; height: 29px; z-index: 2000;}
+#nav_products li ul ul { margin: -33px 0 0 180px; z-index: 2000;}
+#nav_products ul li ul li a { background: #2c2c2c; font-size: 1em; font-weight: 700; padding: 8px 10px; width: 160px; border-bottom: 1px dotted #cccccc; z-index: 2000;}
+#nav_products ul li ul li a:hover { background: #2c2c2c; border-bottom: 1px dotted #cccccc; z-index: 2000;}
+#nav_products li:hover ul ul, #nav_products li:hover ul ul ul, #nav_products li.sfhover ul ul, #nav_products li.sfhover ul ul ul { left: -999em; z-index: 2000;}
+#nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul, #nav_products li li li.sfhover ul, #nav_products li:hover ul, #nav_products li:hover ul, #nav_products li.sfhover ul, #nav_products li:hover ul, #nav_products li li:hover ul, #nav_products li.sfhover ul, #nav_products li li.sfhover ul {     left: auto; z-index: 2000;}
 
 #nav_products .arrow { margin: 1px 0 0 10px; }
 
 /***** Breadcrumbs ******/
-.breadcrumbs { text-transform: uppercase; color: #bbbbbb;  padding-bottom: 20px;}
+.breadcrumbs { text-transform: uppercase; color: #bbbbbb;  padding-bottom: 20px; clear:both; }
 .breadcrumbs .homebutton { padding-bottom: 0px; margin: auto; height: 29px; width: 25px; float: left; }
 .breadcrumbs img { width: 16px; height: 29px; float: left;  }
 .breadcrumbs a { color: #bbbbbb; }
@@ -161,7 +161,7 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
 .products_slider li p { font-size: 1em; }
 .products_slider .javascript_css { padding: 10px; position: relative; }
 .products_slider .back a, .products_slider .next a { display: none; outline: none; }
-.products_slider ul { left: 0; list-style-type: none; margin: 20px 0px 0; padding: 0; position: relative; width: auto; }
+.products_slider ul { left: 0; list-style-type: none; margin: 20px 9px 0; padding: 0; position: relative; width: auto; }
 .products_slider li { display: inline; float: left; }
 .products_slider_theme { height: 190px; }
 .products_slider_theme .back { height: 16px;  }
@@ -171,7 +171,7 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
 .products_slider_theme li { overflow: hidden; padding: 5px 0px; text-align: center; }
 .products_slider_theme li img { margin: 0 0 0px; }
 .products_slider_theme li p {height: 15px; margin: 0; overflow: hidden; width: 162px; }
-.highzindex { z-index: 888; }
+.highzindex { z-index: 188; }
 .products_slider_theme .leftpadding { padding-left: 60px;}
 
 /***** Product Details Page *****/
@@ -258,8 +258,9 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
     body { font-size: 12px; }
     h1, h2, h3 { font-size: 16px; }
     #searchentry .search_box input { width: 100px; }
-    .innertab, .innertab a { font-size: 0.9em; }
-    #headerimage img { width: 50em; }
+    #menubar, #menubar a { font-size: 0.9em; }
+    #headerimage img { max-width: 530px; }
+    .product_detail_image img { max-width: 200px; }
     .checkoutarrow { display: none; }
     #nav_products .arrow { margin: 1px 0 0 3px; }
 
@@ -268,7 +269,7 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
     select, input[type="text"], input[type="password"], input[type="email"] { max-width: 200px; }
     #searchentry .search_box input { width: 75px; }
     #headerimage img { width: 30em; }
-    .menuheight { height: 30px; }
+    .menuheight { max-width: 330px; }
     #menubar { border-bottom: 0px;}
     .spyglass { display: none; }
     .products_slider_theme .leftpadding { padding-left: 0px; }

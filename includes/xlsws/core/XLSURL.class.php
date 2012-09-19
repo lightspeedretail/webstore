@@ -153,7 +153,7 @@ class XLSURL {
 				$this->strRouteId = str_replace("-","_",$this->arrUrlSegments[0]);
 				$this->strRouteController = "xlspg";
 				$this->intStatus=200;
-				if ($this->strRouteId=="searchresults") $this->strProductSearch=$_GET['q'];
+				if ($this->strRouteId=="searchresults") $this->strProductSearch=preg_replace('/<(style|script).*?<\/\1>/xmsi', '', QApplication::QueryString('q'));
 				break;
 
 			case XLSURL::KEY_SEARCH: //Search Results

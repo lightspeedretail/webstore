@@ -50,8 +50,9 @@ if($this->dtrProducts->Paginator) {
 			<?php  if ($this->subcategories && (count($this->subcategories) > 0)): ?>
 
 				<?php echo _sp("Subcategories"); ?>:
-					<?php  foreach ($this->subcategories as $categ): ?>
-					<a href="<?= $categ['link']; ?>"><?= $categ['name']; ?></a>
+					<?php  $ct=0;
+						foreach ($this->subcategories as $categ): if ($ct++>0) echo "&nbsp;"; ?>
+					<a href="<?= $categ['link']; ?>"><?= trim($categ['name']); ?></a>
 					<?php endforeach; ?>
 
 			<?php endif; ?>
