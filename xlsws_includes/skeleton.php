@@ -142,10 +142,7 @@ class xlsws_index extends QForm {
 		}
 		
 		
-		if (_xls_get_conf('DEBUG_DISABLE_DRAGDROP','0') == '0' && !_xls_is_idevice() )  
-			$this->strEmptyCartMessage = _sp("Drag Selections Here"); 
-		else
-	  		$this->strEmptyCartMessage = _sp("Your cart is empty");
+		$this->strEmptyCartMessage = _sp("Your cart is empty");
 
 
 
@@ -973,12 +970,6 @@ EOS;
 		$pnlImg->HtmlEntities = false;
 
 		if($ajax_add_action ) {
-			if (_xls_get_conf('DEBUG_DISABLE_DRAGDROP','0') == '0' && !_xls_is_idevice()) {
-				$pnlImg->AddControlToMove($pnlImg);
-				$pnlImg->RemoveAllDropZones();
-				$pnlImg->AddDropZone($this->cartPnl);
-				$pnlImg->AddAction(new QMoveEvent() , new QAjaxAction($ajax_add_action));
-			}
 			
 			$pnlImg->AddAction(new QClickEvent() , new QJavaScriptAction("document.location.href='" . $prod->Link . "'"));
 
