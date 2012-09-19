@@ -228,7 +228,7 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
 
 /***** Messages from system *****/
 .msg { text-align:  center; font-size: 1.2em; color: #252525; font-weight: 600; padding-top: 30px; padding-bottom: 20px;}
-
+.flash_message { font-size: 1.1em; font-weight: 600; background-color: #FCF0AD;border: 1px solid #ccaaaa; padding: 5px; margin-top: 5px; margin-bottom: 5px;}
 /***** Order/SRO/Quote Display *****/
 #orderdisplay .label { text-transform: uppercase; font-size: 0.9em; font-weight: 600; }
 #orderdisplay input[type="text"],#genericcart input[type="text"]:focus { font-size: 1.1em; margin-bottom: 7px; background-color: white; border: 3px; border-bottom: 1px solid black; text-align: center; padding: 2px; height: 15px; }
