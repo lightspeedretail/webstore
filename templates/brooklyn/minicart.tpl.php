@@ -90,8 +90,8 @@ $items = $cart->GetCartItemArray();
 
 	 if($this->showCheckout()): ?>
 		 <div id="shoppingcartbottom">
-			 <div class="cart_label two columns"><?php _xt("Subtotal"); ?></div>
-			 <div class="cart_price one column omega"><?= _xls_currency($cart->Subtotal) ?></div>
+			 <div class="cart_label two columns alpha omega"><?php _xt("Subtotal"); ?></div>
+			 <div class="cart_price two columns alpha omega"><?= _xls_currency($cart->Subtotal) ?></div>
 		 </div>
 
 		<div id="shoppingcartcheckout" onclick="window.location='<?php echo _xls_site_url("checkout/pg"); ?>'">

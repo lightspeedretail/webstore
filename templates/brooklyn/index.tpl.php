@@ -139,14 +139,14 @@
 
 			<div class="row>">
 				<div class="addresshours">
-					<div class="eight columns omega label">
+					<div class="seven columns omega label offset-by-one">
 					<?php
 						echo _xls_get_conf('STORE_NAME')."<br>";
 						echo _xls_get_conf('STORE_ADDRESS1')."<br>";
 						echo _xls_get_conf('STORE_ADDRESS2');
 					?>
 					</div>
-					<div class="eight columns alpha right label">
+					<div class="seven columns alpha right label">
 						<?php
 						echo _xls_get_conf('STORE_HOURS')."<br>";
 						echo _xls_get_conf('STORE_PHONE')."<br>";
