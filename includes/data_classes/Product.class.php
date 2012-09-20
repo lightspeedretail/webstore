@@ -1054,6 +1054,9 @@ class Product extends ProductGen {
 			case 'OriginalCode':
 				return $this->strCode;
 
+			case 'OriginalInventory':
+				return $this->fltInventory;
+
 			case 'Price':
 				return $this->GetPriceDisplay();
 

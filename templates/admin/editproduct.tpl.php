@@ -77,15 +77,19 @@ if(isset($this->HelperRibbon))
 	 	<div class="clear_float"></div>
 	
 	
-			<div class="basic_row tableheader ">
-				<div class="colfield w70">ID#</div>
-				<div class="colfield w300">Code</div>
-				<div class="colfield w70">Current</div>
-				<div class="colfield w70">Web</div>
-				<div class="colfield w70">Master?</div>
-				<div class="colfield w70">MasterId</div>
-				<div class="colfield">Last Modified</div>
-				<div class="colfield w70">Delete</div>
+			<div class="basic_row tableheader smallfont">
+				<div class="colfield w70 smallfont">ID#</div>
+				<div class="colfield w100 smallfont">Code</div>
+				<div class="colfield w50 smallfont">Current</div>
+				<div class="colfield w50 smallfont">Web</div>
+				<div class="colfield w50 smallfont">Master?</div>
+				<div class="colfield w50 smallfont">MasterId</div>
+				<div class="colfield w50 smallfont">Inv</div>
+				<div class="colfield w50 smallfont">iTtl</div>
+				<div class="colfield w50 smallfont">iRsrv</div>
+				<div class="colfield w50 smallfont">iAvail</div>
+				<div class="colfield w100 smallfont">Last Modified</div>
+				<div class="colfield w70 smallfont">Delete</div>
 
 				<div class="clear_float"></div>
 			</div> 
@@ -94,15 +98,21 @@ if(isset($this->HelperRibbon))
 
 	<? $x=1; foreach ($this->arrProducts as $arrProduct) { ?>
 		
-			<div class="basic_row rowbg" id="row<? echo $arrProduct['Rowid']->Text; ?>">
-				<div class="colfield w70"><?php $arrProduct['Rowid']->Render(); ?></div>
-				<div class="colfield w300"><?php $arrProduct['OriginalCode']->Render(); ?></div>
-				<div class="colfield w70"><?php $arrProduct['Current']->Render(); ?>&nbsp;</div>
-				<div class="colfield w70"><?php $arrProduct['Web']->Render(); ?></div>
-				<div class="colfield w70"><?php $arrProduct['MasterModel']->Render(); ?>&nbsp;</div>
-				<div class="colfield w70"><?php $arrProduct['FkProductMasterId']->Render(); ?>&nbsp;</div>
-				<div class="colfield"><?php $arrProduct['Modified']->Render(); ?></div>
-				<div class="colfield w70"><?php $arrProduct['Delete']->Render(); ?></div>
+			<div class="basic_row rowbg smallfont" id="row<? echo $arrProduct['Rowid']->Text; ?>">
+				<div class="colfield w70 smallfont"><?php $arrProduct['Rowid']->Render(); ?></div>
+				<div class="colfield w100 smallfont"><?php $arrProduct['OriginalCode']->Render(); ?></div>
+				<div class="colfield w50 smallfont"><?php $arrProduct['Current']->Render(); ?>&nbsp;</div>
+				<div class="colfield w50 smallfont"><?php $arrProduct['Web']->Render(); ?></div>
+				<div class="colfield w50 smallfont"><?php $arrProduct['MasterModel']->Render(); ?>&nbsp;</div>
+				<div class="colfield w50 smallfont"><?php $arrProduct['FkProductMasterId']->Render(); ?>&nbsp;</div>
+
+				<div class="colfield w50 smallfont"><?php $arrProduct['OriginalInventory']->Render(); ?></div>
+				<div class="colfield w50 smallfont"><?php $arrProduct['InventoryTotal']->Render(); ?></div>
+				<div class="colfield w50 smallfont"><?php $arrProduct['InventoryReserved']->Render(); ?></div>
+				<div class="colfield w50 smallfont"><?php $arrProduct['InventoryAvail']->Render(); ?></div>
+
+				<div class="colfield w100 smallfont"><?php $arrProduct['Modified']->Render(); ?></div>
+				<div class="colfield w70 smallfont"><?php $arrProduct['Delete']->Render(); ?></div>
 
 
 				<div class="clear_float"></div>

@@ -903,6 +903,7 @@ padding-top: 3px;
 .w100 { width:100px; }
 .w120 { width:120px; }
 .w70 { width:70px; }
+
 .ml10 { margin-left: 10px }
 .mr10 { margin-right: 10px }
 .w150 { width:150px; }
@@ -913,6 +914,7 @@ padding-top: 3px;
 .googleselect { width: 500px; }
 .center { margin-left: 230px; }
 .leftbump { padding-left: 15px; }
+.smallfont { font-size: 0.7em; }
 
 #editcontainer .colfieldwide
 {

@@ -6271,7 +6271,7 @@ class xlsws_admin_productedit extends xlsws_admin {
 	protected $objProduct;
 	protected $CustomerControl;
 
-	protected $arrFields = array('Rowid','OriginalCode','Name','Current','Web','MasterModel','FkProductMasterId','Modified');
+	protected $arrFields = array('Rowid','OriginalCode','Name','Current','Web','MasterModel','OriginalInventory','InventoryTotal','InventoryAvail','InventoryReserved','FkProductMasterId','Modified');
 
 	protected $ctlProductCode;
 	protected $ctlSearchResult;
