@@ -99,7 +99,7 @@ class XLSPaginator extends QPaginator {
         if ($intPageId != $this->intPageNumber) {
             $strLabel = sprintf('<a page="%s" href="%s" %s>%s</a>',
                 $intPageId, 
-                _xls_site_url() . "?" . $strQueryString . "&page={$intPageId}",
+                _xls_site_url($objUrl->Uri) . "?" . $strQueryString . "&page={$intPageId}",
                 "",
                 $strLabel
             ); //(_xls_get_conf('DEBUG_DISABLE_AJAX',0) ? "" : $this->GetActionAttributes())
