@@ -1152,7 +1152,7 @@ EOT;
 				$result == "DEFAULT_TEMPLATE_THEME" ? "pass" : "fail");
 				//Have new 2.5 templates been added
 
-				$checked['2.5 Templates added'] = file_exists("templates/minimal/index.tpl.php") ? "pass"
+				$checked['2.5 Templates added'] = file_exists("templates/brooklyn/index.tpl.php") ? "pass"
 					: "fail";
 
 				$checked['<b>Note: Specific template code changes are not checked.</b>'] = "pass";
@@ -1608,7 +1608,7 @@ EOT;
 					$sql[]
 						= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Default Country', 'DEFAULT_COUNTRY', 'US', 'Default country for shipping or customer registration', 15, 2, NOW(), NOW(), 'COUNTRY');";
 					$sql[]
-						= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Template', 'DEFAULT_TEMPLATE', 'minimal', 'The default template from templates directory to be used for Web Store', 0, 0, NOW(), NOW(), 'TEMPLATE');";
+						= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Template', 'DEFAULT_TEMPLATE', 'brooklyn', 'The default template from templates directory to be used for Web Store', 0, 0, NOW(), NOW(), 'TEMPLATE');";
 					$sql[]
 						= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Template theme', 'DEFAULT_TEMPLATE_THEME', 'webstore-light', 'If supported, changable colo(u)rs for template files.', 19, 2, NOW(), NOW(), 'DEFAULT_TEMPLATE_THEME');";
 					$sql[]
@@ -3020,7 +3020,7 @@ EOT;
 					$strReturn .= "Creating SQL tables.<br/>";
 
 					//Set new template image sizes
-					$fnOptions = "templates/minimal/options.xml";
+					$fnOptions = "templates/brooklyn/options.xml";
 					if (file_exists($fnOptions)) {
 						$strXml = file_get_contents($fnOptions);
 
