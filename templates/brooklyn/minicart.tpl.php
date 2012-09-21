@@ -33,7 +33,7 @@ $items = $cart->GetCartItemArray();
 		
 
 	<div id="shoppingcarttop" class="rounded-top">
-		<span class="title"><a href="<?php echo _xls_site_url('/cart/pg'); ?>"><?=  _sp("Shopping Cart"); ?></a></span><img src="<?= templateNamed("css/images/shoppingcart.png"); ?>" class="carticon">
+		<span class="title"><a href="<?php echo _xls_site_url('/cart/pg'); ?>"><?=  _sp("Shopping Cart"); ?></a></span><span class="carticon">&nbsp;</span>
 
 		<div class="minicart_itemlist">
 			<?php if($cart->Count > 0):  ?>
@@ -90,7 +90,7 @@ $items = $cart->GetCartItemArray();
 
 	 if($this->showCheckout()): ?>
 		 <div id="shoppingcartbottom">
-			 <div class="cart_label two columns alpha omega"><?php _xt("Subtotal"); ?></div>
+			 <div class="cart_label two columns alpha omega"><span class="subtotallabel"><?php _xt("Subtotal"); ?></span></div>
 			 <div class="cart_price two columns alpha omega"><?= _xls_currency($cart->Subtotal) ?></div>
 		 </div>
 

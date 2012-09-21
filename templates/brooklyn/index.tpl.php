@@ -61,7 +61,6 @@
 	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/base.css">
 	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/skeleton.css">
 	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/<?php echo _xls_get_conf('DEFAULT_TEMPLATE_THEME','webstore'); ?>.css"/>
-	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/webstorecustom.css"/>
 	<link rel="stylesheet" type="text/css" href="assets/css/pushup.css"/>
 
 	<!--[if lt IE 9]>

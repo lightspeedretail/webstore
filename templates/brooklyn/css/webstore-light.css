@@ -18,7 +18,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 input, input:focus { font-family: inherit; color: #232323; font-size: 1.1em; line-height: 1.2em; background-color: #e5e5e5;; border: 10px solid #e5e5e5;}
 select, input[type="text"], input[type="password"], input[type="email"],input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus { font-family: inherit; color: #232323; font-size: 1.1em; line-height: 1.2em; background-color: #e5e5e5; border: 10px solid #e5e5e5; width: 200px;}
-input[type="checkbox"] { width: 20px; height: 20px; }
+input { -webkit-appearance: none;  }
+input[type="checkbox"] { width: 20px; height: 20px; border: 0px; -webkit-appearance: checkbox; }
 .left { text-align: left;}
 .center { text-align: center;}
 .right { text-align: right;}
@@ -65,7 +66,7 @@ a:hover {  }
 #nav_products .arrow { margin: 1px 0 0 10px; }
 
 /***** Breadcrumbs ******/
-.breadcrumbs { text-transform: uppercase; color: #bbbbbb;  padding-bottom: 20px; clear:both; }
+.breadcrumbs { text-transform: uppercase; color: #bbbbbb; padding-bottom: 10px; margin-bottom: 10px; clear:both; border-bottom: 1px dotted #aaaaaa;}
 .breadcrumbs .homebutton { padding-bottom: 0px; margin: auto; height: 29px; width: 25px; float: left; }
 .breadcrumbs img { width: 16px; height: 29px; float: left;  }
 .breadcrumbs a { color: #bbbbbb; }
@@ -74,6 +75,7 @@ a:hover {  }
 /***** Product Grid *****/
 #gridheader h1 { line-height: 40px; margin-top: 0px; margin-bottom: 3px; }
 .subcategories { margin-left: 10px;margin-bottom: 15px;}
+.subcategories a { text-decoration: underline;}
 .product_cell { border: 1px #e4e0d8 solid; min-height: 300px; max-height: 300px; vertical-align: baseline; cursor: pointer;}
 .product_cell_graphic { height: 225px; margin: auto;}
 .product_cell img { max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; margin-top: 10px;}
@@ -105,8 +107,8 @@ a:hover {  }
 
 /***** Mini Cart (right side shopping cart) *****/
 #shoppingcart { text-transform: uppercase; padding-top: 10px; padding-left: 4px; padding-right: 4px;  clear:both;}
-#shoppingcarttop .title a { font-size: 1.429em; height: auto; min-height: 220px; width: 100%; z-index: 500; padding-top: 10px; padding-bottom: 10px; }
-#shoppingcarttop .carticon { float: right; }
+#shoppingcarttop .title a { font-size: 1.1em; height: auto; min-height: 220px; width: 100%; z-index: 500; padding-top: 10px; padding-bottom: 10px; }
+#shoppingcarttop .carticon { float: right; background: url(images/shoppingcartlight.png) no-repeat top right; height: 26px; width: 26px; line-height: 16px; }
 #shoppingcarttop .minicart_itemlist { margin-top: 15px; margin-bottom: 5px; }
 #shoppingcarttop .minicart_item { padding-top: 15px; padding-bottom: 25px; border-top: 1px dotted #bbbbbb;  height: 30px; line-height: 1em; clear: both;}
 #shoppingcarttop .minicart_image {float:left;  height: 36px; width: 36px; margin:auto; padding-right: 6px;}
@@ -119,6 +121,7 @@ a:hover {  }
 #shoppingcartbottom { border-top: 1px dotted #bbbbbb;  height: 30px; line-height: 1em; clear: both; padding-top: 20px; padding-bottom: 20px;}
 #shoppingcartbottom .cart_label  { padding-bottom: 2px; float:left; font-size: 0.95em; text-align: right; font-weight: 500;}
 #shoppingcartbottom .cart_price { padding-bottom: 2px;float:left; width: 80px; font-size: 1.1em; text-align: right; font-weight: 500;}
+#shoppingcartbottom .subtotallabel { font-weight: 600; }
     /* checkout button */
 #shoppingcartcheckout {  clear:both; background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
 #shoppingcartcheckout .checkoutlink {  margin: auto;  text-align: center; }
@@ -186,7 +189,7 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
 #product_details .addcart { width: 192px; background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; margin-right: 10px; text-align: center;margin-bottom: 10px; cursor: pointer; float: left;}
 #product_details .addcart a { margin-top: 20px; color: white; text-transform: uppercase; font-size: 1.1em;}
 
-#product_details .wishlist { width: 192px; background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; margin-right: 10px; text-align: center;margin-bottom: 10px; cursor: pointer; float: left;}
+#product_details .wishlist { width: 192px; background-color: #7f7f7f; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; margin-right: 10px; text-align: center;margin-bottom: 10px; cursor: pointer; float: left;}
 #product_details .wishlist a { margin-top: 20px; color: white; text-transform: uppercase; font-size: 1.1em;}
 
 #product_details #SelectSize, #SelectColor { max-width: 188px; }
@@ -247,9 +250,9 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
 
 /***** Footy *****/
 #footer { clear: both;}
-#footer .addresshours { height: 80px; background-color: #e9e9e9; margin: 30px 10px 30px 0; padding-top: 10px; padding-bottom: 15px;}
-#footer .addresshours .indentl { margin-left: 20px; margin-right: -20px;}
-#footer .addresshours .indentr { margin-right: 20px; margin-left: -20px;}
+#footer .addresshours { height: 70px; background-color: #e9e9e9; margin: 30px 10px 30px 0; padding-top: 30px; padding-bottom: 7px; line-height: 1.2em;}
+#footer .addresshours .indentl { margin-left: 40px; margin-right: -40px;}
+#footer .addresshours .indentr { margin-right: 40px; margin-left: -40px;}
 #footer .bottomtabs { text-transform: uppercase; text-align: center; font-size: 0.9em;  }
 #footer .bottomtabs a { font-size: 1.1em; font-weight: 400; }
 #footer .copyright { text-align: center; text-transform: uppercase; color: #b7b7b7; font-size: 0.8em;  }
@@ -265,6 +268,8 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
     .product_detail_image img { max-width: 200px; }
     .checkoutarrow { display: none; }
     #nav_products .arrow { margin: 1px 0 0 3px; }
+    #footer .addresshours .indentl { margin-left: 20px; margin-right: -20px;}
+    #footer .addresshours .indentr { margin-right: 20px; margin-left: -20px;}
 
 }
 @media only screen and (max-width: 767px) {/* iPhone */
