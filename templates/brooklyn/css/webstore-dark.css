@@ -263,8 +263,13 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
 @media only screen and (max-width: 960px) { /*iPad and below */
     body { font-size: 12px; }
     h1, h2, h3 { font-size: 16px; }
+    select, input[type="text"], input[type="password"], input[type="email"] { max-width: 190px; }
     #product_details #SelectSize, #SelectColor { max-width: 148px; }
     #product_details #SelectSize { float: left; margin-right: 2px;}
+    #checkout #CustomerContactBillingAddressState { width: 75px;}
+    #checkout #CustomerContactBillingAddressZip { width: 75px; }
+    #checkout #CustomerContactShippingAddressState { width: 75px;}
+    #checkout #CustomerContactShippingAddressZip { width: 75px; }
     #searchentry .search_box input { width: 100px; }
     #menubar, #menubar a { font-size: 0.9em; }
     #headerimage img { max-width: 530px; }
@@ -274,11 +279,14 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
     #footer .addresshours .indentl { margin-left: 20px; margin-right: -20px;}
     #footer .addresshours .indentr { margin-right: 20px; margin-left: -20px;}
 
+    #prodImageHolder {  max-width: 200px; background-color: white; margin:0; padding: 0px; }
+    #prodImageHolder img {max-width: 150px; display: block; margin: 0; overflow: hidden; }
+
 }
 @media only screen and (max-width: 767px) {/* iPhone */
     select, input[type="text"], input[type="password"], input[type="email"] { max-width: 200px; }
     #searchentry .search_box input { width: 75px; }
-    #headerimage img { width: 30em; }
+    #headerimage img { max-width: 360px; }
     .menuheight { max-width: 330px; }
     #menubar { border-bottom: 0px;}
     .spyglass { display: none; }
