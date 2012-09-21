@@ -5,6 +5,7 @@ Please see https://github.com/lightspeedretail/webstore/issues for technical det
 # 2.2.0
 
 New Features
+* New "Brooklyn" template with light and dark selectable themes
 * SEO Options and 3rd party integration
 * Inventory handling
 * Promo Code revamp
@@ -12,7 +13,6 @@ New Features
 * Paypal Pro module
 * Admin troubleshooting tasks
 * Many options for enabling/disabling WS features, adjusting features in Admin panel (instead of manually)
-
 
 General
 * Web Store now tracks available inventory, deducting pending orders to prevent backordering (requires uploading Orders from LightSpeed)
@@ -23,17 +23,17 @@ General
 * Implemented Google Analytics natively, add UA account code to Admin Panel
 * Implemented Google AdWords conversion code, add account code to Admin Panel
 * Created log entry expiration, ability to eliminate System Log entries after set number of days (default 30)
-* Ability to disable AJAX pagination through Admin panel option
-* Ability to disable drag-and-drop functionality through Admin Panel
 * Now properly restores abandoned cart for logged in user on next login to resume prior shopping session
 * Page Titles, Meta Descriptions now configurable through Admin Panel, can use different macro keywords
 
 
 Templates
+* Booklyn template scalable and fully functional with iPad, iPhone and other smartphones
 * Tabs are now editable through Admin Panel custom pages instead of modifying templates manually
 * Custom Pages can be enabled/disabled and will add/remove tabs automatically
 * Modified default banner size to more standard 750x100 instead of 748x111
-* Web Store detects iPad/iPhone browsing and disables drag-and-drop automatically, allowing normal clicking to function
+* Web Store detects iPad/iPhone browsing and changes hover products to clickable dropdown of Primary categories
+* Subcategories now show as links below primary header
 * Web Store properly handles Login on iPad
 * Added option to specify featured products for home page
 * Added option to Display/Hide Product Code on Product Details page

@@ -187,18 +187,15 @@ class xlsws_db_maintenance {
 
 			$strUpgradeText .= "<br/>Upgrading to Database schema 214";
 
-			$intCurrentSchema=214;
+			$intCurrentSchema=217;
 		}
 		
-		//ToDO: REMOVE BEFORE RELEASE
-		$intCurrentSchema=214; //This is just to let the following code run while we're testing	
 
-		//Upgrade to 220 schema for WS2.2
-		if ($intCurrentSchema==214)
+		//Upgrade to 250 schema for WS2.5
+		if ($intCurrentSchema<=217)
 		{
 		
-			//@Todo: Add any 2.2 changes here
-			
+
 			$this->add_table('xlsws_cart_type' , "CREATE TABLE `xlsws_cart_type` (
 			  `id` int(10) NOT NULL AUTO_INCREMENT,
 			  `name` varchar(255) NOT NULL,
@@ -730,19 +727,19 @@ class xlsws_db_maintenance {
 				helper_text='If your store uses SROs for repairs and uploads them to Web Store, turn this option on to allow customers to view pending repairs.'
 				where `key`='ENABLE_SRO'");
 
-			$strUpgradeText .= "<br/>Upgrading to Database schema 220";
+			$strUpgradeText .= "<br/>Upgrading to Database schema 250";
 			
 			
 			$strUpgradeText .= "<h2>Please run the steps MIGRATE PHOTOS (if available) and RECALCULATE PENDING ORDERS after running this Upgrade.</h2>";
 			
 			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
-			$config->Value="220";
+			$config->Value="250";
 			$config->Save();
 		
 		
 		}
-		
-		
+		$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
+		$strUpgradeText .= "<br/>Database schema version ".$config->Value."<br>";
 
 		return $strUpgradeText;
 	}
