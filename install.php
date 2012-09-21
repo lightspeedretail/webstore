@@ -3299,9 +3299,25 @@ EOT;
 					fwrite($fp, $str, strlen($str));
 					fclose($fp);
 				} else {
-					$strtext .= "<h3>Could not update robots.txt due to write permissions error. Please manually modify this file and correct the URL to Sitemap with your Web Store URL</h3>";
+					$strReturn .= "<h3>Could not update robots.txt due to write permissions error. Please manually modify this file and correct the URL to Sitemap with your Web Store URL</h3>";
 				}
 
+
+				//Update Rewrite Base in htaccess
+				$origText = "RewriteBase /";
+				$replText = "RewriteBase ".$_SERVER['SCRIPT_NAME'];
+				$replText = str_replace("/install.php", "", $replText);
+				$strFileContents = file_get_contents('htaccess');
+				if ($strFileContents) {
+					$fp = @fopen('.htaccess', 'w');
+				}
+				if ($fp) {
+					$str = str_replace($origText, $replText, $strFileContents);
+					fwrite($fp, $str, strlen($str));
+					fclose($fp);
+				} else {
+					$strReturn .= "<h3>Important: Rename the file htaccess to .htaccess (adding a period in front of the filename) in your Webstore root folder. (We attempted to do this for you but a previous .htaccess already existed.) Please manually modify the RewriteBase line inside if you have Web store in a subfolder</h3>";
+				}
 
 				//Step 3 - Show any output
 				$strtext .= "<h1>Finished with " . ($intCount - $errCount)
