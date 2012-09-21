@@ -6,7 +6,7 @@ You should not hard-code point sizes for fonts, you should use em or percentages
 so it degrades gracefully on smaller screens. Use http://pxtoem.com/ for conversion.
 See base.css for base point sizes used.
 
-We recommend placing customizations in webstorecustom.css which overrides elements in this
+We recommend placing customizations in webstore-custom.css which overrides elements in this
 file, and leaving this file untouched.
 */
 
@@ -262,6 +262,8 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
 @media only screen and (max-width: 960px) { /*iPad and below */
     body { font-size: 12px; }
     h1, h2, h3 { font-size: 16px; }
+    #product_details #SelectSize, #SelectColor { max-width: 148px; }
+    #product_details #SelectSize { float: left; margin-right: 2px;}
     #searchentry .search_box input { width: 100px; }
     #menubar, #menubar a { font-size: 0.9em; }
     #headerimage img { max-width: 530px; }
@@ -281,6 +283,8 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
     .spyglass { display: none; }
     .products_slider_theme .leftpadding { padding-left: 0px; }
     .products_slider, .products_slider_theme { display: none; }
+    #footer .addresshours { height: 160px; }
 }
+
 
 

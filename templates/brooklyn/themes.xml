@@ -7,10 +7,6 @@
 		<keystring>Dark theme</keystring>
 		<valuestring>webstore-dark</valuestring>
 	</theme>
-    <theme>
-		<keystring>Custom theme</keystring>
-		<valuestring>webstore-custom</valuestring>
-	</theme>
 </themes>
 
 
