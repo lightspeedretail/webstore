@@ -498,7 +498,7 @@ class xlsws_db_maintenance {
 				'STORE_ADDRESS2', 'Anytown, USA 12345', 'Address line 2', 2, 6, NOW(), NOW(), 'NULL',0);");
 			$this->add_config_key('STORE_HOURS' ,
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Store Operating Hours',
-				'STORE_HOURS', 'MON / FRI: 9AM-9PM<br>SAT/SUN: 9AM-5PM', 'Store hours. Use &lt;br&gt; tag to create two lines if desired.', 2, 7, NOW(), NOW(), 'NULL',0);");
+				'STORE_HOURS', 'MON - SAT: 9AM-9PM', 'Store hours.', 2, 7, NOW(), NOW(), 'NULL',0);");
 
 
 			//URL and Description Formatting
