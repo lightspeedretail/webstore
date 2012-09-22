@@ -398,7 +398,7 @@ class Cart extends CartGen {
 		else if ($objPromoCode->Type == PromoCodeType::Percent)
 			$intDiscount = $objPromoCode->Amount/100;
 		else {
-			QApplication::Log(E_WARNING, 'checkout'.
+			QApplication::Log(E_WARNING, 'checkout',
 				'Invalid PromoCode type ' . $objPromoCode->Type);
 			return;
 		}
@@ -1127,7 +1127,7 @@ class Cart extends CartGen {
 
 	public static function update_cart_qty($itemid, $qty) {
 		QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
-		return $this->UpdateCartQuantity($itemid, $qty);
+		return Cart::UpdateCartQuantity($itemid, $qty);
 	}
 
 	/**
