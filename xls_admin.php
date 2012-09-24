@@ -121,7 +121,7 @@ if ((trim($ips) != '')){
 require_once(CUSTOM_INCLUDES . 'prepend.inc.php');
 
 if(!isset($XLSWS_VARS['page']))
-	_rd("xls_admin.php?page=config&subpage=store".admin_sid());
+	_rd(_xls_site_url("xls_admin.php?page=config&subpage=store".admin_sid()));
 
 
 /* class XLS_OnOff
@@ -4015,7 +4015,7 @@ abstract class xlsws_admin_generic_edit_form extends xlsws_admin {
 
 		//ToDo: During Admin redesign, make a proper way to intercept editing to different QPanel
 		if ($this->edit_override)
-			_rd($_SERVER["SCRIPT_NAME"]  . '?page=dbadmin&subpage=dbedit&row=' . $strParameter . admin_sid());
+			_rd(_xls_site_url('xls_admin.php?page=dbadmin&subpage=dbedit&row=' . $strParameter . admin_sid()));
 
 
 		$this->intEditRowid = $strParameter;
@@ -6159,7 +6159,7 @@ class xlsws_admin_dbedit extends xlsws_admin {
 	}
 
 	public function btnCancel_click($strFormId, $strControlId, $strParameter) {
-		_rd($_SERVER["SCRIPT_NAME"]  . '?page=dbadmin&subpage=dbpending' . admin_sid());
+		_rd(_xls_site_url('xls_admin.php?page=dbadmin&subpage=dbpending' . admin_sid()));
 	}
 
 	public function btnSave_click($strFormId, $strControlId, $strParameter){
@@ -6246,7 +6246,7 @@ class xlsws_admin_dbedit extends xlsws_admin {
 
 
 
-		_rd($_SERVER["SCRIPT_NAME"]  . '?page=dbadmin&subpage=dbpending' . admin_sid());
+		_rd(_xls_site_url('xls_admin.php?page=dbadmin&subpage=dbpending' . admin_sid()));
 	}
 
 
@@ -6412,7 +6412,7 @@ class xlsws_admin_productedit extends xlsws_admin {
 
 		$objProduct = Product::LoadByCode($ctlCode->Text);
 		if ($objProduct)
-			_rd('xls_admin.php?page=dbadmin&subpage=products&rowid='.$objProduct->Rowid. admin_sid());
+			_rd(_xls_site_url('xls_admin.php?page=dbadmin&subpage=products&rowid='.$objProduct->Rowid. admin_sid()));
 		else
 			$ctlResult->Text = $ctlCode->Text . ' not found';
 
@@ -6424,7 +6424,7 @@ class xlsws_admin_productedit extends xlsws_admin {
 	}
 
 	public function btnCancel_click($strFormId, $strControlId, $strParameter) {
-		_rd('xls_admin.php?page=dbadmin&subpage=dbpending' . admin_sid());
+		_rd(_xls_site_url('xls_admin.php?page=dbadmin&subpage=dbpending' . admin_sid()));
 	}
 
 	public function btnSave_click($strFormId, $strControlId, $strParameter){
@@ -6455,7 +6455,7 @@ class xlsws_admin_productedit extends xlsws_admin {
 
 
 
-		_rd($_SERVER["SCRIPT_NAME"]  . '?page=dbadmin&subpage=products&rowid=' . $intRowid.admin_sid());
+		_rd(_xls_site_url('xls_admin.php?page=dbadmin&subpage=products&rowid=' . $intRowid.admin_sid()));
 	}
 
 
