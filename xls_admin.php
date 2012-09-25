@@ -5324,7 +5324,8 @@ class xlsws_seo_categories extends xlsws_admin_generic_edit_form{
 
 
 	protected function beforeSave($objItem) {
-		$objItem->GoogleId = $_POST['GoogleCatEdit'];
+		$objItem->GoogleId = $_POST['GoogleCatEdit']; error_log("passed edit is ".$_POST['GoogleCatExtraEdit']);
+		$objItem->MetaKeywords = $_POST['GoogleCatExtraEdit']; //Since we dont use keywords anymore, let's co-opt this field
 
 		if (!empty($_POST['ImageId'])) {
 			$objProduct = Product::LoadByCode($_POST['ImageId']);
@@ -5354,6 +5355,7 @@ class xlsws_seo_categories extends xlsws_admin_generic_edit_form{
 	public function GoogleId_Render($objItem) { //Hidden field for Google Category that we use to actually write to db
 		if($objItem->Rowid == $this->intEditRowid ) {
 			$strRetVal = "<input type='hidden' name='GoogleCatEdit' id='GoogleCatEdit' value='".$objItem->GoogleId."'>";
+			$strRetVal .= "<input type='hidden' name='GoogleCatExtraEdit' id='GoogleCatExtraEdit' value='".$objItem->MetaKeywords."'>";
 			if ($objItem->GoogleId==0 && $objItem->Rowid != $objItem->Parent) {
 				$arrTree = $objItem->GetTrail();
 				$objCat = Category::Load($arrTree[0]['key']);

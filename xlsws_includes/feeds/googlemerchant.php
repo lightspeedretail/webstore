@@ -50,14 +50,19 @@ $arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 ".$strQueryAddl." O
 while ($objItem = $arrProducts->FetchObject()) {
 	$objProduct = Product::Load($objItem->rowid);
 	
-	$strGoogle = _xls_get_googlecategory($objProduct->Rowid);
+	$arrGoogle = _xls_get_googlecategory($objProduct->Rowid);
+	$strGoogle = $arrGoogle['Category'];
+
+
 
 	$arrTaxGrids = $objProduct->GetTaxRateGrid();
 	$arrTrail = Category::GetTrailByProductId($objProduct->Rowid,'names');
 
 	//If our current category doesn't have Google set but we have a parent that does, use it
-	if (empty($strGoogle) && count($arrTrail)>1)
-		$strGoogle = _xls_get_googleparentcategory($objProduct->Rowid);
+	if (empty($strGoogle) && count($arrTrail)>1) {
+		$arrGoogle = _xls_get_googleparentcategory($objProduct->Rowid);
+		$strGoogle = $arrGoogle['Category'];
+	}
 		
 	
   echo '<item>'.chr(13);
@@ -88,20 +93,25 @@ while ($objItem = $arrProducts->FetchObject()) {
 		echo chr(9).'<g:price>'.$objProduct->Price.'</g:price>'.chr(13);
 		echo chr(9).'<g:brand><![CDATA['.$objProduct->Family.']]></g:brand>'.chr(13);
 		echo chr(9).'<g:gtin>'.$objProduct->Upc.'</g:gtin>'.chr(13);
-	   
-		echo '<product_color>'.$objProduct->ProductColor.'</product_color>'.chr(13);
-		echo '<product_size>'.$objProduct->ProductSize.'</product_size>'.chr(13);
+
+		if (substr($strGoogle,0,7)=="Apparel") {
+			echo chr(9).'<g:gender>'.$arrGoogle['Gender'].'</g:gender>'.chr(13);
+			echo chr(9).'<g:age_group>'.$arrGoogle['Age'].'</g:age_group>'.chr(13);
+		}
+
+		echo chr(9).'<product_color>'.$objProduct->ProductColor.'</product_color>'.chr(13);
+		echo chr(9).'<product_size>'.$objProduct->ProductSize.'</product_size>'.chr(13);
 
 		if ($objProduct->FkProductMasterId>0)
-			echo '<item_group_id>'.$objProduct->FkProductMasterId.'</item_group_id>'.chr(13);
+			echo chr(9).'<item_group_id>'.$objProduct->FkProductMasterId.'</item_group_id>'.chr(13);
 		
 		foreach ($arrTaxGrids as $arrTaxGrid) {			
-			echo '<g:tax>'.chr(13);
-			echo '   <g:country>'.$arrTaxGrid[0].'</g:country>'.chr(13);
-			echo '  <g:region>'.$arrTaxGrid[1].'</g:region>'.chr(13);
-			echo '  <g:rate>'.$arrTaxGrid[2].'</g:rate>'.chr(13);
-			echo '  <g:tax_ship>'.$arrTaxGrid[3].'</g:tax_ship>'.chr(13);
-			echo '</g:tax>	'.chr(13);   
+			echo chr(9).'<g:tax>'.chr(13);
+			echo chr(9).'   <g:country>'.$arrTaxGrid[0].'</g:country>'.chr(13);
+			echo chr(9).'  <g:region>'.$arrTaxGrid[1].'</g:region>'.chr(13);
+			echo chr(9).'  <g:rate>'.$arrTaxGrid[2].'</g:rate>'.chr(13);
+			echo chr(9).'  <g:tax_ship>'.$arrTaxGrid[3].'</g:tax_ship>'.chr(13);
+			echo chr(9).'</g:tax>	'.chr(13);
 		}	   
 	   
 	   echo chr(9).'<g:shipping_weight>'.$objProduct->ProductWeight.'</g:shipping_weight>'.chr(13);

@@ -17,7 +17,7 @@
 #simplemodal-overlay {background-color:#000; cursor:wait;}
 
 /* Container */
-#simplemodal-container {height:295px; width:580px; color:#bbb; background-color:#333; border:4px solid #444; padding:5px;}
+#simplemodal-container {height:325px; width:580px; color:#bbb; background-color:#333; border:4px solid #444; padding:5px;}
 #simplemodal-container .simplemodal-data {padding:8px;}
 #simplemodal-container code {background:#141414; border-left:3px solid #65B43D; color:#bbb; display:block; font-size:12px; margin-bottom:12px; padding:4px 0px 6px;}
 #simplemodal-container a {color:#ddd;}

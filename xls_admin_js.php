@@ -180,7 +180,17 @@ switch($_GET['item']) {
 			echo '<option value="0">';
 			echo '</select>';
 		}
-	
+
+		echo '<div id="googleextra" class="googleextra">'.str_repeat('&nbsp;',($x*2)).'&nbsp;Required for Apparel &amp; Accessories only: <b>Gender</b> <select name="googleg" id="googleg" class="tinyfont" >';
+		echo '<option value="Unisex">Unisex';
+		echo '<option value="Male">Male';
+		echo '<option value="Female">Female';
+		echo '</select>&nbsp;';
+
+		echo '<b>Age</b> <select name="googlea" id="googlea" class="tinyfont" >';
+		echo '<option value="Adult">Adult';
+		echo '<option value="Kids">Kids';
+		echo '</select></div>';
 		echo $strEnd;
 	break;
 	

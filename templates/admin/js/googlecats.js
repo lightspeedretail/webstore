@@ -39,7 +39,13 @@ jQuery(function ($) {
 								choosegoogle.setup($('#GoogleCatEdit').val());
 							else if ($('#GoogleCatParentEdit').val() != '')
 								choosegoogle.setup($('#GoogleCatParentEdit').val());
-							
+
+                            if($('#GoogleCatExtraEdit').val() != '') {
+                                var strStrSplit = $('#GoogleCatExtraEdit').val().split(',');
+                                $('#googleg').val(strStrSplit[0]);
+                                $('#googlea').val(strStrSplit[1]);
+                            }
+
 						});
 					
 				$('#basic-modal-content').modal({
@@ -96,6 +102,10 @@ jQuery(function ($) {
 					$el.attr("disabled",'disabled');
 				}
 
+                if ($("#google1").val() == "Apparel & Accessories")
+                    $('#googleextra').show();
+                else
+                    $('#googleextra').hide();
 				
 				
 			}, 'json');
@@ -112,10 +122,12 @@ jQuery(function ($) {
 					$.each(data, function(key, value) {
 					$('#GoogleCatEdit').val(key);
 					$('#googlecat').html(value.substring(0,15));
-				
+
 					});
 				}, 'json');
-			
+
+            $('#GoogleCatExtraEdit').val($('#googleg').val()+','+$('#googlea').val());
+
 			$.modal.close();
 			return;
 		}

@@ -912,6 +912,7 @@ padding-top: 3px;
 .bgalert { background-color: #F778A1; }
 .strikeout { text-decoration:line-through; }
 .googleselect { width: 500px; }
+.googleextra { display: none; }
 .center { margin-left: 230px; }
 .leftbump { padding-left: 15px; }
 .smallfont { font-size: 0.7em; }

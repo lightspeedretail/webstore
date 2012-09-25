@@ -1161,13 +1161,19 @@ function _xls_get_crumbtrail($type = 'full') {
  */
 function _xls_get_googlecategory($intProductRowid) {
 
-	$result = _dbx("select c.name as google_category from xlsws_product_category_assn as a left join xlsws_category as b on a.category_id=b.rowid left join xlsws_google_categories as c on b.google_id=c.rowid where a.product_id=".$intProductRowid,"Query");
+	$result = _dbx("select c.name as google_category, meta_keywords from xlsws_product_category_assn as a left join xlsws_category as b on a.category_id=b.rowid left join xlsws_google_categories as c on b.google_id=c.rowid where a.product_id=".$intProductRowid,"Query");
 	$objGoogle = $result->FetchObject();
 	$strLine = $objGoogle->google_category;
 	$strLine = str_replace("&","&amp;",$strLine);
 	$strLine = str_replace(">","&gt;",$strLine);
-	
-	return trim($strLine);		  	
+
+	$arrGoogle = array();
+	$arrGoogle['Category'] = trim($strLine);
+	$arrX = explode(",",$objGoogle->meta_keywords);
+	$arrGoogle['Gender'] = $arrX[0];
+	$arrGoogle['Age'] = $arrX[1];
+
+	return $arrGoogle;
 				  	
 }
 
@@ -1176,11 +1182,22 @@ function _xls_get_googleparentcategory($intProductRowid) {
 	$arrTrailFull = Category::GetTrailByProductId($intProductRowid);
 	$objCat = Category::Load($arrTrailFull[0]['key']);
 	$objPar = GoogleCategories::Load($objCat->GoogleId);
-	if ($objPar) $strLine = $objPar->Name;
+	if ($objPar) {
+		$strLine = $objPar->Name;
+		$strMeta = $objCat->MetaKeywords;
+	}
 	$strLine = str_replace("&","&amp;",$strLine);
 	$strLine = str_replace(">","&gt;",$strLine);
-	
-	return trim($strLine);	
+
+
+	$arrGoogle = array();
+	$arrGoogle['Category'] = trim($strLine);
+	$arrX = explode(",",$strMeta);
+	$arrGoogle['Gender'] = $arrX[0];
+	$arrGoogle['Age'] = $arrX[1];
+
+	return $arrGoogle;
+
 }
 
 
