@@ -881,10 +881,11 @@ function _xls_get_current_customer_id() {
  */
 function _xls_get_current_customer_name() {
 	$customer = Customer::GetCurrent();
-	if($customer)
-		return $customer->Mainname;
+	if($customer) {
+		if (strlen($customer->Mainname)<13) return $customer->Mainname;
+		else return _xls_truncate($customer->Firstname,13);
 
-	return "My Account";
+	} else return "My Account";
 }
 
 /**

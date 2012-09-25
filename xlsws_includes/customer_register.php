@@ -264,7 +264,7 @@ class xlsws_cregister extends xlsws_index {
 		$objCustomer->Password = md5(trim($this->PasswordControl->Password1->Text));
 		$objCustomer->Firstname = trim($this->txtCRFName->Text);
 		$objCustomer->Lastname = trim($this->txtCRLName->Text);
-		$objCustomer->Mainname = (($this->customer) && ($this->customer->Mainname != '')) ? $this->customer->Mainname : (trim($this->txtCRFName->Text) . " " . trim($this->txtCRLName->Text));
+		$objCustomer->Mainname = trim($this->txtCRFName->Text) . " " . trim($this->txtCRLName->Text);
 		$objCustomer->Company = trim($this->txtCRCompany->Text);
 		$objCustomer->Mainphone = trim($this->txtCRMPhone->Text);
 		/*$objCustomer->Homepage = trim($this->txtCRHomePage->Text);
@@ -327,6 +327,9 @@ class xlsws_cregister extends xlsws_index {
 			
 			Customer::Login($this->BillingContactControl->Email,$this->PasswordControl->Password1->Text);
 			Cart::UpdateCartCustomer();			
+		} else {
+			$_SESSION['customer']=$objCustomer;
+			_rd(_xls_site_url("myaccount/pg"));
 		}
 			
 

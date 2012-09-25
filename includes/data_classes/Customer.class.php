@@ -82,10 +82,10 @@ class Customer extends CustomerGen {
         if (array_key_exists('customer', $_SESSION))
             $objCustomer = $_SESSION['customer'];
 
-        if (!$objCustomer)
+        if (!$objCustomer) {
             $objCustomer = new Customer();
-
-        $_SESSION['customer'] = $objCustomer;
+			$_SESSION['customer'] = $objCustomer;
+        }
 		return $objCustomer;
 	}
 
