@@ -111,12 +111,12 @@ class Customer extends CustomerGen {
 			return false;
 
 		// Clear single-use temp password
-		if (!empty($objCustomer->TempPassword)) {
-			$objCustomer->TempPassword = '';
+		if ($objCustomer->TempPassword>'') {
+			$objCustomer->TempPassword = null;
 			$objCustomer->Save();
 		}
 
-		return true;
+		return $match;
 	}
 
 	/**
