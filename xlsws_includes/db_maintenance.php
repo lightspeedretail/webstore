@@ -475,7 +475,12 @@ class xlsws_db_maintenance {
 			$this->add_config_key('GOOGLE_ANALYTICS' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Google Analytics Code (format: UA-00000000-0)', 
 				'GOOGLE_ANALYTICS', '', 'Google Analytics code for tracking', 20, 1, NOW(), NOW(), 'NULL',0);");
-			$this->add_config_key('GOOGLE_ADWORDS' , 
+			$this->add_config_key('GOOGLE_MPN' ,
+				"INSERT INTO `xlsws_configuration` VALUES
+					(NULL, 'Product Codes are Manufacturer Part Numbers in Google Shopping', 'GOOGLE_MPN', '0',
+					'If your Product Codes are Manufacturer Part Numbers, turn this on to apply this to Google Shopping feed.',
+					20, 4, NOW(), NOW(), 'BOOL', 0);");
+			$this->add_config_key('GOOGLE_ADWORDS' ,
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Google AdWords ID (format: 000000000)', 
 				'GOOGLE_ADWORDS', '', 'Google AdWords Conversion ID (found in line \'var google_conversion_id\' when viewing code from Google AdWords setup)', 20, 2, NOW(), NOW(), 'NULL',0);");
 			$this->add_config_key('GOOGLE_VERIFY' , 

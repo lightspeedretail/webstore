@@ -788,6 +788,10 @@ class Product extends ProductGen {
 				$arrGrid[] = array($strCountry,	$strState,$fltRate,$strTaxShip);
 			
 			}
+
+			if ($objDestination->Country == '*' && $objDestination->State == '*' && _xls_get_conf('DEFAULT_COUNTRY','US')=='US') {
+				$arrGrid[] = array(_xls_get_conf('DEFAULT_COUNTRY','US'),'','0','n');
+			}
 		}
 		
 		return $arrGrid;

@@ -33,6 +33,7 @@ require('includes/prepend.inc.php');
 
 //Load some information we'll use within the loops
 $intStockHandling = _xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0);
+$intGoogleMPN = _xls_get_conf('GOOGLE_MPN',0);
 $strQueryAddl = ($intStockHandling == 0 ? " and inventory_avail>0" : "");
 
 header ("content-type: text/xml;charset=UTF-8");
@@ -93,14 +94,17 @@ while ($objItem = $arrProducts->FetchObject()) {
 		echo chr(9).'<g:price>'.$objProduct->Price.'</g:price>'.chr(13);
 		echo chr(9).'<g:brand><![CDATA['.$objProduct->Family.']]></g:brand>'.chr(13);
 		echo chr(9).'<g:gtin>'.$objProduct->Upc.'</g:gtin>'.chr(13);
+		if ($intGoogleMPN)
+			echo chr(9).'<g:mpn><![CDATA['.$objProduct->Code.']]></g:mpn>'.chr(13);
+
 
 		if (substr($strGoogle,0,7)=="Apparel") {
 			echo chr(9).'<g:gender>'.$arrGoogle['Gender'].'</g:gender>'.chr(13);
 			echo chr(9).'<g:age_group>'.$arrGoogle['Age'].'</g:age_group>'.chr(13);
 		}
 
-		echo chr(9).'<product_color>'.$objProduct->ProductColor.'</product_color>'.chr(13);
-		echo chr(9).'<product_size>'.$objProduct->ProductSize.'</product_size>'.chr(13);
+		echo chr(9).'<g:color>'.$objProduct->ProductColor.'</g:color>'.chr(13);
+		echo chr(9).'<g:size>'.$objProduct->ProductSize.'</g:size>'.chr(13);
 
 		if ($objProduct->FkProductMasterId>0)
 			echo chr(9).'<item_group_id>'.$objProduct->FkProductMasterId.'</item_group_id>'.chr(13);

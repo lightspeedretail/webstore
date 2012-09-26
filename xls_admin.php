@@ -3427,7 +3427,7 @@ class xlsws_admin_seo_modules extends xlsws_admin {
 		$this->configPnls['google'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Google , "configDone");
 		$this->configPnls['google']->Name = _sp('Google Integration');
 		$this->configPnls['google']->Info = _sp('Google account information and settings');
-
+		$this->configPnls['google']->ConfigurationGuide = "<span style='font-size: 10pt'>If you are using Google Shopping (Google Merchant Center), your store data feed URL is: "._xls_site_url('/googlemerchant.xml'."</span>");
 	}
 
 
