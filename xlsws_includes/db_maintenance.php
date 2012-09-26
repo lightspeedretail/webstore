@@ -579,6 +579,7 @@ class xlsws_db_maintenance {
 			_dbx("update `xlsws_configuration` set template_specific=1 where `key` like '%_IMAGE_WIDTH'");
 			_dbx("update `xlsws_configuration` set template_specific=1 where `key` like '%_IMAGE_HEIGHT'");
 			_dbx("update `xlsws_configuration` set template_specific=1 where `key` = 'DEFAULT_TEMPLATE_THEME'");
+			_dbx("update `xlsws_configuration` set template_specific=1 where `key` = 'PRODUCTS_PER_PAGE'");
 
 			//Because of a change to the width display in Admin panel, make sure the option type is set so numbers aren't huge fields
 			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='QUOTE_EXPIRY'");		

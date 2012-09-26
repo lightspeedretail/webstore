@@ -51,6 +51,10 @@
 		<keystring>DEFAULT_TEMPLATE_THEME</keystring>
 		<valuestring>webstore-light</valuestring>
 	</entry>
+	<entry>
+		<keystring>PRODUCTS_PER_PAGE</keystring>
+		<valuestring>9</valuestring>
+	</entry>
 </defaults>
 
 
