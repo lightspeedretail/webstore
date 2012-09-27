@@ -6522,18 +6522,28 @@ class xlsws_admin_maintenance extends xlsws_admin {
 		$this->arrTabs = $GLOBALS['arrSystemTabs'];
 		$this->currentTab = 'task';
 
-		$this->arrMPnls['OffLineOnlineStore'] = new QPanel($this);
-		$this->arrMPnls['OffLineOnlineStore']->Visible = false;
-		$this->arrMPnls['OffLineOnlineStore']->Name = (_xls_get_conf('STORE_OFFLINE' , false))?_sp('Take Store Online'):_sp('Take Store Offline');
-		$this->arrMPnls['OffLineOnlineStore']->HtmlEntities = false;
-		$this->arrMPnls['OffLineOnlineStore']->ToolTip= _sp('Disable/enable access to your site temporarily. Store can only be access then using a generated link.');
 
 
-		$this->arrMPnls['UpgradeWS'] = new QPanel($this);
-		$this->arrMPnls['UpgradeWS']->Visible = false;
-		$this->arrMPnls['UpgradeWS']->Name = _sp('Upgrade Web Store Database');
-		$this->arrMPnls['UpgradeWS']->HtmlEntities = false;
-		$this->arrMPnls['UpgradeWS']->ToolTip= _sp('Upgrade webstore with latest patches/bug fixes');
+		$ctPic = _dbx("select count(*) as thecount from xlsws_product where coalesce(request_url,'') = '';",'Query');
+		$arrTotal = $ctPic->FetchArray();
+		$ct = $arrTotal['thecount'];
+		$ctPic = _dbx("select count(*) as thecount from xlsws_family where coalesce(request_url,'') = '';",'Query');
+		$arrTotal = $ctPic->FetchArray();
+		$ct += $arrTotal['thecount'];
+		$ctPic = _dbx("select count(*) as thecount from xlsws_category where coalesce(request_url,'') = '';",'Query');
+		$arrTotal = $ctPic->FetchArray();
+		$ct += $arrTotal['thecount'];
+		$ctPic = _dbx("select count(*) as thecount from xlsws_custom_page where coalesce(request_url,'') = '';",'Query');
+		$arrTotal = $ctPic->FetchArray();
+		$ct += $arrTotal['thecount'];
+		if ($ct>0) {
+			$this->arrMPnls['MigrateURL'] = new QPanel($this);
+			$this->arrMPnls['MigrateURL']->Visible = false;
+			$this->arrMPnls['MigrateURL']->Name = _sp('Migrate URLs to SEO friendly structure');
+			$this->arrMPnls['MigrateURL']->HtmlEntities = false;
+			$this->arrMPnls['MigrateURL']->ToolTip= _sp('Migrate URLs to SEO structure');
+		}
+
 
 		if (_xls_get_conf('LIGHTSPEED_HOSTING' , '0')=='0') {
 			$ctPic = _dbx("select count(*) as thecount from xlsws_images where left(image_path,8) != 'product/';",'Query');
@@ -6547,9 +6557,30 @@ class xlsws_admin_maintenance extends xlsws_admin {
 			}
 		}
 
+
+		$this->arrMPnls['flushCategories'] = new QPanel($this);
+		$this->arrMPnls['flushCategories']->Visible = false;
+		$this->arrMPnls['flushCategories']->Name = _sp('Purge Deleted Categories');
+		$this->arrMPnls['flushCategories']->HtmlEntities = false;
+		$this->arrMPnls['flushCategories']->ToolTip= _sp('In some cases, deletion of categories or caching of categories may require a purge, press this button if you are experiencing mismatches in your category tree');
+
+		$this->arrMPnls['OffLineOnlineStore'] = new QPanel($this);
+		$this->arrMPnls['OffLineOnlineStore']->Visible = false;
+		$this->arrMPnls['OffLineOnlineStore']->Name = (_xls_get_conf('STORE_OFFLINE' , false))?_sp('Take Store Online'):_sp('Take Store Offline');
+		$this->arrMPnls['OffLineOnlineStore']->HtmlEntities = false;
+		$this->arrMPnls['OffLineOnlineStore']->ToolTip= _sp('Disable/enable access to your site temporarily. Store can only be access then using a generated link.');
+
+
+		$this->arrMPnls['UpgradeWS'] = new QPanel($this);
+		$this->arrMPnls['UpgradeWS']->Visible = false;
+		$this->arrMPnls['UpgradeWS']->Name = _sp('Upgrade Web Store Database');
+		$this->arrMPnls['UpgradeWS']->HtmlEntities = false;
+		$this->arrMPnls['UpgradeWS']->ToolTip= _sp('Upgrade webstore with latest patches/bug fixes');
+
+
 		$this->arrMPnls['RecalculateAvail'] = new QPanel($this);
 		$this->arrMPnls['RecalculateAvail']->Visible = false;
-		$this->arrMPnls['RecalculateAvail']->Name = _sp('Recalculate Pending Orders');
+		$this->arrMPnls['RecalculateAvail']->Name = _sp('Recalculate Available Inventory');
 		$this->arrMPnls['RecalculateAvail']->HtmlEntities = false;
 		$this->arrMPnls['RecalculateAvail']->ToolTip= _sp('Recalculate inventory based on pending orders');
 
@@ -6558,22 +6589,18 @@ class xlsws_admin_maintenance extends xlsws_admin {
 
 		$this->arrMPnls['optimizeDB'] = new QPanel($this);
 		$this->arrMPnls['optimizeDB']->Visible = false;
-		$this->arrMPnls['optimizeDB']->Name = _sp('Optimize Database');
+		$this->arrMPnls['optimizeDB']->Name = _sp('Erase abandoned carts over '.intval(_xls_get_conf('CART_LIFE' , 30)).' days');
 		$this->arrMPnls['optimizeDB']->HtmlEntities = false;
-		$this->arrMPnls['optimizeDB']->ToolTip= _sp('Optimize database for faster performance in your site');
+		$this->arrMPnls['optimizeDB']->ToolTip= _sp('Clears out all unpaid carts over '.intval(_xls_get_conf('CART_LIFE' , 30)).' days');
 
 
-		$this->arrMPnls['backupDB'] = new QPanel($this);
-		$this->arrMPnls['backupDB']->Visible = false;
-		$this->arrMPnls['backupDB']->Name = _sp('Backup Database');
-		$this->arrMPnls['backupDB']->HtmlEntities = false;
-		$this->arrMPnls['backupDB']->ToolTip= _sp('Backup encrypted copy ');
+//		$this->arrMPnls['backupDB'] = new QPanel($this);
+//		$this->arrMPnls['backupDB']->Visible = false;
+//		$this->arrMPnls['backupDB']->Name = _sp('Backup Database');
+//		$this->arrMPnls['backupDB']->HtmlEntities = false;
+//		$this->arrMPnls['backupDB']->ToolTip= _sp('Backup encrypted copy ');
 
-		$this->arrMPnls['flushCategories'] = new QPanel($this);
-		$this->arrMPnls['flushCategories']->Visible = false;
-		$this->arrMPnls['flushCategories']->Name = _sp('Purge Deleted Categories');
-		$this->arrMPnls['flushCategories']->HtmlEntities = false;
-		$this->arrMPnls['flushCategories']->ToolTip= _sp('In some cases, deletion of categories or caching of categories may require a purge, press this button if you are experiencing mismatches in your category tree');
+
 
 		$this->pxyAction = new QControlProxy($this);
 		$this->pxyAction->AddAction(new QClickEvent() , new QAjaxAction('doAction'));
@@ -6651,13 +6678,46 @@ class xlsws_admin_maintenance extends xlsws_admin {
 		//Include db_maint class to access update functions
 		include_once(XLSWS_INCLUDES . 'db_maintenance.php');
 		$objDbMaint = new xlsws_db_maintenance;
-		$this->arrMPnls['MigratePhotos']->Text = $objDbMaint->MigratePhotos();//Include db_maint class to access update functions
+
+		$intRet = $objDbMaint->MigratePhotos();//Include db_maint class to access update functions
+		if ($intRet>0)
+			$this->arrMPnls['MigratePhotos']->Text =  "<span style='font-size: 13pt'>Not all photos converted (3000 converted). Click Perform again. $intRet remaining.<br>";
+		elseif ($int==-1)
+			$this->arrMPnls['MigratePhotos']->Text = "Can't process photos, run Migrate URLs first";
+
+		else
+			$this->arrMPnls['MigratePhotos']->Text = "Photos have been migrated and renamed to SEO names<br>";
 
 		$this->arrMPnls['MigratePhotos']->Visible = true;
 		$this->arrMPnls['MigratePhotos']->Refresh();
 	}
 
+	protected function MigrateURL(){
+		set_time_limit(1200);
 
+
+		$strReturn = "Running Convert SEO on Product table<br>";
+		$intRet = Product::ConvertSEO();
+		if ($intRet>0)
+			$strReturn .=  "<span style='font-size: 13pt'>Not all products converted (20000 converted). Click Perform again. $intRet remaining.<br>";
+		else {
+			$strReturn .=  "Running Convert SEO on Category table<br>";
+			Category::ConvertSEO();
+
+			$strReturn .=  "Running Convert SEO on Family table<br>";
+			Family::ConvertSEO();
+
+			$strReturn .=  "Running Convert SEO on CustomPage table<br>";
+			CustomPage::ConvertSEO();
+
+			$strReturn .= "Done!";
+
+		}
+		$this->arrMPnls['MigrateURL']->Text = $strReturn;
+
+		$this->arrMPnls['MigrateURL']->Visible = true;
+		$this->arrMPnls['MigrateURL']->Refresh();
+	}
 
 	protected function OffLineOnlineStore(){
 
@@ -6766,8 +6826,6 @@ class xlsws_admin_maintenance extends xlsws_admin {
 		_dbx("OPTIMIZE table xlsws_category");
 		_dbx("OPTIMIZE table xlsws_product_category_assn");
 		$this->arrMPnls['optimizeDB']->Text .= date('Y-m-d H:i:s ') .  _sp("Done!") . "<br/>";
-		_dbx("TRUNCATE table xlsws_log");
-		$this->arrMPnls['optimizeDB']->Text .= date('Y-m-d H:i:s ') .  _sp("Clearing system log table.") . "<br/>";
 
 		$this->arrMPnls['optimizeDB']->Visible = true;
 		$this->arrMPnls['optimizeDB']->Refresh();

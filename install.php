@@ -3381,6 +3381,8 @@ EOT;
 					unlink($v);
 				}
 
+				@rename(__DOCROOT__ . __SUBDIRECTORY__.'/index.html', __DOCROOT__ . __SUBDIRECTORY__.'old-index.html');
+
 				if ($blnShowNotes) {
 					$retVal .= "<P>Further Database updates may be done by logging into Admin Panel and choosing System->Tasks to complete any remaining steps shown above.";
 				}

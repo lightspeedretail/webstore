@@ -40,7 +40,8 @@ class xlsws_db_maintenance {
 
 	
 	private function perform_schema_changes() {
-	
+		set_time_limit(3600);
+
 		$strUpgradeText = "";
 		
 		//Prior to 2.1.4, we didn't have a schema version number so we still have to go from the beginning
@@ -417,12 +418,12 @@ class xlsws_db_maintenance {
 			$this->add_config_key('INVENTORY_RESERVED' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Deduct Pending Orders from Available Inventory', 
 				'INVENTORY_RESERVED', '1', 'This option will calculate Qty Available minus Pending Orders. Turning on Upload Orders in LightSpeed Tools->eCommerce->Documents is required to make this feature work properly.', 11, 4, NOW(), NOW(), 'BOOL',0);");
-			if ($this->add_column('xlsws_product' , 'inventory_reserved' ,
-				"ALTER TABLE xlsws_product ADD COLUMN inventory_reserved float NOT NULL DEFAULT 0 AFTER inventory_total;"))
-				_dbx("UPDATE xlsws_product SET inventory_reserved=0");
-			if ($this->add_column('xlsws_product' , 'inventory_avail' ,
-				"ALTER TABLE xlsws_product ADD COLUMN inventory_avail float NOT NULL DEFAULT 0 AFTER inventory_reserved;"))
-				_dbx("UPDATE xlsws_product SET inventory_avail=0");
+			$this->add_column('xlsws_product' , 'inventory_reserved' ,
+				"ALTER TABLE xlsws_product ADD COLUMN inventory_reserved float NOT NULL DEFAULT 0 AFTER inventory_total;");
+			$this->add_column('xlsws_product' , 'inventory_avail' ,
+				"ALTER TABLE xlsws_product ADD COLUMN inventory_avail float NOT NULL DEFAULT 0 AFTER inventory_reserved;");
+			_dbx("UPDATE xlsws_product SET inventory_reserved=0");
+			_dbx("UPDATE xlsws_product SET inventory_avail=0");
 			_dbx("UPDATE `xlsws_configuration` SET `title`='When a product is Out of Stock',
 				`options`='INVENTORY_OUT_ALLOW_ADD',`helper_text`='How should system treat products currently out of stock. Note: Turn OFF the checkbox for -Only Upload Products with Available Inventory- in Tools->eCommerce.' where `key`='INVENTORY_OUT_ALLOW_ADD'");
 			//_dbx("ALTER TABLE `xlsws_product` ADD INDEX (`inventory`, `inventory_avail`);");	//need to check if exists
@@ -443,23 +444,27 @@ class xlsws_db_maintenance {
 				`options`='SSL_NO_NEED_FORWARD',`helper_text`='Change when SSL secure mode is used.' where `key`='SSL_NO_NEED_FORWARD'");	
 				
 			//SEO Changes
-			if ($this->add_column('xlsws_category' , 'request_url' ,
-				"ALTER TABLE xlsws_category ADD COLUMN `request_url` varchar (255) AFTER `child_count`"))
-			Category::ConvertSEO();
-			$this->add_index('xlsws_category','request_url');
-			if ($this->add_column('xlsws_product' , 'request_url' ,
-				"ALTER TABLE xlsws_product ADD COLUMN `request_url` varchar (255) AFTER `web_keyword3`"))
-			Product::ConvertSEO();
-			$this->add_index('xlsws_product','request_url');	
-			if ($this->add_column('xlsws_custom_page' , 'request_url' ,
-				"ALTER TABLE xlsws_custom_page ADD COLUMN `request_url` varchar (255) AFTER `page`"))
-			CustomPage::ConvertSEO();
-			$this->add_index('xlsws_custom_page','request_url');	
-			if ($this->add_column('xlsws_family' , 'request_url' ,
-				"ALTER TABLE xlsws_family ADD COLUMN `request_url` varchar (255) AFTER `family`"))
-			Family::ConvertSEO();
+			$this->add_column('xlsws_category' , 'request_url' ,
+				"ALTER TABLE xlsws_category ADD COLUMN `request_url` varchar (255) AFTER `child_count`");
+			$this->add_column('xlsws_product' , 'request_url' ,
+				"ALTER TABLE xlsws_product ADD COLUMN `request_url` varchar (255) AFTER `web_keyword3`");
+			$this->add_column('xlsws_custom_page' , 'request_url' ,
+				"ALTER TABLE xlsws_custom_page ADD COLUMN `request_url` varchar (255) AFTER `page`");
+			$this->add_column('xlsws_family' , 'request_url' ,
+				"ALTER TABLE xlsws_family ADD COLUMN `request_url` varchar (255) AFTER `family`");
+
 			$this->add_index('xlsws_family','request_url');
+			$this->add_index('xlsws_category','request_url');
+			$this->add_index('xlsws_product','request_url');
+			$this->add_index('xlsws_custom_page','request_url');
 			$this->add_index('xlsws_product','image_id');
+
+			CustomPage::ConvertSEO();
+			Family::ConvertSEO();
+			Category::ConvertSEO();
+			$matches = _dbx("SELECT count(*) as thecount from xlsws_product","Query");
+			$row = $matches->FetchArray();
+			if ($row['thecount']<15000) Product::ConvertSEO();
 
 			
 			$this->add_config_key('SHOW_TEMPLATE_CODE' , 
@@ -736,7 +741,7 @@ class xlsws_db_maintenance {
 			$strUpgradeText .= "<br/>Upgrading to Database schema 250";
 			
 			
-			$strUpgradeText .= "<h2>Please run the steps MIGRATE PHOTOS (if available) and RECALCULATE PENDING ORDERS after running this Upgrade.</h2>";
+			$strUpgradeText .= "<h2>From Admin Panel (System->Tasks), please run the steps MIGRATE URLs (if available) , MIGRATE PHOTOS (if available) and RECALCULATE AVAILABLE INVENTORY after running this Upgrade. You also need to perform an Update Store command from LightSpeed.</h2>";
 			
 			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
 			$config->Value="250";
@@ -942,15 +947,20 @@ class xlsws_db_maintenance {
 		public function MigratePhotos() {
 
 			//First make sure we have our new names set
-			Product::ConvertSEO();
+			$matches = _dbx("SELECT count(*) as thecount from xlsws_product where coalesce(request_url,'') = ''", "Query");
+			$row = $matches->FetchArray();
+			if ($row['thecount']>0) return -1;
 
 			//Then switch to file system if it's not already
 			_xls_set_conf('IMAGE_STORE','FS');
 
-			$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE image_path NOT like '%/%' and rowid=parent ORDER BY rowid", "Query");
+			$intLimit = 3000;
+
+			$intDone=0;
+			$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE image_path NOT like '%/%' and rowid=parent ORDER BY rowid LIMIT ".$intLimit, "Query");
 			while ($objItem = $arrProducts->FetchObject()) {
 				$objImage = Images::Load($objItem->rowid);
-				echo $objImage->ImagePath." ".$objImage->Rowid." ".$objImage->Parent."<br>";
+				//echo $objImage->ImagePath." ".$objImage->Rowid." ".$objImage->Parent."<br>";
 
 				//We only care about the master photos, we'll delete the thumbnails and regenerate
 				if ($objImage->Rowid == $objImage->Parent) {
@@ -979,63 +989,76 @@ class xlsws_db_maintenance {
 
 					//echo $strName." ".$intRowId." ".$strAdd." ".$intIndex."<br>";
 					$objProduct = Product::Load($intRowId);
-					if ($objProduct && $objProduct->RequestUrl != '') {
-						$strNewImageName = Images::GetImageName(substr($objProduct->RequestUrl,0,60), 0, 0, $intIndex, $strAdd);
+					if ($objProduct) {
+						if ($objProduct->RequestUrl != '') {
+							$strNewImageName = Images::GetImageName(substr($objProduct->RequestUrl,0,60), 0, 0, $intIndex, $strAdd);
 
 
-						//If the image already exists, we just have to rename and move it, and update the db record
+							//If the image already exists, we just have to rename and move it, and update the db record
 
-						if ($objImage->ImageFileExists()) {
-							if (exif_imagetype(Images::GetImagePath($strNewImageName)) == IMAGETYPE_JPEG)
-								$strNewImageName = substr($strNewImageName,0,-4) . ".jpg";
-							//echo "renaming ".$strExistingPath." to ".$strNewImageName."<br>";
-							$strPath = Images::GetImagePath($strNewImageName);
-							$arrPath = pathinfo($strPath);
-							$strFolder = $arrPath['dirname']; echo $strFolder."<br>";
-							if (!$objImage->SaveImageFolder($strFolder))
-								return "Halting: error creating folder ".$strFolder;
+							if ($objImage->ImageFileExists()) {
+								if (exif_imagetype(Images::GetImagePath($strNewImageName)) == IMAGETYPE_JPEG)
+									$strNewImageName = substr($strNewImageName,0,-4) . ".jpg";
+								//echo "renaming ".$strExistingPath." to ".$strNewImageName."<br>";
+								$strPath = Images::GetImagePath($strNewImageName);
+								$arrPath = pathinfo($strPath);
+								$strFolder = $arrPath['dirname']; echo $strFolder."<br>";
+								if (!$objImage->SaveImageFolder($strFolder))
+									return "Halting: error creating folder ".$strFolder;
 
-							if (!rename(Images::GetImagePath($strExistingPath), Images::GetImagePath($strNewImageName)))
-								return "Halting: error trying to rename ".$strExistingPath." to ".$strNewImageName;
-							$objImage->ImagePath=$strNewImageName;
-							$objImage->ImageData=null;
-							$objImage->Save();
-
-						} else {
-							//echo Images::GetImagePath($objImage->ImagePath)." doesn't exist<br>";
-							$blbImage = $objImage->GetImageData();
-							if (empty($blbImage)) {
-								//We have missing photo data and/or bad file, clean up. Worse case we have to reupload.
-								$objProduct->ImageId = null;
-								$objProduct->Save();
-								$objImage->Delete();
-							} else {
-								$objImage->SaveImageData($strNewImageName, $blbImage);
-								$objImage->Reload();
+								if (!rename(Images::GetImagePath($strExistingPath), Images::GetImagePath($strNewImageName)))
+									return "Halting: error trying to rename ".$strExistingPath." to ".$strNewImageName;
 								$objImage->ImagePath=$strNewImageName;
 								$objImage->ImageData=null;
 								$objImage->Save();
+
+							} else {
+								//echo Images::GetImagePath($objImage->ImagePath)." doesn't exist<br>";
+								$blbImage = $objImage->GetImageData();
+								if (empty($blbImage)) {
+									//We have missing photo data and/or bad file, clean up. Worse case we have to reupload.
+									$objProduct->ImageId = null;
+									$objProduct->Save();
+									$objImage->Delete();
+								} else {
+									$objImage->SaveImageData($strNewImageName, $blbImage);
+									$objImage->Reload();
+									$objImage->ImagePath=$strNewImageName;
+									$objImage->ImageData=null;
+									$objImage->Save();
+								}
 							}
 						}
+					} else $objImage->Delete();
 
-					}
+				}
 
+				$intDone++;
+			}
+
+
+			$ctPic = _dbx("select count(*) as thecount FROM xlsws_images WHERE image_path NOT like '%/%' and rowid=parent",'Query');
+			$arrTotal = $ctPic->FetchArray();
+			$intCt = $arrTotal['thecount'];
+
+			if ($arrTotal['thecount']==0 ) {
+				//Now we remove all the thumbnails because our browsing will recreate them
+				$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE image_path NOT like '%/%' and rowid <> parent ORDER BY rowid LIMIT 3000", "Query");
+				while ($objItem = $arrProducts->FetchObject()) {
+					$objImage = Images::Load($objItem->rowid);
+					$objImage->DeleteImage();
+					//We delete directly because our class would attempt to remove the parent which we don't want
+					_dbx('DELETE FROM `xlsws_images` WHERE `rowid` = ' . $objImage->Rowid . '');
 				}
 
 
 			}
 
-			//Now we remove all the thumbnails because our browsing will recreate them
-			$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE image_path NOT like '%/%' and rowid <> parent ORDER BY rowid", "Query");
-			while ($objItem = $arrProducts->FetchObject()) {
-				$objImage = Images::Load($objItem->rowid);
-				$objImage->DeleteImage();
-				//We delete directly because our class would attempt to remove the parent which we don't want
-				_dbx('DELETE FROM `xlsws_images` WHERE `rowid` = ' . $objImage->Rowid . '');
-			}
+			$ctPic = _dbx("select count(*) as thecount FROM xlsws_images WHERE image_path NOT like '%/%' and rowid<>parent",'Query');
+			$arrTotal = $ctPic->FetchArray();
+			$intCt += $arrTotal['thecount'];
 
-
-			return "Photos have been migrated and renamed to SEO names.";
+			return $intCt;
 
 		}
 

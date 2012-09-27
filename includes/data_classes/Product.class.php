@@ -142,15 +142,18 @@ class Product extends ProductGen {
 		//so we just have to do this directly with the db
 		$db = Product::GetDatabase();
 
-		$matches = $db->Query("SELECT rowid,name,code from xlsws_product where coalesce(request_url,'') = '' order by rowid");
+		$matches = $db->Query("SELECT rowid,name,code from xlsws_product where coalesce(request_url,'') = '' order by rowid LIMIT 20000");
 			
 		while ($row = $matches->FetchArray()) {
+			if ($row['name']=='') $row['name']='no-description';
 			_dbx("UPDATE xlsws_product SET request_url='".
 				_xls_seo_url(_xls_get_conf('SEO_URL_CODES' , 0) ? $row['name']."-".$row['code'] : $row['name'])."'
 				WHERE rowid=".$row['rowid']);
-				
 		}
-	
+
+		$matches = $db->Query("SELECT count(*) as thecount from xlsws_product where coalesce(request_url,'') = ''");
+		$row = $matches->FetchArray();
+		return $row['thecount'];
 
 	}
 	
