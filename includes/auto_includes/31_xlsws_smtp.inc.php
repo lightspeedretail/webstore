@@ -52,7 +52,7 @@
                 QEmailServer::$SmtpPort = $strPort;
 
                 if (_xls_get_conf('EMAIL_SMTP_USERNAME',false)) { 
-                    QEmailServer::$AuthLogin = true;
+                    _xls_get_conf('EMAIL_SMTP_AUTH_PLAIN',false) ? QEmailServer::$AuthPlain = true : QEmailServer::$AuthLogin = true;
                     QEmailServer::$SmtpUsername = 
                         _xls_get_conf('EMAIL_SMTP_USERNAME');
                     QEmailServer::$SmtpPassword = 

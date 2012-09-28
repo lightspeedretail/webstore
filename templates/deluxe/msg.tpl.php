@@ -30,7 +30,7 @@
 <br style="clear:both"/>
 
 <div class="msg">
-<?php _xt($this->msg); ?>.	
+<?php echo $this->msg; ?>	
 </div>
 
 <br style="clear:both"/>

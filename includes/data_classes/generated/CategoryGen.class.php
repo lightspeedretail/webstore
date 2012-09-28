@@ -20,8 +20,10 @@
 	 * @property integer $Parent the value for intParent 
 	 * @property integer $Position the value for intPosition (Not Null)
 	 * @property integer $ChildCount the value for intChildCount 
+	 * @property string $RequestUrl the value for strRequestUrl 
 	 * @property string $CustomPage the value for strCustomPage 
 	 * @property integer $ImageId the value for intImageId 
+	 * @property integer $GoogleId the value for intGoogleId 
 	 * @property string $MetaKeywords the value for strMetaKeywords 
 	 * @property string $MetaDescription the value for strMetaDescription 
 	 * @property QDateTime $Created the value for dttCreated 
@@ -81,6 +83,15 @@
 
 
 		/**
+		 * Protected member variable that maps to the database column xlsws_category.request_url
+		 * @var string strRequestUrl
+		 */
+		protected $strRequestUrl;
+		const RequestUrlMaxLength = 255;
+		const RequestUrlDefault = null;
+
+
+		/**
 		 * Protected member variable that maps to the database column xlsws_category.custom_page
 		 * @var string strCustomPage
 		 */
@@ -95,6 +106,14 @@
 		 */
 		protected $intImageId;
 		const ImageIdDefault = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_category.google_id
+		 * @var integer intGoogleId
+		 */
+		protected $intGoogleId;
+		const GoogleIdDefault = null;
 
 
 		/**
@@ -259,7 +278,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -321,7 +340,7 @@
 		 * Static Qcodo Query method to query for a single Category object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Category the queried object
 		 */
@@ -334,16 +353,38 @@
 				throw $objExc;
 			}
 
-			// Perform the Query, Get the First Row, and Instantiate a new Category object
+			// Perform the Query
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-			return Category::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
+
+			// Instantiate a new Category object and return it
+
+			// Do we have to expand anything?
+			if ($objQueryBuilder->ExpandAsArrayNodes) {
+				$objToReturn = array();
+				while ($objDbRow = $objDbResult->GetNextRow()) {
+					$objItem = Category::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
+					if ($objItem) $objToReturn[] = $objItem;
+				}
+
+				if (count($objToReturn)) {
+					// Since we only want the object to return, lets return the object and not the array.
+					return $objToReturn[0];
+				} else {
+					return null;
+				}
+			} else {
+				// No expands just return the first row
+				$objDbRow = $objDbResult->GetNextRow();
+				if (is_null($objDbRow)) return null;
+				return Category::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
+			}
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of Category objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Category[] the queried objects as an array
 		 */
@@ -362,10 +403,35 @@
 		}
 
 		/**
+		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
+		 * Uses BuildQueryStatment to perform most of the work.
+		 * @param QQCondition $objConditions any conditions on the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
+		 * @return QDatabaseResultBase the cursor resource instance
+		 */
+		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
+			// Get the query statement
+			try {
+				$strQuery = Category::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+
+			// Perform the query
+			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
+		
+			// Return the results cursor
+			$objDbResult->QueryBuilder = $objQueryBuilder;
+			return $objDbResult;
+		}
+
+		/**
 		 * Static Qcodo Query method to query for a count of Category objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -463,8 +529,10 @@
 			$objBuilder->AddSelectItem($strTableName, 'parent', $strAliasPrefix . 'parent');
 			$objBuilder->AddSelectItem($strTableName, 'position', $strAliasPrefix . 'position');
 			$objBuilder->AddSelectItem($strTableName, 'child_count', $strAliasPrefix . 'child_count');
+			$objBuilder->AddSelectItem($strTableName, 'request_url', $strAliasPrefix . 'request_url');
 			$objBuilder->AddSelectItem($strTableName, 'custom_page', $strAliasPrefix . 'custom_page');
 			$objBuilder->AddSelectItem($strTableName, 'image_id', $strAliasPrefix . 'image_id');
+			$objBuilder->AddSelectItem($strTableName, 'google_id', $strAliasPrefix . 'google_id');
 			$objBuilder->AddSelectItem($strTableName, 'meta_keywords', $strAliasPrefix . 'meta_keywords');
 			$objBuilder->AddSelectItem($strTableName, 'meta_description', $strAliasPrefix . 'meta_description');
 			$objBuilder->AddSelectItem($strTableName, 'created', $strAliasPrefix . 'created');
@@ -483,7 +551,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this Category::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param DatabaseRowBase $objDbRow
+		 * @param QDatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -556,10 +624,14 @@
 			$objToReturn->intPosition = $objDbRow->GetColumn($strAliasName, 'Integer');
 			$strAliasName = array_key_exists($strAliasPrefix . 'child_count', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'child_count'] : $strAliasPrefix . 'child_count';
 			$objToReturn->intChildCount = $objDbRow->GetColumn($strAliasName, 'Integer');
+			$strAliasName = array_key_exists($strAliasPrefix . 'request_url', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'request_url'] : $strAliasPrefix . 'request_url';
+			$objToReturn->strRequestUrl = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'custom_page', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'custom_page'] : $strAliasPrefix . 'custom_page';
 			$objToReturn->strCustomPage = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'image_id', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'image_id'] : $strAliasPrefix . 'image_id';
 			$objToReturn->intImageId = $objDbRow->GetColumn($strAliasName, 'Integer');
+			$strAliasName = array_key_exists($strAliasPrefix . 'google_id', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'google_id'] : $strAliasPrefix . 'google_id';
+			$objToReturn->intGoogleId = $objDbRow->GetColumn($strAliasName, 'Integer');
 			$strAliasName = array_key_exists($strAliasPrefix . 'meta_keywords', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'meta_keywords'] : $strAliasPrefix . 'meta_keywords';
 			$objToReturn->strMetaKeywords = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'meta_description', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'meta_description'] : $strAliasPrefix . 'meta_description';
@@ -615,7 +687,7 @@
 
 		/**
 		 * Instantiate an array of Categories from a Database Result
-		 * @param DatabaseResultBase $objDbResult
+		 * @param QDatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return Category[]
@@ -648,6 +720,32 @@
 			return $objToReturn;
 		}
 
+		/**
+		 * Instantiate a single Category object from a query cursor (e.g. a DB ResultSet).
+		 * Cursor is automatically moved to the "next row" of the result set.
+		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
+		 * @param QDatabaseResultBase $objDbResult cursor resource
+		 * @return Category next row resulting from the query
+		 */
+		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
+			// If blank resultset, then return empty result
+			if (!$objDbResult) return null;
+
+			// If empty resultset, then return empty result
+			$objDbRow = $objDbResult->GetNextRow();
+			if (!$objDbRow) return null;
+
+			// We need the Column Aliases
+			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
+			if (!$strColumnAliasArray) $strColumnAliasArray = array();
+
+			// Pull Expansions (if applicable)
+			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
+
+			// Load up the return result with a row and return it
+			return Category::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
+		}
+
 
 
 
@@ -661,9 +759,10 @@
 		 * @param integer $intRowid
 		 * @return Category
 		*/
-		public static function LoadByRowid($intRowid) {
+		public static function LoadByRowid($intRowid, $objOptionalClauses = null) {
 			return Category::QuerySingle(
 				QQ::Equal(QQN::Category()->Rowid, $intRowid)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -679,7 +778,8 @@
 			try {
 				return Category::QueryArray(
 					QQ::Equal(QQN::Category()->Name, $strName),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -692,10 +792,11 @@
 		 * @param string $strName
 		 * @return int
 		*/
-		public static function CountByName($strName) {
+		public static function CountByName($strName, $objOptionalClauses = null) {
 			// Call Category::QueryCount to perform the CountByName query
 			return Category::QueryCount(
 				QQ::Equal(QQN::Category()->Name, $strName)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -711,7 +812,8 @@
 			try {
 				return Category::QueryArray(
 					QQ::Equal(QQN::Category()->Parent, $intParent),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -724,10 +826,45 @@
 		 * @param integer $intParent
 		 * @return int
 		*/
-		public static function CountByParent($intParent) {
+		public static function CountByParent($intParent, $objOptionalClauses = null) {
 			// Call Category::QueryCount to perform the CountByParent query
 			return Category::QueryCount(
 				QQ::Equal(QQN::Category()->Parent, $intParent)
+			, $objOptionalClauses
+			);
+		}
+			
+		/**
+		 * Load an array of Category objects,
+		 * by RequestUrl Index(es)
+		 * @param string $strRequestUrl
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @return Category[]
+		*/
+		public static function LoadArrayByRequestUrl($strRequestUrl, $objOptionalClauses = null) {
+			// Call Category::QueryArray to perform the LoadArrayByRequestUrl query
+			try {
+				return Category::QueryArray(
+					QQ::Equal(QQN::Category()->RequestUrl, $strRequestUrl),
+					$objOptionalClauses
+					);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
+
+		/**
+		 * Count Categories
+		 * by RequestUrl Index(es)
+		 * @param string $strRequestUrl
+		 * @return int
+		*/
+		public static function CountByRequestUrl($strRequestUrl, $objOptionalClauses = null) {
+			// Call Category::QueryCount to perform the CountByRequestUrl query
+			return Category::QueryCount(
+				QQ::Equal(QQN::Category()->RequestUrl, $strRequestUrl)
+			, $objOptionalClauses
 			);
 		}
 
@@ -762,18 +899,19 @@
 		 * @param integer $intProductId
 		 * @return int
 		*/
-		public static function CountByProduct($intProductId) {
+		public static function CountByProduct($intProductId, $objOptionalClauses = null) {
 			return Category::QueryCount(
-				QQ::Equal(QQN::Category()->Product->ProductId, $intProductId)
+				QQ::Equal(QQN::Category()->Product->ProductId, $intProductId),
+				$objOptionalClauses
 			);
 		}
 
 
 
 
-		//////////////////////////
-		// SAVE, DELETE AND RELOAD
-		//////////////////////////
+		//////////////////////////////////////
+		// SAVE, DELETE, RELOAD
+		//////////////////////////////////////
 
 		/**
 		 * Save this Category
@@ -796,8 +934,10 @@
 							`parent`,
 							`position`,
 							`child_count`,
+							`request_url`,
 							`custom_page`,
 							`image_id`,
+							`google_id`,
 							`meta_keywords`,
 							`meta_description`,
 							`created`
@@ -806,8 +946,10 @@
 							' . $objDatabase->SqlVariable($this->intParent) . ',
 							' . $objDatabase->SqlVariable($this->intPosition) . ',
 							' . $objDatabase->SqlVariable($this->intChildCount) . ',
+							' . $objDatabase->SqlVariable($this->strRequestUrl) . ',
 							' . $objDatabase->SqlVariable($this->strCustomPage) . ',
 							' . $objDatabase->SqlVariable($this->intImageId) . ',
+							' . $objDatabase->SqlVariable($this->intGoogleId) . ',
 							' . $objDatabase->SqlVariable($this->strMetaKeywords) . ',
 							' . $objDatabase->SqlVariable($this->strMetaDescription) . ',
 							' . $objDatabase->SqlVariable($this->dttCreated) . '
@@ -816,6 +958,9 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intRowid = $objDatabase->InsertId('xlsws_category', 'rowid');
+
+					
+
 				} else {
 					// Perform an UPDATE query
 
@@ -845,14 +990,18 @@
 							`parent` = ' . $objDatabase->SqlVariable($this->intParent) . ',
 							`position` = ' . $objDatabase->SqlVariable($this->intPosition) . ',
 							`child_count` = ' . $objDatabase->SqlVariable($this->intChildCount) . ',
+							`request_url` = ' . $objDatabase->SqlVariable($this->strRequestUrl) . ',
 							`custom_page` = ' . $objDatabase->SqlVariable($this->strCustomPage) . ',
 							`image_id` = ' . $objDatabase->SqlVariable($this->intImageId) . ',
+							`google_id` = ' . $objDatabase->SqlVariable($this->intGoogleId) . ',
 							`meta_keywords` = ' . $objDatabase->SqlVariable($this->strMetaKeywords) . ',
 							`meta_description` = ' . $objDatabase->SqlVariable($this->strMetaDescription) . ',
 							`created` = ' . $objDatabase->SqlVariable($this->dttCreated) . '
 						WHERE
 							`rowid` = ' . $objDatabase->SqlVariable($this->intRowid) . '
 					');
+
+					
 				}
 
 			} catch (QCallerException $objExc) {
@@ -898,6 +1047,8 @@
 					`xlsws_category`
 				WHERE
 					`rowid` = ' . $objDatabase->SqlVariable($this->intRowid) . '');
+
+			
 		}
 
 		/**
@@ -944,15 +1095,17 @@
 			$this->Parent = $objReloaded->Parent;
 			$this->intPosition = $objReloaded->intPosition;
 			$this->intChildCount = $objReloaded->intChildCount;
+			$this->strRequestUrl = $objReloaded->strRequestUrl;
 			$this->strCustomPage = $objReloaded->strCustomPage;
 			$this->intImageId = $objReloaded->intImageId;
+			$this->intGoogleId = $objReloaded->intGoogleId;
 			$this->strMetaKeywords = $objReloaded->strMetaKeywords;
 			$this->strMetaDescription = $objReloaded->strMetaDescription;
 			$this->dttCreated = $objReloaded->dttCreated;
 			$this->strModified = $objReloaded->strModified;
 		}
 
-
+		
 
 		////////////////////
 		// PUBLIC OVERRIDERS
@@ -995,6 +1148,11 @@
 					// @return integer
 					return $this->intChildCount;
 
+				case 'RequestUrl':
+					// Gets the value for strRequestUrl 
+					// @return string
+					return $this->strRequestUrl;
+
 				case 'CustomPage':
 					// Gets the value for strCustomPage 
 					// @return string
@@ -1004,6 +1162,11 @@
 					// Gets the value for intImageId 
 					// @return integer
 					return $this->intImageId;
+
+				case 'GoogleId':
+					// Gets the value for intGoogleId 
+					// @return integer
+					return $this->intGoogleId;
 
 				case 'MetaKeywords':
 					// Gets the value for strMetaKeywords 
@@ -1143,6 +1306,17 @@
 						throw $objExc;
 					}
 
+				case 'RequestUrl':
+					// Sets the value for strRequestUrl 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strRequestUrl = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
 				case 'CustomPage':
 					// Sets the value for strCustomPage 
 					// @param string $mixValue
@@ -1160,6 +1334,17 @@
 					// @return integer
 					try {
 						return ($this->intImageId = QType::Cast($mixValue, QType::Integer));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'GoogleId':
+					// Sets the value for intGoogleId 
+					// @param integer $mixValue
+					// @return integer
+					try {
+						return ($this->intGoogleId = QType::Cast($mixValue, QType::Integer));
 					} catch (QCallerException $objExc) {
 						$objExc->IncrementOffset();
 						throw $objExc;
@@ -1315,6 +1500,8 @@
 				WHERE
 					`rowid` = ' . $objDatabase->SqlVariable($objCategory->Rowid) . '
 			');
+
+			
 		}
 
 		/**
@@ -1341,6 +1528,8 @@
 					`rowid` = ' . $objDatabase->SqlVariable($objCategory->Rowid) . ' AND
 					`parent` = ' . $objDatabase->SqlVariable($this->intRowid) . '
 			');
+
+			
 		}
 
 		/**
@@ -1353,6 +1542,8 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Category::GetDatabase();
+
+			
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1387,6 +1578,8 @@
 					`rowid` = ' . $objDatabase->SqlVariable($objCategory->Rowid) . ' AND
 					`parent` = ' . $objDatabase->SqlVariable($this->intRowid) . '
 			');
+
+			
 		}
 
 		/**
@@ -1400,6 +1593,7 @@
 			// Get the Database Object for this Class
 			$objDatabase = Category::GetDatabase();
 
+			
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
@@ -1462,6 +1656,8 @@
 			return ($intRowCount > 0);
 		}
 
+
+
 		/**
 		 * Associates a Product
 		 * @param Product $objProduct
@@ -1486,6 +1682,8 @@
 					' . $objDatabase->SqlVariable($objProduct->Rowid) . '
 				)
 			');
+
+			
 		}
 
 		/**
@@ -1510,6 +1708,8 @@
 					`category_id` = ' . $objDatabase->SqlVariable($this->intRowid) . ' AND
 					`product_id` = ' . $objDatabase->SqlVariable($objProduct->Rowid) . '
 			');
+
+		
 		}
 
 		/**
@@ -1546,8 +1746,10 @@
 			$strToReturn .= '<element name="ParentObject" type="xsd1:Category"/>';
 			$strToReturn .= '<element name="Position" type="xsd:int"/>';
 			$strToReturn .= '<element name="ChildCount" type="xsd:int"/>';
+			$strToReturn .= '<element name="RequestUrl" type="xsd:string"/>';
 			$strToReturn .= '<element name="CustomPage" type="xsd:string"/>';
 			$strToReturn .= '<element name="ImageId" type="xsd:int"/>';
+			$strToReturn .= '<element name="GoogleId" type="xsd:int"/>';
 			$strToReturn .= '<element name="MetaKeywords" type="xsd:string"/>';
 			$strToReturn .= '<element name="MetaDescription" type="xsd:string"/>';
 			$strToReturn .= '<element name="Created" type="xsd:dateTime"/>';
@@ -1586,10 +1788,14 @@
 				$objToReturn->intPosition = $objSoapObject->Position;
 			if (property_exists($objSoapObject, 'ChildCount'))
 				$objToReturn->intChildCount = $objSoapObject->ChildCount;
+			if (property_exists($objSoapObject, 'RequestUrl'))
+				$objToReturn->strRequestUrl = $objSoapObject->RequestUrl;
 			if (property_exists($objSoapObject, 'CustomPage'))
 				$objToReturn->strCustomPage = $objSoapObject->CustomPage;
 			if (property_exists($objSoapObject, 'ImageId'))
 				$objToReturn->intImageId = $objSoapObject->ImageId;
+			if (property_exists($objSoapObject, 'GoogleId'))
+				$objToReturn->intGoogleId = $objSoapObject->GoogleId;
 			if (property_exists($objSoapObject, 'MetaKeywords'))
 				$objToReturn->strMetaKeywords = $objSoapObject->MetaKeywords;
 			if (property_exists($objSoapObject, 'MetaDescription'))
@@ -1636,6 +1842,11 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
+	/**
+	 * @property-read QQNode $ProductId
+	 * @property-read QQNodeProduct $Product
+	 * @property-read QQNodeProduct $_ChildTableNode
+	 */
 	class QQNodeCategoryProduct extends QQAssociationNode {
 		protected $strType = 'association';
 		protected $strName = 'product';
@@ -1663,6 +1874,24 @@
 		}
 	}
 
+	/**
+	 * @property-read QQNode $Rowid
+	 * @property-read QQNode $Name
+	 * @property-read QQNode $Parent
+	 * @property-read QQNodeCategory $ParentObject
+	 * @property-read QQNode $Position
+	 * @property-read QQNode $ChildCount
+	 * @property-read QQNode $RequestUrl
+	 * @property-read QQNode $CustomPage
+	 * @property-read QQNode $ImageId
+	 * @property-read QQNode $GoogleId
+	 * @property-read QQNode $MetaKeywords
+	 * @property-read QQNode $MetaDescription
+	 * @property-read QQNode $Created
+	 * @property-read QQNode $Modified
+	 * @property-read QQNodeCategoryProduct $Product
+	 * @property-read QQReverseReferenceNodeCategory $ChildCategory
+	 */
 	class QQNodeCategory extends QQNode {
 		protected $strTableName = 'xlsws_category';
 		protected $strPrimaryKey = 'rowid';
@@ -1681,10 +1910,14 @@
 					return new QQNode('position', 'Position', 'integer', $this);
 				case 'ChildCount':
 					return new QQNode('child_count', 'ChildCount', 'integer', $this);
+				case 'RequestUrl':
+					return new QQNode('request_url', 'RequestUrl', 'string', $this);
 				case 'CustomPage':
 					return new QQNode('custom_page', 'CustomPage', 'string', $this);
 				case 'ImageId':
 					return new QQNode('image_id', 'ImageId', 'integer', $this);
+				case 'GoogleId':
+					return new QQNode('google_id', 'GoogleId', 'integer', $this);
 				case 'MetaKeywords':
 					return new QQNode('meta_keywords', 'MetaKeywords', 'string', $this);
 				case 'MetaDescription':
@@ -1710,7 +1943,26 @@
 			}
 		}
 	}
-
+	
+	/**
+	 * @property-read QQNode $Rowid
+	 * @property-read QQNode $Name
+	 * @property-read QQNode $Parent
+	 * @property-read QQNodeCategory $ParentObject
+	 * @property-read QQNode $Position
+	 * @property-read QQNode $ChildCount
+	 * @property-read QQNode $RequestUrl
+	 * @property-read QQNode $CustomPage
+	 * @property-read QQNode $ImageId
+	 * @property-read QQNode $GoogleId
+	 * @property-read QQNode $MetaKeywords
+	 * @property-read QQNode $MetaDescription
+	 * @property-read QQNode $Created
+	 * @property-read QQNode $Modified
+	 * @property-read QQNodeCategoryProduct $Product
+	 * @property-read QQReverseReferenceNodeCategory $ChildCategory
+	 * @property-read QQNode $_PrimaryKeyNode
+	 */
 	class QQReverseReferenceNodeCategory extends QQReverseReferenceNode {
 		protected $strTableName = 'xlsws_category';
 		protected $strPrimaryKey = 'rowid';
@@ -1729,10 +1981,14 @@
 					return new QQNode('position', 'Position', 'integer', $this);
 				case 'ChildCount':
 					return new QQNode('child_count', 'ChildCount', 'integer', $this);
+				case 'RequestUrl':
+					return new QQNode('request_url', 'RequestUrl', 'string', $this);
 				case 'CustomPage':
 					return new QQNode('custom_page', 'CustomPage', 'string', $this);
 				case 'ImageId':
 					return new QQNode('image_id', 'ImageId', 'integer', $this);
+				case 'GoogleId':
+					return new QQNode('google_id', 'GoogleId', 'integer', $this);
 				case 'MetaKeywords':
 					return new QQNode('meta_keywords', 'MetaKeywords', 'string', $this);
 				case 'MetaDescription':

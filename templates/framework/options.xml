@@ -1,0 +1,52 @@
+<defaults>
+	<image>
+		<keystring>CATEGORY_IMAGE_HEIGHT</keystring>
+		<valuestring>180</valuestring>
+	</image>
+	<image>
+		<keystring>CATEGORY_IMAGE_WIDTH</keystring>
+		<valuestring>180</valuestring>
+	</image>
+	<image>
+		<keystring>DETAIL_IMAGE_HEIGHT</keystring>
+		<valuestring>256</valuestring>
+	</image>
+	<image>
+		<keystring>DETAIL_IMAGE_WIDTH</keystring>
+		<valuestring>256</valuestring>
+	</image>
+	<image>
+		<keystring>LISTING_IMAGE_HEIGHT</keystring>
+		<valuestring>90</valuestring>
+	</image>
+	<image>
+		<keystring>LISTING_IMAGE_WIDTH</keystring>
+		<valuestring>90</valuestring>
+	</image>
+	<image>
+		<keystring>MINI_IMAGE_HEIGHT</keystring>
+		<valuestring>30</valuestring>
+	</image>
+	<image>
+		<keystring>MINI_IMAGE_WIDTH</keystring>
+		<valuestring>30</valuestring>
+	</image>
+	<image>
+		<keystring>PREVIEW_IMAGE_HEIGHT</keystring>
+		<valuestring>30</valuestring>
+	</image>
+	<image>
+		<keystring>PREVIEW_IMAGE_WIDTH</keystring>
+		<valuestring>30</valuestring>
+	</image>
+	<image>
+		<keystring>SLIDER_IMAGE_HEIGHT</keystring>
+		<valuestring>90</valuestring>
+	</image>
+	<image>
+		<keystring>SLIDER_IMAGE_WIDTH</keystring>
+		<valuestring>90</valuestring>
+	</image>
+</defaults>
+
+

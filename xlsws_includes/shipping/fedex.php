@@ -38,26 +38,9 @@ class fedex extends xlsws_class_shipping {
 	 *
 	 *
 	 */
-	public function name() {
-		$config = $this->getConfigValues(get_class($this));
+	protected $strModuleName = "FedEx";
 
-		if(isset($config['label']))
-			return $config['label'];
-
-		return $this->admin_name();
-	}
-
-	/**
-	 * The name of the shipping module that will be displayed in Web Admin payments
-	 * @return string
-	 *
-	 *
-	 */
-	public function admin_name() {
-		return _sp("FedEx");
-	}
-
-	/**
+		/**
 	 * check() verifies nothing has changed in the configuration since initial load
 	 * @return boolean
 	 *
@@ -72,6 +55,27 @@ class fedex extends xlsws_class_shipping {
 		// if nothing has been configed return null
 		if(!$vals || count($vals) == 0)
 			return false;
+
+		//Check possible scenarios why we would not offer this type of shipping
+		if ($vals['restrictcountry']) { //we have a country restriction
+
+			switch($vals['restrictcountry']) {
+			case 'CUS':
+				if ($_SESSION['XLSWS_CART']->ShipCountry=="US" &&
+					($_SESSION['XLSWS_CART']->ShipState =="AK" || $_SESSION['XLSWS_CART']->ShipState=="HI"))
+					return false;
+				break;
+
+			case 'NORAM':
+				if ($_SESSION['XLSWS_CART']->ShipCountry != "US" && $_SESSION['XLSWS_CART']->ShipCountry != "CA")
+					return false;
+				break;
+
+			default:
+				if ($vals['restrictcountry']!=$_SESSION['XLSWS_CART']->ShipCountry) return false;
+			}
+		}
+
 		return true;
 	}
 
@@ -182,8 +186,18 @@ class fedex extends xlsws_class_shipping {
 		$ret['customs']->AddItem('FedEx Handles Customs Clearance', 'CLEARANCEFEE');
 		$ret['customs']->AddItem('We handle Customs Clearance', 'NOCHARGE');
 
+		$ret['restrictcountry'] = new XLSListBox($objParent);
+		$ret['restrictcountry']->Name = _sp('Only allow '.$this->strModuleName.' to');
+		$ret['restrictcountry']->AddItem('Everywhere (no restriction)', null);
+		$ret['restrictcountry']->AddItem('My Country ('. _xls_get_conf('DEFAULT_COUNTRY').')', _xls_get_conf('DEFAULT_COUNTRY'));
+		if (_xls_get_conf('DEFAULT_COUNTRY')=="US")
+			$ret['restrictcountry']->AddItem('Continental US', 'CUS'); //Really common request, so make a special entry
+		$ret['restrictcountry']->AddItem('North America (US/CA)', 'NORAM');
+		$ret['restrictcountry']->Enabled = true;
+		$ret['restrictcountry']->SelectedIndex = 0;
+           		
 		$ret['product'] = new XLSTextBox($objParent);
-		$ret['product']->Name = _sp('LightSpeed Product Code');
+		$ret['product']->Name = _sp('LightSpeed Product Code (case sensitive)');
 		$ret['product']->Required = true;
 		$ret['product']->Text = 'SHIPPING';
 
@@ -227,11 +241,11 @@ class fedex extends xlsws_class_shipping {
 	 */
 	public function customer_fields($objParent) {
 		$ret = array();
-		$config = $this->getConfigValues('fedex');
+		$config = $this->getConfigValues(get_class($this));
 
-		$ret['service'] = new XLSListBox($objParent);
+		$ret['service'] = new XLSListBox($objParent,'ModuleMethod');
 		$this->make_Fedex_services($ret['service']);
-		$ret['service']->Name = _sp('Preference:');
+		//$ret['service']->Name = _sp('Preference:');
 		return $ret;
 	}
 
@@ -319,16 +333,16 @@ class fedex extends xlsws_class_shipping {
 	public function total($fields, $cart, $country = '', $zipcode = '', $state = '',
 			$city = '', $address2 = '', $address1= '', $company = '', $lname = '', $fname = '') {
 
-		$config = $this->getConfigValues('fedex');
+		$config = $this->getConfigValues(get_class($this));
 
-		$weight = $cart->total_weight();
+		$weight = $cart->Weight;
 
 		if(_xls_get_conf('WEIGHT_UNIT' , 'lb') != 'lb')
 			$weight = $weight * 2.2;   // one KG is 2.2 pounds
 
-		$length = $cart->total_length();
-		$width = $cart->total_width();
-		$height = $cart->total_height();
+		$length = $cart->Length;
+		$width = $cart->Width;
+		$height = $cart->Height;
 
 		if(_xls_get_conf('DIMENSION_UNIT' , 'in') != 'in') {
 			$length = round($length /2.54);
@@ -345,192 +359,210 @@ class fedex extends xlsws_class_shipping {
 			return FALSE;
 
 		$selected = $fields['service']->SelectedValue;
-
-		$fields['service']->RemoveAllItems();
-
-		$ret = array();
-
-		$newline = "<br />";
-
-		//The WSDL is not included with the sample code.
-		//Please include and reference in $path_to_wsdl variable.
-
-		$path_to_wsdl = XLSWS_INCLUDES . "shipping" . "/" . "RateService_v7.wsdl";
-
-		ini_set("soap.wsdl_cache_enabled", "0");
-
-		$client = new SoapClient($path_to_wsdl, array('trace' => 1));
-
-		$request['WebAuthenticationDetail'] = array(
-			'UserCredential' => array(
-				'Key' => $config['authkey'],
-				'Password' => $config['securitycode']
-			)
-		);
-		$request['ClientDetail'] = array('AccountNumber' => $config['accnumber'], 'MeterNumber' => $config['meternumber']);
-		$request['TransactionDetail'] = array('CustomerTransactionId' => ' *** Rate Request v7 using PHP ***');
-		$request['Version'] = array('ServiceId' => 'crs', 'Major' => '7', 'Intermediate' => '0', 'Minor' => '0');
-		$request['ReturnTransitAndCommit'] = true;
-		$request['RequestedShipment']['DropoffType'] = 'REGULAR_PICKUP'; // valid values REGULAR_PICKUP, REQUEST_COURIER, ...
-		$request['RequestedShipment']['ShipTimestamp'] = date('c');
-
-		//Uncomment these additional options below if they are needed for your shipments
-
-		//$request['RequestedShipment']['SpecialServicesRequested'] = array( 'SpecialServiceTypes' => array('SIGNATURE_OPTION'), 'SignatureOptionDetail' => array('OptionType' => 'ADULT'));
-		//$request['RequestedShipment']['SignatureOptionDetail']['OptionType'] = 'ADULT';
-		//$request['RequestedShipment']['ServiceType'] = 'PRIORITY_OVERNIGHT'; // valid values STANDARD_OVERNIGHT, PRIORITY_OVERNIGHT, FEDEX_GROUND, ...
-		if ($config['origincountry'] != "CA" && $config['origincountry'] != "US") $config['originstate']=""; //Only required for these countries
-
-		$request['RequestedShipment']['PackagingType'] = $config['packaging'];
-		$request['RequestedShipment']['Shipper'] = array(
-			'Address' => array(
-				'StreetLines' => array($config['originadde']), // Origin details
-				'City' => $config['origincity'],
-				'StateOrProvinceCode' => $config['originstate'],
-				'PostalCode' => $config['originpostcode'],
-				'CountryCode' => $config['origincountry']
-			)
-		);
-
-		if ($country != "CA" && $country != "US") $state=""; //Only required for these countries
 		
-		$request['RequestedShipment']['Recipient'] = array(
-			'Address' => array(
-				'StreetLines' => array($address1 , $address2), // Destination details
-				'City' => $city,
-				'StateOrProvinceCode' => $state,
-				'PostalCode' => $zipcode,
-				'CountryCode' => $country
-			)
-		);
-
-		$request['RequestedShipment']['ShippingChargesPayment'] = array(
-			'PaymentType' => 'SENDER',
-			'Payor' => array(
-				'AccountNumber' => $config['accnumber'],
-				'CountryCode' => $config['origincountry']
-			)
-		);
-
-		$request['RequestedShipment']['RateRequestTypes'] = 'ACCOUNT';
-		$request['RequestedShipment']['RateRequestTypes'] = 'LIST';
-
-		if ($config['origincountry'] != $country && $config['customs'] == "CLEARANCEFEE") {
-			$request['RequestedShipment']['InternationalDetail'] = array(
-				'CustomsValue' => array (
-					'Amount' => $cart->Subtotal,
-					'Currency' => _xls_get_conf('CURRENCY_DEFAULT' , 'USD')
+		
+		$strShipData=serialize(array(__class__,$weight,$address1,$zipcode));	
+		if (_xls_stack_get('ShipBasedOn') != $strShipData) {
+			_xls_stack_put('ShipBasedOn',$strShipData);
+	
+			
+	
+			$fields['service']->RemoveAllItems();
+	
+			$ret = array();
+	
+			$newline = "<br />";
+	
+			//The WSDL is not included with the sample code.
+			//Please include and reference in $path_to_wsdl variable.
+	
+			$path_to_wsdl = XLSWS_INCLUDES . "shipping" . "/" . "RateService_v7.wsdl";
+	
+			ini_set("soap.wsdl_cache_enabled", "0");
+	
+			$client = new SoapClient($path_to_wsdl, array('trace' => 1));
+	
+			$request['WebAuthenticationDetail'] = array(
+				'UserCredential' => array(
+					'Key' => $config['authkey'],
+					'Password' => $config['securitycode']
 				)
 			);
-		}
-
-		$request['RequestedShipment']['PackageCount'] = '1';
-		$request['RateRequest']['CurrencyType'] = _xls_get_conf('CURRENCY_DEFAULT' , 'USD');
-		$request['RequestedShipment']['PackageDetail'] = 'INDIVIDUAL_PACKAGES';
-
-		if (($length + $width + $height) == 0){
-			$request['RequestedShipment']['RequestedPackageLineItems'] = array(
-				'0' => array(
-					'SequenceNumber' => '1',
-					'InsuredValue' => array(
+			$request['ClientDetail'] = array('AccountNumber' => $config['accnumber'], 'MeterNumber' => $config['meternumber']);
+			$request['TransactionDetail'] = array('CustomerTransactionId' => ' *** Rate Request v7 using PHP ***');
+			$request['Version'] = array('ServiceId' => 'crs', 'Major' => '7', 'Intermediate' => '0', 'Minor' => '0');
+			$request['ReturnTransitAndCommit'] = true;
+			$request['RequestedShipment']['DropoffType'] = 'REGULAR_PICKUP'; // valid values REGULAR_PICKUP, REQUEST_COURIER, ...
+			$request['RequestedShipment']['ShipTimestamp'] = date('c');
+	
+			//Uncomment these additional options below if they are needed for your shipments
+	
+			//$request['RequestedShipment']['SpecialServicesRequested'] = array( 'SpecialServiceTypes' => array('SIGNATURE_OPTION'), 'SignatureOptionDetail' => array('OptionType' => 'ADULT'));
+			//$request['RequestedShipment']['SignatureOptionDetail']['OptionType'] = 'ADULT';
+			//$request['RequestedShipment']['ServiceType'] = 'PRIORITY_OVERNIGHT'; // valid values STANDARD_OVERNIGHT, PRIORITY_OVERNIGHT, FEDEX_GROUND, ...
+			if ($config['origincountry'] != "CA" && $config['origincountry'] != "US") $config['originstate']=""; //Only required for these countries
+	
+			$request['RequestedShipment']['PackagingType'] = $config['packaging'];
+			$request['RequestedShipment']['Shipper'] = array(
+				'Address' => array(
+					'StreetLines' => array($config['originadde']), // Origin details
+					'City' => $config['origincity'],
+					'StateOrProvinceCode' => $config['originstate'],
+					'PostalCode' => $config['originpostcode'],
+					'CountryCode' => $config['origincountry']
+				)
+			);
+	
+			if ($country != "CA" && $country != "US") $state=""; //Only required for these countries
+			
+			$request['RequestedShipment']['Recipient'] = array(
+				'Address' => array(
+					'StreetLines' => array($address1 , $address2), // Destination details
+					'City' => $city,
+					'StateOrProvinceCode' => $state,
+					'PostalCode' => $zipcode,
+					'CountryCode' => $country
+				)
+			);
+	
+			$request['RequestedShipment']['ShippingChargesPayment'] = array(
+				'PaymentType' => 'SENDER',
+				'Payor' => array(
+					'AccountNumber' => $config['accnumber'],
+					'CountryCode' => $config['origincountry']
+				)
+			);
+	
+			$request['RequestedShipment']['RateRequestTypes'] = 'ACCOUNT';
+			$request['RequestedShipment']['RateRequestTypes'] = 'LIST';
+	
+			if ($config['origincountry'] != $country && $config['customs'] == "CLEARANCEFEE") {
+				$request['RequestedShipment']['InternationalDetail'] = array(
+					'CustomsValue' => array (
 						'Amount' => $cart->Subtotal,
 						'Currency' => _xls_get_conf('CURRENCY_DEFAULT' , 'USD')
-					),
-					'ItemDescription' => 'Ordered items',
-					'Weight' => array(
-						'Value' => $weight,
-						'Units' => 'LB'
-					),
-					'CustomerReferences' => array(
-						'CustomerReferenceType' => 'CUSTOMER_REFERENCE',
-						'Value' => _xls_get_conf('STORE_NAME' , 'Web Order')
 					)
-				)
-			);
-		} else {
-			$request['RequestedShipment']['RequestedPackageLineItems'] = array(
-				'0' => array(
-					'SequenceNumber' => '1',
-					'InsuredValue' => array(
-						'Amount' => $cart->Subtotal,
-						'Currency' => _xls_get_conf('CURRENCY_DEFAULT' , 'USD')
-					),
-					'ItemDescription' => 'Ordered items',
-					'Weight' => array(
-						'Value' => $weight,
-						'Units' => 'LB'
-					),
-					'Dimensions' => array(
-						'Length' => $length,
-						'Width' => $width,
-						'Height' => $height,
-						'Units' => 'IN'
-					),
-					'CustomerReferences' => array(
-						'CustomerReferenceType' => 'CUSTOMER_REFERENCE',
-						'Value' => _xls_get_conf('STORE_NAME' , 'Web Order')
-					)
-				)
-			);
-		}
-		try {
-			$response = $client->getRates($request);
-
-			if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
-				QApplication::Log(E_ERROR, get_class($this), "sending ".print_r($request,true));
-				QApplication::Log(E_ERROR, get_class($this), "receiving ".$response);
+				);
 			}
-
-			if ($response->HighestSeverity != 'FAILURE' && $response -> HighestSeverity != 'ERROR') {
-				if ($response->RateReplyDetails) {
-					foreach ($response -> RateReplyDetails as $rateReply) {
-						foreach ($rateReply->RatedShipmentDetails as $choice) {
-							if ($choice->ShipmentRateDetail->RateType == $config['ratetype'])
-								$ret[ $rateReply->ServiceType] = $choice->ShipmentRateDetail->TotalNetCharge->Amount;
-							else if ($rateReply->ServiceType == "FEDEX_GROUND")
-								$ret[ $rateReply->ServiceType] = $rateReply->RatedShipmentDetails[1]->ShipmentRateDetail->TotalNetCharge->Amount;
+	
+			$request['RequestedShipment']['PackageCount'] = '1';
+			$request['RateRequest']['CurrencyType'] = _xls_get_conf('CURRENCY_DEFAULT' , 'USD');
+			$request['RequestedShipment']['PackageDetail'] = 'INDIVIDUAL_PACKAGES';
+	
+			if (($length + $width + $height) == 0){
+				$request['RequestedShipment']['RequestedPackageLineItems'] = array(
+					'0' => array(
+						'SequenceNumber' => '1',
+						'InsuredValue' => array(
+							'Amount' => $cart->Subtotal,
+							'Currency' => _xls_get_conf('CURRENCY_DEFAULT' , 'USD')
+						),
+						'ItemDescription' => 'Ordered items',
+						'Weight' => array(
+							'Value' => $weight,
+							'Units' => 'LB'
+						),
+						'CustomerReferences' => array(
+							'CustomerReferenceType' => 'CUSTOMER_REFERENCE',
+							'Value' => _xls_get_conf('STORE_NAME' , 'Web Order')
+						)
+					)
+				);
+			} else {
+				$request['RequestedShipment']['RequestedPackageLineItems'] = array(
+					'0' => array(
+						'SequenceNumber' => '1',
+						'InsuredValue' => array(
+							'Amount' => $cart->Subtotal,
+							'Currency' => _xls_get_conf('CURRENCY_DEFAULT' , 'USD')
+						),
+						'ItemDescription' => 'Ordered items',
+						'Weight' => array(
+							'Value' => $weight,
+							'Units' => 'LB'
+						),
+						'Dimensions' => array(
+							'Length' => $length,
+							'Width' => $width,
+							'Height' => $height,
+							'Units' => 'IN'
+						),
+						'CustomerReferences' => array(
+							'CustomerReferenceType' => 'CUSTOMER_REFERENCE',
+							'Value' => _xls_get_conf('STORE_NAME' , 'Web Order')
+						)
+					)
+				);
+			}
+			try {
+				$response = $client->getRates($request);
+	
+				if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
+					_xls_log(get_class($this) . " sending ".print_r($request,true),true);
+					_xls_log(get_class($this) . " receiving ".$response,true);
+				}
+	
+				if ($response->HighestSeverity != 'FAILURE' && $response -> HighestSeverity != 'ERROR') {
+					if ($response->RateReplyDetails) {
+						foreach ($response -> RateReplyDetails as $rateReply) {
+							foreach ($rateReply->RatedShipmentDetails as $choice) {
+								if ($choice->ShipmentRateDetail->RateType == $config['ratetype'])
+									$ret[ $rateReply->ServiceType] = $choice->ShipmentRateDetail->TotalNetCharge->Amount;
+								else if ($rateReply->ServiceType == "FEDEX_GROUND")
+									$ret[ $rateReply->ServiceType] = $rateReply->RatedShipmentDetails[1]->ShipmentRateDetail->TotalNetCharge->Amount;
+							}
+						}
+					}
+				} else {
+					foreach ($response->Notifications as $notification) {
+						if(is_array($response->Notifications)) {
+	
+						}
+						else {
+	
 						}
 					}
 				}
-			} else {
-				foreach ($response->Notifications as $notification) {
-					if(is_array($response->Notifications)) {
-
-					}
-					else {
-
-					}
-				}
+			} catch (SoapFault $exception) {
+				_xls_log("FedEx Soap Fault : " . $exception . " " );
 			}
-		} catch (SoapFault $exception) {
-			_xls_log("FedEx Soap Fault : " . $exception . " " );
+	
+			$fields['service']->Visible = false;
+	
+			if(count($ret) <= 0) {
+				_xls_log("FedEx could not get rate for  $country, $state , $zipcode .  " );
+				_xls_log("FedEx request: " . print_r($request, true));
+				_xls_log("FedEx Response: " . print_r($response, true));
+	
+				return false;
+			}
+	
+			$fields['service']->Visible = true;
+			asort($ret);
+			
+			_xls_stack_put('ShipBasedResults',serialize($ret));
+			
+		
+		
+			foreach($ret as $service => $rate) {
+				$desc = strtolower(str_replace("_" , " " , $service ));
+				$desc = ucfirst($desc);
+	
+				$fields['service']->AddItem("$desc (" . _xls_currency(floatval($rate)+ floatval($config['markup'])) . ")" , $service);
+			}
+
 		}
+		else 
+			$ret = unserialize(_xls_stack_get('ShipBasedResults'));
 
-		$fields['service']->Visible = false;
-
-		if(count($ret) <= 0) {
-			_xls_log("FedEx could not get rate for  $country, $state , $zipcode .  " );
-			_xls_log("FedEx request: " . print_r($request, true));
-			_xls_log("FedEx Response: " . print_r($response, true));
-
-			return false;
-		}
-
-		$fields['service']->Visible = true;
-		asort($ret);
-		foreach($ret as $service => $rate) {
-			$desc = strtolower(str_replace("_" , " " , $service ));
-			$desc = ucfirst($desc);
-
-			$fields['service']->AddItem("$desc (" . _xls_currency(floatval($rate)+ floatval($config['markup'])) . ")" , $service);
-		}
-
+		
+		
 		$arr = array(
 			'price' => false,
 			'markup' => floatval($config['markup']),
 			'product' => $config['product']
 		);
-
+		
 		if(isset($ret[$selected])) {
 			$fields['service']->SelectedValue = $selected;
 			$arr['price'] = floatval($ret[$selected])+ floatval($config['markup']);
@@ -540,7 +572,7 @@ class fedex extends xlsws_class_shipping {
 			$fields['service']->SelectedValue = $selected;
 			$arr['price'] = floatval($ret[$selected])+ floatval($config['markup']);
 		}
-
+		
 		return $arr;
 	}
 }

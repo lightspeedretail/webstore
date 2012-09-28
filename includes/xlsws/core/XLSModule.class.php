@@ -29,7 +29,7 @@ class XLSModule extends QBaseClass {
 	protected $strModuleType = null;
 
 	protected function LoadModule() {
-		$objModule = Modules::LoadByFileType(get_class($this) . '.php',
+		$objModule = Modules::LoadByFileType(get_class($this),
 			$this->strModuleType);
 
 		if ($objModule) $this->objModule = $objModule;

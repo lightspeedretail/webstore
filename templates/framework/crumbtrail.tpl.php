@@ -29,23 +29,13 @@
 
 
 <div id="breadcrumbs" class="rounded">
-	<a href="index.php"><img src="<?php echo templateNamed('css'); ?>/images/breadcrumbs_home.png"	style="display: block; float: left; margin: 0 10px 0 12px;"></a>
+	<a href="<?php echo _xls_site_url(); ?>"><img src="<?php echo templateNamed('css'); ?>/images/breadcrumbs_home.png"	style="display: block; float: left; margin: 0 10px 0 12px;"></a>
 	<img src="<?php echo templateNamed('css'); ?>/images/breadcrumbs_separrow.png" style="display: block; float: left; margin: 0 0 0 -2px;">
 
 <ul>
 		<?php foreach($this->crumbs as $crumb): ?>
 			<li>
-				<a <?php if(isset($crumb['link'])): ?>
-						href="<?= $crumb['link']; ?>"
-					<?php elseif(isset($crumb['key'])): ?>
-						href="index.php?<?= $crumb['key']; ?>"
-					<?php else: ?>
-						href="#"<?php endif; ?>  
-						title="<?= $crumb['name']; ?>" 
-					<?php if(isset($crumb['pxy'])): ?>
-						<?= $crumb['pxy'] ; ?>
-					<?php endif; ?>  >
-					
+				<a href="<?= _xls_site_url($crumb['link']); ?>" title="<?= $crumb['name']; ?>" >			
 					<?= _xls_truncate($crumb['name'], 45, "...", true); ?>
 				</a>
 			</li>
@@ -54,11 +44,8 @@
 
 <?php
 
-if($this->dtrProducts && $this->dtrProducts->Paginator){
-
+if($this->dtrProducts && $this->dtrProducts->Paginator)
 	$this->dtrProducts->Paginator->Render();
 	
-}
-
 ?>
 

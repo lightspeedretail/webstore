@@ -27,7 +27,8 @@
 
 ?>
 <div>
-			<div class="product_details border rounded" style="display: block; float: left;">
+
+			<div class="product_details border rounded">
 				
 				<div class="left">
 					<?php $this->pnlImgHolder->Render(); ?><br style="clear: both;" />
@@ -56,8 +57,10 @@
 				<?php $this->giftRegistryPnl->Render(); ?>
 				
 				
-				 <h1><?php $this->lblTitle->Render(); ?></h1> 
-				 <h2><?= $this->prod->Code ?><!-- <?= $this->prod->Rowid ?>--></h2>
+				 <h1><?php $this->lblTitle->Render(); ?></h1>	 
+				<?php if(_xls_get_conf('SHOW_TEMPLATE_CODE' , 1)): ?>
+				 <h2><?= $this->prod->Code ?></h2>
+				<?php endif; ?>	
 
 				<?php	if(_xls_get_conf('INVENTORY_DISPLAY')):	?>
 					<h3><?php $this->lblStock->Render() ; ?></h3>
@@ -71,22 +74,13 @@
 					
 				<?php $this->lstSize->Render(); ?>
 				<?php $this->lstColor->Render(); ?>
-
-
 					
-				
-		<?php  if(($this->prod->SellWeb != 0) && ($this->prod->SellWeb < $this->prod->Sell)): ?>
-				<!--  
-				<div class="price_reg"><?php _xt("Regular Price"); ?> : <strike><?= _xls_currency($this->prod->Sell) ; ?></strike></div>
-				-->
+				<div class="price_reg"><?php $this->lblOriginalPrice->Render(); ?></div>
 				<div class="price"><?php _xt("Price"); ?>: <?php $this->lblPrice->Render(); ?></div>
-		<?php else: ?>
-				<div class="price"><?php _xt("Price"); ?>: <?php $this->lblPrice->Render(); ?></div>
-		<?php endif; ?>				
-				
+				<?php $this->pnlSharingTools->Render(); ?>
+
 				<div class="description"><?php $this->lblDescription->Render() ; ?></div>
-
-
+				
 				<?php if(count($this->arrAutoAddProducts)>0): ?>
 				<fieldset>
 					<legend><?php _xt("Recommended Products"); ?></legend>

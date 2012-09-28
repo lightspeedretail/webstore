@@ -160,9 +160,15 @@
 			objWrapper.setAbsolutePosition(intLeft, intTop);
 
 			// Set Window OnResize Handling
+			if((navigator.userAgent.match(/iPhone/i)) ||
+			(navigator.userAgent.match(/iPod/i)) ||
+			(navigator.userAgent.match(/iPad/i))) {
+			return ;
+			} else {
 			window.onresize = this.handleResize;
 			window.onscroll = this.handleResize;
 			qcodo.activeDialogBox = this;
+			};
 
 			// If we have blnMatteClickable and blnAnyKeyCloses
 			if (objWrapper.anyKeyCloses) {

@@ -33,9 +33,10 @@
 
 class xlsws_class_payment extends XLSModule {
 	protected $strModuleType = "payment";
+	protected $strHelpfulHint = "";
 
 	public function customer() {
-		return Customer::GetCurrent(true);
+		return Customer::GetCurrent();
 	}
 
 	/**

@@ -35,7 +35,7 @@
 
 <?php _xt("This email is a confirmation for the order. To view details or track your order, click on the visit link: ")  ?> 
 
-<a href="<?= _xls_site_dir() . "/index.php?xlspg=order_track&getuid=" . $cart->Linkid;  ?>"><?= _xls_site_dir() . "/index.php?xlspg=order_track&getuid=" . $cart->Linkid;  ?></a><br/><br/>
+<a href="<?= _xls_site_url("/order-track/pg"). "?getuid=" . $cart->Linkid;  ?>"><?= _xls_site_url("/order-track/pg"). "?getuid=" . $cart->Linkid;  ?></a><br/><br/>
 
 <?php _xt("Please refer to your order ID ") ?> <?php echo $cart->IdStr ;   ?> <?php _xt(" if you want to contact us about this order.") ?><br/><br/>
 

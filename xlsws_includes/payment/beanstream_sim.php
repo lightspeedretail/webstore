@@ -40,7 +40,7 @@ class beanstream_sim extends xlsws_class_payment {
 	 *
 	 */
 	public function name() {
-		$config = $this->getConfigValues('beanstream_sim');
+		$config = $this->getConfigValues(get_class($this));
 
 		if(isset($config['label']))
 			return $config['label'];
@@ -48,14 +48,18 @@ class beanstream_sim extends xlsws_class_payment {
 		return "Credit Card";
 	}
 
-	/**
+		/**
 	 * The name of the payment module that will be displayed in Web Admin payments
 	 * @return string
 	 *
 	 *
 	 */
 	public function admin_name() {
-		return "Beanstream Simple Integration (Canada/USA)";
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "Beanstream (US/CAN)";
+		if (!$this->uses_jumper())$strName .= "&nbsp;&nbsp;&nbsp;<font size=2>Advanced Integration</font>";
+		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		return $strName;
 	}
 
 	/**
@@ -96,7 +100,7 @@ class beanstream_sim extends xlsws_class_payment {
 		$ret['ls_payment_method'] = new XLSTextBox($objParent);
 		$ret['ls_payment_method']->Name = _sp('LightSpeed Payment Method');
 		$ret['ls_payment_method']->Required = true;
-		$ret['ls_payment_method']->Text = 'Credit Card';
+		$ret['ls_payment_method']->Text = 'Web Credit Card';
 		$ret['ls_payment_method']->ToolTip = "Please enter the payment method (from LightSpeed) you would like the payment amount to import into";
 
 		return $ret;
@@ -129,7 +133,7 @@ class beanstream_sim extends xlsws_class_payment {
 	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
-		$config = $this->getConfigValues('beanstream_sim');
+		$config = $this->getConfigValues(get_class($this));
 
 		$merchantId		= $config['login'];
 		$hashval		= $config['md5hash'];
@@ -185,7 +189,7 @@ class beanstream_sim extends xlsws_class_payment {
 			);
 			_xls_log("Beanstream success " . print_r($retarr , true)) ;
 		} else {
-			$url = _xls_site_dir() . "/" . "index.php?xlspg=msg";
+			$url = _xls_site_url("msg/pg");
 			_xls_stack_add('msg', "Your payment could not be processed due to the following error: " . $XLSWS_VARS['messageText'] . ". Please try again");
 			$retarr =  array(
 				'order_id' => $XLSWS_VARS['trnOrderNumber'],

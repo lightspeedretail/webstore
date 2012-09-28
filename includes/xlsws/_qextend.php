@@ -53,12 +53,14 @@ function _xt($strMsg) {
  * @param string $url
  */
 function _rd($url = '') {
-	global $_SERVER;
 
-	if(empty($url))
+	if(empty($url)) {
 		$url = $_SERVER["REQUEST_URI"];
-
-	QApplicationBase::Redirect($url);
+		//_xls_site_url will append subfolder again so get rid of it here
+		if (__SUBDIRECTORY__) $url = substr($url,strlen(__SUBDIRECTORY__),999);
+	}
+		
+	QApplicationBase::Redirect(_xls_site_url($url));
 }
 
 /**

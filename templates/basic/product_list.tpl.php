@@ -35,13 +35,9 @@
 	</p>
 <?php endif; ?>
 
-<?php if(isset($this->category) && $this->category->ImageExist): ?>
+<?php if( _xls_get_conf('ENABLE_CATEGORY_IMAGE',0) && isset($this->category) && $this->category->ImageExist): ?>
 	<div style="float:left; display:inline;">
-	<img src="<?= $this->category->ListingImage; ?>" />
-	</div>
-<?php elseif(isset($this->image) && $this->image): ?>
-	<div style="float:left; display:inline;">
-	<img src="<?= $this->image; ?>" />
+	<img src="<?= $this->category->CategoryImage; ?>" />
 	</div>
 <?php endif; ?>
 
@@ -55,16 +51,14 @@
 <?php endforeach; ?> 
 </ul>
 </div>
+<br style="clear:both"/>
 <?php endif; ?> 
-<br style="clear:both"/>
-
+<h1><?php echo _xls_stack_get('override_category') != '' ? _xls_stack_pop('override_category') : $this->category->Name; ?></h1>
 </div>
-<br style="clear:both"/>
-<div id="main_panel" class="rounded">
 
-        <?php $this->dtrProducts->Render(); ?>
-       
-        <br style="clear:both"/>
-
-
-</div>
+<?php if ($this->dtrProducts->TotalItemCount>0) : ?>
+	<div id="main_panel" class="rounded">
+    <?php $this->dtrProducts->Render(); ?>
+    <br style="clear:both"/>
+	</div>
+<?php endif; ?>

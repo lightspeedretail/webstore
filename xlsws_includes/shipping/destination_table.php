@@ -31,31 +31,9 @@
  */
 
 class destination_table extends xlsws_class_shipping {
-	/**
-	 * The name of the shipping module that will be displayed in the checkout page
-	 * @return string
-	 *
-	 *
-	 */
-	public function name() {
-		$config = $this->getConfigValues('destination_table');
-
-		if(isset($config['label']))
-			return $config['label'];
-
-		return _sp("Destination Shipping");
-	}
-
-	/**
-	 * The name of the shipping module that will be displayed in Web Admin payments
-	 * @return string
-	 *
-	 *
-	 */
-	public function admin_name() {
-		return _sp("Destination Shipping");
-	}
-
+	protected $strModuleName = "Destination Shipping";
+	
+	
 	/**
 	 * The Web Admin panel for configuring this shipping option
 	 *
@@ -76,9 +54,9 @@ class destination_table extends xlsws_class_shipping {
 		$ret['per']->AddItem('Item Count' , 'item');
 		$ret['per']->AddItem('Weight' , 'weight');
 		$ret['per']->AddItem('Volume' , 'volume');
-
+           		
 		$ret['product'] = new XLSTextBox($objParent);
-		$ret['product']->Name = _sp('LightSpeed Product Code');
+		$ret['product']->Name = _sp('LightSpeed Product Code (case sensitive)');
 		$ret['product']->Required = true;
 		$ret['product']->Text = 'SHIPPING';
 
@@ -120,7 +98,7 @@ class destination_table extends xlsws_class_shipping {
 	 * No return value, since it updates the passed reference
 	 */
 	public function total($fields, $cart, $country = '', $zipcode = '', $state = '', $city = '', $address2 = '', $address1= '', $company = '', $lname = '', $fname = '') {
-		$config = $this->getConfigValues('destination_table');
+		$config = $this->getConfigValues(get_class($this));
 
 		$unit = 1;
 
@@ -145,8 +123,11 @@ class destination_table extends xlsws_class_shipping {
 			$unit = $cart->total_length() * $cart->total_width() * $cart->total_height();
 		}
 
-		if($unit>$dest->ShipFree)
-			$unit -= $dest->ShipFree;
+		if ($unit >= $dest->ShipFree)
+            $unit -= $dest->ShipFree;
+
+        if ($unit < 0)
+            $unit = 0;
 
         // If the Base Charge is unset or lesser than 0, don't apply this module
         if ($dest-BaseCharge == '' or $dest->BaseCharge < 0)

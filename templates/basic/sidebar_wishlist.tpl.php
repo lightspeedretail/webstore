@@ -26,10 +26,10 @@
  */
 
 if(xlsws_index::isLoggedIn()): ?>
-<a href="index.php?xlspg=gift_registry"><strong><?php _xt('My Wish Lists'); ?></strong></a>
+<a href="<?= _xls_site_url("gift-registry/pg") ?>"><strong><?php _xt('My Wish Lists'); ?></strong></a>
 <br />
 <br />
 <?php endif; ?>
-<a href="index.php?xlspg=gift_search"><strong><?php _xt('Find Wish Lists'); ?></strong></a>
+<a href="<?= _xls_site_url("gift-search/pg") ?>"><strong><?php _xt('Find Wish Lists'); ?></strong></a>
 <br />
 <br />

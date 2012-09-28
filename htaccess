@@ -1,0 +1,37 @@
+#
+#    Copyright (c) 2005-2009 Xsilva Systems Inc. All rights reserved. 
+# 
+#    This file controls search engine friendly urls and redirection
+#
+# NOTE: This file must be renamed to .htaccess (adding a period in front of the filename) to be operational.
+# This file is supplied without the dot in the filename since adding this hides the file within the DMG or Zip file.
+#
+
+# IMPORTANT: If you have Web Store installed in a subfolder, i.e. http://www.example.com/store
+# change RewriteBase to include the subfolder name such as:  RewriteBase /store
+
+Options -MultiViews
+RewriteEngine On
+RewriteBase /
+
+Options +FollowSymLinks
+
+
+# If you have additional files or folders in your web store folder, you may need to add them to the following RewriteCond so they are excluded
+# from Web Store processing
+RewriteCond $1 !^(index\.php|xls_admin\.php|xls_image_upload\.php|xls_soap\.php|xls_jumper\.php|xls_payment_capture\.php|xlsws_ws_service\.php|test\.php|assets|photos|templates|css|js|favicon\.ico|robots\.txt)
+
+# Any URL that ends in .xml will be routed to xlsws_includes/feeds for an equivalent .php file, i.e. sitemap.xml points to xlsws_includes/feeds/sitemap.php
+RewriteRule (.*)\.xml(.*) index.php?/$1/feeds [QSA,L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?/$1 [QSA,L]
+
+
+# block all templates (no reason to have these exposed)
+RedirectMatch 410 ^/.*\.tpl$ 
+
+# block all .log (log files), .sql (sql dump/export) and .conf (config files) files
+# in case some day these files move to another directory
+RedirectMatch 410 ^.*\.(sql|log|conf)$ 

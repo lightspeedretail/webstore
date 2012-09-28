@@ -84,7 +84,7 @@ class Category extends CategoryGen {
                 return true;
 
             foreach ($objSubCategories as $objCategory)
-                if ($objCategory->HasChildrenOrProduct())
+                if ($objCategory->HasChildOrProduct())
                     return true;
         }
 		return false;
@@ -97,7 +97,7 @@ class Category extends CategoryGen {
 	}
 
 	public function HasChildOrProduct() { // LEGACY should be protected
-		if ($this->HasChildren() || $this->HasProducts())
+		if ($this->HasChildren() || $this->HasProducts() || _xls_get_conf('DISPLAY_EMPTY_CATEGORY', '1')=='1')
 			return true;
 		return false;
 	}
@@ -143,12 +143,93 @@ class Category extends CategoryGen {
 	}
 
 	protected function GetLink() {
-		if (_xls_get_conf('ENABLE_SEO_URL', false))
-			if ($this->IsPrimary())
-				return $this->Slug . '.html';
-			else
-				return $this->ParentObject->DirLink . $this->Slug . '.html';
-		return 'index.php?c=' . $this->intRowid;
+		return _xls_site_url($this->strRequestUrl);
+	}
+
+
+	protected function GetMetaDescription() {
+		//We test and potentially traverse up 3 levels to find a description if our current level doesn't have one
+		if ($this->strMetaDescription)
+			return $this->strMetaDescription;
+		elseif ($this->intParent > 0) {
+			$objParent = $this->GetParent();
+			if ($objParent->strMetaDescription)
+				return $objParent->strMetaDescription;
+			if ($objParent->intParent > 0) {
+				$objGrandParent = $objParent->GetParent();
+			if ($objGrandParent->strMetaDescription)
+				return $objGrandParent->strMetaDescription;
+			}
+			return $this->strName;
+		}
+		else return $this->strName;
+	
+	}
+
+	protected function GetMetaKeywords() {
+		//We test and potentially traverse up 3 levels to find a description if our current level doesn't have one
+		if ($this->strMetaKeywords)
+			return $this->strMetaKeywords;
+		elseif ($this->intParent > 0) {
+			$objParent = $this->GetParent();
+			if ($objParent->strMetaKeywords)
+				return $objParent->strMetaKeywords;
+			if ($objParent->intParent > 0) {
+				$objGrandParent = $objParent->GetParent();
+			if ($objGrandParent->strMetaKeywords)
+				return $objGrandParent->strMetaKeywords;
+			}
+			return $this->strName;
+		}
+		else return $this->strName;
+	
+	}
+	
+	/**
+	 * GetTrailByProductId - return array of Category Trail for product
+	 * @param $intRowid RowID of Product
+	 * @param $strType passing "names" will just get simple array of names
+	 *                 otherwise it's it's a full array of items
+	 * @return $arrPath[]
+	 */
+	public static function GetTrailByProductId($intRowid,$strType = 'all') {
+		$arrPath=array();
+		$objCategory = parent::LoadArrayByProduct($intRowid);
+		if ($objCategory) {
+			$arrPath = $objCategory[0]->GetTrail($strType); }
+		return $arrPath;
+	}
+	
+	/**
+	 * GetTrail - return array of Category Trail for category
+	 * @param $strType passing "names" will just get simple array of names
+	 *                 otherwise it's it's a full array of items
+	 * @return $arrPath[]
+	 */
+	public function GetTrail($strType = 'all') {
+		$arrPath=array();
+
+		$objCategory = $this; 
+		$category_id = $objCategory->Rowid;		
+	
+		if($objCategory->Parent==0) {
+		
+			array_push($arrPath , $strType=='names' ? 
+					 $objCategory->Name : array( 'key' => $category_id , 'tag' => 'c' , 'name' => $objCategory->Name , 'link' => $objCategory->Link));
+			
+		} else do {
+			$objCategory = parent::Load($category_id);
+	
+			$strName = $objCategory->Name; 
+			if($objCategory)
+				array_push($arrPath , $strType=='names' ? 
+					 $strName : array( 'key' => $category_id , 'tag' => 'c' , 'name' => $strName , 'link' => $objCategory->Link));
+	
+		} while ($objCategory && ($category_id = $objCategory->Parent));
+		
+		$arrPath = array_reverse($arrPath);			
+
+		return $arrPath;
 	}
 
 	/**
@@ -208,17 +289,6 @@ EOS;
 		$this->intChildCount = $intCount;
 
 		$strQuery = <<<EOS
-SELECT SUM(child_count) AS total_matches
-FROM xlsws_category
-WHERE parent='{$this->intRowid}';
-EOS;
-		$objQuery = _dbx($strQuery, 'Query');
-		$arrTotal = $objQuery->FetchArray();
-		$intCount = $arrTotal['total_matches'];
-
-		$this->intChildCount += $intCount;
-
-		$strQuery = <<<EOS
 UPDATE xlsws_category
 SET `child_count`='{$this->intChildCount}'
 WHERE `rowid`='{$this->intRowid}';
@@ -248,6 +318,13 @@ EOS;
 		);
 	}
 
+	public static function LoadByRequestUrl($strName) {
+		return Category::QuerySingle(
+			QQ::Equal(QQN::Category()->RequestUrl, $strName)
+			);
+	}
+
+
 	public function Delete() {
 		$this->UnassociateAllProducts();
 
@@ -256,7 +333,73 @@ EOS;
 
 		parent::Delete();
 	}
+	
+	
+	public static function ConvertSEO() {
+	
+		$arrCats= Category::LoadAll();
+		foreach ($arrCats as $objCat) {
+			$objCat->RequestUrl = $objCat->GetSEOPath();
+			$objCat->Save();
+		}
+	
+	}
 
+
+	public function GetSEOPath() {
+	
+		$arrPath=array();
+		$objCategory = $this;
+		$strName = $objCategory->Name; 
+
+		$category_id = $objCategory->Rowid;		
+	
+		if($objCategory->Parent==0) {
+			array_push($arrPath, $strName );
+			
+		}else do {
+			$objCategory = parent::Load($category_id);
+	
+			$strName = $objCategory->Name; 
+			if($objCategory)
+				array_push($arrPath, $strName );
+	
+		} while ($objCategory && ($category_id = $objCategory->Parent));
+		
+		$strPath = implode("-",array_reverse($arrPath));
+		return _xls_seo_url($strPath);
+	}
+
+	protected function GetPageMeta($strConf = 'SEO_CATEGORY_TITLE') { 
+	
+		$strItem = _xls_get_conf($strConf, '%storename%');
+		$strCrumbNames = '';
+		$strCrumbNamesR = '';
+		
+		$arrPatterns = array(
+			"%storename%",
+			"%name%",
+			"%crumbtrail%",
+			"%rcrumbtrail%");
+		$arrCrumb = _xls_get_crumbtrail();
+		
+		foreach ($arrCrumb as $crumb) {
+			$strCrumbNames .= $crumb['name']." ";
+			$strCrumbNamesR = $crumb['name']." ".$strCrumbNamesR;
+		}
+				
+		$arrItems = array(
+			_xls_get_conf('STORE_NAME',''),
+			$this->Name,
+			$strCrumbNames,
+			$strCrumbNamesR,
+			);		
+			
+			
+		return str_replace($arrPatterns, $arrItems, $strItem);
+		
+	}
+	
 	/**
 	 * Define legacy functions
 	 */
@@ -328,6 +471,9 @@ EOS;
 
 			case 'Slug':
 				return $this->GetSlug();
+				
+			case 'CanonicalUrl':
+				return _xls_site_dir(false).'/'.$this->RequestUrl;
 
 			case 'HasChildren':
 				return $this->HasChildren();
@@ -340,25 +486,37 @@ EOS;
 
 			case 'ParentObject':
 				return $this->GetParent();
+			
+			case 'FamilyTree':
+				return $this->GetAncestors();
 
 			case 'HasImage':
 			case 'ImageExist': // LEGACY
 				return $this->HasImage();
 
 			case 'ListingImage':
-				return $this->GetImageLink('listingimage');
+				return $this->GetImageLink(ImagesType::listing);
 
 			case 'MiniImage':
-				return $this->GetImageLink('miniimage');
+				return $this->GetImageLink(ImagesType::mini);
+
+			case 'PreviewImage':
+				return $this->GetImageLink(ImagesType::preview);
+
+			case 'SliderImage':
+				return $this->GetImageLink(ImagesType::slider);
+
+			case 'CategoryImage':
+				return $this->GetImageLink(ImagesType::category);
 
 			case 'PDetailImage':
-				return $this->GetImageLink('pdetailimage');
+				return $this->GetImageLink(ImagesType::pdetail);
 
 			case 'SmallImage':
-				return $this->GetImageLink('smallimage');
+				return $this->GetImageLink(ImagesType::small);
 
 			case 'Image':
-				return $this->GetImageLink('image');
+				return $this->GetImageLink(ImagesType::normal);
 
 			case 'DirLink':
 				return $this->GetDirLink();
@@ -366,19 +524,18 @@ EOS;
 			case 'Link':
 				return $this->GetLink();
 
+			case 'PageTitle':
+				return _xls_truncate($this->GetPageMeta('SEO_CATEGORY_TITLE'),70);
+
 			case 'Children':
 			case 'categ_childs': // LEGACY
 				return $this->GetChildren();
 
-            case 'MetaDescription':
-            case 'MetaKeywords':
-                try { 
-                    return trim(parent::__get($strName));
-                }
-                catch (QCallerException $objExc) {
-                    $objExc->IncrementOffset();
-                    throw $objExc;
-                }
+            case 'PageDescription':
+            	return $this->GetMetaDescription();
+            	
+            case 'PageKeywords':
+            	return $this->GetMetaKeywords();
 
 			default:
 				try {
@@ -387,6 +544,8 @@ EOS;
 					$objExc->IncrementOffset();
 					throw $objExc;
 				}
+				
+				
 		}
 	}
 

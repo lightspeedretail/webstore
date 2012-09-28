@@ -19,14 +19,14 @@
  */
 
 /**
- * Deluxe template: Shipping address block for new registration 
+ * Shipping address block for new registration
  *
  * 
  *
  */
 
 ?>
-	<fieldset style="width:370px;" class="shipping">
+	<fieldset class="shipping">
 		<legend><span class="red">*</span> <?php _xt("Shipping Address") ?></legend>
 
 
@@ -43,18 +43,13 @@
 		</div>
 <?php  endif; ?>
 
-
-<?php  if(isset($this->txtCRShipFirstname)):   ?>
-
+<?php  if(isset($this->blnShowShippingNames)):   ?>
 		<div class="left margin">
 			<dl>
 				<dt><label for="First Name"><?php _xt("First Name") ?></label></dt>
 				<dd><?php $this->txtCRShipFirstname->RenderWithError(); ?></dd>
 			</dl>
 		</div>
-<?php  endif; ?>
-
-<?php  if(isset($this->txtCRShipLastname)):   ?>
 
 		<div class="left margin">
 			<dl class="left">
@@ -124,17 +119,10 @@
 		<dl>
 			<dt><label for="Zip" class="zip"><?php _xt("Zip/Postal Code") ?></label></dt>
 		
-			<dd><?php $this->txtCRShipZip->Render() ?></dd>
+			<dd><?php $this->txtCRShipZip->RenderWithError() ?></dd>
 		</dl>
 		</div>
-		
-	<?php if(isset($this->butCalcShipping) && ($this->butCalcShipping->Visible)): ?>
-	<dl>
-	<dd style="margin-top: 20px;"><?php $this->butCalcShipping->Render() ?></dd>
-	</dl>
-	</fieldset>
-	<?php endif; ?>		
-		
+
 </fieldset>
 
 <div style="clear:both"></div>

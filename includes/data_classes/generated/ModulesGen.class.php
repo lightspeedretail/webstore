@@ -16,6 +16,7 @@
 	 * @package LightSpeed Web Store
 	 * @subpackage GeneratedDataObjects
 	 * @property integer $Rowid the value for intRowid (Read-Only PK)
+	 * @property integer $Active the value for intActive 
 	 * @property string $File the value for strFile (Not Null)
 	 * @property string $Type the value for strType (Not Null)
 	 * @property integer $SortOrder the value for intSortOrder 
@@ -36,6 +37,14 @@
 		 */
 		protected $intRowid;
 		const RowidDefault = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_modules.active
+		 * @var integer intActive
+		 */
+		protected $intActive;
+		const ActiveDefault = null;
 
 
 		/**
@@ -174,7 +183,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -236,7 +245,7 @@
 		 * Static Qcodo Query method to query for a single Modules object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Modules the queried object
 		 */
@@ -249,16 +258,38 @@
 				throw $objExc;
 			}
 
-			// Perform the Query, Get the First Row, and Instantiate a new Modules object
+			// Perform the Query
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-			return Modules::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
+
+			// Instantiate a new Modules object and return it
+
+			// Do we have to expand anything?
+			if ($objQueryBuilder->ExpandAsArrayNodes) {
+				$objToReturn = array();
+				while ($objDbRow = $objDbResult->GetNextRow()) {
+					$objItem = Modules::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
+					if ($objItem) $objToReturn[] = $objItem;
+				}
+
+				if (count($objToReturn)) {
+					// Since we only want the object to return, lets return the object and not the array.
+					return $objToReturn[0];
+				} else {
+					return null;
+				}
+			} else {
+				// No expands just return the first row
+				$objDbRow = $objDbResult->GetNextRow();
+				if (is_null($objDbRow)) return null;
+				return Modules::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
+			}
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of Modules objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Modules[] the queried objects as an array
 		 */
@@ -277,10 +308,35 @@
 		}
 
 		/**
+		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
+		 * Uses BuildQueryStatment to perform most of the work.
+		 * @param QQCondition $objConditions any conditions on the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
+		 * @return QDatabaseResultBase the cursor resource instance
+		 */
+		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
+			// Get the query statement
+			try {
+				$strQuery = Modules::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+
+			// Perform the query
+			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
+		
+			// Return the results cursor
+			$objDbResult->QueryBuilder = $objQueryBuilder;
+			return $objDbResult;
+		}
+
+		/**
 		 * Static Qcodo Query method to query for a count of Modules objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -374,6 +430,7 @@
 			}
 
 			$objBuilder->AddSelectItem($strTableName, 'rowid', $strAliasPrefix . 'rowid');
+			$objBuilder->AddSelectItem($strTableName, 'active', $strAliasPrefix . 'active');
 			$objBuilder->AddSelectItem($strTableName, 'file', $strAliasPrefix . 'file');
 			$objBuilder->AddSelectItem($strTableName, 'type', $strAliasPrefix . 'type');
 			$objBuilder->AddSelectItem($strTableName, 'sort_order', $strAliasPrefix . 'sort_order');
@@ -394,7 +451,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this Modules::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param DatabaseRowBase $objDbRow
+		 * @param QDatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -413,6 +470,8 @@
 
 			$strAliasName = array_key_exists($strAliasPrefix . 'rowid', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'rowid'] : $strAliasPrefix . 'rowid';
 			$objToReturn->intRowid = $objDbRow->GetColumn($strAliasName, 'Integer');
+			$strAliasName = array_key_exists($strAliasPrefix . 'active', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'active'] : $strAliasPrefix . 'active';
+			$objToReturn->intActive = $objDbRow->GetColumn($strAliasName, 'Integer');
 			$strAliasName = array_key_exists($strAliasPrefix . 'file', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'file'] : $strAliasPrefix . 'file';
 			$objToReturn->strFile = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'type', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'type'] : $strAliasPrefix . 'type';
@@ -446,7 +505,7 @@
 
 		/**
 		 * Instantiate an array of Moduleses from a Database Result
-		 * @param DatabaseResultBase $objDbResult
+		 * @param QDatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return Modules[]
@@ -479,6 +538,32 @@
 			return $objToReturn;
 		}
 
+		/**
+		 * Instantiate a single Modules object from a query cursor (e.g. a DB ResultSet).
+		 * Cursor is automatically moved to the "next row" of the result set.
+		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
+		 * @param QDatabaseResultBase $objDbResult cursor resource
+		 * @return Modules next row resulting from the query
+		 */
+		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
+			// If blank resultset, then return empty result
+			if (!$objDbResult) return null;
+
+			// If empty resultset, then return empty result
+			$objDbRow = $objDbResult->GetNextRow();
+			if (!$objDbRow) return null;
+
+			// We need the Column Aliases
+			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
+			if (!$strColumnAliasArray) $strColumnAliasArray = array();
+
+			// Pull Expansions (if applicable)
+			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
+
+			// Load up the return result with a row and return it
+			return Modules::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
+		}
+
 
 
 
@@ -492,9 +577,10 @@
 		 * @param integer $intRowid
 		 * @return Modules
 		*/
-		public static function LoadByRowid($intRowid) {
+		public static function LoadByRowid($intRowid, $objOptionalClauses = null) {
 			return Modules::QuerySingle(
 				QQ::Equal(QQN::Modules()->Rowid, $intRowid)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -505,12 +591,13 @@
 		 * @param string $strType
 		 * @return Modules
 		*/
-		public static function LoadByFileType($strFile, $strType) {
+		public static function LoadByFileType($strFile, $strType, $objOptionalClauses = null) {
 			return Modules::QuerySingle(
 				QQ::AndCondition(
 				QQ::Equal(QQN::Modules()->File, $strFile),
 				QQ::Equal(QQN::Modules()->Type, $strType)
 				)
+			, $objOptionalClauses
 			);
 		}
 
@@ -544,12 +631,14 @@
 					// Perform an INSERT query
 					$objDatabase->NonQuery('
 						INSERT INTO `xlsws_modules` (
+							`active`,
 							`file`,
 							`type`,
 							`sort_order`,
 							`configuration`,
 							`created`
 						) VALUES (
+							' . $objDatabase->SqlVariable($this->intActive) . ',
 							' . $objDatabase->SqlVariable($this->strFile) . ',
 							' . $objDatabase->SqlVariable($this->strType) . ',
 							' . $objDatabase->SqlVariable($this->intSortOrder) . ',
@@ -585,6 +674,7 @@
 						UPDATE
 							`xlsws_modules`
 						SET
+							`active` = ' . $objDatabase->SqlVariable($this->intActive) . ',
 							`file` = ' . $objDatabase->SqlVariable($this->strFile) . ',
 							`type` = ' . $objDatabase->SqlVariable($this->strType) . ',
 							`sort_order` = ' . $objDatabase->SqlVariable($this->intSortOrder) . ',
@@ -638,6 +728,9 @@
 					`xlsws_modules`
 				WHERE
 					`rowid` = ' . $objDatabase->SqlVariable($this->intRowid) . '');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -680,6 +773,7 @@
 			$objReloaded = Modules::Load($this->intRowid);
 
 			// Update $this's local variables to match
+			$this->intActive = $objReloaded->intActive;
 			$this->strFile = $objReloaded->strFile;
 			$this->strType = $objReloaded->strType;
 			$this->intSortOrder = $objReloaded->intSortOrder;
@@ -710,6 +804,11 @@
 					// Gets the value for intRowid (Read-Only PK)
 					// @return integer
 					return $this->intRowid;
+
+				case 'Active':
+					// Gets the value for intActive 
+					// @return integer
+					return $this->intActive;
 
 				case 'File':
 					// Gets the value for strFile (Not Null)
@@ -778,6 +877,17 @@
 				///////////////////
 				// Member Variables
 				///////////////////
+				case 'Active':
+					// Sets the value for intActive 
+					// @param integer $mixValue
+					// @return integer
+					try {
+						return ($this->intActive = QType::Cast($mixValue, QType::Integer));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
 				case 'File':
 					// Sets the value for strFile (Not Null)
 					// @param string $mixValue
@@ -875,6 +985,7 @@
 		public static function GetSoapComplexTypeXml() {
 			$strToReturn = '<complexType name="Modules"><sequence>';
 			$strToReturn .= '<element name="Rowid" type="xsd:int"/>';
+			$strToReturn .= '<element name="Active" type="xsd:int"/>';
 			$strToReturn .= '<element name="File" type="xsd:string"/>';
 			$strToReturn .= '<element name="Type" type="xsd:string"/>';
 			$strToReturn .= '<element name="SortOrder" type="xsd:int"/>';
@@ -905,6 +1016,8 @@
 			$objToReturn = new Modules();
 			if (property_exists($objSoapObject, 'Rowid'))
 				$objToReturn->intRowid = $objSoapObject->Rowid;
+			if (property_exists($objSoapObject, 'Active'))
+				$objToReturn->intActive = $objSoapObject->Active;
 			if (property_exists($objSoapObject, 'File'))
 				$objToReturn->strFile = $objSoapObject->File;
 			if (property_exists($objSoapObject, 'Type'))
@@ -951,6 +1064,16 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
+	/**
+	 * @property-read QQNode $Rowid
+	 * @property-read QQNode $Active
+	 * @property-read QQNode $File
+	 * @property-read QQNode $Type
+	 * @property-read QQNode $SortOrder
+	 * @property-read QQNode $Configuration
+	 * @property-read QQNode $Modified
+	 * @property-read QQNode $Created
+	 */
 	class QQNodeModules extends QQNode {
 		protected $strTableName = 'xlsws_modules';
 		protected $strPrimaryKey = 'rowid';
@@ -959,6 +1082,8 @@
 			switch ($strName) {
 				case 'Rowid':
 					return new QQNode('rowid', 'Rowid', 'integer', $this);
+				case 'Active':
+					return new QQNode('active', 'Active', 'integer', $this);
 				case 'File':
 					return new QQNode('file', 'File', 'string', $this);
 				case 'Type':
@@ -984,7 +1109,18 @@
 			}
 		}
 	}
-
+	
+	/**
+	 * @property-read QQNode $Rowid
+	 * @property-read QQNode $Active
+	 * @property-read QQNode $File
+	 * @property-read QQNode $Type
+	 * @property-read QQNode $SortOrder
+	 * @property-read QQNode $Configuration
+	 * @property-read QQNode $Modified
+	 * @property-read QQNode $Created
+	 * @property-read QQNode $_PrimaryKeyNode
+	 */
 	class QQReverseReferenceNodeModules extends QQReverseReferenceNode {
 		protected $strTableName = 'xlsws_modules';
 		protected $strPrimaryKey = 'rowid';
@@ -993,6 +1129,8 @@
 			switch ($strName) {
 				case 'Rowid':
 					return new QQNode('rowid', 'Rowid', 'integer', $this);
+				case 'Active':
+					return new QQNode('active', 'Active', 'integer', $this);
 				case 'File':
 					return new QQNode('file', 'File', 'string', $this);
 				case 'Type':

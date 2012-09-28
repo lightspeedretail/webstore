@@ -35,17 +35,38 @@ include_once(XLSWS_INCLUDES . 'payment/credit_card.php');
 class merchantware extends credit_card {
 	private $paid_amount;
 
-	public function admin_name() {
-		return "MerchantWARE Online";
-	}
 
+	/**
+	 * The name of the payment module that will be displayed in the checkout page
+	 * @return string
+	 *
+	 *
+	 */
 	public function name() {
-		$config = $this->getConfigValues('merchantware');
-
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "";
+		
 		if(isset($config['label']))
-			return $config['label'];
-
-		return "Credit Card";
+			$strName = $config['label'];
+		else $strName =  "Credit Card";
+		
+		if ($config['live']=="test") $strName .= " (TEST MODE)";
+		
+		return $strName;
+	}
+	
+	/**
+	 * The name of the payment module that will be displayed in Web Admin payments
+	 * @return string
+	 *
+	 *
+	 */
+	public function admin_name() {
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "MerchantWARE Online";
+		if (!$this->uses_jumper())$strName .= "&nbsp;&nbsp;&nbsp;<font size=2>Advanced Integration</font>";
+		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		return $strName;
 	}
 
 	public function config_fields($objParent) {
@@ -74,7 +95,7 @@ class merchantware extends credit_card {
 		$ret['ls_payment_method'] = new XLSTextBox($objParent);
 		$ret['ls_payment_method']->Name = _sp('LightSpeed Payment Method');
 		$ret['ls_payment_method']->Required = true;
-		$ret['ls_payment_method']->Text = 'Credit Card';
+		$ret['ls_payment_method']->Text = 'Web Credit Card';
 		$ret['ls_payment_method']->ToolTip = "Please enter the payment method (from LightSpeed) you would like the payment amount to import into";
 
 		return $ret;
@@ -88,7 +109,7 @@ class merchantware extends credit_card {
 	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
-		$config = $this->getConfigValues('merchantware');
+		$config = $this->getConfigValues(get_class($this));
 
 		// Credential configuration
 		$cred_site_id = $config['site_id'];
@@ -103,7 +124,8 @@ class merchantware extends credit_card {
         $trans_info_transactionid = '';     // Transaction id
         $trans_info_allow_duplicate = '';   // Turn duplicate checking on or off
         $trans_info_register_num = '';      // Register number
-        
+
+		$card_info_number = _xls_number_only($fields['ccnum']->Text);
         //MerchantWARE expects expiry in 4 digit format
         $card_info_expiry = $fields['ccexpmon']->SelectedValue.substr($fields['ccexpyr']->SelectedValue,2,2);
         
@@ -124,11 +146,11 @@ class merchantware extends credit_card {
                         <strKey>'.$config['trans_key'].'</strKey>
                         <strOrderNumber>'.$wo.'</strOrderNumber>
                         <strAmount>'.$cart->Total.'</strAmount>
-                        <strPAN>'.$fields['ccnum']->Text.'</strPAN>
+                        <strPAN>'.$card_info_number.'</strPAN>
                         <strExpDate>'.$card_info_expiry.'</strExpDate>
                         <strCardHolder>'.$customer->Firstname.' '.$customer->Lastname.'</strCardHolder>
                         <strAVSStreetAddress>'.$customer->Address11.'</strAVSStreetAddress>
-                        <strAVSZipCode>'.$customer->Zip1.'</strAVSZipCode>
+                        <strAVSZipCode>'.str_pad($customer->Zip1, 5, '0', STR_PAD_RIGHT).'</strAVSZipCode>
                         <strCVCode>'.$fields['ccsec']->Text.'</strCVCode>
                         <strAllowDuplicates>'.$trans_info_allow_duplicate.'</strAllowDuplicates>
                         <strRegisterNum>'.$trans_info_register_num .'</strRegisterNum>
@@ -156,8 +178,8 @@ class merchantware extends credit_card {
 		curl_close ($ch);
 
 		if(_xls_get_conf('DEBUG_PAYMENTS' , false)) {
-			QApplication::Log(E_ERROR, get_class($this), "sending ".$cart->IdStr." for amt ".$cart->Total);
-			QApplication::Log(E_ERROR, get_class($this), "receiving ".$resp);
+			_xls_log(get_class($this) . " sending ".$cart->IdStr." for amt ".$cart->Total,true);
+			_xls_log(get_class($this) . " receiving ".$resp,true);
 		}
 		
 		// Parse xml for response values
@@ -173,12 +195,13 @@ class merchantware extends credit_card {
 		// Handle transaction response data
 		if($response_status[0] != 'APPROVED' ) {
 			$this->paid_amount = 0;
-			$errortext = _sp("Your credit card has been declined");
-			return FALSE;
+			$arrResponse = explode(";",$response_status[0]);
+			$errortext = _sp($arrResponse[0].': '.$arrResponse[2]);
+			return array(false,$errortext);
 		}
 
 		$this->paid_amount = $cart->Total;
-		return $response_authorization_code[0];
+		return array(true,$response_authorization_code[0]);
 	}
 
 	public function paid_amount(Cart $cart) {

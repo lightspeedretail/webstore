@@ -48,6 +48,18 @@ class Log extends LogGen {
 	 *
 	 * @return string a nicely formatted string representation of this object
 	 */
+	 
+	 public static function GarbageCollect() {
+	 
+	 	$intLogRotateDays = _xls_get_conf('LOG_ROTATE_DAYS',0);
+        	if ($intLogRotateDays>0) {
+        		$LastDate = date('YmdHis', strtotime("-".$intLogRotateDays." days"));
+       
+        		_dbx("DELETE from xlsws_log where DATE_FORMAT(`created`, '%Y%m%d%H%i%s')<'".$LastDate."'");
+        	}
+        	
+       }
+       
 	public function __toString() {
 		return sprintf('Log Object %s',  $this->intRowid);
 	}

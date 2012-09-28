@@ -68,12 +68,18 @@ margin:0 auto;
 width:1024px;
 }
 
+#MainPanel h1 {
+margin:30px 0px 5px;
+font-size: 14pt;
+font-weight: bold;
+}
+
 /***** Header *****/
 #header {
 display:block;
 float:left;
 height:50px;
-margin:0 0 20px;
+margin:0 0 10px;
 padding:10px 0 75px;
 position:relative;
 text-align:left;
@@ -92,25 +98,32 @@ overflow:hidden;
 width:100%;
 }
 
-#nav li {
-display:inline;
-list-style:none;
-width:100%;
-}
-
-#nav a {
+#nav a { 
 border-left:1px solid #bebebe;
 border-right:1px solid #222;
-color:#111;
 font-size:12px;
 font-weight:700;
-height:60px;
-overflow:hidden;
-padding:12px 0;
-text-align:center;
-text-decoration:none;
+background:url(images/nav_bg.png);
+color: #111;
+text-shadow: none;
+display: table;
+float: left;
+margin: 0px;
+height: 36px;
+text-align: center;
+text-decoration: none;
 text-shadow:#bebebe 1px 1px 1px;
 }
+
+#nav a:hover {
+background:url(images/nav_bg_hover.png);
+}
+
+#nav .innertab{
+        display: table-cell;
+        vertical-align: middle;
+}
+#nav a.productmenu { min-width: 102px; width: 102px; max-width: 102px;}
 
 #products a {
 background:url();
@@ -126,16 +139,17 @@ border:none;
 color:#fff;
 font-size:12px;
 font-weight:700;
-height:45px;
+height:40px;
 margin:4px 0 15px;
 padding:15px 0 0 4px;
 position:absolute;
 text-decoration:none;
 text-shadow:#000 1px 1px 1px;
-top:140px;
+top:130px;
 width:105px;
-z-index:1500;  
+z-index:998;  
 }
+
 
 #nav_products ul {
 border:none;
@@ -204,6 +218,36 @@ display:block;
 
 .arrow {position: absolute; right: -50px;}
 
+/* Formatting for automated tabs. Note these do NOT refer to 1st, 2nd, 3rd and 4th tabs */
+/* Instead, these are used WHEN there are 4 tabs, or 3 tabs, etc. So #tab4 is used for all */
+/* tabs when four are turned on, since width is proportional to the count() */
+#nav a.tab1 { width:182px; }
+#nav a.tab2 { width:182px; }
+#nav a.tab3 { width:142px; }
+#nav a.tab4 { width:112px; }
+#nav a.tab5 { width:90px; }
+#nav a.tab6 { width:75px; }
+
+
+#searchedge {
+border-left:1px solid #fff;
+clear:both;
+height:30px;
+padding:6px 0px 0 8px;
+position:absolute;
+margin-left:563px;
+width:1px;
+}
+#searchentry {
+
+clear:both;
+height:30px;
+padding:6px 0px 0 8px;
+position:absolute;
+margin-left:564px;
+width:199px;
+}
+
 #newProducts a {
 display:block;
 float:left;
@@ -232,20 +276,11 @@ height:24px;
 width:98px;
 }
 
-li#search {
-border-left:1px solid #fff;
-clear:both;
-height:36px;
-padding:6px 10px 0 18px;
-position:absolute;
-width:200px;
-}
-
 ul.autocomplete {
 border: 1px solid #ccc;
 clear: both;
 background: #fff;
-margin: 8px 0 0 -19px;
+margin: 28px 0 0 -19px;
 width: 185px;
 z-index: 500;
 position: absolute;
@@ -263,8 +298,8 @@ border-right: 1px solid #ccc;
 border-left: 1px solid #ccc;
 }
 
-li.search_item {background: #FFFFFF;}
-li.search_item:hover, ul.autocomplete li.search_selected {background: #48E507; }
+.search_item {background: #FFFFFF;}
+.search_item:hover, .autocomplete .search_selected {background: #48E507; }
 
 /***** Crumbtrail *****/
 #breadcrumbs {
@@ -367,9 +402,8 @@ display:table-cell;
 float:left;
 height:auto;
 margin:0 0 -1px;
-max-height:190px;
-height:190px;
-min-height:190px;
+max-height:193px;
+height:193px;
 overflow:hidden;
 text-align:center;
 width:184px;
@@ -388,6 +422,10 @@ width:175px;
 .product_cell img,.product_cell_image {
 display:block;
 margin:0 auto 3px;
+cursor: hand; cursor: pointer;
+}
+.product_detail_image {
+text-align: center;
 }
 
 .product_cell_price {
@@ -402,6 +440,10 @@ padding:3px 0;
 .product_cell p {
 font-style:italic;
 margin:15px 0 25px;
+}
+
+.product_cell .price_reg {
+padding-bottom: 6px;
 }
 
 /** Related products ***/
@@ -656,11 +698,12 @@ overflow:hidden;
 width:100%;
 }
 
-#sidebar h1 {
+#sidebar .clickbar {
 background:url(images/sidebar_header.png);
 border-bottom:1px solid #333;
 border-top:1px solid #fff;
 font-size:14px;
+font-weight: bold;
 height:16px;
 margin:5px 0 0;
 padding:11px;
@@ -699,6 +742,13 @@ padding:10px 8px 10px 14px;
 }
 
 /***** Product Details *****/
+.product_details {
+    display: block;
+    float: left;
+    margin-left: 12px;
+    margin-top: 5px;
+}
+
 .product_details .img {
 border:1px solid #999;
 display:block;
@@ -760,13 +810,14 @@ width:410px;
 color:#000;
 font-size:16px;
 margin:15px 0 -5px;
+line-height:1.5;
 text-shadow:#ccc 1px 1px 1px;
 }
 
 .product_details .price_reg {
 color:#666;
 font-size:12px;
-margin:15px 0 -10px;
+margin:15px 0 10px;
 text-shadow:#ccc 1px 1px 1px;
 }
 
@@ -863,6 +914,16 @@ display:block;
 float:left;
 margin:-7px -5px 0 8px;
 padding:3px 7px 3px 0;
+}
+
+#sharingtools {
+    display:relative;
+    height: 28px;
+    margin-top: -26px;
+    margin-left: 155px;
+    text-align: right;
+    width: 280px;
+    z-index: 1100;
 }
 
 /***** Invoice Cart *****/
@@ -1378,11 +1439,18 @@ font:12px/12px Arial, Helvetica, sans-serif;
 padding:0;
 }
 
-#customer_registration input,.border input,#checkout input,.xlsfset input,input {
+#customer_registration input,.border input,#checkout input,.xlsfset input {
 border:1px solid #acacac;
 color:#444;
 height:20px;
 padding:2px 4px;
+}
+
+#customer_registration input[type='checkbox'],.border input[type='checkbox'],#checkout input[type='checkbox'],.xlsfset input[type='checkbox'] {
+color:#444;
+height:20px;
+padding:2px 4px;
+border: 0px none;
 }
 
 #customer_registration fieldset.action,.border fieldset.action,fieldset.action,#checkout fieldset.action,.xlsfset fieldset.action {
@@ -1515,7 +1583,7 @@ padding-left:3px;
 
 .border,.registry,.cart {
 border:1px solid #cdcdcd;
-margin:0 auto 15px;
+/*margin:0 auto 15px;*/
 width:740px;
 }
 
@@ -1582,7 +1650,7 @@ width:90px;
 color:#555;
 font:12px;
 font-weight:700;
-margin-top:40px;
+margin-top:0px;
 }
 
 #checkout dd {
@@ -1738,6 +1806,18 @@ float:right;
 height:15px;
 margin:-12px -38px 0 0;
 width:15px;
+}
+
+.flash_message {
+display:block;
+margin-left: 15px;
+margin-right: 15px;
+margin-bottom: 20px;
+padding: 15px;
+font-size: 12px;;
+font-weight: bold;
+background-color: #ffffd5;
+border: 1px solid #dd9988;
 }
 
 .cart_notes {
@@ -2226,7 +2306,7 @@ top:-5px;
 .registry_row .invitee_name {display: block; float: left; width: 240px;}
 .registry_row input.invitee_name, .registry_row input.invitee_email {margin: -9px 0 0 0;}
 .registry_row .invitee_name .warning, .registry_row .warning {display: block; float: left; margin: -18px 0 0 160px;}
-.registry_row .invitee_email {display: block; float: left;}
+.registry_row .invitee_email { }
 .registry_row .invitee_tasks {display: block; float: right; margin: -25px 0 0 0;}
 .registry_row .invitee_tasks img {margin: 0 20px;}
 .registry_row .invitee_save, .registry_row .invitee_edit {margin: 6px 10px 0 0;}
@@ -2637,4 +2717,9 @@ margin-top: -30px;
 -webkit-border-bottom-left-radius: 5px;
 -moz-border-radius-bottomright: 5px;
 -webkit-border-bottom-left-radius: 5px;
+}
+
+.shippingbutton {
+    margin-left: 15px;
+    margin-top: 25px;
 }

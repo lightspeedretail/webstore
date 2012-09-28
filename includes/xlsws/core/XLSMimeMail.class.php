@@ -803,7 +803,6 @@ class XLSMimeMail {
 				// Send it
 				if (!$smtp->send($send_params)) {
 					$this->errors = $smtp->getErrors();
-					error_log(print_r($this->errors , true));
 					_xls_log(print_r($this->errors,TRUE));
 					return false;
 				}

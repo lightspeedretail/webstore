@@ -37,6 +37,7 @@ class xlsws_product extends xlsws_index {
 
 	protected $lblTitle; //the label for the product title
 	protected $lblPrice; //the label for the product price
+	protected $lblOriginalPrice; //the label for the product price
 	protected $lblStock; //the label for the product stock levels
 	protected $lblDescription; //the label for the product description
 
@@ -49,7 +50,8 @@ class xlsws_product extends xlsws_index {
 
 	protected $pnlImg; //the panel that holds the image
 	protected $pnlImgHolder; //the panel containing the frame around the image for drag n drop
-
+	protected $pnlSharingTools; //Sharing Tools panel
+	
 	public $arrAdditionalProdImages = array(); //array of additional product photos
 	protected $pnlAdditionalProdImages; //the panel where additional images display
 
@@ -68,6 +70,151 @@ class xlsws_product extends xlsws_index {
 
 	protected $autoAddCheckIDs = array(); //array of items to add the auto add tickmark to if you wish to override
 
+	/**
+	 * build_main - constructor for this controller
+	 * @param none
+	 * @return none
+	 */
+	protected function build_main() {
+		global $XLSWS_VARS;
+
+		define('NO_MAIN_PANEL_AUTO_RENDER' , true);
+		/*contruct all variables and only label widgets should be defined here to maintain layout*/
+
+    	$objUrl = _xls_url_object();    
+		if ($objUrl->RouteId=='') return; //We haven't specified a category, so we're using this as the default home page and showing everything
+		$this->prod =  $this->origin_prod = Product::Load($objUrl->RouteId);
+
+		if (!$this->prod) _xls_404();
+
+		//SEO double-check here. Is the URL the same as what we have on file? If not, do a 301 to the new location to save our ranking
+		if ($this->prod->RequestUrl != $objUrl->UrlSegments[0])
+			_xls_301($this->prod->Link);
+		
+		$this->mainPnl = new QPanel($this,'MainPanel');
+
+		if($this->prod && $this->prod->Web){
+			if ($XLSWS_VARS['ajax'] == "true") {
+				$this->lightbox = true;
+				$this->mainPnl->Template = templateNamed('product_detail_lightbox.tpl.php');
+			} else {
+				$this->lightbox = false;
+				$this->mainPnl->Template = templateNamed('product_detail.tpl.php');
+			}
+
+
+		} else {
+			_xls_log("Product not found in product.php -> $XLSWS_VARS[product]");
+			_xls_display_msg("Sorry! Product not found.");
+		}
+
+		$this->masterProductId = $this->prod->Rowid;
+
+		/*create the add to cart proxy*/
+		$this->misc_components['add_to_cart'] = new QControlProxy($this,'AddToCart');
+
+		/******************* Gift Registry ************************/
+		$this->giftRegistryPnl = new QPanel($this->mainPnl);
+		$this->giftRegistryPnl->Template = templateNamed('product_detail_add_gift_popup.tpl.php');
+		$this->giftRegistryPnl->Visible = false;
+
+		$this->misc_components['show_gift_registry'] = new QControlProxy($this);
+
+		/******************* Gift Registry ************************/
+		// Image - drag and drop
+
+		$this->pnlImgHolder = new QPanel($this->mainPnl , 'prodImageHolder');
+		$this->pnlImgHolder->HtmlEntities = false;
+		$this->pnlImgHolder->AutoRenderChildren = true;
+
+		$this->create_prod_image();
+
+		$this->pnlAdditionalProdImages = new QPanel($this);
+		$this->pnlAdditionalProdImages->Template = templateNamed('product_detail_additional_images.tpl.php');
+		$this->PopulateAdditionalImagesPnl();
+
+		
+		_xls_stack_put('xls_canonical_url',$this->prod->CanonicalUrl);
+		_xls_add_meta_desc($this->prod->PageDescription);
+		_xls_add_page_title($this->prod->PageTitle);
+		_xls_stack_put('xls_meta_image',_xls_site_url($this->prod->SmallImage,true));
+		_xls_remember_url($objUrl->Url);
+		
+		$this->crumbs[] = array(
+            'link'=>$this->prod->CanonicalUrl,
+            'case'=> '',
+            'name'=>$this->prod->Name
+        );
+        
+
+		// Stock
+		$this->lblStock = new QLabel($this->mainPnl,'lblStock');
+		$this->lblStock->Text = $this->prod->InventoryDisplay();
+
+		//Title
+		$this->lblTitle = new QLabel($this->mainPnl,'lblTitle');
+		$this->lblTitle->Text = $this->prod->Name;
+
+		// Description
+		$this->lblDescription = new QLabel($this->mainPnl,'lblDescription');
+		if (_xls_get_conf('HTML_DESCRIPTION') == 0)
+			$this->lblDescription->Text = nl2br($this->prod->Description);
+		else
+			$this->lblDescription->Text = $this->prod->Description;
+
+		$this->lblDescription->HtmlEntities = false;
+
+		//price
+		$this->lblPrice = new QLabel($this->mainPnl,'lblPrice');
+		if ($this->prod->MasterModel && _xls_get_conf('MATRIX_PRICE') == 1)
+			$this->lblPrice->Text = _sp("choose options for pricing");
+		else
+			$this->lblPrice->Text = _xls_currency($this->prod->Price);
+
+		//price
+		$this->lblOriginalPrice = new QLabel($this->mainPnl,'lblOriginalPrice');
+		if(_xls_get_conf('ENABLE_SLASHED_PRICES' , 0)>0 ) {
+			if ($this->prod->MasterModel && _xls_get_conf('MATRIX_PRICE') == 1)
+				$this->lblOriginalPrice->Text = '';
+			elseif ($this->prod->SellWeb != 0 && $this->prod->SellWeb < $this->prod->Sell)
+				$this->lblOriginalPrice->Text = _sp("Regular Price").": <span class='price_slash'>"._xls_currency($this->prod->Sell)."</span>";
+		}
+		$this->lblOriginalPrice->HtmlEntities = false;	
+
+		// Load Options
+		$this->arrOptionProds = Product::LoadArrayByFkProductMasterId($this->prod->Rowid);
+
+		$this->dxImage = new XLSImagePopup($this->prod , $this);
+		$this->dxImage->Visible = false;
+		$this->pxyEnlarge = new QControlProxy($this);
+
+		$this->mainPnl->AutoRenderChildren = false;
+
+		$this->build_widgets();
+
+		// Qty (UNUSED ON PRODUCT DETAIL PRESENTLY)
+		$this->txtQty = new QTextBox($this->mainPnl,'lblQty');
+		$this->txtQty->Text = _sp('Qty');
+
+		if(!_xls_get_conf('DISABLE_CART' , false))
+			$this->txtQty->Visible = false;
+
+		$this->bind_widgets();
+
+		if ($this->lightbox)
+			$this->render_detail_lightbox();
+		
+		//Sharing Tools
+
+		$this->pnlSharingTools = new QLabel($this->mainPnl,'sharingtools');	
+		if(_xls_get_conf('SHOW_SHARING' , 0)) {
+			$this->blnLoadSharing = true;
+			$this->pnlSharingTools->Template = templateNamed('sharing.tpl.php');
+		}
+				
+
+	}
+	
 	/**
 	 * build_registry_dropdown - builds the dropdown to select a gift registry
 	 * @param none
@@ -149,7 +296,7 @@ class xlsws_product extends xlsws_index {
 	 * @return none
 	 */
 	protected function build_size_widget() {
-		$this->lstSize  = new XLSListBox($this->mainPnl);
+		$this->lstSize  = new XLSListBox($this->mainPnl,'SelectSize');
         $this->PopulateMatrixSize();
 	}
 
@@ -159,7 +306,7 @@ class xlsws_product extends xlsws_index {
 	 * @return none
 	 */
 	protected function build_color_widget() {
-        $this->lstColor  = new XLSListBox($this->mainPnl);
+        $this->lstColor  = new XLSListBox($this->mainPnl,'SelectColor');
         $this->PopulateMatrixColor();
 	}
 
@@ -263,121 +410,7 @@ class xlsws_product extends xlsws_index {
 		$this->pxyEnlarge->AddAction(new QClickEvent() , new QTerminateAction());
 	}
 
-	/**
-	 * build_main - constructor for this controller
-	 * @param none
-	 * @return none
-	 */
-	protected function build_main() {
-		global $XLSWS_VARS;
 
-		define('NO_MAIN_PANEL_AUTO_RENDER' , true);
-		/*contruct all variables and only label widgets should be defined here to maintain layout*/
-		$this->prod =  $this->origin_prod = Product::LoadByCode($XLSWS_VARS['product']);
-
-		$this->mainPnl = new QPanel($this);
-
-		if($this->prod && $this->prod->Web){
-			if ($XLSWS_VARS['ajax'] == "true") {
-				$this->lightbox = true;
-				$this->mainPnl->Template = templateNamed('product_detail_lightbox.tpl.php');
-			} else {
-				$this->lightbox = false;
-				$this->mainPnl->Template = templateNamed('product_detail.tpl.php');
-			}
-
-			Visitor::add_view_log($this->prod->Rowid,ViewLogType::productview);
-		} else {
-			_xls_log("Product not found in product.php -> $XLSWS_VARS[product]");
-			_xls_display_msg("Sorry! Product not found.");
-		}
-
-		$this->masterProductId = $this->prod->Rowid;
-
-		/*create the add to cart proxy*/
-		$this->misc_components['add_to_cart'] = new QControlProxy($this);
-
-		/******************* Gift Registry ************************/
-		$this->giftRegistryPnl = new QPanel($this->mainPnl);
-		$this->giftRegistryPnl->Template = templateNamed('product_detail_add_gift_popup.tpl.php');
-		$this->giftRegistryPnl->Visible = false;
-
-		$this->misc_components['show_gift_registry'] = new QControlProxy($this);
-
-		/******************* Gift Registry ************************/
-		// Image - drag and drop
-
-		$this->pnlImgHolder = new QPanel($this->mainPnl , 'prodImageHolder');
-		$this->pnlImgHolder->HtmlEntities = false;
-		$this->pnlImgHolder->AutoRenderChildren = true;
-
-		$this->create_prod_image();
-
-		$this->pnlAdditionalProdImages = new QPanel($this);
-		$this->pnlAdditionalProdImages->Template = templateNamed('product_detail_additional_images.tpl.php');
-		$this->PopulateAdditionalImagesPnl();
-
-		// add desc
-		if($this->prod->MetaDesc != '')
-			_xls_add_meta_desc($this->prod->MetaDesc);
-		else
-			_xls_add_meta_desc($this->prod->Name);
-
-		if($this->prod->MetaKeyword != '')
-			_xls_add_meta_keyword($this->prod->MetaKeyword);
-		else
-			_xls_add_meta_keyword(array($this->prod->Name , $this->prod->Code , $this->prod->WebKeyword1 , $this->prod->WebKeyword2 , $this->prod->WebKeyword3));
-
-		_xls_add_page_title($this->prod->Name . " - " .  $this->prod->Code);
-
-		// Stock
-		$this->lblStock = new QLabel($this->mainPnl);
-		$this->lblStock->Text = $this->prod->InventoryDisplay();
-
-		//Title
-		$this->lblTitle = new QLabel($this->mainPnl);
-		$this->lblTitle->Text = $this->prod->Name;
-
-		// Description
-		$this->lblDescription = new QLabel($this->mainPnl);
-		if (_xls_get_conf('HTML_DESCRIPTION') == 0)
-			$this->lblDescription->Text = nl2br($this->prod->Description);
-		else
-			$this->lblDescription->Text = $this->prod->Description;
-
-		$this->lblDescription->HtmlEntities = false;
-
-		//price
-		$this->lblPrice = new QLabel($this->mainPnl);
-		if ($this->prod->MasterModel && _xls_get_conf('MATRIX_PRICE') == 1)
-			$this->lblPrice->Text = _sp("choose options for pricing");
-		else
-			$this->lblPrice->Text = _xls_currency($this->prod->Price);
-
-		// Load Options
-		$this->arrOptionProds = Product::LoadArrayByFkProductMasterId($this->prod->Rowid);
-
-		$this->dxImage = new XLSImagePopup($this->prod , $this);
-		$this->dxImage->Visible = false;
-		$this->pxyEnlarge = new QControlProxy($this);
-
-		$this->mainPnl->AutoRenderChildren = false;
-
-		$this->build_widgets();
-
-		// Qty (UNUSED ON PRODUCT DETAIL PRESENTLY)
-		$this->txtQty = new QTextBox($this->mainPnl);
-		$this->txtQty->Text = _sp('Qty');
-
-		if(!_xls_get_conf('DISABLE_CART' , false))
-			$this->txtQty->Visible = false;
-
-		$this->bind_widgets();
-
-		if ($this->lightbox)
-			$this->render_detail_lightbox();
-
-	}
 
 	protected function HasMatrixOptions() {
 		if ($this->lstColor->ItemCount <= 1 && $this->lstSize->ItemCount <= 1)
@@ -454,7 +487,7 @@ class xlsws_product extends xlsws_index {
             if (in_array($strSize, $strOptionsArray))
                 continue;
 
-            if (!$objProduct->IsAvailable) 
+            if (!$objProduct->IsDisplayable)
                 continue;
 
             $strOptionsArray[] = $strSize;
@@ -486,7 +519,7 @@ class xlsws_product extends xlsws_index {
             if (in_array($strColor, $strOptionsArray))
                 continue;
 
-            if (!$objProduct->IsAvailable) 
+            if (!$objProduct->IsDisplayable)
                 continue;
 
             $strOptionsArray[] = $strColor;
@@ -592,6 +625,13 @@ class xlsws_product extends xlsws_index {
 
 		$this->prod = $prod;
 		$this->update_qty_price($strFormId, $strControlId, $strParameter);
+		if(_xls_get_conf('ENABLE_SLASHED_PRICES' , 0)>0 )
+			if ($this->prod->SellWeb != 0 && $this->prod->SellWeb < $this->prod->Sell)
+				$this->lblOriginalPrice->Text = _sp("Regular Price").": <span class='price_slash'>"._xls_currency($this->prod->Sell)."</span>";
+				else $this->lblOriginalPrice->Text='';
+		else $this->lblOriginalPrice->Text='';
+	
+		
 		$this->lblStock->Text = $this->prod->InventoryDisplay();
 		$this->lblTitle->Text = $this->prod->Name;
 		if (_xls_get_conf('HTML_DESCRIPTION') == 0)
@@ -645,19 +685,24 @@ class xlsws_product extends xlsws_index {
 	 */
 	protected function prod_add_to_cart($strFormId, $strControlId, $strParameter) {
 		$objProduct = $objOriginal = $this->prod;
-		$objProduct = $this->ValidateMatrix();
+		if ($this->prod->MasterModel==1)
+			$objProduct = $this->ValidateMatrix();
 
 		if (!$objProduct)
 			return;
 		else
 			$this->prod = $objProduct;
 
-		// Remove the existing control before adding new
-		$this->RemoveControl($this->pnlImg->ControlId);
-		$this->create_prod_image();
-		$this->pnlImgHolder->Refresh();
+		
 
 		if (Cart::AddToCart($this->prod, $this->get_qty())) {
+		
+			// Remove the existing control before adding new
+			$this->RemoveControl($this->pnlImg->ControlId);
+			$this->create_prod_image();
+			$this->pnlImgHolder->Refresh();
+			
+		
 			// add auto products - only if parent can be added
 			foreach($this->autoAddCheckIDs as $id=>$qty) {
 				$ctl = $this->GetControl($id);
@@ -668,11 +713,21 @@ class xlsws_product extends xlsws_index {
 						Cart::AddToCart($prod , $qty);
 				}
 			}
+			
+			$this->cartPnl->RemoveChildControls(true);
+			$this->build_cart();
+			$this->cartPnl->Refresh();	
+		} else {
+			//We had an add failure, but rebuild control so we reset
+			$this->RemoveControl($this->pnlImg->ControlId);
+			$this->create_prod_image();
+			$this->pnlImgHolder->Refresh();
+			$this->cartPnl->RemoveChildControls(true);
+			$this->build_cart();
+			$this->cartPnl->Refresh();
 		}
 
-		$this->cartPnl->RemoveChildControls(true);
-		$this->build_cart();
-		$this->cartPnl->Refresh();
+		
 		$this->prod = $objOriginal;
 	}
 

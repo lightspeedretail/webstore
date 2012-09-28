@@ -39,7 +39,7 @@
 	<div class="border rounded">
 		<div class="border_header">
 			<p class="left"><?php _xt('Welcome'); ?>, <?= $this->customer->Firstname ?>!
-			<p class="right" style="margin: -2px 15px 0 0;"><a href="index.php?customer_register"><img src="<?= templateNamed('css/images/btn_edit.png') ?>" onclick="document.location.href='index.php?customer_register'" alt="<?php _xt('Edit') ?>"/></a></p>
+			<p class="right" style="margin: -2px 15px 0 0;"><a href="customer-register/pg"><img src="<?= templateNamed('css/images/btn_edit.png') ?>" onclick="document.location.href='<?= _xls_site_url("customer-register/pg") ?>'" alt="<?php _xt('Edit') ?>"/></a></p>
 		</div>
 		<div class="padding">
 			<p>Name : <?= $this->customer->Firstname . " " . $this->customer->Lastname ?></p>
@@ -62,7 +62,7 @@
 			<table width='100%'>
 			<?php foreach($this->orders as $order): ?>
 				<tr>
-				<td><a href="index.php?xlspg=order_track&getuid=<?php _xt($order->Linkid); ?>"><?php _xt($order->IdStr);?></a></td>
+				<td><a href="<?php echo _xls_site_url("order-track/pg"); ?>?getuid=<?php _xt($order->Linkid); ?>"><?php _xt($order->IdStr);?></a></td>
 				<!--
 					<td><?php _xt($order->DatetimePosted); ?></td>
 					<td><?php _xt($order->Status); ?></td>
@@ -90,11 +90,11 @@
 		<div class="padding">
 		<?php if(count($this->giftregistries) > 0): ?>
 			<?php foreach($this->giftregistries as $registry): ?>
-					<a href="index.php?xlspg=gift_registry&registry_id=<?=  $registry->Rowid  ?>"><?=  $registry->RegistryName  ?></a><br/>
+					<a href="<?php echo _xls_site_url("gift-registry/pg"); ?>&registry_id=<?=  $registry->Rowid  ?>"><?=  $registry->RegistryName  ?></a><br/>
 			<?php endforeach; ?>
 		<?php else: ?>
 				<?php _xt("You have not created any wish list yet."); ?><br/>
-				<a href="index.php?xlspg=gift_registry"><?php _xt('Click here') ?></a> to create a wish list.
+				<a href="<?php echo _xls_site_url("gift-registry/pg"); ?>"><?php _xt('Click here') ?></a> to create a wish list.
 		<?php endif; ?>
 		</div>
 		
@@ -113,7 +113,7 @@
 		<div class="padding">
 		<?php if(count($this->repairs) > 0): ?>
 			<?php foreach($this->repairs as $repair): ?>
-					<a href="index.php?xlspg=sro_track&dosearch=&zipcode=<?= $repair->Zipcode ?>&orderid=<?= $repair->LsId ?>"><?=  $repair->LsId  ?></a><br/>
+					<a href="<?= _xls_site_url("sro-track/pg") ?>?dosearch=true&emailphone=<?= $repair->CustomerEmailPhone ?>&orderid=<?= $repair->LsId ?>"><?=  $repair->LsId  ?></a><br/>
 			<?php endforeach; ?>
 		<?php else: ?>
 				<?php _xt("You have not placed any repair orders with us yet"); ?>

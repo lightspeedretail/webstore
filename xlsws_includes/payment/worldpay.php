@@ -40,14 +40,18 @@ class worldpay extends xlsws_class_payment {
 	 *
 	 */
 	public function name() {
-		$config = $this->getConfigValues('worldpay');
-
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "";
+		
 		if(isset($config['label']))
-			return $config['label'];
-
-		return "WorldPay";
+			$strName = $config['label'];
+		else $strName =  "Worldpay";
+		
+		if ($config['live']=="test") $strName .= " (TEST MODE)";
+		
+		return $strName;
 	}
-
+	
 	/**
 	 * The name of the payment module that will be displayed in Web Admin payments
 	 * @return string
@@ -55,9 +59,12 @@ class worldpay extends xlsws_class_payment {
 	 *
 	 */
 	public function admin_name() {
-		return "WorldPay Simple Integration";
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "Worldpay";
+		if (!$this->uses_jumper())$strName .= "&nbsp;&nbsp;&nbsp;<font size=2>Advanced Integration</font>";
+		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		return $strName;
 	}
-
 	/**
 	 * The Web Admin panel for configuring this payment option
 	 *
@@ -86,7 +93,7 @@ class worldpay extends xlsws_class_payment {
 		$ret['ls_payment_method'] = new XLSTextBox($objParent);
 		$ret['ls_payment_method']->Name = _sp('LightSpeed Payment Method');
 		$ret['ls_payment_method']->Required = true;
-		$ret['ls_payment_method']->Text = 'Credit Card';
+		$ret['ls_payment_method']->Text = 'Web Credit Card';
 		$ret['ls_payment_method']->ToolTip = "Please enter the payment method (from LightSpeed) you would like the payment amount to import into";
 
 		return $ret;
@@ -119,7 +126,7 @@ class worldpay extends xlsws_class_payment {
 	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
-		$config = $this->getConfigValues('worldpay');
+		$config = $this->getConfigValues(get_class($this));
 
 		$installation_id = $config['login'];
 		$worldpay_url = "";
@@ -173,7 +180,7 @@ class worldpay extends xlsws_class_payment {
 		if(!isset($XLSWS_VARS['instId']))
 			return false;
 
-		$config = $this->getConfigValues('worldpay');
+		$config = $this->getConfigValues(get_class($this));
 
 		if($XLSWS_VARS['instId'] != $config['login']) // it's not the same!
 			return false;

@@ -89,7 +89,7 @@ class phone_order extends xlsws_class_payment {
 		$ret['ls_payment_method'] = new XLSTextBox($parentObj);
 		$ret['ls_payment_method']->Name = _sp('LightSpeed Payment Method');
 		$ret['ls_payment_method']->Required = true;
-		$ret['ls_payment_method']->Text = 'Credit Card';
+		$ret['ls_payment_method']->Text = 'Web Credit Card';
 		$ret['ls_payment_method']->ToolTip = "Please enter the payment method (from LightSpeed) you would like the payment amount to import into";
 
 		return $ret;
@@ -122,7 +122,7 @@ class phone_order extends xlsws_class_payment {
 	public function customer_fields($parentObj) {
 		$ret= array();
 
-		$config = $this->getConfigValues('phone_order');
+		$config = $this->getConfigValues(get_class($this));
 		$ret['phone'] = new QLabel($parentObj);
 		$ret['phone']->Text = $config['phone'];
 		return $ret;

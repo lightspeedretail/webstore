@@ -68,15 +68,7 @@
 						</span>
 						
 						<?php $_CONTROL->txtFromEmail->RenderWithError() ?></div>
-					
-					<div class="modal_reg_input_wrap"><?php $_CONTROL->lblVerifyImage->Render() ?></div>
-					
-					<div class="modal_reg_input_wrap">
-						<span class="modal_reg_input_label">
-							<?php _xt("Enter the letters from above") ?>*
-						</span>
-						
-						<?php $_CONTROL->txtVerify->RenderWithError() ?></div>
+	
 					
 					<div class="model_reg_buttons" style="position: relative; left: 175px;">
 						<?php $_CONTROL->btnSend->Render('CssClass=button left rounded') ?> 

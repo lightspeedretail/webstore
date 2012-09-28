@@ -30,7 +30,7 @@
  *
  */
 
-class Paypal extends xlsws_class_payment {
+class paypal extends xlsws_class_payment {
 	const x_delim_char = "|";
 
 	/**
@@ -40,7 +40,7 @@ class Paypal extends xlsws_class_payment {
 	 *
 	 */
 	public function name() {
-		$config = $this->getConfigValues('paypal');
+		$config = $this->getConfigValues(get_class($this));
 
 		if(isset($config['label']))
 			return $config['label'];
@@ -55,9 +55,12 @@ class Paypal extends xlsws_class_payment {
 	 *
 	 */
 	public function admin_name() {
-		return _sp('PayPal');
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "PayPal";
+		if (!$this->uses_jumper())$strName .= "&nbsp;&nbsp;&nbsp;<font size=2>Advanced Integration</font>";
+		if ($config['live']=="test") $strName .= " **IN TEST (SANDBOX) MODE**";
+		return $strName;
 	}
-
 	/**
 	 * The Web Admin panel for configuring this payment option
 	 *
@@ -77,15 +80,22 @@ class Paypal extends xlsws_class_payment {
 		$ret['login']->Required = true;
 		$ret['login']->Name = _sp('Business Email');
 
+		$ret['address'] = new QListBox($objParent);
+		$ret['address']->Name = _sp('Prompt for shipping address again on PayPal');
+		$ret['address']->AddItem('off' , 1);
+		$ret['address']->AddItem('on' , 0);
+		$ret['address']->ToolTip = "Turns on shipping address on PayPal checkout. Turn on if you wish to receive PayPal's Confirmed Address from the user account. May be confusing to user to be prompted for shipping info twice.";
+
+
 		$ret['live'] = new QListBox($objParent);
-		$ret['live']->Name = _sp('Live/Test');
-		$ret['live']->AddItem('test' , 'test'); // TODO before distribute make live
+		$ret['live']->Name = _sp('Live/Sandbox');
 		$ret['live']->AddItem('live' , 'live');
+		$ret['live']->AddItem('sandbox' , 'test');
 
 		$ret['ls_payment_method'] = new XLSTextBox($objParent);
 		$ret['ls_payment_method']->Name = _sp('LightSpeed Payment Method');
 		$ret['ls_payment_method']->Required = true;
-		$ret['ls_payment_method']->Text = 'Credit Card';
+		$ret['ls_payment_method']->Text = 'Web Credit Card';
 		$ret['ls_payment_method']->ToolTip = "Please enter the payment method (from LightSpeed) you would like the payment amount to import into";
 
 		return $ret;
@@ -134,7 +144,7 @@ class Paypal extends xlsws_class_payment {
 	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
-		$config = $this->getConfigValues('paypal');
+		$config = $this->getConfigValues(get_class($this));
 
 		$paypal_email	= $config['login'];
 		$paypal_url = "";
@@ -142,7 +152,7 @@ class Paypal extends xlsws_class_payment {
 		if($config['live'] == 'live')
 			$paypal_url = "https://www.paypal.com/cgi-bin/webscr";
 		else
-			$paypal_url = "https://www.sandbox.paypal.com/cgi-bin/webscrl";
+			$paypal_url = "https://www.sandbox.paypal.com/cgi-bin/webscr";
 
 		$str = "";
 
@@ -164,15 +174,21 @@ class Paypal extends xlsws_class_payment {
 		$str .= _xls_make_hidden('cartId',  $cart->IdStr);
 		$str .= _xls_make_hidden('phone1',   $customer->Mainphone);
 		$str .= _xls_make_hidden('rm',   '2');
-		$str .= _xls_make_hidden('no_shipping',   '2');
+		$str .= _xls_make_hidden('no_shipping',   $config['address']);
+		$str .= _xls_make_hidden('no_note',   '1');
 
 		$str .= _xls_make_hidden('notify_url',   _xls_site_dir() . "/" . "xls_payment_capture.php");
-
+		$str .= _xls_make_hidden('return',   $cart->Link);
+		$str .= _xls_make_hidden('cancel_return',   _xls_site_url('checkout/pg'));
 		$str .= _xls_make_hidden('amount',  round($cart->Total , 2));
 
 		$str .=  ('</FORM>');
 
-		return $str;
+
+		if(_xls_get_conf('DEBUG_PAYMENTS' , false))
+			_xls_log(get_class($this) . " sending ".$cart->IdStr." in ".$config['live']." mode ".$str,true);
+
+			return $str;
 	}
 
 	/**
@@ -187,11 +203,15 @@ class Paypal extends xlsws_class_payment {
 		$paypal_url = "";
 		$order_id = "";
 
-		$config = $this->getConfigValues('paypal');
+
+		if(_xls_get_conf('DEBUG_PAYMENTS' , false))
+			_xls_log(get_class($this) . " IPN Transaction ".print_r($XLSWS_VARS,true),true);
+
+		$config = $this->getConfigValues(get_class($this));
 		if($config['live'] == 'live')
 			$paypal_url = "https://www.paypal.com/cgi-bin/webscr";
 		else
-			$paypal_url = "https://www.sandbox.paypal.com/cgi-bin/webscrl";
+			$paypal_url = "https://www.sandbox.paypal.com/cgi-bin/webscr";
 
 		$paypal_fields = 'cmd=_notify-validate';
 
@@ -207,7 +227,10 @@ class Paypal extends xlsws_class_payment {
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE); // uncomment this line if you get no gateway response.
 		$resp = curl_exec($ch); //execute post and get results
 		curl_close ($ch);
-		
+
+		if(_xls_get_conf('DEBUG_PAYMENTS' , false))
+			_xls_log(get_class($this) . " IPN Verify Response ".$resp,true);
+
 		if (strpos($resp,"VERIFIED") !== FALSE) {
 		
 			if ($XLSWS_VARS['payment_status']=="Completed")
@@ -218,7 +241,6 @@ class Paypal extends xlsws_class_payment {
 					'success' => true,
 					'data' => $XLSWS_VARS['txn_id'],
 				);
-				QApplication::Log(E_ERROR, 'Paypal', "Paypal ".$XLSWS_VARS['payment_status']." " . print_r($retarr , true));
 				return $retarr;
 			}
 			else

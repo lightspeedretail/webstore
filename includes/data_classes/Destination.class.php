@@ -49,6 +49,15 @@ class Destination extends DestinationGen {
 			);
 	}
 
+    public static function LoadDefault() {
+        return Destination::QuerySingle(
+            QQ::AndCondition(
+                QQ::Equal(QQN::Destination()->Country, '*'),
+                QQ::Equal(QQN::Destination()->State, '*')
+            )
+        );
+    }
+
 	public static function LoadByCountry($strCountry, $blnRestrict = false) {
 		if ($blnRestrict) {
 			if (Destination::QueryCount(

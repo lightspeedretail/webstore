@@ -19,11 +19,13 @@
 	 * @property string $Key the value for strKey (Unique)
 	 * @property string $Title the value for strTitle (Not Null)
 	 * @property string $Page the value for strPage 
+	 * @property string $RequestUrl the value for strRequestUrl 
 	 * @property string $MetaKeywords the value for strMetaKeywords 
 	 * @property string $MetaDescription the value for strMetaDescription 
 	 * @property string $Modified the value for strModified (Read-Only Timestamp)
 	 * @property QDateTime $Created the value for dttCreated 
 	 * @property string $ProductTag the value for strProductTag 
+	 * @property integer $TabPosition the value for intTabPosition 
 	 * @property boolean $__Restored whether or not this object was restored from the database (as opposed to created new)
 	 */
 	class CustomPageGen extends QBaseClass {
@@ -70,6 +72,15 @@
 		 * Protected member variable that maps to the database column xlsws_custom_page.meta_keywords
 		 * @var string strMetaKeywords
 		 */
+		protected $strRequestUrl;
+		const RequestUrlMaxLength = 255;
+		const RequestUrlDefault = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_custom_page.meta_keywords
+		 * @var string strMetaKeywords
+		 */
 		protected $strMetaKeywords;
 		const MetaKeywordsMaxLength = 255;
 		const MetaKeywordsDefault = null;
@@ -108,6 +119,12 @@
 		const ProductTagMaxLength = 255;
 		const ProductTagDefault = null;
 
+		/**
+		 * Protected member variable that maps to the database column xlsws_custom_page.tab_position
+		 * @var integer intTabPosition
+		 */
+		protected $intTabPosition;
+		const TabPosition = null;
 
 		/**
 		 * Protected array of virtual attributes for this object (e.g. extra/other calculated and/or non-object bound
@@ -398,11 +415,13 @@
 			$objBuilder->AddSelectItem($strTableName, 'key', $strAliasPrefix . 'key');
 			$objBuilder->AddSelectItem($strTableName, 'title', $strAliasPrefix . 'title');
 			$objBuilder->AddSelectItem($strTableName, 'page', $strAliasPrefix . 'page');
+			$objBuilder->AddSelectItem($strTableName, 'request_url', $strAliasPrefix . 'request_url');
 			$objBuilder->AddSelectItem($strTableName, 'meta_keywords', $strAliasPrefix . 'meta_keywords');
 			$objBuilder->AddSelectItem($strTableName, 'meta_description', $strAliasPrefix . 'meta_description');
 			$objBuilder->AddSelectItem($strTableName, 'modified', $strAliasPrefix . 'modified');
 			$objBuilder->AddSelectItem($strTableName, 'created', $strAliasPrefix . 'created');
 			$objBuilder->AddSelectItem($strTableName, 'product_tag', $strAliasPrefix . 'product_tag');
+			$objBuilder->AddSelectItem($strTableName, 'tab_position', $strAliasPrefix . 'tab_position');
 		}
 
 
@@ -442,6 +461,8 @@
 			$objToReturn->strTitle = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'page', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'page'] : $strAliasPrefix . 'page';
 			$objToReturn->strPage = $objDbRow->GetColumn($strAliasName, 'Blob');
+			$strAliasName = array_key_exists($strAliasPrefix . 'request_url', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'request_url'] : $strAliasPrefix . 'request_url';
+			$objToReturn->strRequestUrl = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'meta_keywords', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'meta_keywords'] : $strAliasPrefix . 'meta_keywords';
 			$objToReturn->strMetaKeywords = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'meta_description', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'meta_description'] : $strAliasPrefix . 'meta_description';
@@ -452,6 +473,8 @@
 			$objToReturn->dttCreated = $objDbRow->GetColumn($strAliasName, 'DateTime');
 			$strAliasName = array_key_exists($strAliasPrefix . 'product_tag', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'product_tag'] : $strAliasPrefix . 'product_tag';
 			$objToReturn->strProductTag = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'tab_position', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'tab_position'] : $strAliasPrefix . 'tab_position';
+			$objToReturn->intTabPosition = $objDbRow->GetColumn($strAliasName, 'Integer');
 
 			// Instantiate Virtual Attributes
 			foreach ($objDbRow->GetColumnNameArray() as $strColumnName => $mixValue) {
@@ -570,18 +593,22 @@
 							`key`,
 							`title`,
 							`page`,
+							`request_url`,
 							`meta_keywords`,
 							`meta_description`,
 							`created`,
-							`product_tag`
+							`product_tag`,
+							`tab_position`
 						) VALUES (
 							' . $objDatabase->SqlVariable($this->strKey) . ',
 							' . $objDatabase->SqlVariable($this->strTitle) . ',
 							' . $objDatabase->SqlVariable($this->strPage) . ',
+							' . $objDatabase->SqlVariable($this->strRequestUrl) . ',
 							' . $objDatabase->SqlVariable($this->strMetaKeywords) . ',
 							' . $objDatabase->SqlVariable($this->strMetaDescription) . ',
 							' . $objDatabase->SqlVariable($this->dttCreated) . ',
-							' . $objDatabase->SqlVariable($this->strProductTag) . '
+							' . $objDatabase->SqlVariable($this->strProductTag) . ',
+							' . $objDatabase->SqlVariable($this->intTabPosition) . '
 						)
 					');
 
@@ -615,10 +642,12 @@
 							`key` = ' . $objDatabase->SqlVariable($this->strKey) . ',
 							`title` = ' . $objDatabase->SqlVariable($this->strTitle) . ',
 							`page` = ' . $objDatabase->SqlVariable($this->strPage) . ',
+							`request_url` = ' . $objDatabase->SqlVariable($this->strRequestUrl) . ',
 							`meta_keywords` = ' . $objDatabase->SqlVariable($this->strMetaKeywords) . ',
 							`meta_description` = ' . $objDatabase->SqlVariable($this->strMetaDescription) . ',
 							`created` = ' . $objDatabase->SqlVariable($this->dttCreated) . ',
-							`product_tag` = ' . $objDatabase->SqlVariable($this->strProductTag) . '
+							`product_tag` = ' . $objDatabase->SqlVariable($this->strProductTag) . ',
+							`tab_position` = ' . $objDatabase->SqlVariable($this->intTabPosition) . '
 						WHERE
 							`rowid` = ' . $objDatabase->SqlVariable($this->intRowid) . '
 					');
@@ -712,11 +741,13 @@
 			$this->strKey = $objReloaded->strKey;
 			$this->strTitle = $objReloaded->strTitle;
 			$this->strPage = $objReloaded->strPage;
+			$this->strRequestUrl = $objReloaded->strRequestUrl;
 			$this->strMetaKeywords = $objReloaded->strMetaKeywords;
 			$this->strMetaDescription = $objReloaded->strMetaDescription;
 			$this->strModified = $objReloaded->strModified;
 			$this->dttCreated = $objReloaded->dttCreated;
 			$this->strProductTag = $objReloaded->strProductTag;
+			$this->intTabPosition = $objReloaded->intTabPosition;
 		}
 
 
@@ -757,6 +788,11 @@
 					// @return string
 					return $this->strPage;
 
+				case 'RequestUrl':
+					// Gets the value for strRequestUrl 
+					// @return string
+					return $this->strRequestUrl;
+
 				case 'MetaKeywords':
 					// Gets the value for strMetaKeywords 
 					// @return string
@@ -782,6 +818,10 @@
 					// @return string
 					return $this->strProductTag;
 
+				case 'TabPosition':
+					// Gets the value for intTabPosition 
+					// @return integer
+					return $this->intTabPosition;
 
 				///////////////////
 				// Member Objects
@@ -852,6 +892,17 @@
 						throw $objExc;
 					}
 
+				case 'RequestUrl':
+					// Sets the value for strRequestUrl 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strRequestUrl = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
 				case 'MetaKeywords':
 					// Sets the value for strMetaKeywords 
 					// @param string $mixValue
@@ -891,6 +942,17 @@
 					// @return string
 					try {
 						return ($this->strProductTag = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'TabPosition':
+					// Sets the value for intTabPosition 
+					// @param integer $mixValue
+					// @return integer
+					try {
+						return ($this->intTabPosition = QType::Cast($mixValue, QType::Integer));
 					} catch (QCallerException $objExc) {
 						$objExc->IncrementOffset();
 						throw $objExc;
@@ -941,11 +1003,13 @@
 			$strToReturn .= '<element name="Key" type="xsd:string"/>';
 			$strToReturn .= '<element name="Title" type="xsd:string"/>';
 			$strToReturn .= '<element name="Page" type="xsd:string"/>';
+			$strToReturn .= '<element name="RequestUrl" type="xsd:string"/>';
 			$strToReturn .= '<element name="MetaKeywords" type="xsd:string"/>';
 			$strToReturn .= '<element name="MetaDescription" type="xsd:string"/>';
 			$strToReturn .= '<element name="Modified" type="xsd:string"/>';
 			$strToReturn .= '<element name="Created" type="xsd:dateTime"/>';
 			$strToReturn .= '<element name="ProductTag" type="xsd:string"/>';
+			$strToReturn .= '<element name="TabPosition" type="xsd:int"/>';
 			$strToReturn .= '<element name="__blnRestored" type="xsd:boolean"/>';
 			$strToReturn .= '</sequence></complexType>';
 			return $strToReturn;
@@ -976,6 +1040,8 @@
 				$objToReturn->strTitle = $objSoapObject->Title;
 			if (property_exists($objSoapObject, 'Page'))
 				$objToReturn->strPage = $objSoapObject->Page;
+			if (property_exists($objSoapObject, 'RequestUrl'))
+				$objToReturn->strRequestUrl = $objSoapObject->strRequestUrl;
 			if (property_exists($objSoapObject, 'MetaKeywords'))
 				$objToReturn->strMetaKeywords = $objSoapObject->MetaKeywords;
 			if (property_exists($objSoapObject, 'MetaDescription'))
@@ -986,6 +1052,8 @@
 				$objToReturn->dttCreated = new QDateTime($objSoapObject->Created);
 			if (property_exists($objSoapObject, 'ProductTag'))
 				$objToReturn->strProductTag = $objSoapObject->ProductTag;
+			if (property_exists($objSoapObject, 'TabPosition'))
+				$objToReturn->intTabPosition = $objSoapObject->TabPosition;
 			if (property_exists($objSoapObject, '__blnRestored'))
 				$objToReturn->__blnRestored = $objSoapObject->__blnRestored;
 			return $objToReturn;
@@ -1034,6 +1102,8 @@
 					return new QQNode('title', 'Title', 'string', $this);
 				case 'Page':
 					return new QQNode('page', 'Page', 'string', $this);
+				case 'RequestUrl':
+					return new QQNode('request_url', 'RequestUrl', 'string', $this);
 				case 'MetaKeywords':
 					return new QQNode('meta_keywords', 'MetaKeywords', 'string', $this);
 				case 'MetaDescription':
@@ -1044,7 +1114,9 @@
 					return new QQNode('created', 'Created', 'QDateTime', $this);
 				case 'ProductTag':
 					return new QQNode('product_tag', 'ProductTag', 'string', $this);
-
+				case 'TabPosition':
+					return new QQNode('tab_position', 'TabPosition', 'integer', $this);
+					
 				case '_PrimaryKeyNode':
 					return new QQNode('rowid', 'Rowid', 'integer', $this);
 				default:
@@ -1072,6 +1144,8 @@
 					return new QQNode('title', 'Title', 'string', $this);
 				case 'Page':
 					return new QQNode('page', 'Page', 'string', $this);
+				case 'RequestUrl':
+					return new QQNode('request_url', 'RequestUrl', 'string', $this);
 				case 'MetaKeywords':
 					return new QQNode('meta_keywords', 'MetaKeywords', 'string', $this);
 				case 'MetaDescription':
@@ -1082,6 +1156,8 @@
 					return new QQNode('created', 'Created', 'QDateTime', $this);
 				case 'ProductTag':
 					return new QQNode('product_tag', 'ProductTag', 'string', $this);
+				case 'TabPosition':
+					return new QQNode('tab_position', 'TabPosition', 'integer', $this);
 
 				case '_PrimaryKeyNode':
 					return new QQNode('rowid', 'Rowid', 'integer', $this);

@@ -25,7 +25,7 @@
  */
 
 // Versioning Information
-define('XLSWS_VERSION', '2.1.7');
+define('XLSWS_VERSION', '2.5.0');
 
 // Define default values
 define('XLS_TRUNCATE_PUNCTUATIONS', ".!?:;,-");
@@ -37,10 +37,23 @@ require(__XLSWS_INCLUDES__ . '/_functions.php');
 require(__XLSWS_INCLUDES__ . '/_qextend.php');
 
 // Add xlsws autoload include paths to QApplication
+// TODO :: Temporary autoinclude paths for development
 QApplication::$ClassPath[] = __XLSWS_INCLUDES__;
 QApplication::$ClassPath[] = __XLSWS_INCLUDES__ . '/core';
 QApplication::$ClassPath[] = __XLSWS_INCLUDES__ . '/qform';
 QApplication::$ClassPath[] = __XLSWS_INCLUDES__ . '/view';
+QApplication::$ClassPath[] = __XLSWS_INCLUDES__ . '/widget';
+QApplication::$ClassPath[] = __XLSWS_INCLUDES__ . '/widget/core';
+QApplication::$ClassPath[] = __XLSWS_INCLUDES__ . '/widget/customer';
+QApplication::$ClassPath[] = __XLSWS_INCLUDES__ . '/widget/checkout';
+QApplication::$ClassPath[] = __XLSWS_INCLUDES__ . '/widget/qform';
+
+// Override custom QControl and QForm to provide additional facilities
+QApplication::$PreloadedClassFile['qcontrol'] =
+        __XLSWS_INCLUDES__ . '/widget/qform/QControl.class.php';
+QApplication::$PreloadedClassFile['qform'] =
+        __XLSWS_INCLUDES__ . '/widget/qform/QForm.class.php';
+
 
 // Register custom data classes / types
 QApplication::$ClassFile['imagestype'] =
@@ -48,6 +61,10 @@ QApplication::$ClassFile['imagestype'] =
 
 QApplication::$ClassFile['promocodetype'] =
 	__DATA_CLASSES__ . '/PromoCodeType.class.php';
+
+QApplication::$ClassFile['updateinventory'] =
+	__DATA_CLASSES__ . '/UpdateInventory.class.php';
+
 
 // Register xlsws static class path definitions to QApplication
 QApplication::$ClassFile['xlssessionhandlerbase'] =

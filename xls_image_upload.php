@@ -82,13 +82,18 @@ function errorConflict($msg, $errCode) {
 }
 
 function getDestination() {
-	if (!(isset($_SERVER['PATH_INFO']) && $_SERVER['PATH_INFO']))
+
+	if (isset($_SERVER['ORIG_PATH_INFO']))
+		$strPath=$_SERVER['ORIG_PATH_INFO'];
+	elseif (isset($_SERVER['PATH_INFO']))
+		$strPath = $_SERVER['PATH_INFO'];
+	else
 		return errorInParams('No path info details present');
 
 	$matches = array();
 
-	if (!preg_match('@/product/(\d+)/index/([0-5])/@',$_SERVER['PATH_INFO'], $matches))
-		return errorInParams('Badly formed path:' . $_SERVER['PATH_INFO']);
+	if (!preg_match('@/product/(\d+)/index/([0-5])/@',$strPath, $matches))
+		return errorInParams('Badly formed path:' . $strPath);
 
 	$pid = $matches[1];
 	$idx = $matches[2];

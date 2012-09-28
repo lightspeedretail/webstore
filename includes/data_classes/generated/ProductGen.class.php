@@ -28,6 +28,8 @@
 	 * @property boolean $Inventoried the value for blnInventoried 
 	 * @property double $Inventory the value for fltInventory 
 	 * @property double $InventoryTotal the value for fltInventoryTotal 
+	 * @property double $InventoryReserved the value for fltInventoryReserved 
+	 * @property double $InventoryAvail the value for fltInventoryAvail 
 	 * @property boolean $MasterModel the value for blnMasterModel 
 	 * @property integer $FkProductMasterId the value for intFkProductMasterId 
 	 * @property string $ProductSize the value for strProductSize 
@@ -45,6 +47,7 @@
 	 * @property string $WebKeyword1 the value for strWebKeyword1 
 	 * @property string $WebKeyword2 the value for strWebKeyword2 
 	 * @property string $WebKeyword3 the value for strWebKeyword3 
+	 * @property string $RequestUrl the value for strRequestUrl 
 	 * @property string $MetaDesc the value for strMetaDesc 
 	 * @property string $MetaKeyword the value for strMetaKeyword 
 	 * @property boolean $Featured the value for blnFeatured (Not Null)
@@ -182,6 +185,22 @@
 		 */
 		protected $fltInventoryTotal;
 		const InventoryTotalDefault = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_product.inventory_reserved
+		 * @var double fltInventoryReserved
+		 */
+		protected $fltInventoryReserved;
+		const InventoryReservedDefault = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_product.inventory_avail
+		 * @var double fltInventoryAvail
+		 */
+		protected $fltInventoryAvail;
+		const InventoryAvailDefault = null;
 
 
 		/**
@@ -325,6 +344,14 @@
 		const WebKeyword3MaxLength = 255;
 		const WebKeyword3Default = null;
 
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_product.meta_desc
+		 * @var string strMetaDesc
+		 */
+		protected $strRequestUrl;
+		const RequestUrlMaxLength = 255;
+		const RequestUrlDefault = null;
 
 		/**
 		 * Protected member variable that maps to the database column xlsws_product.meta_desc
@@ -814,6 +841,8 @@
 			$objBuilder->AddSelectItem($strTableName, 'inventoried', $strAliasPrefix . 'inventoried');
 			$objBuilder->AddSelectItem($strTableName, 'inventory', $strAliasPrefix . 'inventory');
 			$objBuilder->AddSelectItem($strTableName, 'inventory_total', $strAliasPrefix . 'inventory_total');
+			$objBuilder->AddSelectItem($strTableName, 'inventory_reserved', $strAliasPrefix . 'inventory_reserved');
+			$objBuilder->AddSelectItem($strTableName, 'inventory_avail', $strAliasPrefix . 'inventory_avail');
 			$objBuilder->AddSelectItem($strTableName, 'master_model', $strAliasPrefix . 'master_model');
 			$objBuilder->AddSelectItem($strTableName, 'fk_product_master_id', $strAliasPrefix . 'fk_product_master_id');
 			$objBuilder->AddSelectItem($strTableName, 'product_size', $strAliasPrefix . 'product_size');
@@ -831,6 +860,7 @@
 			$objBuilder->AddSelectItem($strTableName, 'web_keyword1', $strAliasPrefix . 'web_keyword1');
 			$objBuilder->AddSelectItem($strTableName, 'web_keyword2', $strAliasPrefix . 'web_keyword2');
 			$objBuilder->AddSelectItem($strTableName, 'web_keyword3', $strAliasPrefix . 'web_keyword3');
+			$objBuilder->AddSelectItem($strTableName, 'request_url', $strAliasPrefix . 'request_url');
 			$objBuilder->AddSelectItem($strTableName, 'meta_desc', $strAliasPrefix . 'meta_desc');
 			$objBuilder->AddSelectItem($strTableName, 'meta_keyword', $strAliasPrefix . 'meta_keyword');
 			$objBuilder->AddSelectItem($strTableName, 'featured', $strAliasPrefix . 'featured');
@@ -1023,6 +1053,10 @@
 			$objToReturn->fltInventory = $objDbRow->GetColumn($strAliasName, 'Float');
 			$strAliasName = array_key_exists($strAliasPrefix . 'inventory_total', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'inventory_total'] : $strAliasPrefix . 'inventory_total';
 			$objToReturn->fltInventoryTotal = $objDbRow->GetColumn($strAliasName, 'Float');
+			$strAliasName = array_key_exists($strAliasPrefix . 'inventory_reserved', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'inventory_reserved'] : $strAliasPrefix . 'inventory_reserved';
+			$objToReturn->fltInventoryReserved = $objDbRow->GetColumn($strAliasName, 'Float');
+			$strAliasName = array_key_exists($strAliasPrefix . 'inventory_avail', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'inventory_avail'] : $strAliasPrefix . 'inventory_avail';
+			$objToReturn->fltInventoryAvail = $objDbRow->GetColumn($strAliasName, 'Float');
 			$strAliasName = array_key_exists($strAliasPrefix . 'master_model', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'master_model'] : $strAliasPrefix . 'master_model';
 			$objToReturn->blnMasterModel = $objDbRow->GetColumn($strAliasName, 'Bit');
 			$strAliasName = array_key_exists($strAliasPrefix . 'fk_product_master_id', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'fk_product_master_id'] : $strAliasPrefix . 'fk_product_master_id';
@@ -1057,6 +1091,8 @@
 			$objToReturn->strWebKeyword2 = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'web_keyword3', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'web_keyword3'] : $strAliasPrefix . 'web_keyword3';
 			$objToReturn->strWebKeyword3 = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'request_url', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'request_url'] : $strAliasPrefix . 'request_url';
+			$objToReturn->strRequestUrl = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'meta_desc', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'meta_desc'] : $strAliasPrefix . 'meta_desc';
 			$objToReturn->strMetaDesc = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'meta_keyword', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'meta_keyword'] : $strAliasPrefix . 'meta_keyword';
@@ -1493,7 +1529,7 @@
 
 			try {
 				if ((!$this->__blnRestored) || ($blnForceInsert)) {
-					// Perform an INSERT query
+					// Perform an INSERT query('
 					$objDatabase->NonQuery('
 						INSERT INTO `xlsws_product` (
 							`name`,
@@ -1508,6 +1544,8 @@
 							`inventoried`,
 							`inventory`,
 							`inventory_total`,
+							`inventory_reserved`,
+							`inventory_avail`,
 							`master_model`,
 							`fk_product_master_id`,
 							`product_size`,
@@ -1525,6 +1563,7 @@
 							`web_keyword1`,
 							`web_keyword2`,
 							`web_keyword3`,
+							`request_url`,
 							`meta_desc`,
 							`meta_keyword`,
 							`featured`,
@@ -1542,6 +1581,8 @@
 							' . $objDatabase->SqlVariable($this->blnInventoried) . ',
 							' . $objDatabase->SqlVariable($this->fltInventory) . ',
 							' . $objDatabase->SqlVariable($this->fltInventoryTotal) . ',
+							' . $objDatabase->SqlVariable($this->fltInventoryReserved) . ',
+							' . $objDatabase->SqlVariable($this->fltInventoryAvail) . ',
 							' . $objDatabase->SqlVariable($this->blnMasterModel) . ',
 							' . $objDatabase->SqlVariable($this->intFkProductMasterId) . ',
 							' . $objDatabase->SqlVariable($this->strProductSize) . ',
@@ -1559,6 +1600,7 @@
 							' . $objDatabase->SqlVariable($this->strWebKeyword1) . ',
 							' . $objDatabase->SqlVariable($this->strWebKeyword2) . ',
 							' . $objDatabase->SqlVariable($this->strWebKeyword3) . ',
+							' . $objDatabase->SqlVariable($this->strRequestUrl) . ',
 							' . $objDatabase->SqlVariable($this->strMetaDesc) . ',
 							' . $objDatabase->SqlVariable($this->strMetaKeyword) . ',
 							' . $objDatabase->SqlVariable($this->blnFeatured) . ',
@@ -1568,7 +1610,7 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intRowid = $objDatabase->InsertId('xlsws_product', 'rowid');
-				} else {
+				} else { 
 					// Perform an UPDATE query
 
 					// First checking for Optimistic Locking constraints (if applicable)
@@ -1605,6 +1647,8 @@
 							`inventoried` = ' . $objDatabase->SqlVariable($this->blnInventoried) . ',
 							`inventory` = ' . $objDatabase->SqlVariable($this->fltInventory) . ',
 							`inventory_total` = ' . $objDatabase->SqlVariable($this->fltInventoryTotal) . ',
+							`inventory_reserved` = ' . $objDatabase->SqlVariable($this->fltInventoryReserved) . ',
+							`inventory_avail` = ' . $objDatabase->SqlVariable($this->fltInventoryAvail) . ',
 							`master_model` = ' . $objDatabase->SqlVariable($this->blnMasterModel) . ',
 							`fk_product_master_id` = ' . $objDatabase->SqlVariable($this->intFkProductMasterId) . ',
 							`product_size` = ' . $objDatabase->SqlVariable($this->strProductSize) . ',
@@ -1622,6 +1666,7 @@
 							`web_keyword1` = ' . $objDatabase->SqlVariable($this->strWebKeyword1) . ',
 							`web_keyword2` = ' . $objDatabase->SqlVariable($this->strWebKeyword2) . ',
 							`web_keyword3` = ' . $objDatabase->SqlVariable($this->strWebKeyword3) . ',
+							`request_url` = ' . $objDatabase->SqlVariable($this->strRequestUrl) . ',
 							`meta_desc` = ' . $objDatabase->SqlVariable($this->strMetaDesc) . ',
 							`meta_keyword` = ' . $objDatabase->SqlVariable($this->strMetaKeyword) . ',
 							`featured` = ' . $objDatabase->SqlVariable($this->blnFeatured) . ',
@@ -1728,6 +1773,8 @@
 			$this->blnInventoried = $objReloaded->blnInventoried;
 			$this->fltInventory = $objReloaded->fltInventory;
 			$this->fltInventoryTotal = $objReloaded->fltInventoryTotal;
+			$this->fltInventoryReserved = $objReloaded->fltInventoryReserved;
+			$this->fltInventoryAvail = $objReloaded->fltInventoryAvail;
 			$this->blnMasterModel = $objReloaded->blnMasterModel;
 			$this->FkProductMasterId = $objReloaded->FkProductMasterId;
 			$this->strProductSize = $objReloaded->strProductSize;
@@ -1745,6 +1792,7 @@
 			$this->strWebKeyword1 = $objReloaded->strWebKeyword1;
 			$this->strWebKeyword2 = $objReloaded->strWebKeyword2;
 			$this->strWebKeyword3 = $objReloaded->strWebKeyword3;
+			$this->strRequestUrl = $objReloaded->strRequestUrl;
 			$this->strMetaDesc = $objReloaded->strMetaDesc;
 			$this->strMetaKeyword = $objReloaded->strMetaKeyword;
 			$this->blnFeatured = $objReloaded->blnFeatured;
@@ -1835,6 +1883,16 @@
 					// @return double
 					return $this->fltInventoryTotal;
 
+				case 'InventoryReserved':
+					// Gets the value for fltInventoryReserved 
+					// @return double
+					return $this->fltInventoryReserved;
+
+				case 'InventoryAvail':
+					// Gets the value for fltInventoryAvail 
+					// @return double
+					return $this->fltInventoryAvail;
+
 				case 'MasterModel':
 					// Gets the value for blnMasterModel 
 					// @return boolean
@@ -1919,6 +1977,11 @@
 					// Gets the value for strWebKeyword3 
 					// @return string
 					return $this->strWebKeyword3;
+
+				case 'RequestUrl':
+					// Gets the value for strRequestUrl 
+					// @return string
+					return $this->strRequestUrl;
 
 				case 'MetaDesc':
 					// Gets the value for strMetaDesc 
@@ -2234,6 +2297,28 @@
 						throw $objExc;
 					}
 
+				case 'InventoryReserved':
+					// Sets the value for fltInventoryReserved 
+					// @param double $mixValue
+					// @return double
+					try {
+						return ($this->fltInventoryReserved = QType::Cast($mixValue, QType::Float));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'InventoryAvail':
+					// Sets the value for fltInventoryAvail 
+					// @param double $mixValue
+					// @return double
+					try {
+						return ($this->fltInventoryAvail = QType::Cast($mixValue, QType::Float));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
 				case 'MasterModel':
 					// Sets the value for blnMasterModel 
 					// @param boolean $mixValue
@@ -2418,6 +2503,17 @@
 					// @return string
 					try {
 						return ($this->strWebKeyword3 = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'RequestUrl':
+					// Sets the value for strRequestUrl 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strRequestUrl = QType::Cast($mixValue, QType::String));
 					} catch (QCallerException $objExc) {
 						$objExc->IncrementOffset();
 						throw $objExc;
@@ -3725,6 +3821,8 @@
 			$strToReturn .= '<element name="Inventoried" type="xsd:boolean"/>';
 			$strToReturn .= '<element name="Inventory" type="xsd:float"/>';
 			$strToReturn .= '<element name="InventoryTotal" type="xsd:float"/>';
+			$strToReturn .= '<element name="InventoryReserved" type="xsd:float"/>';
+			$strToReturn .= '<element name="InventoryAvail" type="xsd:float"/>';
 			$strToReturn .= '<element name="MasterModel" type="xsd:boolean"/>';
 			$strToReturn .= '<element name="FkProductMaster" type="xsd1:Product"/>';
 			$strToReturn .= '<element name="ProductSize" type="xsd:string"/>';
@@ -3742,6 +3840,7 @@
 			$strToReturn .= '<element name="WebKeyword1" type="xsd:string"/>';
 			$strToReturn .= '<element name="WebKeyword2" type="xsd:string"/>';
 			$strToReturn .= '<element name="WebKeyword3" type="xsd:string"/>';
+			$strToReturn .= '<element name="RequestUrl" type="xsd:string"/>';
 			$strToReturn .= '<element name="MetaDesc" type="xsd:string"/>';
 			$strToReturn .= '<element name="MetaKeyword" type="xsd:string"/>';
 			$strToReturn .= '<element name="Featured" type="xsd:boolean"/>';
@@ -3797,6 +3896,10 @@
 				$objToReturn->fltInventory = $objSoapObject->Inventory;
 			if (property_exists($objSoapObject, 'InventoryTotal'))
 				$objToReturn->fltInventoryTotal = $objSoapObject->InventoryTotal;
+			if (property_exists($objSoapObject, 'InventoryReserved'))
+				$objToReturn->fltInventoryReserved = $objSoapObject->InventoryReserved;
+			if (property_exists($objSoapObject, 'InventoryAvail'))
+				$objToReturn->fltInventoryAvail = $objSoapObject->InventoryAvail;
 			if (property_exists($objSoapObject, 'MasterModel'))
 				$objToReturn->blnMasterModel = $objSoapObject->MasterModel;
 			if ((property_exists($objSoapObject, 'FkProductMaster')) &&
@@ -3833,6 +3936,8 @@
 				$objToReturn->strWebKeyword2 = $objSoapObject->WebKeyword2;
 			if (property_exists($objSoapObject, 'WebKeyword3'))
 				$objToReturn->strWebKeyword3 = $objSoapObject->WebKeyword3;
+			if (property_exists($objSoapObject, 'RequestUrl'))
+				$objToReturn->strRequestUrl = $objSoapObject->RequestUrl;
 			if (property_exists($objSoapObject, 'MetaDesc'))
 				$objToReturn->strMetaDesc = $objSoapObject->MetaDesc;
 			if (property_exists($objSoapObject, 'MetaKeyword'))
@@ -3971,6 +4076,10 @@
 					return new QQNode('inventory', 'Inventory', 'double', $this);
 				case 'InventoryTotal':
 					return new QQNode('inventory_total', 'InventoryTotal', 'double', $this);
+				case 'InventoryReserved':
+					return new QQNode('inventory_reserved', 'InventoryReserved', 'double', $this);
+				case 'InventoryAvail':
+					return new QQNode('inventory_avail', 'InventoryAvail', 'double', $this);
 				case 'MasterModel':
 					return new QQNode('master_model', 'MasterModel', 'boolean', $this);
 				case 'FkProductMasterId':
@@ -4009,6 +4118,8 @@
 					return new QQNode('web_keyword2', 'WebKeyword2', 'string', $this);
 				case 'WebKeyword3':
 					return new QQNode('web_keyword3', 'WebKeyword3', 'string', $this);
+				case 'RequestUrl':
+					return new QQNode('request_url', 'RequestUrl', 'string', $this);
 				case 'MetaDesc':
 					return new QQNode('meta_desc', 'MetaDesc', 'string', $this);
 				case 'MetaKeyword':
@@ -4081,6 +4192,10 @@
 					return new QQNode('inventory', 'Inventory', 'double', $this);
 				case 'InventoryTotal':
 					return new QQNode('inventory_total', 'InventoryTotal', 'double', $this);
+				case 'InventoryReserved':
+					return new QQNode('inventory_reserved', 'InventoryReserved', 'double', $this);
+				case 'InventoryAvail':
+					return new QQNode('inventory_avail', 'InventoryAvail', 'double', $this);
 				case 'MasterModel':
 					return new QQNode('master_model', 'MasterModel', 'boolean', $this);
 				case 'FkProductMasterId':
@@ -4119,6 +4234,8 @@
 					return new QQNode('web_keyword2', 'WebKeyword2', 'string', $this);
 				case 'WebKeyword3':
 					return new QQNode('web_keyword3', 'WebKeyword3', 'string', $this);
+				case 'RequestUrl':
+					return new QQNode('request_url', 'RequestUrl', 'string', $this);
 				case 'MetaDesc':
 					return new QQNode('meta_desc', 'MetaDesc', 'string', $this);
 				case 'MetaKeyword':

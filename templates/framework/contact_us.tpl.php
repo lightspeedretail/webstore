@@ -56,11 +56,19 @@
 			<label for="message"><?php _xt('Message') ?>:</label><br />
 			<?php $this->txtMsg->RenderWithError('Width=315' , 'Height=150'); ?>
 			
-		<p><?php $this->lblVerifyImage->Render(); ?> <br style="clear:both;"/></p>
-
-		<p><label for="Verify"><?php _xt("Enter the image from the above text"); ?></label></p>
-				<?php $this->txtVerify->RenderWithError() ?>
-						
+		<?	if (_xls_show_captcha('contactus')) { ?>
+			<div class="block margin">
+				<dl>
+					<dt><label for="Name"><?php $this->lblVerifyImage->Render(); ?></label></dt>
+				</dl>
+			</div>
+	
+			<div class="block margin">
+				<dl class="left">
+					<dd><?php $this->txtCRVerify->RenderWithError(); ?></dd>
+				</dl>
+			</div>
+		<? } ?>
 						
 		<p style="margin-top:40px;"><?php $this->btnSubmit->Render('CssClass=button rounded'); ?></p>
 			

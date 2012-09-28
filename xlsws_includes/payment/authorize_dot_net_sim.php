@@ -40,7 +40,7 @@ class authorize_dot_net_sim extends xlsws_class_payment {
 	 *
 	 */
 	public function name() {
-		$config = $this->getConfigValues('authorize_dot_net_sim');
+		$config = $this->getConfigValues(get_class($this));
 
 		if(isset($config['label']))
 			return $config['label'];
@@ -48,14 +48,18 @@ class authorize_dot_net_sim extends xlsws_class_payment {
 		return "Credit Card";
 	}
 
-	/**
+		/**
 	 * The name of the payment module that will be displayed in Web Admin payments
 	 * @return string
 	 *
 	 *
 	 */
 	public function admin_name() {
-		return _sp('Authorize.net Simple Integration');
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "Authorize.Net";
+		if (!$this->uses_jumper())$strName .= "&nbsp;&nbsp;&nbsp;<font size=2>Advanced Integration</font>";
+		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		return $strName;
 	}
 
 	/**
@@ -88,13 +92,13 @@ class authorize_dot_net_sim extends xlsws_class_payment {
 		$ret['live'] = new XLSListBox($objParent);
 		$ret['live']->Name = _sp('Deployment Mode');
 		$ret['live']->AddItem('live' , 'live');
-		$ret['live']->AddItem('test' , 'test');
-		//$ret['live']->AddItem('dev' , 'dev'); //See note in process() statement about this option
+		$ret['live']->AddItem('sandbox' , 'test');
+		$ret['live']->ToolTip = "To use (TEST MODE) in your regular account, leave this as Live and instead set Test Mode in your Authorize.net account settings on their site. Sandbox should only be used with Authorize.net Sandbox testing servers.";
 
 		$ret['ls_payment_method'] = new XLSTextBox($objParent);
 		$ret['ls_payment_method']->Name = _sp('LightSpeed Payment Method');
 		$ret['ls_payment_method']->Required = true;
-		$ret['ls_payment_method']->Text = 'Credit Card';
+		$ret['ls_payment_method']->Text = 'Web Credit Card';
 		$ret['ls_payment_method']->ToolTip = "Please enter the payment method (from LightSpeed) you would like the payment amount to import into";
 
 		return $ret;
@@ -128,7 +132,7 @@ class authorize_dot_net_sim extends xlsws_class_payment {
 	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
-		$config = $this->getConfigValues('authorize_dot_net_sim');
+		$config = $this->getConfigValues(get_class($this));
 
 		$auth_net_login_id	= $config['login'];
 		$auth_net_tran_key	= $config['trans_key'];
@@ -139,7 +143,7 @@ class authorize_dot_net_sim extends xlsws_class_payment {
 		 * chosen through the Web Admin panel.
 		 *
 		 */
-		if($config['live'] == 'dev')
+		if($config['live'] == 'test')
 			$auth_net_url	= "https://test.authorize.net/gateway/transact.dll";
 		else
 			$auth_net_url	= "https://secure.authorize.net/gateway/transact.dll";
@@ -183,8 +187,8 @@ class authorize_dot_net_sim extends xlsws_class_payment {
 		$str .= _xls_make_hidden('x_relay_url',   _xls_site_dir() . "/" . "xls_payment_capture.php");
 		$str .= _xls_make_hidden('x_relay_response',   'TRUE');
 
-		if($config['live'] == 'test')
-			$str .= _xls_make_hidden('x_test_request',   'TRUE');
+		//if($config['live'] == 'test')
+		//	$str .= _xls_make_hidden('x_test_request',   'TRUE');
 
 		$str .= ('</FORM>');
 
@@ -207,7 +211,7 @@ class authorize_dot_net_sim extends xlsws_class_payment {
 	 * @return string
 	 */
 	public function hmac ($key, $data) {
-		return (bin2hex (mhash(MHASH_MD5, $data, $key)));
+		return hash_hmac('md5', $data, $key);
 	}
 
 	/**
@@ -289,7 +293,7 @@ class authorize_dot_net_sim extends xlsws_class_payment {
 		}
 
 		//confirm md5 hash
-		$config = $this->getConfigValues('authorize_dot_net_sim');
+		$config = $this->getConfigValues(get_class($this));
 
 		if(isset($config['md5hash'])  && ($config['md5hash']) && isset($XLSWS_VARS['x_MD5_Hash'])) {
 			$md5 = strtolower(md5($config['md5hash'] . $config['login'] . $XLSWS_VARS['x_trans_id'] . $XLSWS_VARS['x_amount']));

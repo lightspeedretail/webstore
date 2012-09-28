@@ -1,4 +1,4 @@
-﻿<?php
+﻿﻿<?php
 /*
   LightSpeed Web Store
  
@@ -42,12 +42,16 @@ class beanstream_aim extends credit_card {
 	 *
 	 */
 	public function name() {
-		$config = $this->getConfigValues('beanstream_aim');
-
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "";
+		
 		if(isset($config['label']))
-			return $config['label'];
-
-		return "Credit Card";
+			$strName = $config['label'];
+		else $strName =  "Credit Card";
+		
+		if ($config['live']=="test") $strName .= " (TEST MODE)";
+		
+		return $strName;
 	}
 
 	/**
@@ -57,7 +61,11 @@ class beanstream_aim extends credit_card {
 	 *
 	 */
 	public function admin_name() {
-		return "Beanstream Advanced Integration (Canada/USA)";
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "Beanstream (US/CAN)";
+		if (!$this->uses_jumper())$strName .= "&nbsp;&nbsp;&nbsp;<font size=2>Advanced Integration</font>";
+		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		return $strName;
 	}
 
 
@@ -89,7 +97,7 @@ class beanstream_aim extends credit_card {
 		$ret['ls_payment_method'] = new XLSTextBox($objParent);
 		$ret['ls_payment_method']->Name = _sp('LightSpeed Payment Method');
 		$ret['ls_payment_method']->Required = true;
-		$ret['ls_payment_method']->Text = 'Credit Card';
+		$ret['ls_payment_method']->Text = 'Web Credit Card';
 		$ret['ls_payment_method']->ToolTip = "Please enter the payment method (from LightSpeed) you would like the payment amount to import into";
 
 		return $ret;
@@ -122,14 +130,17 @@ class beanstream_aim extends credit_card {
 	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
-		$config = $this->getConfigValues('beanstream_aim');
+		$config = $this->getConfigValues(get_class($this));
 
 		$merchantId = $config['login'];
 		$amount = $cart->Total;
 		$beanstream_url = "https://www.beanstream.com/scripts/process_transaction.asp";
 		$yearArr = toCharArray($fields['ccexpyr']->SelectedValue);
 		$exp_year = $yearArr[2] . $yearArr[3];
-
+		$strState = $customer->State1;
+		if ($customer->Country1 != "US" && $customer->Country1 != "CA") $strState="--";
+		$strShipState = $cart->ShipState;
+		if ($cart->ShipCountry != "US" && $cart->ShipCountry != "CA") $strShipState="--";
 		$beanstream_values = array (
 			"requestType"		=> "BACKEND",
 			"merchant_id"		=> $merchantId,
@@ -147,8 +158,19 @@ class beanstream_aim extends credit_card {
 			"ordEmailAddress"	=> $customer->Email,
 			"ordPhoneNumber"	=> $cart->Phone,
 			"ordCity"			=> $customer->City1,
-			"ordProvince"		=> $customer->State1,
-			"ordCountry"		=> $customer->Country1
+			"ordProvince"		=> $strState,
+			"ordCountry"		=> $customer->Country1,
+			
+			
+			"shipName"			=> $cart->ShipFirstname." ".$cart->ShipLastname,
+			"shipAddress1"		=> $cart->ShipAddress1,
+			"shipAddress2"		=> $cart->ShipAddress2,
+			"shipCity"			=> $cart->ShipCity,
+			"shipProvince"		=> $strShipState,
+			"shipPostalCode"	=> $cart->ShipZip,
+			"shipCountry"		=> $cart->ShipCountry,
+			"shippingMethod"	=> $cart->ShippingData
+			
 		);
 
 		$beanstream_fields = "";
@@ -166,20 +188,20 @@ class beanstream_aim extends credit_card {
 		$resp_vals = array();
 
 		if(_xls_get_conf('DEBUG_PAYMENTS' , false)) {
-			QApplication::Log(E_ERROR, get_class($this), "sending ".$cart->IdStr." for amt ".$cart->Total);
-			QApplication::Log(E_ERROR, get_class($this), "receiving ".$resp);
+			_xls_log(get_class($this) . " sending ".$cart->IdStr." for amt ".$cart->Total,true);
+			_xls_log(get_class($this) . " receiving ".$resp,true);
 		}
 
 		parse_str($resp, $resp_vals);
 
 		if ($resp_vals['trnApproved'] != "1") {
 			$errortext = _sp(urldecode($resp_vals['messageText']));
-			return FALSE;
+			return array(false,$errortext);
 		}
 
 		($resp_vals['authCode'] == "TEST") ? $this->paid_amt = 0.00 : $this->paid_amt = $amount;
 
-		return $resp_vals['authCode'];
+		return array(true,$resp_vals['authCode']);
 	}
 
 	/**

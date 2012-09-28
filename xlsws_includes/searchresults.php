@@ -33,8 +33,6 @@
 
 class xlsws_searchresult extends xlsws_product_listing {
 	protected $search_array;
-    protected $category = null;
-    protected $subcategories = null;
     protected $search_method = 'OrCondition';
 	protected $default_search_param = 'and';
 
@@ -48,7 +46,7 @@ class xlsws_searchresult extends xlsws_product_listing {
 
         $objCategory = false;
 
-        if (!isset($XLSWS_VARS['filter']) || $XLSWS_VARS['filter'] != 1)
+        if (!isset($XLSWS_VARS['filter']) || $XLSWS_VARS['filter'] == 0)
             return false;
 
         if (isset($XLSWS_VARS['c'])) {
@@ -64,6 +62,10 @@ class xlsws_searchresult extends xlsws_product_listing {
             $objCategory = Category::$Manager->GetByKey($strCategory);
         }
 
+	    if (isset($XLSWS_VARS['filter'])) {
+		    $objCategory = Category::Load($XLSWS_VARS['filter']);
+	    }
+
         if (!$objCategory)
             return false;
 
@@ -76,10 +78,9 @@ class xlsws_searchresult extends xlsws_product_listing {
      * @return string
      */
     protected function GetSearchCriteria() {
-        global $XLSWS_VARS;
 
-        $strCriteria = $XLSWS_VARS['search'];
-        $strCriteria = strip_tags($strCriteria);
+    	$objUrl = _xls_url_object();    
+        $strCriteria = strip_tags($objUrl->ProductSearch);
         $strCriteria = trim($strCriteria);
         $strCriteria = addslashes($strCriteria);
 
@@ -148,17 +149,9 @@ class xlsws_searchresult extends xlsws_product_listing {
      * @return QCondition
      */
     protected function GetProductCondition() {
-        $objCondition = false;
+       
+       return parent::GetProductCondition(_xls_get_conf('CHILD_SEARCH',0));
 
-        if (_xls_get_conf('CHILD_SEARCH') == 1)
-            $objCondition = QQ::AndCondition(
-                QQ::Equal(QQN::Product()->Web, 1), 
-                QQ::Equal(QQN::Product()->MasterModel, 0)
-            );
-        else
-            $objCondition = parent::GetProductCondition();
-
-        return $objCondition;
     }
 
     /**
@@ -309,24 +302,22 @@ class xlsws_searchresult extends xlsws_product_listing {
 	 * @return none
 	 */
 	protected function build_main(){
-		global $XLSWS_VARS;
+
 
         $this->LoadCategory();
 
         parent::build_main();
 
+	    $objUrl = _xls_url_object();    
+		$strCriteria = $objUrl->RouteId;
+		
         $this->crumbs[] = array(
-            'key'=>'search=' . $XLSWS_VARS['search'],
+            'link'=>$objUrl->RouteId . "/".XLSURL::KEY_PAGE."?q=".$objUrl->ProductSearch,
             'case'=> '',
-            'name'=>_sp('Search Results')
+            'name'=>_sp('Search Results for "'.$objUrl->ProductSearch.'"')
         );
 
-        Visitor::add_view_log(
-            0, 
-            ViewLogType::search,
-            '',
-            $XLSWS_VARS['search']
-        );
+        
     }
 
     /**
@@ -338,8 +329,16 @@ class xlsws_searchresult extends xlsws_product_listing {
     protected function dtrProducts_Bind() {
         parent::dtrProducts_Bind();
 
-        if ($this->dtrProducts->TotalItemCount == 0)
-            _xls_display_msg(_sp('Sorry no product was found'));
+        if ($this->dtrProducts->TotalItemCount == 0) {
+           // _xls_display_msg(_sp('Sorry no product was found'));
+            //$this->msg = "Sorry no product was found";
+
+			//$this->mainPnl = new QPanel($this,'MainPanel');
+			//$this->mainPnl->Template = templateNamed('msg.tpl.php');
+			$objUrl = _xls_url_object();
+			$this->custom_page_content = _sp("Sorry, no products were found for the search")." <strong>".$objUrl->ProductSearch."</strong>";
+
+        }
     }
 }
 

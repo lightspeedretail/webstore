@@ -20,7 +20,7 @@
 
 /**
  * Framework template SRO Track individual item details 
- * only comes up directly with /index.php?xlspg=sro_track
+ * only comes up directly with sro-track/pg
  * when logged in
  *
  */
@@ -35,7 +35,7 @@
 </div>
 
 <?php
-    if ((($_CONTROL->CurrentItemIndex % 2) != 0) ||
-        ($_CONTROL->CurrentItemIndex == count($_CONTROL->DataSource) - 1))
-        _xt('<br style="clear:both;"/>', false);
+if ((($_CONTROL->CurrentItemIndex % 2) != 0) ||
+	($_CONTROL->CurrentItemIndex == count($_CONTROL->DataSource) - 1))
+	echo '<br style="clear:both;"/>';
 ?>

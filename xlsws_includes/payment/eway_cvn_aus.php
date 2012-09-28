@@ -40,12 +40,16 @@ class eway_cvn_aus extends credit_card {
 	 *
 	 */
 	public function name() {
-		$config = $this->getConfigValues('eway_cvn_aus');
-
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "";
+		
 		if(isset($config['label']))
-			return $config['label'];
-
-		return "Credit Card";
+			$strName = $config['label'];
+		else $strName =  "Credit Card";
+		
+		if ($config['live']=="test") $strName .= " (TEST MODE)";
+		
+		return $strName;
 	}
 
 	/**
@@ -55,9 +59,12 @@ class eway_cvn_aus extends credit_card {
 	 *
 	 */
 	public function admin_name() {
-		return "eWAY CVN (Australia) Advanced Integration";
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "eWAY CVN Australia";
+		if (!$this->uses_jumper())$strName .= "&nbsp;&nbsp;&nbsp;<font size=2>Advanced Integration</font>";
+		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		return $strName;
 	}
-
 	/**
 	 * The Web Admin panel for configuring this payment option
 	 *
@@ -86,7 +93,7 @@ class eway_cvn_aus extends credit_card {
 		$ret['ls_payment_method'] = new XLSTextBox($objParent);
 		$ret['ls_payment_method']->Name = _sp('LightSpeed Payment Method');
 		$ret['ls_payment_method']->Required = true;
-		$ret['ls_payment_method']->Text = 'Credit Card';
+		$ret['ls_payment_method']->Text = 'Web Credit Card';
 		$ret['ls_payment_method']->ToolTip = "Please enter the payment method (from LightSpeed) you would like the payment amount to import into";
 
 		return $ret;
@@ -119,7 +126,7 @@ class eway_cvn_aus extends credit_card {
 	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
-		$config = $this->getConfigValues('eway_cvn_aus');
+		$config = $this->getConfigValues(get_class($this));
 
 		$ewayCustomerID	= $config['login'];
 		$amount			= $cart->Total;
@@ -150,16 +157,20 @@ class eway_cvn_aus extends credit_card {
 			$xmlRequest .= "<$key>$value</$key>";
 		$xmlRequest .= "</ewaygateway>";
 
+		if(_xls_get_conf('DEBUG_PAYMENTS' , false)) {
+			_xls_log(get_class($this) . " sending ".$cart->IdStr." for amt ".$cart->Total,true);
+		}
+
 		$xmlResponse = $this->sendTransactionToEway($xmlRequest);
 
 		$ewayResponseFields = $this->parseResponse($xmlResponse);
 
 		if($ewayResponseFields["EWAYTRXNSTATUS"]=="True") {
-			return $ewayResponseFields["EWAYAUTHCODE"];
+			return array(true,$ewayResponseFields["EWAYAUTHCODE"]);
 		}
 
 		$errortext = $ewayResponseFields["EWAYTRXNERROR"];
-		return false;
+		return array(false,$errortext);
 	}
 
 	/**
@@ -171,7 +182,7 @@ class eway_cvn_aus extends credit_card {
 	 * @return $xmlResponse
 	 */
 	function sendTransactionToEway($xmlRequest) {
-		$config = $this->getConfigValues('eway_cvn_aus');
+		$config = $this->getConfigValues(get_class($this));
 
 		if($config['live'] == 'live')
 			$eway_cvn_aus_url = "https://www.eway.com.au/gateway_cvn/xmlpayment.asp";
@@ -186,6 +197,10 @@ class eway_cvn_aus extends credit_card {
 
 		$xmlResponse = curl_exec($ch);
 
+		if(_xls_get_conf('DEBUG_PAYMENTS' , false)) {
+			_xls_log(get_class($this) . " receiving ".$xmlResponse,true);
+		}
+		
 		if(curl_errno( $ch ) == CURLE_OK)
 			return $xmlResponse;
 	}

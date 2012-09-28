@@ -9,10 +9,20 @@
 		QApplicationBase::$ClassFile['qqnodecartitem'] = __DATA_CLASSES__ . '/CartItem.class.php';
 		QApplicationBase::$ClassFile['qqreversereferencenodecartitem'] = __DATA_CLASSES__ . '/CartItem.class.php';
 
+	// ClassPaths for the CartMessages class
+		QApplicationBase::$ClassFile['cartmessages'] = __DATA_CLASSES__ . '/CartMessages.class.php';
+		QApplicationBase::$ClassFile['qqnodecartmessages'] = __DATA_CLASSES__ . '/CartMessages.class.php';
+		QApplicationBase::$ClassFile['qqreversereferencenodecartmessages'] = __DATA_CLASSES__ . '/CartMessages.class.php';
+
 	// ClassPaths for the Category class
 		QApplicationBase::$ClassFile['category'] = __DATA_CLASSES__ . '/Category.class.php';
 		QApplicationBase::$ClassFile['qqnodecategory'] = __DATA_CLASSES__ . '/Category.class.php';
 		QApplicationBase::$ClassFile['qqreversereferencenodecategory'] = __DATA_CLASSES__ . '/Category.class.php';
+
+	// ClassPaths for the CategoryAddl class
+		QApplicationBase::$ClassFile['categoryaddl'] = __DATA_CLASSES__ . '/CategoryAddl.class.php';
+		QApplicationBase::$ClassFile['qqnodecategoryaddl'] = __DATA_CLASSES__ . '/CategoryAddl.class.php';
+		QApplicationBase::$ClassFile['qqreversereferencenodecategoryaddl'] = __DATA_CLASSES__ . '/CategoryAddl.class.php';
 
 	// ClassPaths for the Configuration class
 		QApplicationBase::$ClassFile['configuration'] = __DATA_CLASSES__ . '/Configuration.class.php';
@@ -44,6 +54,11 @@
 		QApplicationBase::$ClassFile['qqnodedestination'] = __DATA_CLASSES__ . '/Destination.class.php';
 		QApplicationBase::$ClassFile['qqreversereferencenodedestination'] = __DATA_CLASSES__ . '/Destination.class.php';
 
+	// ClassPaths for the Email class
+		QApplicationBase::$ClassFile['email'] = __DATA_CLASSES__ . '/Email.class.php';
+		QApplicationBase::$ClassFile['qqnodeemail'] = __DATA_CLASSES__ . '/Email.class.php';
+		QApplicationBase::$ClassFile['qqreversereferencenodeemail'] = __DATA_CLASSES__ . '/Email.class.php';
+
 	// ClassPaths for the Family class
 		QApplicationBase::$ClassFile['family'] = __DATA_CLASSES__ . '/Family.class.php';
 		QApplicationBase::$ClassFile['qqnodefamily'] = __DATA_CLASSES__ . '/Family.class.php';
@@ -64,6 +79,11 @@
 		QApplicationBase::$ClassFile['qqnodegiftregistryreceipents'] = __DATA_CLASSES__ . '/GiftRegistryReceipents.class.php';
 		QApplicationBase::$ClassFile['qqreversereferencenodegiftregistryreceipents'] = __DATA_CLASSES__ . '/GiftRegistryReceipents.class.php';
 
+	// ClassPaths for the GoogleCategories class
+		QApplicationBase::$ClassFile['googlecategories'] = __DATA_CLASSES__ . '/GoogleCategories.class.php';
+		QApplicationBase::$ClassFile['qqnodegooglecategories'] = __DATA_CLASSES__ . '/GoogleCategories.class.php';
+		QApplicationBase::$ClassFile['qqreversereferencenodegooglecategories'] = __DATA_CLASSES__ . '/GoogleCategories.class.php';
+
 	// ClassPaths for the Images class
 		QApplicationBase::$ClassFile['images'] = __DATA_CLASSES__ . '/Images.class.php';
 		QApplicationBase::$ClassFile['qqnodeimages'] = __DATA_CLASSES__ . '/Images.class.php';
@@ -83,6 +103,11 @@
 		QApplicationBase::$ClassFile['product'] = __DATA_CLASSES__ . '/Product.class.php';
 		QApplicationBase::$ClassFile['qqnodeproduct'] = __DATA_CLASSES__ . '/Product.class.php';
 		QApplicationBase::$ClassFile['qqreversereferencenodeproduct'] = __DATA_CLASSES__ . '/Product.class.php';
+
+	// ClassPaths for the ProductCopy class
+		QApplicationBase::$ClassFile['productcopy'] = __DATA_CLASSES__ . '/ProductCopy.class.php';
+		QApplicationBase::$ClassFile['qqnodeproductcopy'] = __DATA_CLASSES__ . '/ProductCopy.class.php';
+		QApplicationBase::$ClassFile['qqreversereferencenodeproductcopy'] = __DATA_CLASSES__ . '/ProductCopy.class.php';
 
 	// ClassPaths for the ProductQtyPricing class
 		QApplicationBase::$ClassFile['productqtypricing'] = __DATA_CLASSES__ . '/ProductQtyPricing.class.php';

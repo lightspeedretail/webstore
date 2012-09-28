@@ -30,8 +30,11 @@ abstract class ImagesType extends QBaseClass {
 	const pdetail = 2;
 	const mini = 3;
 	const listing = 4;
+	const category = 5;
+	const preview = 6;
+	const slider = 7;
 
-	const MaxId = 4;
+	const MaxId = 7;
 
 	public static $NameArray = array(
 		0 => 'image',
@@ -39,6 +42,9 @@ abstract class ImagesType extends QBaseClass {
 		2 => 'pdetailimage',
 		3 => 'miniimage',
 		4 => 'listingimage',
+		5 => 'categoryimage',
+		6 => 'previewimage',
+		7 => 'sliderimage'
 	);
 
 	public static $SizeArray = array(
@@ -47,6 +53,9 @@ abstract class ImagesType extends QBaseClass {
 		2 => array(100, 80),
 		3 => array(30, 30),
 		4 => array(50, 40),
+		5 => array(180, 180),
+		6 => array(30, 30),
+		7 => array(120, 120),
 	);
 
 	public static $ConfigKeyArray = array(
@@ -54,7 +63,10 @@ abstract class ImagesType extends QBaseClass {
 		1 => 'LISTING_IMAGE',
 		2 => 'DETAIL_IMAGE',
 		3 => 'MINI_IMAGE',
-		4 => 'LISTING_IMAGE'
+		4 => 'LISTING_IMAGE',
+		5 => 'CATEGORY_IMAGE',
+		6 => 'PREVIEW_IMAGE',
+		7 => 'SLIDER_IMAGE'
 	);
 
 	public static $TokenArray = array(
@@ -63,11 +75,16 @@ abstract class ImagesType extends QBaseClass {
 		2 => 'PDETAIL',
 		3 => 'MINI',
 		4 => 'LISTING',
+		5 => 'CATEGORY',
+		6 => 'PREVIEW',
+		7 => 'SLIDER'
+		
 	);
 
 	public static function ToString($intImageTypeId) {
 		return ImagesType::$NameArray[$intImageTypeId];
 	}
+	
 
 	public static function GetSize($intImageTypeId) {
 		list($intDefWidth, $intDefHeight) = 

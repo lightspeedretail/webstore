@@ -117,13 +117,8 @@ class XLSCartSend extends QDialogBox {
 
 	public function Validate() {
 		$valid = true;
-
-		if(_xls_verify_img_txt() != (($this->txtVerify->Text))) {
-			$this->txtVerify->Warning = _sp("Wrong Verification Code.");
-			$valid = false && $valid;
-
-		}
-
+		$this->errSpan->Text="";
+		
 		if(!isValidEmail($this->txtFromEmail->Text)) {
 			$this->txtFromEmail->Warning = _sp("Invalid E-mail Address.");
 			$valid = false && $valid;
@@ -151,10 +146,20 @@ class XLSCartSend extends QDialogBox {
 		$cart->Save();
 
 		// Generate && send Email
-		_xls_mail(_xls_mail_name($this->txtToName->Text , $this->txtToEmail->Text) , _sp("You have a Cart") , _xls_mail_body_from_template(templatenamed('email_cart_send.tpl.php') , array('cart' =>$cart , 'obj' =>$this)) , $this->txtFromEmail->Text );
+		$blnReturnVal = _xls_mail(
+			_xls_mail_name($this->txtToName->Text , $this->txtToEmail->Text) , 
+			_sp("You have a Cart") , 
+			_xls_mail_body_from_template(templatenamed('email_cart_send.tpl.php') , 
+			array('cart' =>$cart , 'obj' =>$this)) , 
+			$this->txtFromEmail->Text );
 
-		$this->errSpan->CssClass='modal_reg_success_msg';
-		$this->errSpan->Text = _sp("Cart has been sent successfully!");
+		if ($blnReturnVal) {
+			$this->errSpan->CssClass='modal_reg_success_msg';
+			$this->errSpan->Text = _sp("Cart has been sent successfully!");
+		} else {
+			$this->errSpan->CssClass='modal_reg_err_msg';
+			$this->errSpan->Text = _sp("Email sending failed");		
+		}
 
 		$this->btnCancel->Text = _sp('Close');
 

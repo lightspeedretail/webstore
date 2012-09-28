@@ -47,22 +47,75 @@ class Family extends FamilyGen {
 				XLSObjectManager::Singleton('XLSFamilyManager','code');
 	}
 
-	// Override LoadAll to pull from the Products table for performance
-	public static function LoadAll($objOptionalClauses = null) {
-		try {
-			$query = 'SELECT DISTINCT family FROM xlsws_product';
-			$query .= ' WHERE web=1 AND fk_product_master_id=0';
-			$query .= " AND family <> ''";
-			$query .= ' ORDER BY family asc';
+	public static function LoadByRequestUrl($strName) {
+		return Family::QuerySingle(
+			QQ::Equal(QQN::Family()->RequestUrl, $strName)
+			);
+	}
 
-			$db = QApplication::$Database[1];
-			$matches = $db->Query($query);
+	public function GetLink() {
+	
+		return _xls_site_url($this->strRequestUrl."/f/");
+	}
 
-			$families = Product::InstantiateDbResult($matches);
-			return $families;
-		} catch (QCallerException $objExc) {
-			$objExc->IncrementOffset();
-			throw $objExc;
+	
+	public static function ConvertSEO() {
+	
+		$arrFamilies = Family::LoadAll();
+		foreach ($arrFamilies as $objFamily) {
+			$objFamily->RequestUrl = _xls_seo_url($objFamily->Family); 
+			$objFamily->Save();
+		}
+	
+	}
+	
+	protected function GetPageMeta($strConf = 'SEO_CUSTOMPAGE_TITLE') {
+	
+		$strItem = _xls_get_conf($strConf, '%storename%');
+		$strCrumbNames = '';
+		$strCrumbNamesR = '';
+
+		$arrPatterns = array(
+			"%storename%",
+			"%name%",
+			"%crumbtrail%",
+			"%rcrumbtrail%");
+		$arrCrumb = _xls_get_crumbtrail();
+
+		foreach ($arrCrumb as $crumb) {
+			$strCrumbNames .= $crumb['name']." ";
+			$strCrumbNamesR = $crumb['name']." ".$strCrumbNamesR;
+		}
+
+		$arrItems = array(
+			_xls_get_conf('STORE_NAME',''),
+			$this->Family,
+			$strCrumbNames,
+			$strCrumbNamesR,
+			);
+
+
+		return str_replace($arrPatterns, $arrItems, $strItem);
+		
+	}
+	
+	public function __get($strName) {
+		switch ($strName) {
+			case 'Link': 
+				return $this->GetLink();
+			case 'RequestUrl': 
+				return $this->strRequestUrl;
+			case 'PageTitle':
+				return _xls_truncate($this->GetPageMeta('SEO_CUSTOMPAGE_TITLE'),70);
+
+			default:
+				try {
+					return parent::__get($strName);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
 		}
 	}
+	
 }

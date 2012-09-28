@@ -94,10 +94,30 @@ class Product extends ProductGen {
 		return false;
 	}
 
-
+	/**
+	 * Checks to see if the item has Sell on Web checked and also has inventory ready to order
+	 * Note, this will return false for an item out of stock even with Allow Backorders enabled
+	 * Use IsDisplayable() to determine visibility with out of stock items
+	 * @return bool
+	 */
 	protected function IsAvailable() {
 		if ($this->Web && $this->HasInventory(true))
 			return true;
+		return false;
+	}
+
+	/**
+	 * Checks to see if product should be displayed to the user, based on Sell on Web checkbox and
+	 * if we show out of stock products
+	 * @return bool
+	 */
+	protected function IsDisplayable() {
+
+	if($this->IsAvailable)
+		return true;
+	if ($this->Web && _xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0)>0)
+		return true;
+
 		return false;
 	}
 
@@ -110,6 +130,34 @@ class Product extends ProductGen {
 		return str_replace("%2F","/",urlencode($this->strCode));
 	}
 
+	public function GetSEOName() {
+	
+		return _xls_seo_name($this->strName);
+	
+	}
+	
+	public static function ConvertSEO() {
+
+		//Because our product table is potentially huge, we can't risk loading everything into an array and having PHP crash, 
+		//so we just have to do this directly with the db
+		$db = Product::GetDatabase();
+
+		$matches = $db->Query("SELECT rowid,name,code from xlsws_product where coalesce(request_url,'') = '' order by rowid LIMIT 20000");
+			
+		while ($row = $matches->FetchArray()) {
+			if ($row['name']=='') $row['name']='no-description';
+			_dbx("UPDATE xlsws_product SET request_url='".
+				_xls_seo_url(_xls_get_conf('SEO_URL_CODES' , 0) ? $row['name']."-".$row['code'] : $row['name'])."'
+				WHERE rowid=".$row['rowid']);
+		}
+
+		$matches = $db->Query("SELECT count(*) as thecount from xlsws_product where coalesce(request_url,'') = ''");
+		$row = $matches->FetchArray();
+		return $row['thecount'];
+
+	}
+	
+	
 	/**
 	 * Gets the URL referring to the Product image
 	 * @param string $type :: Image size constant
@@ -127,12 +175,50 @@ class Product extends ProductGen {
 		if ($this->IsChild)
 			if ($prod = $this->FkProductMaster)
 				return $prod->Link;
+			
+		return _xls_site_url($this->RequestUrl."/".XLSURL::KEY_PRODUCT."/".$this->Rowid);
+		
+	}
 
-		if(_xls_get_conf('ENABLE_SEO_URL' , false))
-			return $this->Slug . ".html";
-
-		return 'index.php?product=' . $this->Slug .
-			(isset($_GET['c'])?"&c=$_GET[c]":'');
+	protected function GetPageMeta($strConf = 'SEO_PRODUCT_TITLE') { 
+	
+		$strItem = _xls_get_conf($strConf, '%storename%');
+						
+		$arrPatterns = array("%code%",
+			"%storename%",
+			"%name%",
+			"%description%",
+			"%shortdescription%",
+			"%longdescription%",
+			"%keyword1%",
+			"%keyword2%",
+			"%keyword3%",
+			"%price%",
+			"%family%",
+			"%class%",
+			"%crumbtrail%",
+			"%rcrumbtrail%");
+			
+		$arrItems = array($this->Code,
+			_xls_get_conf('STORE_NAME',''),
+			$this->Name,
+			$this->Name,
+			$this->DescriptionShort,
+			$this->Description,
+			$this->WebKeyword1,
+			$this->WebKeyword2,
+			$this->WebKeyword3,
+			_xls_currency($this->Price),
+			$this->Family,
+			$this->ClassName,
+			implode(" ",_xls_get_crumbtrail('names')),
+			implode(" ",array_reverse(_xls_get_crumbtrail('names')))
+			
+			);		
+			
+			
+		return str_replace($arrPatterns, $arrItems, $strItem);
+		
 	}
 
 	/**
@@ -154,6 +240,21 @@ class Product extends ProductGen {
 	}
 
 	/**
+	 * Get and display master description if a product is child. Useful for cart display
+	 * When we just want to show the master
+	 * @return string
+	 */
+	protected function GetMasterName() {
+		if ($this->IsChild())
+		$objProd = $this->GetMaster();
+		else
+			$objProd = $this;
+
+		return $objProd->Name;
+
+	}
+
+	/**
 	 * Return a boolean representing whether the Product has available Inv.
 	 * @return bool
 	 */
@@ -161,7 +262,7 @@ class Product extends ProductGen {
 		if ($bolExtended)
 			if (!$this->Inventoried)
 				return true;
-			else if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD' , true))
+			else if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD' , 0)>1)
 				return true;
 
 		if ($this->GetInventory() > 0)
@@ -179,7 +280,13 @@ class Product extends ProductGen {
 		$strField = $this->GetInventoryField();
 		$intInventory = $this->$strField;
 
-		return $this->$strField;
+		$intValue= $this->$strField;
+		
+		if (_xls_get_conf('INVENTORY_RESERVED' , 0) == '1')
+			$intValue -= $this->InventoryReserved;
+
+		return ($intValue < 0 ? 0 : $intValue);
+		
 	}
 
 	/**
@@ -214,16 +321,18 @@ class Product extends ProductGen {
 	 * product's availability
 	 */
 	public function InventoryDisplay() {
-		$intValue = $this->Inventory;
-
+		
 		if (!$this->Inventoried)
 			return _sp(_xls_get_conf('INVENTORY_NON_TITLE' , ''));
-
+		
 		// Do not display master inventory levels
 		if ($this->IsMaster()) {
 			return '';
 		}
+	
+		$intValue = $this->Inventory;
 
+				
 		if (_xls_get_conf('INVENTORY_DISPLAY_LEVEL' , 0) == 1) {
 			if($intValue <= 0)
 				return _sp(
@@ -354,15 +463,159 @@ class Product extends ProductGen {
 	 * that it will optionally return a message for Master products.
 	 * @param integer defaults to 1
 	 * @return float or string
-	 */
-	public function GetPriceDisplay($intQuantity = 1,
-		$taxExclusive = false) {
+	 */ //4 => _sp("Show Highest Price"),3 => _sp("Show Price Range"), 2 => _sp("Show \"Click for Pricing\"") ,1 => _sp("Show Lowest Price"),0 => _sp("Show Master Item Price")
+	public function GetPriceDisplay($intQuantity = 1, $taxExclusive = false) {
 
-		if ($this->IsMaster() && _xls_get_conf('MATRIX_PRICE') == 1)
-			return _sp("Click for pricing");
+		if (_xls_get_conf('PRICE_REQUIRE_LOGIN',0) == 1 && !xlsws_index::isLoggedIn())
+			return _sp("Log in for prices");
+		
+		if ($this->IsMaster()) {
+		
+			$objProdCondition = QQ::AndCondition(
+                QQ::Equal(QQN::Product()->Web, 1), 
+                QQ::Equal(QQN::Product()->FkProductMasterId, $this->Rowid)
+                );
+                
+			if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) == 0) {
+				 $objAvailCondition = 
+				 	QQ::OrCondition(
+				 		QQ::GreaterThan(QQN::Product()->InventoryAvail, 0),
+	                	QQ::Equal(QQN::Product()->Inventoried, 0)
+	                );
+		            	
+	            $objCondition = QQ::AndCondition(
+	                $objProdCondition, 
+	                $objAvailCondition
+	            );
+	        } 
+	        else 
+	        	$objCondition = $objProdCondition;
+                
+       		$arrMaster = Product::QueryArray($objCondition,
+				QQ::Clause(
+					QQ::OrderBy(QQN::Product()->SellWeb))
+				);
+            	        
+			if (count($arrMaster)==0) return _sp("Missing Child Products?");
+			 
+			switch (_xls_get_conf('MATRIX_PRICE')) {
 
-		return $this->GetPrice($intQuantity, $taxExclusive);
+				case 4: //Show Highest Price
+					return $arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive); 
+
+				case 3: //Show Price Range
+					if ($arrMaster[0]->GetPrice($intQuantity, $taxExclusive) != $arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive))
+					return _xls_currency($arrMaster[0]->GetPrice($intQuantity, $taxExclusive))." - "._xls_currency($arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive));
+					else return $arrMaster[0]->GetPrice($intQuantity, $taxExclusive);
+					
+				case 2: //Show "Click for Pricing"
+					if ($arrMaster[0]->GetPrice($intQuantity, $taxExclusive) != $arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive))
+						return _sp("Click for pricing");
+					else return $this->GetPrice($intQuantity, $taxExclusive);
+				
+				case 1: //Show Lowest Price
+					return $arrMaster[0]->GetPrice($intQuantity, $taxExclusive);
+			
+				case 0: //Show Master Item Price
+				default:
+					return $this->GetPrice($intQuantity, $taxExclusive);
+			
+			
+			}
+
+		}
+		else return $this->GetPrice($intQuantity, $taxExclusive);
 	}
+
+	/**
+	 * GetSlashedPrice will return
+	 * that it will optionally return a message for Master products.
+	 * @param integer defaults to 1
+	 * @return float or string
+	 */ //4 => _sp("Show Highest Price"),3 => _sp("Show Price Range"), 2 => _sp("Show \"Click for Pricing\"") ,1 => _sp("Show Lowest Price"),0 => _sp("Show Master Item Price")
+	public function GetSlashedPrice($intQuantity = 1, $taxExclusive = false) {
+
+		if (_xls_get_conf('PRICE_REQUIRE_LOGIN',0) == 1 && !xlsws_index::isLoggedIn())
+			return '';
+
+		if ($this->IsMaster()) {
+
+			$objProdCondition = QQ::AndCondition(
+				QQ::Equal(QQN::Product()->Web, 1),
+				QQ::Equal(QQN::Product()->FkProductMasterId, $this->Rowid)
+			);
+
+			if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) == 0) {
+				$objAvailCondition =
+					QQ::OrCondition(
+						QQ::GreaterThan(QQN::Product()->InventoryAvail, 0),
+						QQ::Equal(QQN::Product()->Inventoried, 0)
+					);
+
+				$objCondition = QQ::AndCondition(
+					$objProdCondition,
+					$objAvailCondition
+				);
+			}
+			else
+				$objCondition = $objProdCondition;
+
+			$arrMaster = Product::QueryArray($objCondition,
+				QQ::Clause(
+					QQ::OrderBy(QQN::Product()->Sell))
+			);
+
+			if (count($arrMaster)==0) return '';
+
+			switch (_xls_get_conf('MATRIX_PRICE')) {
+
+			case 4: //Show Highest Price
+			case 3:
+				return ( $arrMaster[count($arrMaster)-1]->Sell > $arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive)) ? $arrMaster[count($arrMaster)-1]->Sell : "";
+			case 2: //Show "Click for Pricing"
+				return '';
+
+			case 1: //Show Lowest Price
+				return $arrMaster[0]->Sell;
+				return ( $arrMaster[0]->Sell > $arrMaster[0]->GetPrice($intQuantity, $taxExclusive)) ? $arrMaster[0]->Sell : "";
+
+			case 0: //Show Master Item Price
+			default:
+				return ($this->Sell != $this->GetPrice($intQuantity, $taxExclusive)) ? $this->Sell : "";;
+
+
+			}
+
+		}
+		else return ($this->Sell != $this->GetPrice($intQuantity, $taxExclusive)) ? $this->Sell : "";
+	}
+
+	/**
+	* Calculates pending order qty to count against available
+	* inventory by searching for Requested or Awaiting Processing orders
+	*/
+	public function CalculateReservedInventory() {
+	
+		try { 
+			$intReserved = _dbx_first_cell("select sum(qty) from xlsws_cart_item as a 
+					left join xlsws_cart as b on a.cart_id=b.rowid where 
+					a.product_id=". $this->Rowid." and b.type=4 
+					and (b.status='Requested' or b.status='Awaiting Processing')");
+					
+		}
+        catch (Exception $objExc) {
+            QApplication::Log(E_USER_ERROR, 'Product', 
+                'UpdateReservedInventory failed to calculate');
+        }
+
+        if (empty($intReserved))
+            return 0;
+        else
+            return $intReserved;
+	
+	
+	}
+
 
 	/**
 	 * Calculates the tax on an item
@@ -416,128 +669,34 @@ class Product extends ProductGen {
 		return $p;
 	}
 
-	public function __get($strName) {
-		switch ($strName) {
-			case 'IsMaster':
-				return $this->IsMaster();
-
-			case 'IsChild':
-				return $this->IsChild();
-
-			case 'IsIndependent':
-				return $this->IsIndependent();
-
-			case 'IsAvailable':
-				return $this->IsAvailable();
-
-			case 'Slug':
-				return $this->GetSlug();
-
-			case 'Code':
-				if ($this->IsChild())
-					if ($prod = $this->GetMaster())
-						return $prod->Code;
-				return $this->strCode;
-
-			case 'FkProductMaster':
-				return $this->GetMaster();
-
-			case 'Link':
-				return $this->GetLink();
-
-			case 'ListingImage':
-				return $this->GetImageLink(ImagesType::listing);
-
-			case 'MiniImage':
-				return $this->GetImageLink(ImagesType::mini);
-
-			case 'PDetailImage':
-				return $this->GetImageLink(ImagesType::pdetail);
-
-			case 'SmallImage':
-				return $this->GetImageLink(ImagesType::small);
-
-			case 'Image':
-				return $this->GetImageLink(ImagesType::normal);
-
-			case 'OriginalCode':
-				return $this->strCode;
-
-			case 'Price':
-				return $this->GetPriceDisplay();
-
-			case 'PriceValue':
-				return $this->GetPrice();
-
-			case 'SizeLabel':
-					return _xls_get_conf('PRODUCT_SIZE_LABEL' , _sp('Size'));
-			case 'ColorLabel':
-					return _xls_get_conf('PRODUCT_COLOR_LABEL' , _sp('Color'));
-			case 'Inventory':
-				return $this->GetInventory();
-
-			default:
-				try {
-					return parent::__get($strName);
-				} catch (QCallerException $objExc) {
-					$objExc->IncrementOffset();
-					throw $objExc;
-				}
-		}
-	}
-
-	public function __set($strName, $mixValue) {
-		switch ($strName) {
-			case 'Rowid':
-				if (defined('XLSWS_SOAP'))
-					try {
-						return ($this->intRowid =
-							QType::Cast($mixValue, QType::Integer));
-					}
-					catch (QCallerException $objExc) {
-						$objExc->IncrementOffset();
-						throw $objExc;
-					}
-				else
-					QApplication::Log(E_ERROR, 'uploader',
-						'You may only update the Product Rowid during' .
-						' SOAP operations');
-				break;
-
-			default:
-				try {
-					return parent::__set($strName, $mixValue);
-				} catch (QCallerException $objExc) {
-					$objExc->IncrementOffset();
-					throw $objExc;
-				}
-		}
-	}
+	
 
 	protected function GetAggregateInventory($intRowid = false) {
 		if (!$intRowid)
 			$intRowid = $this->intRowid;
 
-		$strQuery = <<<EOS
-		SELECT SUM(inventory) AS inv, SUM(inventory_total) AS inv_total
-		FROM xlsws_product
-		WHERE web=1
-		AND fk_product_master_id='{$intRowid}';
-EOS;
+		$strQuery = "SELECT SUM(inventory) AS inv, SUM(inventory_total) AS inv_total, SUM(inventory_avail) AS inv_avail
+			FROM xlsws_product
+			WHERE web=1
+			AND fk_product_master_id=".$intRowid;
 
 		$objQuery = _dbx($strQuery, 'Query');
 		$arrTotal = $objQuery->FetchArray();
 
 		$intInv = $arrTotal['inv'];
 		$intInvTotal = $arrTotal['inv_total'];
+		$intInvAvail = $arrTotal['inv_avail'];
 
 		if (!$intInv)
 			$intInv = 0;
 
 		if (!$intInvTotal)
 			$intInvTotal = 0;
+			
+		if (!$intInvAvail)
+			$intInvAvail = 0;
 
-		return array($intInv, $intInvTotal);
+		return array($intInv, $intInvTotal, $intInvAvail);
 	}
 
 	/**
@@ -556,55 +715,92 @@ EOS;
 		if (!$objProduct)
 			return false;
 
-        list($intInv, $intInvTotal) = 
+        list($intInv, $intInvTotal, $intInvAvail) = 
             $this->GetAggregateInventory($objProduct->Rowid);
 
 		$objProduct->Inventory = $intInv;
 		$objProduct->InventoryTotal = $intInvTotal;
+		$objProduct->InventoryAvail = $intInvAvail;
 
 		return $objProduct;
 	}
 
-	protected function UpdateMasterAvailability() {
-		// Non inventoried Products may be added to cart
-		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0) == 1)
-			return false;
-
-		if ($this->IsIndependent() || !$this->Inventoried)
-			return false;
-
-		$objProduct = $this;
-
-		if ($this->IsChild())
-			$objProduct = $this->FkProductMaster;
-
-		if (!$objProduct)
-			return false;
-
-		$blnWeb = $objProduct->Web;
-
-		if ($objProduct->GetInventory() < 1) $objProduct->Web = 0;
-		else $objProduct->Web = 1;
-
-		if ($blnWeb != $objProduct->Web)
-			return $objProduct;
-	}
-
 	public function PreSaveHandler() {
-		if ($this->IsMaster()) {
+		if ($this->IsMaster())
 			$this->UpdateMasterInventory();
-			$this->UpdateMasterAvailability();
-		}
+		
 	}
 
-	public function PostSaveHandler() {
+	public function PostSaveHandler() { 
 		if ($this->IsChild()) {
 			$this->UpdateMasterInventory();
-			$this->UpdateMasterAvailability();
 
 			if ($this->FkProductMaster)
-				$this->FkProductMaster->Save();
+				$this->FkProductMaster->Save(); 
 		}
+	}
+	
+	public static function SetFeaturedByKeyword($strKeyword) {
+	
+		$objDatabase = Product::GetDatabase();
+		$objDatabase->NonQuery("UPDATE xlsws_product SET featured=0 WHERE featured=1");
+		$objDatabase->NonQuery("UPDATE xlsws_product SET featured=1 WHERE 
+			web_keyword1=" . $objDatabase->SqlVariable($strKeyword) . " OR
+			web_keyword2=" . $objDatabase->SqlVariable($strKeyword) . " OR
+			web_keyword3=" . $objDatabase->SqlVariable($strKeyword) 
+			);
+
+	
+	
+	}
+
+	/**
+	 * For a product, returns tax rate for all defined destinations
+	 * Useful for RSS exports
+	 * @return TaxGrid[]
+	*/
+	public function GetTaxRateGrid() {
+		
+		$arrGrid = array();
+		$intTaxStatus = $this->FkTaxStatusId;
+		$objStatus = TaxStatus::Load($intTaxStatus);
+		$objDestinations = Destination::LoadAll();
+
+		foreach ($objDestinations as $objDestination) {
+			//Because of differences in how Google defines zip code ranges, we can't convert our ranges
+			//to theirs. At this time we won't be able to support zip code ranges
+			if ($objDestination->Country != '*' && $objDestination->Zipcode1 == '') {
+			
+				$objTaxCode = TaxCode::Load($objDestination->Taxcode);
+				//print_r($objTaxCode);
+				$fltRate = 0.0;
+				for ($x=1; $x<=5; $x++) {
+					$statusstring = "Tax".$x."Status";
+					$codestring = "Tax".$x."Rate";
+					if ($objStatus->$statusstring==0) $fltRate += $objTaxCode->$codestring;
+				}
+				
+				//Our four elements
+				$strCountry = $objDestination->Country;
+				if ($objDestination->State != '*')
+					$strState = $objDestination->State; 
+				else 
+					$strState = '';
+				//$fltRate -- built above
+				$strTaxShip = _xls_get_conf('SHIPPING_TAXABLE','0') == '1' ? "y" : "n";
+				$arrGrid[] = array($strCountry,	$strState,$fltRate,$strTaxShip);
+			
+			}
+
+			if ($objDestination->Country == '*' && $objDestination->State == '*' && _xls_get_conf('DEFAULT_COUNTRY','US')=='US') {
+				$arrGrid[] = array(_xls_get_conf('DEFAULT_COUNTRY','US'),'','0','n');
+			}
+		}
+		
+		return $arrGrid;
+		
+		
+
 	}
 
 	/**
@@ -628,6 +824,34 @@ EOS;
 		}
 	}
 
+
+	/**
+	 * Load a Product by its Image
+	 * @param integer $intImageId
+	 * @return Product[]
+	*/
+	public static function LoadByImageId($intImageId) {
+		try {
+			return Product::QuerySingle(
+				QQ::Equal(QQN::Product()->ImageId, $intImageId));
+		} catch (QCallerException $objExc) {
+			$objExc->IncrementOffset();
+			throw $objExc;
+		}
+	}
+
+
+	/**
+	 * Load a Product by the SEO formatted url
+	 * @param string $strName
+	 * @return Product[]
+	*/
+	public static function LoadByRequestUrl($strName) {
+		return Product::QuerySingle(
+			QQ::Equal(QQN::Product()->RequestUrl, $strName)
+			);
+	}
+	
 	/**
 	 * Overload the generated Save handler for the Product model.
 	 *
@@ -640,6 +864,7 @@ EOS;
 	 * may be triggered to update related Products.
 	 */
 	public function Save($blnForceInsert = false, $blnForceUpdate = false, $blnSoapSave = false) {
+		
         $this->PreSaveHandler();
 
         if (!$this->Created)
@@ -677,6 +902,8 @@ EOS;
 			`inventoried`,
 			`inventory`,
 			`inventory_total`,
+			`inventory_reserved`,
+			`inventory_avail`,
 			`master_model`,
 			`fk_product_master_id`,
 			`product_size`,
@@ -694,6 +921,7 @@ EOS;
 			`web_keyword1`,
 			`web_keyword2`,
 			`web_keyword3`,
+			`request_url`,
 			`meta_desc`,
 			`meta_keyword`,
 			`featured`,
@@ -712,6 +940,8 @@ EOS;
 			' . $objDatabase->SqlVariable($this->blnInventoried) . ',
 			' . $objDatabase->SqlVariable($this->fltInventory) . ',
 			' . $objDatabase->SqlVariable($this->fltInventoryTotal) . ',
+			' . $objDatabase->SqlVariable($this->fltInventoryReserved) . ',
+			' . $objDatabase->SqlVariable($this->fltInventoryAvail) . ',
 			' . $objDatabase->SqlVariable($this->blnMasterModel) . ',
 			' . $objDatabase->SqlVariable($this->intFkProductMasterId) . ',
 			' . $objDatabase->SqlVariable($this->strProductSize) . ',
@@ -729,6 +959,7 @@ EOS;
 			' . $objDatabase->SqlVariable($this->strWebKeyword1) . ',
 			' . $objDatabase->SqlVariable($this->strWebKeyword2) . ',
 			' . $objDatabase->SqlVariable($this->strWebKeyword3) . ',
+			' . $objDatabase->SqlVariable($this->strRequestUrl) . ',
 			' . $objDatabase->SqlVariable($this->strMetaDesc) . ',
 			' . $objDatabase->SqlVariable($this->strMetaKeyword) . ',
 			' . $objDatabase->SqlVariable($this->blnFeatured) . ',
@@ -760,4 +991,137 @@ EOS;
 			if ($objImage) $objImage->Delete();
 		}
 	}
+	
+	public function __get($strName) {
+		switch ($strName) {
+
+		case 'MasterName':
+			return $this->GetMasterName();
+
+			case 'IsMaster':
+				return $this->IsMaster();
+
+			case 'IsChild':
+				return $this->IsChild();
+
+			case 'IsIndependent':
+				return $this->IsIndependent();
+
+			case 'IsAvailable':
+				return $this->IsAvailable();
+
+			case 'IsDisplayable':
+				return $this->IsDisplayable();
+
+			case 'Slug':
+				return $this->GetSlug();
+
+			case 'Code':
+				if ($this->IsChild())
+					if ($prod = $this->GetMaster())
+						return $prod->Code;
+				return $this->strCode;
+
+			case 'FkProductMaster':
+				return $this->GetMaster();
+
+			case 'Link':
+				return $this->GetLink();
+				
+			case 'SEOName':
+				return $this->GetSEOName();
+
+			case 'CanonicalUrl':
+				return $this->GetLink();
+				
+			case 'ListingImage':
+				return $this->GetImageLink(ImagesType::listing);
+
+			case 'MiniImage':
+				return $this->GetImageLink(ImagesType::mini);
+
+			case 'PreviewImage':
+				return $this->GetImageLink(ImagesType::preview);
+
+			case 'SliderImage':
+				return $this->GetImageLink(ImagesType::slider);
+
+			case 'CategoryImage':
+				return $this->GetImageLink(ImagesType::category);
+
+			case 'PDetailImage':
+				return $this->GetImageLink(ImagesType::pdetail);
+
+			case 'SmallImage':
+				return $this->GetImageLink(ImagesType::small);
+
+			case 'Image':
+				return $this->GetImageLink(ImagesType::normal);
+
+			case 'OriginalCode':
+				return $this->strCode;
+
+			case 'OriginalInventory':
+				return $this->fltInventory;
+
+			case 'Price':
+				return $this->GetPriceDisplay();
+
+			case 'SlashedPrice':
+				return $this->GetSlashedPrice();
+
+			case 'PriceValue':
+				return $this->GetPrice();
+
+			case 'SizeLabel':
+					return _xls_get_conf('PRODUCT_SIZE_LABEL' , _sp('Size'));
+			case 'ColorLabel':
+					return _xls_get_conf('PRODUCT_COLOR_LABEL' , _sp('Color'));
+			case 'Inventory':
+				return $this->GetInventory();
+				
+			case 'PageTitle':
+				return _xls_truncate($this->GetPageMeta('SEO_PRODUCT_TITLE'),70);
+
+			case 'PageDescription':
+				return _xls_truncate($this->GetPageMeta('SEO_PRODUCT_DESCRIPTION'),255);
+
+			default:
+				try { 
+					return parent::__get($strName);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+
+	public function __set($strName, $mixValue) {
+		switch ($strName) {
+			case 'Rowid':
+				if (defined('XLSWS_SOAP'))
+					try {
+						return ($this->intRowid =
+							QType::Cast($mixValue, QType::Integer));
+					}
+					catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+				else
+					QApplication::Log(E_ERROR, 'uploader',
+						'You may only update the Product Rowid during' .
+						' SOAP operations');
+				break;
+
+			default:
+				try {
+					return parent::__set($strName, $mixValue);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+	
 }

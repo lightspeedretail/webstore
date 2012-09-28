@@ -36,10 +36,10 @@ class xlsws_fpassword extends xlsws_index {
 
 	/*Constructor for this module, unused by views*/
 	protected function build_main() {
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('forgot_password.tpl.php');
 
-		$this->crumbs[] = array('key'=>'xlspg=forgot_password' , 'case'=> '' , 'name'=> _sp('Forgot Password?'));
+		$this->crumbs[] = array('link'=>'forgot-password/pg' , 'case'=> '' , 'name'=> _sp('Forgot Password?'));
 
 		//email
 		$this->txtFEmail = new XLSTextBox($this);
@@ -77,7 +77,7 @@ class xlsws_fpassword extends xlsws_index {
 		if($cust && $cust->AllowLogin==0) {
 			_xls_display_msg(
 				_sp("Your login is not active yet. ") .
-				_sp("Please ") . "<a href=\"index.php?xlspg=contact_us\">" . _sp("contact us") . "</a>" .
+				_sp("Please ") . "<a href=\"". _xls_site_url("contact_us/pg"). "\">" . _sp("contact us") . "</a>" .
 				_sp(" if you need urgent assistance.")
 			);
 

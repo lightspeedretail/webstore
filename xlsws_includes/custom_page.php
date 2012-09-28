@@ -35,7 +35,50 @@ class xlsws_custom_page extends xlsws_index {
 	protected $pnlSlider; //the product slider that shows a listing of items
 	protected $productTag = false; //the slideshow product tag used with the product slider
 	public $sliderName = "pnlSlider";
+	protected $sliderTitle = "";
 
+		/**
+	 * build_main - constructor for this controller
+	 * @param none
+	 * @return none
+	 */
+	protected function build_main() {
+
+
+    	$objUrl = _xls_url_object();    
+		$objPage = CustomPage::LoadByRequestUrl($objUrl->RouteId);
+
+		if(!$objPage) {
+			 _xls_404();
+			return;
+		}
+
+
+		$this->mainPnl = new QPanel($this,'MainPanel');
+		$this->content = $objPage->Page;
+
+		_xls_stack_put('xls_canonical_url',$objPage->CanonicalUrl);
+		if (!empty($objPage->MetaDescription))
+			_xls_add_meta_desc($objPage->MetaDescription);		
+		
+		//If we are not using an index override
+		if ($objPage->Key != "index") {
+			_xls_add_page_title($objPage->PageTitle);
+			$this->crumbs[] = array( 'key' => $objPage->Rowid , 'tag' => 'cp' , 'name' => $objPage->Title , 'link' => $objPage->Link);
+			
+		}
+		_xls_remember_url($objUrl->Url);
+
+		$this->productTag = $objPage->ProductTag;
+		$this->sliderTitle = $objPage->Title;
+		
+		if($objPage->ProductTag != '')
+			$this->build_slider();
+
+		$this->mainPnl->Template = templateNamed('custom_page.tpl.php');
+	}
+	
+	
 	/**
 	 * build_slider - builds the products slideshow slider
 	 * @param none
@@ -44,36 +87,81 @@ class xlsws_custom_page extends xlsws_index {
 	protected function build_slider() {
 		global $strPageTitle;
 		$this->pnlSlider = new XLSSlider($this->mainPnl);
-		$this->pnlSlider->Name = $pageR->Title;
+		$this->pnlSlider->Name = $this->sliderTitle;
 		$search = $this->productTag;
 
+		
+		$objProdCondition = $this->GetProductCondition(false);
+	        	
 		$this->pnlSlider->SetProducts(
 			QQ::AndCondition(
 				QQ::OrCondition(
-					new QQXLike(QQN::Product()->Code , "$search"),
 					new QQXLike(QQN::Product()->WebKeyword1 , "$search"),
 					new QQXLike(QQN::Product()->WebKeyword2 , "$search"),
 					new QQXLike(QQN::Product()->WebKeyword3 , "$search")
 				),
-				QQ::OrCondition(
-					QQ::Equal(QQN::Product()->MasterModel , 1),
-					QQ::AndCondition(
-						QQ::Equal(QQN::Product()->MasterModel, 0),
-						QQ::Equal(QQN::Product()->FkProductMasterId, 0)
-					)
-				),
-				QQ::Equal(QQN::Product()->Web, 1)
+				$objProdCondition
 			),
 			QQ::Clause(
 				$this->GetSortOrder(),
 				QQ::LimitInfo(_xls_get_conf('MAX_PRODUCTS_IN_SLIDER' , 64))
 			)
 		);
-
+		
+		
+		$objProd = new xlsws_product_listing;
 		$this->pnlSlider->Template = templateNamed('slider.tpl.php');
-		$this->pnlSlider->sliderTitle = $strPageTitle;
+		$this->pnlSlider->sliderTitle = $this->sliderTitle;
 	}
 
+	/**
+     * Return a QCondition to filter desired Products
+     * - Web enabled
+     * - Either Master or Independant
+	 * @param none
+	 * @return QCondition
+     */
+    protected function GetProductCondition($blnIncludeChildren = false) {
+        
+        if ($blnIncludeChildren)
+	        $objProdCondition = QQ::AndCondition(
+	                QQ::Equal(QQN::Product()->Web, 1), 
+	                QQ::Equal(QQN::Product()->MasterModel, 0)
+	            );
+        else
+	        $objProdCondition = QQ::AndCondition(
+	            QQ::Equal(QQN::Product()->Web, 1), 
+	            
+	            QQ::OrCondition(          
+	                QQ::Equal(QQN::Product()->MasterModel, 1), 
+	                QQ::AndCondition(
+	                    QQ::Equal(QQN::Product()->MasterModel, 0), 
+	                    QQ::Equal(QQN::Product()->FkProductMasterId, 0)
+	                )
+	            )
+	        );
+
+		//How do we handle out of stock products?
+		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) == 0) {
+			 $objAvailCondition = 
+			 	QQ::OrCondition(
+			 		QQ::GreaterThan(QQN::Product()->InventoryAvail, 0),
+                	QQ::Equal(QQN::Product()->Inventoried, 0)
+                );
+			 		
+	            	
+            $objCondition = QQ::AndCondition(
+                $objProdCondition, 
+                $objAvailCondition
+            );
+        } 
+        else 
+            $objCondition = $objProdCondition;
+ 
+                 
+        return $objCondition;
+    }
+    
 	/**
      * Return a QClause to order Products based on field
 	 * @param none
@@ -91,44 +179,7 @@ class xlsws_custom_page extends xlsws_index {
         return QQ::OrderBy(QQN::Product()->$strProperty, $blnAscend);
     }
     
-	/**
-	 * build_main - constructor for this controller
-	 * @param none
-	 * @return none
-	 */
-	protected function build_main() {
-		global $XLSWS_VARS , $strPageTitle;
 
-		if(!isset($XLSWS_VARS['cpage']))
-			$XLSWS_VARS['cpage'] = '404';
-
-		$pageR = CustomPage::LoadByKey($XLSWS_VARS['cpage']);
-
-		if(!$pageR) {
-			_xls_display_msg(_sp("Page") . " $XLSWS_VARS[cpage] " . _sp("does not exist."));
-			return;
-		}
-
-		$this->crumbs[] = array('key'=>"cpage=$XLSWS_VARS[cpage]" , 'case'=> '' , 'name'=> $pageR->Title);
-
-		$this->mainPnl = new QPanel($this);
-		$strPageTitle = $pageR->Title;
-
-		$this->content = $pageR->Page;
-
-		if($pageR->MetaDescription)
-			_xls_add_meta_desc($pageR->MetaDescription);
-
-		if($pageR->MetaKeywords)
-			_xls_add_meta_keyword($pageR->MetaKeywords);
-
-		$this->productTag = $pageR->ProductTag;
-
-		if($pageR->ProductTag != '')
-			$this->build_slider();
-
-		$this->mainPnl->Template = templateNamed('custom_page.tpl.php');
-	}
 }
 
 if(!defined('CUSTOM_STOP_XLSWS'))

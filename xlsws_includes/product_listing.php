@@ -32,25 +32,46 @@
  */
 class xlsws_product_listing extends xlsws_index {
 	protected $dtrProducts; //list of products in the category
+	protected $subcategories = null; //array of subcategories
+	protected $image = null; //image related to category
+	protected $category = null; //the instantiation of a Category database object
+    protected $family = null; //the instantiation of a Family database object
 
+	protected $custom_page_content = ''; //custom page content to appear above the category listing
+
+
+	/**
+     * build_main - constructor for this controller, refrain from modifying this 
+     * function. It is best practice to style the category tree from menu.tpl.php 
+     * and webstore.css with the list this function generates
+	 * @param none
+	 * @return none
+	 */
+    protected function build_main() {
+        $this->mainPnl = new QPanel($this,'MainPanel');
+        $this->mainPnl->Template = templateNamed('product_list.tpl.php');
+
+        $this->CreateDataRepeater();
+	}
+	
     /**
      * Create the view's DataRepeater control
      */
     protected function CreateDataRepeater() {
-        $this->dtrProducts = $objRepeater = new QDataRepeater($this->mainPnl);
+
+        $this->dtrProducts = $objRepeater = new QDataRepeater($this->mainPnl,'ProductCell');
         $this->CreatePaginator();
-        #$this->CreatePaginator(true);
+        if (_xls_get_conf('SECOND_PAGINATOR' , false)) $this->CreatePaginator(true);
 
         $objRepeater->ItemsPerPage =  _xls_get_conf('PRODUCTS_PER_PAGE' , 8);
 		$objRepeater->Template = templateNamed('product_list_item.tpl.php');
 		$objRepeater->CssClass = "product_list rounded";
-        $objRepeater->UseAjax = true;
+        $objRepeater->UseAjax = _xls_get_conf('DEBUG_DISABLE_AJAX' , 0) ? false : true;
 
-        // TODO :: Move pager number to a hidden QControl
-		if (isset($XLSWS_VARS['page']))
-			$objRepeater->PageNumber = intval($XLSWS_VARS['page']);
+		if (QApplication::QueryString('page'))
+			$objRepeater->PageNumber = _xls_number_only(QApplication::QueryString('page'));
         
-        // Bind the method providing Products to the Repater
+        // Bind the method providing Products to the Repeater
         $objRepeater->SetDataBinder('dtrProducts_Bind');
         return $objRepeater;
     }
@@ -69,6 +90,8 @@ class xlsws_product_listing extends xlsws_index {
         }
 
         $objRepeater->$strProperty = new XLSPaginator($this->mainPnl , $strName);
+
+
         return $objRepeater->$strProperty;
     }
 
@@ -79,18 +102,44 @@ class xlsws_product_listing extends xlsws_index {
 	 * @param none
 	 * @return QCondition
      */
-    protected function GetProductCondition() {
-        $objCondition = QQ::AndCondition(
-            QQ::Equal(QQN::Product()->Web, 1), 
-            QQ::OrCondition(
-                QQ::Equal(QQN::Product()->MasterModel, 1), 
-                QQ::AndCondition(
-                    QQ::Equal(QQN::Product()->MasterModel, 0), 
-                    QQ::Equal(QQN::Product()->FkProductMasterId, 0)
-                )
-            )
-        );
+    protected function GetProductCondition($blnIncludeChildren = false) {
+        
+        if ($blnIncludeChildren)
+	        $objProdCondition = QQ::AndCondition(
+	                QQ::Equal(QQN::Product()->Web, 1), 
+	                QQ::Equal(QQN::Product()->MasterModel, 0)
+	            );
+        else
+	        $objProdCondition = QQ::AndCondition(
+	            QQ::Equal(QQN::Product()->Web, 1), 
+	            
+	            QQ::OrCondition(          
+	                QQ::Equal(QQN::Product()->MasterModel, 1), 
+	                QQ::AndCondition(
+	                    QQ::Equal(QQN::Product()->MasterModel, 0), 
+	                    QQ::Equal(QQN::Product()->FkProductMasterId, 0)
+	                )
+	            )
+	        );
 
+		//How do we handle out of stock products?
+		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) == 0) {
+			 $objAvailCondition = 
+			 	QQ::OrCondition(
+			 		QQ::GreaterThan(QQN::Product()->InventoryAvail, 0),
+                	QQ::Equal(QQN::Product()->Inventoried, 0)
+                );
+			 		
+	            	
+            $objCondition = QQ::AndCondition(
+                $objProdCondition, 
+                $objAvailCondition
+            );
+        } 
+        else 
+            $objCondition = $objProdCondition;
+ 
+                 
         return $objCondition;
     }
 
@@ -135,13 +184,22 @@ class xlsws_product_listing extends xlsws_index {
 
         $intFeaturedCount = Product::QueryCount($objFeaturedCondition);
 
-        if ($intFeaturedCount > 0)
+        if ($intFeaturedCount > 0) {
             $objCondition = QQ::AndCondition(
                 $objProductCondition, 
                 $objFeaturedCondition
             );
-        else 
+            _xls_stack_put('override_category',_sp('Featured Products'));
+            _xls_set_crumbtrail(array(array(
+				'link'=>'',
+				'case'=> '',
+				'name'=> _sp("Featured Products")
+				)));
+           }
+        else {
+        	_xls_set_crumbtrail();
             $objCondition = $objProductCondition;
+         }
 
         return $objCondition;
     }
@@ -154,7 +212,8 @@ class xlsws_product_listing extends xlsws_index {
     protected function GetClause() {
         return QQ::Clause(
             $this->GetSortOrder(),
-            $this->dtrProducts->LimitClause
+            $this->dtrProducts->LimitClause,
+            QQ::Distinct()
         );
     }
 
@@ -167,8 +226,7 @@ class xlsws_product_listing extends xlsws_index {
         $objCondition = $this->GetCondition();
         $objClause = $this->GetClause();
 
-        $this->dtrProducts->TotalItemCount = 
-            Product::QueryCount($objCondition);
+        $this->dtrProducts->TotalItemCount = Product::QueryCount($objCondition);
 
         $objProductArray = Product::QueryArray(
             $objCondition, 
@@ -178,18 +236,6 @@ class xlsws_product_listing extends xlsws_index {
         $this->bind_result_images($objProductArray);
     }
 
-	/**
-     * build_main - constructor for this controller, refrain from modifying this 
-     * function. It is best practice to style the category tree from menu.tpl.php 
-     * and webstore.css with the list this function generates
-	 * @param none
-	 * @return none
-	 */
-    protected function build_main() {
-        $this->mainPnl = new QPanel($this);
-        $this->mainPnl->Template = templateNamed('product_list.tpl.php');
 
-        $this->CreateDataRepeater();
-	}
 }
 

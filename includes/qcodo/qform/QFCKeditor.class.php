@@ -241,7 +241,7 @@
 			$this->strValidationError = "";
 			
 			if(!$this->ValidateCrossScript()){
-				_xls_log("Illgal javascript insertion attempt by " . Visitor::get_visitor_name());
+
 				$this->strValidationError = _sp(sprintf("Illegal javascript detected in text. Please remove. "));
 				return false;
 			}

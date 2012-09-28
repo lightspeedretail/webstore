@@ -24,6 +24,7 @@
  
  */
 
+
 /**
  * Open a file for writing
  *
@@ -50,13 +51,13 @@ function _xls_fopen_w($filename) {
  * @return string :: Converted path relative to __SITEROOT__
  */
 function templateNamed($name) {
-	if(_xls_get_conf('DEBUG_TEMPLATE' , false) && stristr($name , ".tpl")) {
-		_xls_stack_add('template_used' , $name);
-	}
+    if (_xls_get_conf('DEBUG_TEMPLATE', 0) == 1)
+        if (stristr($name, '.tpl'))
+            _xls_stack_add('template_used', $name);
 
 	$file = 'templates/' . _xls_get_conf('DEFAULT_TEMPLATE' , 'xsilva') . '/'.$name;
 	if(!file_exists($file) && stristr($name , ".tpl")) {
-		QApplication::Log(E_USER_NOTICE,"Template ".$file." not found - site cannot continue");
+		QApplication::Log(E_ERROR,"Template ".$file." not found - site cannot continue");
 		die("Template file missing. Check System Log for details.");
 	}
 	else return $file;
@@ -80,6 +81,26 @@ function _xls_convert_camel($camel) {
 
 	return strtolower($output);
 }
+
+/**
+ * Convert an string to camel cased string
+ *
+ * @param string $string :: String you wish to convert
+ * @param bool $pascalCase :: Capitalize First Letter
+ * @return string :: Converted string corresponding to a table field
+ */
+
+function camelize($string, $pascalCase = true)
+{
+  $string = str_replace(array('-', '_'), ' ', $string);
+  $string = ucwords($string);
+  $string = str_replace(' ', '', $string); 
+
+  if (!$pascalCase) {
+    return lcfirst($string);
+  }
+  return $string;
+} 
 
 /**
  * Determine whether a string is a properly formated email address
@@ -182,8 +203,17 @@ function _xls_make_hidden($name , $value) {
  *
  * @param unknown_type $msg
  */
-function _xls_log($msg) {
-	QApplication::Log(E_NOTICE, 'unknown', $msg);
+function _xls_log($msg,$blnSysLogOnly = false) {
+
+	if ($blnSysLogOnly) {
+		$log = new Log();
+        $log->Created = new QDateTime(QDateTime::Now);
+        $log->Log = $msg;
+        $log->Save(true);
+
+	}
+	else
+		QApplication::Log(E_NOTICE, 'unknown', $msg);
 }
 
 /**
@@ -207,6 +237,7 @@ function _xls_get_ip() {
 	}
 	return $hname;
 }
+
 
 /**
  * Return values of an array as value and key (itself)
@@ -237,6 +268,20 @@ function _xls_values_as_keys($arr) {
  */
 function _xls_get_conf($strKey, $mixDefault = "") {
 	return Configuration::$Manager->GetValue($strKey, $mixDefault);
+}
+
+/**
+ * Set existing configuration value
+ * @param string $key
+ * @param string $mixDefault
+ * @return bool success
+ */
+function _xls_set_conf($strKey, $mixDefault = "") {
+	$conf = Configuration::LoadByKey($strKey);
+	if(!$conf) return false;
+	$conf->Value = $mixDefault;
+	$conf->Save();
+	return true;
 }
 
 /**
@@ -336,8 +381,7 @@ function _xls_read_dir($dir , $ext = FALSE) {
 
 /**
 * Add variables to the stack_vars array within the _SESSION
-* If the key already exists, we add to it instead of replacing
-*
+* Stacks multiple if already exists
 * @param string $key
 * @param mix $value
 * @return void
@@ -349,13 +393,24 @@ function _xls_stack_add($key, $value) {
 }
 
 /**
+* Add variables to the stack_vars array within the _SESSION
+* Overwrites any previous value
+* @param string $key
+* @param mix $value
+* @return void
+*/
+function _xls_stack_put($key, $value) {
+	$_SESSION['stack_vars'][$key] = array($value);
+
+}
+/**
  * Get a variable from the stack_vars array within the _SESSION
  * Returns the last item in the array
  *
  * @param string $key
  * return mix or false
  */
-function _xls_stack_get($key) {
+function _xls_stack_get($key) { 
 	if(isset($_SESSION['stack_vars'][$key])) {
 		$intItemCount = count($_SESSION['stack_vars'][$key]);
 
@@ -391,6 +446,11 @@ function _xls_stack_pop($key) {
 		return false;
 }
 
+function _xls_stack_remove($key) {
+
+	while (_xls_stack_pop($key)) { }
+	
+}
 /**
  * Clear $_SESSION['stack_vars']
  */
@@ -404,13 +464,36 @@ function _xls_stack_removeall() {
  * @param string $msg
  * @param string $redirect
  */
-function _xls_display_msg($msg, $redirect = "index.php") {
+function _xls_display_msg($msg) {
 	_xls_stack_add('msg', _sp($msg));
 
-	if($redirect)
-		_xls_add_meta_redirect($redirect);
+	_rd(_xls_site_url('msg/'.XLSURL::KEY_PAGE));
+}
 
-	_rd('index.php?xlspg=msg');
+/**
+ * Set last viewed page within _SESSION
+ *
+ * @param string $key
+ * return mix or false
+ */
+function _xls_remember_url($strUrl) {
+	if (empty($strUrl))
+		unset($_SESSION['last_url']);
+	else
+		$_SESSION['last_url'] =  $strUrl;
+}
+
+/**
+ * Set last viewed page within _SESSION
+ *
+ * @param string $key
+ * return mix or false
+ */
+function _xls_get_remembered_url() {
+	if (isset($_SESSION['last_url']))
+		return ($_SESSION['last_url']);
+	else
+		return null;
 }
 
 /**
@@ -427,7 +510,7 @@ function _xls_require_login($msg = false) {
 	_xls_stack_add('login_msg' , _sp($msg));
 	_xls_stack_add('login_redirect_uri' , $uri);
 
-	_rd('index.php?xlspg=login');
+	_rd(_xls_site_url('login/'.XLSURL::KEY_PAGE.'/'));
 }
 
 /**
@@ -456,7 +539,12 @@ function _xls_mail($strAddTo, $strSubject, $strBody, $strAddFrom = false) {
             _sp('SMTP Server is not defined'));
         return false;
     }
-
+	
+	if (QEmailServer::$SmtpServer=="localhost" && _xls_get_conf('LIGHTSPEED_HOSTING' , '0')=='1') {
+			QApplication::Log(E_ERROR, 'email', "Email server not configured, cannot send receipts");
+			return false;
+	}
+		
     // Set default values
     $strAddFrom = _xls_get_conf('ORDER_FROM', $strAddFrom);
     $strAddBcc = _xls_get_conf('EMAIL_BCC', false);
@@ -558,6 +646,8 @@ function _xls_mail_body_from_template($templatefile, $vars) {
  *
  * @return string
  */
+  //ToDo: Delete these after migrating captcha to other files
+
 function _xls_verify_img() {
 	if (Customer::GetCurrent()) {
 		// TODO :: Disable captcha after login
@@ -676,6 +766,20 @@ function _xls_remove_leading_slash($path) {
 		return $path;
 }
 
+
+/**
+* Return the URL Parser Object
+* Useful if we need to find out URL properties to make decisions somewhere
+*
+* @return object
+*/
+function _xls_url_object() {
+	$objUrl = XLSURL::getInstance();
+	return $objUrl;
+}
+
+
+
 /**
 * Return the Base URL for the site
 * Also perform http/https conversion if need be.
@@ -683,27 +787,81 @@ function _xls_remove_leading_slash($path) {
 * @param boolean ssl_attempt
 * @return string url
 */
-function _xls_site_dir($ssl_attempt = true) {
+function _xls_site_dir($ssl_attempt = false, $blnOnlyHost = false) {
 	$strSsl = 'http://';
-	$strHost = $_SERVER['HTTP_HOST'] . dirname(QApplication::$ScriptName);
-	
-	if ($ssl_attempt && isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on'))
-		$strSsl = 'https://';
+	if ($blnOnlyHost)
+		$strHost = $_SERVER['HTTP_HOST'];
+	else
+		$strHost = $_SERVER['HTTP_HOST'] . dirname(QApplication::$ScriptName);
+
+    if ($ssl_attempt ||
+    	  (isset($_SERVER['HTTPS']) &&
+        		($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == '1')))
+    	$strSsl = 'https://';
+	//if ($ssl_attempt) $strSsl = 'https://';
+
 	if (substr($strHost,-1)=="/") $strHost = substr($strHost, 0, -1);
 
 	return $strSsl . $strHost;
 }
 
+//
 /**
- * Get the current customer object
- *
- * @param boolean $fallbackonStackTemp
- * @return obj customer
- */
-function _xls_get_current_customer($fallbackOnStackTemp=false) {
-	QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
-	return Customer::GetCurrent($fallbackonStackTemp);
+* Returns fully qualified URL, based on sitedir. Used to generate a link.
+*
+* @param string $strUrlPath optional
+* @param boolean $strUrlPath optional
+* @return string url
+*/
+function _xls_site_url($strUrlPath =  '', $blnOnlyHost = false) {
+	if (substr($strUrlPath,0,4)=="http") return $strUrlPath; //we've passed through twice, don't double up
+	if (substr($strUrlPath,0,1)=="/") $strUrlPath = substr($strUrlPath,1,999); //remove a leading / so we don't // by accident
+	
+	$usessl=false;
+	
+	if (_xls_get_conf('ENABLE_SSL','0')==1) {
+		if (_xls_get_conf('SSL_NO_NEED_FORWARD',0) != 1)
+			 $usessl = true;
+		elseif (	strstr($strUrlPath,"checkout") !== false ||
+					strstr($strUrlPath,"customer-register") !== false
+		
+					) $usessl = true;
+	}
+
+
+	return _xls_site_dir($usessl,$blnOnlyHost) . '/' . $strUrlPath;
+
+
 }
+
+//Makes our SEO hyphenated string from passed string
+//Used to build anything that will be in a URL. 
+//Same as seo_name plus lower case conversion and removing spaces
+function _xls_seo_url($string) {
+	return strtolower(trim(_xls_seo_name($string), '-'));
+}
+
+//Makes our SEO hyphenated string from passed string
+//Used to build anything that will be in a Name. Allows spaces
+function _xls_seo_name($string) {
+	$string = str_replace('\'','',$string);
+	$string = str_replace("&","and",$string);
+	$string = preg_replace("`\[.*\]`U","",$string);
+	$string = preg_replace('`&(amp;)?#?[A-Za-z0-9]+;`i','-',$string);
+	$string = htmlentities($string, ENT_COMPAT, 'utf-8');
+	$string = preg_replace("`&([a-z])(acute|uml|circ|grave|ring|cedil|slash|tilde|caron|lig|quot|rsquo);`i","\\1", $string);
+	$string = str_replace('-amp-','-and-',$string);
+	$string = preg_replace( array("`[^a-z0-9]`i","`[-]+`") , "-", $string);
+	return trim($string, '- ');
+}
+
+//Makes our SEO hyphenated string from passed string
+//Used to build anything that will be in a Name. Allows spaces
+function _xls_jssafe_name($string) {
+	$string = str_replace('\'','\\\'',$string);
+	return trim($string);
+}
+
 
 /**
  * Get the ID of the current customer object
@@ -715,6 +873,19 @@ function _xls_get_current_customer_id() {
 		return $customer->Rowid;
 
 	return null;
+}
+
+/**
+ * Get the Full Name of the current customer object
+ * @return string
+ */
+function _xls_get_current_customer_name() {
+	$customer = Customer::GetCurrent();
+	if($customer) {
+		if (strlen($customer->Mainname)<13) return $customer->Mainname;
+		else return _xls_truncate($customer->Firstname,13);
+
+	} else return "My Account";
 }
 
 /**
@@ -734,6 +905,32 @@ function _xls_get_url_resource($filename) {
 	$filename = __VIRTUAL_DIRECTORY__ . __SUBDIRECTORY__ . $filename;
 
 	return $filename;
+}
+
+/**
+ * Do a permanent 301 redirect
+ *
+ */
+function _xls_301($strUrl) {
+	header("HTTP/1.1 301 Moved Permanently");
+	header("Location: ".$strUrl);
+	exit();
+}
+
+/**
+ * Do a 404 fail
+ *
+ */
+function _xls_404() {
+	header('HTTP/1.1 404 Not Found');
+	$strFile = "404.php";
+	if(file_exists(CUSTOM_INCLUDES . $strFile)) {
+		include(CUSTOM_INCLUDES . $strFile);
+		exit(); }
+	elseif(file_exists('xlsws_includes/'.$strFile)) {
+		include('xlsws_includes/'.$strFile);
+		 }
+	exit();	
 }
 
 /**
@@ -843,6 +1040,24 @@ function _xls_number_only($string ) {
 }
 
 /**
+ * Return a number out of a string only
+ * @param string $string
+ * @return string
+ */
+function _xls_letters_only($string ) {
+	return preg_replace('/[^A-Za-z]/', '', $string);
+}
+
+/**
+ * Return a currency string removing anything not allowed
+ * @param string $string
+ * @return string
+ */
+function _xls_clean_currency($string) {
+	return preg_replace('/[^0-9\.\-]/', '', $string);
+}
+
+/**
  * Add meta redirect to the stack_vars stack
  * @param string $url
  * @param int $delay
@@ -861,14 +1076,41 @@ function _xls_add_meta_redirect($url , $delay = 60) {
 function _xls_add_page_title($title) {
 	global $strPageTitle;
 	$strPageTitle = $title;
+	_xls_stack_put('xls_page_title',$title);
 }
 
 /**
- * Add meta escription to the stack_vars stack
+ * Set the page title
+ * @param string $title
+ */
+function _xls_add_formatted_page_title($title) {
+	$strPattern = _xls_get_conf('SEO_CUSTOMPAGE_TITLE');
+	$strPattern = str_replace('%name%', $title,$strPattern);
+	$strPattern = str_replace('%storename%', _xls_get_conf('STORE_NAME','LightSpeed Web Store'),$strPattern);
+	
+	_xls_stack_put('xls_page_title',$strPattern);
+}
+
+/**
+ * Return Email Subject
+ * Note that this doesn't populate orderid or customername, that has to be done in skeleton
+ * @param string $title
+ */
+function _xls_format_email_subject($key='EMAIL_SUBJECT_CUSTOMER',$customer="", $orderid="") {
+	$strPattern = _xls_get_conf($key);
+	$strPattern = str_replace('%customername%', $customer,$strPattern);
+	$strPattern = str_replace('%orderid%', $orderid,$strPattern);
+	$strPattern = str_replace('%storename%', _xls_get_conf('STORE_NAME','LightSpeed Web Store'),$strPattern);
+	
+	return $strPattern;
+}
+
+/**
+ * Add meta description to the stack_vars stack
  * @param string $desc
  */
 function _xls_add_meta_desc($desc) {
-	_xls_stack_add('xls_meta_desc', strip_tags($desc));
+	_xls_stack_put('xls_meta_desc', strip_tags($desc));
 }
 
 /**
@@ -878,8 +1120,86 @@ function _xls_add_meta_desc($desc) {
 function _xls_add_meta_keyword($words) {
 	if(is_array($words))
 		$words = implode("," , $words);
-	_xls_stack_add('xls_meta_keywords', strip_tags($words));
+	_xls_stack_put('xls_meta_keywords', strip_tags($words));
 }
+
+/**
+ * Save crumbtrail to session
+ * @param array $arrCrumbs
+ */
+function _xls_set_crumbtrail($arrCrumbs = null) {
+
+	if($arrCrumbs)
+		$_SESSION['crumbtrail'] = $arrCrumbs;
+	else
+		unset($_SESSION['crumbtrail']);
+}
+
+/**
+ * Retrieve crumbtrail, either full array with links or just names
+ * @param string $type
+ * @return $array
+ */
+function _xls_get_crumbtrail($type = 'full') {
+
+	if (!isset($_SESSION['crumbtrail'])) return array();
+	
+	if ($type=='full') return $_SESSION['crumbtrail'];
+	
+	$arrCrumbs = $_SESSION['crumbtrail'];
+	$retArray = array();	
+	foreach ($arrCrumbs as $crumb)
+		$retArray[] =  $crumb['name'];
+	return $retArray;
+		
+}
+
+/**
+ * Retrieve Google Category based on Product RowId
+ * @param int $intProductRowid
+ * @return $string
+ */
+function _xls_get_googlecategory($intProductRowid) {
+
+	$result = _dbx("select c.name as google_category, meta_keywords from xlsws_product_category_assn as a left join xlsws_category as b on a.category_id=b.rowid left join xlsws_google_categories as c on b.google_id=c.rowid where a.product_id=".$intProductRowid,"Query");
+	$objGoogle = $result->FetchObject();
+	$strLine = $objGoogle->google_category;
+	$strLine = str_replace("&","&amp;",$strLine);
+	$strLine = str_replace(">","&gt;",$strLine);
+
+	$arrGoogle = array();
+	$arrGoogle['Category'] = trim($strLine);
+	$arrX = explode(",",$objGoogle->meta_keywords);
+	$arrGoogle['Gender'] = $arrX[0];
+	$arrGoogle['Age'] = $arrX[1];
+
+	return $arrGoogle;
+				  	
+}
+
+function _xls_get_googleparentcategory($intProductRowid) {
+
+	$arrTrailFull = Category::GetTrailByProductId($intProductRowid);
+	$objCat = Category::Load($arrTrailFull[0]['key']);
+	$objPar = GoogleCategories::Load($objCat->GoogleId);
+	if ($objPar) {
+		$strLine = $objPar->Name;
+		$strMeta = $objCat->MetaKeywords;
+	}
+	$strLine = str_replace("&","&amp;",$strLine);
+	$strLine = str_replace(">","&gt;",$strLine);
+
+
+	$arrGoogle = array();
+	$arrGoogle['Category'] = trim($strLine);
+	$arrX = explode(",",$strMeta);
+	$arrGoogle['Gender'] = $arrX[0];
+	$arrGoogle['Age'] = $arrX[1];
+
+	return $arrGoogle;
+
+}
+
 
 /**
  * Return the Web Store's version
@@ -887,6 +1207,35 @@ function _xls_add_meta_keyword($words) {
  */
 function _xls_version() { // LEGACY
 	return XLSWS_VERSION;
+}
+
+/**
+ * Are we being browsed on an iDevice (checks for both devices)
+ * @return bool
+ */
+function _xls_is_idevice() {
+	if (_xls_is_ipad() || _xls_is_iphone()) return true;
+	else return false;
+}
+
+/**
+ * Are we being browsed on an iPad
+ * @return bool
+ */
+function _xls_is_ipad() {
+
+	return (bool) strpos($_SERVER['HTTP_USER_AGENT'],'iPad');
+}
+
+/**
+ * Are we being browsed on an iPhone/Ipod Touch
+ * @return bool
+ */
+function _xls_is_iphone() {
+	
+	if (strpos($_SERVER['HTTP_USER_AGENT'],'iPhone') || strpos($_SERVER['HTTP_USER_AGENT'],'iPod')) 
+	return true;
+	else return false;
 }
 
 /**
@@ -1141,22 +1490,6 @@ function _xls_build_query($array, $query = '', $prefix = '') {
 	return $query;
 }
 
-/**
- * Return the URL for a Custom Page
- * @param string $page :: The page key
- * @return string
- */
-function _xls_custom_page_url($page) {
-	if(!_xls_get_conf('ENABLE_SEO_URL' , false))
-		return "index.php?cpage=$page";
-
-	$cpage = CustomPage::LoadByKey($page);
-
-	if($cpage)
-		return $cpage->Link;
-
-	return "index.php";
-}
 
 /**
  * Return code to load the XML sitemap
@@ -1338,3 +1671,51 @@ function _xls_escape($strText) {
 			$strText);
 	return $strText;
 }
+
+/** Determine whether to show the captcha to the user
+*/
+function _xls_show_captcha($strPage = "checkout") {
+	switch ($strPage) {
+		
+		case 'register': $strKey = "CAPTCHA_REGISTRATION"; break;
+		case 'contactus':  $strKey = "CAPTCHA_CONTACTUS"; break;	
+		case 'checkout': 
+		default: $strKey = "CAPTCHA_CHECKOUT"; break;
+	}
+
+	if (_xls_get_conf($strKey , '0')=='2' || (!xlsws_index::isLoggedIn() && _xls_get_conf($strKey , '0')=='1'))
+	return true;
+	else return false;
+	
+}
+
+/**
+ * Function for displaying what called function, useful for debugging
+ */
+function _xls_whereCalled( $level = 1 ) {
+    $trace = debug_backtrace();
+    $file   = $trace[$level]['file'];
+    $line   = $trace[$level]['line'];
+    $object = $trace[$level]['object'];
+    if (is_object($object)) { $object = get_class($object); }
+
+    return "Where called: class $object was called on line $line of $file";
+
+}
+
+/*********************************************
+	LEGACY FUNCTIONS
+	
+	These functions will be removed in Web Store 2.3
+	Any code using these functions should be changed to call the 
+	code directly within these functions
+**********************************************/
+/**
+ * Return the URL for a Custom Page
+ * @param string $page :: The page key
+ * @return string
+ */
+function _xls_custom_page_url($page) {
+	return CustomPage::GetLinkByKey($page);
+}
+

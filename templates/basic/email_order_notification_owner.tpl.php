@@ -35,6 +35,6 @@
 
 <?php _xt("Click here to view the order: ")  ?> <br/><br/>
 
-<a href="<?= _xls_site_dir() . "/index.php?xlspg=order_track&getuid=" . $cart->Linkid;  ?>"><?= _xls_site_dir() . "/index.php?xlspg=order_track&getuid=" . $cart->Linkid;  ?></a><br/><br/>
+<a href="<?= _xls_site_dir() . "/order-track/pg?getuid=" . $cart->Linkid;  ?>"><?= _xls_site_dir() . "/order-track/pg?getuid=" . $cart->Linkid;  ?></a><br/><br/>
 
 <?=  _xls_get_conf('EMAIL_SIGNATURE'); ?>

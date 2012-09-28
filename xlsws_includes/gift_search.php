@@ -46,10 +46,10 @@ class xlsws_gsearch extends xlsws_index {
 	 * @return none
 	 */
 	protected function build_main() {
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('gift_search.tpl.php');
 
-		$this->crumbs[] = array('key'=>'xlspg=gift_search' , 'case'=> '' , 'name'=> _sp('Wish Lists'));
+		$this->crumbs[] = array('link'=>'gift-search/pg' , 'case'=> '' , 'name'=> _sp('Wish Lists'));
 
 		$this->txtEmail = new XLSTextBox($this->mainPnl , 'gemail');
 		$this->txtEmail->AddAction(new QEnterKeyEvent() , new QServerAction('dosearch'));
@@ -67,6 +67,7 @@ class xlsws_gsearch extends xlsws_index {
 
 		if($this->txtEmail->Text != '')
 			$this->dosearch($this->FormId , $this->txtEmail->ControlId , '');
+		_xls_add_formatted_page_title(_sp('Wish Lists'));
 	}
 
 	/**

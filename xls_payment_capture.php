@@ -34,11 +34,12 @@ ob_start(); // These includes may spit content which we need to ignore
 require_once(CUSTOM_INCLUDES . 'prepend.inc.php');
 ob_end_clean();
 
-// find all payment modules
+
 $payModules = Modules::QueryArray(
-	QQ::Equal(QQN::Modules()->Type, 'payment'),
-	QQ::Clause(QQ::OrderBy(QQN::Modules()->SortOrder))
-);
+	QQ::AndCondition(
+		QQ::Equal(QQN::Modules()->Active, 1),
+		QQ::Equal(QQN::Modules()->Type, 'payment' )),
+	QQ::Clause(QQ::OrderBy(QQN::Modules()->SortOrder)));
 
 // load the modules
 foreach($payModules as $module) {
@@ -67,39 +68,58 @@ foreach($payModules as $module) {
 
 		$order_id = $pay_info['order_id'];
 
-		$cart = Cart::LoadByIdStr($order_id);
+		$objCart = Cart::LoadByIdStr($order_id);
 
-		if(!$cart || ($cart->Type != CartType::awaitpayment)) {
+		if(!$objCart || ($objCart->Type != CartType::awaitpayment)) {
 			_xls_log("Payment process capture error. $module->File did not return a valid order id $order_id . " . print_r($XLSWS_VARS , true));
 			continue;
 		}
 
-		if($cart->PaymentModule != $module->File) {
-			_xls_log("Payment process capture error. $module->File tried returning for $order_id when it was actually processed with $cart->PaymentModule . " . print_r($XLSWS_VARS , true));
+		if($objCart->PaymentModule != $module->File) {
+			_xls_log("Payment process capture error. $module->File tried returning for $order_id when it was actually processed with $objCart->PaymentModule . " . print_r($XLSWS_VARS , true));
 			continue;
 		}
 
-		$cart->PaymentAmount = isset($pay_info['amount']) ? $pay_info['amount'] : 0;
+		$objCart->PaymentAmount = isset($pay_info['amount']) ? $pay_info['amount'] : 0;
 
 		if(isset($pay_info['data']))
-			$cart->PaymentData = $pay_info['data'];
+			$objCart->PaymentData = $pay_info['data'];
 
-		Cart::SaveCart($cart);
+		Cart::SaveCart($objCart);
 
-		if(!isset($pay_info['success']) || ( isset($pay_info['success']) && $pay_info['success']))
-			xlsws_index::completeOrder($cart , false , false);
+        if(!isset($pay_info['success']) || ( isset($pay_info['success']) && $pay_info['success']))
+        {
+	        if(!class_exists('xlsws_checkout')) {
+
+		        //We need to load the checkout file but we don't run the class like normal, we just need
+		        //access to the functions.
+		        $strFile = "checkout.php";
+		        define('CUSTOM_STOP_XLSWS','stop');
+		        if(file_exists(CUSTOM_INCLUDES . $strFile))
+			        include_once(CUSTOM_INCLUDES . $strFile);
+		        elseif(file_exists('xlsws_includes/'.$strFile))
+			        include_once('xlsws_includes/'.$strFile);
+
+		        if(!class_exists('xlsws_checkout'))
+			        QApplication::Log(E_ERROR, 'payment_capture', "Error loading checkout class, can't continue");
+
+	        }
+
+	        xlsws_checkout::FinalizeCheckout($objCart, null, false);
+
+        }
 
 		if(isset($pay_info['output']))
 			exit($pay_info['output']);
 		else {
-			$url = _xls_site_dir() . "/index.php?xlspg=order_track&getuid=" . $cart->Linkid;
+			$url = _xls_site_url("order-track/pg") . "?getuid=" . $objCart->Linkid;
 			exit("<html><head><meta http-equiv=\"refresh\" content=\"1;url=$url\"></head><body><a href=\"$url\">Click here to confirm your order</a></body></html>");
 		}
 	}
 }
 
-_xls_log("Unprocessed executation of payment_capture script. Passed paramaters " . print_r($XLSWS_VARS , true));
+_xls_log("Unprocessed payment_capture script. Passed parameters " . print_r($XLSWS_VARS , true));
 
-_rd("index.php");
+_rd(_xls_site_url());
 
 ?>

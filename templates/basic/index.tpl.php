@@ -31,57 +31,36 @@
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?= _xls_get_conf('ENCODING' , 'utf-8') ?>" />
 	<?php
-		$meta_desc = _xls_stack_pop('xls_meta_desc');
-		
-		if($meta_desc){
-	?>	
-		<meta name="description" content="<?= $meta_desc; ?>">
-	<?php
-		}
-	?><?php
-		$meta_keywords = _xls_stack_pop('xls_meta_keywords');
-		
-		if($meta_keywords){
-	?>	
-		<meta name="keywords" content="<?= $meta_keywords; ?>">
-	<?php
-		}
-	?><?php
 		$redirect = _xls_stack_pop('xls_meta_redirect');
-		
-		if($redirect && isset($redirect['url']) && isset($redirect['delay'])){
-	?>	
-		<meta http-equiv="refresh" content="<?= $redirect['delay']; ?>;URL=<?= $redirect['url']; ?>"/>
-	<?php
-		}
+		if($redirect && isset($redirect['url']) && isset($redirect['delay']))
+		echo '<meta http-equiv="refresh" content="'.$redirect['delay'].';URL='.$redirect['url'].'"/>';
 	?>
-	
 	<meta name="Author" content="<?= _xls_get_conf('STORE_NAME' , 'Web Store.') ?>" />
 	<meta name="Copyright" content="<?= _xls_get_conf('COPYRIGHT_MSG' , 'Xsilva Inc.') ?>" />
 	<meta name="Generator" content="LightSpeed Webstore <?= _xls_version(); ?>" />
 	<meta http-equiv="imagetoolbar" content="false" />
-	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
 	<base href="<?= _xls_site_dir(); ?>/"/>
 
-	<?php global $strPageTitle; ?>		
-	<?php if (isset($strPageTitle)): ?>
-			<title><?=  _xls_get_conf('STORE_NAME', _sp('Shopping cart'));   ?> : <?php _xt($strPageTitle); ?></title>
-	<?php endif; ?>		
+	<title><?php echo _xls_stack_get('xls_page_title'); ?></title>
+	<link rel="canonical" href="<?php echo _xls_stack_pop('xls_canonical_url'); ?>" />
 
+	<meta name="description" content="<?php echo _xls_stack_get('xls_meta_desc'); ?>">
+	<meta property="og:title" content="<?php echo _xls_stack_pop('xls_page_title'); ?>" />
+	<meta property="og:description" content="<?php echo _xls_stack_pop('xls_meta_desc'); ?>" />
+	<meta property="og:image" content="<?php echo _xls_stack_pop('xls_meta_image'); ?>" />
+	
+	<meta name="google-site-verification" content="<?php echo _xls_get_conf('GOOGLE_VERIFY'); ?>" />
+	
 	<link rel="Shortcut Icon" href="favicon.ico" type="image/x-icon" />
 
 	<link rel="stylesheet" type="text/css" href="assets/css/reset.css" />
 	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/webstore.css" />
 	<link rel="stylesheet" type="text/css" href="assets/css/pushup.css" />
 	
-	<!--[if lte IE 7]>
-	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/ie7.css" />
+	<!--[if IE]>
+	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/ie.css" />
 	<![endif]-->
-	
-	<!--[if lt IE 7]>
-	<link rel="stylesheet" type="text/css" href="<?= templateNamed('css') ; ?>/ie6.css" />	
-	<![endif]-->
- 			
+	 			
  	<link rel="stylesheet" type="text/css" href="assets/css/search.css" id="searchcss"  />
 	<link rel="stylesheet" type="text/css" href="assets/css/dummy.css" id="dummy_css"  />
 	<link rel="stylesheet" type="text/css" href="assets/css/datepicker.css" />
@@ -106,6 +85,7 @@
 	</head>
 	
 	<?php $this->RenderBegin(); ?>
+	<?php $this->lblSharingHeader->Render(); ?>
 
 	
 	<?php $this->dxLogin->Render(); ?>
@@ -117,52 +97,39 @@
 				
 				<div class="text">
 					<div class="left" style="margin: 0 55px 0 0;"><?php _xt("Welcome!"); ?></div>
-					<div class="right"><a href="#" <?php $this->pxyLoginLogout->RenderAsEvents() ?>class="loginbox"><?php _xt("Login"); ?></a> &nbsp;|&nbsp; <a href="index.php?xlspg=customer_register"><?php _xt("Register"); ?></a></div>
+					<div class="right"><a href="#" <?php $this->pxyLoginLogout->RenderAsEvents() ?>class="loginbox"><?php _xt("Login"); ?></a> &nbsp;|&nbsp; <a href="<? echo _xls_site_url('customer-register/pg'); ?>"><?php _xt("Register"); ?></a></div>
 				</div>
 				
 				<?php else: ?>
-				<div class="text"><div style="margin: 0 105px 0 0; display: block; float: left;"><a href="index.php?xlspg=myaccount"><?= _xt("My Account"); ?></a></div> <?php $this->lblLogout->Render(); ?></div>
+				<div class="text"><div style="margin: 0 105px 0 0; display: block; float: left;"><a href="<? echo _xls_site_url('myaccount/pg'); ?>"><?= _xt("My Account"); ?></a></div> <?php $this->lblLogout->Render(); ?></div>
 				<?php endif; ?>
 			
 				
 			</div>	
-			<a href="index.php">
-				<img src="<?php
-			     $img =  _xls_get_conf('HEADER_IMAGE' ,  false ); 
-			     
-			     if(!$img)
-			      $img = templateNamed('images') . '/webstore_installation.png';
-			     else{
-			      $img = _xls_get_url_resource($img);
-			     }
-			     echo $img;
-			     ?>" />
+			<a href="<?php echo _xls_site_url(); ?>">
+				<img src="<? echo _xls_site_url(_xls_get_conf('HEADER_IMAGE' ,  false )); ?>" />
 			</a>
 		</div>
 
 		<div id="body">
 		<div id="content" class="rounded-top">
 		
-		<?php $this->menuPnl->Render() ?>
+		<?php $this->menuPnl->Render(); ?>
 		
-		<div id="nav" class="rounded">
-			<ul>
-				<li id="products"><a href="index.php" style="border-left: none;"></a></li>
-				<li id="newProducts"><a href="<?= _xls_custom_page_url('new') ?>"><?php _xt('New Products'); ?></a></li>
-				<li id="topProducts"><a href="<?= _xls_custom_page_url('top') ?>"><?php _xt('Top Products'); ?></a></li>
-				<li id="promotions"><a href="<?= _xls_custom_page_url('promo') ?>"><?php _xt('Promotions'); ?></a></li>
-				<li id="contact"><a href="index.php?xlspg=contact_us"><?php _xt('Contact'); ?></a></li>
-				<li id="search"><?php $this->searchPnl->Render(); ?></li>
-			</ul>				
+    	<div id="nav" class="rounded-top">  	
+			<?php
+			echo '<a class="productmenu" href="'._xls_site_url().'"><span class="innertab">&nbsp;</span></a>'; //will be covered up by products menu
+				foreach ($this->arrTopTabs as $arrTab)
+					echo '<a class="tab'.count($this->arrTopTabs).'" href="'.$arrTab->Link.'"><span class="innertab">'.$arrTab->Title.'</span></a>';
+			?>			
+			<div id="searchentry"><?php $this->searchPnl->Render(); ?></div>				
 		</div>
 
 			<?php $this->crumbTrail->Render(); ?>
 		</div>
-
+	<?php $this->ctlFlashMessages->Render(); ?>
 	<noscript>
-	<h1>
 	<?php  _xt('This store requires you to have Java-Script enabled in your browser.'); ?>
-	</h1>
 	</noscript>	
 
 			<?php $this->mainPnl->Render(); ?>
@@ -183,33 +150,25 @@
 	<div id="footer" class="rounded">    	
 			<div class="left">&copy; <?php _xt('Copyright'); ?> <?= date("Y"); ?> <?= _xls_get_conf('STORE_NAME' , 'Your Store') ?>. <?php _xt('All Rights Reserved'); ?>.</div>
 			<div class="right">
-					<a href="<?= _xls_custom_page_url('about') ?>"><?php _xt('About Us'); ?></a> 
-					| <a href="<?= _xls_custom_page_url('tc') ?>"><?php _xt('Terms & Conditions'); ?></a> 
-					| <a href="<?= _xls_custom_page_url('privacy') ?>"><?php _xt('Privacy Policy'); ?></a>
-					| <a href="index.php?xlspg=sitemap"><?php _xt('Sitemap'); ?></a>
+			<?php
+				foreach ($this->arrBottomTabs as $arrTab)
+					echo '<a href="'.$arrTab->Link.'">'._sp($arrTab->Title).'</a> |';
+				?><a href="sitemap/pg"><?php _xt('Sitemap'); ?></a>
 			</div>
 	</div>
 
 
-	<!-- place google analytics here -->
-
+	<?php $this->lblGoogleAnalytics->Render(); ?>
 
 	<?php $this->dummy_drag_drop->Render(); ?>
 	    
-	<?php $this->RenderEnd(); ?>		
+			
 	<?php
 	if(QApplication::$Database[1]->EnableProfiling)
 		echo QApplication::$Database[1]->OutputProfiling();
 	?>    		
 	
-	<script type="text/javascript">	
-	<?php if($this->blnGetScreenRes):   ?>
-		$.post(document.forms[0].action , { store_screen: "true", width: screen.width , height: screen.height } );
-	<?php endif; ?>	
-		//done
-	</script>
-
-<?php if(_xls_get_conf('DEBUG_TEMPLATE' , false)):  ?>
+<?php if (_xls_get_conf('DEBUG_TEMPLATE', 0) == 1):  ?>
  	<?php $files = array();  ?>
 <!-- 
 	Template files used
@@ -229,5 +188,7 @@
 		window.setTimeout("document.location.href='<?= _xls_site_dir() ?>/index.php'" , <?= $expires ?> * 1000 + 5000 );
 	</script>
 <?php endif; ?>
-	</body>
+
+<?php $this->lblSharingFooter->Render(); ?>
+<?php $this->RenderEnd(); ?>
 </html>

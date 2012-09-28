@@ -29,9 +29,8 @@
  */
 class xlsws_class_shipping extends XLSModule {
 	protected $strModuleType = 'shipping';
-
+	protected $strHelpfulHint = "";
 	protected $strModuleName = "Store Pickup - Sample";
-	
 
 	/**
 	 * The name of the module that will be displayed in the checkout page
@@ -51,10 +50,10 @@ class xlsws_class_shipping extends XLSModule {
 	 * It is different than the module name returned in front of the customer.
 	 * @return string
 	 */
-	public function admin_name() {
-		$config = $this->getConfigValues(get_class($this));
-		if ($config['label']!=$this->strModuleName && isset($config['label']))
-		return _sp($this->strModuleName." (labeled \"".$config['label']."\")");
+	public function admin_name() { 
+		$config = $this->getConfigValues(get_class($this)); 
+		if ($config['label'] != $this->strModuleName && isset($config['label']))
+			return $this->strModuleName." (labeled \"".$config['label']."\")";
 		else return $this->strModuleName;
 	}
 	
@@ -162,7 +161,6 @@ class xlsws_class_shipping extends XLSModule {
 	}
 
 	public function Autoload($strClassName) {
-		error_log(__FUNCTION__);
 		if(file_exists(XLSWS_INCLUDES . 'shipping/' . $strClassName . ".php"))
 			require_once(XLSWS_INCLUDES . 'shipping/' . $strClassName . ".php");
 	}
@@ -182,7 +180,8 @@ class xlsws_class_shipping extends XLSModule {
 
 	/**
 	 * Check if the module is valid or not.
-	 * Returning false here will exclude the module from both admin panel and checkout page
+	 * Returning false here will exclude the module from checkout page
+	 * Can be used for tests against cart conditions
 	 *
 	 * @return boolean
 	 */
@@ -270,4 +269,26 @@ class xlsws_class_shipping extends XLSModule {
 
 		return $ret;
 	}
+	
+	
+	public function __get($strName) {
+		switch ($strName) {
+		
+			case 'HelpfulHint':
+				return $this->strHelpfulHint;
+			
+			case 'Name':
+				return $this->name();
+
+			default:
+				try {
+					return parent::__get($strName);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+	
+	
 }

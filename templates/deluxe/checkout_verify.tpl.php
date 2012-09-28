@@ -27,9 +27,13 @@
 
 ?>
 
-	<fieldset style="display: block; float: left;">
-		<legend><?php _xt('Submit your order') ?></legend>
+	<fieldset>
+		<legend><?php _xt('Submit your order') ?> <?php 
+            if ($this->CaptchaControl->Wait)
+                 $this->CaptchaControl->Wait->Render();
+        ?></legend>
 
+<?	if (_xls_show_captcha('checkout')) { ?>
 		<div class="block margin">
 			<dl>
 				<dt><label for="Name"><?php $this->lblVerifyImage->Render(); ?></label></dt>
@@ -38,10 +42,10 @@
 
 		<div class="block margin">
 			<dl class="left">
-				<dt><label for="Verify"><?php _xt("Enter the text from the above image"); ?></label></dt>
-				<dd><?php $this->txtCRVerify->Text=""; $this->txtCRVerify->RenderWithError() ?></dd>
+				<dd><?php $this->txtCRVerify->RenderWithError(); ?></dd>
 			</dl>
 		</div>
+<? } ?>
 
 		<div class="block margin">
 			<dl>
@@ -53,7 +57,7 @@
 		<div class="left margin clear">
 			<dl>
 				<dd><?php $this->chkAgree->Render(); ?><label for="cConfirm"
-       class="opt"><?php printf(_sp("I hereby agree to the")." <a href=\"%s\" target=\"_new\">"._sp("Terms and Conditions")."</a> "._sp("of shopping with")." %s" , _xls_site_dir() . "/index.php?cpage=tc" , _xls_get_conf('STORE_NAME' , $_SERVER['HTTP_HOST']) ); ?>
+       class="opt"><?php printf(_sp("I hereby agree to the")." <a href=\"%s\" target=\"_new\">"._sp("Terms and Conditions")."</a> "._sp("of shopping with")." %s" , _xls_site_url("terms-and-conditions") , _xls_get_conf('STORE_NAME' , $_SERVER['HTTP_HOST']) ); ?>
        			</label></dd>
 			</dl>
 		</div>

@@ -43,25 +43,44 @@ class usps extends xlsws_class_shipping {
 	private $response;
 
 	protected $strModuleName = "USPS";
-	
 
 	/**
-	 * check() verifies nothing has changed in the configuration since initial load
+	 * Check if the module is valid or not.
+	 * Returning false here will exclude the module from checkout page
+	 * Can be used for tests against cart conditions
+	 *
 	 * @return boolean
-	 *
-	 *
 	 */
 	public function check() {
-		if(defined('XLSWS_ADMIN_MODULE'))
-			return true;
-
 		$vals = $this->getConfigValues(get_class($this));
-
+		
 		// if nothing has been configed return null
 		if(!$vals || count($vals) == 0)
 			return false;
+
+		//Check possible scenarios why we would not offer this type of shipping
+		if ($vals['restrictcountry']) { //we have a country restriction
+
+			switch($vals['restrictcountry']) {
+			case 'CUS':
+				if ($_SESSION['XLSWS_CART']->ShipCountry=="US" &&
+					($_SESSION['XLSWS_CART']->ShipState =="AK" || $_SESSION['XLSWS_CART']->ShipState=="HI"))
+					return false;
+				break;
+
+			case 'NORAM':
+				if ($_SESSION['XLSWS_CART']->ShipCountry != "US" && $_SESSION['XLSWS_CART']->ShipCountry != "CA")
+					return false;
+				break;
+
+			default:
+				if ($vals['restrictcountry']!=$_SESSION['XLSWS_CART']->ShipCountry) return false;
+			}
+		}
+
 		return true;
 	}
+
 
 	/**
 	 * make_USPS_services populates with shipping options available through shipper
@@ -96,8 +115,18 @@ class usps extends xlsws_class_shipping {
 		$ret['originpostcode']->Name = _sp('Origin Zipcode');
 		$ret['originpostcode']->Required = true;
 
+		$ret['restrictcountry'] = new XLSListBox($objParent);
+		$ret['restrictcountry']->Name = _sp('Only allow '.$this->strModuleName.' to');
+		$ret['restrictcountry']->AddItem('Everywhere (no restriction)', null);
+		$ret['restrictcountry']->AddItem('My Country ('. _xls_get_conf('DEFAULT_COUNTRY').')', _xls_get_conf('DEFAULT_COUNTRY'));
+		if (_xls_get_conf('DEFAULT_COUNTRY')=="US")
+			$ret['restrictcountry']->AddItem('Continental US', 'CUS'); //Really common request, so make a special entry
+		$ret['restrictcountry']->AddItem('North America (US/CA)', 'NORAM');
+		$ret['restrictcountry']->Enabled = true;
+		$ret['restrictcountry']->SelectedIndex = 0;
+           		
 		$ret['product'] = new XLSTextBox($objParent);
-		$ret['product']->Name = _sp('LightSpeed Product Code');
+		$ret['product']->Name = _sp('LightSpeed Product Code (case sensitive)');
 		$ret['product']->Required = true;
 		$ret['product']->Text = 'SHIPPING';
 
@@ -172,8 +201,8 @@ class usps extends xlsws_class_shipping {
 	 */
 	public function customer_fields($objParent) {
 		$ret = array();
-		$ret['service'] = new XLSListBox($objParent);
-		$ret['service']->Name = _sp('Preference:');
+		$ret['service'] = new XLSListBox($objParent,'ModuleMethod');
+		//$ret['service']->Name = _sp('Preference:');
 		return $ret;
 	}
 
@@ -204,7 +233,7 @@ class usps extends xlsws_class_shipping {
 		if(!$selected)
 			$selected = _xls_stack_pop('usps_method');
 
-		$config = $this->getConfigValues('USPS');
+		$config = $this->getConfigValues(get_class($this));
 
 		$weight = $cart->total_weight();
 
@@ -373,13 +402,13 @@ class usps extends xlsws_class_shipping {
 	public function getRate($showall=false) {
 		if (($this->ounces + $this->pounds) == 0)
 			$this->pounds=1;
-        $config = $this->getConfigValues('usps');
+        $config = $this->getConfigValues(get_class($this));
 		$request = ($this->isDomestic()) ? $this->buildDomesticRateRequest() : $this->buildInternationalRateRequest() ;
 		$this->response = $this->sendUSPSRateRequest($request);
 
 		if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
-			QApplication::Log(E_ERROR, get_class($this), "sending ".print_r($request,true));
-			QApplication::Log(E_ERROR, get_class($this), "receiving ".$this->response);
+			_xls_log(get_class($this) . " sending ".print_r($request,true),true);
+			_xls_log(get_class($this) . " receiving ".$this->response,true);
 		}
 
 		// Parse xml for response values

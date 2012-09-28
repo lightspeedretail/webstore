@@ -32,31 +32,9 @@
 
 class australiapost extends xlsws_class_shipping {
 	public $service_types;
-
-	/**
-	 * The name of the shipping module that will be displayed in the checkout page
-	 * @return string
-	 *
-	 *
-	 */
-	public function name() {
-		$config = $this->getConfigValues(get_class($this));
-
-		if(isset($config['label']))
-			return $config['label'];
-
-		return $this->admin_name();
-	}
-
-	/**
-	 * The name of the shipping module that will be displayed in Web Admin payments
-	 * @return string
-	 *
-	 *
-	 */
-	public function admin_name() {
-		return _sp("Australia Post");
-	}
+	
+	protected $strModuleName = "Australia Post";
+	
 
 	/**
 	 * make_AustraliaPost_services populates with shipping options available through shipper
@@ -97,8 +75,18 @@ class australiapost extends xlsws_class_shipping {
 		$ret['defaultproduct']->Name = _sp('Default shipping product');
 		$this->make_AustraliaPost_services($ret['defaultproduct']);
 
+		$ret['restrictcountry'] = new XLSListBox($objParent);
+		$ret['restrictcountry']->Name = _sp('Only allow '.$this->strModuleName.' to');
+		$ret['restrictcountry']->AddItem('Everywhere (no restriction)', null);
+		$ret['restrictcountry']->AddItem('My Country ('. _xls_get_conf('DEFAULT_COUNTRY').')', _xls_get_conf('DEFAULT_COUNTRY'));
+		if (_xls_get_conf('DEFAULT_COUNTRY')=="US")
+			$ret['restrictcountry']->AddItem('Continental US', 'CUS'); //Really common request, so make a special entry
+		$ret['restrictcountry']->AddItem('North America (US/CA)', 'NORAM');
+		$ret['restrictcountry']->Enabled = true;
+		$ret['restrictcountry']->SelectedIndex = 0;
+           		
 		$ret['product'] = new XLSTextBox($objParent);
-		$ret['product']->Name = _sp('LightSpeed Product Code');
+		$ret['product']->Name = _sp('LightSpeed Product Code (case sensitive)');
 		$ret['product']->Required = true;
 		$ret['product']->Text = 'SHIPPING';
 
@@ -143,11 +131,11 @@ class australiapost extends xlsws_class_shipping {
 	 */
 	public function customer_fields($objParent) {
 		$ret = array();
-		$config = $this->getConfigValues('AustraliaPost');
+		$config = $this->getConfigValues(get_class($this));
 
-		$ret['service'] = new XLSListBox($objParent);
+		$ret['service'] = new XLSListBox($objParent,'ModuleMethod');
 		$this->make_AustraliaPost_services($ret['service']);
-		$ret['service']->Name = _sp('Preference:');
+		////$ret['service']->Name = _sp('Preference:');
 		$ret['service']->SelectedValue = $config['defaultproduct'];
 		return $ret;
 	}
@@ -187,7 +175,7 @@ class australiapost extends xlsws_class_shipping {
 	public function total($fields, $cart, $country = '', $zipcode  = '', $state = '',
 		$city = '', $address2 = '',  $address1= '', $company = '', $lname = '',   $fname = '') {
 
-		$config = $this->getConfigValues('AustraliaPost');
+		$config = $this->getConfigValues(get_class($this));
 
 		$weight = $cart->total_weight();
 
@@ -253,8 +241,8 @@ class australiapost extends xlsws_class_shipping {
 			curl_close($c);
 			
 			if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
-				QApplication::Log(E_ERROR, get_class($this), "sending ".$url);
-				QApplication::Log(E_ERROR, get_class($this), "receiving ".$result);
+				_xls_log(get_class($this) . " sending ".$url,true);
+				_xls_log(get_class($this) . " receiving ".$result,true);
 			}
 		
 			/*
@@ -321,14 +309,32 @@ class australiapost extends xlsws_class_shipping {
 	 *
 	 */
 	public function check() {
-		if(defined('XLSWS_ADMIN_MODULE'))
-			return true;
-
 		$vals = $this->getConfigValues(get_class($this));
-
+		
 		// if nothing has been configed return null
 		if(!$vals || count($vals) == 0)
 			return false;
+
+		//Check possible scenarios why we would not offer this type of shipping
+		if ($vals['restrictcountry']) { //we have a country restriction
+
+			switch($vals['restrictcountry']) {
+			case 'CUS':
+				if ($_SESSION['XLSWS_CART']->ShipCountry=="US" &&
+					($_SESSION['XLSWS_CART']->ShipState =="AK" || $_SESSION['XLSWS_CART']->ShipState=="HI"))
+					return false;
+				break;
+
+			case 'NORAM':
+				if ($_SESSION['XLSWS_CART']->ShipCountry != "US" && $_SESSION['XLSWS_CART']->ShipCountry != "CA")
+					return false;
+				break;
+
+			default:
+				if ($vals['restrictcountry']!=$_SESSION['XLSWS_CART']->ShipCountry) return false;
+			}
+		}
+
 		return true;
 	}
 }

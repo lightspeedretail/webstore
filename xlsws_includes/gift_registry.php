@@ -144,7 +144,7 @@ class xlsws_gregistry extends xlsws_index {
 			$this->txtGRHtmlContent->Width = "500px";
 			$this->txtGRHtmlContent->Height = 300;
 			$this->txtGRHtmlContent->ReadOnly = true;
-			$this->txtGRHtmlContent->ToolbarSet = "XLSWS";
+			$this->txtGRHtmlContent->ToolbarSet = "WebstoreToolbar";
 			$this->txtGRHtmlContent->Name=_sp("What do the visitors see?");
 		}
 	}
@@ -158,7 +158,6 @@ class xlsws_gregistry extends xlsws_index {
 		$this->txtGRShipOption = new XLSListBox($this->pnlGRForm);
 		$this->txtGRShipOption->AddItem('-- Select a Option --', null);
 		$this->txtGRShipOption->AddItem(_sp('Ship to me'), 'Ship to me');
-		$this->txtGRShipOption->AddItem(_sp('Keep in store'), 'Keep in store');
 		$this->txtGRShipOption->AddItem(_sp('Ship to buyer'), 'Ship to buyer');
 		$this->txtGRShipOption->Name = _sp("Ship to");
 	}
@@ -258,7 +257,7 @@ class xlsws_gregistry extends xlsws_index {
 	 */
 	protected function bind_widgets() {
 		$this->btnGRSave->AddAction(new QClickEvent(),new QServerAction('btnGRSave_Click'));
-		$this->btnGRCancel->AddAction(new QClickEvent(),new QJavaScriptAction("document.location.href='index.php?xlspg=gift_registry'"));
+		$this->btnGRCancel->AddAction(new QClickEvent(),new QJavaScriptAction("document.location.href='"._xls_site_url("gift-registry/pg")."'"));
 		$this->pxyGREdit->AddAction(new QClickEvent(),new QServerAction('btnGRForm_Click'));
 		$this->pxyGREdit->AddAction(new QClickEvent(),new QJavaScriptAction('return false;'));
 		$this->pxyGiftItemDelete->AddAction(new QClickEvent(),new QServerAction('btnGiftItemDelete_Click'));
@@ -285,10 +284,10 @@ class xlsws_gregistry extends xlsws_index {
 
 		$customer = Customer::GetCurrent();
 
-		$this->mainPnl = new QPanel($this);
+		$this->mainPnl = new QPanel($this,'MainPanel');
 		$this->mainPnl->Template = templateNamed('gift_detail.tpl.php');
 
-		$this->crumbs[] = array('key'=>'xlspg=gift_registry' , 'case'=> '' , 'name'=> _sp('My Wish Lists'));
+		$this->crumbs[] = array('link'=>'gift-registry/pg' , 'case'=> '' , 'name'=> _sp('My Wish Lists'));
 
 		if(!$this->isLoggedIn())
 			_xls_require_login("Sorry, you have to be logged in to use the Wish List.");
@@ -389,8 +388,8 @@ class xlsws_gregistry extends xlsws_index {
 
 			$this->pxyGRView_Click($this->strFormId , '' , $rowid);
 		}
+		_xls_add_formatted_page_title(_sp('Wish Lists'));
 
-		Visitor::add_view_log('', ViewLogType::giftregistryadd);
 	}
 
 	/**
@@ -897,7 +896,7 @@ class xlsws_gregistry extends xlsws_index {
 		foreach($objItemArray as $objItem)
 			$objItem->Delete();
 
-		_rd("index.php?xlspg=gift_registry");
+		_rd(_xls_site_url("gift-registry/pg"));
 	}
 
 	/**

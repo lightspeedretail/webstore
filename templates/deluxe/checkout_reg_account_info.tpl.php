@@ -28,26 +28,26 @@
 ?>
 
 		<fieldset>
-		<legend><?php _xt('Account Information') ?></legend>
+		<legend><?php _xt('Customer Contact') ?></legend>
 
 		<div class="left margin">
 			<dl>
 				<dt><label for="Name"><span class="red">*</span> <?php _xt("First Name"); ?></label></dt>
-				<dd><?php $this->txtCRFName->RenderWithError() ?></dd>
+				<dd><?php $this->txtCRFName->RenderWithError(); ?></dd>
 			</dl>
 		</div>
 
 		<div class="left margin">
 			<dl class="left">
 				<dt><label for="Name"><span class="red">*</span> <?php _xt("Last Name"); ?></label></dt>
-				<dd><?php $this->txtCRLName->RenderWithError() ?></dd>
+				<dd><?php $this->txtCRLName->RenderWithError(); ?></dd>
 			</dl>
 		</div>
 
 		<div class="left margin clear">
 			<dl>
 				<dt><label for="Company"><?php _xt("Company"); ?></label></dt>
-				<dd><?php $this->txtCRCompany->Render() ?></dd>
+				<dd><?php $this->txtCRCompany->Render(); ?></dd>
 			</dl><br />
 		</div>
 
@@ -64,5 +64,13 @@
 				<dd><?php $this->txtCREmail->RenderWithError() ?></dd>
 			</dl>	
 		</div>
+		<?php if (!$this->isLoggedIn()) { ?>
+		<div class="left margin clear">
+			<dl>
+				<dt><label for="EmailConfirm"><span class="red">*</span> <?php _xt("Email (Confirm)"); ?></label></dt>
+				<dd><?php $this->txtCRConfEmail->RenderWithError() ?></dd>
+			</dl>	
+		</div>
+		<? } ?>
 		</fieldset>	
 			

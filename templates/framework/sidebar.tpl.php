@@ -29,7 +29,7 @@
 foreach($this->arrSidePanels as $name => $pnl){
 ?>
 
-			<h1 class="rounded" style="color: #111;" onclick="$('#<?= $pnl->ControlId ?>_container').slideToggle('slow');"><?= $name; ?></h1>
+			<div class="clickbar rounded" style="color: #111;" onclick="$('#<?= $pnl->ControlId ?>_container').slideToggle('slow');"><?= $name; ?></div>
 			<div class="containers rounded-bottom" id="<?= $pnl->ControlId ?>_container" style="display: none;">
 					<?php $pnl->Render(); ?>
 			</div>

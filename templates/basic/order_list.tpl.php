@@ -20,21 +20,21 @@
 
 /**
  * Basic template: Order Track individual item details 
- * only comes up directly with /index.php?xlspg=order_track
+ * only comes up directly with order-track/pg
  * when logged in
  *
  */
 
 ?>
 <div class="border">
-    <b>ID #</b><?php _xt($_ITEM->IdStr); ?><br/>
-    Date: <b><?php _xt($_ITEM->DatetimePosted); ?></b><br/>
-    Status: <span class="<?= $this->order_status_css($_ITEM->Status); ?>"><?php _xt($_ITEM->Status); ?></span><br/>
-    <a href="index.php?xlspg=order_track&getuid=<?php _xt($_ITEM->Linkid); ?>"><?php _xt("View"); ?></a>
+	<b>ID #: </b><?php _xt($_ITEM->IdStr); ?><br/>
+	Date: <b><?php _xt($_ITEM->DatetimePosted); ?></b><br/>
+	Status: <span class="<?= $this->order_status_css($_ITEM->Status); ?>"><?php _xt($_ITEM->Status); ?></span><br/>
+	<a href="<?php echo _xls_site_url("order-track/pg"); ?>?getuid=<?php echo $_ITEM->Linkid; ?>"><?php _xt("View"); ?></a>
 </div>
 
 <?php
-    if ((($_CONTROL->CurrentItemIndex % 2) != 0) ||
-        ($_CONTROL->CurrentItemIndex == count($_CONTROL->DataSource) - 1))
-        _xt('<br style="clear:both;"/>', false);
+if ((($_CONTROL->CurrentItemIndex % 2) != 0) ||
+	($_CONTROL->CurrentItemIndex == count($_CONTROL->DataSource) - 1))
+	echo '<br style="clear:both;"/>';
 ?>

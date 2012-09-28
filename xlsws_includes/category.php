@@ -31,40 +31,58 @@
  * and assigning template variables to the views related to the category pages
  */
 class xlsws_category extends xlsws_product_listing {
-	protected $subcategories = null; //array of subcategories
-	protected $image = null; //image related to category
-	protected $category = null; //the instantiation of a Category database object
 
-	protected $custom_page_content = ''; //custom page content to appear above the category listing
+	/**
+     * build_main - constructor for this controller, refrain from modifying this 
+     * function. It is best practice to style the category tree from menu.tpl.php 
+     * and webstore.css with the list this function generates
+	 * @param none
+	 * @return none
+	 */
+    protected function build_main() {
+        $objUrl = _xls_url_object();
 
+        $this->LoadCategory();
+        $this->LoadSubCategories();
+        $this->LoadCustomPage();
+
+        parent::build_main();
+
+        if ($this->category) {
+            $objCategory = $this->category;
+
+			_xls_stack_put('xls_canonical_url',$objCategory->CanonicalUrl);
+			_xls_add_meta_desc($objCategory->PageDescription);
+			_xls_add_page_title($objCategory->PageTitle);
+			_xls_remember_url($objUrl->Url);
+			
+			
+		}
+
+
+    }
+	
+	
     /**
      * Bind the currently selected Category to the form
 	 * @param none
 	 * @return none
      */
-    protected function LoadCategory() {
-        global $XLSWS_VARS;
+    protected function LoadCategory() { 
 
-        if (isset($XLSWS_VARS['c'])) {
-            if ($XLSWS_VARS['c'] == 'root')
-                unset($XLSWS_VARS['c']);
-            else if (empty($XLSWS_VARS['c']))
-                unset($XLSWS_VARS['c']);
-        }
-
-        if (isset($XLSWS_VARS['c'])) {
-            $arrCategories = explode('.', $XLSWS_VARS['c']);
-            $strCategory = array_pop($arrCategories);
-            $objCategory = Category::$Manager->GetByKey($strCategory);
-
-            if ($objCategory)
+    	$objUrl = _xls_url_object();    
+		if ($objUrl->RouteId=='') return; //We haven't specified a category, so we're using this as the default home page and showing everything
+		
+		$objCategory = Category::LoadByRequestUrl($objUrl->RouteId);
+		 if ($objCategory)
                 $this->category = $objCategory;
             else
-                _xls_display_msg(_sp('Sorry! The category was not found.'));
-        }
-
-        if (!$this->category)
+               _xls_404();
+		
+		if (!$this->category)
             return false;
+            
+ 
     }
 
     /**
@@ -117,20 +135,6 @@ class xlsws_category extends xlsws_product_listing {
             $this->category->MetaKeywords = $objPage->MetaKeywords;
     }
 
-    /**
-     * Bind the category Image to the form
-	 * @param none
-	 * @return none
-     */
-    protected function LoadImage() {
-        if (!$this->category)
-            return false;
-
-        if (!$this->category->HasImage)
-            return false;
-
-        $this->image = $this->category->SmallImage;
-    }
 
     /**
      * Create the paginator(s) for the DataRepeater
@@ -149,7 +153,6 @@ class xlsws_category extends xlsws_product_listing {
 	 * @return QCondition
      */
     protected function GetCategoryCondition() {
-        global $XLSWS_VARS;
 
         if (!$this->category)
             return false;
@@ -188,44 +191,7 @@ class xlsws_category extends xlsws_product_listing {
         return $objCondition;
     }
 
-	/**
-     * build_main - constructor for this controller, refrain from modifying this 
-     * function. It is best practice to style the category tree from menu.tpl.php 
-     * and webstore.css with the list this function generates
-	 * @param none
-	 * @return none
-	 */
-    protected function build_main() {
-        global $XLSWS_VARS;
 
-        $this->LoadCategory();
-        $this->LoadSubCategories();
-        $this->LoadCustomPage();
-        $this->LoadImage();
-
-        parent::build_main();
-
-        if ($this->category) {
-            $objCategory = $this->category;
-
-            // Set Meta Description
-			if($objCategory->MetaDescription != '')
-				_xls_add_meta_desc($objCategory->MetaDescription);
-			else
-				_xls_add_meta_desc($objCategory->Name);
-
-            // Set Meta Keywords
-			if($objCategory->MetaKeywords != '')
-				_xls_add_meta_keyword($objCategory->MetaKeywords);
-			else
-				_xls_add_meta_keyword($objCategory->Name);
-
-            // Set Title
-			_xls_add_page_title($objCategory->Name);
-
-			Visitor::add_view_log($XLSWS_VARS['c'], ViewLogType::categoryview);
-		}
-	}
 
 }
 

@@ -457,6 +457,10 @@
 			return mssql_fetch_array($this->objMsSqlResult);
 		}
 
+		public function FetchObject() {
+			return mssql_fetch_object($this->objMsSqlResult);
+		}
+		
 		public function FetchFields() {
 			$objArrayToReturn = array();
 			while ($objSqlServerDatabaseField = $this->FetchField())

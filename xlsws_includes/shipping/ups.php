@@ -33,30 +33,7 @@
 class ups extends xlsws_class_shipping {
 	public $service_types;
 
-	/**
-	 * The name of the shipping module that will be displayed in the checkout page
-	 * @return string
-	 *
-	 *
-	 */
-	public function name() {
-		$config = $this->getConfigValues(get_class($this));
-
-		if(isset($config['label']))
-			return $config['label'];
-
-		return $this->admin_name();
-	}
-
-	/**
-	 * The name of the shipping module that will be displayed in Web Admin payments
-	 * @return string
-	 *
-	 *
-	 */
-	public function admin_name() {
-		return _sp("UPS");
-	}
+	protected $strModuleName = "UPS";
 
 	/**
 	 * make_ups_products populates with shipping options available through shipper
@@ -66,7 +43,17 @@ class ups extends xlsws_class_shipping {
 	 *
 	 */
 	protected function make_ups_products($field) {
-		$this->service_types = array('1DA'=>'UPS Next Day Air','2DA'=>'UPS 2nd Day Air','3DS'=>'UPS 3 Day Select','GND'=>'UPS Ground','STD'=>'UPS Canada Standard' , 'XPR' => 'UPS Worldwide Express' , 'XDM' => 'UPS Worldwide Express plus' , 'XPD'=>'UPS Worldwide Expedited');
+		$this->service_types = array(
+									'GND'=>'UPS Ground',
+									'3DS'=>'UPS 3 Day Select',				
+									'2DA'=>'UPS 2nd Day Air',
+									'1DA'=>'UPS Next Day Air',
+									'STD'=>'UPS Canada Standard' , 
+									'XPR' => 'UPS Worldwide Express' ,
+									'XDM' => 'UPS Worldwide Express plus' ,
+									'XPD'=>'UPS Worldwide Expedited'
+									  
+									  );
 
 		foreach($this->service_types as $type=>$desc)
 			$field->AddItem( $desc , $type);
@@ -118,8 +105,18 @@ class ups extends xlsws_class_shipping {
 		$ret['package']->AddItem('UPS Worldwide 25 kilo', 'UW25');
 		$ret['package']->AddItem('UPS Worldwide 10 kilo', 'UW10');
 
+		$ret['restrictcountry'] = new XLSListBox($objParent);
+		$ret['restrictcountry']->Name = _sp('Only allow '.$this->strModuleName.' to');
+		$ret['restrictcountry']->AddItem('Everywhere (no restriction)', null);
+		$ret['restrictcountry']->AddItem('My Country ('. _xls_get_conf('DEFAULT_COUNTRY').')', _xls_get_conf('DEFAULT_COUNTRY'));
+		if (_xls_get_conf('DEFAULT_COUNTRY')=="US")
+			$ret['restrictcountry']->AddItem('Continental US', 'CUS'); //Really common request, so make a special entry
+		$ret['restrictcountry']->AddItem('North America (US/CA)', 'NORAM');
+		$ret['restrictcountry']->Enabled = true;
+		$ret['restrictcountry']->SelectedIndex = 0;
+           		
 		$ret['product'] = new XLSTextBox($objParent);
-		$ret['product']->Name = _sp('LightSpeed Product Code');
+		$ret['product']->Name = _sp('LightSpeed Product Code (case sensitive)');
 		$ret['product']->Required = true;
 		$ret['product']->Text = 'SHIPPING';
 
@@ -163,11 +160,11 @@ class ups extends xlsws_class_shipping {
 	 */
 	public function customer_fields($objParent) {
 		$ret = array();
-		$config = $this->getConfigValues('ups');
+		$config = $this->getConfigValues(get_class($this));
 
-		$ret['service'] = new XLSListBox($objParent);
+		$ret['service'] = new XLSListBox($objParent,'ModuleMethod');
 		$this->make_ups_products($ret['service']);
-		$ret['service']->Name = _sp('Preference:');
+		//$ret['service']->Name = _sp('Preference:');
 		$ret['service']->SelectedValue = $config['defaultproduct'];
 		return $ret;
 	}
@@ -194,16 +191,16 @@ class ups extends xlsws_class_shipping {
 	public function total($fields, $cart, $country = '', $zipcode = '', $state = '',
 	$city = '', $address2 = '', $address1= '', $company = '', $lname = '', $fname = '') {
 
-		$config = $this->getConfigValues('ups');
+		$config = $this->getConfigValues(get_class($this));
 
-		$weight = $cart->total_weight();
+		$weight = $cart->Weight;
 
 		if(_xls_get_conf('WEIGHT_UNIT' , 'lb') != 'lb')
 			$weight = $weight * 2.2;   // one KG is 2.2 pounds
 
-		$length = $cart->total_length();
-		$width = $cart->total_width();
-		$height = $cart->total_height();
+		$length = $cart->Length;
+		$width = $cart->Width;
+		$height = $cart->Height;
 
 		if(_xls_get_conf('DIMENSION_UNIT' , 'in') != 'in') {
 			$length = round($length / 2.54);
@@ -215,7 +212,7 @@ class ups extends xlsws_class_shipping {
 
 		if(empty($config['origincountry']) || empty($config['defaultproduct']))
 			return false;
-
+		
 		//validate the product
 		if($country != $config['origincountry']) {
 			$config['defaultproduct'] = 'XPR';
@@ -223,76 +220,88 @@ class ups extends xlsws_class_shipping {
 				$fields['service']->SelectedValue = 'XPR';
 		}
 
-		$this->make_ups_products($fields['service']);
 
-		$fields['service']->RemoveAllItems();
-
-		$found = 0;
-		$ret = array();
-
-		$zipcode=str_replace(" ","",$zipcode); //Remove spaces i.e. canada Z1Z 1Z1 to Z1Z1Z1
-		if (strtoupper($country)=="US")
-			$zipcode=substr($zipcode,0,5); //UPS module doesn't support Zip+4 in US
+		$strShipData=serialize(array(__class__,$weight,$address1,$zipcode));	
+		if (_xls_stack_get('ShipBasedOn') != $strShipData) {
+			_xls_stack_put('ShipBasedOn',$strShipData);
+	
 
 
 
-		foreach($this->service_types as $type=>$desc) {
-			$upsAction =  "3";  // You want 3.  Don't change - reference API library if you want. // CleverAppz - Make this a user config?
-			$url = join(
-				"&",
-				array(
-					"http://www.ups.com/using/services/rave/qcostcgi.cgi?accept_UPS_license_agreement=yes",
-					"10_action=$upsAction",
-					"13_product=" . $type,
-					"14_origCountry=$config[origincountry]",
-					"15_origPostal=".substr($config[originpostcode],0,5),
-					"19_destPostal=".$zipcode,
-					"22_destCountry=$country",
-					"23_weight=" . $weight,
-					"24_value=" . $cart->Total,
-					"25_length=" . $length,
-					"26_width=" . $width,
-					"27_height=" . $height,
-					"47_rateChart=$config[ratecode]",
-					"48_container=$config[package]",
-					"49_residential=1"
-				)
-			);
-
-			$c = curl_init();
-			curl_setopt($c, CURLOPT_URL, $url);
-			curl_setopt($c, CURLOPT_HEADER, FALSE);
-			curl_setopt($c, CURLOPT_SSL_VERIFYPEER, FALSE);
-			curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
-			$result = curl_exec($c);
-			curl_close($c);
-
-			$result=explode("%",$result);
-			if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
-				QApplication::Log(E_ERROR, get_class($this), "sending ".$url);
-				QApplication::Log(E_ERROR, get_class($this), "receiving ".print_r($result,true));
+			$this->make_ups_products($fields['service']);
+	
+			$fields['service']->RemoveAllItems();
+	
+			$found = 0;
+			$ret = array();
+	
+			$zipcode=str_replace(" ","",$zipcode); //Remove spaces i.e. canada Z1Z 1Z1 to Z1Z1Z1
+			if (strtoupper($country)=="US")
+				$zipcode=substr($zipcode,0,5); //UPS module doesn't support Zip+4 in US
+	
+	
+	
+			foreach($this->service_types as $type=>$desc) {
+				$upsAction =  "3";
+				$url = join(
+					"&",
+					array(
+						"http://www.ups.com/using/services/rave/qcostcgi.cgi?accept_UPS_license_agreement=yes",
+						"10_action=$upsAction",
+						"13_product=" . $type,
+						"14_origCountry=$config[origincountry]",
+						"15_origPostal=".substr($config[originpostcode],0,5),
+						"19_destPostal=".$zipcode,
+						"22_destCountry=$country",
+						"23_weight=" . $weight,
+						"24_value=" . $cart->Total,
+						"25_length=" . $length,
+						"26_width=" . $width,
+						"27_height=" . $height,
+						"47_rateChart=$config[ratecode]",
+						"48_container=$config[package]",
+						"49_residential=1"
+					)
+				);
+	
+				$c = curl_init();
+				curl_setopt($c, CURLOPT_URL, $url);
+				curl_setopt($c, CURLOPT_HEADER, FALSE);
+				curl_setopt($c, CURLOPT_SSL_VERIFYPEER, FALSE);
+				curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
+				$result = curl_exec($c);
+				curl_close($c);
+	
+				$result=explode("%",$result);
+				if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
+					_xls_log(get_class($this) . " sending ".$url,true);
+					_xls_log(get_class($this) . " receiving ".print_r($result,true),true);
+				}
+	
+				if(count($result) < 9)
+					continue;
+	
+				$returnval = $result[10];
+	
+				$fields['service']->AddItem("$desc (" . _xls_currency(floatval($returnval)+ floatval($config['markup'])) . ")" , $type);
+	
+				$ret[$type] = floatval($returnval) + floatval($config['markup']);
+	
+				$found++;
 			}
-
-			if(count($result) < 9)
-				continue;
-
-			$returnval = $result[10];
-
-			$fields['service']->AddItem("$desc (" . _xls_currency(floatval($returnval)+ floatval($config['markup'])) . ")" , $type);
-
-			$ret[$type] = floatval($returnval) + floatval($config['markup']);
-
-			$found++;
+			
+			if($found <=0) {
+				_xls_log("UPS: Could not get ups rate $country , $zipcode .");
+				$fields['service']->Visible = false;
+				return false;
+			}
+			$fields['service']->Visible = true;
+			_xls_stack_put('ShipBasedResults',serialize($ret));
 		}
-
-		if($found <=0) {
-			_xls_log("UPS: Could not get ups rate $country , $zipcode .");
-			$fields['service']->Visible = false;
-			return false;
-		}
-
-		$fields['service']->Visible = true;
-		asort($ret);
+		else 
+			$ret = unserialize(_xls_stack_get('ShipBasedResults'));
+	
+			
 		$arr = array(
 			'price' => false,
 			'msg' => '',
@@ -322,14 +331,33 @@ class ups extends xlsws_class_shipping {
 	 *
 	 */
 	public function check() {
-		if(defined('XLSWS_ADMIN_MODULE'))
-			return true;
-
 		$vals = $this->getConfigValues(get_class($this));
-
+		
 		// if nothing has been configed return null
 		if(!$vals || count($vals) == 0)
 			return false;
+
+		//Check possible scenarios why we would not offer this type of shipping
+		if ($vals['restrictcountry']) { //we have a country restriction
+
+			switch($vals['restrictcountry']) {
+			case 'CUS':
+				if ($_SESSION['XLSWS_CART']->ShipCountry=="US" &&
+					($_SESSION['XLSWS_CART']->ShipState =="AK" || $_SESSION['XLSWS_CART']->ShipState=="HI"))
+					return false;
+				break;
+
+			case 'NORAM':
+				if ($_SESSION['XLSWS_CART']->ShipCountry != "US" && $_SESSION['XLSWS_CART']->ShipCountry != "CA")
+					return false;
+				break;
+
+			default:
+				if ($vals['restrictcountry']!=$_SESSION['XLSWS_CART']->ShipCountry) return false;
+			}
+		}
+
 		return true;
 	}
+
 }

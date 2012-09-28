@@ -45,11 +45,6 @@ class XLSPaginator extends QPaginator {
         // Define amount of pages to view in pagination
         $this->IndexCount = 7;
 
-        // Todo :: This deserves further cleanup
-		if($this->url)
-			$url = $this->url;
-		else
-			$url = "index.php?";
 
         // Define left and right button content
 		$this->strLabelForPrevious = "<img src=\"" .
@@ -89,19 +84,28 @@ class XLSPaginator extends QPaginator {
     public function GetControlHtmlPage($intPageId, $strLabel = '', 
         $blnInner = false) {
 
+        $objUrl = _xls_url_object(); 
+        $strQueryString = $objUrl->QueryString;
+
+		//If we have a page number from the previous URL, remove it so we don't stack it
+		$strQueryString = preg_replace('/page=[\w]+/', '', $strQueryString);
+
         if (!$strLabel)
             $strLabel = $intPageId;
         $strClass = '';
 
         $this->strActionParameter = $intPageId;
 
-        if ($intPageId != $this->intPageNumber)
+        if ($intPageId != $this->intPageNumber) {
             $strLabel = sprintf('<a page="%s" href="%s" %s>%s</a>',
                 $intPageId, 
-                $this->url . "&page={$intPageId}",
-                $this->GetActionAttributes(),
+                _xls_site_url($objUrl->Uri) . "?" . $strQueryString . "&page={$intPageId}",
+                "",
                 $strLabel
-            );
+            ); //(_xls_get_conf('DEBUG_DISABLE_AJAX',0) ? "" : $this->GetActionAttributes())
+	        $strLabel = str_replace("?&","?",$strLabel);
+	        $strLabel = str_replace("&&","&",$strLabel);
+        }
         else $strClass = 'current';
 
         if ($blnInner) return $strLabel;
@@ -129,7 +133,7 @@ class XLSPaginator extends QPaginator {
             $strStyle,
             $this->GetAttributes(true, false)
         );
-
+		$strToReturn .= ' <div class="table"> ';
         $strToReturn .= '  <ul>' . PHP_EOL;
         $strToReturn .= $this->GetControlHtmlPreviousPage();
 
@@ -182,7 +186,26 @@ class XLSPaginator extends QPaginator {
         $strToReturn .= $this->GetControlHtmlNextPage();
 		$strToReturn .= '  </ul>' . PHP_EOL;
 		$strToReturn .= '</div>' . PHP_EOL;
+		$strToReturn .= '</div>' . PHP_EOL;
 
 		return $strToReturn;
     }
+
+	public function __set($strName, $mixValue) {
+		switch ($strName) {
+		case 'LabelForPrevious':
+			$this->strLabelForPrevious = $mixValue;
+			break;
+		case 'LabelForNext':
+			$this->strLabelForNext = $mixValue;
+			break;
+		default:
+			try {
+				return parent::__set($strName, $mixValue);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
+	}
 }

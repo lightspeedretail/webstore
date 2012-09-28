@@ -354,7 +354,7 @@
 				$strParameterArray = array();
 				foreach ($objMethod->GetAllParameters() as $objParameter) {
 					$strParameterDefinition = sprintf('%s %s$%s',
-						($objParameter->IsObject() || $objParameter->Type == QType::DateTime) ? $objParameter->Type : '',
+						($objParameter->Type == QType::DateTime) ? $objParameter->Type : '',
 						($objParameter->Reference) ? '&' : '',
 						$objParameter->Name
 					);
@@ -416,10 +416,10 @@
 		}
 
 		public function GetWsdlTypes($strComplexTypesArray) {
-			$strToReturn = sprintf('<types><schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="%s" ' .
-				'xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">',
+			$strToReturn = sprintf('<types><schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" targetNamespace="%s">',
 				$this->strNamespace);
-
+			$strToReturn .= '<import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>';
+		
 			foreach ($strComplexTypesArray as $strComplexType)
 				$strToReturn .= $strComplexType;
 
@@ -472,6 +472,7 @@
 				'xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" ' .
 				'xmlns:tns="%s" ' .
 				'xmlns:xsd="http://www.w3.org/2001/XMLSchema" ' .
+				'xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"  ' .
 				'xmlns:xsd1="%s">',
 				$this->strClassName, $this->strNamespace, $this->strNamespace, $this->strNamespace);
 

@@ -433,6 +433,10 @@
 			return $this->objMySqliResult->fetch_array();
 		}
 
+		public function FetchObject() {
+			return $this->objMySqliResult->fetch_object();
+		}
+
 		public function FetchFields() {
 			$objArrayToReturn = array();
 			while ($objField = $this->objMySqliResult->fetch_field())

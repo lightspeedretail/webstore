@@ -43,12 +43,16 @@ class authorize_dot_net_aim extends credit_card {
 	 *
 	 */
 	public function name() {
-		$config = $this->getConfigValues('authorize_dot_net_aim');
-
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "";
+		
 		if(isset($config['label']))
-			return $config['label'];
-
-		return "Credit Card";
+			$strName = $config['label'];
+		else $strName =  "Credit Card";
+		
+		if ($config['live']=="test") $strName .= " (TEST MODE)";
+		
+		return $strName;
 	}
 
 	/**
@@ -58,9 +62,12 @@ class authorize_dot_net_aim extends credit_card {
 	 *
 	 */
 	public function admin_name() {
-		return "Authorize.Net Advanced Integration";
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "Authorize.Net";
+		if (!$this->uses_jumper())$strName .= "&nbsp;&nbsp;&nbsp;<font size=2>Advanced Integration</font>";
+		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		return $strName;
 	}
-
 	/**
 	 * The Web Admin panel for configuring this payment option
 	 *
@@ -87,16 +94,22 @@ class authorize_dot_net_aim extends credit_card {
 		$ret['live'] = new XLSListBox($objParent);
 		$ret['live']->Name = _sp('Deployment Mode');
 		$ret['live']->AddItem('live' , 'live');
-		$ret['live']->AddItem('test' , 'test');
-		//$ret['live']->AddItem('dev' , 'dev'); //See note in process() statement about this option
+		$ret['live']->AddItem('sandbox' , 'test');
+		$ret['live']->ToolTip = "To use (TEST MODE) in your regular account, leave this as Live and instead set Test Mode in your Authorize.net account settings on their site. Sandbox should only be used with Authorize.net Sandbox testing servers.";
 
+		$ret['ccv'] = new XLSListBox($objParent);
+		$ret['ccv']->Name = _sp('Use CCV Credit Card Verification');
+		$ret['ccv']->AddItem('Off' , 0);
+		$ret['ccv']->AddItem('On' , 1);
+		$ret['ccv']->ToolTip = "If you have enabled CCV/CVC (Enhanced CCV Handling Filter) in your Authorize.net account, turn this on. Otherwise this should remain off.";
+		
 		$ret['specialcode'] = new XLSTextBox($objParent);
 		$ret['specialcode']->Name = _sp('Special Transaction Code (if any)');
 
 		$ret['ls_payment_method'] = new XLSTextBox($objParent);
 		$ret['ls_payment_method']->Name = _sp('LightSpeed Payment Method');
 		$ret['ls_payment_method']->Required = true;
-		$ret['ls_payment_method']->Text = 'Credit Card';
+		$ret['ls_payment_method']->Text = 'Web Credit Card';
 		$ret['ls_payment_method']->ToolTip = "Please enter the payment method (from LightSpeed) you would like the payment amount to import into";
 
 		return $ret;
@@ -130,7 +143,7 @@ class authorize_dot_net_aim extends credit_card {
 	public function process($cart , $fields, $errortext) {
 		$customer = $this->customer();
 
-		$config = $this->getConfigValues('authorize_dot_net_aim');
+		$config = $this->getConfigValues(get_class($this));
 
 		$auth_net_login_id = $config['login'];
 		$auth_net_tran_key = $config['trans_key'];
@@ -141,7 +154,7 @@ class authorize_dot_net_aim extends credit_card {
 		 * chosen through the Web Admin panel.
 		 *
 		 */
-		if($config['live'] == 'dev')
+		if($config['live'] == 'test')
 			$auth_net_url = "https://test.authorize.net/gateway/transact.dll";
 		else
 			$auth_net_url = "https://secure.authorize.net/gateway/transact.dll";
@@ -183,8 +196,12 @@ class authorize_dot_net_aim extends credit_card {
 			"x_freight"				=> $cart->ShippingSell,
 		);
 
-		if($config['live'] == 'test')
-			$authnet_values['x_test_request'] = 'TRUE';
+		if($config['ccv'] == '1')
+			$authnet_values['x_card_code'] = $fields['ccsec']->Text;
+
+
+		//if($config['live'] == 'test')
+		//	$authnet_values['x_test_request'] = 'TRUE';
 
 		$auth_net_fields = "";
 		foreach( $authnet_values as $key => $value )
@@ -199,8 +216,8 @@ class authorize_dot_net_aim extends credit_card {
 		curl_close ($ch);
 
 		if(_xls_get_conf('DEBUG_PAYMENTS' , false)) {
-			QApplication::Log(E_ERROR, get_class($this), "sending ".$cart->IdStr." for amt ".$cart->Total);
-			QApplication::Log(E_ERROR, get_class($this), "receiving ".$resp);
+			_xls_log(get_class($this) . " sending ".$cart->IdStr." for amt ",true);
+			_xls_log(get_class($this) . " receiving ".$resp,true);
 		}
 		
 		$resp_vals = _xls_delim_to_array($resp , self::x_delim_char);
@@ -208,13 +225,13 @@ class authorize_dot_net_aim extends credit_card {
 
 		if($resp_vals[0] != '1' ) {
 			$this->paid_amount = 0;
-			$errortext = _sp("Your credit card has been declined");
-			return FALSE;
+			$errortext = _sp($resp_vals[3]);
+			return array(false,$errortext);
 		}
 
 		$this->paid_amount = $cart->Total;
 		// on success, return the transaction ID
-		return $resp_vals[4];
+		return array(true,$resp_vals[4]);
 	}
 
 	/**

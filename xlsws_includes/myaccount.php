@@ -37,6 +37,35 @@ class xlsws_myaccount extends xlsws_index {
 	protected $giftregistries; //the list of gift registries associated to the customer
 
 	/**
+	 * build_main - constructor for this controller
+	 * @param none
+	 * @return none
+	 */
+	protected function build_main() {
+		global $XLSWS_VARS;
+
+		$customer = Customer::GetCurrent();
+
+		if($customer)
+			$this->customer = $customer;
+		else
+			_xls_display_msg("Sorry, you have to be logged in to access this page.");
+
+		$this->mainPnl = new QPanel($this,'MainPanel');
+		$this->mainPnl->Template = templateNamed('myaccount.tpl.php');
+
+		$this->crumbs[] = array('link'=>'myaccount/pg' , 'case'=> '' , 'name'=> _sp('My account'));
+
+		$this->get_orders();
+		$this->get_repairs();
+
+		$this->giftregistries = GiftRegistry::QueryArray(QQ::Equal(QQN::GiftRegistry()->CustomerId, Customer::GetCurrent()->Rowid));
+		
+		_xls_add_formatted_page_title('My Account');
+		
+	}
+	
+	/**
 	 * get_orders - get list of orders for this customer
 	 * @param none
 	 * @return none
@@ -75,31 +104,7 @@ class xlsws_myaccount extends xlsws_index {
 		);
 	}
 
-	/**
-	 * build_main - constructor for this controller
-	 * @param none
-	 * @return none
-	 */
-	protected function build_main() {
-		global $XLSWS_VARS;
-
-		$customer = Customer::GetCurrent();
-
-		if($customer)
-			$this->customer = $customer;
-		else
-			_xls_display_msg("Sorry, you have to be logged in to access this page.");
-
-		$this->mainPnl = new QPanel($this);
-		$this->mainPnl->Template = templateNamed('myaccount.tpl.php');
-
-		$this->crumbs[] = array('key'=>'xlspg=myaccount' , 'case'=> '' , 'name'=> _sp('My account'));
-
-		$this->get_orders();
-		$this->get_repairs();
-
-		$this->giftregistries = GiftRegistry::QueryArray(QQ::Equal(QQN::GiftRegistry()->CustomerId, Customer::GetCurrent()->Rowid));
-	}
+	
 }
 
 if(!defined('CUSTOM_STOP_XLSWS'))

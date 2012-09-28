@@ -20,7 +20,7 @@
 
 /**
  * Framework template SRO Track individual item details 
- * only comes up directly with /index.php?xlspg=sro_track
+ * only comes up directly with sro-track/pg
  * when logged in
  *
  */
@@ -32,12 +32,13 @@
 <div class="border">
     <b>ID #</b><?php _xt($_ITEM->LsId); ?><br/>
     Lodged: <b><?php _xt($_ITEM->DatetimeCre); ?></b><br/>
-    Status: <span class="<?= $this->sro_status_css($_ITEM->Status); ?>"><?php _xt($_ITEM->Status); ?></span><br/>
-    <a href="#" <?php $this->pxySro->RenderAsEvents($_ITEM->Rowid); ?>><?php _xt("View"); ?><a/>
+	Status: <?php _xt($_ITEM->Status); ?><br/>
+	<a href="<?php echo _xls_site_url('sro-track/pg?dosearch=true&orderid='.$_ITEM->LsId.'&emailphone='.$_ITEM->CustomerEmailPhone); ?>"><?php _xt("View"); ?></a>
 </div>
 
 <?php
-    if ((($_CONTROL->CurrentItemIndex % 2) != 0) ||
-        ($_CONTROL->CurrentItemIndex == count($_CONTROL->DataSource) - 1))
-        _xt('<br style="clear:both;"/>', false);
+if ((($_CONTROL->CurrentItemIndex % 2) != 0) ||
+	($_CONTROL->CurrentItemIndex == count($_CONTROL->DataSource) - 1))
+	echo '<br style="clear:both;"/>';
 ?>
+

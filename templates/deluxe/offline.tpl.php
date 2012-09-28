@@ -77,7 +77,7 @@
 			     ?>" />
 				
 				<h1><?php _xt("Please check back later."); ?></h1>
-				<h2><?php _xt("Feel free to contact us at"); ?> <strong><?= _xls_get_conf('STORE_PHONE') ?></strong> <?php _xt("or by email at"); ?>  <a href="mailto:<?= _xls_get_conf('ADMIN_EMAIL'); ?>"><?= _xls_get_conf('ADMIN_EMAIL'); ?></a></h2>
+				<h2><?php _xt("Feel free to contact us at"); ?> <strong><?= _xls_get_conf('STORE_PHONE') ?></strong> <?php _xt("or by email at"); ?>  <a href="mailto:<?= _xls_get_conf('EMAIL_FROM'); ?>"><?= _xls_get_conf('EMAIL_FROM'); ?></a></h2>
 			</div>
 		</div>
 		

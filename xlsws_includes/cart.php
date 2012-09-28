@@ -46,7 +46,68 @@ class xlsws_cart extends xlsws_index {
 
 	protected $pxyBackToCart; // Actions to perform when clicking Continue
 	protected $pxyCheckOut; // Actions to do on checkout
+	
 
+	/**
+	 * build_main - constructor for this controller
+	 * @param none
+	 * @return none
+	 */
+	protected function build_main() {
+		global $XLSWS_VARS;
+
+		//is there a Get Cart?
+		if(isset($XLSWS_VARS['getcart'])) {
+			try {
+				Cart::LoadCartByLink($XLSWS_VARS['getcart']);
+				_rd(_xls_site_url("cart/pg"));
+			} catch (Exception $objExc) {
+				_xls_display_msg($objExc->getMessage());
+			}
+		}
+
+		$this->cart = Cart::GetCart();
+
+		if ($this->cart->Count == 0)
+			_xls_display_msg(_sp("Your cart is empty. " .
+				"Please add items to this cart."));
+
+		$this->mainPnl = new QPanel($this,'MainPanel');
+		$this->mainPnl->Template = templateNamed('cart.tpl.php');
+		$this->mainPnl->AutoRenderChildren = false;
+
+		$this->crumbs[] = array('link'=>'cart/pg',
+			'case'=> '',
+			'name'=> _sp('Edit Cart'));
+
+		//new XLSGrid($this->mainPnl);
+		$this->dtgCart = new QDataRepeater($this->mainPnl);
+		$this->dtgCart->Template = templateNamed('cart_item.tpl.php');
+		$this->dtgCart->UseAjax = true;
+		$this->dtgCart->SetDataBinder('dtgCart_Bind');
+
+		$this->misc_components['order_subtotal'] =
+			new QLabel($this->mainPnl);
+		$this->misc_components['order_subtotal']->Text =
+			$this->cart->Subtotal;
+		$this->misc_components['order_subtotal']->CssClass =
+			"cart_line_selltotal";
+
+		if(_xls_get_conf('TAX_INCLUSIVE_PRICING','') == '1')
+			$this->misc_components['order_subtotal']->Display = false;
+
+		if($this->cart->FkTaxCodeId >= 0){
+			$this->order_display_tax($this->cart , $this->mainPnl);
+		}
+
+		$this->build_widgets();
+		$this->pxyBackToCart = new QControlProxy($this);
+		$this->pxyCheckOut = new QControlProxy($this);
+		$this->bind_widgets();
+
+	}
+	
+	
 	/**
 	 * build_update_widget - builds the update cart submit button
 	 * @param none
@@ -82,6 +143,9 @@ class xlsws_cart extends xlsws_index {
 		}
 	}
 
+
+	
+	
 	/**
 	 * build_send_box - builds the send cart modal box
 	 * @param none
@@ -128,63 +192,7 @@ class xlsws_cart extends xlsws_index {
 			new QJavaScriptAction('return false;'));
 	}
 
-	/**
-	 * build_main - constructor for this controller
-	 * @param none
-	 * @return none
-	 */
-	protected function build_main() {
-		global $XLSWS_VARS;
 
-		//is there a Get Cart?
-		if(isset($XLSWS_VARS['getcart'])) {
-			try {
-				Cart::LoadCartByLink($XLSWS_VARS['getcart']);
-				_rd("index.php?xlspg=cart");
-			} catch (Exception $objExc) {
-				_xls_display_msg($objExc->getMessage());
-			}
-		}
-
-		$this->cart = Cart::GetCart();
-
-		if ($this->cart->Count == 0)
-			_xls_display_msg(_sp("Your cart is empty. " .
-				"Please add items to this cart."));
-
-		$this->mainPnl = new QPanel($this);
-		$this->mainPnl->Template = templateNamed('cart.tpl.php');
-		$this->mainPnl->AutoRenderChildren = false;
-
-		$this->crumbs[] = array('key'=>'xlspg=cart',
-			'case'=> '',
-			'name'=> _sp('Shopping Cart'));
-
-		//new XLSGrid($this->mainPnl);
-		$this->dtgCart = new QDataRepeater($this->mainPnl);
-		$this->dtgCart->Template = templateNamed('cart_item.tpl.php');
-		$this->dtgCart->UseAjax = true;
-		$this->dtgCart->SetDataBinder('dtgCart_Bind');
-
-		$this->misc_components['order_subtotal'] =
-			new QLabel($this->mainPnl);
-		$this->misc_components['order_subtotal']->Text =
-			$this->cart->Subtotal;
-		$this->misc_components['order_subtotal']->CssClass =
-			"cart_line_selltotal";
-
-		if(_xls_get_conf('TAX_INCLUSIVE_PRICING','') == '1')
-			$this->misc_components['order_subtotal']->Display = false;
-
-		if($this->cart->FkTaxCodeId >= 0){
-			$this->order_display_tax($this->cart , $this->mainPnl);
-		}
-
-		$this->build_widgets();
-		$this->pxyBackToCart = new QControlProxy($this);
-		$this->pxyCheckOut = new QControlProxy($this);
-		$this->bind_widgets();
-	}
 
 	/**
 	 * check_out_customer_register
@@ -198,16 +206,10 @@ class xlsws_cart extends xlsws_index {
 	protected function check_out_customer_register($strFormId, $strControlId, $strParameter){
 		$customer = Customer::GetCurrent();
 
-		// 170209 - request by ian to go the checkout page direct
-		_rd("index.php?xlspg=checkout");
+		_rd("checkout/pg");
 
 		return;
 
-		// if loggged in - to go the shipping page
-		if($customer)
-			_rd("index.php?xlspg=checkout");
-
-		_rd("index.php?xlspg=checkout_customer");
 	}
 
 	/**
@@ -374,22 +376,17 @@ class xlsws_cart extends xlsws_index {
 	}
 
 	/**
-	 * showCart - Default function meant to be overriden by other functions to show the cart, default is false
+	 * showCart - Show side Minicart
 	 * @param none
 	 * @return none
 	 */
 	protected function showCart(){
-		return false;
-	}
-
-	/**
-	 * showDark - Default function meant to be overriden by other functions to show the darkness in the cart
-	 * @param none
-	 * @return none
-	 */
-	protected function showDark(){
 		return true;
 	}
+	protected function showCheckout(){
+		return true;
+	}
+
 }
 
 if(!defined('CUSTOM_STOP_XLSWS'))

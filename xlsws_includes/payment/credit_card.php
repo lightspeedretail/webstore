@@ -38,7 +38,7 @@ class credit_card extends xlsws_class_payment {
 	 * @return string
 	 */
 	public function name() {
-		$config = $this->getConfigValues('credit_card');
+		$config = $this->getConfigValues(get_class($this));
 
 		return "Sample Credit Card. Reference only access";
 	}
@@ -80,11 +80,13 @@ class credit_card extends xlsws_class_payment {
 		$ret['ccnum']->Name = _sp('Card Number');
 		$ret['ccnum']->Required = true;
 		$ret['ccnum']->DisplayStyle = QDisplayStyle::Block;
+		$ret['ccnum']->SetCustomAttribute('autocomplete', 'off');
 
 		$ret['ccsec'] = new XLSTextBox($objParent);
 		$ret['ccsec']->Name = _sp('CVV');
 		$ret['ccsec']->Required = true;
 		$ret['ccsec']->Width = 40;
+		$ret['ccsec']->SetCustomAttribute('autocomplete', 'off');
 
 		$ret['ccname'] = new XLSTextBox($objParent);
 		$ret['ccname']->Name = _sp('Name on Card');
@@ -119,7 +121,7 @@ class credit_card extends xlsws_class_payment {
 		// check if card is expired
 		if(date('Y-m') > $exp) {
 			$fields['ccexpmon']->Warning = _sp("Expired");
-			Visitor::add_view_log('',ViewLogType::invalidcreditcard,'',"Expired year/month given $exp");
+
 			return false;
 		}
 
@@ -130,7 +132,7 @@ class credit_card extends xlsws_class_payment {
 				$fields['ccnum']->Warning = _sp($errortext);
 			else
 				$fields['ccnum']->Warning = _sp("Invalid credit card number");
-			Visitor::add_view_log('',ViewLogType::invalidcreditcard,'',$fields['ccnum']->Text);
+
 			return false;
 		}
 

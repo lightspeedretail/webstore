@@ -30,21 +30,38 @@ include_once('usaepay.php');
 class axia extends credit_card {
 	private $paid_amount;
 
-	public function admin_name() {
-		return "Axia via USAEpay";
-	}
-
+	/**
+	 * The name of the payment module that will be displayed in the checkout page
+	 * @return string
+	 *
+	 *
+	 */
 	public function name() {
-
-		$config = $this->GetConfigurationValues('axia');
-
-		if(isset($config['label'])) {
-			return $config['label'];
-		}
-
-		return "Credit Card";
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "";
+		
+		if(isset($config['label']))
+			$strName = $config['label'];
+		else $strName =  "Credit Card";
+		
+		if ($config['live']=="test") $strName .= " (TEST MODE)";
+		
+		return $strName;
 	}
 
+	/**
+	 * The name of the payment module that will be displayed in Web Admin payments
+	 * @return string
+	 *
+	 *
+	 */
+	public function admin_name() {
+		$config = $this->getConfigValues(get_class($this));
+		$strName = "Axia via USAEpay";
+		if (!$this->uses_jumper())$strName .= "&nbsp;&nbsp;&nbsp;<font size=2>Advanced Integration</font>";
+		if ($config['live']=="test") $strName .= " **IN TEST MODE**";
+		return $strName;
+	}
 	public function config_fields($objParent) {
 		$ret= array();
 
@@ -73,7 +90,7 @@ class axia extends credit_card {
 		$ret['ls_payment_method'] = new XLSTextBox($objParent);
 		$ret['ls_payment_method']->Name = _sp('LightSpeed Payment Method');
 		$ret['ls_payment_method']->Required = true;
-		$ret['ls_payment_method']->Text = 'Credit Card';
+		$ret['ls_payment_method']->Text = 'Web Credit Card';
 		$ret['ls_payment_method']->ToolTip = "Please enter the payment method (from LightSpeed) you would like the payment amount to import into";
 
 		return $ret;
@@ -148,12 +165,12 @@ class axia extends credit_card {
 			return $tran->refnum;
 		} else {
 			$this->paid_amount = 0;
-			$errortext = _sp("Your credit card has been declined");
-			return FALSE;
+			$errortext = _sp($tran->error);
+			return array(false,$errortext);
 		}
 
 		$this->paid_amount = $cart->Total;
-		return $resp_vals[4];
+		return array(true,$resp_vals[4]);
 	}
 
 	public function paid_amount(Cart $cart){

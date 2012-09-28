@@ -26,9 +26,9 @@
  */
 
 ?>
-
 <div>
-			<div class="product_details border rounded" style="display: block; float: left;">
+
+			<div class="product_details border rounded">
 				
 				<div class="left">
 					<?php $this->pnlImgHolder->Render(); ?><br style="clear: both;" />
@@ -36,7 +36,7 @@
 					<div class="small_imgs">
 					<?php foreach($this->arrAdditionalProdImages as $img): ?>
 						<?php if($img && ($img instanceof Images)): ?>
-							<a href="#" <?php $this->pxyEnlarge->RenderAsEvents($img->Rowid) ?>><img src="<?= Images::GetUrl($img->Rowid , Images::SMALL); ?>" alt="" class="" style="height: 40px; width: 40px;"/></a>
+							<a href="#" <?php $this->pxyEnlarge->RenderAsEvents($img->Rowid) ?>><img src="<?= Images::GetImageLink($img->Rowid , Images::SMALL); ?>" alt="" class="" style="height: 40px; width: 40px;"/></a>
 						<?php endif; ?>
 					<?php endforeach; ?>
 					<?php if(_xls_get_conf('PRODUCT_ENLARGE_SHOW_LIGHTBOX' , 1)): ?>
@@ -52,7 +52,7 @@
 					<a href="#" class="wishlist rounded-bottom" <?php  $this->misc_components['show_gift_registry']->RenderAsEvents('show') ?>><img src="<?= templateNamed('css') ; ?>/images/wishlist.png" /><?php _xt("Add to Wish List"); ?></a>
 					<?php endif; ?>
 					
-					<a href="#" <?php  $this->misc_components['add_to_cart']->RenderAsEvents($this->prod->Code) ?>><span class="addcart rounded-bottom"><img src="<?= templateNamed('css') ; ?>/images/addtocart.png" /><?php _xt("Add to Cart"); ?></span></a><br />
+					<a href="#" <?php  $this->misc_components['add_to_cart']->RenderAsEvents($this->prod->Code) ?>><span class="addcart rounded-bottom"><img src="<?= templateNamed('css') ; ?>/images/addtocart.png" /><?php _xt("Add to Cart"); ?></span></a>
 					<?php else:?>
 						<p style="margin-top: 100px;"></p> 
 				<?php endif; ?>
@@ -61,8 +61,10 @@
 				<?php $this->giftRegistryPnl->Render(); ?>
 				
 				
-				 <h1><?php $this->lblTitle->Render(); ?></h1> 
-				 <h2><?= $this->prod->Code ?><!-- <?= $this->prod->Rowid ?>--></h2>
+				 <h1><?php $this->lblTitle->Render(); ?></h1>
+				 <?php if(_xls_get_conf('SHOW_TEMPLATE_CODE' , 1)): ?>
+				 <h2><?= $this->prod->Code ?></h2>
+				<?php endif; ?>	
 
 				<?php	if(_xls_get_conf('INVENTORY_DISPLAY')):	?>
 					<h3><?php $this->lblStock->Render() ; ?></h3>
@@ -76,18 +78,11 @@
 
 				<?php $this->lstSize->Render(); ?>
 				<?php $this->lstColor->Render(); ?>
-
 					
-				
-		<?php  if(($this->prod->SellWeb != 0) && ($this->prod->SellWeb < $this->prod->Sell)): ?>
-				<!--  
-				<div class="price_reg"><?php _xt("Regular Price"); ?> : <strike><?= _xls_currency($this->prod->Sell) ; ?></strike></div>
-				-->
+				<div class="price_reg"><?php $this->lblOriginalPrice->Render(); ?></div>
 				<div class="price"><?php _xt("Price"); ?>: <?php $this->lblPrice->Render(); ?></div>
-		<?php else: ?>
-				<div class="price"><?php _xt("Price"); ?>: <?php $this->lblPrice->Render(); ?></div>
-		<?php endif; ?>				
-				
+				<?php $this->pnlSharingTools->Render(); ?>
+
 				<div class="description"><?php $this->lblDescription->Render() ; ?></div>
 
 

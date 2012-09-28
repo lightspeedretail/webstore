@@ -21,7 +21,7 @@
 /**
  * Framework template View order header details (id, date, status, notes) 
  * calls other views
- * Called from /index.php?xlspg=order_track&getuid=xxxxxxxxxx
+ * Called from /order-track/pg?getuid=xxxxxxxxxx
  *
  */
 
@@ -31,7 +31,7 @@ if($this->order): ?>
 
 	
 
-<?php $this->lblOrderMsg->Render(); ?>	
+<h1 style="text-align: center; margin: -25px 0 25px 0;"><?php $this->lblOrderMsg->Render(); ?></h1>	
 
 
 	<div class="border rounded">
@@ -41,7 +41,8 @@ if($this->order): ?>
 		<p class="borderp">
 		<?php _xt('Order ID') ?>: <?php $this->lblIdStr->Render() ?><br />
 		<?php _xt('Date') ?>: <?php $this->lblOrderDate->Render() ?><br />
-		<?php _xt('Status') ?>: <?php $this->lblOrderStatus->Render() ?>
+		<?php _xt('Status') ?>: <?php $this->lblOrderStatus->Render() ?><br />
+		<?php _xt('Payment Transaction #') ?>: <?php $this->lblOrderPaymentData->Render() ?>
 		</p>
 	</div>
 	
@@ -64,4 +65,5 @@ if($this->order): ?>
 
 
 <br style="clear:both"/>
+<?php $this->lblConversionCode->Render(); ?>
 <?php endif; ?>

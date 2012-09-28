@@ -27,6 +27,12 @@
 if (!empty(QApplication::$Database)) {
 	if (!defined('__PREPEND_QUICKINIT__')) {
 		global $XLSWS_VARS;
+
+		foreach ($_GET as $key => $val)
+			$_GET[$key] = preg_replace('/<(style|script).*?<\/\1>/xmsi', '', $val);
+		foreach ($_POST as $key => $val)
+			$_POST[$key] = preg_replace('/<(style|script).*?<\/\1>/xmsi', '', $val);
+
 		$XLSWS_VARS = array_merge($_GET, $_POST);
 
 		global $customer;

@@ -33,7 +33,7 @@
 
 <?php _xt("Please visit the site using the following link.") ?><br/><br/>
 
-<?= _xls_site_dir() . "/index.php?xlspg=gift_search_detail&gift_token=" . $gift->GiftCode ?><br/><br/>
+<?= _xls_site_url("gift_search_detail/pg") . "?gift_token=" . $gift->GiftCode ?><br/><br/>
 
 <?php _xt("Wish List Password: ") ?><strong><?= $gift->RegistryPassword ?></strong><br/><br/>
 

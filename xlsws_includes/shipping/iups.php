@@ -34,18 +34,18 @@ class iups extends xlsws_class_shipping {
 	public $service_types;
 		//US ORIGIN
 	protected $ups_service_us = array (
-		'01' => 'UPS Next Day Air',
-		'02' => 'UPS 2nd Day Air',
 		'03' => 'UPS Ground',
-		'07' => 'UPS Worldwide Express',
-		'08' => 'UPS Worldwide Expedited',
 		'11' => 'UPS Standard',
 		'12' => 'UPS 3 Day Select',
+		'02' => 'UPS 2nd Day Air',
 		'13' => 'UPS Next Day Air Saver',
+		'01' => 'UPS Next Day Air',
 		'14' => 'UPS Next Day Air Early A.M.',
+		'65' => 'UPS Express Saver',
+		'07' => 'UPS Worldwide Express',
+		'08' => 'UPS Worldwide Expedited',
 		'54' => 'UPS Worldwide Express Plus',
 		'59' => 'UPS 2nd Day Air A.M.',
-		'65' => 'UPS Express Saver',
 		'82' => 'UPS Today Standard',
 		'83' => 'UPS Today Dedicated',
 		'84' => 'UPS Today Intercity',
@@ -54,15 +54,16 @@ class iups extends xlsws_class_shipping {
 
 
 	protected $ups_service_eu = array (
-		'01' => 'UPS Next Day Air',
-		'02' => 'UPS 2nd Day Air',
 		'03' => 'UPS Ground',
-		'07' => 'UPS Worldwide Express',
-		'08' => 'UPS Worldwide Expedited',
 		'11' => 'UPS Standard',
 		'12' => 'UPS 3 Day Select',
+		'02' => 'UPS 2nd Day Air',
 		'13' => 'UPS Next Day Air Saver',
+		'01' => 'UPS Next Day Air',
 		'14' => 'UPS Next Day Air Early A.M.',
+		'07' => 'UPS Worldwide Express',
+		'08' => 'UPS Worldwide Expedited',
+
 		'54' => 'UPS Worldwide Express Plus',
 		'59' => 'UPS 2nd Day Air A.M.',
 		'65' => 'UPS Express Saver',
@@ -73,15 +74,15 @@ class iups extends xlsws_class_shipping {
 	);
 
 	protected $ups_service_ca = array (
-		'01' => 'UPS Next Day Air',
-		'02' => 'UPS 2nd Day Air',
 		'03' => 'UPS Ground',
-		'07' => 'UPS Worldwide Express',
-		'08' => 'UPS Worldwide Expedited',
 		'11' => 'UPS Standard',
 		'12' => 'UPS 3 Day Select',
+		'02' => 'UPS 2nd Day Air',
 		'13' => 'UPS Next Day Air Saver',
-		'14' => 'UPS Next Day Air Early A.M.',
+		'01' => 'UPS Next Day Air',
+		'14' => 'UPS Next Day Air Early A.M.',	
+		'07' => 'UPS Worldwide Express',
+		'08' => 'UPS Worldwide Expedited',
 		'54' => 'UPS Worldwide Express Plus',
 		'59' => 'UPS 2nd Day Air A.M.',
 		'65' => 'UPS Express Saver',
@@ -93,11 +94,12 @@ class iups extends xlsws_class_shipping {
 
 	//From Other origin
 	protected $ups_service_other = array (
+		'11' => 'UPS Standard',
+		'65' => 'UPS Saver',
 		'07' => 'UPS Express',
 		'08' => 'UPS Worldwide Expedited',
-		'11' => 'UPS Standard',
-		'54' => 'UPS Worldwide Express Plus',
-		'65' => 'UPS Saver'
+		'54' => 'UPS Worldwide Express Plus'
+		
 	);
 
 	var $userid;
@@ -107,6 +109,7 @@ class iups extends xlsws_class_shipping {
 	var $upstool='https://www.ups.com/ups.app/xml/Rate';
 	var $request;
 	var $service;
+	var $customerclassification;
 	var $pickuptype='01'; // 01 daily pickup
 	  /* Pickup Type
 		01- Daily Pickup
@@ -156,45 +159,41 @@ class iups extends xlsws_class_shipping {
 	}
 	
 
-	/**
-	 * The name of the shipping module that will be displayed in the checkout page
-	 * @return string
-	 *
-	 *
-	 */
-	 public function name() {
-		$config = $this->getConfigValues(get_class($this));
-
-		if(isset($config['label']))
-			return $config['label'];
-
-		return $this->admin_name();
-	}
-
-	/**
-	 * The name of the shipping module that will be displayed in Web Admin payments
-	 * @return string
-	 *
-	 *
-	 */
-	public function admin_name() {
-		return _sp("IUPS");
-	}
+	protected $strModuleName = "IUPS";
 
 	public function check() {
-		if(defined('XLSWS_ADMIN_MODULE'))
-			return true;
-
 		$vals = $this->getConfigValues(get_class($this));
-
+		
 		// if nothing has been configed return null
 		if(!$vals || count($vals) == 0)
 			return false;
+
+		//Check possible scenarios why we would not offer this type of shipping
+		if ($vals['restrictcountry']) { //we have a country restriction
+
+			switch($vals['restrictcountry']) {
+			case 'CUS':
+				if ($_SESSION['XLSWS_CART']->ShipCountry=="US" &&
+					($_SESSION['XLSWS_CART']->ShipState =="AK" || $_SESSION['XLSWS_CART']->ShipState=="HI"))
+					return false;
+				break;
+
+			case 'NORAM':
+				if ($_SESSION['XLSWS_CART']->ShipCountry != "US" && $_SESSION['XLSWS_CART']->ShipCountry != "CA")
+					return false;
+				break;
+
+			default:
+				if ($vals['restrictcountry']!=$_SESSION['XLSWS_CART']->ShipCountry) return false;
+			}
+		}
+
 		return true;
 	}
 
+
 	protected function make_iups_products($field) {
-		$config = $this->getConfigValues('iups');
+		$config = $this->getConfigValues(get_class($this));
 		$region = $config['regionservices'];
 
 		$this->service_types = $values = $this->$region;
@@ -267,12 +266,21 @@ class iups extends xlsws_class_shipping {
 
 		$ret['ratecode'] = new XLSListBox($objParent);
 		$ret['ratecode']->Name = _sp('Rate Code');
-		$ret['ratecode']->AddItem('Regular Daily Pickup', 'Regular+Daily+Pickup');
-		$ret['ratecode']->AddItem('On Call Air', 'On+Call+Air');
-		$ret['ratecode']->AddItem('One Time Pickup', 'One+Time+Pickup');
-		$ret['ratecode']->AddItem('Letter Center', 'Letter+Center');
-		$ret['ratecode']->AddItem('Customer Counter', 'Customer+Counter');
+		$ret['ratecode']->AddItem('Regular Daily Pickup', '01');
+		$ret['ratecode']->AddItem('Suggested Retail Rates', '11');
+		$ret['ratecode']->AddItem('On Call Air', '07');
+		$ret['ratecode']->AddItem('One Time Pickup', '06');
+		$ret['ratecode']->AddItem('Letter Center', '19');
+		$ret['ratecode']->AddItem('Customer Counter', '03');
+		$ret['ratecode']->AddItem('Air Service Center', '20');
 
+	
+		$ret['customerclassification'] = new XLSListBox($objParent);
+		$ret['customerclassification']->Name = _sp('Customer Classification');
+		$ret['customerclassification']->AddItem('Retail', '04');
+		$ret['customerclassification']->AddItem('Occasional', '03');
+		$ret['customerclassification']->AddItem('Wholesale', '01');                   
+                    
 		$ret['package'] = new XLSListBox($objParent);
 		$ret['package']->Name = _sp('Packaging');
 		$ret['package']->AddItem('Customer Packaging', 'CP');
@@ -282,8 +290,18 @@ class iups extends xlsws_class_shipping {
 		$ret['package']->AddItem('UPS Worldwide 25 kilo', 'UW25');
 		$ret['package']->AddItem('UPS Worldwide 10 kilo', 'UW10');
 
+		$ret['restrictcountry'] = new XLSListBox($objParent);
+		$ret['restrictcountry']->Name = _sp('Only allow '.$this->strModuleName.' to');
+		$ret['restrictcountry']->AddItem('Everywhere (no restriction)', null);
+		$ret['restrictcountry']->AddItem('My Country ('. _xls_get_conf('DEFAULT_COUNTRY').')', _xls_get_conf('DEFAULT_COUNTRY'));
+		if (_xls_get_conf('DEFAULT_COUNTRY')=="US")
+			$ret['restrictcountry']->AddItem('Continental US', 'CUS'); //Really common request, so make a special entry
+		$ret['restrictcountry']->AddItem('North America (US/CA)', 'NORAM');
+		$ret['restrictcountry']->Enabled = true;
+		$ret['restrictcountry']->SelectedIndex = 0;
+           		
 		$ret['product'] = new XLSTextBox($objParent);
-		$ret['product']->Name = _sp('LightSpeed Product Code');
+		$ret['product']->Name = _sp('LightSpeed Product Code (case sensitive)');
 		$ret['product']->Required = true;
 		$ret['product']->Text = 'SHIPPING';
 
@@ -308,17 +326,17 @@ class iups extends xlsws_class_shipping {
 
 	public function customer_fields($objParent) {
 		$ret = array();
-		$config = $this->getConfigValues('iups');
+		$config = $this->getConfigValues(get_class($this));
 
-		$ret['service'] = new XLSListBox($objParent);
+		$ret['service'] = new XLSListBox($objParent,'ModuleMethod');
 		$this->make_iups_products($ret['service']);
-		$ret['service']->Name = _sp('Preference:');
+		//$ret['service']->Name = _sp('Preference:');
 		//$ret['product']->SelectedValue = $config['defaultproduct'];
 		return $ret;
 	}
 
 	public function total($fields, $cart, $country = '', $zipcode = '', $state = '', $city = '', $address2 = '', $address1 = '', $company = '', $lname = '', $fname = '') {
-		$config = $this->getConfigValues('iups');
+		$config = $this->getConfigValues(get_class($this));
 
 		if(empty($config['originpostcode']) || empty($config['origincountry']) || empty($config['username']) || empty($config['accesskey']))
 			return false;
@@ -329,70 +347,85 @@ class iups extends xlsws_class_shipping {
 		$this->userid = $config['username'];
 		$this->passwd = $config['password'];
 		$this->accesskey = $config['accesskey'];
+		$this->customerclassification = $config['customerclassification'];
+		$this->pickuptype = $config['ratecode'];
 		$this->currency = $cart->Currency;
 
-		$weight = $cart->total_weight();
+		$weight = $cart->Weight;
 		$this->weight_type = strtoupper(_xls_get_conf('WEIGHT_UNIT', 'lb'));
 		$this->weight_type .= "S"; // Add KGS or LBS
 
-		$length = $cart->total_length();
-		$width = $cart->total_width();
-		$height = $cart->total_height();
+		$length = $cart->Length;
+		$width = $cart->Width;
+		$height = $cart->Height;
 		$this->measurement_type = strtoupper(_xls_get_conf('DIMENSION_UNIT', 'in'));
 
 		$selected = $fields['service']->SelectedValue;
 
-		$this->make_iups_products($fields['service']);
 
-		$fields['service']->RemoveAllItems();
+		$strShipData=serialize(array(__class__,$weight,$address1,$zipcode));	
+		if (_xls_stack_get('ShipBasedOn') != $strShipData) {
+			_xls_stack_put('ShipBasedOn',$strShipData);
 
-		$found = 0;
-		$ret = array();
 
-			$rates = $this->rate(
-				$selected,
-				$zipcode,
-				$state,
-				$country,
-				$weight,
-				$length,
-				$width,
-				$height,
-				($company!='') ? 0 : 1,
-				$cart->Total,
-				$this->package_type
-			);
+			$this->make_iups_products($fields['service']);
+	
+			$fields['service']->RemoveAllItems();
+	
+			$found = 0;
+			$ret = array();
+	
+				$rates = $this->rate(
+					$selected,
+					$zipcode,
+					$state,
+					$country,
+					$weight,
+					$length,
+					$width,
+					$height,
+					($company!='') ? 0 : 1,
+					$cart->Total,
+					$this->package_type
+				);
+	
+				if($rates === false) {
+					$fields['service']->Visible = false;
+					return false;
+				}
 
-			if($rates === false) {
+			asort($rates,SORT_NUMERIC);
+			
+			foreach($rates as $type=>$rate) {
+				if(isset($this->service_types[$type]))
+					$desc = $this->service_types[$type];
+				else
+					$desc = "UPS $type";
+	
+				$fields['service']->AddItem("$desc (" . _xls_currency(floatval($rate) + floatval($config['markup'])) . ")" , $type);
+	
+				$ret[$type] = floatval($rate) + floatval($config['markup']);
+	
+				$found++;
+			}
+			
+
+			if($found <=0) {
+				QApplication::Log(E_ERROR, __CLASS__,
+					'Could not get shipping information for '.$state." ".$zipcode." ".$country);
+				QApplication::Log(E_ERROR, __CLASS__,
+					"Shipper Response: " . print_r($rates,TRUE));
+	
 				$fields['service']->Visible = false;
 				return false;
 			}
-
-		foreach($rates as $type=>$rate) {
-			if(isset($this->service_types[$type]))
-				$desc = $this->service_types[$type];
-			else
-				$desc = "UPS $type";
-
-			$fields['service']->AddItem("$desc (" . _xls_currency(floatval($rate) + floatval($config['markup'])) . ")" , $type);
-
-			$ret[$type] = floatval($rate) + floatval($config['markup']);
-
-			$found++;
+	
+			$fields['service']->Visible = true;
+			_xls_stack_put('ShipBasedResults',serialize($ret));
 		}
-
-		if($found <=0) {
-			QApplication::Log(E_ERROR, __CLASS__,
-				'Could not get shipping information for '.$state." ".$zipcode." ".$country);
-			QApplication::Log(E_ERROR, __CLASS__,
-				"Shipper Response: " . print_r($rates,TRUE));
-
-			$fields['service']->Visible = false;
-			return false;
-		}
-
-		$fields['service']->Visible = true;
-
+		else 
+			$ret = unserialize(_xls_stack_get('ShipBasedResults'));
+	
 		$arr = array(
 			'price' => false,
 			'msg' => '',
@@ -493,158 +526,87 @@ class iups extends xlsws_class_shipping {
 	function construct_request_xml(){
 		$currency_code = $this->currency;
 
-		$customer_classification = '';
+		$customer_classification = $this->customerclassification;
+		
+		if ($customer_classification=='')
+			$customer_classification='04';
 
-		if ($this->s_country == 'US' && $this->pickuptype == '11') {
+		if ($this->pickuptype=='')
+			$this->pickuptype='01';
 
-			$customer_classification=<<<EOT
-
-	<CustomerClassification>
-
-		<Code>04</Code>
-
-	</CustomerClassification>
-
-EOT;
-
-		}
-
-
-		$xml=<<<EOT
-
-<?xml version="1.0"?>
-
+		$xml='<?xml version="1.0"?>
 <AccessRequest xml:lang="en-US">
-
-	<AccessLicenseNumber>$this->accesskey</AccessLicenseNumber>
-
-	<UserId>$this->userid</UserId>
-
-	<Password>$this->passwd</Password>
-
+	<AccessLicenseNumber>'.$this->accesskey.'</AccessLicenseNumber>
+	<UserId><![CDATA['.$this->userid.']]></UserId>
+	<Password><![CDATA['.$this->passwd.']]></Password>
 </AccessRequest>
-
 <?xml version="1.0"?>
-
-<RatingServiceSelectionRequest xml:lang='en-US'>
-
+<RatingServiceSelectionRequest xml:lang=\'en-US\'>
   <Request>
-
 	<TransactionReference>
-
 	  <CustomerContext>Rating and Service</CustomerContext>
-
 	  <XpciVersion>1.0001</XpciVersion>
-
 	</TransactionReference>
-
 	<RequestAction>Rate</RequestAction>
-
 	<RequestOption>shop</RequestOption>
-
   </Request>
-
 	<PickupType>
-
-	<Code>$this->pickuptype</Code>
-
+	<Code>'.$this->pickuptype.'</Code>
   </PickupType>
-
-  $customer_classification
-
+  <CustomerClassification>
+		<Code>'.$customer_classification.'</Code>
+	</CustomerClassification>
   <Shipment>
-
 	<Shipper>
-
 		<Address>
-
-			<PostalCode>$this->s_zip</PostalCode>
-
-			<CountryCode>$this->s_country</CountryCode>
-
+			<PostalCode>'.$this->s_zip.'</PostalCode>
+			<CountryCode>'.$this->s_country.'</CountryCode>
 		</Address>
-
 	</Shipper>
-
 	<ShipTo>
-
 		<Address>
-
-			<PostalCode>$this->t_zip</PostalCode>
-
-			<CountryCode>$this->t_country</CountryCode>
-
-			<ResidentialAddressIndicator>$this->residential</ResidentialAddressIndicator>
-
+			<PostalCode>'.$this->t_zip.'</PostalCode>
+			<CountryCode>'.$this->t_country.'</CountryCode>
+			<ResidentialAddressIndicator>'.$this->residential.'</ResidentialAddressIndicator>
 		</Address>
-
 	</ShipTo>
-
 	<ShipFrom>
-
 		<Address>
-
-			<PostalCode>$this->s_zip</PostalCode>
-
-			<CountryCode>$this->s_country</CountryCode>
-
+			<PostalCode>'.$this->s_zip.'</PostalCode>
+			<CountryCode>'.$this->s_country.'</CountryCode>
 		</Address>
-
 	</ShipFrom>
 	<Service>
-
-			<Code>$this->service</Code>
-
+			<Code>'.$this->service.'</Code>
 	</Service>
 	<Package>
-
 		<PackagingType>
-
-			<Code>$this->package_type</Code>
-
+			<Code>'.$this->package_type.'</Code>
 		</PackagingType>
-
 			<Dimensions>
-
 				<UnitOfMeasurement>
-
-				  <Code>$this->measurement_type</Code>
-
+				  <Code>'.$this->measurement_type.'</Code>
 				</UnitOfMeasurement>
-
-				<Length>$this->l</Length>
-
-				<Width>$this->w</Width>
-
-				<Height>$this->h</Height>
-
+				<Length>'.$this->l.'</Length>
+				<Width>'.$this->w.'</Width>
+				<Height>'.$this->h.'</Height>
 			</Dimensions>
-
 		<PackageWeight>
-
 			<UnitOfMeasurement>
-
-				 <Code>$this->weight_type</Code>
-
+				 <Code>'.$this->weight_type.'</Code>
 			</UnitOfMeasurement>
-
-			<Weight>$this->weight</Weight>
-
+			<Weight>'.$this->weight.'</Weight>
 		</PackageWeight>
-
 	</Package>
 	<PackageServiceOptions>
 		<InsuredValue>
-			<CurrencyCode>$currency_code</CurrencyCode>
-			<MonetaryValue>$this->value</MonetaryValue>
+			<CurrencyCode>'.$currency_code.'</CurrencyCode>
+			<MonetaryValue>'.$this->value.'</MonetaryValue>
 		</InsuredValue>
 	</PackageServiceOptions>
-
   </Shipment>
+</RatingServiceSelectionRequest>';
 
-</RatingServiceSelectionRequest>
-
-EOT;
 		return $xml;
 	}
 
@@ -723,8 +685,8 @@ EOT;
 		
 
 		if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
-			QApplication::Log(E_ERROR, get_class($this), "sending ".$y);
-			QApplication::Log(E_ERROR, get_class($this), "receiving ".$this->xmlreturndata);
+			_xls_log(get_class($this) . " sending ".$y,true);
+			_xls_log(get_class($this) . " receiving ".$this->xmlreturndata,true);
 		}
 			
 	}

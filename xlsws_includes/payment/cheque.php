@@ -53,7 +53,9 @@ class cheque extends xlsws_class_payment {
 	 *
 	 */
 	public function admin_name() {
-		return "Cheque";
+		if (_xls_get_conf('DEFAULT_COUNTRY','US')=='US')
+			return "Check";
+		else return "Cheque";
 	}
 
 	/**
@@ -119,7 +121,7 @@ class cheque extends xlsws_class_payment {
 	public function customer_fields($parentObj) {
 		$ret= array();
 
-		$config = $this->getConfigValues('cheque');
+		$config = $this->getConfigValues(get_class($this));
 		$ret['adde'] = new QLabel($parentObj);
 		$ret['adde']->Text = $config['adde'];
 

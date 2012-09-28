@@ -54,6 +54,9 @@ class xlsws_index extends QForm {
 	protected $menu_categories; //the list of categories in the form of an array in a tree format
 	protected $dummy_drag_drop; //a drag n drop placeholder
 
+	protected $arrTopTabs; //Top tabs for index page
+	protected $arrBottomTabs; //Bottom tabs for index page
+		
 	protected $crumbs; //the array of crumbs in the crumbtrail
 	protected $txtSearchBox; //the input textbox for the search field
 	protected $lblLogout; //the label for the word logout
@@ -69,50 +72,23 @@ class xlsws_index extends QForm {
 
 	public $blnGetScreenRes = false; //true or false, get the current shopper's screen resolution
 
-	/*Shared widgets by customer register and checkout*/
-	protected $txtCREmail; //input textbox for email address
-	protected $txtCRFName; //input textbox for first name
-	protected $txtCRLName; //input textbox for last name
-	protected $txtCRCompany; //input textbox for company name
-	protected $txtCRMPhone; //input textbox for phone number
+	public $lblGoogleAnalytics = ''; //Code for Google Analytics.
 
-	protected $txtCRShipFirstname; //input text box for shipping first name
-	protected $txtCRShipLastname; //input text box for shipping last name
-	protected $txtCRShipCompany; //input text box for shipping company
-	protected $txtCRShipAddr1; //input text box for shipping address line 1
-	protected $txtCRShipAddr2; //input text box for shipping address line 2
-	protected $txtCRShipCountry; //input text box for shipping country (hidden)
-	protected $txtCRShipState; //input text box for shipping state (hidden)
-	protected $txtCRShipCity; //input text box for shipping city
-	protected $txtCRShipZip; //input text box for shipping zip or postal code
-	protected $txtCRShipPhone; //input text box for shipping phone number
+	protected $ctlFlashMessages; //Flash Messages
+	protected $strEmptyCartMessage;
+	protected $lblSharingHeader;
+	protected $lblSharingFooter;
+	protected $blnLoadSharing;
 
-	protected $txtCRBillAddr1; //input text box for billing address line 1
-	protected $txtCRBillAddr2; //input text box for shipping address line 2
-	protected $txtCRBillCountry; //input text box for billing country (hidden)
-	protected $txtCRBillState; //input text box for billing state (hidden)
-	protected $txtCRBillCity; //input text box for billing city
-	protected $txtCRBillZip; //input text box for billing zip or postal code
-	protected $txtCRVerify; //input text box for entering the captcha image
-
-	protected $objShipStateWait; //object to hold wait icon for when a shipping state changes
-	protected $objBillStateWait; //object to hold wait icon for when a billing state changes
-	protected $objSaveWait; //object to hold wait icon for when the submit button is pressed
-	protected $objSameWait; //object to hold wait icon for when someone chooses shipping address is the same as billing
-	protected $saveWrap; //wrapper that goes around the save
-
-	protected $pnlBillingAdde; //The QPanel that shows the input fields for the customer billing address
-	protected $pnlShippingAdde; //The QPanel that shows the input fields for the customer shipping address
-
-	/**
+	protected $Route;
+    /**
 	 * build_menu - builds the category tree
 	 * @param none
 	 * @return none
 	 */
 	protected function build_menu() {
-		if (_xls_get_conf('CACHE_CATEGORY', false) &&
-		 ($this->menu_categories = _xls_stack_get('XLS_CACHE_MENU'))) {
-			// Load cached categories from Session if applicable
+		if ($this->menu_categories = _xls_stack_get('XLS_CACHE_MENU')) {
+			// Load cached categories from Session
 		}
 
 		else {
@@ -126,8 +102,7 @@ class xlsws_index extends QForm {
 				$this->menu_categories[] = $objCategory;
 			}
 
-			if (_xls_get_conf('CACHE_CATEGORY', false) == 1)
-				$_SESSION['stack_vars']['XLS_CACHE_MENU'][0] =
+			$_SESSION['stack_vars']['XLS_CACHE_MENU'][0] =
 					$this->menu_categories;
 		}
 
@@ -136,290 +111,49 @@ class xlsws_index extends QForm {
 
 		// Let's have the menuPnl auto render any and all child controls
 		$this->menuPnl->AutoRenderChildren = true;
-	}
+		
+		_xls_stack_put('xls_page_title', _xls_get_conf('STORE_NAME','LightSpeed Web Store') . " : "._xls_get_conf('STORE_TAGLINE',''));
+		
+		$this->lblGoogleAnalytics  = new QLabel($this,'GoogleAnalytics');
+		$this->lblGoogleAnalytics->HtmlEntities = false;
+		if (_xls_get_conf('GOOGLE_ANALYTICS','') != '') {
+			$this->lblGoogleAnalytics->Text = "<script type=\"text/javascript\">
 
-	/**
-	 * build_email_widget - builds the email input type textbox on checkout and customer register
-	 * @param Qpanel - the Qpanel these widgets should be laid out in
-	 * @return none
-	 */
-	protected function build_email_widget($qpanel) {
-		$this->txtCREmail = new XLSTextBox($qpanel , 'email');
-		$this->txtCREmail->Name = _sp('Email');
-
-		if($this->customer)
-			$this->txtCREmail->Text=$this->customer->Email;
-
-		$this->txtCREmail->Required = $this->txtCREmail->ValidateTrimmed = true;
-	}
-
-	/**
-	 * build_fname_widget - builds the first email input type textbox on checkout and customer register
-	 * @param Qpanel - the Qpanel these widgets should be laid out in
-	 * @param string - the input type name of this widget
-	 * @return none
-	 */
-	protected function build_fname_widget($qpanel,$name) {
-		$widget = "txtCRFName";
-
-		if (strstr($name,"ship"))
-			$widget = "txtCRShipFirstname";
-
-		$this->$widget = new XLSTextBox($qpanel , $name);
-		$this->$widget->Name = _sp('Firstname');
-
-		if($this->customer)
-			$this->$widget->Text=$this->customer->Firstname;
-
-		$this->$widget->Required = true;
-	}
-
-	/**
-	 * build_lname_widget - builds the last name input type textbox on checkout and customer register
-	 * @param Qpanel - the Qpanel these widgets should be laid out in
-	 * @param string - the input type name of this widget
-	 * @return none
-	 */
-	protected function build_lname_widget($qpanel,$name) {
-		$widget = "txtCRLName";
-		if (strstr($name,"ship"))
-			$widget = "txtCRShipLastname";
-
-		$this->$widget = new XLSTextBox($qpanel , $name);
-		$this->$widget->Name = _sp('Surname');
-		if($this->customer)
-			$this->$widget->Text=$this->customer->Lastname;
-		$this->$widget->Required = true;
-	}
-
-	/**
-	 * build_company_widget - builds the company input type textbox on checkout and customer register
-	 * @param Qpanel - the Qpanel these widgets should be laid out in
-	 * @param string - the input type name of this widget
-	 * @return none
-	 */
-	protected function build_company_widget($qpanel, $name) {
-		$widget = "txtCRCompany";
-
-		if (strstr($name,"ship"))
-			$widget = "txtCRShipCompany";
-
-		$this->$widget = new XLSTextBox($qpanel , $name);
-		$this->$widget->Name = _sp('Company');
-
-		if($this->customer)
-			$this->$widget->Text=$this->customer->Company;
-	}
-
-	/**
-	 * build_phone_widget - builds the phone input type textbox on checkout and customer register
-	 * @param Qpanel - the Qpanel these widgets should be laid out in
-	 * @return none
-	 */
-	protected function build_phone_widget($qpanel,$name) {
-		$widget = "txtCRMPhone";
-		if (strstr($name,"ship"))
-			$widget = "txtCRShipPhone";
-
-		$this->$widget = new XLSTextBox($qpanel , $name);
-		$this->$widget->Name = _sp('Phone');
-
-		if($this->customer)
-			$this->$widget->Text=$this->customer->Mainphone;
-
-		$this->$widget->Required = true;
-	}
-
-	/**
-	 * build_add1_widget - builds the address line 1 input type textbox on checkout and customer register
-	 * @param Qpanel - the Qpanel these widgets should be laid out in
-	 * @param string - the input type name of this widget
-	 * @return none
-	 */
-	protected function build_add1_widget($qpanel,$name) {
-		$widget = "txtCRBillAddr1";
-		$field = "Address11";
-
-		if (strstr($name,"ship")) {
-			$widget = "txtCRShipAddr1";
-			$field = "Address21";
+			  var _gaq = _gaq || [];
+			  _gaq.push(['_setAccount', '"._xls_get_conf('GOOGLE_ANALYTICS')."']);
+			  _gaq.push(['_trackPageview']);
+			
+			  (function() {
+			    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			  })();
+			
+			</script>";
 		}
 
-		$this->$widget = new XLSTextBox($qpanel , $name);
-		$this->$widget->Name = _sp('Address');
 
-		if($this->customer)
-			$this->$widget->Text=$this->customer->$field;
-
-		$this->$widget->Required = true;
-	}
-
-	/**
-	 * build_add2_widget - builds the address line 2 input type textbox on checkout and customer register
-	 * @param Qpanel - the Qpanel these widgets should be laid out in
-	 * @param string - the input type name of this widget
-	 * @return none
-	 */
-	protected function build_add2_widget($qpanel, $name) {
-		$widget = "txtCRBillAddr2";
-		$field = "Address12";
-
-		if (strstr($name,"ship")) {
-			$widget = "txtCRShipAddr2";
-			$field = "Address22";
+		$this->lblSharingHeader  = new QPanel($this,'SharingHeader');
+		$this->lblSharingFooter  = new QPanel($this,'SharingFooter');
+		if(_xls_get_conf('SHOW_SHARING' , 0)) {
+			$this->lblSharingHeader->Template = templateNamed('sharing_header.tpl.php');
+			$this->lblSharingFooter->Template = templateNamed('sharing_footer.tpl.php');
+			$this->blnLoadSharing = false; //make this true for controllers where we use the buttons
 		}
+		
+		
+		$this->strEmptyCartMessage = _sp("Your cart is empty");
 
-		$this->$widget = new XLSTextBox($qpanel , $name);
 
-		if($this->customer)
-			$this->$widget->Text=$this->customer->$field;
 
-		$this->$widget->Name = _sp('Line 2');
+		$objUrl = _xls_url_object();
+		if ($objUrl->RouteController=="xlspg")
+			$this->Route = $objUrl->RouteId;
+
 	}
 
-	/**
-	 * build_city_widget - builds the address line 2 input type textbox on checkout and customer register
-	 * @param Qpanel - the Qpanel these widgets should be laid out in
-	 * @param string - the input type name of this widget
-	 * @return none
-	 */
-	protected function build_city_widget($qpanel, $name) {
-		$widget = "txtCRBillCity";
-		$field = "City1";
-
-		if (strstr($name,"ship")) {
-			$widget = "txtCRShipCity";
-			$field = "City2";
-		}
-
-		$this->$widget = new XLSTextBox($qpanel , $name);
-
-		if($this->customer)
-			$this->$widget->Text=$this->customer->$field;
-
-		$this->$widget->Required = true;
-		$this->$widget->Name = _sp('City');
-	}
-
-	/**
-	 * build_country_widget - builds the address country input type listbox on checkout and customer register
-	 * @param Qpanel - the Qpanel these widgets should be laid out in
-	 * @param string - the input type name of this widget
-	 * @return none
-	 */
-	protected function build_country_widget($qpanel, $name) {
-		$widget = "txtCRBillCountry";
-		$field = "Country1";
-
-		if (strstr($name,"ship")) {
-			$widget = "txtCRShipCountry";
-			$field = "Country2";
-		}
-
-		$this->$widget = new XLSListBox($qpanel , $name);
-		$this->$widget->AddItem(_sp('-- Select One --'), null);
-		$this->$widget->Name = _sp('Country');
-
-		$this->add_countries_to_listbox($this->$widget);
-
-		if($this->customer)
-			$this->$widget->SelectedValue=$this->customer->$field;
-		else
-			$this->$widget->SelectedValue=_xls_get_conf('DEFAULT_COUNTRY');
-
-		$this->$widget->Required = true;
-	}
-
-	/**
-	 * build_state_widget - builds the address state input type listbox on checkout and customer register
-	 * @param Qpanel - the Qpanel these widgets should be laid out in
-	 * @param string - the input type name of this widget
-	 * @return none
-	 */
-	protected function build_state_widget($qpanel, $name) {
-		$widget = "txtCRBillState";
-		$field = "State1";
-
-		if (strstr($name,"ship")) {
-			$widget = "txtCRShipState";
-			$field = "State2";
-		}
-
-		$this->$widget = new XLSListBox($qpanel , $name);
-		$this->$widget->Name = _sp('State');
-
-		$currcountry = str_replace("State","Country",$widget);
-		$country_code = $this->$currcountry->SelectedValue;
-
-		$this->add_states_to_listbox_for_country($this->$widget, $country_code);
-
-		if($this->customer) {
-			$this->$widget->SelectedValue=$this->customer->$field;
-		}
-	}
-
-	/**
-	 * build_zip_widget - builds the address zipcode input type textbox on checkout and customer register
-	 * @param Qpanel - the Qpanel these widgets should be laid out in
-	 * @param string - the input type name of this widget
-	 * @return none
-	 */
-	protected function build_zip_widget($qpanel, $name) {
-		$widget = "txtCRBillZip";
-		$field = "Zip1";
-
-		if (strstr($name,"ship")) {
-			$widget = "txtCRShipZip";
-			$field = "Zip2";
-		}
-
-		$this->$widget = new XLSZipField($qpanel , $name);
-
-		if($this->customer)
-			$this->$widget->Text = $this->customer->$field;
-
-		$this->$widget->Required = true;
-		$this->$widget->Name = _sp('Zip/Postal Code');
-	}
-
-	/**
-	 * build_shipsame_widget - builds the shipping address is the same as billing address tickmark
-	 * @param none
-	 * @return none
-	 */
-	protected function build_shipsame_widget() {
-		$this->chkSame = new QCheckBox($this->pnlBillingAdde);
-		$this->chkSame->Text = _sp("Shipping Address is the same as Billing Address");
-
-		if (QApplication::IsBrowser(QBrowserType::InternetExplorer)) {
-			// IE 7 is unhappy with the temp disable JS, for some mysterious reason... using regular AJAX action for the explorer family.
-			$this->chkSame->AddAction(new QClickEvent(), new QAjaxAction('chkSame_Click'));
-		} else {
-			// other browser's sane enough to enable crazy-click-protection.
-			$this->chkSame->AddAction(new QClickEvent(), new QAutoTempDisabledAjaxAction('chkSame_Click'));
-		}
-	}
-
-
-	/**
-	 * build_captcha_widget - builds the captcha code with the input textbox to enter this code
-	 * @param Qpanel - the Qpanel these widgets should be laid out in
-	 * @return none
-	 */
-	protected function build_captcha_widget($qpanel) {
-		$this->pnlVerify = new QPanel($qpanel);
-		$this->pnlVerify->Template = templateNamed('checkout_verify.tpl.php');
-
-		$this->lblVerifyImage = new QLabel($this->pnlVerify);
-		$this->lblVerifyImage->HtmlEntities = false;
-		$this->lblVerifyImage->CssClass='customer_reg_draw_verify';
-		$this->lblVerifyImage->Text=_xls_verify_img();
-
-		// verify code
-		$this->txtCRVerify = new XLSTextBox($this->pnlVerify);
-		$this->txtCRVerify->Name = _sp('Enter the text from above');
-		$this->txtCRVerify->SetCustomAttribute("autocomplete" , "off");
-	}
+	
+	
 
 	/**
 	 * build_orderid_widget - builds the textbox for the sidebar where clients enter the order or sro id
@@ -498,6 +232,33 @@ EOS;
             $listbox->AddItem($objCountry->Country, $objCountry->Code);
 	}
 
+
+	/**
+	 * build_flash_messages - builds QLabel and displays any cart messages, removing them afterwards
+	 * @param none
+	 * @return none
+	 */
+	protected function BuildFlashMessages() {
+		
+		$this->ctlFlashMessages = new QLabel($this,'FlashMessages');
+		$this->ctlFlashMessages->HtmlEntities = false;
+		
+		$cart = Cart::GetCart();
+		if ($cart)
+			$messages = CartMessages::LoadArrayByCartId($cart->Rowid);
+		if ($messages) {
+			$strMessage = "";
+			foreach ($messages as $message)
+				$strMessage .= "<div class='flash_message'>".$message->Message."</div>"; 
+			$this->ctlFlashMessages->Text = $strMessage;
+			CartMessages::DeleteByCartId($cart->Rowid);
+		}
+		
+		
+	}
+	
+	
+	
 	/**
 	 * states_for_country_code - returns a list of states from the Web Store database to a listbox based on country
 	 * @param string $country_code :: 2 letter country code
@@ -571,18 +332,27 @@ EOS;
 	}
 
 	/**
-	 * showCart - shows the shopping cart by default, can be overloaded to do other checks
+	 * showCart - shows the minicart by default, can be overloaded to do other checks
 	 * @param none
-	 * @return none
+	 * @return boolean
 	 */
 	protected function showCart() {
 		return true;
 	}
 
 	/**
-	 * showCart - shows the sidebars by default, can be overloaded to do other checks
+	 * showCheckout - shows the checkout buttons on the minicart
 	 * @param none
-	 * @return none
+	 * @return boolean
+	 */
+	protected function showCheckout() {
+		return true;
+	}
+
+	/**
+	 * showSideBar - shows the sidebars by default, can be overloaded to do other checks
+	 * @param none
+	 * @return boolean
 	 */
 	protected function showSideBar() {
 		return true;
@@ -600,11 +370,14 @@ EOS;
 		if ($cart->Rowid)
 			$cart = Cart::Load($cart->Rowid);
 
-		// if cart is that of a order or processed - get out!
+		// if cart is that of a order or processed, it should not be in our session
 		if (!$cart || in_array($cart->Type,
 			array(CartType::invoice, CartType::order, CartType::sro)))
-				Cart::ClearCart();
-
+			Cart::ClearCart();
+		
+		if ($cart->UpdateMissingProducts())
+			$cart->Reload();
+			
 		if(file_exists(CUSTOM_INCLUDES . "minicart.php"))
 			include(CUSTOM_INCLUDES . "minicart.php");
 		else
@@ -651,7 +424,36 @@ EOS;
 		if(file_exists(CUSTOM_INCLUDES . "crumbtrail.php"))
 			include(CUSTOM_INCLUDES . "crumbtrail.php");
 		else
-			include('xlsws_includes/crumbtrail.php');
+			{
+			$objUrl = _xls_url_object();
+			if ($objUrl->RouteId != '')
+				switch($objUrl->RouteController) {
+				
+					case "category":
+						$objCategory = Category::LoadByRequestUrl($objUrl->RouteId);
+						if ($objCategory) $this->crumbs = $objCategory->GetTrail();
+						break;
+					case "product":
+						$objProduct = Product::Load($objUrl->RouteId);
+						if ($objProduct) $this->crumbs = Category::GetTrailByProductId($objProduct->Rowid);
+
+						break;
+						
+					
+				}
+			
+			//Save the crumbtrail since we can use it elsewhere i.e. Meta information	
+			if (isset($this->crumbs))
+				_xls_set_crumbtrail($this->crumbs);
+			
+			// Let's have the pnlPanel auto render any and all child controls
+			$this->crumbTrail = new QPanel($this);
+			$this->crumbTrail->Template = templateNamed('crumbtrail.tpl.php');
+			$this->crumbTrail->AutoRenderChildren = true;
+			
+			}
+			
+			
 	}
 
 
@@ -661,10 +463,10 @@ EOS;
 	 * @return boolean true or false
 	 */
 	public static function isLoggedIn() {
-		$customer = Customer::GetCurrent();
+        $objCustomer = Customer::GetCurrent();
 
-		if ($customer && !is_null($customer))
-			return true;
+        if ($objCustomer && $objCustomer->Rowid)
+            return true;
 
 		return false;
 	}
@@ -693,14 +495,37 @@ EOS;
 		if(Customer::Login($email , $password)) {
 			$customer = Customer::GetCurrent();
 
-			Visitor::add_view_log($customer->Rowid,
-				ViewLogType::customerlogin);
 
+			
+			$objCartInProgress = Cart::LoadLastCartInProgress(1);
+			if ($objCartInProgress) {
+				$objCurrentCart = Cart::GetCart();
+				$arrCurrentItems = $objCurrentCart->GetCartItemArray();
+				
+				//Switch to original cart
+				$items = $objCartInProgress->GetCartItemArray(); 
+				$_SESSION['XLSWS_CART'] = $objCartInProgress;
+				
+				//Add any new items
+				if (count($arrCurrentItems)>0) {
+					foreach($arrCurrentItems as $objItem) {
+						$objProduct = Product::Load($objItem->ProductId);
+						$objCartInProgress->AddToCart($objProduct,$objItem->Qty,$objItem->Description,
+							$objItem->Sell,$objItem->Discount,$objItem->CartType,$objItem->GiftRegistryItem);
+						$objItem->Delete();
+					}
+					$objCurrentCart->Delete();			
+				}
+				$objCartInProgress->CustomerId=$customer->Rowid;
+				$objCartInProgress->Save();
+							
+			}
+		
 			Cart::UpdateCartCustomer();
 
 			$uri = _xls_stack_pop('login_redirect_uri');
 			if($uri) _rd($uri);
-			else _rd();
+			else _rd(_xls_site_dir());
 
 			return;
 		}
@@ -709,19 +534,25 @@ EOS;
 	}
 
 	/**
-	 * performLogout - Logs a customer out and redirects if neccessary
+	 * performLogout - Logs a customer out and redirects if necessary
 	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
 	 * @return none
 	 */
 	protected function performLogout($strFormId, $strControlId, $strParameter) {
 		$customer = Customer::GetCurrent();
 
-		Visitor::add_view_log($customer->Rowid, ViewLogType::customerlogout);
-
+		//Ensure customer_id is set if there are any items in the cart
+		$cart = Cart::GetCart();
+		$items = $cart->GetCartItemArray(); 
+		if (count($items)>0) {
+			$cart->CustomerId = $customer->Rowid;
+			$cart->Save();
+		}
+		
 		Customer::Logout();
 		Cart::ClearCart();
 
-		_rd($_SERVER['REQUEST_URI']);
+		_rd(_xls_site_dir());
 	}
 
 	/*overloaded in extended classes as the view contructor*/
@@ -739,50 +570,64 @@ EOS;
 		$this->sidePnl->Template = templateNamed("sidebar.tpl.php");
 
 		$sidebarModules = Modules::QueryArray(
-			QQ::Equal(QQN::Modules()->Type, 'sidebar'),
+			QQ::AndCondition(
+					QQ::Equal(QQN::Modules()->Type, 'sidebar'),
+					QQ::Equal(QQN::Modules()->Active, 1)
+					),
 			QQ::Clause(QQ::OrderBy(QQN::Modules()->SortOrder))
+			
 		);
-
+	
 		foreach($sidebarModules as $module) {
 			$obj = $this->loadModule($module->File, 'sidebar');
 
 			if($obj->check())
 				$this->arrSidePanels[$obj->name()] =
-					$obj->getPanel($this->sidePnl);
+					$obj->getPanel($this->sidePnl,camelize($obj->name()));
 		}
 	}
 
+	/**
+	 * build_tabs - reads array for the tabs for the template
+	 * @param none
+	 * @return none
+	 */
+	protected function build_tabs() {
+	
+	
+		$this->arrTopTabs = CustomPage::QueryArray(
+		        QQ::AndCondition(
+		            QQ::GreaterOrEqual(QQN::CustomPage()->TabPosition,10),
+		            QQ::LessOrEqual(QQN::CustomPage()->TabPosition,19)
+		        ),
+					QQ::Clause(QQ::OrderBy(QQN::CustomPage()->TabPosition))
+		    );
+		$this->arrBottomTabs = CustomPage::QueryArray(
+		        QQ::AndCondition(
+		            QQ::GreaterOrEqual(QQN::CustomPage()->TabPosition,20),
+		            QQ::LessOrEqual(QQN::CustomPage()->TabPosition,29)
+		        ),
+					QQ::Clause(QQ::OrderBy(QQN::CustomPage()->TabPosition))
+		    );
+		
+	
+	}
+	
 	/**
 	 * continue_shopping - takes the customer back to the last page they were from the cart page
 	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
 	 * @return none
 	 */
 	public function continue_shopping($strFormId, $strControlId, $strParameter) {
-		// find the last page visited as product/search/category
-		$v = Visitor::get_visitor();
-
-		$page =  ViewLog::QuerySingle(
-			QQ::AndCondition(
-				QQ::Equal(QQN::ViewLog()->VisitorId, $v->Rowid),
-				QQ::In(QQN::ViewLog()->LogTypeId, array(
-					ViewLogType::categoryview,
-					ViewLogType::productview,
-					ViewLogType::search,
-					ViewLogType::pageview
-				)),
-				QQ::NotLike(QQN::ViewLog()->Page, '%seo_forward%')  //WS2.0.2
-			),
-			QQ::Clause(
-				QQ::OrderBy(QQN::ViewLog()->Created, false)
-			)
-		);
+	
+		$page =  _xls_get_remembered_url();
 
 		if(!$page) {
-			_rd("index.php");
+			_rd(_xls_site_url());
 			return;
 		}
 
-		_rd($page->Page);
+		_rd($page);
 	}
 
 	// custom QQN node - not intended for modification
@@ -790,52 +635,10 @@ EOS;
 		return new QQNode($node->_Name, '`' . $node->_Name . '` like ' . $param . " AND Code = 'Code'" , 'string'  , QQN::Product());
 	}
 
-	/**
-	 * search_guesses - takes guesses as to what you're searching for based on current search keyword (use xls_ajax_search.php 2.0.3 onwards)
-	 * @param integer, integer, string $strFormId, $strControlId, $strParameter :: Passed by Qcodo by default
-	 * @return none
-	 */
-	public function search_guesses($strFormId, $strControlId, $strParameter) {
-		$search =  $strParameter;
+	
+    protected function Form_Preload() {
 
-		//exit("Test\n");
-		$search = addslashes(trim($search));
-
-		$productArray = Product::QueryArray(
-			QQ::AndCondition(
-				QQ::OrCondition(
-					QQ::Equal(QQN::Product()->MasterModel, 1),
-					QQ::AndCondition(
-						QQ::Equal(QQN::Product()->MasterModel, 0),
-						QQ::Equal(QQN::Product()->FkProductMasterId, 0)
-					)
-				),
-				QQ::Equal(QQN::Product()->Web , 1),
-				QQ::OrCondition(
-					new QQXLike(QQN::Product()->Code , "$search"),
-					new QQXLike(QQN::Product()->Name , "$search")
-				)
-			),
-			QQ::Clause(
-				QQ::OrderBy(
-					$this->generateLikeSearchNodeForProduct(QQN::Product()->Code , "'$search%'"), false,
-					$this->generateLikeSearchNodeForProduct(QQN::Product()->Name , "'$search%'"), false,
-					$this->generateLikeSearchNodeForProduct(QQN::Product()->Code , "'%$search%'"), false,
-					$this->generateLikeSearchNodeForProduct(QQN::Product()->Name , "'%$search%'"), false
-				),
-				QQ::LimitInfo(5)
-			)
-		);
-
-		//_xls_log($productArray);
-		foreach($productArray as $product) {
-			if(stristr($product->Name,$search))
-				echo $product->Name ."\n";
-			else
-				echo $product->Code . " " . $product->Name ."\n";
-		}
-		exit();
-	}
+    }
 
 	/**
 	 * Form_Create - takes all panels and builds them into a page with a form
@@ -845,11 +648,9 @@ EOS;
 	protected function Form_Create() {
 		global $XLSWS_VARS;
 
-		$visitor = Visitor::get_visitor();
+        $this->Form_PreLoad();
 
-		if($visitor->ScreenRes == '')
-			$this->blnGetScreenRes = true;
-
+		//TODO: This should be migrated to the XLSCore management
 		// manage SSL forwarding
 		if($this->require_ssl() && _xls_get_conf( 'ENABLE_SSL' , false)) {
 			if(!(isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 1 || $_SERVER['HTTPS'] == 'on'))) {
@@ -861,16 +662,18 @@ EOS;
 		}
 
 		// forward to non SSL if not required
-		if(!$this->require_ssl() && isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 1 || $_SERVER['HTTPS'] == 'on') && _xls_get_conf( 'SSL_NO_NEED_FORWARD' , true)) {
+		if(!$this->require_ssl() && isset($_SERVER['HTTPS']) &&
+			($_SERVER['HTTPS'] == 1 || $_SERVER['HTTPS'] == 'on') &&
+			_xls_get_conf( 'SSL_NO_NEED_FORWARD' , true)) {
 
-			if(isset($XLSWS_VARS['seo_rewrite'])){ // WS.2.0.1 Bug fix for handling rewrite in SSL
-				$url = "http://".$_SERVER['HTTP_HOST'] . $_SERVER["REQUEST_URI"];   // WS.2.0.1 Bug fix for handling rewrite
-			} else {
-				$url = "http://".$_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
-				$url.="?".$_SERVER['QUERY_STRING'];
-			}
+			$objUrl = _xls_url_object();
+			$url = _xls_site_url($objUrl->Uri);
+			if (strlen($objUrl->QueryString))
+				$url .= "?".$objUrl->QueryString;
+			$url = str_replace("https:","http:",$url);
 
-			header("Location: $url");
+			_xls_301($url);
+
 			exit();
 		}
 
@@ -880,7 +683,8 @@ EOS;
 		$this->build_crumb();
 		$this->build_login();
 		$this->build_side_bar();
-
+		$this->build_tabs();
+		$this->BuildFlashMessages();
 		$this->build_main();
 
 		$this->build_dummy_dragdrop();
@@ -893,6 +697,12 @@ EOS;
 			$this->mainPnl->AutoRenderChildren = true;
 	}
 
+
+	protected function Form_Exit() {
+		_xls_set_crumbtrail();
+				
+	}
+	
 	/**
 	 * build_dummy_dragdrop - build a drag n drop zone to use for products
 	 * @param none
@@ -900,27 +710,21 @@ EOS;
 	 */
 	protected function build_dummy_dragdrop() {
 		$this->dummy_drag_drop = new QLabel($this);
-		$this->dummy_drag_drop->AddControlToMove($this->dummy_drag_drop);
-		$this->dummy_drag_drop->RemoveAllDropZones();
-		$this->dummy_drag_drop->AddDropZone($this);
-		$this->dummy_drag_drop->AddAction(new QMoveEvent() , new QJavaScriptAction("void(null);"));
-	}
-
-	//may be overloaded by extended classes
-	protected function showDark() {
-		return false;
 	}
 
 	/**
-	 * loadModule - build a drag n drop zone to use for products
+	 * loadModule
 	 * @param string filename of module
 	 * @param string directory that the file resides in
 	 * @return object instantiated object for a module (shipping or payment usually)
 	 */
 	public static function loadModule($file , $dir) {
-		$classname = basename($file , ".php");
-
-		if(is_file(CUSTOM_INCLUDES . "$dir" . "/" . $file)) {
+	
+		//Since our "$file" passed is a classname without .php, we build it back
+		$classname = basename($file , ".php"); 
+		$file = $classname . ".php";
+		
+		if(is_file(CUSTOM_INCLUDES . "$dir" . "/" . $file) && !class_exists($classname)) {
 			try {
 				include_once(CUSTOM_INCLUDES . "$dir" . "/" . $file);
 
@@ -932,7 +736,7 @@ EOS;
 			}
 		}
 
-		if(!is_file(XLSWS_INCLUDES . "$dir" . "/" . $file)) {
+		if(!is_file(XLSWS_INCLUDES . "$dir" . "/" . $file)  && !class_exists($classname)) {
 			_xls_log("ERROR: Module does not exist $file in $dir");
 			return null;
 		}
@@ -940,7 +744,7 @@ EOS;
 		try {
 			include_once(XLSWS_INCLUDES . "$dir" . "/" . $file);
 
-			$class = new $classname;
+				$class = new $classname;
 
 			return $class;
 		} catch(Exception $e) {
@@ -1043,13 +847,11 @@ EOS;
 	protected function update_shippingcost_display($objCart) {
 		if (!isset($this->misc_components['order_shipping_cost']))
 			return false;
-		if ((strpos($objCart->IdStr,"WO-") === false || $objCart->Status != "Awaiting Processing")
-			&& $_GET['xlspg'] != "checkout" && $objCart->ShippingSell==0)
-				$this->misc_components['order_shipping_cost']->Text =
-					_sp("(Included Above)");
-		else
 			$this->misc_components['order_shipping_cost']->Text =
 				_xls_currency($objCart->ShippingSell);
+		if ($this->misc_components['order_shipping_cost'] instanceof QControl) {
+			$this->misc_components['order_shipping_cost']->Refresh();
+		}
 	}
 
 	/**
@@ -1133,7 +935,7 @@ EOS;
 	}
 
 	/**
-	 * bind_result_images - binds images to a list of produts
+	 * bind_result_images - binds images to a list of products
 	 * @param array Product - an array of product objects to bind
 	 * @return none
 	 */
@@ -1162,15 +964,13 @@ EOS;
 
 		$pnlImg->Width  = $width; // _xls_get_conf('DETAIL_IMAGE_WIDTH',100);
 		$pnlImg->Height = $height; //_xls_get_conf('DETAIL_IMAGE_HEIGHT',80);
-		$pnlImg->SetCustomStyle('background' , "url(" . $prod->$imgType . ") no-repeat center");
+		//$pnlImg->SetCustomStyle('background' , "url(" . $prod->$imgType . ") no-repeat center");
+		$pnlImg->Text = "<img src='".$prod->$imgType."' >"; //width='".$width."px' height='".$height."px'
 		$pnlImg->CssClass = 'product_cell_image';
 		$pnlImg->HtmlEntities = false;
 
-		if($ajax_add_action) {
-			$pnlImg->AddControlToMove($pnlImg);
-			$pnlImg->RemoveAllDropZones();
-			$pnlImg->AddDropZone($this->cartPnl);
-			$pnlImg->AddAction(new QMoveEvent() , new QAjaxAction($ajax_add_action));
+		if($ajax_add_action ) {
+			
 			$pnlImg->AddAction(new QClickEvent() , new QJavaScriptAction("document.location.href='" . $prod->Link . "'"));
 
 			if(!$action_parameter)
@@ -1200,7 +1000,9 @@ EOS;
 	 * @return string a rendered html version of this image
 	 */
 	public function render_prod_drag_image($_ITEM) {
-		if(isset($this->arrProdDragImages[$_ITEM->Rowid]) && !$this->arrProdDragImages[$_ITEM->Rowid]['panel']->Rendered)
+		if(isset($this->arrProdDragImages[$_ITEM->Rowid]) && 
+			!$this->arrProdDragImages[$_ITEM->Rowid]['panel']->Rendered 
+			)
 			$this->arrProdDragImages[$_ITEM->Rowid]['panel']->Render();
 		else
 			echo "<img src=\"" .  $_ITEM->SmallImage . "\" />";
@@ -1228,7 +1030,7 @@ EOS;
 			$prods = Product::LoadArrayByFkProductMasterId($prod->Rowid);
 
 			if(count($prods)>0) {
-				_rd("index.php?product=" . $prod->Code);
+				_rd($prod->Link);
 				return;
 			}
 		}
@@ -1290,66 +1092,71 @@ EOS;
 	 * @return none
 	 */
 	public static function completeOrder($cart = false , $customer = false , $forward = true) {
-		if(!$cart)
-			$cart = Cart::GetCart();
-
-		if(function_exists('_custom_before_order_complete'))
-				_custom_before_order_complete($cart);
-
-		if(!$customer) {
-			$customer = new Customer();
-			$customer->Company = $cart->ShipCompany;
-			$customer->Firstname = $cart->ShipFirstname;
-			$customer->Lastname = $cart->ShipLastname;
-			$customer->Address11 = $cart->ShipAddress1;
-			$customer->Address12 = $cart->ShipAddress2;
-			$customer->City1 = $cart->ShipCity;
-			$customer->Email = $cart->Email;
-			$customer->State1 = $cart->ShipState;
-			$customer->Country1 = $cart->ShipCountry;
-			$customer->Mainphone = $cart->Phone;
-		}
-
-		$cart->Type = CartType::order;
-		$cart->Submitted = QDateTime::Now(true);
-
-		Cart::SaveCart($cart);
-		$order_id = $cart->IdStr;
-		$zipcode = $cart->Zipcode;
-
-		// clear out the cart from session
-		Cart::ClearCart();
-
-		_xls_stack_add('xls_submit_order', true);
-
-		if(function_exists('_custom_after_order_complete'))
-			_custom_after_order_complete($cart);
-			        
-        //Sending receipts
-        xlsws_index::send_email($cart);	
-         
-		// Show invoice
-		if($forward)
-			_rd($cart->Link);
-
+        QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
+        return xlsws_checkout::FinalizeCheckout($cart, $customer, $forwarD);
 	}
 
 	public static function send_email($cart) {
-		$order_id = $cart->IdStr;
-		$zipcode = $cart->Zipcode;
+        QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
+        if (_xls_get_conf('EMAIL_SEND_CUSTOMER',0)==1)
+        	xlsws_index::SendCustomerEmail($cart, null);
+        if (_xls_get_conf('EMAIL_SEND_STORE',0)==1)
+        	xlsws_index::SendOwnerEmail($cart, null);
+	}
+	
+	public static function SendCustomerEmail($objCart, $objCustomer) { 
+	
+		$strSubject = _xls_format_email_subject('EMAIL_SUBJECT_CUSTOMER',$objCart->Name,$objCart->IdStr);
+		if (!_xls_mail(
+			$objCart->Email,
+			$strSubject,
+			_xls_mail_body_from_template(
+				templateNamed('email_order_notification.tpl.php'),
+				array(
+					'cart' => $objCart,
+					'customer' => $objCustomer
+				)
+            ),
+            _xls_get_conf('ORDER_FROM')
+        )) {
+        QApplication::Log(E_ERROR, 'Customer Receipt', $objCart->Email." email failed to send.");
+        return false;
+        } else return true;
+    }
 
-		_xls_mail(
-			$cart->Email,
-			_xls_get_conf('STORE_NAME', 'Web') . " " . _sp("Order Notification") . " " . $order_id,
-			_xls_mail_body_from_template(templateNamed('email_order_notification.tpl.php'), array('cart' => $cart, 'customer' =>$customer)),
-			_xls_get_conf('ORDER_FROM')
-		);
+    public static function SendOwnerEmail($objCart, $objCustomer) {
 
-		_xls_mail(
-			_xls_get_conf('ORDER_FROM'),
-			_xls_get_conf('STORE_NAME' , 'Web') . " " . _sp("Order Notification") . " " . $order_id,
-			_xls_mail_body_from_template(templateNamed('email_order_notification_owner.tpl.php') , array('cart' => $cart , 'customer' =>$customer)),
-			_xls_get_conf('ORDER_FROM')
-		);
+		$strSubject = _xls_format_email_subject('EMAIL_SUBJECT_OWNER',$objCart->Name,$objCart->IdStr);
+
+        if (!_xls_mail(
+            _xls_get_conf('ORDER_FROM'),
+            $strSubject,
+            _xls_mail_body_from_template(
+                templateNamed('email_order_notification_owner.tpl.php'),
+                array(
+                    'cart' => $objCart, 
+                    'customer' => $objCustomer
+                )
+            ),
+            _xls_get_conf('ORDER_FROM')
+        )) {
+        	QApplication::Log(E_ERROR, 'Store Receipt', $objCart->Email." email failed to send.");
+        	return false;
+        } else return true;
+    }
+
+	public function __get($strName) {
+		switch ($strName) {
+		case 'LoadSharing':
+			return $this->blnLoadSharing;
+
+		default:
+			try {
+				return parent::__get($strName);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
 	}
 }

@@ -67,37 +67,77 @@ class sidebar_order_lookup_qp extends QPanel {
 			return;
 		}
 
-		// IS there an SRO?
-		$sro = Sro::QuerySingle(
-			QQ::AndCondition(
-				QQ::Equal(QQN::Sro()->LsId, $this->txtSKOrderId->Text),
-				QQ::OrCondition(
-					QQ::Equal(QQN::Sro()->CustomerEmailPhone, $this->txtEmailPhone->Text)
-				)
-			)
-		);
 
-		if($sro)
-			_rd("index.php?xlspg=sro_track&dosearch=true&orderid=" . $this->txtSKOrderId->Text . "&emailphone=" . $this->txtEmailPhone->Text);
-		else {
-			// is it quote?
-			$quote = Cart::QuerySingle(
-				QQ::AndCondition(
-					QQ::Equal(QQN::Cart()->Type , CartType::quote),
-					QQ::Equal(QQN::Cart()->IdStr , $this->txtSKOrderId->Text),
-					QQ::OrCondition(
-						QQ::Equal(QQN::Cart()->Phone , _xls_number_only($this->txtEmailPhone->Text)),
-						QQ::Equal(QQN::Cart()->Email , $this->txtEmailPhone->Text)
-					)
-					//, QQ::Equal(QQN::Cart()->Zipcode , $this->txtSKZipCode->Text)
-				)
-			);
-
-			if($quote)
-				_rd($quote->Link);
-			else
-				_rd("index.php?xlspg=order_track&dosearch=true&orderid=" . $this->txtSKOrderId->Text . "&emailphone=" . $this->txtEmailPhone->Text); // otherwise search orders!
+		$strSearchElements = explode("-",$this->txtSKOrderId->Text);
+		if(count($strSearchElements) != 2) {
+			_xls_display_msg(_sp("Enter Order/Quote number in format: WO-12345 or S-12345 or Q-12345"));
+			return;
 		}
+		
+		switch (strtoupper($strSearchElements[0])) {
+		
+			case 'WO':
+			
+				// is it quote?
+				$objOrder = Cart::QuerySingle(
+					QQ::AndCondition(
+						QQ::Equal(QQN::Cart()->Type , CartType::order),
+						QQ::Equal(QQN::Cart()->IdStr , $this->txtSKOrderId->Text),
+						QQ::OrCondition(
+							QQ::Equal(QQN::Cart()->Phone , _xls_number_only($this->txtEmailPhone->Text)),
+							QQ::Equal(QQN::Cart()->Email , $this->txtEmailPhone->Text)
+						)
+					)
+				);
+	
+				if($objOrder)
+					_rd(_xls_site_url('order-track/pg') . "?getuid=".$objOrder->Linkid);
+				break;
+				
+			case 'S':
+				// IS there an SRO?
+				$sro = Sro::QuerySingle(
+					QQ::AndCondition(
+						QQ::Equal(QQN::Sro()->LsId, $this->txtSKOrderId->Text),
+						QQ::OrCondition(
+							QQ::Equal(QQN::Sro()->CustomerEmailPhone, $this->txtEmailPhone->Text)
+						)
+					)
+				);
+		
+				if($sro)
+					_rd(_xls_site_url('sro-track/pg') . "?dosearch=true&orderid=" . $this->txtSKOrderId->Text . "&emailphone=" . $this->txtEmailPhone->Text);
+				break;
+				
+				
+			case 'Q':
+			
+				// is it quote?
+				$quote = Cart::QuerySingle(
+					QQ::AndCondition(
+						QQ::Equal(QQN::Cart()->Type , CartType::quote),
+						QQ::Equal(QQN::Cart()->IdStr , $this->txtSKOrderId->Text),
+						QQ::OrCondition(
+							QQ::Equal(QQN::Cart()->Phone , _xls_number_only($this->txtEmailPhone->Text)),
+							QQ::Equal(QQN::Cart()->Email , $this->txtEmailPhone->Text)
+						)
+					)
+				);
+	
+				if($quote)
+					_rd($quote->Link);
+				break;
+				
+			
+		
+		
+		
+		}
+	
+		//If we made it this far, it's invalid
+		_xls_display_msg(_sp("Order/SRO/Quote with entered email address not found"));
+
+			
 	}
 }
 

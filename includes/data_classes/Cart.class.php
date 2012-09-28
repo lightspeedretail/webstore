@@ -107,15 +107,32 @@ class Cart extends CartGen {
 	 * Remove cart items from session
 	 * @return
 	 */
-	public static function ClearCart(){
+	public static function ClearCart() {
+
 		unset($_SESSION['XLSWS_CART']);
 	}
 
+	public function ClearCartItems() {
+
+		//If the cart is a completed invoice, order or SRO, we never want to delete a completed order
+		if (!in_array($this->Type,array(CartType::invoice, CartType::order, CartType::sro)))
+		{
+			$items = $this->GetCartItemArray();
+			foreach ($items as $item)
+				$item->Delete();
+		}
+
+	}
 	/**
 	 * Save cart to database
 	 * @return
 	 */
 	public static function SaveCart($objCart){
+
+		if (_xls_get_conf('DEBUG_CART', 0) == 1)
+			QApplication::Log(E_ERROR, 'SaveCart', _xls_whereCalled());
+
+
 		if ($objCart->intRowid) {
 			$objCart->SaveUpdatedCartItems();
 			$objCart->Save(false, true);
@@ -124,6 +141,12 @@ class Cart extends CartGen {
 			$objCart->Save(true);
 
 		$_SESSION['XLSWS_CART'] = $objCart;
+	}
+
+	public function Save($blnForceInsert = false, $blnForceUpdate = false) {
+		if (_xls_get_conf('DEBUG_CART', 0) == 1)
+			QApplication::Log(E_ERROR, 'savingcart', $_SERVER['REMOTE_ADDR'].' '._xls_whereCalled().' '.print_r($this,true));
+		return parent::Save($blnForceInsert,$blnForceUpdate);
 	}
 
 	/**
@@ -135,7 +158,7 @@ class Cart extends CartGen {
 		$customer = Customer::GetCurrent();
 		$cart = Cart::GetCart();
 
-		if($customer){
+		if ($customer && $customer->Rowid) {
 			$cart->Customer = $customer;
 			$dest = Destination::LoadMatching(
 				$customer->Country2,
@@ -206,6 +229,23 @@ class Cart extends CartGen {
          
     }
 
+	/** For any cart items, recalculate the inventory available. Always needs to be done after
+	 * an order is completed
+	 *
+	 */
+	public function RecalculateInventoryOnCartItems() {
+
+		$arrItems = $this->GetCartItemArray();
+		foreach($arrItems as $objItem) {
+			$objProduct = Product::Load($objItem->ProductId);
+			$objProduct->InventoryReserved=$objProduct->CalculateReservedInventory();
+			//Since $objProduct->Inventory isn't the real inventory column, it's a calculation,
+			//just pass it to the Avail so we have it for queries elsewhere
+			$objProduct->InventoryAvail=$objProduct->Inventory;
+			$objProduct->Save();
+		}
+	}
+
     public function SetIdStr() {
         $strQueryFormat = 'SELECT COUNT(rowid) FROM xlsws_cart WHERE '.
             '`id_str` = "%s" AND `rowid` != "%s";';
@@ -224,7 +264,7 @@ class Cart extends CartGen {
             $this->Save();
         }
         catch (Exception $objExc) {
-            QApplicaiton::Log(E_USER_ERROR, 'checkout', 
+            QApplication::Log(E_USER_ERROR, 'checkout', 
                 'Failed to save cart with : ' . $objExc);
         }
 
@@ -248,11 +288,16 @@ class Cart extends CartGen {
 
 		if ($intQuantity == $objItem->Qty)
 			return;
-
-		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD','0') != '1' &&
+		
+		if (_xls_get_conf('PRICE_REQUIRE_LOGIN',0) == 1 && !xlsws_index::isLoggedIn()) {
+			_qalert(_sp('You must log in before Adding to Cart.'));
+				return false;
+		}
+		
+		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) < 2 &&
 			$intQuantity > $objItem->Qty &&
 			$objItem->Product->Inventoried &&
-			$objItem->Product->Inventory < $intQuantity) {
+			$objItem->Product->InventoryAvail < $intQuantity) {
 				_qalert(_sp('Your chosen quantity is not available' .
 				' for ordering. Please come back and order later.'));
 				return false;
@@ -275,20 +320,46 @@ class Cart extends CartGen {
 	}
 
 	/**
-	 * Update Cart by removing Products which no longer exist
+	 * Update Cart by removing Products which no longer exist or are unavailable
 	 */
 	public function UpdateMissingProducts() {
+		$blnResult=false;
 		foreach ($this->GetCartItemArray() as $objItem) {
-			if (!$objItem->Product) {
-				QApplication::Log(E_WARNING, 'cart',
-					'Removing missing product code cart : ' . $this->Rowid);
+		
+			if (!$objItem->Product || $objItem->Product->Web==0) {
+				CartMessages::CreateMessage($this->Rowid,_sp('The product') .
+					' "'.$objItem->Description . '" ' . _sp('is no longer available on this site and has been removed from your cart'));
 				$objItem->Delete();
+				$bnlResult = true;
 			}
+
+			
+			if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) != 2) { //IOW, unless we allow backordering
+				if ($objItem->Product->Inventoried) {
+					if ($objItem->Product->Inventory==0) {
+					 	CartMessages::CreateMessage($this->Rowid,_sp('The product') .
+						' "'.$objItem->Description . '" ' . _sp(' is now out of stock and has been removed from your cart.'));
+						$objItem->Delete();
+						$bnlResult = true;
+					 
+					 }
+					 elseif ($objItem->Qty > $objItem->Product->Inventory) {
+					 	CartMessages::CreateMessage($this->Rowid,_sp('The product') .
+						' "'.$objItem->Description . '" ' . _sp(' now has less stock available than the amount you requested. Your cart quantity has been reduced to match what is available.'));
+						$objItem->Qty=$objItem->Product->Inventory;
+						$bnlResult = true;	
+					}
+			 	}
+			}
+			
+			
 		}
+		return $bnlResult;
 	}
 
 	/**
 	 * Update Cart by applying a Promo Code
+	 * dryRun is deprecated, we shouldn't run this as a validation test
 	 */
 	public function UpdatePromoCode($dryRun = false) {
 		if (!$this->FkPromoId)
@@ -305,19 +376,21 @@ class Cart extends CartGen {
 		
 		// Sort array by High Price to Low Price, reset discount to 0 to evaluate from the beginning
 		$arrSorted = array();
+		$intOriginalSubTotal=0;
 		foreach ($this->GetCartItemArray() as $objItem) {
 			if (!$dryRun)
 				$objItem->Discount = 0;
 			$arrSorted[] = $objItem;
+			$intOriginalSubTotal += $objItem->Qty*$objItem->Sell;
         }	
 				
-		if ($objPromoCode->Threshold > $this->Subtotal) {
+		if ($objPromoCode->Threshold > $intOriginalSubTotal && $this->FkPromoId != NULL) {
 				$this->UpdateDiscountExpiry();
 				$this->FkPromoId = NULL;
 				QApplication::ExecuteJavaScript("alert('Promo Code \"" .$objPromoCode->Code .  _sp("\" no longer applies to your cart and has been removed.")  . "')");				
 			return;
 		}
-			
+	
 
 		$intDiscount = 0;
 		if ($objPromoCode->Type == PromoCodeType::Flat)
@@ -325,19 +398,17 @@ class Cart extends CartGen {
 		else if ($objPromoCode->Type == PromoCodeType::Percent)
 			$intDiscount = $objPromoCode->Amount/100;
 		else {
-			QApplication::Log(E_WARNING, 'checkout'.
+			QApplication::Log(E_WARNING, 'checkout',
 				'Invalid PromoCode type ' . $objPromoCode->Type);
 			return;
 		}
 
-		$bolApplied = false;
-
-					
-			
+		$bolApplied = false;	
 			
 		usort($arrSorted, array('XLSCartItemManager', 'CompareByPrice'));
 
-		foreach ($arrSorted as $objItem) {
+		
+		foreach ($arrSorted as $objItem) { 
 			if (!$objPromoCode->IsProductAffected($objItem))
 				continue;
 
@@ -362,7 +433,7 @@ class Cart extends CartGen {
 				}
 			}
 			else if ($objPromoCode->Type == PromoCodeType::Percent) {
-				$intItemDiscount = $intDiscount * $objItem->Sell;
+				$intItemDiscount = $objItem->Sell - round((1-$intDiscount) * $objItem->Sell,2,PHP_ROUND_HALF_UP);
 			}
 
 			if (!$dryRun)
@@ -392,8 +463,8 @@ class Cart extends CartGen {
 		$intNoTax = 999;
 		if ($objNoTax) $intNoTax = $objNoTax->Rowid;
 
-		// Dont want taxes, so return
-		if ($this->FkTaxCodeId == $intNoTax)
+		// Don't want taxes, so return
+		if ($this->FkTaxCodeId == $intNoTax || $this->FkTaxCodeId==-1)
 			return;
 
 		foreach($this->GetCartItemArray() as $objItem) {
@@ -536,7 +607,7 @@ class Cart extends CartGen {
 		$this->Subtotal = 0;
 
 		foreach ($this->GetCartItemArray() as $objItem) {
-			$this->Count += $objItem->Qty;
+			$this->Count += 1; //How many rows in cart_items
 			$this->Subtotal += $objItem->SellTotal;
 		}
 	}
@@ -581,11 +652,8 @@ class Cart extends CartGen {
 		$UpdateShipping = true,
 		$SaveCart = true)
 	{
-		$this->UpdateMissingProducts();
-
-		// TODO : Legacy code
-		//if ($this->IsExpired())
-		//    $this->UpdateDiscountExpiry();
+		if ($this->UpdateMissingProducts())
+			$this->Reload();
 
 		$this->UpdateSubtotal();
 
@@ -709,10 +777,13 @@ class Cart extends CartGen {
             return false;
 
 		// If cart unsaved, Save it to get Rowid
-		if (!$this->Rowid)
+		if (!$this->Rowid) {
 			$this->Save();
+			$this->UpdateCartCustomer();
+		}
 
 		$objItem->CartId = $this->Rowid;
+		$this->UpdateSubtotal();
 		$objItem->Save();
 
 		$this->UpdateCart(false,true,false,true);
@@ -796,13 +867,12 @@ class Cart extends CartGen {
     }
 
 	protected function GetLink($blnTracking = false) { 
-		$strUrl = _xls_site_dir() . '/index.php?xlspg=';
+	
+		if ($blnTracking) $strUrl =  'order-track/'.XLSURL::KEY_PAGE.'?getuid=';
+		else $strUrl = 'cart/'.XLSURL::KEY_PAGE.'?getcart=';
 
-		if ($blnTracking) $strUrl = $strUrl . 'order_track&getuid=';
-		else $strUrl = $strUrl . 'cart&getcart=';
-
-		$strUrl = $strUrl . $this->Linkid;
-		return $strUrl;
+		$strUrl .= $this->Linkid;
+		return _xls_site_url($strUrl);
 	}
 
 	/**
@@ -877,6 +947,21 @@ class Cart extends CartGen {
 	}
 
 	/**
+	 * Findest the tallest product out of all your cart items to use as box height
+	 * @return int
+	 */
+	public static function GetPending() {
+		$intCount = Cart::QueryCount(
+		QQ::AndCondition(
+					QQ::Equal(QQN::Cart()->Downloaded, 0),
+					QQ::Equal(QQN::Cart()->Type, 4 ))
+
+	    );
+	    return $intCount;
+	}
+
+	   
+	/**
 	 * from an emailed cart, load the cart by link
 	 * @return
 	 */
@@ -899,6 +984,34 @@ class Cart extends CartGen {
 		}
 	}
 
+	/**
+		 * Load an array of Cart objects,
+		 * by CustomerId Index(es)
+		 * @param integer $intCustomerId
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @return Cart[]
+		*/
+		public static function LoadLastCartInProgress($intCustomerId) {
+			// Call Cart::QueryArray to perform the LoadArrayByCustomerId query
+			try {
+				$items = Cart::QueryArray(
+					QQ::AndCondition(
+						QQ::Equal(QQN::Cart()->CustomerId, $intCustomerId),
+						QQ::Equal(QQN::Cart()->Type, '1'),
+						QQ::GreaterThan(QQN::Cart()->Count, 0)),
+					QQ::Clause(
+						
+						QQ::OrderBy(QQN::Cart()->Rowid, false),
+			 			QQ::LimitInfo(1)
+			 		)
+					);
+				return $items[0];
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
+		
 	/**
 	 * loads cart by a given promo code id, if it exists
 	 *
@@ -1014,7 +1127,7 @@ class Cart extends CartGen {
 
 	public static function update_cart_qty($itemid, $qty) {
 		QApplication::Log(E_USER_NOTICE, 'legacy', __FUNCTION__);
-		return $this->UpdateCartQuantity($itemid, $qty);
+		return Cart::UpdateCartQuantity($itemid, $qty);
 	}
 
 	/**
@@ -1062,7 +1175,13 @@ class Cart extends CartGen {
 			case 'SubTotalTaxIncIfSet':
 				QApplication::Log(E_USER_NOTICE, 'legacy', $strName);
 				return $this->Subtotal;
-
+				
+			case 'TaxTotal':
+				return round(round($this->Tax1,2)+round($this->Tax2,2)+
+									round($this->Tax3,2)+round($this->Tax4,2)+round($this->Tax5,2),2);
+			case 'Pending':
+				return $this->GetPending();
+			
 			default:
 				try {
 					return parent::__get($strName);

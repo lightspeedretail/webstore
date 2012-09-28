@@ -23,22 +23,31 @@
 		const pdetailimage = 3;
 		const miniimage = 4;
 		const listingimage = 5;
+		const categoryimage = 6;
+		const previewimage = 7;
+		const sliderimage = 8;
 
-		const MaxId = 5;
+		const MaxId = 8;
 
 		public static $NameArray = array(
 			1 => 'image',
 			2 => 'smallimage',
 			3 => 'pdetailimage',
 			4 => 'miniimage',
-			5 => 'listingimage');
+			5 => 'listingimage',
+			6 => 'categoryimage',
+			7 => 'previewimage',
+			8 => 'sliderimage');
 
 		public static $TokenArray = array(
 			1 => 'image',
 			2 => 'smallimage',
 			3 => 'pdetailimage',
 			4 => 'miniimage',
-			5 => 'listingimage');
+			5 => 'listingimage',
+			6 => 'categoryimage',
+			7 => 'previewimage',
+			8 => 'sliderimage');
 
 		public static $ExtraColumnNamesArray = array(
 			'Width',
@@ -59,7 +68,16 @@
 						'Height' => '30'),
 			5 => array (
 						'Width' => '40',
-						'Height' => '40'));
+						'Height' => '40'),
+			6 => array (
+						'Width' => '180',
+						'Height' => '180'),
+			7 => array (
+						'Width' => '30',
+						'Height' => '30'),
+			8 => array (
+						'Width' => '90',
+						'Height' => '90'));
 
 
 		public static function ToString($intImagesTypeId) {
@@ -69,6 +87,9 @@
 				case 3: return 'pdetailimage';
 				case 4: return 'miniimage';
 				case 5: return 'listingimage';
+				case 6: return 'categoryimage';
+				case 7: return 'previewimage';
+				case 8: return 'sliderimage';
 				default:
 					throw new QCallerException(sprintf('Invalid intImagesTypeId: %s', $intImagesTypeId));
 			}
@@ -81,6 +102,9 @@
 				case 3: return 'pdetailimage';
 				case 4: return 'miniimage';
 				case 5: return 'listingimage';
+				case 6: return 'categoryimage';
+				case 7: return 'previewimage';
+				case 8: return 'sliderimage';
 				default:
 					throw new QCallerException(sprintf('Invalid intImagesTypeId: %s', $intImagesTypeId));
 			}

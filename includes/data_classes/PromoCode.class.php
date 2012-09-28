@@ -38,7 +38,8 @@ class PromoCode extends PromoCodeGen {
 	}
 
 	protected function IsActive() {
-		if ($this->IsStarted() &&
+		if ($this->IsEnabled() &&
+			$this->IsStarted() &&
 			!$this->IsExpired() &&
 			$this->HasRemaining())
 				return true;
@@ -52,47 +53,84 @@ class PromoCode extends PromoCodeGen {
 		return true;
 	}
 
+	protected function IsEnabled() {
+		if ($this->blnEnabled)
+			return true;
+		return false;
+	}
+
+	public function IsExcept() {
+		if ($this->intExcept==1)
+			return true;
+		return false;
+	}
+
 	protected function IsStarted() {
-		if (date("Y-m-d")>=date("Y-m-d",strtotime($this->strValidFrom)))
+		if ($this->strValidFrom=="" || date("Y-m-d")>=date("Y-m-d",strtotime($this->strValidFrom)))
 			return true;
 		return false;
 	}
 
 	protected function IsExpired() {
-		if (date("Y-m-d",strtotime($this->strValidUntil))<date("Y-m-d"))
+		if ($this->strValidUntil != "" && date("Y-m-d",strtotime($this->strValidUntil))<date("Y-m-d"))
+			return true;
+		return false;
+	}
+	
+	
+	protected function IsShipping() {
+		if ($this->LsCodeArray[0]=="shipping:")
 			return true;
 		return false;
 	}
 
 	public function IsProductAffected($objItem) {
-		$arrCode = $this->LsCodeArray;
-		if (empty($arrCode))
-			return true;
 
+		$arrCode = unserialize(strtolower(serialize($this->LsCodeArray)));
+		if (empty($arrCode)) //no product restrictions
+			return true;
+		
+
+		
+		$boolReturn = false;
+		
         foreach($arrCode as $strCode) {
             $strCode=strtolower($strCode);
-            
-            if (substr($strCode, 0,7) == "family:" && 
-                substr($strCode,7,255) == strtolower($objItem->Product->Family)) 
-            return true;
+  
+             if (substr($strCode, 0,7) == "family:" && 
+                trim(substr($strCode,7,255)) == strtolower($objItem->Product->Family)) 
+            $boolReturn = true; 
             
             if (substr($strCode, 0,6) == "class:" && 
-                substr($strCode,6,255) == strtolower($objItem->Product->ClassName)) 
-            return true;
-            
+                trim(substr($strCode,6,255)) == strtolower($objItem->Product->ClassName)) 
+             $boolReturn = true; 
+             
             if (substr($strCode, 0,8) == "keyword:" && (
                 trim(substr($strCode,8,255)) == strtolower($objItem->Product->WebKeyword1) ||
                 trim(substr($strCode,8,255)) == strtolower($objItem->Product->WebKeyword2) ||
                 trim(substr($strCode,8,255)) == strtolower($objItem->Product->WebKeyword3) )              
                 ) 
-            return true; 
+            $boolReturn = true; 
+            
+            if (substr($strCode, 0,9) == "category:") {
+				$arrTrail = Category::GetTrailByProductId($objItem->Product->Rowid,'names');
+				$strTrail = implode("|",$arrTrail);
+
+				$strCompareCode = trim(substr($strCode,9,255));
+				if ($strCompareCode == strtolower(substr($strTrail,0,strlen($strCompareCode))))               
+					$boolReturn = true;
+			}
            
         }  
-		  
-		  if (_xls_array_search_begin($objItem->Code, $arrCode))
-			return true;
 
-		return false;
+		  if (_xls_array_search_begin(strtolower($objItem->Code), $arrCode))
+			$boolReturn = true; 
+
+		//We normally return true if it's a match. If this code uses Except, then the logic is reversed
+		if ($this->IsExcept())
+			$boolReturn = ($boolReturn == true ? false : true);
+
+		return $boolReturn; 
 	}
 
 	/**
@@ -106,6 +144,63 @@ class PromoCode extends PromoCodeGen {
 		);
 	}
 
+	/**
+	 * Load a PromoCode from code for Shipping Promo Code
+	 * Separated from other types of promo codes
+	 * @param string $strCode
+	 * @return PromoCode
+	 */
+	public static function LoadByCodeShipping($strCode) {
+		return PromoCode::QuerySingle(
+			QQ::AndCondition(
+				QQ::Equal(QQN::PromoCode()->Code, $strCode),
+				QQ::Like(QQN::PromoCode()->Lscodes, "shipping:,%")
+				)
+		);						
+	}
+	
+	/**
+	 * Delete all Shipping PromoCodes
+	 * @return void
+	 */
+	public static function DeleteShippingPromoCodes() {
+			// Get the Database Object for this Class
+			$objDatabase = PromoCode::GetDatabase();
+
+			// Perform the Query
+			$objDatabase->NonQuery('
+				DELETE FROM
+					`xlsws_promo_code`
+					WHERE `lscodes` LIKE "shipping:,%"');
+		}
+
+	public static function DisableShippingPromoCodes() {
+			// Get the Database Object for this Class
+			$objDatabase = PromoCode::GetDatabase();
+
+			// Perform the Query
+			$objDatabase->NonQuery('
+				update
+					`xlsws_promo_code`
+					set `enabled`= 0
+					WHERE `lscodes` LIKE "shipping:,%"');
+		}
+
+
+	public static function EnableShippingPromoCodes() {
+			// Get the Database Object for this Class
+			$objDatabase = PromoCode::GetDatabase();
+
+			// Perform the Query
+			$objDatabase->NonQuery('
+				update
+					`xlsws_promo_code`
+					set `enabled`= 1
+					WHERE `lscodes` LIKE "shipping:,%"');;
+		}
+
+
+	
 	/**
 	 * Load a PromoCode from cart id
 	 * @param string $intCart
@@ -130,6 +225,12 @@ class PromoCode extends PromoCodeGen {
 			case 'Active':
 				return $this->IsActive();
 
+			case 'Enabled':
+				return $this->IsEnabled();
+
+			case 'Except':
+				return $this->intExcept;
+
 			case 'HasRemaining':
 				return $this->HasRemaining();
 
@@ -138,6 +239,10 @@ class PromoCode extends PromoCodeGen {
 
 			case 'Expired':
 				return $this->IsExpired();
+				
+			case 'Shipping':
+				return $this->IsShipping();
+				
 
 			case 'Threshold':
 				return $this->strThreshold;

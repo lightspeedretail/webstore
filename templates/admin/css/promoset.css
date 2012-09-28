@@ -1,0 +1,49 @@
+/*
+ * SimpleModal Basic Modal Dialog
+ * http://www.ericmmartin.com/projects/simplemodal/
+ * http://code.google.com/p/simplemodal/
+ *
+ * Copyright (c) 2010 Eric Martin - http://ericmmartin.com
+ *
+ * Licensed under the MIT license:
+ *   http://www.opensource.org/licenses/mit-license.php
+ *
+ * Revision: $Id: basic.css 257 2010-07-27 23:06:56Z emartin24 $
+ */
+
+#basic-modal-content {display:none;}
+
+/* Overlay */
+#simplemodal-overlay {background-color:#000; cursor:wait;}
+
+/* Container */
+#simplemodal-container {height:295px; width:880px; color:#111; background-color:#eeeeee; border:4px solid #444; padding:5px;text-shadow: none;}
+#simplemodal-container .simplemodal-data {padding:8px;}
+#simplemodal-container code {background:#141414; border-left:3px solid #65B43D; color:#bbb; display:block; font-size:12px; margin-bottom:12px; padding:4px 0px 6px;}
+#simplemodal-container a {color:#222;}
+#simplemodal-container a.modalCloseImg {background:url(../img/basic/x.png) no-repeat; width:25px; height:29px; display:inline; z-index:3200; position:absolute; top:-15px; right:-16px; cursor:pointer;}
+#simplemodal-container h3 {color:#84b8d9;}
+.tip {
+    font-size: 10px;
+    margin-left: 10px;
+    margin-top: 20px;
+}
+.center { margin-left: 290px; }
+.dropdown {
+background:#222;
+border:1px solid #111;
+color:#fff;
+display:inline;
+float:left;
+font-size:13px;
+font-weight:700;
+margin-top:-6px;
+text-align:left;
+display: block;
+}
+.label {
+font-size:13px;
+
+margin-left:20px;
+margin-right:12px;
+}

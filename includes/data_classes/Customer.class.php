@@ -74,24 +74,19 @@ class Customer extends CustomerGen {
 
 	/**
 	 * Get the current customer object
-	 * @param boolean $fallbackonStackTemp
 	 * @return obj customer
 	 */
-	public static function GetCurrent($fallbackOnStackTemp = false) {
-		if (array_key_exists('customer', $_SESSION) &&
-			(!is_null($_SESSION['customer'])))
-			$customer = $_SESSION['customer'];
+	public static function GetCurrent() {
+        $objCustomer = null;
 
-		if ($customer)
-			return $customer;
+        if (array_key_exists('customer', $_SESSION))
+            $objCustomer = $_SESSION['customer'];
 
-		if ($fallbackOnStackTemp) {
-			$tempCustomer = _xls_stack_get('xls_temp_customer');
-			if ($tempCustomer)
-				return $tempCustomer;
-		}
-
-		return null;
+        if (!$objCustomer) {
+            $objCustomer = new Customer();
+			$_SESSION['customer'] = $objCustomer;
+        }
+		return $objCustomer;
 	}
 
 	/**
@@ -116,12 +111,12 @@ class Customer extends CustomerGen {
 			return false;
 
 		// Clear single-use temp password
-		if (!empty($objCustomer->TempPassword)) {
-			$objCustomer->TempPassword = '';
+		if ($objCustomer->TempPassword>'') {
+			$objCustomer->TempPassword = null;
 			$objCustomer->Save();
 		}
 
-		return true;
+		return $match;
 	}
 
 	/**
@@ -147,9 +142,6 @@ class Customer extends CustomerGen {
 		if (!$objCustomer->Authenticate($objCustomer, $strPassword))
 			return false;
 
-		// assign customer to the visitor
-		Visitor::update_with_customer_id($objCustomer->Rowid);
-
 		$_SESSION['customer'] = $objCustomer;
 		return true;
 	}
@@ -166,7 +158,7 @@ class Customer extends CustomerGen {
 
 		unset($_SESSION['customer']);
 		$customer = NULL;
-		Visitor::do_logout();
+
 
 		session_unset();
 		session_destroy();

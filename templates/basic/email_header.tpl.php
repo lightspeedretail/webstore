@@ -30,7 +30,7 @@
 
 
 		<meta http-equiv="Content-Type" content="text/html; charset=<?php _xt(QApplication::$EncodingType); ?>" />
-		<base href="<?= _xls_site_dir(false);?>/"/>
+		<base href="<?= _xls_site_url();?>"/>
 		<title><?= _xls_get_conf('STORE_NAME') ?> <?php _xt("Email") ?></title>
 
 <style type="text/css">
@@ -40,11 +40,56 @@ body {
    font-size: 13px;
    font-style: normal;
    line-height: 1.5em;
-   color: #111;
+
 }
 
 table {
 font-size: 12px;
+border: 0px;
+width: 750px;
+margin: 0 auto; 
+
+}
+
+tbody {
+background-color: #E9EBEA;
+}
+
+.graphicheader {
+height: 100px; 
+text-align: left;
+width=750px;
+background-color: #ffffff;
+} 
+
+#cartitems table {
+	width: 730px;
+	margin-top: 10px;
+	margin-bottom: 20px;
+	
+}
+
+#cartitems th {
+background: none repeat scroll 0 0 #000000;
+color: #FFFFFF;
+font-weight: bold;
+padding-left: 2px;
+text-align: left;
+}
+
+#cartitems .summary {
+text-align:right;
+font-weight: bold;
+}
+
+
+#cartitems .rightprice {
+text-align:right;
+}
+
+#cartitems .shipping {
+vertical-align: top;
+text-align: left;
 }
 
 #footer a {color: #fff;}
@@ -54,11 +99,10 @@ a img {border: none;}
 </style>
 
 
-<table border="0" width="780px" style="margin: 0 auto; background: #E9EBEA;">
-  <tbody>
+<table>
     <tr>
-      <th style="height: 105px; text-align: left;" width="780px" background="<?= templateNamed('images/email_header_bg.png') ?>">
-      <a href="index.php">
+      <th class="graphicheader">
+      <a href="/">
 	      <img src="<?php
 	     $img =  _xls_get_conf('HEADER_IMAGE' ,  false ); 
 	     
@@ -72,5 +116,9 @@ a img {border: none;}
      </a>
       </th>
     </tr>
+ </table>
+<table>
+  <tbody>
     <tr>
-     <td style="padding:15px;" width="780px">
+     <td style="padding:15px;" width="750px">
+	

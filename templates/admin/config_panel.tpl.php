@@ -33,14 +33,20 @@
 						</div>
 						
 						<?php if($_CONTROL->EditMode): ?>
-								<div class="module_config<?= $_CONTROL->special_css_class; ?>">
+						
+							<div class="module_config<?= $_CONTROL->special_css_class; ?>">
+								
+							<? if(isset($_CONTROL->ConfigurationGuide))
+							echo $_CONTROL->ConfigurationGuide; ?>
+	
 									<?php  foreach($_CONTROL->fields as $key => $field): ?>
 								
 									<p>
 										<span class="label"><?= $field->Name; ?>:</span> 
 										<span class="field">
 											<?php $field->RenderWithError(); ?>
-											<a href="#" onclick="return false;" class="tooltip" title="<?= $_CONTROL->GetHelperText($key); ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" alt="Key: #" class="info_right" /></a>
+											<? if (strlen($_CONTROL->GetHelperText($key))>1) { ?>
+											<a href="#" onclick="return false;" class="tooltip" title="<?= $_CONTROL->GetHelperText($key); ?>"><img src="<?= adminTemplate('css/images/btn_info.png') ?>" alt="Key: #" class="info_right" /></a><? } ?>
 										</span> 
 									</p>
 								

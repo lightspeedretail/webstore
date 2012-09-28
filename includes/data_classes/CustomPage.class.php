@@ -39,16 +39,98 @@ class CustomPage extends CustomPageGen {
 
 	// Return the URL for this object
 	public function GetLink() {
-		if (_xls_get_conf('ENABLE_SEO_URL', false))
-			return $this->strKey . '.html';
-		else
-			return 'index.php?cpage=' . $this->strKey;
+		if (substr(strip_tags($this->strPage),0,7)=="http://" || substr(strip_tags($this->strPage),0,8)=="https://")
+			return strip_tags($this->strPage);
+		
+		//Because of our special handling on the contact us form	
+		if ($this->strKey=="contactus")
+			$strUrl = 'contact_us/'.XLSURL::KEY_PAGE;
+		else $strUrl = $this->strRequestUrl;
+		
+		$objCatTest = Category::LoadByRequestUrl($strUrl);
+		if ($objCatTest)
+			$strUrl .= "/".XLSURL::KEY_CUSTOMPAGE; //avoid conflicting Custom Page and Product URL
+
+
+		return _xls_site_url($strUrl,false);
+		
+	}
+
+	public static function LoadByRequestUrl($strName) {
+		return CustomPage::QuerySingle(
+			QQ::Equal(QQN::CustomPage()->RequestUrl, $strName)
+			);
+	}
+
+	public static function LoadByKey($strName) {
+		return CustomPage::QuerySingle(
+			QQ::Equal(QQN::CustomPage()->Key, $strName)
+			);
+	}
+	
+	public static function GetLinkByKey($strKey) {
+	
+		$cpage = CustomPage::LoadByKey($strKey);
+		if($cpage)
+			return $cpage->Link;
+		else return _xls_site_url();
+	
+	}
+
+	public static function ConvertSEO() {
+	
+		$arrPages = CustomPage::LoadAll();
+		foreach ($arrPages as $objPage) {
+			$objPage->RequestUrl = _xls_seo_url($objPage->Title);
+			$objPage->Save();
+		}
+	
+	}
+	
+	protected function GetPageMeta($strConf = 'SEO_CUSTOMPAGE_TITLE') { 
+	
+		$strItem = _xls_get_conf($strConf, '%storename%');
+		$strCrumbNames = '';
+		$strCrumbNamesR = '';
+		
+		$arrPatterns = array(
+			"%storename%",
+			"%name%",
+			"%title%",
+			"%crumbtrail%",
+			"%rcrumbtrail%");
+		$arrCrumb = _xls_get_crumbtrail();
+		
+		foreach ($arrCrumb as $crumb) {
+			$strCrumbNames .= $crumb['name']." ";
+			$strCrumbNamesR = $crumb['name']." ".$strCrumbNamesR;
+		}
+				
+		$arrItems = array(
+			_xls_get_conf('STORE_NAME',''),
+			$this->Title,
+			$this->Title,
+			$strCrumbNames,
+			$strCrumbNamesR,
+			);		
+			
+			
+		return str_replace($arrPatterns, $arrItems, $strItem);
+		
 	}
 
 	public function __get($strName) {
 		switch ($strName) {
-			case 'Link': 
+			case 'Link':
+			case 'CanonicalUrl': 
 				return $this->GetLink();
+			case 'RequestUrl': 
+				return $this->strRequestUrl;
+			case 'Title':
+				return $this->strTitle;
+
+			case 'PageTitle':
+				return _xls_truncate($this->GetPageMeta('SEO_CUSTOMPAGE_TITLE'),70);
 
 			default:
 				try {

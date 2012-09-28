@@ -50,6 +50,7 @@
 	 * @property string $User the value for strUser 
 	 * @property string $Zip1 the value for strZip1 
 	 * @property string $Zip2 the value for strZip2 
+	 * @property integer $CheckSame the value for intCheckSame 
 	 * @property boolean $NewsletterSubscribe the value for blnNewsletterSubscribe 
 	 * @property boolean $HtmlEmail the value for blnHtmlEmail 
 	 * @property string $Password the value for strPassword 
@@ -384,6 +385,14 @@
 		protected $strZip2;
 		const Zip2MaxLength = 16;
 		const Zip2Default = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_customer.check_same
+		 * @var integer intCheckSame
+		 */
+		protected $intCheckSame;
+		const CheckSameDefault = null;
 
 
 		/**
@@ -828,6 +837,7 @@
 			$objBuilder->AddSelectItem($strTableName, 'user', $strAliasPrefix . 'user');
 			$objBuilder->AddSelectItem($strTableName, 'zip1', $strAliasPrefix . 'zip1');
 			$objBuilder->AddSelectItem($strTableName, 'zip2', $strAliasPrefix . 'zip2');
+			$objBuilder->AddSelectItem($strTableName, 'check_same', $strAliasPrefix . 'check_same');
 			$objBuilder->AddSelectItem($strTableName, 'newsletter_subscribe', $strAliasPrefix . 'newsletter_subscribe');
 			$objBuilder->AddSelectItem($strTableName, 'html_email', $strAliasPrefix . 'html_email');
 			$objBuilder->AddSelectItem($strTableName, 'password', $strAliasPrefix . 'password');
@@ -1010,6 +1020,8 @@
 			$objToReturn->strZip1 = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'zip2', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'zip2'] : $strAliasPrefix . 'zip2';
 			$objToReturn->strZip2 = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'check_same', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'check_same'] : $strAliasPrefix . 'check_same';
+			$objToReturn->intCheckSame = $objDbRow->GetColumn($strAliasName, 'Integer');
 			$strAliasName = array_key_exists($strAliasPrefix . 'newsletter_subscribe', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'newsletter_subscribe'] : $strAliasPrefix . 'newsletter_subscribe';
 			$objToReturn->blnNewsletterSubscribe = $objDbRow->GetColumn($strAliasName, 'Bit');
 			$strAliasName = array_key_exists($strAliasPrefix . 'html_email', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'html_email'] : $strAliasPrefix . 'html_email';
@@ -1213,6 +1225,7 @@
 							`user`,
 							`zip1`,
 							`zip2`,
+							`check_same`,
 							`newsletter_subscribe`,
 							`html_email`,
 							`password`,
@@ -1254,6 +1267,7 @@
 							' . $objDatabase->SqlVariable($this->strUser) . ',
 							' . $objDatabase->SqlVariable($this->strZip1) . ',
 							' . $objDatabase->SqlVariable($this->strZip2) . ',
+							' . $objDatabase->SqlVariable($this->intCheckSame) . ',
 							' . $objDatabase->SqlVariable($this->blnNewsletterSubscribe) . ',
 							' . $objDatabase->SqlVariable($this->blnHtmlEmail) . ',
 							' . $objDatabase->SqlVariable($this->strPassword) . ',
@@ -1324,6 +1338,7 @@
 							`user` = ' . $objDatabase->SqlVariable($this->strUser) . ',
 							`zip1` = ' . $objDatabase->SqlVariable($this->strZip1) . ',
 							`zip2` = ' . $objDatabase->SqlVariable($this->strZip2) . ',
+							`check_same` = ' . $objDatabase->SqlVariable($this->intCheckSame) . ',
 							`newsletter_subscribe` = ' . $objDatabase->SqlVariable($this->blnNewsletterSubscribe) . ',
 							`html_email` = ' . $objDatabase->SqlVariable($this->blnHtmlEmail) . ',
 							`password` = ' . $objDatabase->SqlVariable($this->strPassword) . ',
@@ -1454,6 +1469,7 @@
 			$this->strUser = $objReloaded->strUser;
 			$this->strZip1 = $objReloaded->strZip1;
 			$this->strZip2 = $objReloaded->strZip2;
+			$this->intCheckSame = $objReloaded->intCheckSame;
 			$this->blnNewsletterSubscribe = $objReloaded->blnNewsletterSubscribe;
 			$this->blnHtmlEmail = $objReloaded->blnHtmlEmail;
 			$this->strPassword = $objReloaded->strPassword;
@@ -1655,6 +1671,11 @@
 					// Gets the value for strZip2 
 					// @return string
 					return $this->strZip2;
+
+				case 'CheckSame':
+					// Gets the value for intCheckSame 
+					// @return integer
+					return $this->intCheckSame;
 
 				case 'NewsletterSubscribe':
 					// Gets the value for blnNewsletterSubscribe 
@@ -2145,6 +2166,17 @@
 					// @return string
 					try {
 						return ($this->strZip2 = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'CheckSame':
+					// Sets the value for intCheckSame 
+					// @param integer $mixValue
+					// @return integer
+					try {
+						return ($this->intCheckSame = QType::Cast($mixValue, QType::Integer));
 					} catch (QCallerException $objExc) {
 						$objExc->IncrementOffset();
 						throw $objExc;
@@ -2892,6 +2924,7 @@
 			$strToReturn .= '<element name="User" type="xsd:string"/>';
 			$strToReturn .= '<element name="Zip1" type="xsd:string"/>';
 			$strToReturn .= '<element name="Zip2" type="xsd:string"/>';
+			$strToReturn .= '<element name="CheckSame" type="xsd:int"/>';
 			$strToReturn .= '<element name="NewsletterSubscribe" type="xsd:boolean"/>';
 			$strToReturn .= '<element name="HtmlEmail" type="xsd:boolean"/>';
 			$strToReturn .= '<element name="Password" type="xsd:string"/>';
@@ -2991,6 +3024,8 @@
 				$objToReturn->strZip1 = $objSoapObject->Zip1;
 			if (property_exists($objSoapObject, 'Zip2'))
 				$objToReturn->strZip2 = $objSoapObject->Zip2;
+			if (property_exists($objSoapObject, 'CheckSame'))
+				$objToReturn->intCheckSame = $objSoapObject->CheckSame;
 			if (property_exists($objSoapObject, 'NewsletterSubscribe'))
 				$objToReturn->blnNewsletterSubscribe = $objSoapObject->NewsletterSubscribe;
 			if (property_exists($objSoapObject, 'HtmlEmail'))
@@ -3115,6 +3150,8 @@
 					return new QQNode('zip1', 'Zip1', 'string', $this);
 				case 'Zip2':
 					return new QQNode('zip2', 'Zip2', 'string', $this);
+				case 'CheckSame':
+					return new QQNode('check_same', 'CheckSame', 'integer', $this);
 				case 'NewsletterSubscribe':
 					return new QQNode('newsletter_subscribe', 'NewsletterSubscribe', 'boolean', $this);
 				case 'HtmlEmail':
@@ -3227,6 +3264,8 @@
 					return new QQNode('zip1', 'Zip1', 'string', $this);
 				case 'Zip2':
 					return new QQNode('zip2', 'Zip2', 'string', $this);
+				case 'CheckSame':
+					return new QQNode('check_same', 'CheckSame', 'integer', $this);
 				case 'NewsletterSubscribe':
 					return new QQNode('newsletter_subscribe', 'NewsletterSubscribe', 'boolean', $this);
 				case 'HtmlEmail':

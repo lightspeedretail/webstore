@@ -58,6 +58,7 @@
 	 * @property string $PaymentModule the value for strPaymentModule 
 	 * @property string $PaymentData the value for strPaymentData 
 	 * @property string $PaymentAmount the value for strPaymentAmount 
+	 * @property string $TrackingNumber the value for strTrackingNumber 
 	 * @property integer $FkTaxCodeId the value for intFkTaxCodeId 
 	 * @property boolean $TaxInclusive the value for blnTaxInclusive 
 	 * @property string $Subtotal the value for strSubtotal 
@@ -386,7 +387,6 @@
 		 * @var string strPrintedNotes
 		 */
 		protected $strPrintedNotes;
-		const PrintedNotesMaxLength = 255;
 		const PrintedNotesDefault = null;
 
 
@@ -466,6 +466,15 @@
 		 */
 		protected $strPaymentAmount;
 		const PaymentAmountDefault = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column xlsws_cart.tracking_number
+		 * @var string strTrackingNumber
+		 */
+		protected $strTrackingNumber;
+		const TrackingNumberMaxLength = 255;
+		const TrackingNumberDefault = null;
 
 
 		/**
@@ -780,7 +789,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -842,7 +851,7 @@
 		 * Static Qcodo Query method to query for a single Cart object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Cart the queried object
 		 */
@@ -855,16 +864,38 @@
 				throw $objExc;
 			}
 
-			// Perform the Query, Get the First Row, and Instantiate a new Cart object
+			// Perform the Query
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-			return Cart::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
+
+			// Instantiate a new Cart object and return it
+
+			// Do we have to expand anything?
+			if ($objQueryBuilder->ExpandAsArrayNodes) {
+				$objToReturn = array();
+				while ($objDbRow = $objDbResult->GetNextRow()) {
+					$objItem = Cart::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
+					if ($objItem) $objToReturn[] = $objItem;
+				}
+
+				if (count($objToReturn)) {
+					// Since we only want the object to return, lets return the object and not the array.
+					return $objToReturn[0];
+				} else {
+					return null;
+				}
+			} else {
+				// No expands just return the first row
+				$objDbRow = $objDbResult->GetNextRow();
+				if (is_null($objDbRow)) return null;
+				return Cart::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
+			}
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of Cart objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Cart[] the queried objects as an array
 		 */
@@ -883,10 +914,35 @@
 		}
 
 		/**
+		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
+		 * Uses BuildQueryStatment to perform most of the work.
+		 * @param QQCondition $objConditions any conditions on the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
+		 * @return QDatabaseResultBase the cursor resource instance
+		 */
+		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
+			// Get the query statement
+			try {
+				$strQuery = Cart::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+
+			// Perform the query
+			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
+		
+			// Return the results cursor
+			$objDbResult->QueryBuilder = $objQueryBuilder;
+			return $objDbResult;
+		}
+
+		/**
 		 * Static Qcodo Query method to query for a count of Cart objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -1022,6 +1078,7 @@
 			$objBuilder->AddSelectItem($strTableName, 'payment_module', $strAliasPrefix . 'payment_module');
 			$objBuilder->AddSelectItem($strTableName, 'payment_data', $strAliasPrefix . 'payment_data');
 			$objBuilder->AddSelectItem($strTableName, 'payment_amount', $strAliasPrefix . 'payment_amount');
+			$objBuilder->AddSelectItem($strTableName, 'tracking_number', $strAliasPrefix . 'tracking_number');
 			$objBuilder->AddSelectItem($strTableName, 'fk_tax_code_id', $strAliasPrefix . 'fk_tax_code_id');
 			$objBuilder->AddSelectItem($strTableName, 'tax_inclusive', $strAliasPrefix . 'tax_inclusive');
 			$objBuilder->AddSelectItem($strTableName, 'subtotal', $strAliasPrefix . 'subtotal');
@@ -1056,7 +1113,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this Cart::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param DatabaseRowBase $objDbRow
+		 * @param QDatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -1186,7 +1243,7 @@
 			$strAliasName = array_key_exists($strAliasPrefix . 'sell_total', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'sell_total'] : $strAliasPrefix . 'sell_total';
 			$objToReturn->strSellTotal = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'printed_notes', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'printed_notes'] : $strAliasPrefix . 'printed_notes';
-			$objToReturn->strPrintedNotes = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$objToReturn->strPrintedNotes = $objDbRow->GetColumn($strAliasName, 'Blob');
 			$strAliasName = array_key_exists($strAliasPrefix . 'shipping_method', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'shipping_method'] : $strAliasPrefix . 'shipping_method';
 			$objToReturn->strShippingMethod = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'shipping_module', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'shipping_module'] : $strAliasPrefix . 'shipping_module';
@@ -1205,6 +1262,8 @@
 			$objToReturn->strPaymentData = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'payment_amount', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'payment_amount'] : $strAliasPrefix . 'payment_amount';
 			$objToReturn->strPaymentAmount = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'tracking_number', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'tracking_number'] : $strAliasPrefix . 'tracking_number';
+			$objToReturn->strTrackingNumber = $objDbRow->GetColumn($strAliasName, 'VarChar');
 			$strAliasName = array_key_exists($strAliasPrefix . 'fk_tax_code_id', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'fk_tax_code_id'] : $strAliasPrefix . 'fk_tax_code_id';
 			$objToReturn->intFkTaxCodeId = $objDbRow->GetColumn($strAliasName, 'Integer');
 			$strAliasName = array_key_exists($strAliasPrefix . 'tax_inclusive', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'tax_inclusive'] : $strAliasPrefix . 'tax_inclusive';
@@ -1304,7 +1363,7 @@
 
 		/**
 		 * Instantiate an array of Carts from a Database Result
-		 * @param DatabaseResultBase $objDbResult
+		 * @param QDatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return Cart[]
@@ -1337,6 +1396,32 @@
 			return $objToReturn;
 		}
 
+		/**
+		 * Instantiate a single Cart object from a query cursor (e.g. a DB ResultSet).
+		 * Cursor is automatically moved to the "next row" of the result set.
+		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
+		 * @param QDatabaseResultBase $objDbResult cursor resource
+		 * @return Cart next row resulting from the query
+		 */
+		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
+			// If blank resultset, then return empty result
+			if (!$objDbResult) return null;
+
+			// If empty resultset, then return empty result
+			$objDbRow = $objDbResult->GetNextRow();
+			if (!$objDbRow) return null;
+
+			// We need the Column Aliases
+			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
+			if (!$strColumnAliasArray) $strColumnAliasArray = array();
+
+			// Pull Expansions (if applicable)
+			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
+
+			// Load up the return result with a row and return it
+			return Cart::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
+		}
+
 
 
 
@@ -1350,9 +1435,10 @@
 		 * @param integer $intRowid
 		 * @return Cart
 		*/
-		public static function LoadByRowid($intRowid) {
+		public static function LoadByRowid($intRowid, $objOptionalClauses = null) {
 			return Cart::QuerySingle(
 				QQ::Equal(QQN::Cart()->Rowid, $intRowid)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1362,9 +1448,10 @@
 		 * @param string $strIdStr
 		 * @return Cart
 		*/
-		public static function LoadByIdStr($strIdStr) {
+		public static function LoadByIdStr($strIdStr, $objOptionalClauses = null) {
 			return Cart::QuerySingle(
 				QQ::Equal(QQN::Cart()->IdStr, $strIdStr)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1380,7 +1467,8 @@
 			try {
 				return Cart::QueryArray(
 					QQ::Equal(QQN::Cart()->CustomerId, $intCustomerId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1393,10 +1481,11 @@
 		 * @param integer $intCustomerId
 		 * @return int
 		*/
-		public static function CountByCustomerId($intCustomerId) {
+		public static function CountByCustomerId($intCustomerId, $objOptionalClauses = null) {
 			// Call Cart::QueryCount to perform the CountByCustomerId query
 			return Cart::QueryCount(
 				QQ::Equal(QQN::Cart()->CustomerId, $intCustomerId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1412,7 +1501,8 @@
 			try {
 				return Cart::QueryArray(
 					QQ::Equal(QQN::Cart()->Type, $intType),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1425,10 +1515,11 @@
 		 * @param integer $intType
 		 * @return int
 		*/
-		public static function CountByType($intType) {
+		public static function CountByType($intType, $objOptionalClauses = null) {
 			// Call Cart::QueryCount to perform the CountByType query
 			return Cart::QueryCount(
 				QQ::Equal(QQN::Cart()->Type, $intType)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1444,7 +1535,8 @@
 			try {
 				return Cart::QueryArray(
 					QQ::Equal(QQN::Cart()->Linkid, $strLinkid),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1457,10 +1549,11 @@
 		 * @param string $strLinkid
 		 * @return int
 		*/
-		public static function CountByLinkid($strLinkid) {
+		public static function CountByLinkid($strLinkid, $objOptionalClauses = null) {
 			// Call Cart::QueryCount to perform the CountByLinkid query
 			return Cart::QueryCount(
 				QQ::Equal(QQN::Cart()->Linkid, $strLinkid)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1476,7 +1569,8 @@
 			try {
 				return Cart::QueryArray(
 					QQ::Equal(QQN::Cart()->FkTaxCodeId, $intFkTaxCodeId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1489,10 +1583,11 @@
 		 * @param integer $intFkTaxCodeId
 		 * @return int
 		*/
-		public static function CountByFkTaxCodeId($intFkTaxCodeId) {
+		public static function CountByFkTaxCodeId($intFkTaxCodeId, $objOptionalClauses = null) {
 			// Call Cart::QueryCount to perform the CountByFkTaxCodeId query
 			return Cart::QueryCount(
 				QQ::Equal(QQN::Cart()->FkTaxCodeId, $intFkTaxCodeId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1508,7 +1603,8 @@
 			try {
 				return Cart::QueryArray(
 					QQ::Equal(QQN::Cart()->Submitted, $dttSubmitted),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1521,10 +1617,11 @@
 		 * @param QDateTime $dttSubmitted
 		 * @return int
 		*/
-		public static function CountBySubmitted($dttSubmitted) {
+		public static function CountBySubmitted($dttSubmitted, $objOptionalClauses = null) {
 			// Call Cart::QueryCount to perform the CountBySubmitted query
 			return Cart::QueryCount(
 				QQ::Equal(QQN::Cart()->Submitted, $dttSubmitted)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1540,7 +1637,8 @@
 			try {
 				return Cart::QueryArray(
 					QQ::Equal(QQN::Cart()->GiftRegistry, $intGiftRegistry),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1553,10 +1651,11 @@
 		 * @param integer $intGiftRegistry
 		 * @return int
 		*/
-		public static function CountByGiftRegistry($intGiftRegistry) {
+		public static function CountByGiftRegistry($intGiftRegistry, $objOptionalClauses = null) {
 			// Call Cart::QueryCount to perform the CountByGiftRegistry query
 			return Cart::QueryCount(
 				QQ::Equal(QQN::Cart()->GiftRegistry, $intGiftRegistry)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1572,7 +1671,8 @@
 			try {
 				return Cart::QueryArray(
 					QQ::Equal(QQN::Cart()->Downloaded, $blnDownloaded),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1585,10 +1685,11 @@
 		 * @param boolean $blnDownloaded
 		 * @return int
 		*/
-		public static function CountByDownloaded($blnDownloaded) {
+		public static function CountByDownloaded($blnDownloaded, $objOptionalClauses = null) {
 			// Call Cart::QueryCount to perform the CountByDownloaded query
 			return Cart::QueryCount(
 				QQ::Equal(QQN::Cart()->Downloaded, $blnDownloaded)
+			, $objOptionalClauses
 			);
 		}
 
@@ -1601,9 +1702,9 @@
 
 
 
-		//////////////////////////
-		// SAVE, DELETE AND RELOAD
-		//////////////////////////
+		//////////////////////////////////////
+		// SAVE, DELETE, RELOAD
+		//////////////////////////////////////
 
 		/**
 		 * Save this Cart
@@ -1664,6 +1765,7 @@
 							`payment_module`,
 							`payment_data`,
 							`payment_amount`,
+							`tracking_number`,
 							`fk_tax_code_id`,
 							`tax_inclusive`,
 							`subtotal`,
@@ -1726,6 +1828,7 @@
 							' . $objDatabase->SqlVariable($this->strPaymentModule) . ',
 							' . $objDatabase->SqlVariable($this->strPaymentData) . ',
 							' . $objDatabase->SqlVariable($this->strPaymentAmount) . ',
+							' . $objDatabase->SqlVariable($this->strTrackingNumber) . ',
 							' . $objDatabase->SqlVariable($this->intFkTaxCodeId) . ',
 							' . $objDatabase->SqlVariable($this->blnTaxInclusive) . ',
 							' . $objDatabase->SqlVariable($this->strSubtotal) . ',
@@ -1750,6 +1853,7 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intRowid = $objDatabase->InsertId('xlsws_cart', 'rowid');
+
 				} else {
 					// Perform an UPDATE query
 
@@ -1817,6 +1921,7 @@
 							`payment_module` = ' . $objDatabase->SqlVariable($this->strPaymentModule) . ',
 							`payment_data` = ' . $objDatabase->SqlVariable($this->strPaymentData) . ',
 							`payment_amount` = ' . $objDatabase->SqlVariable($this->strPaymentAmount) . ',
+							`tracking_number` = ' . $objDatabase->SqlVariable($this->strTrackingNumber) . ',
 							`fk_tax_code_id` = ' . $objDatabase->SqlVariable($this->intFkTaxCodeId) . ',
 							`tax_inclusive` = ' . $objDatabase->SqlVariable($this->blnTaxInclusive) . ',
 							`subtotal` = ' . $objDatabase->SqlVariable($this->strSubtotal) . ',
@@ -1839,6 +1944,7 @@
 						WHERE
 							`rowid` = ' . $objDatabase->SqlVariable($this->intRowid) . '
 					');
+
 				}
 
 			} catch (QCallerException $objExc) {
@@ -1884,6 +1990,7 @@
 					`xlsws_cart`
 				WHERE
 					`rowid` = ' . $objDatabase->SqlVariable($this->intRowid) . '');
+
 		}
 
 		/**
@@ -1968,6 +2075,7 @@
 			$this->strPaymentModule = $objReloaded->strPaymentModule;
 			$this->strPaymentData = $objReloaded->strPaymentData;
 			$this->strPaymentAmount = $objReloaded->strPaymentAmount;
+			$this->strTrackingNumber = $objReloaded->strTrackingNumber;
 			$this->FkTaxCodeId = $objReloaded->FkTaxCodeId;
 			$this->blnTaxInclusive = $objReloaded->blnTaxInclusive;
 			$this->strSubtotal = $objReloaded->strSubtotal;
@@ -1990,7 +2098,7 @@
 			$this->intFkPromoId = $objReloaded->intFkPromoId;
 		}
 
-
+		
 
 		////////////////////
 		// PUBLIC OVERRIDERS
@@ -2222,6 +2330,11 @@
 					// Gets the value for strPaymentAmount 
 					// @return string
 					return $this->strPaymentAmount;
+
+				case 'TrackingNumber':
+					// Gets the value for strTrackingNumber 
+					// @return string
+					return $this->strTrackingNumber;
 
 				case 'FkTaxCodeId':
 					// Gets the value for intFkTaxCodeId 
@@ -2882,6 +2995,17 @@
 						throw $objExc;
 					}
 
+				case 'TrackingNumber':
+					// Sets the value for strTrackingNumber 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strTrackingNumber = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
 				case 'FkTaxCodeId':
 					// Sets the value for intFkTaxCodeId 
 					// @param integer $mixValue
@@ -3271,6 +3395,8 @@
 				WHERE
 					`rowid` = ' . $objDatabase->SqlVariable($objCartItem->Rowid) . '
 			');
+
+		
 		}
 
 		/**
@@ -3297,6 +3423,8 @@
 					`rowid` = ' . $objDatabase->SqlVariable($objCartItem->Rowid) . ' AND
 					`cart_id` = ' . $objDatabase->SqlVariable($this->intRowid) . '
 			');
+
+			
 		}
 
 		/**
@@ -3310,6 +3438,7 @@
 			// Get the Database Object for this Class
 			$objDatabase = Cart::GetDatabase();
 
+			
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
@@ -3343,6 +3472,8 @@
 					`rowid` = ' . $objDatabase->SqlVariable($objCartItem->Rowid) . ' AND
 					`cart_id` = ' . $objDatabase->SqlVariable($this->intRowid) . '
 			');
+
+			
 		}
 
 		/**
@@ -3421,6 +3552,8 @@
 				WHERE
 					`rowid` = ' . $objDatabase->SqlVariable($objSro->Rowid) . '
 			');
+
+			
 		}
 
 		/**
@@ -3447,6 +3580,8 @@
 					`rowid` = ' . $objDatabase->SqlVariable($objSro->Rowid) . ' AND
 					`cart_id` = ' . $objDatabase->SqlVariable($this->intRowid) . '
 			');
+
+			
 		}
 
 		/**
@@ -3493,6 +3628,8 @@
 					`rowid` = ' . $objDatabase->SqlVariable($objSro->Rowid) . ' AND
 					`cart_id` = ' . $objDatabase->SqlVariable($this->intRowid) . '
 			');
+
+			
 		}
 
 		/**
@@ -3506,6 +3643,7 @@
 			// Get the Database Object for this Class
 			$objDatabase = Cart::GetDatabase();
 
+			
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
@@ -3568,6 +3706,7 @@
 			$strToReturn .= '<element name="PaymentModule" type="xsd:string"/>';
 			$strToReturn .= '<element name="PaymentData" type="xsd:string"/>';
 			$strToReturn .= '<element name="PaymentAmount" type="xsd:string"/>';
+			$strToReturn .= '<element name="TrackingNumber" type="xsd:string"/>';
 			$strToReturn .= '<element name="FkTaxCode" type="xsd1:TaxCode"/>';
 			$strToReturn .= '<element name="TaxInclusive" type="xsd:boolean"/>';
 			$strToReturn .= '<element name="Subtotal" type="xsd:string"/>';
@@ -3699,6 +3838,8 @@
 				$objToReturn->strPaymentData = $objSoapObject->PaymentData;
 			if (property_exists($objSoapObject, 'PaymentAmount'))
 				$objToReturn->strPaymentAmount = $objSoapObject->PaymentAmount;
+			if (property_exists($objSoapObject, 'TrackingNumber'))
+				$objToReturn->strTrackingNumber = $objSoapObject->TrackingNumber;
 			if ((property_exists($objSoapObject, 'FkTaxCode')) &&
 				($objSoapObject->FkTaxCode))
 				$objToReturn->FkTaxCode = TaxCode::GetObjectFromSoapObject($objSoapObject->FkTaxCode);
@@ -3794,6 +3935,77 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
+	/**
+	 * @property-read QQNode $Rowid
+	 * @property-read QQNode $IdStr
+	 * @property-read QQNode $AddressBill
+	 * @property-read QQNode $AddressShip
+	 * @property-read QQNode $ShipFirstname
+	 * @property-read QQNode $ShipLastname
+	 * @property-read QQNode $ShipCompany
+	 * @property-read QQNode $ShipAddress1
+	 * @property-read QQNode $ShipAddress2
+	 * @property-read QQNode $ShipCity
+	 * @property-read QQNode $ShipZip
+	 * @property-read QQNode $ShipState
+	 * @property-read QQNode $ShipCountry
+	 * @property-read QQNode $ShipPhone
+	 * @property-read QQNode $Zipcode
+	 * @property-read QQNode $Contact
+	 * @property-read QQNode $Discount
+	 * @property-read QQNode $Firstname
+	 * @property-read QQNode $Lastname
+	 * @property-read QQNode $Company
+	 * @property-read QQNode $Name
+	 * @property-read QQNode $Phone
+	 * @property-read QQNode $Po
+	 * @property-read QQNode $Type
+	 * @property-read QQNode $Status
+	 * @property-read QQNode $CostTotal
+	 * @property-read QQNode $Currency
+	 * @property-read QQNode $CurrencyRate
+	 * @property-read QQNode $DatetimeCre
+	 * @property-read QQNode $DatetimeDue
+	 * @property-read QQNode $DatetimePosted
+	 * @property-read QQNode $Email
+	 * @property-read QQNode $SellTotal
+	 * @property-read QQNode $PrintedNotes
+	 * @property-read QQNode $ShippingMethod
+	 * @property-read QQNode $ShippingModule
+	 * @property-read QQNode $ShippingData
+	 * @property-read QQNode $ShippingCost
+	 * @property-read QQNode $ShippingSell
+	 * @property-read QQNode $PaymentMethod
+	 * @property-read QQNode $PaymentModule
+	 * @property-read QQNode $PaymentData
+	 * @property-read QQNode $PaymentAmount
+	 * @property-read QQNode $TrackingNumber
+	 * @property-read QQNode $FkTaxCodeId
+	 * @property-read QQNodeTaxCode $FkTaxCode
+	 * @property-read QQNode $TaxInclusive
+	 * @property-read QQNode $Subtotal
+	 * @property-read QQNode $Tax1
+	 * @property-read QQNode $Tax2
+	 * @property-read QQNode $Tax3
+	 * @property-read QQNode $Tax4
+	 * @property-read QQNode $Tax5
+	 * @property-read QQNode $Total
+	 * @property-read QQNode $Count
+	 * @property-read QQNode $Downloaded
+	 * @property-read QQNode $User
+	 * @property-read QQNode $IpHost
+	 * @property-read QQNode $CustomerId
+	 * @property-read QQNodeCustomer $Customer
+	 * @property-read QQNode $GiftRegistry
+	 * @property-read QQNodeGiftRegistry $GiftRegistryObject
+	 * @property-read QQNode $SendTo
+	 * @property-read QQNode $Submitted
+	 * @property-read QQNode $Modified
+	 * @property-read QQNode $Linkid
+	 * @property-read QQNode $FkPromoId
+	 * @property-read QQReverseReferenceNodeCartItem $CartItem
+	 * @property-read QQReverseReferenceNodeSro $Sro
+	 */
 	class QQNodeCart extends QQNode {
 		protected $strTableName = 'xlsws_cart';
 		protected $strPrimaryKey = 'rowid';
@@ -3886,6 +4098,8 @@
 					return new QQNode('payment_data', 'PaymentData', 'string', $this);
 				case 'PaymentAmount':
 					return new QQNode('payment_amount', 'PaymentAmount', 'string', $this);
+				case 'TrackingNumber':
+					return new QQNode('tracking_number', 'TrackingNumber', 'string', $this);
 				case 'FkTaxCodeId':
 					return new QQNode('fk_tax_code_id', 'FkTaxCodeId', 'integer', $this);
 				case 'FkTaxCode':
@@ -3949,7 +4163,79 @@
 			}
 		}
 	}
-
+	
+	/**
+	 * @property-read QQNode $Rowid
+	 * @property-read QQNode $IdStr
+	 * @property-read QQNode $AddressBill
+	 * @property-read QQNode $AddressShip
+	 * @property-read QQNode $ShipFirstname
+	 * @property-read QQNode $ShipLastname
+	 * @property-read QQNode $ShipCompany
+	 * @property-read QQNode $ShipAddress1
+	 * @property-read QQNode $ShipAddress2
+	 * @property-read QQNode $ShipCity
+	 * @property-read QQNode $ShipZip
+	 * @property-read QQNode $ShipState
+	 * @property-read QQNode $ShipCountry
+	 * @property-read QQNode $ShipPhone
+	 * @property-read QQNode $Zipcode
+	 * @property-read QQNode $Contact
+	 * @property-read QQNode $Discount
+	 * @property-read QQNode $Firstname
+	 * @property-read QQNode $Lastname
+	 * @property-read QQNode $Company
+	 * @property-read QQNode $Name
+	 * @property-read QQNode $Phone
+	 * @property-read QQNode $Po
+	 * @property-read QQNode $Type
+	 * @property-read QQNode $Status
+	 * @property-read QQNode $CostTotal
+	 * @property-read QQNode $Currency
+	 * @property-read QQNode $CurrencyRate
+	 * @property-read QQNode $DatetimeCre
+	 * @property-read QQNode $DatetimeDue
+	 * @property-read QQNode $DatetimePosted
+	 * @property-read QQNode $Email
+	 * @property-read QQNode $SellTotal
+	 * @property-read QQNode $PrintedNotes
+	 * @property-read QQNode $ShippingMethod
+	 * @property-read QQNode $ShippingModule
+	 * @property-read QQNode $ShippingData
+	 * @property-read QQNode $ShippingCost
+	 * @property-read QQNode $ShippingSell
+	 * @property-read QQNode $PaymentMethod
+	 * @property-read QQNode $PaymentModule
+	 * @property-read QQNode $PaymentData
+	 * @property-read QQNode $PaymentAmount
+	 * @property-read QQNode $TrackingNumber
+	 * @property-read QQNode $FkTaxCodeId
+	 * @property-read QQNodeTaxCode $FkTaxCode
+	 * @property-read QQNode $TaxInclusive
+	 * @property-read QQNode $Subtotal
+	 * @property-read QQNode $Tax1
+	 * @property-read QQNode $Tax2
+	 * @property-read QQNode $Tax3
+	 * @property-read QQNode $Tax4
+	 * @property-read QQNode $Tax5
+	 * @property-read QQNode $Total
+	 * @property-read QQNode $Count
+	 * @property-read QQNode $Downloaded
+	 * @property-read QQNode $User
+	 * @property-read QQNode $IpHost
+	 * @property-read QQNode $CustomerId
+	 * @property-read QQNodeCustomer $Customer
+	 * @property-read QQNode $GiftRegistry
+	 * @property-read QQNodeGiftRegistry $GiftRegistryObject
+	 * @property-read QQNode $SendTo
+	 * @property-read QQNode $Submitted
+	 * @property-read QQNode $Modified
+	 * @property-read QQNode $Linkid
+	 * @property-read QQNode $FkPromoId
+	 * @property-read QQReverseReferenceNodeCartItem $CartItem
+	 * @property-read QQReverseReferenceNodeSro $Sro
+	 * @property-read QQNode $_PrimaryKeyNode
+	 */
 	class QQReverseReferenceNodeCart extends QQReverseReferenceNode {
 		protected $strTableName = 'xlsws_cart';
 		protected $strPrimaryKey = 'rowid';
@@ -4042,6 +4328,8 @@
 					return new QQNode('payment_data', 'PaymentData', 'string', $this);
 				case 'PaymentAmount':
 					return new QQNode('payment_amount', 'PaymentAmount', 'string', $this);
+				case 'TrackingNumber':
+					return new QQNode('tracking_number', 'TrackingNumber', 'string', $this);
 				case 'FkTaxCodeId':
 					return new QQNode('fk_tax_code_id', 'FkTaxCodeId', 'integer', $this);
 				case 'FkTaxCode':

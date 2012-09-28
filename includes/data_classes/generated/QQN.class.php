@@ -13,10 +13,22 @@
 			return new QQNodeCartItem('xlsws_cart_item', null, null);
 		}
 		/**
+		 * @return QQNodeCartMessages
+		 */
+		static public function CartMessages() {
+			return new QQNodeCartMessages('xlsws_cart_messages', null, null);
+		}
+		/**
 		 * @return QQNodeCategory
 		 */
 		static public function Category() {
 			return new QQNodeCategory('xlsws_category', null, null);
+		}
+		/**
+		 * @return QQNodeCategoryAddl
+		 */
+		static public function CategoryAddl() {
+			return new QQNodeCategoryAddl('xlsws_category_addl', null, null);
 		}
 		/**
 		 * @return QQNodeConfiguration
@@ -55,6 +67,12 @@
 			return new QQNodeDestination('xlsws_destination', null, null);
 		}
 		/**
+		 * @return QQNodeEmail
+		 */
+		static public function Email() {
+			return new QQNodeEmail('xlsws_email', null, null);
+		}
+		/**
 		 * @return QQNodeFamily
 		 */
 		static public function Family() {
@@ -79,6 +97,12 @@
 			return new QQNodeGiftRegistryReceipents('xlsws_gift_registry_receipents', null, null);
 		}
 		/**
+		 * @return QQNodeGoogleCategories
+		 */
+		static public function GoogleCategories() {
+			return new QQNodeGoogleCategories('xlsws_google_categories', null, null);
+		}
+		/**
 		 * @return QQNodeImages
 		 */
 		static public function Images() {
@@ -101,6 +125,12 @@
 		 */
 		static public function Product() {
 			return new QQNodeProduct('xlsws_product', null, null);
+		}
+		/**
+		 * @return QQNodeProductCopy
+		 */
+		static public function ProductCopy() {
+			return new QQNodeProductCopy('xlsws_product_copy', null, null);
 		}
 		/**
 		 * @return QQNodeProductQtyPricing

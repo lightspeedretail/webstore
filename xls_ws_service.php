@@ -30,6 +30,7 @@
     require('includes/prepend.inc.php');    
     ob_end_clean();
 
+
     class XLSWService extends QSoapService {
         
         
@@ -49,7 +50,7 @@
         public function ws_version($passkey){
             
             if(!$this->check_passkey($passkey))
-                return self::FAIL_AUTH;
+                return "Invalid Password";
                             
             
             return _xls_version();
@@ -359,16 +360,17 @@
 
             if (!$blbRawImage) {
                 QApplication::Log(E_ERROR, 'uploader',
-                    'Did not receive image data for ' . $intRowid, __FUNCTION__);                return self::UNKNOWN_ERROR;
+                    'Did not receive image data for ' . $intRowid, __FUNCTION__);
+                    return self::UNKNOWN_ERROR;
             }    
 
             if (is_null($objProduct))
-                $objProduct = Product::Load($intRowid);
+               $objProduct = Product::Load($intRowid); 
 
             if (!$objProduct) {
                 QApplication::Log(E_ERROR, 'uploader',
-                    "Product Id does not exist $intRowid", __FUNCTION__);
-                return self::UNKNOWN_ERROR;
+                    " Attempting to save image for a missing product rowid:$intRowid", __FUNCTION__);
+                return self::UNKNOWN_ERROR." Attempting to save image for a missing product rowid:$intRowid";
             }    
 
             $blbImage = imagecreatefromstring($blbRawImage);
@@ -387,7 +389,7 @@
                 $objImage->Created = new QDateTime(QDateTime::Now);
 
             $objImage->SaveImageData(
-                Images::GetImageName($intRowid), $blbRawImage
+                Images::GetImageName(substr($objProduct->RequestUrl,0,60)), $blbImage
             );
             $objImage->Save();
 
@@ -404,7 +406,65 @@
 
             return self::OK;
         }
+      
 
+		/**
+         * Updating Inventory (delta update)
+         *
+         * @param string $passkey
+         * @param UpdateInventory[] $UpdateInventory
+         * @return string
+         */
+        public function update_inventory(
+                  $passkey,
+                  $UpdateInventory              
+                ){ 
+
+            if(!$this->check_passkey($passkey))
+                return self::FAIL_AUTH;
+
+				foreach($UpdateInventory as $arrProduct) {
+
+					$objProduct = Product::LoadByRowid($arrProduct->productID);
+					if ($objProduct) {
+						$strCode = $objProduct->Code;
+						foreach($arrProduct as $key=>$val) {
+							switch ($key) {
+							
+								case 'inventory': $objProduct->Inventory = $val; break;
+								case 'inventoryTotal': $objProduct->InventoryTotal = $val; break;
+							
+							}
+							
+						}
+						 // Now save the product
+			            try {
+
+				            $objProduct->InventoryReserved=$objProduct->CalculateReservedInventory();
+				            $objProduct->InventoryAvail=$objProduct->Inventory;
+							$objProduct->Save();
+			                
+			            }
+			            catch(Exception $e) {
+			                QApplication::Log(E_ERROR, 'uploader', 
+			                    "Product update failed for $strCode . Error: " . $e);
+			                return self::UNKNOWN_ERROR . $e;
+			            }
+					
+					
+					} else
+					_xls_log("Sent inventory update for a product we can't find ".$arrProduct->productID);
+					
+					
+				}
+				
+				
+	
+
+            return self::OK;
+        }
+        
+        
         /**
          * Save a product in the database (Create if need be)
          *
@@ -493,7 +553,7 @@
                 $blnForceInsert = false;
                 $bnForceUpdate = true;
             }
-            else { 
+            else {
                 $blnForceInsert = true;
                 $bnForceUpdate = false;
             }
@@ -507,7 +567,7 @@
     WHERE code = {$strSqlCode};
 EOS;
 
-            $intDuplicateId = _dbx_first_cell($strQuery);
+           $intDuplicateId = _dbx_first_cell($strQuery);
             if ($intDuplicateId)
                 if ($intDuplicateId != $intRowid) { 
                     
@@ -521,7 +581,7 @@ EOS;
                      	QApplication::Log(E_ERROR, 'uploader', 
                         'Duplicate product code found : ' . $strCode, 
                         __FUNCTION__); 
-                       return false;
+                       return self::UNKNOWN_ERROR . ' Duplicate product code found : ' . $strCode;
                      }
                 }
 
@@ -564,11 +624,22 @@ EOS;
             $product->WebKeyword2 = $strWebKeyword2;
             $product->WebKeyword3 = $strWebKeyword3;
             $product->Featured = $blnFeatured;
+            
+            $product->RequestUrl = _xls_seo_url(_xls_get_conf('SEO_URL_CODES' , 0) ? $strName."-".$strCode : $strName);
+
 	        $strFeatured = _xls_get_conf('FEATURED_KEYWORD','notset');
 	        if ($strFeatured != 'notset' && $product->Web && (
             	$strWebKeyword1==$strFeatured || $strWebKeyword2==$strFeatured || $strWebKeyword2==$strFeatured))
-            $product->Featured=1;
+            	$product->Featured=1;
             
+			$fltReserved = $product->CalculateReservedInventory();
+
+			$product->InventoryReserved = $fltReserved;
+			if(_xls_get_conf('INVENTORY_FIELD_TOTAL',0) == 1)
+				$product->InventoryAvail=($fltInventoryTotal-$fltReserved);
+			else
+				$product->InventoryAvail=($fltInventory-$fltReserved);
+
             // Now save the product
             try {
                 $product->Save($blnForceInsert, $blnForceUpdate, true);
@@ -577,8 +648,9 @@ EOS;
                 QApplication::Log(E_ERROR, 'uploader', 
                     "Product update failed for $strCode . Error: " . $e);
                 return self::UNKNOWN_ERROR . $e;
-            }
-
+            }		
+			
+			
             // Save the product image
             $blbImage = trim($blbImage);
             if($blbImage && ($blbImage = base64_decode($blbImage))) {
@@ -588,6 +660,7 @@ EOS;
                 , $blbImage 
                 , $product);
             }
+
 
             // Save category
             $strCategoryPath = trim($strCategoryPath);
@@ -630,10 +703,12 @@ EOS;
 	            if (!$objFamily) {
 	            	$objFamily = new Family();
 	            	$objFamily->Family = $strFamily;
+	            	$objFamily->RequestUrl = _xls_seo_url($strFamily);
 	            	$objFamily->Save();
 	            }
             }        
             
+
             return self::OK;
         }
         
@@ -716,8 +791,8 @@ EOS;
             $objImage->Height = imagesy($blbImage);
             $objImage->Created = new QDateTime(QDateTime::Now);
             $objImage->SaveImageData(
-                Images::GetImageName($intRowid, 0, 0, $intIndex, 'add'),
-                $blbRawImage
+                Images::GetImageName(substr($objProduct->RequestUrl,0,60), 0, 0, $intIndex, 'add'),
+                $blbImage
             );
             $objImage->Save(true);
 
@@ -753,8 +828,9 @@ EOS;
             $product = Product::Load($intRowid);
             
             if(!$product){
-                _xls_log("SOAP ERROR : Product id does not exist $intRowid .");
-                return self::UNKNOWN_ERROR;
+                //_xls_log("SOAP ERROR : Product id does not exist $intRowid .");
+                //We were asked to delete a product that was apparently already deleted, so just ignore
+                return self::OK;
             }
                 
             try{
@@ -801,11 +877,8 @@ EOS;
                 return self::FAIL_AUTH;
 
             $objProduct = Product::Load($intRowid); 
-            if (!$objProduct) {
-                QApplication::Log(E_WARNING, 'uploader', 
-                    'Product id does not exist ' . $intRowid, __FUNCTION__);
+            if (!$objProduct) //This is a routine clear for any upload, new products will always trigger here
                 return self::UNKNOWN_ERROR;
-            }
                 
             try {
                 $objProduct->DeleteImages();
@@ -851,6 +924,7 @@ EOS;
 
                 
             $related = ProductRelated::LoadByProductIdRelatedId($intProductId , $intRelatedId);
+            $objProduct = Product::Load($intProductId);
             
             $new = false;
             
@@ -859,7 +933,10 @@ EOS;
                 $new = true;
             }
             
+            //You can't auto add a master product
+            if ($objProduct->MasterModel==1) $intAutoadd=0;
             
+          
             $related->ProductId = $intProductId;
             $related->RelatedId = $intRelatedId;
             $related->Autoadd = $intAutoadd;
@@ -1052,7 +1129,7 @@ EOS;
             
             if($blbImage  &&  ($blbImage = base64_decode($blbImage))){
                 
-                $filename = "photos/header.jpg";
+                $filename = "photos/header.png";
                 
                 if(!file_put_contents($filename , $blbImage)){
                     _xls_log("SOAP ERROR : Unable to save header image in $filename.");
@@ -1175,15 +1252,11 @@ EOS;
         }
         
         
-                
-        
-        
-        
         /**
          * Save/Add a category with ID.
          * Rowid and ParentId are RowID of the current category and parentIDs
          * Category is the category name
-         * blbImage is base64encoded jpeg
+         * blbImage is base64encoded png
          * meta keywords and descriptions are for meta tags displayed for SEO improvement
          * Custom page is a page-key defined in Custom Pages in admin panel
          * Position defines the sorting position of category. Lower number comes first
@@ -1224,24 +1297,28 @@ EOS;
                 return self::UNKNOWN_ERROR;
             }
 
-            $objCategory = false; 
+            $objCategoryAddl = false; 
 
             // If provided a rowid, attempt to load it
             if ($intRowId)
-                $objCategory = Category::Load($intRowId);
-            else if (!$objCategory and $intParentId)
-                $objCategory = 
-                    Category::LoadByNameParent($strCategory, $intParentId);
+                $objCategoryAddl = CategoryAddl::Load($intRowId);
+            else if (!$objCategoryAddl and $intParentId)
+                $objCategoryAddl = 
+                    CategoryAddl::LoadByNameParent($strCategory, $intParentId);
 
             // Failing that, create a new Category
-            if (!$objCategory) { 
-                $objCategory = new Category();
-                $objCategory->Created = new QDateTime(QDateTime::Now);
+            if (!$objCategoryAddl) { 
+                $objCategoryAddl = new CategoryAddl();
+                $objCategoryAddl->Created = new QDateTime(QDateTime::Now);
             }
 
-            $objCategory->Name = $strCategory;
-            $objCategory->Parent = $intParentId;
-            $objCategory->Position = $intPosition;
+            $objCategoryAddl->Name = $strCategory;
+            $objCategoryAddl->Parent = $intParentId;
+            $objCategoryAddl->Position = $intPosition;
+            
+            /*
+              LS currently does not support this information being sent, so ignore it for now
+              
             if ($strCustomPage)
                 $objCategory->CustomPage = $strCustomPage;
             if ($strMetaKeywords)
@@ -1249,11 +1326,13 @@ EOS;
             if ($strMetaDescription)
                 $objCategory->MetaDescription = $strMetaDescription;
 
+			
+			
             $blbImage = trim($blbImage);
             if ($blbImage && ($blbImage = base64_decode($blbImage))) {
                 $im = imagecreatefromstring($blbImage);
 
-                if ($objCategory->ImageId){ // There is a image already
+                if ($objCategoryAddl->ImageId){ // There is a image already
                     $image = Images::LoadByRowid($category->ImageId);
                     $image->SetImage($blbImage , $intRowId . "_categ");
                     $image->Width = imagesx ( $im );
@@ -1268,7 +1347,7 @@ EOS;
                     $image->Created = new  QDateTime(QDateTime::Now);
                     
                     $image->Save(true);
-                    $objCategory->ImageId = $image->Rowid;
+                    $objCategoryAddl->ImageId = $image->Rowid;
                 }
                 
                 $image->Parent = $image->Rowid;
@@ -1278,14 +1357,54 @@ EOS;
                 unset($image);
                 unset($im);
             }
-
-            if ($intRowId && $objCategory->Rowid != $intRowId) { 
+				
+				*/
+				
+            if ($intRowId && $objCategoryAddl->Rowid != $intRowId) { 
+                $objCategoryAddl->Save(true);
+                self::changeRowId($objCategoryAddl , QQN::CategoryAddl() , $intRowId);
+                $objCategoryAddl = CategoryAddl::Load($intRowId);
+            }
+            
+     
+            
+            //Now that we've successfully saved in our cache table, update the regular Category table
+            $objCategory = Category::Load($intRowId);
+            // Failing that, create a new Category
+            if (!$objCategory) { 
+                $objCategory = new Category();
+                $objCategory->Created = new QDateTime(QDateTime::Now);       
+            }
+            if ($objCategory) {
+            	$objCategory->Name = $objCategoryAddl->Name;
+            	$objCategory->Parent = $objCategoryAddl->Parent;
+            	$objCategory->Position = $objCategoryAddl->Position;       
+            }
+            if ($intRowId && $objCategory->Rowid != $intRowId) {        
                 $objCategory->Save(true);
                 self::changeRowId($objCategory , QQN::Category() , $intRowId);
                 $objCategory = Category::Load($intRowId);
-            }
-
+            }    
+                
+            try{
+                 $objCategory->Save();
+            }catch(Exception $e){
+                QApplication::Log(E_ERROR, 'soap', 'Error saving category '.$e);
+                return self::UNKNOWN_ERROR;
+            }  
+            
+            //After saving, update some key fields     
             $objCategory->UpdateChildCount();
+            $objCategory->Reload();       
+ 			$objCategory->RequestUrl=$objCategory->GetSEOPath();        
+           
+           
+           	try{
+                 $objCategory->Save();
+            }catch(Exception $e){
+                QApplication::Log(E_ERROR, 'soap', 'Error saving category '.$e);
+                return self::UNKNOWN_ERROR;
+            }
             
             return self::OK;
         }       
@@ -1303,7 +1422,7 @@ EOS;
         /**
          * Save/Add a category.
          * CategoryPath to contain category names seperated by path as they are supposed to be traversed.
-         * blbImage is base64encoded jpeg
+         * blbImage is base64encoded png
          * meta keywords and descriptions are for meta tags displayed for SEO improvement
          * Custom page is a page-key defined in Custom Pages in admin panel
          * Position defines the sorting position of category. Lower number comes first
@@ -1392,6 +1511,7 @@ EOS;
             $category->CustomPage = trim($strCustomPage);
             $category->MetaKeywords = $strMetaKeywords;
             $category->MetaDescription = $strMetaDescription;
+            $category->RequestUrl = $category->GetSEOPath();
             $category->Save();
             $category->UpdateChildCount();
             
@@ -1454,7 +1574,7 @@ EOS;
                 
             }catch(Exception $e){
                 _xls_log("SOAP ERROR : Error adding tax $strTax " . $e);
-                return self::UNKNOWN_ERROR;
+                return self::UNKNOWN_ERROR." Error adding tax $strTax " . $e;
             }
             
             return self::OK;
@@ -1528,7 +1648,13 @@ EOS;
                 return self::OK;
             $new = false;
             // Loads tax
-            $tax = TaxCode::LoadByCode($strCode);
+            $tax = TaxCode::Load($intRowid);
+            
+            if ($tax)
+            	if ($tax->Code != $strCode) { //Tax Code has been renamed, just reinsert
+            		$tax->Delete(); 
+            		unset($tax);
+            	}
             
             if(!$tax){
                 $tax = new TaxCode();
@@ -1552,7 +1678,7 @@ EOS;
                 
             }catch(Exception $e){
                 _xls_log("SOAP ERROR : Error adding tax code $strCode " . $e);
-                return self::UNKNOWN_ERROR;
+                return self::UNKNOWN_ERROR." Error adding tax code $strCode " . $e;
             }
             
             return self::OK;
@@ -2495,6 +2621,7 @@ EOS;
         
         /**
          * Update all webstore orders before a timestamp ***DEPRECIATED - DO NOT USE, USED ONLY AS A WRAPPER FOR LIGHTSPEED DOWNLOAD REQUESTS, DO NOT DELETE****
+         * We also piggyback on this statement for pseudo-cron jobs since we know it's triggered at least once an hour
          *
          * @param string $passkey
          * @param int $intDttSubmitted
@@ -2502,6 +2629,11 @@ EOS;
          * @return string
          */
         public function update_order_downloaded_status_by_ts($passkey , $intDttSubmitted , $intDownloaded){
+
+			//Make sure we have our Any/Any default tax set in Destinations
+			TaxCode::VerifyAnyDestination();
+        	
+        	
             return self::OK;
             
         }
@@ -2689,14 +2821,22 @@ EOS;
             if(!$objCart)
                 return self::UNKNOWN_ERROR;
 
-            $product = Product::Load($intProductId);
-            if(!$product)
+            $objProduct = Product::Load($intProductId);
+            if(!$objProduct)
                 return self::UNKNOWN_ERROR;
 
-            $objCart->AddSoapProduct($product,
+            $objCart->AddSoapProduct($objProduct,
                 $fltQty, $strDescription,
                 $fltSell, $fltDiscount, CartType::order);
+			
 
+			$objProduct->InventoryReserved=$objProduct->CalculateReservedInventory();
+			//Since $objProduct->Inventory isn't the real inventory column, it's a calculation,
+			//just pass it to the Avail so we have it for queries elsewhere
+            $objProduct->InventoryAvail=$objProduct->Inventory;
+			$objProduct->Save();
+
+			
             return self::OK;
         }
         
@@ -2726,6 +2866,7 @@ EOS;
             }
             
             $family->Family = $strFamily;
+            $family->RequestUrl = _xls_seo_url($strFamily);
             
             try{
                 $family->Save($new);
@@ -2883,26 +3024,16 @@ EOS;
         
         /**
          * Flush categories (But not the associations to products!)
-         * This gets called on every Update Store. We defeat the erasing if cache categorie is turned on
+         * This gets called on every Update Store. We cache the transaction in category_addl and then sync changes,
+         * to avoid wiping out saved info.
          * @param string $passkey
          * @return string
          */
         public function flush_category($passkey) {
             if (!$this->check_passkey($passkey))
                 return self::FAIL_AUTH;
-
-            if (_xls_get_conf('CACHE_CATEGORY', 0) == 1)
-                return self::OK;
-
-            if (_xls_get_conf('DEBUG_RESET', 0) == 1) {
-                QApplication::Log(
-                    E_NOTICE, 'uploader',
-                    "Skipped Category flush operation due to DEBUG mode"
-                );
-                return self::OK;
-            }
-
-            $obj = new Category();
+			
+            $obj = new CategoryAddl();
 
             try {
                 $obj->Truncate();
@@ -2976,6 +3107,7 @@ EOS;
                 
                 	case "Category":
                     	_dbx("TRUNCATE `xlsws_product_category_assn`");
+                    	$obj = new CategoryAddl(); //We blank our caching table, not the real table
                     	break;
                     	             
                 	case "Images":
@@ -3076,7 +3208,7 @@ EOS;
     private static function changeRowId($obj , $qqn , $rowid){
 
         $st = "UPDATE " . substr($qqn->GetAsManualSqlColumn() , strpos($qqn->GetAsManualSqlColumn() , ".")+1 ) . " SET Rowid = '" . $rowid . "' WHERE Rowid =  '" . $obj->Rowid  . "'";
-        //_xls_log($st);
+       // error_log($st);
         _dbx( $st  , "NonQuery");       
         
     }

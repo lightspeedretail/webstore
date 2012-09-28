@@ -55,6 +55,8 @@ class xlsws_track_order extends xlsws_index {
 	protected $lblPrintedNotes; //the label for the printed notes
 	protected $lblOrderStatus; //the label for order status
 	protected $lblOrderDate; //the label for order date
+	protected $lblOrderPaymentType; //the label for the payment type
+	protected $lblOrderPaymentData; //the label for the payment data
 
 	protected $butBack; //the "go back" button
 
@@ -68,7 +70,192 @@ class xlsws_track_order extends xlsws_index {
 	protected $new_order;
 
 	protected $lblOrderMsg; //a span that shows an error on top of this page if any
+	protected $lblConversionCode;  //Google Adwords conversion code
 
+	/**
+	 * build_main - constructor for this controller
+	 * @param none
+	 * @return none
+	 */
+	protected function build_main() {
+		global $XLSWS_VARS;
+
+    	$objUrl = _xls_url_object();    
+
+
+		$customer = Customer::GetCurrent();
+
+		if($customer)
+			$this->customer = $customer;
+
+		$this->mainPnl = new QPanel($this,'MainPanel');
+		$this->mainPnl->Template = templateNamed('order_track.tpl.php');
+
+		$this->crumbs[] = array('link'=>'myaccount/pg' , 'case'=> '' , 'name'=> _sp('My Orders'));
+
+		$this->errSpan = new QLabel($this->mainPnl);
+		$this->errSpan->CssClass='modal_reg_err_msg';
+
+		// Wait icon
+		$this->objDefaultWaitIcon = new QWaitIcon($this);
+
+		$this->orderResultPnl = new XLSContentBox($this->mainPnl,'ResultPanel');
+		$this->orderResultPnl->Name = _sp("Your Orders");
+		$this->orderResultPnl->Visible = false;
+
+		$this->dtrOrder = new QDataRepeater($this->orderResultPnl,'OrderResults');
+		$this->dtrOrder->Template = templateNamed('order_list.tpl.php');
+		$this->pxyOrder = new QControlProxy($this);
+
+		$this->build_widgets();
+
+		$orders = array();
+
+		if($this->customer) {
+			// find ORDERs
+
+			// Load by email and main phone
+			$orders = Cart::QueryArray(
+				QQ::AndCondition(
+					QQ::Equal(QQN::Cart()->Email, $this->customer->Email),
+					QQ::OrCondition(
+						QQ::Equal(QQN::Cart()->Type, CartType::order),
+						QQ::Equal(QQN::Cart()->Type, CartType::saved)
+					)
+				),
+				QQ::Clause(
+					QQ::OrderBy(QQN::Cart()->IdStr, false )
+				)
+			);
+
+			if(count($orders) > 0) {
+				// hide the panel
+				$this->orderSearchPnl->Visible = false;
+				$this->orderResultPnl->Visible = true;
+
+				$this->dtrOrder->DataSource = $orders;
+			}
+		}
+
+		// The View Detail Panel
+		$this->orderViewPnl = new QPanel($this->mainPnl,'ViewPanel');
+		$this->orderViewPnl->Template = templateNamed('order_view.tpl.php');
+		$this->orderViewPnl->Visible = false;
+
+		$this->lblIdStr = new QLabel($this->orderViewPnl,'IdStr');
+		$this->lblOrderDate = new QLabel($this->orderViewPnl,'OrderDate');
+		$this->lblOrderStatus = new QLabel($this->orderViewPnl,'OrderStatus');
+		$this->lblOrderPaymentData = new QLabel($this->orderViewPnl,'OrderPayment');
+
+		$this->orderViewItemsPnl = new QPanel($this->orderViewPnl,'ViewItems');
+
+		$this->lblOrderMsg = new QLabel($this->mainPnl,'OrderMessage');
+		$this->lblConversionCode = new QLabel($this->mainPnl,'ConversionCode');
+		$this->bind_widgets();
+
+		
+			 
+
+		if(isset($_GET['dosearch'])) {
+			$this->txtOrderId->Text = $_GET['orderid'];
+			$this->txtEmailphone->Text = $_GET['emailphone'];
+			$this->search_Order();
+		}
+
+		if(isset($_GET['getuid'])) {
+			$this->show_submit_order = $_GET['getuid'];
+			$this->search_Order($_GET['getuid']);
+		}
+
+		if ($_GET['sendemail'] == "true" && isset($_GET['oid'])) {
+			//$order = Cart::QuerySingle(QQ::Equal(QQN::Cart()->Linkid , $_GET['oid']));
+			//$this->send_email($order);
+			return;
+		}
+
+		$this->order_display($this->order , $this->orderViewItemsPnl);
+		_xls_add_formatted_page_title(_sp('Order Details ').$this->order->IdStr);
+
+        if(isset($_GET['final'])) {
+			 $this->lblOrderMsg->Text = _sp("Thank you for your order.");
+			 
+			 //We put in our cart information into Analytics for additional tracking
+			 if (_xls_get_conf('GOOGLE_ANALYTICS','') != '') {
+			 
+			 
+			 	$strItemCode = "";
+			 	foreach ($this->order->GetCartItemArray() as $item) {
+			 		$objProduct = Product::Load($item->ProductId);
+			 		$strItemCode .= "_gaq.push(['_addItem',
+					    '".$this->order->IdStr."',           // order ID - required
+					    '"._xls_jssafe_name($item->Code)."',           // SKU/code - required
+					    '"._xls_jssafe_name($item->Description)."',        // product name
+					    '"._xls_jssafe_name($objProduct->ClassName)."',   // category or variation
+					    '".($item->Sell-$item->Discount)."',          // unit price - required
+					    '".$item->Qty."'               // quantity - required
+					  ]);
+					  ";
+				}
+			 
+			 
+				$this->lblGoogleAnalytics->Text = "<script type=\"text/javascript\">
+	
+				  var _gaq = _gaq || [];
+				  _gaq.push(['_setAccount', '"._xls_get_conf('GOOGLE_ANALYTICS')."']);
+				  _gaq.push(['_trackPageview']);
+				
+					 _gaq.push(['_addTrans',
+					    '".$this->order->IdStr."',           // order ID - required
+					    '"._xls_jssafe_name(_xls_get_conf('STORE_NAME',''))."',  // affiliation or store name
+					    '".$this->order->Total."',          // total - required
+					    '".$this->order->TaxTotal."',           // tax
+					    '".$this->order->ShippingSell."',              // shipping
+					    '"._xls_jssafe_name($this->order->ShipCity)."',       // city
+					    '".$this->order->ShipState."',     // state or province
+					    '".$this->order->ShipCountry."'             // country
+					  ]);
+					
+					   ".$strItemCode."
+					   
+					  _gaq.push(['_trackTrans']); //submits transaction to the Analytics servers
+					
+
+				  (function() {
+				    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+				    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+				    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+				  })();
+				
+				</script>";
+			}
+		
+			//Are we using Adwords campaigns? 
+			 if (_xls_get_conf('GOOGLE_ADWORDS','') != '') {
+				 $this->lblConversionCode->HtmlEntities = false;
+				 $this->lblConversionCode->Text = '<script type="text/javascript">
+					/* <![CDATA[ */
+					var google_conversion_id = '. _xls_get_conf('GOOGLE_ADWORDS'). '
+					var google_conversion_language = "en";
+					var google_conversion_format = "3";
+					var google_conversion_color = "ffffff";
+					var google_conversion_label = "purchase";
+					var google_conversion_value = '.$this->order->Subtotal.';
+					/* ]]> */
+					</script>
+					<script type="text/javascript" src="http://www.googleadservices.com/pagead/conversion.js">
+					</script>
+					<noscript>
+					<div style="display:inline;">
+					<img height="1" width="1" style="border-style:none;" alt="" 
+					src="http://www.googleadservices.com/pagead/conversion/'. _xls_get_conf('GOOGLE_ADWORDS','0'). '/?value='.$this->order->Subtotal.'&amp;label=purchase&amp;guid=ON&amp;script=0"/>
+					</div>
+					</noscript>';
+			}
+		}
+        	
+	}
+	
+	
 	/**
 	 * build_content_box - builds the content box to search orders
 	 * @param none
@@ -114,122 +301,16 @@ class xlsws_track_order extends xlsws_index {
 		$this->btnSearch->AddAction(new QClickEvent(), new QServerAction('search_Order'));
 	}
 
-	/**
-	 * build_main - constructor for this controller
-	 * @param none
-	 * @return none
-	 */
-	protected function build_main() {
-		global $XLSWS_VARS;
 
-		$customer = Customer::GetCurrent();
-
-		if($customer)
-			$this->customer = $customer;
-
-		$this->mainPnl = new QPanel($this);
-		$this->mainPnl->Template = templateNamed('order_track.tpl.php');
-
-		$this->crumbs[] = array('key'=>'xlspg=myaccount' , 'case'=> '' , 'name'=> _sp('My Orders'));
-
-		$this->errSpan = new QLabel($this->mainPnl);
-		$this->errSpan->CssClass='modal_reg_err_msg';
-
-		// Wait icon
-		$this->objDefaultWaitIcon = new QWaitIcon($this);
-
-		$this->orderResultPnl = new XLSContentBox($this->mainPnl);
-		$this->orderResultPnl->Name = _sp("Your Orders");
-		$this->orderResultPnl->Visible = false;
-
-		$this->dtrOrder = new QDataRepeater($this->orderResultPnl);
-		$this->dtrOrder->Template = templateNamed('order_list.tpl.php');
-		$this->pxyOrder = new QControlProxy($this);
-
-		$this->build_widgets();
-
-		//DEPRECIATED FROM WEB STORE 2.0.2 ONWARDS, USED IN CASE DEVELOPERS PREFER TO USE ZIPCODE FOR LOOKUPS
-		$this->txtZipCode = new XLSTextBox($this->orderSearchPnl);
-		$this->txtZipCode->Name = _sp("Zipcode");
-		$this->txtZipCode->Display = false;
-		//END DEPRECIATED SEGMENT
-
-		$orders = array();
-
-		if($this->customer) {
-			// find ORDERs
-
-			// Load by email and main phone
-			$orders = Cart::QueryArray(
-				QQ::AndCondition(
-					QQ::Equal(QQN::Cart()->Email, $this->customer->Email),
-					QQ::OrCondition(
-						QQ::Equal(QQN::Cart()->Type, CartType::order),
-						QQ::Equal(QQN::Cart()->Type, CartType::saved)
-					)
-				),
-				QQ::Clause(
-					QQ::OrderBy(QQN::Cart()->IdStr, false )
-				)
-			);
-
-			if(count($orders) > 0) {
-				// hide the panel
-				$this->orderSearchPnl->Visible = false;
-				$this->orderResultPnl->Visible = true;
-
-				$this->dtrOrder->DataSource = $orders;
-			}
-		}
-
-		// The View Detail Panel
-		$this->orderViewPnl = new QPanel($this->mainPnl);
-		$this->orderViewPnl->Template = templateNamed('order_view.tpl.php');
-		$this->orderViewPnl->Visible = false;
-
-		$this->lblIdStr = new QLabel($this->orderViewPnl);
-		$this->lblOrderDate = new QLabel($this->orderViewPnl);
-		$this->lblOrderStatus = new QLabel($this->orderViewPnl);
-
-		$this->orderViewItemsPnl = new QPanel($this->orderViewPnl);
-
-		$this->show_submit_order = _xls_stack_pop('xls_submit_order');
-		$this->new_order = $this->show_submit_order; //maintain the boolean value for this since the previous variable gets altered later
-
-		$this->lblOrderMsg = new QLabel($this->mainPnl);
-		$this->bind_widgets();
-
-		if($this->show_submit_order)
-			 $this->lblOrderMsg->Text = _sp("Thank you for your order.");
-
-		if(isset($_GET['dosearch'])) {
-			$this->txtOrderId->Text = $_GET['orderid'];
-			$this->txtEmailphone->Text = $_GET['emailphone'];
-			$this->search_Order();
-		}
-
-		if(isset($_GET['getuid'])) {
-			$this->show_submit_order = $_GET['getuid'];
-			$this->search_Order();
-		}
-
-		if ($_GET['sendemail'] == "true" && isset($_GET['oid'])) {
-			//$order = Cart::QuerySingle(QQ::Equal(QQN::Cart()->Linkid , $_GET['oid']));
-			//$this->send_email($order);
-			return;
-		}
-
-		$this->order_display($this->order , $this->orderViewItemsPnl);
-	}
 
 	/**
 	 * search_Order - Searches for an order with the provided email and order id
 	 * @param none
 	 * @return none
 	 */
-	protected function search_Order() {
-		if($this->show_submit_order) {
-			$this->order = Cart::QuerySingle(QQ::Equal(QQN::Cart()->Linkid , $this->show_submit_order));
+	protected function search_Order($strLinkId = null) {
+		if($strLinkId) {
+			$this->order = Cart::QuerySingle(QQ::Equal(QQN::Cart()->Linkid , $strLinkId));
 		} else {
 			$orderid = trim($this->txtOrderId->Text);
 			// $zipcode = trim($this->txtZipCode->Text);
@@ -284,6 +365,7 @@ class xlsws_track_order extends xlsws_index {
 
 		$this->lblIdStr->Text = $this->order->IdStr;
 		$this->lblOrderStatus->Text = _sp($this->order->Status);
+		$this->lblOrderPaymentData->Text = $this->order->PaymentData;
 
 		// Color the Orders
 		$this->lblOrderStatus->CssClass = $this->order_status_css($this->order->Status);
@@ -321,9 +403,7 @@ class xlsws_track_order extends xlsws_index {
 		$this->orderResultPnl->Visible= false;
 		$this->orderResultPnl->Visible= false;
 		$this->order_display($this->order , $this->orderViewItemsPnl);
-		if ($this->new_order) {
-			QApplication::ExecuteJavaScript("$(document).ready(function() { $.get('index.php?xlspg=order_track&sendemail=true&oid=".$_GET['getuid'] . "',function(data) { });});");
-		}
+
 	}
 
 	/**

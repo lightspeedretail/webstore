@@ -32,32 +32,9 @@
 
 class canadapost extends xlsws_class_shipping {
 	public $service_types;
-
-	/**
-	 * The name of the shipping module that will be displayed in the checkout page
-	 * @return string
-	 *
-	 *
-	 */
-	public function name() {
-		$config = $this->getConfigValues(get_class($this));
-
-		if(isset($config['label']))
-			return $config['label'];
-
-		return $this->admin_name();
-	}
-
-	/**
-	 * The name of the shipping module that will be displayed in Web Admin payments
-	 * @return string
-	 *
-	 *
-	 */
-	public function admin_name() {
-		return _sp("Canada Post");
-	}
-
+	protected $strModuleName = "Canada Post";
+	
+	
 	/**
 	 * check() verifies nothing has changed in the configuration since initial load
 	 * @return boolean
@@ -65,16 +42,35 @@ class canadapost extends xlsws_class_shipping {
 	 *
 	 */
 	public function check() {
-		if(defined('XLSWS_ADMIN_MODULE'))
-			return true;
-
 		$vals = $this->getConfigValues(get_class($this));
-
+		
 		// if nothing has been configed return null
 		if(!$vals || count($vals) == 0)
 			return false;
+			
+		//Check possible scenarios why we would not offer this type of shipping
+		if ($vals['restrictcountry']) { //we have a country restriction
+			
+			switch($vals['restrictcountry']) {
+				case 'CUS':
+					if ($_SESSION['XLSWS_CART']->ShipCountry=="US" && 
+						($_SESSION['XLSWS_CART']->ShipState =="AK" || $_SESSION['XLSWS_CART']->ShipState=="HI"))
+						return false;
+				break;
+
+			case 'NORAM':
+				if ($_SESSION['XLSWS_CART']->ShipCountry != "US" && $_SESSION['XLSWS_CART']->ShipCountry != "CA")
+					return false;
+				break;
+
+			default:
+					if ($vals['restrictcountry']!=$_SESSION['XLSWS_CART']->ShipCountry) return false;
+			}
+		}
+
 		return true;
 	}
+
 
 	/**
 	 * make_CanadaPost_services populates with shipping options available through shipper
@@ -128,8 +124,18 @@ class canadapost extends xlsws_class_shipping {
 		$ret['defaultproduct']->Name = _sp('Default shipping product');
 		$this->make_CanadaPost_services($ret['defaultproduct']);
 
+		$ret['restrictcountry'] = new XLSListBox($objParent);
+		$ret['restrictcountry']->Name = _sp('Only allow '.$this->strModuleName.' to');
+		$ret['restrictcountry']->AddItem('Everywhere (no restriction)', null);
+		$ret['restrictcountry']->AddItem('My Country ('. _xls_get_conf('DEFAULT_COUNTRY').')', _xls_get_conf('DEFAULT_COUNTRY'));
+		if (_xls_get_conf('DEFAULT_COUNTRY')=="US")
+			$ret['restrictcountry']->AddItem('Continental US', 'CUS'); //Really common request, so make a special entry
+		$ret['restrictcountry']->AddItem('North America (US/CA)', 'NORAM');
+		$ret['restrictcountry']->Enabled = true;
+		$ret['restrictcountry']->SelectedIndex = 0;
+           		
 		$ret['product'] = new XLSTextBox($objParent);
-		$ret['product']->Name = _sp('LightSpeed Product Code');
+		$ret['product']->Name = _sp('LightSpeed Product Code (case sensitive)');
 		$ret['product']->Required = true;
 		$ret['product']->Text = 'SHIPPING';
 
@@ -179,11 +185,11 @@ class canadapost extends xlsws_class_shipping {
 	 */
 	public function customer_fields($objParent) {
 		$ret = array();
-		$config = $this->getConfigValues('CanadaPost');
+		$config = $this->getConfigValues(get_class($this));
 
-		$ret['service'] = new QListBox($objParent);
+		$ret['service'] = new XLSListBox($objParent,'ModuleMethod');
 		$this->make_CanadaPost_services($ret['service']);
-		$ret['service']->Name = _sp('Preference:');
+		////$ret['service']->Name = _sp('Preference:');
 		$ret['service']->SelectedValue = $config['defaultproduct'];
 		return $ret;
 	}
@@ -223,16 +229,16 @@ class canadapost extends xlsws_class_shipping {
 	public function total($fields, $cart, $country = '', $zipcode  = '', $state = '',
 		$city = '', $address2 = '', $address1 = '', $company = '', $lname = '', $fname = '' ) {
 
-		$config = $this->getConfigValues('CanadaPost');
+		
 
-		$weight = $cart->total_weight();
+		$weight = $cart->Weight;
 
 		if(_xls_get_conf('WEIGHT_UNIT', 'kg') != 'kg')
 			$weight = $weight / 2.2;   // one KG is 2.2 pounds
 
-		$length = $cart->total_length();
-		$width = $cart->total_width();
-		$height = $cart->total_height();
+		$length = $cart->Length;
+		$width = $cart->Width;
+		$height = $cart->Height;
 
 		if(_xls_get_conf('DIMENSION_UNIT', 'cm') != 'cm') {
 			$length = round($length *2.54);
@@ -241,97 +247,101 @@ class canadapost extends xlsws_class_shipping {
 		}
 
 		$selected = $fields['service']->SelectedValue;
-
-		$this->make_CanadaPost_services($fields['service']);
-
-		$fields['service']->RemoveAllItems();
-
-		$found = 0;
-		$ret = array();
-		$url = "http://sellonline.canadapost.ca:30000";
-
-		$xml =
-		"<?xml version=\"1.0\" ?>
-		<eparcel>
-			<language>en</language>
-			<ratesAndServicesRequest>
-				<merchantCPCID>" . $config['cpc'] . "</merchantCPCID>
-				<turnAroundTime>120</turnAroundTime>
-				<itemsPrice>" . $cart->Subtotal . "</itemsPrice>
-				<lineItems>
-					<item>
-						<quantity>1</quantity>
-						<weight>" . $weight  . "</weight>
-						<length>" . $length  . "</length>
-						<width>" . $width  . "</width>
-						<height>" . $height  . "</height>
-						<description>Canada Post Shipping</description>
-						<readyToShip />
-					</item>
-				</lineItems>
-				" .  "<city>" . $city . "</city>\n" .
-		"<provOrState>" . $state . "</provOrState>\n" .
-		"<country>" . $country. "</country>\n".
-		"<postalCode>" . $zipcode . "</postalCode>\n".
-		"</ratesAndServicesRequest>
-		</eparcel>
-		";
-
-		$ch = curl_init();
-		curl_setopt ($ch, CURLOPT_URL,$url);
-		curl_setopt ($ch, CURLOPT_HEADER, 0);
-		curl_setopt ($ch, CURLOPT_POST, 1);
-		curl_setopt ($ch, CURLOPT_POSTFIELDS, $xml);
-		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
-		$result = curl_exec ($ch);
-		
-		if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
-			QApplication::Log(E_ERROR, get_class($this), "sending ".$xml);
-			QApplication::Log(E_ERROR, get_class($this), "receiving ".$result);
-		}
-		
-		
-		$values = array();
-		$index = array();
-		$array = array();
-
-		$parser = xml_parser_create();
-		xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 1);
-		xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
-		xml_parse_into_struct($parser, $result, $values, $index);
-		xml_parser_free($parser);
-		$index = 0;
-
-		$name = false;
-
-		foreach ($values as $k => $v) {
-			if(!isset($v['tag']) || !isset($v['value']) )
-				continue;
-
-			if($v['tag'] == 'name')
-				$name = $v['value'];
-
-			if(($v['tag'] == 'rate') && $name) {
-				$vindex = $index+1;
-				$fields['service']->AddItem("$name (" . _xls_currency(floatval($v['value']) + floatval($config['markup'])) . ")" , $name);
-				$ret[$name] = floatval($v['value']) + floatval($config['markup']);
-				$found++;
-				$name = false;
+	
+		$strShipData=serialize(array(__class__,$weight,$address1,$zipcode));	
+		if (_xls_stack_get('ShipBasedOn') != $strShipData) {
+			_xls_stack_put('ShipBasedOn',$strShipData);
+	
+			$config = $this->getConfigValues(get_class($this));
+			$this->make_CanadaPost_services($fields['service']);
+	
+			$fields['service']->RemoveAllItems();
+	
+			$found = 0;
+			$ret = array();
+			$url = "http://sellonline.canadapost.ca:30000";
+	
+			$xml =
+			"<?xml version=\"1.0\" ?>
+			<eparcel>
+				<language>en</language>
+				<ratesAndServicesRequest>
+					<merchantCPCID>" . $config['cpc'] . "</merchantCPCID>
+					<turnAroundTime>120</turnAroundTime>
+					<itemsPrice>" . $cart->Subtotal . "</itemsPrice>
+					<lineItems>
+						<item>
+							<quantity>1</quantity>
+							<weight>" . $weight  . "</weight>
+							<length>" . $length  . "</length>
+							<width>" . $width  . "</width>
+							<height>" . $height  . "</height>
+							<description>Canada Post Shipping</description>
+							<readyToShip />
+						</item>
+					</lineItems>
+					" .  "<city>" . $city . "</city>\n" .
+			"<provOrState>" . $state . "</provOrState>\n" .
+			"<country>" . $country. "</country>\n".
+			"<postalCode>" . $zipcode . "</postalCode>\n".
+			"</ratesAndServicesRequest>
+			</eparcel>
+			";
+	
+			$ch = curl_init();
+			curl_setopt ($ch, CURLOPT_URL,$url);
+			curl_setopt ($ch, CURLOPT_HEADER, 0);
+			curl_setopt ($ch, CURLOPT_POST, 1);
+			curl_setopt ($ch, CURLOPT_POSTFIELDS, $xml);
+			curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
+			$result = curl_exec ($ch);
+			
+			if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
+				_xls_log(get_class($this) . " sending ".$xml,true);
+				_xls_log(get_class($this) . " receiving ".$result,true);
 			}
-			$index++;
+			
+			$oXML = new SimpleXMLElement($result);		
+			
+			if($oXML->error) {
+				//What we have is ... failure to communicate
+				QApplication::Log(E_ERROR, __CLASS__,
+								'Canada Post: '.$oXML->error->statusMessage);
+				$fields['service']->Visible = false;				
+				return false;
+			}
+	
+	
+			foreach($oXML->ratesAndServicesResponse->product as $key=>$val) {
+	              $strKey = $val->name;
+	              $strRate = $val->rate;
+	              $strKey = $this->cleanMethodName($strKey);
+				  $ret[$strKey] = floatval($strRate) + floatval($config['markup']);
+				  
+				  $found++;
+				}
+				
+			asort($ret,SORT_NUMERIC);
+	
+			foreach ($ret as $key=>$val)
+				$fields['service']->AddItem("$key (" . _xls_currency(floatval($val) + floatval($config['markup'])) . ")" , $key);
+	
+			
+			if($found <=0) {
+				_xls_log("Canada Post: Could not get rates $country  , $zipcode .");
+	
+				$fields['service']->Visible = false;
+				return false;
+			}
+	
+			$fields['service']->Visible = true;
+			_xls_stack_put('ShipBasedResults',serialize($ret));
 		}
+		else 
+			$ret = unserialize(_xls_stack_get('ShipBasedResults'));
 
-		if($found <=0) {
-			_xls_log("Canada Post: Could not get rates $country  , $zipcode .");
-			_xls_log("Canada Post request: " . print_r($xml,true));
-			_xls_log("Canada Post response: " . print_r($result,true));
 
-			$fields['service']->Visible = false;
-			return false;
-		}
-
-		$fields['service']->Visible = true;
 
 		$arr = array(
 			'price' => false,
@@ -350,4 +360,14 @@ class canadapost extends xlsws_class_shipping {
 
 		return $arr;
 	}
+	
+	 public function cleanMethodName($strName) {
+        $strName = html_entity_decode($strName);
+        $strName = strip_tags($strName);
+        $strName = str_replace('reg', '', $strName);
+        $strName = preg_replace("/[^A-Za-z0-9\-\ ]/", '', $strName);
+        $strName = trim($strName);
+        return $strName;
+    }
+    
 }
