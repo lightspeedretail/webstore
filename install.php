@@ -1681,12 +1681,6 @@ EOT;
 					$sql[]
 						= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Uploader should delete duplicates', 'DEBUG_DELETE_DUPES', '', 'If selected, a product which is uploading will replace any duplicate product codes.', 1, 21, NOW(), NOW(), 'BOOL');";
 
-$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Featured Keyword', 'FEATURED_KEYWORD', 'featured', 'If this keyword is one of your product keywords, the product will be featured on the Web Store homepage.', 8, 6, NOW(), NOW(), NULL);";
-$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug Payment Methods', 'DEBUG_PAYMENTS', '', 'If selected, WS log all activity for credit card processing and other payment methods.', 1, 18, NOW(), NOW(), 'BOOL');";
-$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug Shipping Methods', 'DEBUG_SHIPPING', '', 'If selected, WS log all activity for shipping methods.', 1, 19, NOW(), NOW(), 'BOOL');";
-$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Reset Without Flush', 'DEBUG_RESET', '', 'If selected, WS will not perform a flush on content tables when doing a Reset Store Products.', 1, 20, NOW(), NOW(), 'BOOL');";
-$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Uploader should delete duplicates', 'DEBUG_DELETE_DUPES', '', 'If selected, a product which is uploading will replace any duplicate product codes.', 1, 21, NOW(), NOW(), 'BOOL');";
-
 //$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug LightSpeed Soap Call', 'DEBUG_LS_SOAP_CALL', '1', 'If selected, all soap calls will be logged in the database. It is advised that you do not enable this unless advised by XSilva', 1, 16, NOW(), NOW(), 'BOOL');";
 
 					//$strReturn .= "Entering Configuration values<br/>";
