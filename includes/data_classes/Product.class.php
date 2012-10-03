@@ -535,6 +535,10 @@ class Product extends ProductGen {
 	 */ //4 => _sp("Show Highest Price"),3 => _sp("Show Price Range"), 2 => _sp("Show \"Click for Pricing\"") ,1 => _sp("Show Lowest Price"),0 => _sp("Show Master Item Price")
 	public function GetSlashedPrice($intQuantity = 1, $taxExclusive = false) {
 
+		if(_xls_get_conf('TAX_INCLUSIVE_PRICING',0)) $taxExclusive = false; else $taxExclusive = true;
+
+		if ($taxExclusive) $strField = "Sell"; else $strField = "SellTaxInclusive";
+
 		if (_xls_get_conf('PRICE_REQUIRE_LOGIN',0) == 1 && !xlsws_index::isLoggedIn())
 			return '';
 
@@ -571,23 +575,24 @@ class Product extends ProductGen {
 
 			case 4: //Show Highest Price
 			case 3:
-				return ( $arrMaster[count($arrMaster)-1]->Sell > $arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive)) ? $arrMaster[count($arrMaster)-1]->Sell : "";
+				return ( $arrMaster[count($arrMaster)-1]->$strField > $arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive)) ? $arrMaster[count($arrMaster)-1]->$strField : "";
 			case 2: //Show "Click for Pricing"
 				return '';
 
 			case 1: //Show Lowest Price
-				return $arrMaster[0]->Sell;
-				return ( $arrMaster[0]->Sell > $arrMaster[0]->GetPrice($intQuantity, $taxExclusive)) ? $arrMaster[0]->Sell : "";
+				return $arrMaster[0]->$strField;
 
 			case 0: //Show Master Item Price
 			default:
-				return ($this->Sell != $this->GetPrice($intQuantity, $taxExclusive)) ? $this->Sell : "";;
+				return ($this->$strField != $this->GetPrice($intQuantity, $taxExclusive)) ? $this->$strField : "";;
 
 
 			}
 
 		}
-		else return ($this->Sell != $this->GetPrice($intQuantity, $taxExclusive)) ? $this->Sell : "";
+		else return ($this->$strField != $this->GetPrice($intQuantity, $taxExclusive)) ? $this->$strField : "";
+
+
 	}
 
 	/**
