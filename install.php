@@ -3470,7 +3470,7 @@ EOT;
 		.install_agreement {
 			width: 800px;
 		}
-			<? } ?>
+			<?php } ?>
 
 		.header {
 			margin: 5px 0 45px -70px;
