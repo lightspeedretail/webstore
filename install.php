@@ -36,7 +36,9 @@
 	if (version_compare(PHP_VERSION, '5.2.4') < 0) {
 		die('WebStore requires at least PHP version of 5.2.4. Sorry cannot continue installation.');
 	}
-
+if (version_compare(PHP_VERSION, '5.4.0') > 0) {
+	die('WebStore does not support PHP 5.4 at this time. Please use 5.3.x. Sorry cannot continue installation.');
+}
 
 //////////////////////////////////////////////////////////////////
 // Verify the config file exists, and if not, create it
@@ -1104,11 +1106,12 @@ EOT;
 					$phpinfo['Core']['magic_quotes_gpc'] == "Off" ? "pass" : "fail");
 					$checked['allow_call_time_pass_reference in Php.ini must be turned On'] = (
 					$phpinfo['Core']['allow_call_time_pass_reference'] == "On" ? "pass" : "fail");
-					$checked['short_open_tag in Php.ini must be turned On'] = ($phpinfo['Core']['short_open_tag'] == "On" ? "pass" : "fail");
+					$checked['register_globals in Php.ini must be turned Off'] = ($phpinfo['Core']['register_globals'] == "Off" ? "pass" : "fail");
 				}
 
-				$checked['register_globals in Php.ini must be turned Off'] = ($phpinfo['Core']['register_globals'] == "Off" ? "pass" : "fail");
 
+
+				$checked['short_open_tag in Php.ini must be turned On'] = ($phpinfo['Core']['short_open_tag'] == "On" ? "pass" : "fail");
 
 
 				//Check folder permissions
