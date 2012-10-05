@@ -715,6 +715,8 @@ class xlsws_db_maintenance {
 				$objPromoCode = PromoCode::LoadByCodeShipping("free_shipping:");
 				if (!$objPromoCode) {
 					$config = $objShipping->GetConfigValues();
+					$intThreshold = $config['rate'];
+					if (empty($intThreshold)) $intThreshold=0;
 					$objPromoCode = new PromoCode;
 					$objPromoCode->Lscodes = "shipping:,";
 					$objPromoCode->Code='free_shipping:';
@@ -724,7 +726,7 @@ class xlsws_db_maintenance {
 					$objPromoCode->Amount='';
 					$objPromoCode->ValidFrom='';
 					$objPromoCode->ValidUntil='';
-					$objPromoCode->Threshold=$config['rate'];
+					$objPromoCode->Threshold=$intThreshold;
 					$objPromoCode->QtyRemaining=-1;
 					$objPromoCode->Save();
 				}
