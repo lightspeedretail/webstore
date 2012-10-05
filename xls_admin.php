@@ -6546,7 +6546,7 @@ class xlsws_admin_maintenance extends xlsws_admin {
 
 
 		if (_xls_get_conf('LIGHTSPEED_HOSTING' , '0')=='0') {
-			$ctPic = _dbx("select count(*) as thecount from xlsws_images where left(image_path,8) != 'product/';",'Query');
+			$ctPic = _dbx("select count(*) as thecount from xlsws_images where left(coalesce(image_path,''),8) != 'product/';",'Query');
 			$arrTotal = $ctPic->FetchArray();
 			if ($arrTotal['thecount']>0) {
 				$this->arrMPnls['MigratePhotos'] = new QPanel($this);

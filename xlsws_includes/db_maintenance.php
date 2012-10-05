@@ -262,7 +262,7 @@ class xlsws_db_maintenance {
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Last timestamp uploader ran', 
 				'UPLOADER_TIMESTAMP', '0', 'Internal', 0, 0, NOW(), NOW(), 'NULL',0);");
 
-			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=1,`sort_order`=24 where `key`='IMAGE_STORE'");
+			_dbx("UPDATE `xlsws_configuration` SET `value`='FS',`configuration_type_id`=1,`sort_order`=24 where `key`='IMAGE_STORE'");
 
 
 			//Families menu labeling
@@ -957,7 +957,7 @@ class xlsws_db_maintenance {
 			$intLimit = 3000;
 
 			$intDone=0;
-			$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE image_path NOT like '%/%' and rowid=parent ORDER BY rowid LIMIT ".$intLimit, "Query");
+			$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE coalesce(image_path,'') NOT like '%/%' and rowid=parent ORDER BY rowid LIMIT ".$intLimit, "Query");
 			while ($objItem = $arrProducts->FetchObject()) {
 				$objImage = Images::Load($objItem->rowid);
 				//echo $objImage->ImagePath." ".$objImage->Rowid." ".$objImage->Parent."<br>";
@@ -965,7 +965,7 @@ class xlsws_db_maintenance {
 				//We only care about the master photos, we'll delete the thumbnails and regenerate
 				if ($objImage->Rowid == $objImage->Parent) {
 
-					$strExistingPath = $objImage->ImagePath;
+
 					$strName = pathinfo($strExistingPath, PATHINFO_FILENAME);
 
 					$intPos = strpos($strName, '_');
@@ -988,11 +988,27 @@ class xlsws_db_maintenance {
 					}
 
 					//echo $strName." ".$intRowId." ".$strAdd." ".$intIndex."<br>";
-					$objProduct = Product::Load($intRowId);
+					$objProduct = Product::LoadByImageId($objImage->Rowid);
+
+					if ($objProduct) { //we found it in the product table, so that means this is our primary image
+						$strAdd=null;
+						$intIndex=null;
+
+					} else {
+						$objImageAssn = _dbx("SELECT * FROM xlsws_product_image_assn WHERE image_id=".$objImage->Rowid, "Query");
+						$row = $objImageAssn->FetchObject();
+						$objProduct = Product::Load($row->product_id);
+						if ($objProduct) {
+							$strAdd = "add";
+							$intIndex = null;
+
+						}
+
+					}
+
 					if ($objProduct) {
 						if ($objProduct->RequestUrl != '') {
 							$strNewImageName = Images::GetImageName(substr($objProduct->RequestUrl,0,60), 0, 0, $intIndex, $strAdd);
-
 
 							//If the image already exists, we just have to rename and move it, and update the db record
 
@@ -1002,7 +1018,7 @@ class xlsws_db_maintenance {
 								//echo "renaming ".$strExistingPath." to ".$strNewImageName."<br>";
 								$strPath = Images::GetImagePath($strNewImageName);
 								$arrPath = pathinfo($strPath);
-								$strFolder = $arrPath['dirname']; echo $strFolder."<br>";
+								$strFolder = $arrPath['dirname'];
 								if (!$objImage->SaveImageFolder($strFolder))
 									return "Halting: error creating folder ".$strFolder;
 
@@ -1013,7 +1029,7 @@ class xlsws_db_maintenance {
 								$objImage->Save();
 
 							} else {
-								//echo Images::GetImagePath($objImage->ImagePath)." doesn't exist<br>";
+
 								$blbImage = $objImage->GetImageData();
 								if (empty($blbImage)) {
 									//We have missing photo data and/or bad file, clean up. Worse case we have to reupload.
@@ -1021,6 +1037,7 @@ class xlsws_db_maintenance {
 									$objProduct->Save();
 									$objImage->Delete();
 								} else {
+									$blbImage = imagecreatefromstring($blbImage);
 									$objImage->SaveImageData($strNewImageName, $blbImage);
 									$objImage->Reload();
 									$objImage->ImagePath=$strNewImageName;
@@ -1028,7 +1045,7 @@ class xlsws_db_maintenance {
 									$objImage->Save();
 								}
 							}
-						}
+						} else error_log("Missing Request_url, skipping");
 					} else $objImage->Delete();
 
 				}
@@ -1037,24 +1054,24 @@ class xlsws_db_maintenance {
 			}
 
 
-			$ctPic = _dbx("select count(*) as thecount FROM xlsws_images WHERE image_path NOT like '%/%' and rowid=parent",'Query');
+			$ctPic = _dbx("select count(*) as thecount FROM xlsws_images WHERE coalesce(image_path,'') NOT like '%/%' and rowid=parent",'Query');
 			$arrTotal = $ctPic->FetchArray();
 			$intCt = $arrTotal['thecount'];
 
-			if ($arrTotal['thecount']==0 ) {
-				//Now we remove all the thumbnails because our browsing will recreate them
-				$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE image_path NOT like '%/%' and rowid <> parent ORDER BY rowid LIMIT 3000", "Query");
-				while ($objItem = $arrProducts->FetchObject()) {
-					$objImage = Images::Load($objItem->rowid);
-					$objImage->DeleteImage();
-					//We delete directly because our class would attempt to remove the parent which we don't want
-					_dbx('DELETE FROM `xlsws_images` WHERE `rowid` = ' . $objImage->Rowid . '');
-				}
+//			if ($arrTotal['thecount']==0 ) {
+//				//Now we remove all the thumbnails because our browsing will recreate them
+//				$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE coalesce(image_path,'') NOT like '%/%' and rowid <> parent ORDER BY rowid LIMIT 3000", "Query");
+//				while ($objItem = $arrProducts->FetchObject()) {
+//					$objImage = Images::Load($objItem->rowid);
+//					$objImage->DeleteImage();
+//					//We delete directly because our class would attempt to remove the parent which we don't want
+//					_dbx('DELETE FROM `xlsws_images` WHERE `rowid` = ' . $objImage->Rowid . '');
+//				}
+//
+//
+//			}
 
-
-			}
-
-			$ctPic = _dbx("select count(*) as thecount FROM xlsws_images WHERE image_path NOT like '%/%' and rowid<>parent",'Query');
+			$ctPic = _dbx("select count(*) as thecount FROM xlsws_images WHERE coalesce(image_path,'') NOT like '%/%' and rowid<>parent",'Query');
 			$arrTotal = $ctPic->FetchArray();
 			$intCt += $arrTotal['thecount'];
 
