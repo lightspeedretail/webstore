@@ -963,7 +963,7 @@ class xlsws_db_maintenance {
 			$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE coalesce(image_path,'') NOT like '%/%' and rowid=parent ORDER BY rowid LIMIT ".$intLimit, "Query");
 			while ($objItem = $arrProducts->FetchObject()) {
 				$objImage = Images::Load($objItem->rowid);
-				//echo $objImage->ImagePath." ".$objImage->Rowid." ".$objImage->Parent."<br>";
+				echo $objImage->ImagePath." ".$objImage->Rowid." ".$objImage->Parent."<br>";
 
 				//We only care about the master photos, we'll delete the thumbnails and regenerate
 				if ($objImage->Rowid == $objImage->Parent) {
@@ -971,11 +971,11 @@ class xlsws_db_maintenance {
 
 
 					$objProduct = Product::LoadByImageId($objImage->Rowid);
-
+					$strExistingPath = $objImage->ImagePath;
 					if ($objProduct) { //we found it in the product table, so that means this is our primary image
 						$strAdd=null;
 						$intIndex=null;
-						$strExistingPath = $objImage->ImagePath;
+
 
 					} else {
 						$objImageAssn = _dbx("SELECT * FROM xlsws_product_image_assn WHERE image_id=".$objImage->Rowid, "Query");
