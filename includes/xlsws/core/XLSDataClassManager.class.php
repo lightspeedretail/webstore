@@ -49,6 +49,22 @@ class XLSConfigurationManager extends XLSObjectManager {
 			return $mixDefault;
 		return $objConfiguration->Value;
 	}
+
+	/**
+	 * Set the value for a given Configuration key
+	 * @param string strKeyValue
+	 * @param mix mixDefault :: Default value in case the value is empty
+	 * @return mix value
+	 */
+	public function SetValue($strKeyValue, $mixDefault) {
+		$objConfiguration = $this->GetByKey($strKeyValue);
+
+		if (!$objConfiguration)
+			return $mixDefault;
+		$objConfiguration->Value = $mixDefault;
+		return $objConfiguration->Value;
+
+	}
 }
 
 /**
