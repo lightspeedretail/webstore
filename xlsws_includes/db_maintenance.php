@@ -957,13 +957,19 @@ class xlsws_db_maintenance {
 			_xls_set_conf('IMAGE_STORE','FS');
 			Configuration::$Manager->SetValue('IMAGE_STORE','FS'); //Because key may already be in memory
 
-			$intLimit = 3000;
+			$objCheck = _dbx("SELECT count(*) as thecount FROM xlsws_images WHERE coalesce(image_path,'') NOT like '%/%' and rowid=parent and image_data is not null", "Query");
+			$row = $objCheck->FetchObject();
+			if ($row->thecount>500)
+				$intLimit = 1000;
+			else
+				$intLimit = 4000;
+
 
 			$intDone=0;
 			$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE coalesce(image_path,'') NOT like '%/%' and rowid=parent ORDER BY rowid LIMIT ".$intLimit, "Query");
 			while ($objItem = $arrProducts->FetchObject()) {
 				$objImage = Images::Load($objItem->rowid);
-				echo $objImage->ImagePath." ".$objImage->Rowid." ".$objImage->Parent."<br>";
+				//echo $objImage->ImagePath." ".$objImage->Rowid." ".$objImage->Parent."<br>";
 
 				//We only care about the master photos, we'll delete the thumbnails and regenerate
 				if ($objImage->Rowid == $objImage->Parent) {
@@ -993,7 +999,7 @@ class xlsws_db_maintenance {
 					if ($objProduct) {
 						if ($objProduct->RequestUrl != '') {
 							$strNewImageName = Images::GetImageName(substr($objProduct->RequestUrl,0,60), 0, 0, $intIndex, $strAdd);
-							error_log("renaming ".$strExistingPath." to ".$strNewImageName);
+							//error_log("renaming ".$strExistingPath." to ".$strNewImageName);
 							//If the image already exists, we just have to rename and move it, and update the db record
 
 							if ($objImage->ImageFileExists()) {
@@ -1042,18 +1048,18 @@ class xlsws_db_maintenance {
 			$arrTotal = $ctPic->FetchArray();
 			$intCt = $arrTotal['thecount'];
 
-//			if ($arrTotal['thecount']==0 ) {
-//				//Now we remove all the thumbnails because our browsing will recreate them
-//				$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE coalesce(image_path,'') NOT like '%/%' and rowid <> parent ORDER BY rowid LIMIT 3000", "Query");
-//				while ($objItem = $arrProducts->FetchObject()) {
-//					$objImage = Images::Load($objItem->rowid);
-//					$objImage->DeleteImage();
-//					//We delete directly because our class would attempt to remove the parent which we don't want
-//					_dbx('DELETE FROM `xlsws_images` WHERE `rowid` = ' . $objImage->Rowid . '');
-//				}
-//
-//
-//			}
+			if ($arrTotal['thecount']==0 ) {
+				//Now we remove all the thumbnails because our browsing will recreate them
+				$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE coalesce(image_path,'') NOT like '%/%' and rowid <> parent ORDER BY rowid LIMIT ".$intLimit, "Query");
+				while ($objItem = $arrProducts->FetchObject()) {
+					$objImage = Images::Load($objItem->rowid);
+					$objImage->DeleteImage();
+					//We delete directly because our class would attempt to remove the parent which we don't want
+					_dbx('DELETE FROM `xlsws_images` WHERE `rowid` = ' . $objImage->Rowid . '');
+				}
+
+
+			}
 
 			$ctPic = _dbx("select count(*) as thecount FROM xlsws_images WHERE coalesce(image_path,'') NOT like '%/%' and rowid<>parent",'Query');
 			$arrTotal = $ctPic->FetchArray();
