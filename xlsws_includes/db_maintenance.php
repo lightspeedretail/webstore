@@ -955,7 +955,7 @@ class xlsws_db_maintenance {
 
 			//Then switch to file system if it's not already
 			_xls_set_conf('IMAGE_STORE','FS');
-			Configuration::$Manager->SetValue('IMAGE_STORE','FS'); //Because key may already be in memory
+			//Configuration::$Manager->SetValue('IMAGE_STORE','FS'); //Because key may already be in memory
 
 			$objCheck = _dbx("SELECT count(*) as thecount FROM xlsws_images WHERE coalesce(image_path,'') NOT like '%/%' and rowid=parent and image_data is not null", "Query");
 			$row = $objCheck->FetchObject();
