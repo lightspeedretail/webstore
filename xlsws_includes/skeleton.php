@@ -583,7 +583,7 @@ EOS;
 
 			if($obj->check())
 				$this->arrSidePanels[$obj->name()] =
-					$obj->getPanel($this->sidePnl,camelize($obj->name()));
+					$obj->getPanel($this->sidePnl,_xls_letters_only($obj->name()));
 		}
 	}
 
