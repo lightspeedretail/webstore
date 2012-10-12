@@ -549,7 +549,7 @@ class xlsws_db_maintenance {
 
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Width', `configuration_type_id`=17, `sort_order`=5 ,options='INT' ,template_specific=1
 				where `key`='DETAIL_IMAGE_WIDTH'");	
-			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Width', `configuration_type_id`=17, `sort_order`=6 ,options='INT' ,template_specific=1
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Height', `configuration_type_id`=17, `sort_order`=6 ,options='INT' ,template_specific=1
 				where `key`='DETAIL_IMAGE_HEIGHT'");		
 
 				
@@ -557,7 +557,7 @@ class xlsws_db_maintenance {
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Category Page Image Width', 
 				'CATEGORY_IMAGE_WIDTH', '180', 'if using a Category Page image', 17, 7, NOW(), NOW(), 'INT',1);");
 			$this->add_config_key('CATEGORY_IMAGE_HEIGHT' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Category Page Image Width', 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Category Page Image Height',
 				'CATEGORY_IMAGE_HEIGHT', '180', 'if using a Category Page image', 17, 8, NOW(), NOW(), 'INT',1);");
 			$this->add_config_key('PREVIEW_IMAGE_WIDTH' , 
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Preview Thumbnail (Product Detail Page) Width', 
@@ -745,10 +745,27 @@ class xlsws_db_maintenance {
 			
 			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
 			$config->Value="250";
+			$intCurrentSchema=250;
 			$config->Save();
 		
 		
 		}
+
+
+		if ($intCurrentSchema==250)
+		{
+
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Height' where `key`='DETAIL_IMAGE_HEIGHT'");
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Category Page Image Height' where `key`='CATEGORY_IMAGE_HEIGHT'");
+
+			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
+			$config->Value="251";
+			$intCurrentSchema=251;
+			$config->Save();
+
+		}
+
+
 		$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
 		$strUpgradeText .= "<br/>Database schema version ".$config->Value."<br>";
 
