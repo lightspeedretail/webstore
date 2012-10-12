@@ -41,7 +41,7 @@ class XLSStateControl extends XLSListControl {
 
         if ($this->blnFilterDestinations) {
             $objDestinations = Destination::LoadByCountry(
-                $objCountry->SelectedValue
+                $objCountry->SelectedValue,$this->blnFilterDestinations
             );
             $strStates = array();
 
@@ -49,23 +49,27 @@ class XLSStateControl extends XLSListControl {
                 foreach ($objDestinations as $objDestination) {
                     $strCode = $objDestination->State;
 
-                    if ($strCode == '*') {
+                    if ($objDestination->Country != '*' && $strCode == '*') {
                         $objStates = State::LoadArrayByCountryCode(
                             $objCountry->SelectedValue
                         );
                         break;
                     }
 
-                    if ($strCode && !in_array($strCode, $strStates))
+                    if ($objDestination->Country != '*' && $strCode && !in_array($strCode, $strStates))
                         $strStates[] = $strCode;
                 }
 
-                if ($strStates) {
+                if ($strStates && $objDestination->Country != '*') {
                     $objStates = State::QueryArray(
-                        QQ::In(
-                            QQN::State()->Code,
-                            $strStates
-                        ),
+	                    QQ::AndCondition(
+		                    QQ::In(
+		                        QQN::State()->Code,
+		                        $strStates
+		                    ),
+		                    QQ::Equal(
+			                    QQN::State()->CountryCode, $objDestination->Country)
+		                ),
                         QQ::Clause(
                             QQ::OrderBy(
                                 QQN::State()->SortOrder, 
