@@ -6578,12 +6578,15 @@ class xlsws_admin_maintenance extends xlsws_admin {
 		$this->arrMPnls['UpgradeWS']->ToolTip= _sp('Upgrade webstore with latest patches/bug fixes');
 
 
-		$this->arrMPnls['RecalculateAvail'] = new QPanel($this);
-		$this->arrMPnls['RecalculateAvail']->Visible = false;
-		$this->arrMPnls['RecalculateAvail']->Name = _sp('Recalculate Available Inventory');
-		$this->arrMPnls['RecalculateAvail']->HtmlEntities = false;
-		$this->arrMPnls['RecalculateAvail']->ToolTip= _sp('Recalculate inventory based on pending orders');
-
+		$ctPic = _dbx("SELECT count(*) as thecount FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0",'Query');
+		$arrTotal = $ctPic->FetchArray();
+		if($arrTotal['thecount']>0) {
+			$this->arrMPnls['RecalculateAvail'] = new QPanel($this);
+			$this->arrMPnls['RecalculateAvail']->Visible = false;
+			$this->arrMPnls['RecalculateAvail']->Name = _sp('Recalculate Available Inventory');
+			$this->arrMPnls['RecalculateAvail']->HtmlEntities = false;
+			$this->arrMPnls['RecalculateAvail']->ToolTip= _sp('Recalculate inventory based on pending orders');
+		}
 
 
 
@@ -6639,26 +6642,11 @@ class xlsws_admin_maintenance extends xlsws_admin {
 	}
 
 	protected function RecalculateAvail(){
-		if($this->arrMPnls['RecalculateAvail']->Visible){
-			$this->arrMPnls['RecalculateAvail']->Visible = false;
-			return;
-		}
 
-		$objProdCondition = QQ::AndCondition(
-			QQ::Equal(QQN::Product()->Web,1),
-			QQ::OrCondition(
-				QQ::Equal(QQN::Product()->MasterModel, 1),
-				QQ::AndCondition(
-					QQ::Equal(QQN::Product()->MasterModel, 0),
-					QQ::Equal(QQN::Product()->FkProductMasterId, 0)
-				))
-		);
+		$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0  ORDER BY rowid LIMIT 6000", "Query");
+		while ($objItem = $arrProducts->FetchObject()) {
+			$objProduct = Product::Load($objItem->rowid);
 
-		$arrProducts = Product::QueryArray(QQ::Equal(QQN::Product()->Web,1),
-			QQ::Clause(
-				QQ::OrderBy(QQN::Product()->Rowid)
-			));
-		foreach ($arrProducts as $objProduct) {
 			$objProduct->InventoryReserved=$objProduct->CalculateReservedInventory();
 			//Since $objProduct->Inventory isn't the real inventory column, it's a calculation,
 			//just pass it to the Avail so we have it for queries elsewhere
@@ -6667,8 +6655,17 @@ class xlsws_admin_maintenance extends xlsws_admin {
 
 		}
 
+		$ctPic = _dbx("SELECT count(*) as thecount FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0",'Query');
+		$arrTotal = $ctPic->FetchArray();
+		$intRet = $arrTotal['thecount'];
 
-		$this->arrMPnls['RecalculateAvail']->Text = _sp("Inventory availability has been recalculated.");
+		if ($intRet>0)
+			$this->arrMPnls['RecalculateAvail']->Text =  "<span style='font-size: 13pt'>Not all products calculated (6000 calculated). Click Perform again. $intRet remaining.<br>";
+		else
+			$this->arrMPnls['RecalculateAvail']->Text = "Inventory availability has been recalculated.";
+
+
+
 		$this->arrMPnls['RecalculateAvail']->Visible = true;
 		$this->arrMPnls['RecalculateAvail']->Refresh();
 	}
