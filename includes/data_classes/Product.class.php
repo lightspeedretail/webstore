@@ -389,9 +389,8 @@ class Product extends ProductGen {
 	protected function GetQuantityPrices() {
 		$customer = Customer::GetCurrent();
 		$intCustomerLevel = 0;
-		$arrPrices = false;
 
-		if ($customer)
+		if ($customer && !empty($customer->PricingLevel))
 			$intCustomerLevel = $customer->PricingLevel;
 
 		$arrPrices = ProductQtyPricing::LoadArrayByProductIdPricingLevel(
@@ -403,9 +402,6 @@ class Product extends ProductGen {
 
 		return $arrPrices;
 	}
-
-	// TODO convert _xls_tax_default_taxcode to TaxCode member
-	// Part of refactoring TaxCode && Cart
 
 	/**
 	 * Given an amount of Products, return the applicable Qty Price
