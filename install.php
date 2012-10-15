@@ -36,7 +36,7 @@
 	if (version_compare(PHP_VERSION, '5.2.4') < 0) {
 		die('WebStore requires at least PHP version of 5.2.4. Sorry cannot continue installation.');
 	}
-if (version_compare(PHP_VERSION, '5.4.0') > 0) {
+if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
 	die('WebStore does not support PHP 5.4 at this time. Please use 5.3.x. Sorry cannot continue installation.');
 }
 
