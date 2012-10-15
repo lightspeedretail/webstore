@@ -292,7 +292,7 @@ class xlsws_db_maintenance {
 				where `key`='DEFAULT_TEMPLATE'");
 			$this->add_config_key('DEFAULT_TEMPLATE_THEME' ,
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Template theme', 'DEFAULT_TEMPLATE_THEME', '',
-				'If supported, changable colo(u)rs for template files.',
+				'If supported, changeable colo(u)rs for template files.',
 				19, 2, NOW(), NOW(), 'DEFAULT_TEMPLATE_THEME',1);");
 			$this->add_config_key('ENABLE_SLASHED_PRICES' ,
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Enabled Slashed \"Original\" Prices', 'ENABLE_SLASHED_PRICES', '',
