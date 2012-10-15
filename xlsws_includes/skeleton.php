@@ -496,17 +496,18 @@ EOS;
 			$customer = Customer::GetCurrent();
 
 
-			
-			$objCartInProgress = Cart::LoadLastCartInProgress(1);
+			//Is there a cart in the db this customer already had?
+			$objCartInProgress = Cart::LoadLastCartInProgress($customer->Rowid);
 			if ($objCartInProgress) {
+
+				//Grab the cart items from the current session we're in
 				$objCurrentCart = Cart::GetCart();
 				$arrCurrentItems = $objCurrentCart->GetCartItemArray();
 				
-				//Switch to original cart
-				$items = $objCartInProgress->GetCartItemArray(); 
+				//Make the old cart from the db our current session cart
 				$_SESSION['XLSWS_CART'] = $objCartInProgress;
 				
-				//Add any new items
+				//Merge in any new items we had in our cart from this session
 				if (count($arrCurrentItems)>0) {
 					foreach($arrCurrentItems as $objItem) {
 						$objProduct = Product::Load($objItem->ProductId);
@@ -520,9 +521,11 @@ EOS;
 				$objCartInProgress->Save();
 							
 			}
-		
+
+			//Attach the customer ID to the cart just in case it's not already there
 			Cart::UpdateCartCustomer();
 
+			//Go back to whence we came
 			$uri = _xls_stack_pop('login_redirect_uri');
 			if($uri) _rd($uri);
 			else _rd(_xls_site_dir());

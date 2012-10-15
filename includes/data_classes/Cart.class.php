@@ -1000,7 +1000,7 @@ class Cart extends CartGen {
 				$items = Cart::QueryArray(
 					QQ::AndCondition(
 						QQ::Equal(QQN::Cart()->CustomerId, $intCustomerId),
-						QQ::Equal(QQN::Cart()->Type, '1'),
+						QQ::Equal(QQN::Cart()->Type, CartType::cart),
 						QQ::GreaterThan(QQN::Cart()->Count, 0)),
 					QQ::Clause(
 						
