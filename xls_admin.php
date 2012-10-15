@@ -3611,11 +3611,11 @@ abstract class xlsws_admin_generic_edit_form extends xlsws_admin {
 		$this->dtgItems->CellSpacing = 0;
 
 		$this->dtgItems->Paginator = new QPaginator($this->dtgItems);
-		$this->dtgItems->Paginator->CssClass = "table_base rounded {5px top transparent}";
+		$this->dtgItems->Paginator->CssClass = "paginator";
 
 		$this->dtgItems->ItemsPerPage = $this->default_items_per_page;
 
-		$this->dtgItems->HtmlAfter = "adfasdf";
+		$this->dtgItems->HtmlAfter = " ";
 
 		$qqn = $this->qqn;
 
