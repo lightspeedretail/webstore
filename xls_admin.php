@@ -5324,7 +5324,7 @@ class xlsws_seo_categories extends xlsws_admin_generic_edit_form{
 
 
 	protected function beforeSave($objItem) {
-		$objItem->GoogleId = $_POST['GoogleCatEdit']; error_log("passed edit is ".$_POST['GoogleCatExtraEdit']);
+		$objItem->GoogleId = $_POST['GoogleCatEdit'];
 		$objItem->MetaKeywords = $_POST['GoogleCatExtraEdit']; //Since we dont use keywords anymore, let's co-opt this field
 
 		if (!empty($_POST['ImageId'])) {
