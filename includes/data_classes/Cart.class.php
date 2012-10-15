@@ -349,7 +349,9 @@ class Cart extends CartGen {
 						$objItem->Qty=$objItem->Product->Inventory;
 						$bnlResult = true;	
 					}
-			 	}
+					$this->UpdateSubtotal();
+					$this->SyncSave();
+				}
 			}
 			
 			
@@ -652,7 +654,8 @@ class Cart extends CartGen {
 		$UpdateShipping = true,
 		$SaveCart = true)
 	{
-		if ($this->UpdateMissingProducts())
+		if ($this->intType == CartType::cart)
+			if ($this->UpdateMissingProducts())
 			$this->Reload();
 
 		$this->UpdateSubtotal();
@@ -1171,6 +1174,9 @@ class Cart extends CartGen {
 
 			case 'Weight':
 				return $this->GetWeight();
+
+			case 'Subtotal':
+				return $this->strSubtotal;
 
 			case 'SubTotalTaxIncIfSet':
 				QApplication::Log(E_USER_NOTICE, 'legacy', $strName);
