@@ -3322,7 +3322,7 @@ class xlsws_admin_cpage extends xlsws_admin{
 
 		$this->listPages();
 
-		$this->HelperRibbon = "Looking to override your default home page? Create a custom page using the key \"index\" which will be shown instead.";
+		$this->HelperRibbon = "Looking to override your default home page? Create a custom page using the key \"index\" which will be shown instead. You can also make any tab jump to another page by entering the full URL by itself in the text box, no coding needed.";
 
 	}
 
