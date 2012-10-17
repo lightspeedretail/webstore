@@ -3277,14 +3277,12 @@ EOT;
 
 					case 'replace':
 						$blnReplace = false;
-						if (md5_file($v->filename) == $v->original_hash) {
-							$blnReplace = true;
+
+						foreach($v->original_hash as $hash) {
+							if (md5_file($v->filename) == $hash) $blnReplace = true;
+							if (md5_file($v->filename) != $hash && $v->status == 'critical' && isset($_GET['ignore'])) $blnReplace = true;
 						}
-						if (md5_file($v->filename) != $v->original_hash && $v->status == 'critical'
-							&& isset($_GET['ignore'])
-						) {
-							$blnReplace = true;
-						}
+
 						//If the file doesn't exist (can happen for large jumps in upgrading), set replace flag
 						if (!file_exists($v->filename))
 							$blnReplace = true;
