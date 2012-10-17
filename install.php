@@ -128,10 +128,9 @@ if (stristr($content, "define ('__DOCROOT__'")
 	// config is there.
 	$strUrl = $_SERVER['SCRIPT_NAME'];
 	$strUrl = str_replace("install.php","",$strUrl);
-	exit('Store has already been installed. <script type="text/javascript">document.location.href="'.$strUrl.'";</script>');
+	if ((time()-filemtime("includes/configuration.inc.php"))>120 || !isset($_POST['Qform__FormCheckableControls']))
+		exit('Store has already been installed. <script type="text/javascript">document.location.href="'.$strUrl.'";</script>');
 }
-
-
 //// include our prepend.inc which'll give us access to useful classes like QForm, used below
 require_once('includes/prepend.inc.php');
 
@@ -211,7 +210,10 @@ if (!isset($this)) {
 				//	array('check_permissions' => 'Check Permissions'),
 				array('db_settings' => 'Database settings'),
 				array('store_password' => 'Password'),
-				array('install_db' => 'Installing database')
+				array('install_db' => 'Installing database'),
+				array('performDBInstall' => 'Summary'),
+				array('gotostore' => 'Summary')
+
 			);
 
 
@@ -355,7 +357,7 @@ if (!isset($this)) {
 			//$lbox->TextMode = QTextMode::MultiLine;
 			//$lbox->ReadOnly = true;
 			$lbox->DisplayStyle = QDisplayStyle::Block;
-			$lbox->CssClass = "install_agreement";
+			$lbox->CssClass = "install_agreement topbump";
 			$lbox->Text
 				= <<<EOT
 				
@@ -837,6 +839,12 @@ EOT;
 
 		}
 
+		protected function gotostore()
+		{
+			$strUrl = $_SERVER['SCRIPT_NAME'];
+			$strUrl = str_replace("install.php","",$strUrl);
+			_rd($strUrl);
+		}
 
 		protected function store_password()
 		{
@@ -921,7 +929,7 @@ EOT;
 						<strong>Store Admin Password</strong> : %s <br/>
 						<br/>
 						<br/>
-						Click install store to perform installation of the store.<br/>"
+						Click Next to perform installation of the store.<br/>"
 				, $docroot->Text
 				, $virtualdir->Text
 				, $subdir->Text
@@ -938,13 +946,15 @@ EOT;
 			$installdb->DisplayStyle = QDisplayStyle::Block;
 			$installdb->CssClass = "textbold";
 
-			$dbbut = $this->iControl('dbbut', 'QButton');
-			$dbbut->Text = "Install Store";
-			$dbbut->CssClass = "button center rounded";
-			$dbbut->AddAction(new QClickEvent(), new QServerAction('performDBInstall'));
+//			$dbbut = $this->iControl('dbbut', 'QButton');
+//			$dbbut->Text = "Install Store";
+//			$dbbut->CssClass = "button center rounded";
+//			$dbbut->AddAction(new QClickEvent(), new QServerAction('performDBInstall'));
 
 			$this->pnlInstall->CssClass = "install_center";
 		}
+
+
 
 
 		protected function btnPrev_Click($strFormId, $strControlId, $strParameter)
@@ -1257,14 +1267,14 @@ EOT;
 		}
 
 
-		protected function performDBInstall($strFormId, $strControlId, $strParameter)
+		protected function performDBInstall()
 		{
-
+			$this->pnlStep->Text = "<img src=\"templates/install/step_05.png\" /></div>";
 
 			$link = $this->connect_db();
 
 			if (!$link) {
-				return;
+				die("cannot connect to database");
 			}
 
 			$db_ok = true;
@@ -1312,7 +1322,7 @@ EOT;
 				QApplication::ExecuteJavaScript(
 					'alert(\'Cannot write to includes/configuration.inc.php. Please check permission.\');'
 				);
-				return;
+				die();
 			}
 
 
@@ -1342,81 +1352,82 @@ EOT;
 
 			if ($numRows == 0) {
 
+
 				$sql
 					= "CREATE TABLE `xlsws_cart` (
-  `rowid` int(11) NOT NULL auto_increment,
-  `id_str` varchar(64) default NULL,
-  `address_bill` varchar(255) default NULL,
-  `address_ship` varchar(255) default NULL,
-  `ship_firstname` varchar(64) default NULL,
-  `ship_lastname` varchar(64) default NULL,
-  `ship_company` varchar(255) default NULL,
-  `ship_address1` varchar(255) default NULL,
-  `ship_address2` varchar(255) default NULL,
-  `ship_city` varchar(64) default NULL,
-  `ship_zip` varchar(10) default NULL,
-  `ship_state` varchar(16) default NULL,
-  `ship_country` varchar(16) default NULL,
-  `ship_phone` varchar(32) default NULL,
-  `zipcode` varchar(10) default NULL,
-  `contact` varchar(255) default NULL,
-  `discount` double default NULL,
-  `firstname` varchar(64) default NULL,
-  `lastname` varchar(64) default NULL,
-  `company` varchar(255) default NULL,
-  `name` varchar(255) default NULL,
-  `phone` varchar(64) default NULL,
-  `po` varchar(64) default NULL,
-  `type` mediumint(9) default NULL,
-  `status` varchar(32) default NULL,
-  `cost_total` double default NULL,
-  `currency` varchar(3) default NULL,
-  `currency_rate` double default NULL,
-  `datetime_cre` datetime default NULL,
-  `datetime_due` datetime default NULL,
-  `datetime_posted` datetime default NULL,
-  `email` varchar(255) default NULL,
-  `sell_total` double default NULL,
-  `printed_notes` varchar(255) default NULL,
-  `shipping_method` varchar(255) default NULL,
-  `shipping_module` varchar(64) default NULL,
-  `shipping_data` varchar(255) default NULL,
-  `shipping_cost` double default NULL,
-  `shipping_sell` double default NULL,
-  `payment_method` varchar(255) default NULL,
-  `payment_module` varchar(64) default NULL,
-  `payment_data` varchar(255) default NULL,
-  `payment_amount` double default NULL,
-  `fk_tax_code_id` bigint(20) default '0',
-  `tax_inclusive` tinyint(1) default NULL,
-  `subtotal` double default NULL,
-  `tax1` double default '0',
-  `tax2` double default '0',
-  `tax3` double default '0',
-  `tax4` double default '0',
-  `tax5` double default '0',
-  `total` double default NULL,
-  `count` int(11) default '0',
-  `downloaded` tinyint(1) default '0',
-  `user` varchar(32) default NULL,
-  `ip_host` varchar(255) default NULL,
-  `customer_id` int(11) default NULL,
-  `gift_registry` bigint(20) default NULL,
-  `send_to` varchar(255) default NULL,
-  `submitted` datetime default NULL,
-  `modified` timestamp NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `linkid` varchar(32) default NULL,
-  `fk_promo_id` int(5) default NULL,  
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `id_str` (`id_str`),
-  KEY `customer` (`customer_id`),
-  KEY `type` (`type`),
-  KEY `linkid` (`linkid`),
-  KEY `fk_tax_code_id` (`fk_tax_code_id`),
-  KEY `submitted` (`submitted`),
-  KEY `gift_registry` (`gift_registry`),
-  KEY `downloaded` (`downloaded`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` int(11) NOT NULL auto_increment,
+		  `id_str` varchar(64) default NULL,
+		  `address_bill` varchar(255) default NULL,
+		  `address_ship` varchar(255) default NULL,
+		  `ship_firstname` varchar(64) default NULL,
+		  `ship_lastname` varchar(64) default NULL,
+		  `ship_company` varchar(255) default NULL,
+		  `ship_address1` varchar(255) default NULL,
+		  `ship_address2` varchar(255) default NULL,
+		  `ship_city` varchar(64) default NULL,
+		  `ship_zip` varchar(10) default NULL,
+		  `ship_state` varchar(16) default NULL,
+		  `ship_country` varchar(16) default NULL,
+		  `ship_phone` varchar(32) default NULL,
+		  `zipcode` varchar(10) default NULL,
+		  `contact` varchar(255) default NULL,
+		  `discount` double default NULL,
+		  `firstname` varchar(64) default NULL,
+		  `lastname` varchar(64) default NULL,
+		  `company` varchar(255) default NULL,
+		  `name` varchar(255) default NULL,
+		  `phone` varchar(64) default NULL,
+		  `po` varchar(64) default NULL,
+		  `type` mediumint(9) default NULL,
+		  `status` varchar(32) default NULL,
+		  `cost_total` double default NULL,
+		  `currency` varchar(3) default NULL,
+		  `currency_rate` double default NULL,
+		  `datetime_cre` datetime default NULL,
+		  `datetime_due` datetime default NULL,
+		  `datetime_posted` datetime default NULL,
+		  `email` varchar(255) default NULL,
+		  `sell_total` double default NULL,
+		  `printed_notes` varchar(255) default NULL,
+		  `shipping_method` varchar(255) default NULL,
+		  `shipping_module` varchar(64) default NULL,
+		  `shipping_data` varchar(255) default NULL,
+		  `shipping_cost` double default NULL,
+		  `shipping_sell` double default NULL,
+		  `payment_method` varchar(255) default NULL,
+		  `payment_module` varchar(64) default NULL,
+		  `payment_data` varchar(255) default NULL,
+		  `payment_amount` double default NULL,
+		  `fk_tax_code_id` bigint(20) default '0',
+		  `tax_inclusive` tinyint(1) default NULL,
+		  `subtotal` double default NULL,
+		  `tax1` double default '0',
+		  `tax2` double default '0',
+		  `tax3` double default '0',
+		  `tax4` double default '0',
+		  `tax5` double default '0',
+		  `total` double default NULL,
+		  `count` int(11) default '0',
+		  `downloaded` tinyint(1) default '0',
+		  `user` varchar(32) default NULL,
+		  `ip_host` varchar(255) default NULL,
+		  `customer_id` int(11) default NULL,
+		  `gift_registry` bigint(20) default NULL,
+		  `send_to` varchar(255) default NULL,
+		  `submitted` datetime default NULL,
+		  `modified` timestamp NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+		  `linkid` varchar(32) default NULL,
+		  `fk_promo_id` int(5) default NULL,
+		  PRIMARY KEY  (`rowid`),
+		  UNIQUE KEY `id_str` (`id_str`),
+		  KEY `customer` (`customer_id`),
+		  KEY `type` (`type`),
+		  KEY `linkid` (`linkid`),
+		  KEY `fk_tax_code_id` (`fk_tax_code_id`),
+		  KEY `submitted` (`submitted`),
+		  KEY `gift_registry` (`gift_registry`),
+		  KEY `downloaded` (`downloaded`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating table Cart.<br/>";
@@ -1427,28 +1438,28 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_cart_item` (
-  `rowid` bigint(20) NOT NULL auto_increment,
-  `cart_id` bigint(20) NOT NULL,
-  `cart_type` int(11) default '1',
-  `product_id` bigint(20) NOT NULL,
-  `code` varchar(255) NOT NULL,
-  `description` varchar(255) NOT NULL,
-  `discount` varchar(16) default NULL,
-  `qty` float NOT NULL,
-  `sell` double NOT NULL,
-  `sell_base` double NOT NULL,
-  `sell_discount` double NOT NULL,
-  `sell_total` double NOT NULL,
-  `serial_numbers` varchar(255) default NULL,
-  `gift_registry_item` bigint(20) default NULL,
-  `datetime_added` datetime NOT NULL,
-  `datetime_mod` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`rowid`),
-  KEY `cart_id` (`cart_id`),
-  KEY `code` (`code`),
-  KEY `product_id` (`product_id`),
-  KEY `gift_registry_item` (`gift_registry_item`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` bigint(20) NOT NULL auto_increment,
+		  `cart_id` bigint(20) NOT NULL,
+		  `cart_type` int(11) default '1',
+		  `product_id` bigint(20) NOT NULL,
+		  `code` varchar(255) NOT NULL,
+		  `description` varchar(255) NOT NULL,
+		  `discount` varchar(16) default NULL,
+		  `qty` float NOT NULL,
+		  `sell` double NOT NULL,
+		  `sell_base` double NOT NULL,
+		  `sell_discount` double NOT NULL,
+		  `sell_total` double NOT NULL,
+		  `serial_numbers` varchar(255) default NULL,
+		  `gift_registry_item` bigint(20) default NULL,
+		  `datetime_added` datetime NOT NULL,
+		  `datetime_mod` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+		  PRIMARY KEY  (`rowid`),
+		  KEY `cart_id` (`cart_id`),
+		  KEY `code` (`code`),
+		  KEY `product_id` (`product_id`),
+		  KEY `gift_registry_item` (`gift_registry_item`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating table Cart Items.<br/>";
@@ -1458,21 +1469,21 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_category` (
-  `rowid` int(11) NOT NULL auto_increment,
-  `name` varchar(64) default NULL,
-  `parent` int(11) default NULL,
-  `position` int(11) NOT NULL,
-  `child_count` int(11) default '1',
-  `custom_page` varchar(64) default NULL,
-  `image_id` bigint(20) default NULL,
-  `meta_keywords` varchar(255) default NULL,
-  `meta_description` varchar(255) default NULL,
-  `created` datetime default NULL,
-  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`rowid`),
-  KEY `name` (`name`),
-  KEY `parent` (`parent`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` int(11) NOT NULL auto_increment,
+		  `name` varchar(64) default NULL,
+		  `parent` int(11) default NULL,
+		  `position` int(11) NOT NULL,
+		  `child_count` int(11) default '1',
+		  `custom_page` varchar(64) default NULL,
+		  `image_id` bigint(20) default NULL,
+		  `meta_keywords` varchar(255) default NULL,
+		  `meta_description` varchar(255) default NULL,
+		  `created` datetime default NULL,
+		  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+		  PRIMARY KEY  (`rowid`),
+		  KEY `name` (`name`),
+		  KEY `parent` (`parent`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating table Category.<br/>";
@@ -1482,20 +1493,20 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_configuration` (
-  `rowid` bigint(20) NOT NULL auto_increment,
-  `title` varchar(64) NOT NULL,
-  `key` varchar(64) NOT NULL,
-  `value` mediumtext NOT NULL,
-  `helper_text` varchar(255) NOT NULL,
-  `configuration_type_id` int(11) NOT NULL default '0',
-  `sort_order` int(5) default NULL,
-  `modified` timestamp NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `created` datetime default NULL,
-  `options` varchar(255) default NULL,
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `key` (`key`),
-  KEY `configuration_type_id` (`configuration_type_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` bigint(20) NOT NULL auto_increment,
+		  `title` varchar(64) NOT NULL,
+		  `key` varchar(64) NOT NULL,
+		  `value` mediumtext NOT NULL,
+		  `helper_text` varchar(255) NOT NULL,
+		  `configuration_type_id` int(11) NOT NULL default '0',
+		  `sort_order` int(5) default NULL,
+		  `modified` timestamp NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+		  `created` datetime default NULL,
+		  `options` varchar(255) default NULL,
+		  PRIMARY KEY  (`rowid`),
+		  UNIQUE KEY `key` (`key`),
+		  KEY `configuration_type_id` (`configuration_type_id`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating table Configration.<br/>";
@@ -1508,7 +1519,7 @@ EOT;
 					= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Image Store Location', 'IMAGE_STORE', 'FS', 'Where images are stored? Database or FileSystem on web server?', 17, 8, NOW(), NOW(), 'STORE_IMAGE_LOCATION');";
 				$sql[]
 					= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Authorized IPs For Web Store Admin (USE WITH CAUTION)', 'LSAUTH_IPS', '', 'List of IP Addresses (comma seperated) which are allowed to administer this server. NOTE: DO NOT USE THIS OPTION IF YOU DO NOT HAVE A STATIC IP ADDRESS', 16, 4, NOW(), NOW(), '');";
-//$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Moderate Customer Registration', 'MODERATE_REGISTRATION', '', 'If enabled, customer registrations will need to be moderated before they are approved', 3, 1, NOW(), NOW(), 'BOOL');";
+				//$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Moderate Customer Registration', 'MODERATE_REGISTRATION', '', 'If enabled, customer registrations will need to be moderated before they are approved', 3, 1, NOW(), NOW(), 'BOOL');";
 				$sql[]
 					= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Disable Cart', 'DISABLE_CART', '', 'If selected, products will only be shown but not sold', 4, 4, NOW(), NOW(), 'BOOL');";
 				$sql[]
@@ -1517,7 +1528,7 @@ EOT;
 					= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Default Currency', 'CURRENCY_DEFAULT', 'USD', '', 15, 7, NOW(), NOW(), NULL);";
 				$sql[]
 					= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Languages', 'LANGUAGES', 'EN,ES,FR', '', 3, 3, NOW(), NOW(), NULL);";
-//$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Newsletter', 'NEWSLETTER_DEFAULT', '1', 'Subscribe new customer to newsletter by default', 3, 6, NOW(), NOW(), 'BOOL');";
+				//$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Newsletter', 'NEWSLETTER_DEFAULT', '1', 'Subscribe new customer to newsletter by default', 3, 6, NOW(), NOW(), 'BOOL');";
 				$sql[]
 					= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Phone Types', 'PHONE_TYPES', 'work,home,mobile,work fax,home fax', 'Options phone types in Additional Contact Info', 3, 5, NOW(), NOW(), NULL);";
 				$sql[]
@@ -1670,7 +1681,7 @@ EOT;
 					= "insert into xlsws_configuration values (null,'Update color options', 'ENABLE_COLOR_FILTER', 0, 'Enable this option to have the color drop-down menu populated on each size change',8,5,now(),now(),'BOOL');";
 				$sql[]
 					= "INSERT into `xlsws_configuration` VALUES (NULL,'Database Schema Version', 'DATABASE_SCHEMA_VERSION', '214','Used for tracking schema changes',0,0,NOW(),NOW(),NULL);";
-//Do not add any more statements here, upgrade db lines should be in xlsws_includes/db_maintenance.php
+				//Do not add any more statements here, upgrade db lines should be in xlsws_includes/db_maintenance.php
 
 
 				$sql[]
@@ -1684,7 +1695,7 @@ EOT;
 				$sql[]
 					= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Uploader should delete duplicates', 'DEBUG_DELETE_DUPES', '', 'If selected, a product which is uploading will replace any duplicate product codes.', 1, 21, NOW(), NOW(), 'BOOL');";
 
-//$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug LightSpeed Soap Call', 'DEBUG_LS_SOAP_CALL', '1', 'If selected, all soap calls will be logged in the database. It is advised that you do not enable this unless advised by XSilva', 1, 16, NOW(), NOW(), 'BOOL');";
+				//$sql[]= "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug LightSpeed Soap Call', 'DEBUG_LS_SOAP_CALL', '1', 'If selected, all soap calls will be logged in the database. It is advised that you do not enable this unless advised by XSilva', 1, 16, NOW(), NOW(), 'BOOL');";
 
 				//$strReturn .= "Entering Configuration values<br/>";
 
@@ -1695,18 +1706,18 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_country` (
-  `rowid` bigint(20) NOT NULL auto_increment,
-  `code` char(2) NOT NULL default '',
-  `code_A3` char(3) NOT NULL default '',
-  `region` char(2) NOT NULL default '',
-  `avail` char(1) NOT NULL default 'Y',
-  `sort_order` int(11) default '10',
-  `country` varchar(255) NOT NULL,
-  `zip_validate_preg` varchar(255) NULL default '',
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `code` (`code`),
-  KEY `avail` (`avail`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` bigint(20) NOT NULL auto_increment,
+		  `code` char(2) NOT NULL default '',
+		  `code_A3` char(3) NOT NULL default '',
+		  `region` char(2) NOT NULL default '',
+		  `avail` char(1) NOT NULL default 'Y',
+		  `sort_order` int(11) default '10',
+		  `country` varchar(255) NOT NULL,
+		  `zip_validate_preg` varchar(255) NULL default '',
+		  PRIMARY KEY  (`rowid`),
+		  UNIQUE KEY `code` (`code`),
+		  KEY `avail` (`avail`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating country Table.<br/>";
@@ -2029,17 +2040,17 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_credit_card` (
-  `rowid` int(11) NOT NULL auto_increment,
-  `name` varchar(32) NOT NULL,
-  `length` varchar(16) NOT NULL,
-  `prefix` varchar(64) NOT NULL,
-  `sort_order` int(11) NOT NULL default '0',
-  `enabled` tinyint(1) NOT NULL,
-  `validFunc` varchar(32) default NULL,
-  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` int(11) NOT NULL auto_increment,
+		  `name` varchar(32) NOT NULL,
+		  `length` varchar(16) NOT NULL,
+		  `prefix` varchar(64) NOT NULL,
+		  `sort_order` int(11) NOT NULL default '0',
+		  `enabled` tinyint(1) NOT NULL,
+		  `validFunc` varchar(32) default NULL,
+		  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+		  PRIMARY KEY  (`rowid`),
+		  UNIQUE KEY `name` (`name`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating credit card types Table.<br/>";
@@ -2084,51 +2095,51 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_customer` (
-  `rowid` bigint(20) NOT NULL auto_increment,
-  `address1_1` varchar(255) default NULL,
-  `address1_2` varchar(255) default NULL,
-  `address2_1` varchar(255) default NULL,
-  `address_2_2` varchar(255) default NULL,
-  `city1` varchar(64) default NULL,
-  `city2` varchar(64) default NULL,
-  `company` varchar(255) default NULL,
-  `country1` varchar(32) default NULL,
-  `country2` varchar(32) default NULL,
-  `currency` varchar(3) default NULL,
-  `email` varchar(255) default NULL,
-  `firstname` varchar(64) default NULL,
-  `pricing_level` int(11) default NULL,
-  `homepage` varchar(255) default NULL,
-  `id_customer` varchar(32) default NULL,
-  `language` varchar(8) default NULL,
-  `lastname` varchar(64) default NULL,
-  `mainname` varchar(255) default NULL,
-  `mainphone` varchar(32) default NULL,
-  `mainephonetype` varchar(8) default NULL,
-  `phone1` varchar(32) default NULL,
-  `phonetype1` varchar(8) default NULL,
-  `phone2` varchar(32) default NULL,
-  `phonetype2` varchar(8) default NULL,
-  `phone3` varchar(32) default NULL,
-  `phonetype3` varchar(8) default NULL,
-  `phone4` varchar(32) default NULL,
-  `phonetype4` varchar(8) default NULL,
-  `state1` varchar(32) default NULL,
-  `state2` varchar(32) default NULL,
-  `type` varchar(1) default NULL,
-  `user` varchar(32) default NULL,
-  `zip1` varchar(16) default NULL,
-  `zip2` varchar(16) default NULL,
-  `newsletter_subscribe` tinyint(1) default NULL,
-  `html_email` tinyint(1) default '1',
-  `password` varchar(32) default NULL,
-  `temp_password` varchar(32) default NULL,
-  `allow_login` tinyint(1) default '1',
-  `created` datetime NOT NULL,
-  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` bigint(20) NOT NULL auto_increment,
+		  `address1_1` varchar(255) default NULL,
+		  `address1_2` varchar(255) default NULL,
+		  `address2_1` varchar(255) default NULL,
+		  `address_2_2` varchar(255) default NULL,
+		  `city1` varchar(64) default NULL,
+		  `city2` varchar(64) default NULL,
+		  `company` varchar(255) default NULL,
+		  `country1` varchar(32) default NULL,
+		  `country2` varchar(32) default NULL,
+		  `currency` varchar(3) default NULL,
+		  `email` varchar(255) default NULL,
+		  `firstname` varchar(64) default NULL,
+		  `pricing_level` int(11) default NULL,
+		  `homepage` varchar(255) default NULL,
+		  `id_customer` varchar(32) default NULL,
+		  `language` varchar(8) default NULL,
+		  `lastname` varchar(64) default NULL,
+		  `mainname` varchar(255) default NULL,
+		  `mainphone` varchar(32) default NULL,
+		  `mainephonetype` varchar(8) default NULL,
+		  `phone1` varchar(32) default NULL,
+		  `phonetype1` varchar(8) default NULL,
+		  `phone2` varchar(32) default NULL,
+		  `phonetype2` varchar(8) default NULL,
+		  `phone3` varchar(32) default NULL,
+		  `phonetype3` varchar(8) default NULL,
+		  `phone4` varchar(32) default NULL,
+		  `phonetype4` varchar(8) default NULL,
+		  `state1` varchar(32) default NULL,
+		  `state2` varchar(32) default NULL,
+		  `type` varchar(1) default NULL,
+		  `user` varchar(32) default NULL,
+		  `zip1` varchar(16) default NULL,
+		  `zip2` varchar(16) default NULL,
+		  `newsletter_subscribe` tinyint(1) default NULL,
+		  `html_email` tinyint(1) default '1',
+		  `password` varchar(32) default NULL,
+		  `temp_password` varchar(32) default NULL,
+		  `allow_login` tinyint(1) default '1',
+		  `created` datetime NOT NULL,
+		  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+		  PRIMARY KEY  (`rowid`),
+		  UNIQUE KEY `email` (`email`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating Customer Table.<br/>";
@@ -2138,18 +2149,18 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_custom_page` (
-  `rowid` bigint(20) NOT NULL auto_increment,
-  `key` varchar(32) NOT NULL,
-  `title` varchar(64) NOT NULL,
-  `page` mediumtext,
-  `meta_keywords` varchar(255) default NULL,
-  `meta_description` varchar(255) default NULL,
-  `modified` timestamp NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `created` datetime default NULL,
-  `product_tag` varchar(255) default NULL,
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `key` (`key`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` bigint(20) NOT NULL auto_increment,
+		  `key` varchar(32) NOT NULL,
+		  `title` varchar(64) NOT NULL,
+		  `page` mediumtext,
+		  `meta_keywords` varchar(255) default NULL,
+		  `meta_description` varchar(255) default NULL,
+		  `modified` timestamp NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+		  `created` datetime default NULL,
+		  `product_tag` varchar(255) default NULL,
+		  PRIMARY KEY  (`rowid`),
+		  UNIQUE KEY `key` (`key`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 				//$strReturn .= "Creating Custom pages Table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_custom_page`;");
@@ -2186,19 +2197,19 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_destination` (
-  `rowid` int(11) NOT NULL auto_increment,
-  `country` varchar(5) default NULL,
-  `state` varchar(5) default NULL,
-  `zipcode1` varchar(10) default NULL,
-  `zipcode2` varchar(10) default NULL,
-  `taxcode` int(11) default NULL,
-  `name` varchar(32) default NULL,
-  `base_charge` float default '0',
-  `ship_free` float default NULL,
-  `ship_rate` float default NULL,
-  `modified` timestamp NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`rowid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` int(11) NOT NULL auto_increment,
+		  `country` varchar(5) default NULL,
+		  `state` varchar(5) default NULL,
+		  `zipcode1` varchar(10) default NULL,
+		  `zipcode2` varchar(10) default NULL,
+		  `taxcode` int(11) default NULL,
+		  `name` varchar(32) default NULL,
+		  `base_charge` float default '0',
+		  `ship_free` float default NULL,
+		  `ship_rate` float default NULL,
+		  `modified` timestamp NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+		  PRIMARY KEY  (`rowid`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 				//$strReturn .= "Creating Destinations Table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_destination`;");
@@ -2207,11 +2218,11 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_family` (
-  `rowid` int(11) NOT NULL auto_increment,
-  `family` varchar(255) NOT NULL,
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `Family` (`family`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` int(11) NOT NULL auto_increment,
+		  `family` varchar(255) NOT NULL,
+		  PRIMARY KEY  (`rowid`),
+		  UNIQUE KEY `Family` (`family`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 				//$strReturn .= "Creating Families Table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_family`;");
@@ -2220,21 +2231,21 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_gift_registry` (
-  `rowid` int(11) NOT NULL auto_increment,
-  `registry_name` varchar(100) NOT NULL,
-  `registry_password` varchar(100) NOT NULL,
-  `registry_description` text,
-  `event_date` date NOT NULL,
-  `html_content` text NOT NULL,
-  `ship_option` varchar(100) default NULL,
-  `customer_id` int(11) NOT NULL,
-  `gift_code` varchar(100) NOT NULL,
-  `created` datetime NOT NULL,
-  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `gift_code` (`gift_code`),
-  KEY `customer_id` (`customer_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` int(11) NOT NULL auto_increment,
+		  `registry_name` varchar(100) NOT NULL,
+		  `registry_password` varchar(100) NOT NULL,
+		  `registry_description` text,
+		  `event_date` date NOT NULL,
+		  `html_content` text NOT NULL,
+		  `ship_option` varchar(100) default NULL,
+		  `customer_id` int(11) NOT NULL,
+		  `gift_code` varchar(100) NOT NULL,
+		  `created` datetime NOT NULL,
+		  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+		  PRIMARY KEY  (`rowid`),
+		  UNIQUE KEY `gift_code` (`gift_code`),
+		  KEY `customer_id` (`customer_id`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 				//$strReturn .= "Creating Gift Registry Table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_gift_registry`;");
@@ -2243,20 +2254,20 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_gift_registry_items` (
-  `rowid` int(11) NOT NULL auto_increment,
-  `registry_id` int(11) NOT NULL,
-  `product_id` int(11) NOT NULL,
-  `qty` double NOT NULL default '1',
-  `registry_status` varchar(50) default '0',
-  `purchase_status` bigint(20) default '0',
-  `purchased_by` varchar(100) default NULL,
-  `created` datetime NOT NULL,
-  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `rowid` (`rowid`,`registry_id`),
-  KEY `registry_id` (`registry_id`),
-  KEY `product_id` (`product_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` int(11) NOT NULL auto_increment,
+		  `registry_id` int(11) NOT NULL,
+		  `product_id` int(11) NOT NULL,
+		  `qty` double NOT NULL default '1',
+		  `registry_status` varchar(50) default '0',
+		  `purchase_status` bigint(20) default '0',
+		  `purchased_by` varchar(100) default NULL,
+		  `created` datetime NOT NULL,
+		  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+		  PRIMARY KEY  (`rowid`),
+		  UNIQUE KEY `rowid` (`rowid`,`registry_id`),
+		  KEY `registry_id` (`registry_id`),
+		  KEY `product_id` (`product_id`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating Gift Registry Items table.<br/>";
@@ -2266,18 +2277,18 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_gift_registry_receipents` (
-  `rowid` int(11) NOT NULL auto_increment,
-  `registry_id` int(11) NOT NULL,
-  `customer_id` int(11) default NULL,
-  `receipent_name` varchar(100) NOT NULL,
-  `receipent_email` varchar(100) NOT NULL,
-  `email_sent` tinyint(1) default '0',
-  `created` datetime NOT NULL,
-  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`rowid`),
-  KEY `registry_id` (`registry_id`),
-  KEY `customer_id` (`customer_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` int(11) NOT NULL auto_increment,
+		  `registry_id` int(11) NOT NULL,
+		  `customer_id` int(11) default NULL,
+		  `receipent_name` varchar(100) NOT NULL,
+		  `receipent_email` varchar(100) NOT NULL,
+		  `email_sent` tinyint(1) default '0',
+		  `created` datetime NOT NULL,
+		  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+		  PRIMARY KEY  (`rowid`),
+		  KEY `registry_id` (`registry_id`),
+		  KEY `customer_id` (`customer_id`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating Gift Registry Receipients table.<br/>";
@@ -2287,19 +2298,19 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_images` (
-  `rowid` bigint(20) NOT NULL auto_increment,
-  `image_path` varchar(255) default NULL,
-  `image_data` mediumblob,
-  `width` mediumint(9) default NULL,
-  `height` mediumint(9) default NULL,
-  `checksum` varchar(32) default NULL,
-  `parent` bigint(20) default NULL,
-  `created` datetime NOT NULL,
-  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `width` (`width`,`height`,`parent`),
-  KEY `parent` (`parent`)
-) ENGINE=MyISAM CHARSET=utf8";
+		  `rowid` bigint(20) NOT NULL auto_increment,
+		  `image_path` varchar(255) default NULL,
+		  `image_data` mediumblob,
+		  `width` mediumint(9) default NULL,
+		  `height` mediumint(9) default NULL,
+		  `checksum` varchar(32) default NULL,
+		  `parent` bigint(20) default NULL,
+		  `created` datetime NOT NULL,
+		  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+		  PRIMARY KEY  (`rowid`),
+		  UNIQUE KEY `width` (`width`,`height`,`parent`),
+		  KEY `parent` (`parent`)
+		) ENGINE=MyISAM CHARSET=utf8";
 
 
 				//$strReturn .= "Creating images table.<br/>";
@@ -2309,14 +2320,14 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_log` (
-  `rowid` bigint(20) NOT NULL auto_increment,
-  `visitor_id` bigint(20) default NULL,
-  `log` text NOT NULL,
-  `created` datetime NOT NULL,
-  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`rowid`),
-  KEY `visitor_id` (`visitor_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` bigint(20) NOT NULL auto_increment,
+		  `visitor_id` bigint(20) default NULL,
+		  `log` text NOT NULL,
+		  `created` datetime NOT NULL,
+		  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+		  PRIMARY KEY  (`rowid`),
+		  KEY `visitor_id` (`visitor_id`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating System Logs table.<br/>";
@@ -2326,16 +2337,16 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_modules` (
-  `rowid` bigint(20) NOT NULL auto_increment,
-  `file` varchar(64) NOT NULL,
-  `type` varchar(16) NOT NULL,
-  `sort_order` int(5) default NULL,
-  `configuration` mediumtext,
-  `modified` timestamp NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `created` datetime default NULL,
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `file` (`file`,`type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` bigint(20) NOT NULL auto_increment,
+		  `file` varchar(64) NOT NULL,
+		  `type` varchar(16) NOT NULL,
+		  `sort_order` int(5) default NULL,
+		  `configuration` mediumtext,
+		  `modified` timestamp NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+		  `created` datetime default NULL,
+		  PRIMARY KEY  (`rowid`),
+		  UNIQUE KEY `file` (`file`,`type`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating Modules table.<br/>";
@@ -2363,52 +2374,52 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_product` (
-  `rowid` int(11) NOT NULL auto_increment,
-  `name` varchar(255) NOT NULL,
-  `image_id` bigint(20) default NULL,
-  `class_name` varchar(32) default NULL,
-  `code` varchar(255) NOT NULL,
-  `current` tinyint(1) default NULL,
-  `description` mediumtext,
-  `description_short` mediumtext,
-  `family` varchar(255) default NULL,
-  `gift_card` tinyint(1) default NULL,
-  `inventoried` tinyint(1) default NULL,
-  `inventory` float default NULL,
-  `inventory_total` float default NULL,
-  `master_model` tinyint(1) default NULL,
-  `fk_product_master_id` bigint(20) default '0',
-  `product_size` varchar(32) default NULL,
-  `product_color` varchar(32) default NULL,
-  `product_height` float default NULL,
-  `product_length` float default NULL,
-  `product_width` float default NULL,
-  `product_weight` float default '0',
-  `fk_tax_status_id` bigint(20) default '0',
-  `sell` float default NULL,
-  `sell_tax_inclusive` float default NULL,
-  `sell_web` float default NULL,
-  `upc` varchar(12) default NULL,
-  `web` tinyint(1) default NULL,
-  `web_keyword1` varchar(255) default NULL,
-  `web_keyword2` varchar(255) default NULL,
-  `web_keyword3` varchar(255) default NULL,
-  `meta_desc` varchar(255) default NULL,
-  `meta_keyword` varchar(255) default NULL,
-  `featured` tinyint(1) NOT NULL default '0',
-  `created` datetime default NULL,
-  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `code` (`code`),
-  KEY `web` (`web`),
-  KEY `name` (`name`),
-  KEY `fk_product_master_id` (`fk_product_master_id`),
-  KEY `master_model` (`master_model`),
-  KEY `fk_tax_status_id` (`fk_tax_status_id`),
-  FULLTEXT KEY `description` (`description`),
-  FULLTEXT KEY `name_2` (`name`),
-  FULLTEXT KEY `code_2` (`code`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` int(11) NOT NULL auto_increment,
+		  `name` varchar(255) NOT NULL,
+		  `image_id` bigint(20) default NULL,
+		  `class_name` varchar(32) default NULL,
+		  `code` varchar(255) NOT NULL,
+		  `current` tinyint(1) default NULL,
+		  `description` mediumtext,
+		  `description_short` mediumtext,
+		  `family` varchar(255) default NULL,
+		  `gift_card` tinyint(1) default NULL,
+		  `inventoried` tinyint(1) default NULL,
+		  `inventory` float default NULL,
+		  `inventory_total` float default NULL,
+		  `master_model` tinyint(1) default NULL,
+		  `fk_product_master_id` bigint(20) default '0',
+		  `product_size` varchar(32) default NULL,
+		  `product_color` varchar(32) default NULL,
+		  `product_height` float default NULL,
+		  `product_length` float default NULL,
+		  `product_width` float default NULL,
+		  `product_weight` float default '0',
+		  `fk_tax_status_id` bigint(20) default '0',
+		  `sell` float default NULL,
+		  `sell_tax_inclusive` float default NULL,
+		  `sell_web` float default NULL,
+		  `upc` varchar(12) default NULL,
+		  `web` tinyint(1) default NULL,
+		  `web_keyword1` varchar(255) default NULL,
+		  `web_keyword2` varchar(255) default NULL,
+		  `web_keyword3` varchar(255) default NULL,
+		  `meta_desc` varchar(255) default NULL,
+		  `meta_keyword` varchar(255) default NULL,
+		  `featured` tinyint(1) NOT NULL default '0',
+		  `created` datetime default NULL,
+		  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+		  PRIMARY KEY  (`rowid`),
+		  UNIQUE KEY `code` (`code`),
+		  KEY `web` (`web`),
+		  KEY `name` (`name`),
+		  KEY `fk_product_master_id` (`fk_product_master_id`),
+		  KEY `master_model` (`master_model`),
+		  KEY `fk_tax_status_id` (`fk_tax_status_id`),
+		  FULLTEXT KEY `description` (`description`),
+		  FULLTEXT KEY `name_2` (`name`),
+		  FULLTEXT KEY `code_2` (`code`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating Products table.<br/>";
@@ -2418,10 +2429,10 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_product_category_assn` (
-  `product_id` int(11) NOT NULL,
-  `category_id` int(11) NOT NULL,
-  PRIMARY KEY  (`product_id`,`category_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+		  `product_id` int(11) NOT NULL,
+		  `category_id` int(11) NOT NULL,
+		  PRIMARY KEY  (`product_id`,`category_id`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 
 
 				//$strReturn .= "Creating Product-Category Relation table.<br/>";
@@ -2431,10 +2442,10 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_product_image_assn` (
-  `product_id` int(11) NOT NULL,
-  `image_id` int(11) NOT NULL,
-  KEY `product_id` (`product_id`,`image_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+		  `product_id` int(11) NOT NULL,
+		  `image_id` int(11) NOT NULL,
+		  KEY `product_id` (`product_id`,`image_id`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 
 
 				//$strReturn .= "Creating Product-Image Relation table.<br/>";
@@ -2444,15 +2455,15 @@ EOT;
 
 				$sql
 					= "CREATE TABLE xlsws_product_qty_pricing (
-  rowid bigint(20) NOT NULL auto_increment,
-  product_id int(11) NOT NULL,
-  pricing_level int(11) default NULL,
-  qty float default NULL,
-  price float default NULL,
-  PRIMARY KEY  (rowid),
-  KEY product_id (product_id),
-  KEY product_id_2 (product_id,pricing_level)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+		  rowid bigint(20) NOT NULL auto_increment,
+		  product_id int(11) NOT NULL,
+		  pricing_level int(11) default NULL,
+		  qty float default NULL,
+		  price float default NULL,
+		  PRIMARY KEY  (rowid),
+		  KEY product_id (product_id),
+		  KEY product_id_2 (product_id,pricing_level)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 
 				//$strReturn .= "Creating Qty Pricing table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_product_qty_pricing`;");
@@ -2461,16 +2472,16 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_product_related` (
-  `rowid` bigint(20) NOT NULL auto_increment,
-  `product_id` bigint(20) NOT NULL,
-  `related_id` bigint(20) NOT NULL,
-  `autoadd` tinyint(1) default NULL,
-  `qty` float default NULL,
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `product_id` (`product_id`,`related_id`),
-  KEY `product_id_2` (`product_id`),
-  KEY `related_id` (`related_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` bigint(20) NOT NULL auto_increment,
+		  `product_id` bigint(20) NOT NULL,
+		  `related_id` bigint(20) NOT NULL,
+		  `autoadd` tinyint(1) default NULL,
+		  `qty` float default NULL,
+		  PRIMARY KEY  (`rowid`),
+		  UNIQUE KEY `product_id` (`product_id`,`related_id`),
+		  KEY `product_id_2` (`product_id`),
+		  KEY `related_id` (`related_id`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating Related Product table.<br/>";
@@ -2480,26 +2491,26 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_sro` (
-  `rowid` int(11) NOT NULL auto_increment,
-  `ls_id` varchar(20) default NULL,
-  `customer_name` varchar(255) default NULL,
-  `customer_email_phone` varchar(255) NOT NULL,
-  `zipcode` varchar(10) default NULL,
-  `problem_description` mediumtext,
-  `printed_notes` mediumtext,
-  `work_performed` mediumtext,
-  `additional_items` mediumtext,
-  `warranty` mediumtext,
-  `warranty_info` mediumtext,
-  `status` varchar(32) default NULL,
-  `cart_id` bigint(20) default NULL,
-  `datetime_cre` datetime default NULL,
-  `datetime_mod` timestamp NULL default NULL,
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `ls_id` (`ls_id`),
-  KEY `cart_id` (`cart_id`),
-  KEY `customer_email_phone` (`customer_email_phone`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` int(11) NOT NULL auto_increment,
+		  `ls_id` varchar(20) default NULL,
+		  `customer_name` varchar(255) default NULL,
+		  `customer_email_phone` varchar(255) NOT NULL,
+		  `zipcode` varchar(10) default NULL,
+		  `problem_description` mediumtext,
+		  `printed_notes` mediumtext,
+		  `work_performed` mediumtext,
+		  `additional_items` mediumtext,
+		  `warranty` mediumtext,
+		  `warranty_info` mediumtext,
+		  `status` varchar(32) default NULL,
+		  `cart_id` bigint(20) default NULL,
+		  `datetime_cre` datetime default NULL,
+		  `datetime_mod` timestamp NULL default NULL,
+		  PRIMARY KEY  (`rowid`),
+		  UNIQUE KEY `ls_id` (`ls_id`),
+		  KEY `cart_id` (`cart_id`),
+		  KEY `customer_email_phone` (`customer_email_phone`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating SRO table.<br/>";
@@ -2509,17 +2520,17 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_sro_repair` (
-  `rowid` int(11) NOT NULL auto_increment,
-  `sro_id` varchar(20) default NULL,
-  `family` varchar(255) default NULL,
-  `description` varchar(255) default NULL,
-  `purchase_date` varchar(32) default NULL,
-  `serial_number` varchar(255) default NULL,
-  `datetime_cre` datetime default NULL,
-  `datetime_mod` timestamp NULL default NULL,
-  PRIMARY KEY  (`rowid`),
-  KEY `sro_id` (`sro_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;";
+		  `rowid` int(11) NOT NULL auto_increment,
+		  `sro_id` varchar(20) default NULL,
+		  `family` varchar(255) default NULL,
+		  `description` varchar(255) default NULL,
+		  `purchase_date` varchar(32) default NULL,
+		  `serial_number` varchar(255) default NULL,
+		  `datetime_cre` datetime default NULL,
+		  `datetime_mod` timestamp NULL default NULL,
+		  PRIMARY KEY  (`rowid`),
+		  KEY `sro_id` (`sro_id`)
+		) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;";
 
 
 				//$strReturn .= "Creating SRO Repair table.<br/>";
@@ -2529,17 +2540,17 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_state` (
-  `rowid` bigint(20) unsigned NOT NULL auto_increment,
-  `country_code` char(2) NOT NULL default '',
-  `code` varchar(32) NOT NULL default '',
-  `avail` char(1) NOT NULL default 'Y',
-  `sort_order` int(11) default '10',
-  `state` varchar(255) NOT NULL,
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `cs` (`country_code`,`code`),
-  KEY `code` (`code`),
-  KEY `country_code` (`country_code`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` bigint(20) unsigned NOT NULL auto_increment,
+		  `country_code` char(2) NOT NULL default '',
+		  `code` varchar(32) NOT NULL default '',
+		  `avail` char(1) NOT NULL default 'Y',
+		  `sort_order` int(11) default '10',
+		  `state` varchar(255) NOT NULL,
+		  PRIMARY KEY  (`rowid`),
+		  UNIQUE KEY `cs` (`country_code`,`code`),
+		  KEY `code` (`code`),
+		  KEY `country_code` (`country_code`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 				//$strReturn .= "Creating State/Region table.<br/>";
 				$db_ok = $db_ok && $this->mysql_query("DROP TABLE IF EXISTS `xlsws_state`;");
@@ -2834,13 +2845,13 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_tax` (
-  `rowid` bigint(20) NOT NULL auto_increment,
-  `tax` char(32) NOT NULL,
-  `max` double default '0',
-  `compounded` tinyint(1) default '0',
-  PRIMARY KEY  (`rowid`),
-  KEY `tax` (`tax`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` bigint(20) NOT NULL auto_increment,
+		  `tax` char(32) NOT NULL,
+		  `max` double default '0',
+		  `compounded` tinyint(1) default '0',
+		  PRIMARY KEY  (`rowid`),
+		  KEY `tax` (`tax`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating tax table.<br/>";
@@ -2850,17 +2861,17 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_tax_code` (
-  `rowid` bigint(20) NOT NULL auto_increment,
-  `code` char(32) NOT NULL,
-  `list_order` int(11) NOT NULL default '0',
-  `tax1_rate` double NOT NULL default '0',
-  `tax2_rate` double NOT NULL default '0',
-  `tax3_rate` double NOT NULL default '0',
-  `tax4_rate` double NOT NULL default '0',
-  `tax5_rate` double NOT NULL default '0',
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `code` (`code`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` bigint(20) NOT NULL auto_increment,
+		  `code` char(32) NOT NULL,
+		  `list_order` int(11) NOT NULL default '0',
+		  `tax1_rate` double NOT NULL default '0',
+		  `tax2_rate` double NOT NULL default '0',
+		  `tax3_rate` double NOT NULL default '0',
+		  `tax4_rate` double NOT NULL default '0',
+		  `tax5_rate` double NOT NULL default '0',
+		  PRIMARY KEY  (`rowid`),
+		  UNIQUE KEY `code` (`code`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating tax code.<br/>";
@@ -2870,15 +2881,15 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_tax_status` (
-  `rowid` bigint(20) NOT NULL auto_increment,
-  `status` char(32) NOT NULL,
-  `tax1_status` tinyint(1) NOT NULL default '1',
-  `tax2_status` tinyint(1) NOT NULL default '1',
-  `tax3_status` tinyint(1) NOT NULL default '1',
-  `tax4_status` tinyint(1) NOT NULL default '1',
-  `tax5_status` tinyint(1) NOT NULL default '1',
-  PRIMARY KEY  (`rowid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` bigint(20) NOT NULL auto_increment,
+		  `status` char(32) NOT NULL,
+		  `tax1_status` tinyint(1) NOT NULL default '1',
+		  `tax2_status` tinyint(1) NOT NULL default '1',
+		  `tax3_status` tinyint(1) NOT NULL default '1',
+		  `tax4_status` tinyint(1) NOT NULL default '1',
+		  `tax5_status` tinyint(1) NOT NULL default '1',
+		  PRIMARY KEY  (`rowid`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating tax status.<br/>";
@@ -2888,19 +2899,19 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_view_log` (
-  `rowid` bigint(20) NOT NULL auto_increment,
-  `resource_id` bigint(20) default NULL,
-  `log_type_id` int(11) NOT NULL,
-  `visitor_id` bigint(20) default NULL,
-  `page` varchar(255) default NULL,
-  `vars` varchar(32) default NULL COMMENT 'Additional data for the view log',
-  `created` datetime NOT NULL,
-  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`rowid`),
-  KEY `visitor_id` (`visitor_id`),
-  KEY `log_type_id` (`log_type_id`),
-  KEY `resource_id` (`resource_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` bigint(20) NOT NULL auto_increment,
+		  `resource_id` bigint(20) default NULL,
+		  `log_type_id` int(11) NOT NULL,
+		  `visitor_id` bigint(20) default NULL,
+		  `page` varchar(255) default NULL,
+		  `vars` varchar(32) default NULL COMMENT 'Additional data for the view log',
+		  `created` datetime NOT NULL,
+		  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+		  PRIMARY KEY  (`rowid`),
+		  KEY `visitor_id` (`visitor_id`),
+		  KEY `log_type_id` (`log_type_id`),
+		  KEY `resource_id` (`resource_id`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating View Log.<br/>";
@@ -2909,17 +2920,17 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_promo_code` (
-  `rowid` int(11) NOT NULL auto_increment,
-  `code` varchar(255) default NULL,
-  `type` int(11) default '0',
-  `amount` double NOT NULL,
-  `valid_from` tinytext NOT NULL,
-  `qty_remaining` int(11) NOT NULL default '-1',
-  `valid_until` tinytext,
-  `lscodes` longtext NOT NULL,
-  `threshold` double NOT NULL,
-  PRIMARY KEY  (`rowid`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8";
+		  `rowid` int(11) NOT NULL auto_increment,
+		  `code` varchar(255) default NULL,
+		  `type` int(11) default '0',
+		  `amount` double NOT NULL,
+		  `valid_from` tinytext NOT NULL,
+		  `qty_remaining` int(11) NOT NULL default '-1',
+		  `valid_until` tinytext,
+		  `lscodes` longtext NOT NULL,
+		  `threshold` double NOT NULL,
+		  PRIMARY KEY  (`rowid`)
+		) ENGINE=MyISAM  DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating Promo Codes.<br/>";
@@ -2928,12 +2939,12 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_shipping_tiers` (
-  `rowid` int(11) NOT NULL auto_increment,
-  `start_price` double default '0',
-  `end_price` double default '0',
-  `rate` double default '0',
-  PRIMARY KEY  (`rowid`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8";
+		  `rowid` int(11) NOT NULL auto_increment,
+		  `start_price` double default '0',
+		  `end_price` double default '0',
+		  `rate` double default '0',
+		  PRIMARY KEY  (`rowid`)
+		) ENGINE=MyISAM  DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating Shipping Tiers.<br/>";
@@ -2943,14 +2954,14 @@ EOT;
 
 				$sql
 					= "CREATE TABLE IF NOT EXISTS `xlsws_sessions` (
-  `intSessionId` int(10) NOT NULL auto_increment,
-  `vchName` varchar(255) NOT NULL default '',
-  `uxtExpires` int(10) unsigned NOT NULL default '0',
-  `txtData` longtext,
-  PRIMARY KEY  (`intSessionId`),
-  KEY `idxName` (`vchName`),
-  KEY `idxExpires` (`uxtExpires`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8";
+		  `intSessionId` int(10) NOT NULL auto_increment,
+		  `vchName` varchar(255) NOT NULL default '',
+		  `uxtExpires` int(10) unsigned NOT NULL default '0',
+		  `txtData` longtext,
+		  PRIMARY KEY  (`intSessionId`),
+		  KEY `idxName` (`vchName`),
+		  KEY `idxExpires` (`uxtExpires`)
+		) ENGINE=MyISAM  DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating Sessions Table.<br/>";
@@ -2960,11 +2971,11 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_view_log_type` (
-  `rowid` bigint(20) NOT NULL auto_increment,
-  `name` varchar(32) NOT NULL,
-  PRIMARY KEY  (`rowid`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` bigint(20) NOT NULL auto_increment,
+		  `name` varchar(32) NOT NULL,
+		  PRIMARY KEY  (`rowid`),
+		  UNIQUE KEY `name` (`name`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating View Log Types.<br/>";
@@ -3004,17 +3015,17 @@ EOT;
 
 				$sql
 					= "CREATE TABLE `xlsws_visitor` (
-  `rowid` bigint(20) NOT NULL auto_increment,
-  `customer_id` bigint(20) default NULL,
-  `host` varchar(255) default NULL,
-  `ip` varchar(32) default NULL,
-  `browser` varchar(255) default NULL,
-  `screen_res` varchar(12) default NULL,
-  `created` datetime default NULL,
-  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`rowid`),
-  KEY `customer_id` (`customer_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+		  `rowid` bigint(20) NOT NULL auto_increment,
+		  `customer_id` bigint(20) default NULL,
+		  `host` varchar(255) default NULL,
+		  `ip` varchar(32) default NULL,
+		  `browser` varchar(255) default NULL,
+		  `screen_res` varchar(12) default NULL,
+		  `created` datetime default NULL,
+		  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+		  PRIMARY KEY  (`rowid`),
+		  KEY `customer_id` (`customer_id`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 
 
 				//$strReturn .= "Creating Visitor.<br/>";
@@ -3035,6 +3046,7 @@ EOT;
 						}
 					}
 				}
+
 
 
 			} else {
@@ -3106,23 +3118,29 @@ EOT;
 				$strUrl = $_SERVER['SCRIPT_NAME'];
 				$strUrl = str_replace("install.php","",$strUrl);
 
-
+				//Pre-emptively warn about GoDaddy
 				if (stripos($dbhost->Text,'hostedresource.com')>0)
-					$strReturn .= "<h2>GoDaddy?</h2>We detected you may be using GoDaddy for your hosting. If so, you MUST make an account change per the instructions at <a href='http://www.lightspeedretail.com/support/?p=8251/' target='_new'>GoDaddy Hosting Settings</a> for Web Store to work properly.<P>";
+					$strReturn .= "<h2>GoDaddy?</h2>We detected you may be using GoDaddy for your hosting. If so, you MUST make an account change per the instructions at <a href='http://www.lightspeedretail.com/support/?p=8251/' target='_new'>GoDaddy Hosting Settings</a> for Web Store product uploading to work properly.<P>";
 
 
-				$strReturn .= "<a href=\"".$strUrl."\">Click here</a> to see your store.";
+				//$strReturn .= "<a href=\"".$strUrl."\">Click here</a> to see your store.";
 			} else {
 				file_put_contents("includes/configuration.inc.php", $old_config_file);
 			}
 
-
+			$lbox->DisplayStyle = QDisplayStyle::Block;
+			$lbox->CssClass = "install_agreement topbump";
 			$lbox->Text = $strReturn;
 			$lbox->HtmlEntities = false;
+			$this->btnPrev->Display = false;
+			$this->btnNext->Display = false;
 
-			echo $strReturn;
-
-			exit();
+			$dbbut = $this->iControl('dbbut', 'QButton');
+			$dbbut->Text = "Visit your new store!";
+			$dbbut->CssClass = "button centerb rounded install_center";
+			$strUrl = $_SERVER['SCRIPT_NAME'];
+			$strUrl = str_replace("install.php","",$strUrl);
+			$dbbut->AddAction(new QClickEvent(), new QJavaScriptAction("document.location.href='".$strUrl."';"));
 
 
 		}
@@ -3468,6 +3486,7 @@ EOT;
             margin: 0;
         }
 
+
         #content {
             padding:        15px;
             text-align:     center;
@@ -3484,9 +3503,12 @@ EOT;
             background-color: #ffffff;
             border:           1px solid #666;
             padding:          5px 2px 2px 10px;
-            margin:           20px 0 10px 0;
+            margin:           5px 0 10px 0;
         }
-
+        .topbump { margin-top: 20px; }
+        #dbbut {
+            margin-left: 160px;
+        }
 
 			<?php if (isset($_GET['upgrade'])) { ?>
         .install_content {
@@ -3517,7 +3539,7 @@ EOT;
 
         .prev_button {
             display:  inline;
-            float:    left;
+            /*float:    left;*/
             position: relative;
             top:      452px;
         }
@@ -3545,6 +3567,7 @@ EOT;
             float:   left;
             width:   10px;
         }
+
 
         .host_settings { margin: 90px 0 0 155px; }
 
