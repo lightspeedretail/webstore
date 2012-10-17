@@ -3438,7 +3438,7 @@ EOT;
 
 			$this->hideControls();
 
-			$this->pnlStep->Text = "<img src=\"templates/install/step_01.png\" />";
+			$this->pnlStep->Text = "<img src=\"templates/install/step_05.png\" />";
 			$this->btnNext->Display = false;
 			$lbox = $this->iControl('agreement', 'QPanel');
 			//$lbox->TextMode = QTextMode::MultiLine;
