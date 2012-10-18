@@ -3354,6 +3354,7 @@ EOT;
 			$origText = "RewriteBase /";
 			$replText = "RewriteBase ".$_SERVER['SCRIPT_NAME'];
 			$replText = str_replace("/install.php", "", $replText);
+			if ($replText=="RewriteBase ") $replText="RewriteBase /";
 			$strFileContents = file_get_contents('htaccess');
 			if ($strFileContents) {
 				$fp = @fopen('.htaccess', 'w');
