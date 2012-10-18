@@ -3784,6 +3784,7 @@ abstract class xlsws_admin_generic_edit_form extends xlsws_admin {
 		if ($this->intEditRowid == -1)
 			array_push($objItemsArray, new $className);
 
+		$this->dtgItems->Paginator->SetCustomStyle('top',58+(count($objItemsArray)*47).'px');
 		// Bind the datasource to the datagrid
 		$this->dtgItems->DataSource = $objItemsArray;
 	}
