@@ -83,6 +83,20 @@ switch($_GET['item']) {
 
 		break;
 
+
+	case 'recalculateinventory':
+
+
+		include(XLSWS_INCLUDES . 'db_maintenance.php');
+		$objDbMaint = new xlsws_db_maintenance;
+		$intRet = $objDbMaint->RecalculateInventory();
+		if ($intRet>0)
+			echo  "<span style='font-size: 13pt'>Calculating available inventory... $intRet remaining.<img src='assets/images/spinner_14.gif'/><br></span>";
+		else
+			echo "<span style='font-size: 13pt'>Inventory availability has been recalculated.<br></span>";
+
+		break;
+
 	case 'promorestrict' :
 		$objPromoCode = PromoCode::Load(_xls_number_only($_GET['id']));
 		if (!$objPromoCode) die();

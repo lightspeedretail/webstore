@@ -6545,6 +6545,15 @@ class xlsws_admin_maintenance extends xlsws_admin {
 			$this->arrMPnls['MigrateURL']->ToolTip= _sp('Migrate URLs to SEO structure');
 		}
 
+		$ctPic = _dbx("SELECT count(*) as thecount FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0",'Query');
+		$arrTotal = $ctPic->FetchArray();
+		if($arrTotal['thecount']>0) {
+			$this->arrMPnls['RecalculateAvail'] = new QPanel($this,'RecalculateAvail');
+			$this->arrMPnls['RecalculateAvail']->Visible = false;
+			$this->arrMPnls['RecalculateAvail']->Name = _sp('Recalculate Available Inventory');
+			$this->arrMPnls['RecalculateAvail']->HtmlEntities = false;
+			$this->arrMPnls['RecalculateAvail']->ToolTip= _sp('Recalculate inventory based on pending orders');
+		}
 
 		if (_xls_get_conf('LIGHTSPEED_HOSTING' , '0')=='0') {
 			$ctPic = _dbx("select count(*) as thecount from xlsws_images where left(coalesce(image_path,''),8) != 'product/' limit 1;",'Query');
@@ -6579,15 +6588,6 @@ class xlsws_admin_maintenance extends xlsws_admin {
 		$this->arrMPnls['UpgradeWS']->ToolTip= _sp('Upgrade webstore with latest patches/bug fixes');
 
 
-		$ctPic = _dbx("SELECT count(*) as thecount FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0",'Query');
-		$arrTotal = $ctPic->FetchArray();
-		if($arrTotal['thecount']>0) {
-			$this->arrMPnls['RecalculateAvail'] = new QPanel($this);
-			$this->arrMPnls['RecalculateAvail']->Visible = false;
-			$this->arrMPnls['RecalculateAvail']->Name = _sp('Recalculate Available Inventory');
-			$this->arrMPnls['RecalculateAvail']->HtmlEntities = false;
-			$this->arrMPnls['RecalculateAvail']->ToolTip= _sp('Recalculate inventory based on pending orders');
-		}
 
 
 
@@ -6643,32 +6643,9 @@ class xlsws_admin_maintenance extends xlsws_admin {
 	}
 
 	protected function RecalculateAvail(){
-
-		$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0  ORDER BY rowid LIMIT 6000", "Query");
-		while ($objItem = $arrProducts->FetchObject()) {
-			$objProduct = Product::Load($objItem->rowid);
-
-			$objProduct->InventoryReserved=$objProduct->CalculateReservedInventory();
-			//Since $objProduct->Inventory isn't the real inventory column, it's a calculation,
-			//just pass it to the Avail so we have it for queries elsewhere
-			$objProduct->InventoryAvail=$objProduct->Inventory;
-			$objProduct->Save(false,true);
-
-		}
-
-		$ctPic = _dbx("SELECT count(*) as thecount FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0",'Query');
-		$arrTotal = $ctPic->FetchArray();
-		$intRet = $arrTotal['thecount'];
-
-		if ($intRet>0)
-			$this->arrMPnls['RecalculateAvail']->Text =  "<span style='font-size: 13pt'>Not all products calculated (6000 calculated). Click Perform again. $intRet remaining.<br>";
-		else
-			$this->arrMPnls['RecalculateAvail']->Text = "Inventory availability has been recalculated.";
-
-
-
 		$this->arrMPnls['RecalculateAvail']->Visible = true;
 		$this->arrMPnls['RecalculateAvail']->Refresh();
+		QApplication::ExecuteJavaScript("startInventoryCalc('".session_name() . "=" . session_id()."');");
 	}
 
 	protected function MigratePhotos(){

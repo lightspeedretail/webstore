@@ -964,6 +964,29 @@ class xlsws_db_maintenance {
 		}
 
 
+	public function RecalculateInventory() {
+
+		$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0  ORDER BY rowid LIMIT 1000", "Query");
+		while ($objItem = $arrProducts->FetchObject()) {
+			$objProduct = Product::Load($objItem->rowid);
+
+			$objProduct->InventoryReserved=$objProduct->CalculateReservedInventory();
+			//Since $objProduct->Inventory isn't the real inventory column, it's a calculation,
+			//just pass it to the Avail so we have it for queries elsewhere
+			$objProduct->InventoryAvail=$objProduct->Inventory;
+			$objProduct->Save(false,true);
+
+		}
+
+		$ctPic = _dbx("SELECT count(*) as thecount FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0",'Query');
+		$arrTotal = $ctPic->FetchArray();
+		return $arrTotal['thecount'];
+
+
+
+
+	}
+
 	public function MigratePhotos() {
 
 		//First make sure we have our new names set
