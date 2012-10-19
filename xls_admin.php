@@ -6525,16 +6525,16 @@ class xlsws_admin_maintenance extends xlsws_admin {
 
 
 
-		$ctPic = _dbx("select count(*) as thecount from xlsws_product where coalesce(request_url,'') = '';",'Query');
+		$ctPic = _dbx("select count(*) as thecount from xlsws_product where coalesce(request_url,'') = '' limit 1;",'Query');
 		$arrTotal = $ctPic->FetchArray();
 		$ct = $arrTotal['thecount'];
-		$ctPic = _dbx("select count(*) as thecount from xlsws_family where coalesce(request_url,'') = '';",'Query');
+		$ctPic = _dbx("select count(*) as thecount from xlsws_family where coalesce(request_url,'') = '' limit 1;",'Query');
 		$arrTotal = $ctPic->FetchArray();
 		$ct += $arrTotal['thecount'];
-		$ctPic = _dbx("select count(*) as thecount from xlsws_category where coalesce(request_url,'') = '';",'Query');
+		$ctPic = _dbx("select count(*) as thecount from xlsws_category where coalesce(request_url,'') = '' limit 1;",'Query');
 		$arrTotal = $ctPic->FetchArray();
 		$ct += $arrTotal['thecount'];
-		$ctPic = _dbx("select count(*) as thecount from xlsws_custom_page where coalesce(request_url,'') = '';",'Query');
+		$ctPic = _dbx("select count(*) as thecount from xlsws_custom_page where coalesce(request_url,'') = '' limit 1;",'Query');
 		$arrTotal = $ctPic->FetchArray();
 		$ct += $arrTotal['thecount'];
 		if ($ct>0) {
@@ -6547,7 +6547,7 @@ class xlsws_admin_maintenance extends xlsws_admin {
 
 
 		if (_xls_get_conf('LIGHTSPEED_HOSTING' , '0')=='0') {
-			$ctPic = _dbx("select count(*) as thecount from xlsws_images where left(coalesce(image_path,''),8) != 'product/';",'Query');
+			$ctPic = _dbx("select count(*) as thecount from xlsws_images where left(coalesce(image_path,''),8) != 'product/' limit 1;",'Query');
 			$arrTotal = $ctPic->FetchArray();
 			if ($arrTotal['thecount']>0) {
 				$this->arrMPnls['MigratePhotos'] = new QPanel($this,'MigratePhotos');
@@ -6672,6 +6672,8 @@ class xlsws_admin_maintenance extends xlsws_admin {
 	}
 
 	protected function MigratePhotos(){
+
+		_dbx("update xlsws_images set image_path='' where image_path is null;");
 
 		$this->arrMPnls['MigratePhotos']->Visible = true;
 		$this->arrMPnls['MigratePhotos']->Refresh();

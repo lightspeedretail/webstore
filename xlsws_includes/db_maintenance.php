@@ -458,6 +458,7 @@ class xlsws_db_maintenance {
 			$this->add_index('xlsws_product','request_url');
 			$this->add_index('xlsws_custom_page','request_url');
 			$this->add_index('xlsws_product','image_id');
+			$this->add_index('xlsws_images','image_path');
 
 			CustomPage::ConvertSEO();
 			Family::ConvertSEO();
@@ -966,7 +967,7 @@ class xlsws_db_maintenance {
 	public function MigratePhotos() {
 
 		//First make sure we have our new names set
-		$matches = _dbx("SELECT count(*) as thecount from xlsws_product where coalesce(request_url,'') = ''", "Query");
+		$matches = _dbx("SELECT count(*) as thecount from xlsws_product where coalesce(request_url,'') = '' limit 1", "Query");
 		$row = $matches->FetchArray();
 		if ($row['thecount']>0) return -1;
 
@@ -974,7 +975,7 @@ class xlsws_db_maintenance {
 		_xls_set_conf('IMAGE_STORE','FS');
 		//Configuration::$Manager->SetValue('IMAGE_STORE','FS'); //Because key may already be in memory
 
-		$objCheck = _dbx("SELECT count(*) as thecount FROM xlsws_images WHERE coalesce(image_path,'') NOT like '%/%' and rowid=parent and image_data is not null", "Query");
+		$objCheck = _dbx("SELECT count(*) as thecount FROM xlsws_images WHERE image_path NOT like '%/%' and rowid=parent and image_data is not null limit 51", "Query");
 		$row = $objCheck->FetchObject();
 		if ($row->thecount>50)
 			$intLimit = 50;
@@ -983,7 +984,7 @@ class xlsws_db_maintenance {
 
 
 		$intDone=0;
-		$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE coalesce(image_path,'') NOT like '%/%' and rowid=parent ORDER BY rowid LIMIT ".$intLimit, "Query");
+		$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE image_path NOT like '%/%' and rowid=parent ORDER BY rowid LIMIT ".$intLimit, "Query");
 		while ($objItem = $arrProducts->FetchObject()) {
 			$objImage = Images::Load($objItem->rowid);
 //			error_log("Transferring image row ".$objItem->rowid);
@@ -1021,7 +1022,7 @@ class xlsws_db_maintenance {
 						//If the image already exists, we just have to rename and move it, and update the db record
 
 						if ($objImage->ImageFileExists()) {
-							if (exif_imagetype(Images::GetImagePath($strNewImageName)) == IMAGETYPE_JPEG)
+							if (exif_imagetype(Images::GetImagePath($strExistingPath)) == IMAGETYPE_JPEG)
 								$strNewImageName = substr($strNewImageName,0,-4) . ".jpg";
 							//echo "renaming ".$strExistingPath." to ".$strNewImageName."<br>";
 							$strPath = Images::GetImagePath($strNewImageName);
@@ -1062,13 +1063,13 @@ class xlsws_db_maintenance {
 		}
 
 
-		$ctPic = _dbx("select count(*) as thecount FROM xlsws_images WHERE coalesce(image_path,'') NOT like '%/%' and rowid=parent",'Query');
+		$ctPic = _dbx("select count(*) as thecount FROM xlsws_images WHERE image_path NOT like '%/%' and rowid=parent limit 1",'Query');
 		$arrTotal = $ctPic->FetchArray();
 		$intCt = $arrTotal['thecount'];
 
 		if ($arrTotal['thecount']==0 ) {
 			//Now we remove all the thumbnails because our browsing will recreate them
-			$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE coalesce(image_path,'') NOT like '%/%' and rowid <> parent ORDER BY rowid LIMIT ".$intLimit, "Query");
+			$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE image_path NOT like '%/%' and rowid <> parent ORDER BY rowid LIMIT ".$intLimit, "Query");
 			while ($objItem = $arrProducts->FetchObject()) {
 				$objImage = Images::Load($objItem->rowid);
 				$objImage->DeleteImage();
@@ -1077,11 +1078,12 @@ class xlsws_db_maintenance {
 			}
 
 
-		}
 
-		$ctPic = _dbx("select count(*) as thecount FROM xlsws_images WHERE coalesce(image_path,'') NOT like '%/%' and rowid<>parent",'Query');
-		$arrTotal = $ctPic->FetchArray();
-		$intCt += $arrTotal['thecount'];
+
+		}
+			$ctPic = _dbx("select count(*) as thecount FROM xlsws_images WHERE image_path NOT like '%/%' and rowid<>parent",'Query');
+			$arrTotal = $ctPic->FetchArray();
+			$intCt += $arrTotal['thecount'];
 //		error_log("End if photo migration");
 		return $intCt;
 
