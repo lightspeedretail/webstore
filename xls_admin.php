@@ -6538,7 +6538,7 @@ class xlsws_admin_maintenance extends xlsws_admin {
 		$arrTotal = $ctPic->FetchArray();
 		$ct += $arrTotal['thecount'];
 		if ($ct>0) {
-			$this->arrMPnls['MigrateURL'] = new QPanel($this);
+			$this->arrMPnls['MigrateURL'] = new QPanel($this,'MigrateURL');
 			$this->arrMPnls['MigrateURL']->Visible = false;
 			$this->arrMPnls['MigrateURL']->Name = _sp('Migrate URLs to SEO friendly structure');
 			$this->arrMPnls['MigrateURL']->HtmlEntities = false;
@@ -6550,7 +6550,7 @@ class xlsws_admin_maintenance extends xlsws_admin {
 			$ctPic = _dbx("select count(*) as thecount from xlsws_images where left(coalesce(image_path,''),8) != 'product/';",'Query');
 			$arrTotal = $ctPic->FetchArray();
 			if ($arrTotal['thecount']>0) {
-				$this->arrMPnls['MigratePhotos'] = new QPanel($this);
+				$this->arrMPnls['MigratePhotos'] = new QPanel($this,'MigratePhotos');
 				$this->arrMPnls['MigratePhotos']->Visible = false;
 				$this->arrMPnls['MigratePhotos']->Name = _sp('Migrate Photos to SEO friendly structure');
 				$this->arrMPnls['MigratePhotos']->HtmlEntities = false;
@@ -6672,49 +6672,19 @@ class xlsws_admin_maintenance extends xlsws_admin {
 	}
 
 	protected function MigratePhotos(){
-		set_time_limit(1200);
-		//Include db_maint class to access update functions
-		include_once(XLSWS_INCLUDES . 'db_maintenance.php');
-		$objDbMaint = new xlsws_db_maintenance;
-
-		$intRet = $objDbMaint->MigratePhotos();//Include db_maint class to access update functions
-		if ($intRet>0)
-			$this->arrMPnls['MigratePhotos']->Text =  "<span style='font-size: 13pt'>Not all photos converted (3000 converted). Click Perform again. $intRet remaining.<br>";
-		elseif ($int==-1)
-			$this->arrMPnls['MigratePhotos']->Text = "Can't process photos, run Migrate URLs first";
-
-		else
-			$this->arrMPnls['MigratePhotos']->Text = "Photos have been migrated and renamed to SEO names<br>";
 
 		$this->arrMPnls['MigratePhotos']->Visible = true;
 		$this->arrMPnls['MigratePhotos']->Refresh();
+		QApplication::ExecuteJavaScript("startPhotoMigration('".session_name() . "=" . session_id()."');");
+
 	}
 
 	protected function MigrateURL(){
-		set_time_limit(1200);
-
-
-		$strReturn = "Running Convert SEO on Product table<br>";
-		$intRet = Product::ConvertSEO();
-		if ($intRet>0)
-			$strReturn .=  "<span style='font-size: 13pt'>Not all products converted (20000 converted). Click Perform again. $intRet remaining.<br>";
-		else {
-			$strReturn .=  "Running Convert SEO on Category table<br>";
-			Category::ConvertSEO();
-
-			$strReturn .=  "Running Convert SEO on Family table<br>";
-			Family::ConvertSEO();
-
-			$strReturn .=  "Running Convert SEO on CustomPage table<br>";
-			CustomPage::ConvertSEO();
-
-			$strReturn .= "Done!";
-
-		}
-		$this->arrMPnls['MigrateURL']->Text = $strReturn;
 
 		$this->arrMPnls['MigrateURL']->Visible = true;
 		$this->arrMPnls['MigrateURL']->Refresh();
+		QApplication::ExecuteJavaScript("startUrlMigration('".session_name() . "=" . session_id()."');");
+
 	}
 
 	protected function OffLineOnlineStore(){

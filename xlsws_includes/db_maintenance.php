@@ -976,10 +976,10 @@ class xlsws_db_maintenance {
 
 		$objCheck = _dbx("SELECT count(*) as thecount FROM xlsws_images WHERE coalesce(image_path,'') NOT like '%/%' and rowid=parent and image_data is not null", "Query");
 		$row = $objCheck->FetchObject();
-		if ($row->thecount>500)
-			$intLimit = 500;
+		if ($row->thecount>50)
+			$intLimit = 50;
 		else
-			$intLimit = 4000;
+			$intLimit = 1000;
 
 
 		$intDone=0;

@@ -62,6 +62,7 @@ if(isset($this->HelperRibbon))
 		</div>
 		
 		
-<?php $this->RenderEnd(); ?>		
+<?php $this->RenderEnd(); ?>
+		</div>
 </body>
 </html>

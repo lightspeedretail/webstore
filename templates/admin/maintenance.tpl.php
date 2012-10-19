@@ -40,7 +40,50 @@ $this->RenderBegin(); ?>
 		?>
 		</div>
 		<br clear="both">
-		
+<script language="javascript">
+	var prunning=0;
+	var pinttimer=0;
+
+	var urunning=0;
+	var uinttimer=0;
+
+    function startPhotoMigration(key) {
+        document.getElementById('MigratePhotos').innerHTML = "<span style='font-size: 13pt'>Converting photos... <img src='assets/images/spinner_14.gif'/><br></span>";
+        pinttimer=self.setInterval(function(){migratePhotos(key)},1000);
+        migratePhotos(key);
+    }
+    function migratePhotos(key)
+    {
+	    if (prunning==1) return;
+        prunning=1;
+		var strUrl = "xls_admin_js.php?item=migratephotos&" + key;
+        $.get(strUrl, function(data){
+            document.getElementById('MigratePhotos').innerHTML = data;
+            prunning=0;
+	        if (data.indexOf('All')>0)
+	        clearInterval(pinttimer);
+        });
+    }
+
+	function startUrlMigration(key) {
+        document.getElementById('MigrateURL').innerHTML = "<span style='font-size: 13pt'>Converting URLs... <img src='assets/images/spinner_14.gif'/><br></span>";
+        uinttimer=self.setInterval(function(){migrateURLs(key)},1000);
+        migrateURLs(key);
+    }
+    function migrateURLs(key)
+    {
+	    if (urunning==1) return;
+        urunning=1;
+		var strUrl = "xls_admin_js.php?item=migrateurls&" + key;
+        $.get(strUrl, function(data){
+            document.getElementById('MigrateURL').innerHTML = data;
+            urunning=0;
+	        if (data.indexOf('Done')>0)
+	        clearInterval(uinttimer);
+        });
+    }
+
+</script>
 <div id="options"  style="width:960px;" >
 	<div class="content">	
 
@@ -69,6 +112,7 @@ if(isset($this->HelperRibbon))
 
 
 
-<?php $this->RenderEnd(); ?>		
+<?php $this->RenderEnd(); ?>
+	</div>
 </body>
 </html>

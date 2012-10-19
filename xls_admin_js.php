@@ -45,8 +45,44 @@ function GetResetButtonHtml($ctlId) {
 require('includes/prepend.inc.php');
 
 switch($_GET['item']) {
-	
-	
+
+	case 'migratephotos':
+
+		include(XLSWS_INCLUDES . 'db_maintenance.php');
+		$objDbMaint = new xlsws_db_maintenance;
+		$intRet = $objDbMaint->MigratePhotos();
+		if ($intRet>0)
+			echo  "<span style='font-size: 13pt'>Converting photos... $intRet remaining.<img src='assets/images/spinner_14.gif'/><br></span>";
+		elseif ($intRet==-1)
+			echo "Can't process photos, run Migrate URLs first";
+		else
+			echo "<span style='font-size: 13pt'>All photos have been migrated and renamed to SEO names.<br></span>";
+
+		break;
+
+	case 'migrateurls':
+
+		$strReturn = "Running Convert SEO on Product table<br>";
+		$intRet = Product::ConvertSEO();
+		if ($intRet>0)
+			$strReturn .=  "<span style='font-size: 13pt'>Running Convert SEO on Product table  $intRet remaining.<img src='assets/images/spinner_14.gif'/<br>";
+		else {
+			$strReturn .=  "Running Convert SEO on Category table<br>";
+			Category::ConvertSEO();
+
+			$strReturn .=  "Running Convert SEO on Family table<br>";
+			Family::ConvertSEO();
+
+			$strReturn .=  "Running Convert SEO on CustomPage table<br>";
+			CustomPage::ConvertSEO();
+
+			$strReturn .= "Done!";
+
+		}
+		echo $strReturn;
+
+		break;
+
 	case 'promorestrict' :
 		$objPromoCode = PromoCode::Load(_xls_number_only($_GET['id']));
 		if (!$objPromoCode) die();
