@@ -1080,6 +1080,7 @@ EOT;
 			$phpinfo = $this->parse_php_info();
 			//We check all the elements we need for a successful install and pass back the report
 			$checked = array();
+
 			$checked['MySQLi'] = isset($phpinfo['mysqli']) ? "pass" : "fail";
 			$checked['PHP Session'] = ($phpinfo['session']['Session Support'] == "enabled" ? "pass" : "fail");
 			$checked['cURL Support'] = isset($phpinfo['curl']) ? "pass" : "fail";
@@ -1102,8 +1103,10 @@ EOT;
 			$checked['GD Library Freetype Support'] = (
 			$phpinfo['gd']['FreeType Support'] == "enabled" ? "pass" : "fail");
 			$checked['MCrypt Encryption Library'] = isset($phpinfo['mcrypt']) ? "pass" : "fail";
+			$checked['session.use_cookies must be turned On'] = (
+				$phpinfo['session']['session.use_cookies'] == "On" ? "pass" : "fail");
 			$checked['session.use_only_cookies must be turned Off'] = (
-			$phpinfo['session']['session.use_only_cookies'] == "Off" ? "pass" : "fail");
+				$phpinfo['session']['session.use_only_cookies'] == "Off" ? "pass" : "fail");
 			$checked['Soap Library'] = ($phpinfo['soap']['Soap Client'] == "enabled" ? "pass" : "fail");
 			$checked['OpenSSL'] = ($phpinfo['openssl']['OpenSSL support'] == "enabled" ? "pass" : "fail");
 
@@ -1139,7 +1142,9 @@ EOT;
 					__DOCROOT__ . __SUBDIRECTORY__ . '/includes/qcodo/cache/state'
 				) ? "pass" : "fail");
 			}
-
+			//If any of our items fail, be helpful and show them where the php.ini is. Otherwise, we hide it since working servers shouldn't advertise this
+			if (in_array('fail',$checked))
+				$checked = array_merge(array('<b>php.ini file is at</b> '.$phpinfo['phpinfotemp']['Loaded Configuration File']=>"pass"),$checked);
 			return $checked;
 		}
 
