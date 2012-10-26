@@ -364,6 +364,9 @@ class Cart extends CartGen {
 	 * dryRun is deprecated, we shouldn't run this as a validation test
 	 */
 	public function UpdatePromoCode($dryRun = false) {
+
+		$bolShippingApplied = -1;
+
 		if (!$this->FkPromoId)
 			return;
 
@@ -390,20 +393,20 @@ class Cart extends CartGen {
 		{
 			if ($objPromoCode->Except==0 || $objPromoCode==1)
 			{
-				$bolApplied = true;	//We start with true because we want to make sure we don't have a disqualifying item in our cart
+				$bolShippingApplied = true;	//We start with true because we want to make sure we don't have a disqualifying item in our cart
 
 				foreach ($arrSorted as $objItem)
-					if (!$objPromoCode->IsProductAffected($objItem)) $bolApplied=false;
+					if (!$objPromoCode->IsProductAffected($objItem)) $bolShippingApplied=false;
 			}
 			if ($objPromoCode->Except==2)
 			{
-				$bolApplied = false;
+				$bolShippingApplied = false;
 				foreach ($arrSorted as $objItem)
-					if ($objPromoCode->IsProductAffected($objItem)) $bolApplied=true;
+					if ($objPromoCode->IsProductAffected($objItem)) $bolShippingApplied=true;
 			}
 
 		}
-		if ($bolApplied == false || ($objPromoCode->Threshold > $intOriginalSubTotal && $this->FkPromoId != NULL)) {
+		if ($bolShippingApplied == false || ($objPromoCode->Threshold > $intOriginalSubTotal && $this->FkPromoId != NULL)) {
 				$this->UpdateDiscountExpiry();
 				$this->FkPromoId = NULL;
 				QApplication::ExecuteJavaScript("alert('Promo Code \"" .$objPromoCode->Code .  _sp("\" no longer applies to your cart and has been removed.")  . "')");				
