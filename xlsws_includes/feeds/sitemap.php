@@ -75,8 +75,7 @@ $strQueryAddl = ($intStockHandling == 0 ? " and inventory_avail>0" : "");
 
 	}
 
-
-	$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 ".$strQueryAddl." ORDER BY rowid", "Query");
+$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE current=1 AND web=1 AND fk_product_master_id=0 ".$strQueryAddl." ORDER BY rowid", "Query");
 
 		while ($objItem = $arrProducts->FetchObject()) {
 			$objProduct = Product::Load($objItem->rowid);
