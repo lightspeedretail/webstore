@@ -205,18 +205,31 @@ class XLSPromoControl extends XLSCompositeControl {
 		foreach ($objCart->GetCartItemArray() as $objItem)
 			$arrSorted[] = $objItem;
 
-		if ($objPromoCode->Shipping) {	
-			$bolApplied = true;	//We start with true because we want to make sure we don't have a disqualifying item in our cart
-			
-			foreach ($arrSorted as $objItem) 
-				if (!$objPromoCode->IsProductAffected($objItem)) $bolApplied=false;
+		if ($objPromoCode->Shipping) {
+			//Except - 0=All items must qualify  1=No Items must qualify  2=At least one item
+			//Note that we don't have to test for 1 here because IsProductAffected is already doing that
+
+			if ($objPromoCode->Except==0 || $objPromoCode==1)
+			{
+				$bolApplied = true;	//We start with true because we want to make sure we don't have a disqualifying item in our cart
+
+				foreach ($arrSorted as $objItem)
+					if (!$objPromoCode->IsProductAffected($objItem)) $bolApplied=false;
+			}
+			if ($objPromoCode->Except==2)
+			{
+				$bolApplied = false;
+				foreach ($arrSorted as $objItem)
+					if ($objPromoCode->IsProductAffected($objItem)) $bolApplied=true;
+			}
 
 			if ($bolApplied==false)
 				$this->objInputControl->ValidationError = 
                		_sp('Free Shipping Promo Code cannot be used with your cart items.');
                		
+
 			return $bolApplied;
-			
+
 		}
 		
 		//See if any items in the cart match qualify for this promo code

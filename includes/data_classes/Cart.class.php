@@ -384,9 +384,26 @@ class Cart extends CartGen {
 				$objItem->Discount = 0;
 			$arrSorted[] = $objItem;
 			$intOriginalSubTotal += $objItem->Qty*$objItem->Sell;
-        }	
-				
-		if ($objPromoCode->Threshold > $intOriginalSubTotal && $this->FkPromoId != NULL) {
+        }
+
+		if ($objPromoCode->Shipping)
+		{
+			if ($objPromoCode->Except==0 || $objPromoCode==1)
+			{
+				$bolApplied = true;	//We start with true because we want to make sure we don't have a disqualifying item in our cart
+
+				foreach ($arrSorted as $objItem)
+					if (!$objPromoCode->IsProductAffected($objItem)) $bolApplied=false;
+			}
+			if ($objPromoCode->Except==2)
+			{
+				$bolApplied = false;
+				foreach ($arrSorted as $objItem)
+					if ($objPromoCode->IsProductAffected($objItem)) $bolApplied=true;
+			}
+
+		}
+		if ($bolApplied == false || ($objPromoCode->Threshold > $intOriginalSubTotal && $this->FkPromoId != NULL)) {
 				$this->UpdateDiscountExpiry();
 				$this->FkPromoId = NULL;
 				QApplication::ExecuteJavaScript("alert('Promo Code \"" .$objPromoCode->Code .  _sp("\" no longer applies to your cart and has been removed.")  . "')");				
