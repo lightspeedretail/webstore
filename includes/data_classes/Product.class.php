@@ -580,13 +580,13 @@ class Product extends ProductGen {
 
 			case 0: //Show Master Item Price
 			default:
-				return ($this->$strField != $this->GetPrice($intQuantity, $taxExclusive)) ? $this->$strField : "";;
+				return ($this->$strField > $this->GetPrice($intQuantity, $taxExclusive)) ? $this->$strField : "";;
 
 
 			}
 
 		}
-		else return ($this->$strField != $this->GetPrice($intQuantity, $taxExclusive)) ? $this->$strField : "";
+		else return ($this->$strField > $this->GetPrice($intQuantity, $taxExclusive)) ? $this->$strField : "";
 
 
 	}
