@@ -89,6 +89,26 @@ class Images extends ImagesGen {
 		return $strSection . "/" . $strName[0] . "/" . $strName . '.' . $fileExt;
 	}
 
+	/**
+	 * Checks to see if the filename we want to use is being used for another product (in the case of duplicate Descriptions)
+	 * @param $strFile
+	 * @param $intThisProductId
+	 * @return bool
+	 */
+	public static function ExistsForOtherProduct($strFile, $intImageId){
+
+		$objImages = Images::QueryArray(
+			QQ::AndCondition(
+				QQ::Equal(QQN::Images()->ImagePath, $strFile)
+			)
+		);
+
+		$blnReturn = false;
+		foreach ($objImages as $objImage)
+		if ($objImage->Rowid != $intImageId)
+			$blnReturn= true;
+		return $blnReturn;
+	}
 	public static function GetImagePath($strFile) {
 		return __DOCROOT__ . __PHOTOS__ . "/${strFile}";
 	}
