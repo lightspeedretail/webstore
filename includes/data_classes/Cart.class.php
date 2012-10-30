@@ -455,7 +455,10 @@ class Cart extends CartGen {
 				}
 			}
 			else if ($objPromoCode->Type == PromoCodeType::Percent) {
-				$intItemDiscount = $objItem->Sell - round((1-$intDiscount) * $objItem->Sell,2,PHP_ROUND_HALF_UP);
+				if (version_compare(PHP_VERSION, '5.3.0') < 0)
+					$intItemDiscount = $objItem->Sell - round((1-$intDiscount) * $objItem->Sell,2);
+				else
+					$intItemDiscount = $objItem->Sell - round((1-$intDiscount) * $objItem->Sell,2,PHP_ROUND_HALF_UP);
 			}
 
 			if (!$dryRun)
