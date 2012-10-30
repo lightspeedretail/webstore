@@ -106,13 +106,29 @@ class xlsws_product_listing extends xlsws_index {
         
         if ($blnIncludeChildren)
 	        $objProdCondition = QQ::AndCondition(
-	                QQ::Equal(QQN::Product()->Web, 1), 
-	                QQ::Equal(QQN::Product()->MasterModel, 0)
+	                QQ::Equal(QQN::Product()->Web, 1),
+	                QQ::Equal(QQN::Product()->MasterModel, 0),
+		            QQ::AndCondition(QQ::OrCondition(
+			            QQ::Equal(QQN::Product()->Current, 1),
+			            QQ::AndCondition(
+				            QQ::Equal(QQN::Product()->Current, 0),
+				            QQ::Equal(QQN::Product()->Inventoried, 1),
+				            QQ::GreaterThan(QQN::Product()->InventoryAvail, 0)
+			            )
+			            )
+		            )
 	            );
         else
 	        $objProdCondition = QQ::AndCondition(
-	            QQ::Equal(QQN::Product()->Web, 1), 
-	            
+	            QQ::Equal(QQN::Product()->Web, 1),
+		        QQ::OrCondition(
+			        QQ::Equal(QQN::Product()->Current, 1),
+			        QQ::AndCondition(
+				        QQ::Equal(QQN::Product()->Current, 0),
+				        QQ::Equal(QQN::Product()->Inventoried, 1),
+				        QQ::GreaterThan(QQN::Product()->InventoryAvail, 0)
+			        )),
+
 	            QQ::OrCondition(          
 	                QQ::Equal(QQN::Product()->MasterModel, 1), 
 	                QQ::AndCondition(
