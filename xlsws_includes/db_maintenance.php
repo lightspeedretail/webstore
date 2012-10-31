@@ -130,7 +130,7 @@ class xlsws_db_maintenance {
 			_dbx($sql);
 
 			$this->add_config_key('HTML_DESCRIPTION' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Ignore line breaks in long description', 'HTML_DESCRIPTION', '0', 'If you are utilizing HTML primarily within your web long descriptions, you may want this option on', 8,8 , NOW(), NOW(), 'BOOL');" , '2.0.7');
-			$this->add_config_key('MATRIX_PRICE' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Hide price of matrix master product', 'MATRIX_PRICE', '0', 'If you do not want to show the price of your master product in a size/color matrix, turn this option on', 8,9 , NOW(), NOW(), 'BOOL');" , '2.0.7');
+			$this->add_config_key('MATRIX_PRICE' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Hide price of matrix master product', 'MATRIX_PRICE', '3', 'If you do not want to show the price of your master product in a size/color matrix, turn this option on', 8,9 , NOW(), NOW(), 'BOOL');" , '2.0.7');
 
 			$this->add_table('xlsws_promo_code' , "CREATE TABLE `xlsws_promo_code` (
 			  `rowid` int(11) NOT NULL auto_increment,
@@ -430,7 +430,7 @@ class xlsws_db_maintenance {
 
 			//Pricing Changes
 			_dbx("UPDATE `xlsws_configuration` SET `title`='In Product Grid, when child product prices vary',
-				`options`='MATRIX_PRICE',`helper_text`='How should system treat child products when different child products have different prices.' where `key`='MATRIX_PRICE'");
+				`options`='MATRIX_PRICE',`value`=3,`helper_text`='How should system treat child products when different child products have different prices.' where `key`='MATRIX_PRICE'");
 			$this->add_config_key('PRICE_REQUIRE_LOGIN' ,
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Require login to view prices',
 				'PRICE_REQUIRE_LOGIN', '0', 'System will not display prices to anyone not logged in.', 3, 3, NOW(), NOW(), 'BOOL',0);");
