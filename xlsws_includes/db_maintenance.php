@@ -31,24 +31,24 @@
  */
 class xlsws_db_maintenance {
 
-	public function RunUpdateSchema($shownotes = true) {		
+	public function RunUpdateSchema($shownotes = true) {
 
 		$strRetVal = $this->perform_schema_changes();
-		
+
  		if ($shownotes) return $strRetVal; else return;
 	}
 
-	
+
 	private function perform_schema_changes() {
 		set_time_limit(3600);
 
 		$strUpgradeText = "";
-		
+
 		//Prior to 2.1.4, we didn't have a schema version number so we still have to go from the beginning
 		$intCurrentSchema = _xls_get_conf('DATABASE_SCHEMA_VERSION', '0');
 		if ($intCurrentSchema<214)
 		{
-			
+
 			$this->check_column_type('xlsws_cart_item' , 'qty' , 'float' , 'NOT NULL' , '2.0.1');
 			$this->check_column_type('xlsws_product_related' , 'qty' , 'float' , 'NULL DEFAULT NULL' , '2.0.1');
 			$this->add_config_key('QTY_FRACTION_PURCHASE' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Allow Qty-purchase in fraction', 'QTY_FRACTION_PURCHASE', '0', 'If enabled, customers will be able to purchase items in fractions. E.g. 0.5 of an item can ordered by a customer.', 0, 10, NOW(), NOW(), 'BOOL');" , '2.0.1');
@@ -86,30 +86,30 @@ class xlsws_db_maintenance {
 			$this->update_row('xlsws_state' , 'TRIM(CONCAT(country_code , code))' , "'DEBAW'" , "State" , "CONCAT('Baden-W' , CHAR(0xFC USING latin1) , 'rttemberg')"  , '2.0.1');
 			$this->update_row('xlsws_state' , 'TRIM(CONCAT(country_code , code))' , "'DETHE'" , "State" , "CONCAT('Th' , CHAR(0xFC USING latin1) , 'ringen')"  , '2.0.1');
 
-			
+
 			$this->update_row('xlsws_country' , 'code' , "'US'" , "zip_validate_preg" , "'/^([0-9]{5})(-[0-9]{4})?$/i'"  , '2.0.1');
-			
-			
-			
+
+
+
 			$this->check_column_type('xlsws_product' , 'code' , 'varchar(255)' , 'NOT NULL' , '2.0.2');
 			$this->check_column_type('xlsws_cart_item' , 'code' , 'varchar(255)' , 'NOT NULL' , '2.0.2');
-			
-			
-			
+
+
+
 			$this->add_column('xlsws_cart' , 'downloaded' , "ALTER TABLE  `xlsws_cart` ADD  `downloaded` BOOL NULL DEFAULT  '0' AFTER  `count`" , '2.0.2');
 			$this->check_index_exists('xlsws_cart','downloaded','2.0.2');
-			
+
 			$this->add_column('xlsws_cart' , 'tax_inclusive' , "ALTER TABLE  `xlsws_cart` ADD  `tax_inclusive` BOOL NULL DEFAULT  '0' AFTER  `fk_tax_code_id`" , '2.0.2');
-			
-			
+
+
 			$this->add_config_key('NEXT_ORDER_ID' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Next Order Id',  'NEXT_ORDER_ID',  '12000',  'What is the next order id webstore will use? This value will incremented at every order submission.',  '15',  '11', NOW( ) , NOW( ), '');" , '2.0.2');
 			$this->add_config_key('SHIPPING_TAXABLE' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Add taxes for shipping fees', 'SHIPPING_TAXABLE', '0', 'Enable this option if you want taxes to be calculated for shipping fees and applied to the total.', 9, 7, NOW(), NOW(), 'BOOL');", '2.0.3');
 			$this->update_row('xlsws_configuration' , '`key`' , "'NEXT_ORDER_ID'" , "`options`" , "'PINT'"  , '2.0.2');
-			
-			
-			
+
+
+
 			$this->add_column('xlsws_category' , 'child_count' , "ALTER TABLE  `xlsws_category` ADD  `child_count` INT NULL DEFAULT  '1' AFTER  `position` " , '2.0.2');
-			
+
 			$sql = "DELETE FROM xlsws_configuration where title='Moderate Customer Registration'";
 			_dbx($sql);
 
@@ -130,7 +130,7 @@ class xlsws_db_maintenance {
 			_dbx($sql);
 
 			$this->add_config_key('HTML_DESCRIPTION' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Ignore line breaks in long description', 'HTML_DESCRIPTION', '0', 'If you are utilizing HTML primarily within your web long descriptions, you may want this option on', 8,8 , NOW(), NOW(), 'BOOL');" , '2.0.7');
-			$this->add_config_key('MATRIX_PRICE' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Hide price of matrix master product', 'MATRIX_PRICE', '0', 'If you do not want to show the price of your master product in a size/color matrix, turn this option on', 8,9 , NOW(), NOW(), 'BOOL');" , '2.0.7');
+			$this->add_config_key('MATRIX_PRICE' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Hide price of matrix master product', 'MATRIX_PRICE', '3', 'If you do not want to show the price of your master product in a size/color matrix, turn this option on', 8,9 , NOW(), NOW(), 'BOOL');" , '2.0.7');
 
 			$this->add_table('xlsws_promo_code' , "CREATE TABLE `xlsws_promo_code` (
 			  `rowid` int(11) NOT NULL auto_increment,
@@ -167,13 +167,13 @@ class xlsws_db_maintenance {
 
 			$this->add_config_key('SESSION_HANDLER' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Session storage', 'SESSION_HANDLER', 'FS', 'Store sessions in the database or file system?', 1, 6, NOW(), NOW(), 'STORE_IMAGE_LOCATION');" , '2.1');
 			$this->add_config_key('CHILD_SEARCH' , "INSERT into `xlsws_configuration` VALUES (NULL,'Show child products in search results', 'CHILD_SEARCH', '','If you want child products from a size color matrix to show up in search results, enable this option',8,10,NOW(),NOW(),'BOOL');" , '2.1');
-	
+
 			$this->add_config_key('EMAIL_SMTP_SECURITY_MODE' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Security mode for outbound SMTP',  'EMAIL_SMTP_SECURITY_MODE',  '0',  'Automatic based on SMTP Port, or force security.',  '5',  '8', NOW() , NOW(), 'EMAIL_SMTP_SECURITY_MODE');" , '2.1.2');
-		
+
 			$this->add_config_key('MAX_PRODUCTS_IN_SLIDER' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Maximum Products in Slider',  'MAX_PRODUCTS_IN_SLIDER',  '64',  'For a custom page, max products in slider.',  '8',  '11', NOW() , NOW(), 'PINT');" , '2.1.3');
 			$this->add_config_key('ENABLE_COLOR_FILTER' , "INSERT INTO `xlsws_configuration` VALUES (NULL, 'Update color options',  'ENABLE_COLOR_FILTER',  '0',  'Enable this option to have the color drop-down menu populated on each size change.',  '8',  '5', NOW() , NOW(), 'BOOL');" , '2.1.4');
-		
-		
+
+
 			_dbx("ALTER TABLE xlsws_family MODIFY COLUMN family varchar (255)");
 
 			_dbx("ALTER TABLE xlsws_product MODIFY COLUMN family varchar (255)");
@@ -181,21 +181,21 @@ class xlsws_db_maintenance {
 
 			$sql = "UPDATE xlsws_configuration SET `options`='INVENTORY_DISPLAY_LEVEL' WHERE `key`='INVENTORY_DISPLAY_LEVEL'";
 			_dbx($sql);
-			
-			$this->add_config_key('DATABASE_SCHEMA_VERSION' , 
-			"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Database Schema Version',  
+
+			$this->add_config_key('DATABASE_SCHEMA_VERSION' ,
+			"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Database Schema Version',
 			'DATABASE_SCHEMA_VERSION',  '214',  'Used for tracking schema changes',  '',  '', NOW() , NOW(), NULL);" , '2.1.4');
 
 			$strUpgradeText .= "<br/>Upgrading to Database schema 214";
 
 			$intCurrentSchema=217;
 		}
-		
+
 
 		//Upgrade to 250 schema for WS2.5
 		if ($intCurrentSchema<=217)
 		{
-		
+
 
 			$this->add_table('xlsws_cart_type' , "CREATE TABLE `xlsws_cart_type` (
 			  `id` int(10) NOT NULL AUTO_INCREMENT,
@@ -221,56 +221,56 @@ class xlsws_db_maintenance {
 
 			$this->add_column('xlsws_category' , 'google_id' ,
 				"ALTER TABLE `xlsws_category` ADD `google_id` INT  DEFAULT NULL AFTER `image_id`");
-				
+
 			_dbx("ALTER TABLE `xlsws_cart` CHANGE `printed_notes` `printed_notes` TEXT  NULL");
 
-				
-			$this->add_config_key('FEATURED_KEYWORD' , 
+
+			$this->add_config_key('FEATURED_KEYWORD' ,
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Featured Keyword', 'FEATURED_KEYWORD', 'featured',
-				'If this keyword is one of your product keywords, the product will be featured on the Web Store homepage.', 
+				'If this keyword is one of your product keywords, the product will be featured on the Web Store homepage.',
 				8, 6, NOW(), NOW(), NULL,0);" , '2.2.0');
 
-			$this->add_config_key('LIGHTSPEED_HOSTING' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'LightSpeed Hosting', 
+			$this->add_config_key('LIGHTSPEED_HOSTING' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'LightSpeed Hosting',
 				'LIGHTSPEED_HOSTING', '0', 'Flag which indicates site is hosted by LightSpeed', 0, 0, NOW(), NOW(), 'BOOL',0);" , '2.2.0');
 
 			//Add debug keys
-			$this->add_config_key('DEBUG_PAYMENTS' , 
+			$this->add_config_key('DEBUG_PAYMENTS' ,
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug Payment Methods', 'DEBUG_PAYMENTS', '',
-				'If selected, WS logs all activity for credit card processing and other payment methods.', 
+				'If selected, WS logs all activity for credit card processing and other payment methods.',
 				1, 18, NOW(), NOW(), 'BOOL',0);");
-			$this->add_config_key('DEBUG_SHIPPING' , 
+			$this->add_config_key('DEBUG_SHIPPING' ,
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Debug Shipping Methods', 'DEBUG_SHIPPING', '',
-				'If selected, WS logs all activity for shipping processing.', 
+				'If selected, WS logs all activity for shipping processing.',
 				1, 19, NOW(), NOW(), 'BOOL',0);");
-			$this->add_config_key('DEBUG_RESET' , 
+			$this->add_config_key('DEBUG_RESET' ,
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Reset Without Flush', 'DEBUG_RESET', '',
-				'If selected, WS will not perform a flush on content tables when doing a Reset Store Products.', 
+				'If selected, WS will not perform a flush on content tables when doing a Reset Store Products.',
 				1, 20, NOW(), NOW(), 'BOOL',0);");
-			$this->add_config_key('DEBUG_DISABLE_AJAX' , 
+			$this->add_config_key('DEBUG_DISABLE_AJAX' ,
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Disable Ajax Paging', 'DEBUG_DISABLE_AJAX', '0',
-				'If selected, WS will not page using AJAX but will use regular URLs.', 
+				'If selected, WS will not page using AJAX but will use regular URLs.',
 				1, 21, NOW(), NOW(), 'BOOL',0);");
-			$this->add_config_key('DEBUG_DELETE_DUPES' , 
+			$this->add_config_key('DEBUG_DELETE_DUPES' ,
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Uploader should delete duplicates', 'DEBUG_DELETE_DUPES', '0',
-				'If selected, a product which is uploading will replace any duplicate product codes.', 
+				'If selected, a product which is uploading will replace any duplicate product codes.',
 				1, 23, NOW(), NOW(), 'BOOL',0);");
-			$this->add_config_key('LOG_ROTATE_DAYS' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Log Rotate Days', 
+			$this->add_config_key('LOG_ROTATE_DAYS' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Log Rotate Days',
 				'LOG_ROTATE_DAYS', '30', 'How many days System Log should be retained.', 1, 30, NOW(), NOW(), 'INT',0);");
-			$this->add_config_key('UPLOADER_TIMESTAMP' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Last timestamp uploader ran', 
+			$this->add_config_key('UPLOADER_TIMESTAMP' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Last timestamp uploader ran',
 				'UPLOADER_TIMESTAMP', '0', 'Internal', 0, 0, NOW(), NOW(), 'NULL',0);");
 
-			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=1,`sort_order`=24 where `key`='IMAGE_STORE'");
+			_dbx("UPDATE `xlsws_configuration` SET `value`='FS',`configuration_type_id`=1,`sort_order`=24 where `key`='IMAGE_STORE'");
 
 
 			//Families menu labeling
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Show Families on Product Menu?',`configuration_type_id`=19,`sort_order`=3,
 				`options`='ENABLE_FAMILIES' where `key`='ENABLE_FAMILIES'");
-			
-			$this->add_config_key('ENABLE_FAMILIES_MENU_LABEL' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Show Families Menu label', 
+
+			$this->add_config_key('ENABLE_FAMILIES_MENU_LABEL' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Show Families Menu label',
 				'ENABLE_FAMILIES_MENU_LABEL', 'By Manufacturer', '', 19, 4, NOW(), NOW(), NULL,0);");
 
 
@@ -278,7 +278,7 @@ class xlsws_db_maintenance {
 			if ($this->add_column('xlsws_promo_code' , 'enabled' ,
 				"ALTER TABLE xlsws_promo_code ADD COLUMN enabled tinyint (1) NOT NULL DEFAULT 1 AFTER rowid "))
 			_dbx("UPDATE xlsws_promo_code SET enabled=1");
-			
+
 			if ($this->add_column('xlsws_promo_code' , 'except' ,
 				"ALTER TABLE xlsws_promo_code ADD COLUMN except tinyint (1) NOT NULL DEFAULT 0 AFTER enabled "))
 				_dbx("UPDATE xlsws_promo_code SET except=0");
@@ -286,17 +286,17 @@ class xlsws_db_maintenance {
 			$this->add_column('xlsws_cart' , 'tracking_number',
 				"ALTER TABLE xlsws_cart ADD COLUMN `tracking_number` VARCHAR(255) NULL DEFAULT NULL AFTER `payment_amount`");
 
-			
+
 			//Template section
-			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=19,`sort_order`=1 
+			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=19,`sort_order`=1
 				where `key`='DEFAULT_TEMPLATE'");
 			$this->add_config_key('DEFAULT_TEMPLATE_THEME' ,
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Template theme', 'DEFAULT_TEMPLATE_THEME', '',
-				'If supported, changable colo(u)rs for template files.',
+				'If supported, changeable colo(u)rs for template files.',
 				19, 2, NOW(), NOW(), 'DEFAULT_TEMPLATE_THEME',1);");
-			$this->add_config_key('ENABLE_SLASHED_PRICES' , 
+			$this->add_config_key('ENABLE_SLASHED_PRICES' ,
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Enabled Slashed \"Original\" Prices', 'ENABLE_SLASHED_PRICES', '',
-				'If selected, will display original price slashed out and Web Price as a Sale Price.', 
+				'If selected, will display original price slashed out and Web Price as a Sale Price.',
 				19, 3, NOW(), NOW(), 'ENABLE_SLASHED_PRICES',0);");
 
 
@@ -336,25 +336,25 @@ class xlsws_db_maintenance {
 			_dbx("DELETE FROM `xlsws_country` WHERE `code`='FX'");
 
 			//ReCaptcha Keys
-			$this->add_config_key('RECAPTCHA_PUBLIC_KEY' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'ReCaptcha Public Key', 
+			$this->add_config_key('RECAPTCHA_PUBLIC_KEY' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'ReCaptcha Public Key',
 				'RECAPTCHA_PUBLIC_KEY', '', 'Sign up for an account at http://www.google.com/recaptcha', 18, 2, NOW(), NOW(), NULL,0);");
-			$this->add_config_key('RECAPTCHA_PRIVATE_KEY' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'ReCaptcha Private Key', 
+			$this->add_config_key('RECAPTCHA_PRIVATE_KEY' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'ReCaptcha Private Key',
 				'RECAPTCHA_PRIVATE_KEY', '', 'Sign up for an account at http://www.google.com/recaptcha', 18, 3, NOW(), NOW(), NULL,0);");
 
-			$this->add_config_key('CAPTCHA_STYLE' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Captcha Style', 
+			$this->add_config_key('CAPTCHA_STYLE' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Captcha Style',
 				'CAPTCHA_STYLE', '0', 'Sign up for an account at http://www.google.com/recaptcha', 18, 1, NOW(), NOW(), 'CAPTCHA_STYLE',0);");
 
-			$this->add_config_key('CAPTCHA_CHECKOUT' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Captcha on Checkout', 
+			$this->add_config_key('CAPTCHA_CHECKOUT' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Captcha on Checkout',
 				'CAPTCHA_CHECKOUT', '1', '', 18, 6, NOW(), NOW(), 'CAPTCHA_CHECKOUT',0);");
-			$this->add_config_key('CAPTCHA_CONTACTUS' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Captcha on Contact Us', 
+			$this->add_config_key('CAPTCHA_CONTACTUS' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Captcha on Contact Us',
 				'CAPTCHA_CONTACTUS', '1', '', 18, 7, NOW(), NOW(), 'CAPTCHA_CONTACTUS',0);");
-			$this->add_config_key('CAPTCHA_REGISTRATION' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Captcha on Registration', 
+			$this->add_config_key('CAPTCHA_REGISTRATION' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Captcha on Registration',
 				'CAPTCHA_REGISTRATION', '1', '', 18, 8, NOW(), NOW(), 'CAPTCHA_REGISTRATION',0);");
 			$this->add_config_key('CAPTCHA_THEME' ,
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'ReCaptcha Theme',
@@ -362,27 +362,27 @@ class xlsws_db_maintenance {
 
 
 			//Email options
-			$this->add_config_key('EMAIL_SMTP_AUTH_PLAIN' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Force AUTH PLAIN Authentication', 
+			$this->add_config_key('EMAIL_SMTP_AUTH_PLAIN' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Force AUTH PLAIN Authentication',
 				'EMAIL_SMTP_AUTH_PLAIN', '0', 'Force plain text password in rare circumstances', 5, 9, NOW(), NOW(), 'BOOL',0);");
-			$this->add_config_key('EMAIL_SEND_CUSTOMER' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Send Receipts to Customers', 
+			$this->add_config_key('EMAIL_SEND_CUSTOMER' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Send Receipts to Customers',
 				'EMAIL_SEND_CUSTOMER', '1', 'Option whether to email order receipts to customers', 24, 1, NOW(), NOW(), 'BOOL',0);");
-			$this->add_config_key('EMAIL_SEND_STORE' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Send Order Alerts to Store', 
+			$this->add_config_key('EMAIL_SEND_STORE' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Send Order Alerts to Store',
 				'EMAIL_SEND_STORE', '1', 'Option to send Store Owner email when order is placed', 24, 2, NOW(), NOW(), 'BOOL',0);");
-			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=24, `sort_order`=5  
+			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=24, `sort_order`=5
 				where `key`='HTML_EMAIL'");
-			$this->add_config_key('EMAIL_SUBJECT_CUSTOMER' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Customer Email Subject Line', 
+			$this->add_config_key('EMAIL_SUBJECT_CUSTOMER' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Customer Email Subject Line',
 				'EMAIL_SUBJECT_CUSTOMER', '%storename% Order Notification %orderid%', 'Configure Email Subject line with variables for Customer Email', 24, 10, NOW(), NOW(), NULL,0);");
-			$this->add_config_key('EMAIL_SUBJECT_OWNER' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Owner Email Subject Line', 
+			$this->add_config_key('EMAIL_SUBJECT_OWNER' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Owner Email Subject Line',
 				'EMAIL_SUBJECT_OWNER', '%storename% Order Notification %orderid%', 'Configure Email Subject line with variables for Owner email', 24, 11, NOW(), NOW(), NULL,0);");
-					
+
 			_dbx("DELETE from xlsws_configuration WHERE `key`='ADMIN_EMAIL'");
-			
-			
+
+
 			//Fix some sequencing problems for options
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=10 where `key`='EMAIL_SIGNATURE'");
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=11 where `key`='EMAIL_SMTP_SERVER'");
@@ -404,19 +404,19 @@ class xlsws_db_maintenance {
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=8 where `key`='INVENTORY_LOW_THRESHOLD'");
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=9 where `key`='INVENTORY_NON_TITLE'");
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=10 where `key`='INVENTORY_OUT_ALLOW_ADD'");
-			
-			//Cleaning up some tooltips and descriptions to be clearer		
+
+			//Cleaning up some tooltips and descriptions to be clearer
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Enter relative URL (usually starting with /photos)'
 				where `key`='HEADER_IMAGE'");
-			_dbx("UPDATE `xlsws_configuration` SET `helper_text`='Enter the location (relative to you Web Store install directory) to the header or logo image for your Web Store. Do not use a http:// prefix, this will interfere with SSL security. ' where `key`='HEADER_IMAGE'");	
+			_dbx("UPDATE `xlsws_configuration` SET `helper_text`='Enter the location (relative to you Web Store install directory) to the header or logo image for your Web Store. Do not use a http:// prefix, this will interfere with SSL security. ' where `key`='HEADER_IMAGE'");
 			_dbx("UPDATE `xlsws_configuration` SET `title`='New customers can purchase', `options`='ALLOW_GUEST_CHECKOUT', `helper_text`='Force customers to sign up with an account before shopping? Note this some customers will abandon a forced-signup process. Customer cards are created in LightSpeed based on all orders, not dependent on customer registrations.' where `key`='ALLOW_GUEST_CHECKOUT'");
-			
-						
+
+
 			//Inventory handling changes
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Inventory should include Virtual Warehouses'
 				where `key`='INVENTORY_FIELD_TOTAL'");
-			$this->add_config_key('INVENTORY_RESERVED' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Deduct Pending Orders from Available Inventory', 
+			$this->add_config_key('INVENTORY_RESERVED' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Deduct Pending Orders from Available Inventory',
 				'INVENTORY_RESERVED', '1', 'This option will calculate Qty Available minus Pending Orders. Turning on Upload Orders in LightSpeed Tools->eCommerce->Documents is required to make this feature work properly.', 11, 4, NOW(), NOW(), 'BOOL',0);");
 			$this->add_column('xlsws_product' , 'inventory_reserved' ,
 				"ALTER TABLE xlsws_product ADD COLUMN inventory_reserved float NOT NULL DEFAULT 0 AFTER inventory_total;");
@@ -427,12 +427,12 @@ class xlsws_db_maintenance {
 			_dbx("UPDATE `xlsws_configuration` SET `title`='When a product is Out of Stock',
 				`options`='INVENTORY_OUT_ALLOW_ADD',`helper_text`='How should system treat products currently out of stock. Note: Turn OFF the checkbox for -Only Upload Products with Available Inventory- in Tools->eCommerce.' where `key`='INVENTORY_OUT_ALLOW_ADD'");
 			//_dbx("ALTER TABLE `xlsws_product` ADD INDEX (`inventory`, `inventory_avail`);");	//need to check if exists
-			
+
 			//Pricing Changes
 			_dbx("UPDATE `xlsws_configuration` SET `title`='In Product Grid, when child product prices vary',
-				`options`='MATRIX_PRICE',`helper_text`='How should system treat child products when different child products have different prices.' where `key`='MATRIX_PRICE'");	
-			$this->add_config_key('PRICE_REQUIRE_LOGIN' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Require login to view prices', 
+				`options`='MATRIX_PRICE',`value`=3,`helper_text`='How should system treat child products when different child products have different prices.' where `key`='MATRIX_PRICE'");
+			$this->add_config_key('PRICE_REQUIRE_LOGIN' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Require login to view prices',
 				'PRICE_REQUIRE_LOGIN', '0', 'System will not display prices to anyone not logged in.', 3, 3, NOW(), NOW(), 'BOOL',0);");
 			//Fix some sequencing problems for options
 			_dbx("UPDATE `xlsws_configuration` SET `sort_order`=4 where `key`='LANGUAGES'");
@@ -441,8 +441,8 @@ class xlsws_db_maintenance {
 
 
 			_dbx("UPDATE `xlsws_configuration` SET `title`='SSL Security certificate should be used',
-				`options`='SSL_NO_NEED_FORWARD',`helper_text`='Change when SSL secure mode is used.' where `key`='SSL_NO_NEED_FORWARD'");	
-				
+				`options`='SSL_NO_NEED_FORWARD',`helper_text`='Change when SSL secure mode is used.' where `key`='SSL_NO_NEED_FORWARD'");
+
 			//SEO Changes
 			$this->add_column('xlsws_category' , 'request_url' ,
 				"ALTER TABLE xlsws_category ADD COLUMN `request_url` varchar (255) AFTER `child_count`");
@@ -458,6 +458,7 @@ class xlsws_db_maintenance {
 			$this->add_index('xlsws_product','request_url');
 			$this->add_index('xlsws_custom_page','request_url');
 			$this->add_index('xlsws_product','image_id');
+			$this->add_index('xlsws_images','image_path');
 
 			CustomPage::ConvertSEO();
 			Family::ConvertSEO();
@@ -466,19 +467,19 @@ class xlsws_db_maintenance {
 			$row = $matches->FetchArray();
 			if ($row['thecount']<15000) Product::ConvertSEO();
 
-			
-			$this->add_config_key('SHOW_TEMPLATE_CODE' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Show Product Code on Product Details', 
+
+			$this->add_config_key('SHOW_TEMPLATE_CODE' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Show Product Code on Product Details',
 				'SHOW_TEMPLATE_CODE', '1', 'Determines if the Product Code should be visible', 19, 20, NOW(), NOW(), 'BOOL',0);");
-			$this->add_config_key('SHOW_SHARING' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Show Sharing Buttons on Product Details', 
+			$this->add_config_key('SHOW_SHARING' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Show Sharing Buttons on Product Details',
 				'SHOW_SHARING', '1', 'Show Sharing buttons such as Facebook and Pinterest', 19, 21, NOW(), NOW(), 'BOOL',0);");
-				
-			$this->add_config_key('SEO_URL_CODES' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Product Codes in Product URLs', 
+
+			$this->add_config_key('SEO_URL_CODES' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Use Product Codes in Product URLs',
 				'SEO_URL_CODES', '0', 'If your Product Codes are important (such as model numbers), this will include them when making SEO formatted URLs. If you generate your own Product Codes that are only internal, you can leave this off.', 21, 1, NOW(), NOW(), 'BOOL',0);");
-			$this->add_config_key('GOOGLE_ANALYTICS' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Google Analytics Code (format: UA-00000000-0)', 
+			$this->add_config_key('GOOGLE_ANALYTICS' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Google Analytics Code (format: UA-00000000-0)',
 				'GOOGLE_ANALYTICS', '', 'Google Analytics code for tracking', 20, 1, NOW(), NOW(), 'NULL',0);");
 			$this->add_config_key('GOOGLE_MPN' ,
 				"INSERT INTO `xlsws_configuration` VALUES
@@ -486,16 +487,16 @@ class xlsws_db_maintenance {
 					'If your Product Codes are Manufacturer Part Numbers, turn this on to apply this to Google Shopping feed.',
 					20, 4, NOW(), NOW(), 'BOOL', 0);");
 			$this->add_config_key('GOOGLE_ADWORDS' ,
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Google AdWords ID (format: 000000000)', 
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Google AdWords ID (format: 000000000)',
 				'GOOGLE_ADWORDS', '', 'Google AdWords Conversion ID (found in line \'var google_conversion_id\' when viewing code from Google AdWords setup)', 20, 2, NOW(), NOW(), 'NULL',0);");
-			$this->add_config_key('GOOGLE_VERIFY' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Google Site Verify ID (format: _PRasdu8f9a8F9A..etc)', 
+			$this->add_config_key('GOOGLE_VERIFY' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Google Site Verify ID (format: _PRasdu8f9a8F9A..etc)',
 				'GOOGLE_VERIFY', '', 'Google Verify Code (found in google-site-verification meta header)', 20, 3, NOW(), NOW(), 'NULL',0);");
 
 
 			_dbx("DELETE FROM `xlsws_configuration` where `key`='ENABLE_SEO_URL'");
-			$this->add_config_key('STORE_TAGLINE' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Store Tagline', 
+			$this->add_config_key('STORE_TAGLINE' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Store Tagline',
 				'STORE_TAGLINE', 'Amazing products available to order online!', 'Slogan which follows your store name on the Title bar', 2, 4, NOW(), NOW(), 'NULL',0);");
 			$this->add_config_key('STORE_ADDRESS1' ,
 				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Store Address',
@@ -509,17 +510,17 @@ class xlsws_db_maintenance {
 
 
 			//URL and Description Formatting
-			$this->add_config_key('SEO_PRODUCT_TITLE' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Product Title format', 
+			$this->add_config_key('SEO_PRODUCT_TITLE' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Product Title format',
 				'SEO_PRODUCT_TITLE', '%description% : %storename%', 'Which elements appear in the Title', 22, 2, NOW(), NOW(), 'NULL',0);");
-			$this->add_config_key('SEO_PRODUCT_DESCRIPTION' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Product Meta Description format', 
+			$this->add_config_key('SEO_PRODUCT_DESCRIPTION' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Product Meta Description format',
 				'SEO_PRODUCT_DESCRIPTION', '%longdescription%', 'Which elements appear in the Meta Description', 22, 3, NOW(), NOW(), 'NULL',0);");
-			$this->add_config_key('SEO_CATEGORY_TITLE' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Category pages Title format', 
+			$this->add_config_key('SEO_CATEGORY_TITLE' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Category pages Title format',
 				'SEO_CATEGORY_TITLE', '%name% : %storename%', 'Which elements appear in the title of a category page', 23, 1, NOW(), NOW(), 'NULL',0);");
-			$this->add_config_key('SEO_CUSTOMPAGE_TITLE' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Custom pages Title format', 
+			$this->add_config_key('SEO_CUSTOMPAGE_TITLE' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Custom pages Title format',
 				'SEO_CUSTOMPAGE_TITLE', '%name% : %storename%', 'Which elements appear in the title of a custom page', 23, 2, NOW(), NOW(), 'NULL',0);");
 
 			//Copy our category table since we will use this to handle uploads and SEO activities
@@ -535,51 +536,51 @@ class xlsws_db_maintenance {
 			  KEY `parent` (`parent`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
 
-			
-		
+
+
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Grid image width', `configuration_type_id`=17, `sort_order`=1,options='INT',template_specific=1
-				where `key`='LISTING_IMAGE_WIDTH'");	
+				where `key`='LISTING_IMAGE_WIDTH'");
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Grid image height', `configuration_type_id`=17, `sort_order`=2 ,options='INT' ,template_specific=1
 				where `key`='LISTING_IMAGE_HEIGHT'");
-			
+
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Shopping Cart image width', `configuration_type_id`=17, `sort_order`=3 ,options='INT',template_specific=1
-				where `key`='MINI_IMAGE_WIDTH'");	
+				where `key`='MINI_IMAGE_WIDTH'");
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Shopping Cart image height', `configuration_type_id`=17, `sort_order`=4 ,options='INT',template_specific=1
-				where `key`='MINI_IMAGE_HEIGHT'");		
+				where `key`='MINI_IMAGE_HEIGHT'");
 
 			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Width', `configuration_type_id`=17, `sort_order`=5 ,options='INT' ,template_specific=1
-				where `key`='DETAIL_IMAGE_WIDTH'");	
-			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Width', `configuration_type_id`=17, `sort_order`=6 ,options='INT' ,template_specific=1
-				where `key`='DETAIL_IMAGE_HEIGHT'");		
+				where `key`='DETAIL_IMAGE_WIDTH'");
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Height', `configuration_type_id`=17, `sort_order`=6 ,options='INT' ,template_specific=1
+				where `key`='DETAIL_IMAGE_HEIGHT'");
 
-				
-			$this->add_config_key('CATEGORY_IMAGE_WIDTH' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Category Page Image Width', 
+
+			$this->add_config_key('CATEGORY_IMAGE_WIDTH' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Category Page Image Width',
 				'CATEGORY_IMAGE_WIDTH', '180', 'if using a Category Page image', 17, 7, NOW(), NOW(), 'INT',1);");
-			$this->add_config_key('CATEGORY_IMAGE_HEIGHT' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Category Page Image Width', 
+			$this->add_config_key('CATEGORY_IMAGE_HEIGHT' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Category Page Image Height',
 				'CATEGORY_IMAGE_HEIGHT', '180', 'if using a Category Page image', 17, 8, NOW(), NOW(), 'INT',1);");
-			$this->add_config_key('PREVIEW_IMAGE_WIDTH' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Preview Thumbnail (Product Detail Page) Width', 
+			$this->add_config_key('PREVIEW_IMAGE_WIDTH' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Preview Thumbnail (Product Detail Page) Width',
 				'PREVIEW_IMAGE_WIDTH', '30', 'Preview Thumbnail image', 17, 9, NOW(), NOW(), 'INT',1);");
-			$this->add_config_key('PREVIEW_IMAGE_HEIGHT' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Preview Thumbnail (Product Detail Page) Height', 
+			$this->add_config_key('PREVIEW_IMAGE_HEIGHT' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Preview Thumbnail (Product Detail Page) Height',
 				'PREVIEW_IMAGE_HEIGHT', '30', 'Preview Thumbnail image', 17, 10, NOW(), NOW(), 'INT',1);");
-			$this->add_config_key('SLIDER_IMAGE_WIDTH' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Slider Image Width', 
+			$this->add_config_key('SLIDER_IMAGE_WIDTH' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Slider Image Width',
 				'SLIDER_IMAGE_WIDTH', '90', 'Slider on custom pages', 17, 11, NOW(), NOW(), 'INT',1);");
-			$this->add_config_key('SLIDER_IMAGE_HEIGHT' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Slider Image Height', 
+			$this->add_config_key('SLIDER_IMAGE_HEIGHT' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Slider Image Height',
 				'SLIDER_IMAGE_HEIGHT', '90', 'Slider on custom pages', 17, 12, NOW(), NOW(), 'INT',1);");
-			$this->add_config_key('IMAGE_FORMAT' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Image Format', 
+			$this->add_config_key('IMAGE_FORMAT' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Image Format',
 				'IMAGE_FORMAT', 'jpg', 'Use .jpg or .png format for images. JPG files are smaller but slightly lower quality. PNG is higher quality and supports transparency, but has a larger file size.', 17, 18, NOW(), NOW(), 'IMAGE_FORMAT',0);");
-			
-			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=17, `sort_order`=15 
-				where `key`='PRODUCT_ENLARGE_SHOW_LIGHTBOX'");	
 
-			$this->add_config_key('ENABLE_CATEGORY_IMAGE' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Display Image on Category Page (when set)', 
+			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=17, `sort_order`=15
+				where `key`='PRODUCT_ENLARGE_SHOW_LIGHTBOX'");
+
+			$this->add_config_key('ENABLE_CATEGORY_IMAGE' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Display Image on Category Page (when set)',
 				'ENABLE_CATEGORY_IMAGE', '0', 'Requires a defined Category image under SEO settings', 17, 13, NOW(), NOW(), 'BOOL',1);");
 			_dbx("update `xlsws_configuration` set template_specific=1 where `key` like '%_IMAGE_WIDTH'");
 			_dbx("update `xlsws_configuration` set template_specific=1 where `key` like '%_IMAGE_HEIGHT'");
@@ -587,7 +588,7 @@ class xlsws_db_maintenance {
 			_dbx("update `xlsws_configuration` set template_specific=1 where `key` = 'PRODUCTS_PER_PAGE'");
 
 			//Because of a change to the width display in Admin panel, make sure the option type is set so numbers aren't huge fields
-			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='QUOTE_EXPIRY'");		
+			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='QUOTE_EXPIRY'");
 			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='CART_LIFE'");
 			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='DEFAULT_EXPIRY_GIFT_REGISTRY'");
 			_dbx("UPDATE `xlsws_configuration` SET options='INT' where `key`='RESET_GIFT_REGISTRY_PURCHASE_STATUS'");
@@ -604,7 +605,7 @@ class xlsws_db_maintenance {
 
 			$this->add_column('xlsws_customer' , 'check_same' ,
 				"ALTER TABLE xlsws_customer ADD COLUMN `check_same` INT(11) DEFAULT NULL AFTER `zip2`");
-						
+
 			//We've changed how we're storing payment and shipping module information, no longer using the .php extension
 			//so let's go through and update our tables
 			$objItems = Modules::LoadAll();
@@ -615,7 +616,7 @@ class xlsws_db_maintenance {
 				$objItem->Save();
 
 			}
-		
+
 			$objItems =  Cart::QueryArray(
                             QQ::AndCondition(
                                 QQ::Equal(QQN::Cart()->Type, CartType::order)
@@ -625,16 +626,16 @@ class xlsws_db_maintenance {
 				$strFile = $objItem->PaymentModule;
 				$classname = basename($strFile , ".php");
 				$objItem->PaymentModule = $classname;
-				
+
 				$strFile = $objItem->ShippingModule;
 				$classname = basename($strFile , ".php");
 				$objItem->ShippingModule = $classname;
-				
+
 				$objItem->Save();
 
 			}
-		
-		
+
+
 			//Cart flash messages table
 			$this->add_table('xlsws_cart_messages' , "CREATE TABLE `xlsws_cart_messages` (
 			  `rowid` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -689,21 +690,21 @@ class xlsws_db_maintenance {
 				  	$objGC->Name7=trim($arrItems[6]);
 				  	$objGC->Name8=trim($arrItems[7]);
 				  	$objGC->Name9=trim($arrItems[8]);
-				  	
+
 				  	$objGC->Save();
 				  }
 				fclose($file);
 			for ($x=1; $x<=9; $x++)
 				_dbx("update xlsws_google_categories set `name".$x."`=null where `name".$x."`=''");
 			_dbx("DELETE FROM xlsws_google_categories WHERE `name1` IS NULL");
-			
-			
+
+
 			//Shipping options
-			$this->add_config_key('SHIP_SAME_BILLSHIP' , 
-				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Require Billing and Shipping Address to Match', 
+			$this->add_config_key('SHIP_SAME_BILLSHIP' ,
+				"INSERT INTO `xlsws_configuration` VALUES (NULL, 'Require Billing and Shipping Address to Match',
 				'SHIP_SAME_BILLSHIP', '0', 'Locks the Shipping and Billing are same checkbox to not allow separate shipping address.', 25, 2, NOW(), NOW(), 'BOOL',0);");
-			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=25, `sort_order`=1 
-				where `key`='SHIP_RESTRICT_DESTINATION'");	
+			_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`=25, `sort_order`=1
+				where `key`='SHIP_RESTRICT_DESTINATION'");
 			if ($this->add_column('xlsws_shipping_tiers' , 'class_name' ,
 				"ALTER TABLE `xlsws_shipping_tiers` ADD `class_name` VARCHAR(255)  NULL  DEFAULT NULL  AFTER `rate`;"))
 			_dbx("update xlsws_shipping_tiers set `class_name`='tier_table'");
@@ -715,6 +716,8 @@ class xlsws_db_maintenance {
 				$objPromoCode = PromoCode::LoadByCodeShipping("free_shipping:");
 				if (!$objPromoCode) {
 					$config = $objShipping->GetConfigValues();
+					$intThreshold = $config['rate'];
+					if (empty($intThreshold)) $intThreshold=0;
 					$objPromoCode = new PromoCode;
 					$objPromoCode->Lscodes = "shipping:,";
 					$objPromoCode->Code='free_shipping:';
@@ -724,7 +727,7 @@ class xlsws_db_maintenance {
 					$objPromoCode->Amount='';
 					$objPromoCode->ValidFrom='';
 					$objPromoCode->ValidUntil='';
-					$objPromoCode->Threshold=$config['rate'];
+					$objPromoCode->Threshold=$intThreshold;
 					$objPromoCode->QtyRemaining=-1;
 					$objPromoCode->Save();
 				}
@@ -739,32 +742,49 @@ class xlsws_db_maintenance {
 				where `key`='ENABLE_SRO'");
 
 			$strUpgradeText .= "<br/>Upgrading to Database schema 250";
-			
-			
+
+
 			$strUpgradeText .= "<h2>From Admin Panel (System->Tasks), please run the steps MIGRATE URLs (if available) , MIGRATE PHOTOS (if available) and RECALCULATE AVAILABLE INVENTORY after running this Upgrade. You also need to perform an Update Store command from LightSpeed.</h2>";
-			
+
 			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
 			$config->Value="250";
+			$intCurrentSchema=250;
 			$config->Save();
-		
-		
+
+
 		}
+
+
+		if ($intCurrentSchema==250)
+		{
+
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Height' where `key`='DETAIL_IMAGE_HEIGHT'");
+			_dbx("UPDATE `xlsws_configuration` SET `title`='Category Page Image Height' where `key`='CATEGORY_IMAGE_HEIGHT'");
+
+			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
+			$config->Value="251";
+			$intCurrentSchema=251;
+			$config->Save();
+
+		}
+
+
 		$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
 		$strUpgradeText .= "<br/>Database schema version ".$config->Value."<br>";
 
 		return $strUpgradeText;
 	}
-	
-	
-	private function drop_index($table,$indexname) { 
+
+
+	private function drop_index($table,$indexname) {
 		$res = _dbx("SHOW INDEXES FROM `$table` WHERE key_name='$indexname'" , 'Query');
 
 		if($res && ($row = $res->GetNextRow()))
 				_dbx("ALTER TABLE `$table` DROP INDEX `$indexname`");
-						
+
 
 			return true;
-	
+
 	}
 
 	private function add_index($table,$indexname) {
@@ -773,43 +793,43 @@ class xlsws_db_maintenance {
 		if($res && ($row = $res->GetNextRow()))
 				return false;
 
-		_dbx("ALTER TABLE `$table` ADD INDEX `$indexname` (`$indexname`)");	
+		_dbx("ALTER TABLE `$table` ADD INDEX `$indexname` (`$indexname`)");
 		return true;
-	
+
 	}
-		
+
 	private function add_column($table , $column , $create_sql , $version = false) {
 
 			$res = _dbx("SHOW COLUMNS FROM $table WHERE Field='$column'" , 'Query');
-						
+
 			if($res && ($row = $res->GetNextRow()))
 				return false;
-						
-			_dbx($create_sql);	
+
+			_dbx($create_sql);
 			return true;
 		}
-		
-		
+
+
 		private function check_column_type($table , $column , $type , $misc ,$version = false){
 			$res = _dbx("SHOW COLUMNS FROM $table WHERE Field='$column'" , 'Query');
-			
+
 			if(!$version)
 				$version = _xls_version();
-			
+
 			if(!$res){
 				$strUpgradeText .= "<br/>" . sprintf(_sp("Fatal Error: %s not found in table %s. Contact xsilva support") , $column , $table);
 				return;
 			}
-			
+
 			$row = $res->GetNextRow();
-			
+
 			if(!$row){
 				$strUpgradeText .= "<br/>" . sprintf(_sp("Fatal Error: %s not found in table %s. Contact xsilva support") , $column , $table);
 				return;
 			}
-			
+
 			$ctype = $row->GetColumn('Type');
-			
+
 			if($ctype == $type){
 				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s already exists in table %s of type %s."), $version , $column , $table , $type);
 			}else{
@@ -818,60 +838,60 @@ class xlsws_db_maintenance {
 			}
 		}
 
-		
-		
-		
-		
+
+
+
+
 		private function check_index_exists($table , $column , $version = false){
 			$res = _dbx("SHOW INDEX FROM `$table` WHERE Column_name = '$column'" , 'Query');
-			
+
 			if(!$version)
 				$version = _xls_version();
 			$apply = false;
-				
+
 			if(!$res){
 				$apply = true;
 			}
-			
+
 			if(!$apply){
 				$row = $res->GetNextRow();
-				
+
 				if(!$row){
 					$apply = true;
 				}
-			
+
 			}
-			
+
 			if($apply){
-				_dbx("ALTER TABLE  `$table` ADD INDEX (  `$column` )");	
+				_dbx("ALTER TABLE  `$table` ADD INDEX (  `$column` )");
 				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s.%s indexed.") , $version , $table , $column);
 			}else{
 				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s.%s index already exists."), $version , $table  , $column);
 			}
-			
+
 		}
-		
+
 		private function add_config_key($key , $sql, $version = false) {
 
 			$conf = Configuration::LoadByKey($key);
-			
+
 			if(!$conf)
 				_dbx($sql);
-						
+
 		}
-		
+
 		private function add_table($table , $create_sql ,  $version = false){
 			$res = _dbx("show tables" , 'Query');
-			
+
 			if(!$version)
 				$version = _xls_version();
-			
+
 			$table = strtolower(trim($table));
-			
+
 			$apply = true;
-				
+
 			if($res){
-				
+
 				while($row = $res->GetNextRow()){
 					$colnames = $row->GetColumnNameArray();
 					$colname = $colnames[0];
@@ -881,40 +901,40 @@ class xlsws_db_maintenance {
 				}
 
 			}
-			
+
 			if($apply){
-				_dbx($create_sql);	
+				_dbx($create_sql);
 				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s created.") , $version , $table );
 			}else{
 				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s already exists."), $version , $table );
 			}
 		}
-		
-		
+
+
 		protected function insert_row($table , $columns , $version = false){
 			$check_sql = "SELECT COUNT(*) as C FROM $table WHERE 1=1 ";
-			
+
 			foreach($columns as $name=>$value)
 				$check_sql .= " and `$name` = '$value'";
-			
-			
+
+
 			$res = _dbx($check_sql , 'Query');
-			
+
 			if(!$version)
 				$version = _xls_version();
-			
+
 			$apply = true;
-				
+
 			if($res){
-				
+
 				while($row = $res->GetNextRow()){
 					if($row->GetColumn('C') == 1)
 						$apply = false;
 				}
 
 			}
-			
-			
+
+
 			if($apply){
 				$sql = "INSERT INTO $table (`" . implode(array_keys($columns) , "`,`") . "`) VALUES ('" . implode($columns , "','") . "')";
 				try{
@@ -922,21 +942,21 @@ class xlsws_db_maintenance {
 				}catch(Exception $c){
 					$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: !!!FAILED!!!! %s created row %s.") , $version , $table , print_r($columns , true));
 					return;
-				}	
-				
+				}
+
 				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s created row %s.") , $version , $table , print_r($columns , true));
 			}else{
 				$strUpgradeText .= "<br/>" . sprintf(_sp("%s patch: %s already contains %s."), $version , $table , print_r($columns , true) );
 			}
 		}
-		
-		
-		
+
+
+
 		protected function update_row($table , $key_column , $key , $value_column , $value , $version = false){
 			if(!$version)
 				$version = _xls_version();
-			
-			
+
+
 			$sql = "UPDATE $table SET $value_column = $value WHERE $key_column =  $key ";
 			_xls_log($sql);
 			_dbx($sql);
@@ -944,124 +964,154 @@ class xlsws_db_maintenance {
 		}
 
 
-		public function MigratePhotos() {
+	public function RecalculateInventory() {
 
-			//First make sure we have our new names set
-			$matches = _dbx("SELECT count(*) as thecount from xlsws_product where coalesce(request_url,'') = ''", "Query");
-			$row = $matches->FetchArray();
-			if ($row['thecount']>0) return -1;
+		$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0  ORDER BY rowid LIMIT 1000", "Query");
+		while ($objItem = $arrProducts->FetchObject()) {
+			$objProduct = Product::Load($objItem->rowid);
 
-			//Then switch to file system if it's not already
-			_xls_set_conf('IMAGE_STORE','FS');
-
-			$intLimit = 3000;
-
-			$intDone=0;
-			$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE image_path NOT like '%/%' and rowid=parent ORDER BY rowid LIMIT ".$intLimit, "Query");
-			while ($objItem = $arrProducts->FetchObject()) {
-				$objImage = Images::Load($objItem->rowid);
-				//echo $objImage->ImagePath." ".$objImage->Rowid." ".$objImage->Parent."<br>";
-
-				//We only care about the master photos, we'll delete the thumbnails and regenerate
-				if ($objImage->Rowid == $objImage->Parent) {
-
-					$strExistingPath = $objImage->ImagePath;
-					$strName = pathinfo($strExistingPath, PATHINFO_FILENAME);
-
-					$intPos = strpos($strName, '_');
-
-					if ($intPos !== false) {
-						$arrFileParts = explode("_",$strName);
-						$intRowId=substr($strName,0,$intPos);
-						if (count($arrFileParts)==2) { //just add with no index
-							$strAdd = "add";
-							$intIndex = null;
-						}
-						if (count($arrFileParts)==3) { //add with index
-							$strAdd = "add";
-							$intIndex = $arrFileParts[1];
-						}
-					} else {
-						$intRowId=$strName;
-						$strAdd=null;
-						$intIndex=null;
-					}
-
-					//echo $strName." ".$intRowId." ".$strAdd." ".$intIndex."<br>";
-					$objProduct = Product::Load($intRowId);
-					if ($objProduct) {
-						if ($objProduct->RequestUrl != '') {
-							$strNewImageName = Images::GetImageName(substr($objProduct->RequestUrl,0,60), 0, 0, $intIndex, $strAdd);
-
-
-							//If the image already exists, we just have to rename and move it, and update the db record
-
-							if ($objImage->ImageFileExists()) {
-								if (exif_imagetype(Images::GetImagePath($strNewImageName)) == IMAGETYPE_JPEG)
-									$strNewImageName = substr($strNewImageName,0,-4) . ".jpg";
-								//echo "renaming ".$strExistingPath." to ".$strNewImageName."<br>";
-								$strPath = Images::GetImagePath($strNewImageName);
-								$arrPath = pathinfo($strPath);
-								$strFolder = $arrPath['dirname']; echo $strFolder."<br>";
-								if (!$objImage->SaveImageFolder($strFolder))
-									return "Halting: error creating folder ".$strFolder;
-
-								if (!rename(Images::GetImagePath($strExistingPath), Images::GetImagePath($strNewImageName)))
-									return "Halting: error trying to rename ".$strExistingPath." to ".$strNewImageName;
-								$objImage->ImagePath=$strNewImageName;
-								$objImage->ImageData=null;
-								$objImage->Save();
-
-							} else {
-								//echo Images::GetImagePath($objImage->ImagePath)." doesn't exist<br>";
-								$blbImage = $objImage->GetImageData();
-								if (empty($blbImage)) {
-									//We have missing photo data and/or bad file, clean up. Worse case we have to reupload.
-									$objProduct->ImageId = null;
-									$objProduct->Save();
-									$objImage->Delete();
-								} else {
-									$objImage->SaveImageData($strNewImageName, $blbImage);
-									$objImage->Reload();
-									$objImage->ImagePath=$strNewImageName;
-									$objImage->ImageData=null;
-									$objImage->Save();
-								}
-							}
-						}
-					} else $objImage->Delete();
-
-				}
-
-				$intDone++;
-			}
-
-
-			$ctPic = _dbx("select count(*) as thecount FROM xlsws_images WHERE image_path NOT like '%/%' and rowid=parent",'Query');
-			$arrTotal = $ctPic->FetchArray();
-			$intCt = $arrTotal['thecount'];
-
-			if ($arrTotal['thecount']==0 ) {
-				//Now we remove all the thumbnails because our browsing will recreate them
-				$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE image_path NOT like '%/%' and rowid <> parent ORDER BY rowid LIMIT 3000", "Query");
-				while ($objItem = $arrProducts->FetchObject()) {
-					$objImage = Images::Load($objItem->rowid);
-					$objImage->DeleteImage();
-					//We delete directly because our class would attempt to remove the parent which we don't want
-					_dbx('DELETE FROM `xlsws_images` WHERE `rowid` = ' . $objImage->Rowid . '');
-				}
-
-
-			}
-
-			$ctPic = _dbx("select count(*) as thecount FROM xlsws_images WHERE image_path NOT like '%/%' and rowid<>parent",'Query');
-			$arrTotal = $ctPic->FetchArray();
-			$intCt += $arrTotal['thecount'];
-
-			return $intCt;
+			$objProduct->InventoryReserved=$objProduct->CalculateReservedInventory();
+			//Since $objProduct->Inventory isn't the real inventory column, it's a calculation,
+			//just pass it to the Avail so we have it for queries elsewhere
+			$objProduct->InventoryAvail=$objProduct->Inventory;
+			$objProduct->Save(false,true);
 
 		}
 
+		$ctPic = _dbx("SELECT count(*) as thecount FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0",'Query');
+		$arrTotal = $ctPic->FetchArray();
+		return $arrTotal['thecount'];
 
-		
+
+
+
+	}
+
+	public function MigratePhotos() {
+
+		//First make sure we have our new names set
+		$matches = _dbx("SELECT count(*) as thecount from xlsws_product where coalesce(request_url,'') = '' limit 1", "Query");
+		$row = $matches->FetchArray();
+		if ($row['thecount']>0) return -1;
+
+		//Then switch to file system if it's not already
+		_xls_set_conf('IMAGE_STORE','FS');
+		//Configuration::$Manager->SetValue('IMAGE_STORE','FS'); //Because key may already be in memory
+
+		$objCheck = _dbx("SELECT count(*) as thecount FROM xlsws_images WHERE image_path NOT like '%/%' and rowid=parent and image_data is not null limit 51", "Query");
+		$row = $objCheck->FetchObject();
+		if ($row->thecount>50)
+			$intLimit = 50;
+		else
+			$intLimit = 1000;
+
+
+		$intDone=0;
+		$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE image_path NOT like '%/%' and rowid=parent ORDER BY rowid LIMIT ".$intLimit, "Query");
+		while ($objItem = $arrProducts->FetchObject()) {
+			$objImage = Images::Load($objItem->rowid);
+//			error_log("Transferring image row ".$objItem->rowid);
+			//echo $objImage->ImagePath." ".$objImage->Rowid." ".$objImage->Parent."<br>";
+
+			//We only care about the master photos, we'll delete the thumbnails and regenerate
+			if ($objImage->Rowid == $objImage->Parent) {
+
+
+
+				$objProduct = Product::LoadByImageId($objImage->Rowid);
+				$strExistingPath = $objImage->ImagePath;
+				if ($objProduct) { //we found it in the product table, so that means this is our primary image
+					$strAdd=null;
+					$intIndex=null;
+
+
+				} else {
+					$objImageAssn = _dbx("SELECT * FROM xlsws_product_image_assn WHERE image_id=".$objImage->Rowid, "Query");
+					$row = $objImageAssn->FetchObject();
+					$objProduct = Product::Load($row->product_id);
+					if ($objProduct) {
+						$objImageAssn2 = _dbx("SELECT count(*) as thecount FROM xlsws_product_image_assn WHERE product_id=".$row->product_id." and image_id<".$objImage->Rowid, "Query");
+						$row2 = $objImageAssn2->FetchObject();
+						$strAdd = "add";
+						$intIndex = $row2->thecount;
+					}
+
+				}
+
+				if ($objProduct) {
+					if ($objProduct->RequestUrl != '') {
+						$strNewImageName = Images::GetImageName(substr($objProduct->RequestUrl,0,60), 0, 0, $intIndex, $strAdd);
+						//error_log("renaming ".$strExistingPath." to ".$strNewImageName);
+						//If the image already exists, we just have to rename and move it, and update the db record
+
+						if ($objImage->ImageFileExists()) {
+							if (exif_imagetype(Images::GetImagePath($strExistingPath)) == IMAGETYPE_JPEG)
+								$strNewImageName = substr($strNewImageName,0,-4) . ".jpg";
+							//echo "renaming ".$strExistingPath." to ".$strNewImageName."<br>";
+							$strPath = Images::GetImagePath($strNewImageName);
+							$arrPath = pathinfo($strPath);
+							$strFolder = $arrPath['dirname'];
+							if (!$objImage->SaveImageFolder($strFolder))
+								return "Halting: error creating folder ".$strFolder;
+
+							if (!rename(Images::GetImagePath($strExistingPath), Images::GetImagePath($strNewImageName)))
+								return "Halting: error trying to rename ".$strExistingPath." to ".$strNewImageName;
+							$objImage->ImagePath=$strNewImageName;
+							$objImage->ImageData=null;
+							$objImage->Save();
+
+						} else {
+							error_log("Extracting image ".$objItem->rowid);
+							$blbImage = $objImage->GetImageData();
+							if (empty($blbImage)) {
+								//We have missing photo data and/or bad file, clean up. Worse case we have to reupload.
+								$objProduct->ImageId = null;
+								$objProduct->Save();
+								$objImage->Delete();
+							} else {
+								$blbImage = imagecreatefromstring($blbImage);
+								$objImage->SaveImageData($strNewImageName, $blbImage);
+								$objImage->Reload();
+								$objImage->ImagePath=$strNewImageName;
+								$objImage->ImageData=null;
+								$objImage->Save();
+							}
+						}
+					} else error_log("Missing Request_url, skipping");
+				} else $objImage->Delete();
+
+			}
+
+			$intDone++;
+		}
+
+
+		$ctPic = _dbx("select count(*) as thecount FROM xlsws_images WHERE image_path NOT like '%/%' and rowid=parent limit 1",'Query');
+		$arrTotal = $ctPic->FetchArray();
+		$intCt = $arrTotal['thecount'];
+
+		if ($arrTotal['thecount']==0 ) {
+			//Now we remove all the thumbnails because our browsing will recreate them
+			$arrProducts = _dbx("SELECT * FROM xlsws_images WHERE image_path NOT like '%/%' and rowid <> parent ORDER BY rowid LIMIT ".$intLimit, "Query");
+			while ($objItem = $arrProducts->FetchObject()) {
+				$objImage = Images::Load($objItem->rowid);
+				$objImage->DeleteImage();
+				//We delete directly because our class would attempt to remove the parent which we don't want
+				_dbx('DELETE FROM `xlsws_images` WHERE `rowid` = ' . $objImage->Rowid . '');
+			}
+
+
+
+
+		}
+			$ctPic = _dbx("select count(*) as thecount FROM xlsws_images WHERE image_path NOT like '%/%' and rowid<>parent",'Query');
+			$arrTotal = $ctPic->FetchArray();
+			$intCt += $arrTotal['thecount'];
+//		error_log("End if photo migration");
+		return $intCt;
+
+	}
+
+
+
 	}

@@ -117,7 +117,7 @@
 	<td class="label left">Product Codes:<br><?php $_CONTROL->ctlProductCodes->RenderWithError(); ?></td>
 </table>
 
-	<div>Tip: Click in the scrollbar area to avoid accidentally clicking items.</div>
+	<div class="tip">Tip: Click in the scrollbar area to avoid accidentally clicking items.</div>
 								
 </div>
 <?php endif; ?>

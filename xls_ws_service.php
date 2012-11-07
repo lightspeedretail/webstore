@@ -388,8 +388,12 @@
             if (!$objImage->Created)
                 $objImage->Created = new QDateTime(QDateTime::Now);
 
+	        $strImageName = Images::GetImageName(substr($objProduct->RequestUrl,0,60));
+	        if (Images::ExistsForOtherProduct($strImageName,$objProduct->ImageId))
+	            $strImageName = Images::GetImageName(substr($objProduct->RequestUrl,0,60)."[".$objProduct->Rowid."]");
+
             $objImage->SaveImageData(
-                Images::GetImageName(substr($objProduct->RequestUrl,0,60)), $blbImage
+                $strImageName, $blbImage
             );
             $objImage->Save();
 

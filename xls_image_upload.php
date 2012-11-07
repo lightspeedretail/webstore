@@ -107,7 +107,12 @@ function getDestination() {
 }
 
 function getImageData() {
-	$rawPostData = file_get_contents('php://input');
+
+	$ctx=stream_context_create(array(
+		'http'=>array('timeout' => ini_get('max_input_time'))
+	));
+
+	$rawPostData = file_get_contents('php://input',false,$ctx);
 
 	if (empty($rawPostData)) {
 		return errorInParams('No image data posted?');

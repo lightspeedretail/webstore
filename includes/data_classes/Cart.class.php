@@ -349,7 +349,9 @@ class Cart extends CartGen {
 						$objItem->Qty=$objItem->Product->Inventory;
 						$bnlResult = true;	
 					}
-			 	}
+					$this->UpdateSubtotal();
+					$this->SyncSave();
+				}
 			}
 			
 			
@@ -362,6 +364,9 @@ class Cart extends CartGen {
 	 * dryRun is deprecated, we shouldn't run this as a validation test
 	 */
 	public function UpdatePromoCode($dryRun = false) {
+
+		$bolShippingApplied = -1;
+
 		if (!$this->FkPromoId)
 			return;
 
@@ -382,9 +387,26 @@ class Cart extends CartGen {
 				$objItem->Discount = 0;
 			$arrSorted[] = $objItem;
 			$intOriginalSubTotal += $objItem->Qty*$objItem->Sell;
-        }	
-				
-		if ($objPromoCode->Threshold > $intOriginalSubTotal && $this->FkPromoId != NULL) {
+        }
+
+		if ($objPromoCode->Shipping)
+		{
+			if ($objPromoCode->Except==0 || $objPromoCode==1)
+			{
+				$bolShippingApplied = true;	//We start with true because we want to make sure we don't have a disqualifying item in our cart
+
+				foreach ($arrSorted as $objItem)
+					if (!$objPromoCode->IsProductAffected($objItem)) $bolShippingApplied=false;
+			}
+			if ($objPromoCode->Except==2)
+			{
+				$bolShippingApplied = false;
+				foreach ($arrSorted as $objItem)
+					if ($objPromoCode->IsProductAffected($objItem)) $bolShippingApplied=true;
+			}
+
+		}
+		if ($bolShippingApplied == false || ($objPromoCode->Threshold > $intOriginalSubTotal && $this->FkPromoId != NULL)) {
 				$this->UpdateDiscountExpiry();
 				$this->FkPromoId = NULL;
 				QApplication::ExecuteJavaScript("alert('Promo Code \"" .$objPromoCode->Code .  _sp("\" no longer applies to your cart and has been removed.")  . "')");				
@@ -433,7 +455,10 @@ class Cart extends CartGen {
 				}
 			}
 			else if ($objPromoCode->Type == PromoCodeType::Percent) {
-				$intItemDiscount = $objItem->Sell - round((1-$intDiscount) * $objItem->Sell,2,PHP_ROUND_HALF_UP);
+				if (version_compare(PHP_VERSION, '5.3.0') < 0)
+					$intItemDiscount = $objItem->Sell - round((1-$intDiscount) * $objItem->Sell,2);
+				else
+					$intItemDiscount = $objItem->Sell - round((1-$intDiscount) * $objItem->Sell,2,PHP_ROUND_HALF_UP);
 			}
 
 			if (!$dryRun)
@@ -652,7 +677,8 @@ class Cart extends CartGen {
 		$UpdateShipping = true,
 		$SaveCart = true)
 	{
-		if ($this->UpdateMissingProducts())
+		if ($this->intType == CartType::cart)
+			if ($this->UpdateMissingProducts())
 			$this->Reload();
 
 		$this->UpdateSubtotal();
@@ -997,7 +1023,7 @@ class Cart extends CartGen {
 				$items = Cart::QueryArray(
 					QQ::AndCondition(
 						QQ::Equal(QQN::Cart()->CustomerId, $intCustomerId),
-						QQ::Equal(QQN::Cart()->Type, '1'),
+						QQ::Equal(QQN::Cart()->Type, CartType::cart),
 						QQ::GreaterThan(QQN::Cart()->Count, 0)),
 					QQ::Clause(
 						
@@ -1171,6 +1197,9 @@ class Cart extends CartGen {
 
 			case 'Weight':
 				return $this->GetWeight();
+
+			case 'Subtotal':
+				return $this->strSubtotal;
 
 			case 'SubTotalTaxIncIfSet':
 				QApplication::Log(E_USER_NOTICE, 'legacy', $strName);

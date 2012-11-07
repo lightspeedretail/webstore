@@ -163,7 +163,13 @@ class usps extends xlsws_class_shipping {
 					if (array_search($key, $this->methods) !== false)
 						$ret[$key]->Checked = true;
 				}
+			} else {
+				$ret['shiptypes'] = new QLabel($objParent);
+				$ret['shiptypes']->Display = true;
+				$ret['shiptypes']->Name = _sp('Attempting to contact USPS');
+				$ret['shiptypes']->Text = "Connection to USPS failed. Bad username?";
 			}
+
 		}
 
 		return $ret;
@@ -470,7 +476,7 @@ class usps extends xlsws_class_shipping {
 	*/
 	private function buildDomesticRateRequest() {
 		$r ='API=RateV3&XML=<?xml version="1.0"?>';
-		$r.= '<RateV3Request USERID="'.$this->uspsID.'">';
+		$r.= '<RateV3Request USERID="'.urlencode($this->uspsID).'">';
 		$r.='<Package ID="0">';
 		$r.='<Service>ALL</Service>';
 		$r.='<ZipOrigination>'.substr($this->zipOrigination,0,5).'</ZipOrigination>';
@@ -494,7 +500,7 @@ class usps extends xlsws_class_shipping {
 	*/
 	private function buildInternationalRateRequest() {
 		$r ='API=IntlRate&XML=<?xml version="1.0"?>';
-		$r.= '<IntlRateRequest USERID="'.$this->uspsID.'">';
+		$r.= '<IntlRateRequest USERID="'.urlencode($this->uspsID).'">';
 		$r.='<Package ID="0">';
 		$r.='<Pounds>'.$this->pounds.'</Pounds>';
 		$r.='<Ounces>'.$this->ounces.'</Ounces>';

@@ -84,7 +84,8 @@ class tier_table extends xlsws_class_shipping {
 					_xls_log(get_class($this) . " tier ship evaluating ".$fltCriteria.' as '.$config['tierbased'],true);
 				}
 				
-		$results = $db->Query("select * from xlsws_shipping_tiers where class_name='".get_class($this)."' and start_price <= " . $fltCriteria . " and end_price >= " .$fltCriteria);
+//		$results = $db->Query("select * from xlsws_shipping_tiers where class_name='".get_class($this)."' and start_price <= " . $fltCriteria . " and end_price >= " .$fltCriteria);
+		$results = $db->Query("select * from xlsws_shipping_tiers where start_price <= " . $fltCriteria . " and end_price >= " .$fltCriteria);
 		$rate = ShippingTiers::InstantiateDbResult($results);
 		$price = $rate[0]->Rate;
 		if (!isset($rate[0])){ //Price falls into a tier table price gap, so tell user we can't calculate and report error.

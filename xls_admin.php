@@ -3322,7 +3322,7 @@ class xlsws_admin_cpage extends xlsws_admin{
 
 		$this->listPages();
 
-		$this->HelperRibbon = "Looking to override your default home page? Create a custom page using the key \"index\" which will be shown instead.";
+		$this->HelperRibbon = "Looking to override your default home page? Create a custom page using the key \"index\" which will be shown instead. You can also make any tab jump to another page by entering the full URL by itself in the text box, no coding needed.";
 
 	}
 
@@ -3611,11 +3611,11 @@ abstract class xlsws_admin_generic_edit_form extends xlsws_admin {
 		$this->dtgItems->CellSpacing = 0;
 
 		$this->dtgItems->Paginator = new QPaginator($this->dtgItems);
-		$this->dtgItems->Paginator->CssClass = "table_base rounded {5px top transparent}";
+		$this->dtgItems->Paginator->CssClass = "paginator";
 
 		$this->dtgItems->ItemsPerPage = $this->default_items_per_page;
 
-		$this->dtgItems->HtmlAfter = "adfasdf";
+		$this->dtgItems->HtmlAfter = " ";
 
 		$qqn = $this->qqn;
 
@@ -3784,6 +3784,7 @@ abstract class xlsws_admin_generic_edit_form extends xlsws_admin {
 		if ($this->intEditRowid == -1)
 			array_push($objItemsArray, new $className);
 
+		$this->dtgItems->Paginator->SetCustomStyle('top',58+(count($objItemsArray)*47).'px');
 		// Bind the datasource to the datagrid
 		$this->dtgItems->DataSource = $objItemsArray;
 	}
@@ -5324,7 +5325,7 @@ class xlsws_seo_categories extends xlsws_admin_generic_edit_form{
 
 
 	protected function beforeSave($objItem) {
-		$objItem->GoogleId = $_POST['GoogleCatEdit']; error_log("passed edit is ".$_POST['GoogleCatExtraEdit']);
+		$objItem->GoogleId = $_POST['GoogleCatEdit'];
 		$objItem->MetaKeywords = $_POST['GoogleCatExtraEdit']; //Since we dont use keywords anymore, let's co-opt this field
 
 		if (!empty($_POST['ImageId'])) {
@@ -6524,32 +6525,41 @@ class xlsws_admin_maintenance extends xlsws_admin {
 
 
 
-		$ctPic = _dbx("select count(*) as thecount from xlsws_product where coalesce(request_url,'') = '';",'Query');
+		$ctPic = _dbx("select count(*) as thecount from xlsws_product where coalesce(request_url,'') = '' limit 1;",'Query');
 		$arrTotal = $ctPic->FetchArray();
 		$ct = $arrTotal['thecount'];
-		$ctPic = _dbx("select count(*) as thecount from xlsws_family where coalesce(request_url,'') = '';",'Query');
+		$ctPic = _dbx("select count(*) as thecount from xlsws_family where coalesce(request_url,'') = '' limit 1;",'Query');
 		$arrTotal = $ctPic->FetchArray();
 		$ct += $arrTotal['thecount'];
-		$ctPic = _dbx("select count(*) as thecount from xlsws_category where coalesce(request_url,'') = '';",'Query');
+		$ctPic = _dbx("select count(*) as thecount from xlsws_category where coalesce(request_url,'') = '' limit 1;",'Query');
 		$arrTotal = $ctPic->FetchArray();
 		$ct += $arrTotal['thecount'];
-		$ctPic = _dbx("select count(*) as thecount from xlsws_custom_page where coalesce(request_url,'') = '';",'Query');
+		$ctPic = _dbx("select count(*) as thecount from xlsws_custom_page where coalesce(request_url,'') = '' limit 1;",'Query');
 		$arrTotal = $ctPic->FetchArray();
 		$ct += $arrTotal['thecount'];
 		if ($ct>0) {
-			$this->arrMPnls['MigrateURL'] = new QPanel($this);
+			$this->arrMPnls['MigrateURL'] = new QPanel($this,'MigrateURL');
 			$this->arrMPnls['MigrateURL']->Visible = false;
 			$this->arrMPnls['MigrateURL']->Name = _sp('Migrate URLs to SEO friendly structure');
 			$this->arrMPnls['MigrateURL']->HtmlEntities = false;
 			$this->arrMPnls['MigrateURL']->ToolTip= _sp('Migrate URLs to SEO structure');
 		}
 
+		$ctPic = _dbx("SELECT count(*) as thecount FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0",'Query');
+		$arrTotal = $ctPic->FetchArray();
+		if($arrTotal['thecount']>0) {
+			$this->arrMPnls['RecalculateAvail'] = new QPanel($this,'RecalculateAvail');
+			$this->arrMPnls['RecalculateAvail']->Visible = false;
+			$this->arrMPnls['RecalculateAvail']->Name = _sp('Recalculate Available Inventory');
+			$this->arrMPnls['RecalculateAvail']->HtmlEntities = false;
+			$this->arrMPnls['RecalculateAvail']->ToolTip= _sp('Recalculate inventory based on pending orders');
+		}
 
 		if (_xls_get_conf('LIGHTSPEED_HOSTING' , '0')=='0') {
-			$ctPic = _dbx("select count(*) as thecount from xlsws_images where left(image_path,8) != 'product/';",'Query');
+			$ctPic = _dbx("select count(*) as thecount from xlsws_images where left(coalesce(image_path,''),8) != 'product/' limit 1;",'Query');
 			$arrTotal = $ctPic->FetchArray();
 			if ($arrTotal['thecount']>0) {
-				$this->arrMPnls['MigratePhotos'] = new QPanel($this);
+				$this->arrMPnls['MigratePhotos'] = new QPanel($this,'MigratePhotos');
 				$this->arrMPnls['MigratePhotos']->Visible = false;
 				$this->arrMPnls['MigratePhotos']->Name = _sp('Migrate Photos to SEO friendly structure');
 				$this->arrMPnls['MigratePhotos']->HtmlEntities = false;
@@ -6577,12 +6587,6 @@ class xlsws_admin_maintenance extends xlsws_admin {
 		$this->arrMPnls['UpgradeWS']->HtmlEntities = false;
 		$this->arrMPnls['UpgradeWS']->ToolTip= _sp('Upgrade webstore with latest patches/bug fixes');
 
-
-		$this->arrMPnls['RecalculateAvail'] = new QPanel($this);
-		$this->arrMPnls['RecalculateAvail']->Visible = false;
-		$this->arrMPnls['RecalculateAvail']->Name = _sp('Recalculate Available Inventory');
-		$this->arrMPnls['RecalculateAvail']->HtmlEntities = false;
-		$this->arrMPnls['RecalculateAvail']->ToolTip= _sp('Recalculate inventory based on pending orders');
 
 
 
@@ -6639,84 +6643,27 @@ class xlsws_admin_maintenance extends xlsws_admin {
 	}
 
 	protected function RecalculateAvail(){
-		if($this->arrMPnls['RecalculateAvail']->Visible){
-			$this->arrMPnls['RecalculateAvail']->Visible = false;
-			return;
-		}
-
-		$objProdCondition = QQ::AndCondition(
-			QQ::Equal(QQN::Product()->Web,1),
-			QQ::OrCondition(
-				QQ::Equal(QQN::Product()->MasterModel, 1),
-				QQ::AndCondition(
-					QQ::Equal(QQN::Product()->MasterModel, 0),
-					QQ::Equal(QQN::Product()->FkProductMasterId, 0)
-				))
-		);
-
-		$arrProducts = Product::QueryArray(QQ::Equal(QQN::Product()->Web,1),
-			QQ::Clause(
-				QQ::OrderBy(QQN::Product()->Rowid)
-			));
-		foreach ($arrProducts as $objProduct) {
-			$objProduct->InventoryReserved=$objProduct->CalculateReservedInventory();
-			//Since $objProduct->Inventory isn't the real inventory column, it's a calculation,
-			//just pass it to the Avail so we have it for queries elsewhere
-			$objProduct->InventoryAvail=$objProduct->Inventory;
-			$objProduct->Save(false,true);
-
-		}
-
-
-		$this->arrMPnls['RecalculateAvail']->Text = _sp("Inventory availability has been recalculated.");
 		$this->arrMPnls['RecalculateAvail']->Visible = true;
 		$this->arrMPnls['RecalculateAvail']->Refresh();
+		QApplication::ExecuteJavaScript("startInventoryCalc('".session_name() . "=" . session_id()."');");
 	}
 
 	protected function MigratePhotos(){
-		set_time_limit(1200);
-		//Include db_maint class to access update functions
-		include_once(XLSWS_INCLUDES . 'db_maintenance.php');
-		$objDbMaint = new xlsws_db_maintenance;
 
-		$intRet = $objDbMaint->MigratePhotos();//Include db_maint class to access update functions
-		if ($intRet>0)
-			$this->arrMPnls['MigratePhotos']->Text =  "<span style='font-size: 13pt'>Not all photos converted (3000 converted). Click Perform again. $intRet remaining.<br>";
-		elseif ($int==-1)
-			$this->arrMPnls['MigratePhotos']->Text = "Can't process photos, run Migrate URLs first";
-
-		else
-			$this->arrMPnls['MigratePhotos']->Text = "Photos have been migrated and renamed to SEO names<br>";
+		_dbx("update xlsws_images set image_path='' where image_path is null;");
 
 		$this->arrMPnls['MigratePhotos']->Visible = true;
 		$this->arrMPnls['MigratePhotos']->Refresh();
+		QApplication::ExecuteJavaScript("startPhotoMigration('".session_name() . "=" . session_id()."');");
+
 	}
 
 	protected function MigrateURL(){
-		set_time_limit(1200);
-
-
-		$strReturn = "Running Convert SEO on Product table<br>";
-		$intRet = Product::ConvertSEO();
-		if ($intRet>0)
-			$strReturn .=  "<span style='font-size: 13pt'>Not all products converted (20000 converted). Click Perform again. $intRet remaining.<br>";
-		else {
-			$strReturn .=  "Running Convert SEO on Category table<br>";
-			Category::ConvertSEO();
-
-			$strReturn .=  "Running Convert SEO on Family table<br>";
-			Family::ConvertSEO();
-
-			$strReturn .=  "Running Convert SEO on CustomPage table<br>";
-			CustomPage::ConvertSEO();
-
-			$strReturn .= "Done!";
-
-		}
-		$this->arrMPnls['MigrateURL']->Text = $strReturn;
 
 		$this->arrMPnls['MigrateURL']->Visible = true;
 		$this->arrMPnls['MigrateURL']->Refresh();
+		QApplication::ExecuteJavaScript("startUrlMigration('".session_name() . "=" . session_id()."');");
+
 	}
 
 	protected function OffLineOnlineStore(){
