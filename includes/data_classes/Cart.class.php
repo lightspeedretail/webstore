@@ -213,10 +213,10 @@ class Cart extends CartGen {
             return $intIdStr;
     }
 
-    public function GetCartNextIdStr() {
+    public function GetCartNextIdStr($blnUseDb = true) {
         $strNextId = _xls_get_conf('NEXT_ORDER_ID', false);
         
-        if ($strNextId) {
+        if ($blnUseDb && $strNextId) {
             $intNextId = preg_replace("/[^0-9]/", "", $strNextId);
             return 'WO-' . $intNextId;
         }

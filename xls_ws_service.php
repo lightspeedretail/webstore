@@ -2765,6 +2765,13 @@ EOS;
                 _xls_log("SOAP ERROR : add_order " . $e);
                 return self::UNKNOWN_ERROR;
             }
+
+
+	        if (substr($strId,0,3)=="WO-")
+		        _xls_set_conf('NEXT_ORDER_ID',$cart->GetCartNextIdStr(false));
+	        
+
+
             return self::OK;
         }
         
