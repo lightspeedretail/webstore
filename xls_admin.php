@@ -2198,7 +2198,7 @@ class xlsws_admin_cpage_panel extends QPanel {
 
 		if(!$this->page->Rowid){
 			$this->page->Save(true);
-			_rd($_SERVER['REQUEST_URI']);
+			_rd(_xls_site_url('xls_admin.php?page=cpage' . admin_sid()));
 		}else
 			$this->page->Save();
 
