@@ -60,7 +60,7 @@ class xlsws_db_maintenance {
 			  `name` varchar(32) NOT NULL,
 			  PRIMARY KEY  (`rowid`),
 			  UNIQUE KEY `name` (`name`)
-			) ENGINE=MyISAM DEFAULT CHARSET=latin1" , '2.0.1');
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8" , '2.0.1');
 
 			$this->insert_row('xlsws_view_log_type' , array('rowid' => 1 , 'name' =>  'index') , '2.0.1');
 			$this->insert_row('xlsws_view_log_type' , array('rowid' => 2 , 'name' =>  'categoryview') , '2.0.1');
@@ -1049,7 +1049,7 @@ class xlsws_db_maintenance {
 								$strNewImageName = substr($strNewImageName,0,-4) . ".jpg";
 							//echo "renaming ".$strExistingPath." to ".$strNewImageName."<br>";
 							$strPath = Images::GetImagePath($strNewImageName);
-							$arrPath = pathinfo($strPath);
+							$arrPath = mb_pathinfo($strPath);
 							$strFolder = $arrPath['dirname'];
 							if (!$objImage->SaveImageFolder($strFolder))
 								return "Halting: error creating folder ".$strFolder;

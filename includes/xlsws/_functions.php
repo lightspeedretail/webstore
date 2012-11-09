@@ -842,16 +842,19 @@ function _xls_seo_url($string) {
 }
 
 //Makes our SEO hyphenated string from passed string
-//Used to build anything that will be in a Name. Allows spaces
+//Used to build anything that will be in a Name.
 function _xls_seo_name($string) {
 	$string = str_replace('\'','',$string);
+	$string = str_replace(',','',$string);
 	$string = str_replace("&","and",$string);
+	$string = str_replace("+","and",$string);
+	$string = str_replace(" ","-",$string);
 	$string = preg_replace("`\[.*\]`U","",$string);
 	$string = preg_replace('`&(amp;)?#?[A-Za-z0-9]+;`i','-',$string);
-	$string = htmlentities($string, ENT_COMPAT, 'utf-8');
+	//$string = htmlentities($string, ENT_COMPAT, 'utf-8');
 	$string = preg_replace("`&([a-z])(acute|uml|circ|grave|ring|cedil|slash|tilde|caron|lig|quot|rsquo);`i","\\1", $string);
 	$string = str_replace('-amp-','-and-',$string);
-	$string = preg_replace( array("`[^a-z0-9]`i","`[-]+`") , "-", $string);
+	$string = preg_replace( array("`[^a-z0-9{Cyrillic}{Greek}]/u`i","`[-]+`") , "-", $string);
 	return trim($string, '- ');
 }
 
@@ -1688,6 +1691,21 @@ function _xls_show_captcha($strPage = "checkout") {
 	else return false;
 	
 }
+
+
+function mb_pathinfo($filepath,$portion = null) {
+	preg_match('%^(.*?)[\\\\/]*(([^/\\\\]*?)(\.([^\.\\\\/]+?)|))[\\\\/\.]*$%im',$filepath,$m);
+	if($m[1]) $ret['dirname']=$m[1];
+	if($m[2]) $ret['basename']=$m[2];
+	if($m[5]) $ret['extension']=$m[5];
+	if($m[3]) $ret['filename']=$m[3];
+	if ($portion==PATHINFO_DIRNAME) return $ret['dirname'];
+	if ($portion==PATHINFO_BASENAME) return $ret['basename'];
+	if ($portion==PATHINFO_EXTENSION) return $ret['extension'];
+	if ($portion==PATHINFO_FILENAME) return $ret['filename'];
+	return $ret;
+}
+
 
 /**
  * Function for displaying what called function, useful for debugging

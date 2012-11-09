@@ -388,9 +388,9 @@
             if (!$objImage->Created)
                 $objImage->Created = new QDateTime(QDateTime::Now);
 
-	        $strImageName = Images::GetImageName(substr($objProduct->RequestUrl,0,60));
+	        $strImageName = Images::GetImageName(mb_substr($objProduct->RequestUrl,0,60));
 	        if (Images::ExistsForOtherProduct($strImageName,$objProduct->ImageId))
-	            $strImageName = Images::GetImageName(substr($objProduct->RequestUrl,0,60)."[".$objProduct->Rowid."]");
+	            $strImageName = Images::GetImageName(mb_substr($objProduct->RequestUrl,0,60)."[".$objProduct->Rowid."]");
 
             $objImage->SaveImageData(
                 $strImageName, $blbImage
@@ -593,6 +593,9 @@ EOS;
                 $product = new Product();
                 $product->Rowid = $intRowid;
             }
+
+	        $strName = trim($strName);
+	        $strCode = trim($strCode);
 
             $product->Code = $strCode;
             $product->Name = $strName;
