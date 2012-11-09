@@ -598,7 +598,7 @@ EOS;
 	        $strCode = trim($strCode);
 			$strCode = str_replace('"','',$strCode);
 			$strCode = str_replace("'",'',$strCode);
-
+			if (is_null($strDescription)) $strDescription='';
             $product->Code = $strCode;
             $product->Name = $strName;
             $product->ClassName = $strClassName;

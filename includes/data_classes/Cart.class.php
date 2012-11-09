@@ -724,7 +724,7 @@ class Cart extends CartGen {
 
 		if ($objProduct->Rowid)
 			$objItem->ProductId = $objProduct->Rowid;
-
+		if (is_null($strDescription)) $strDescription="";
 		$objItem->CartType = $mixCartType;
 		$objItem->Description = $strDescription;
 		$objItem->GiftRegistryItem = $intGiftItemId;
