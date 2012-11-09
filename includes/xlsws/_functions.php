@@ -845,6 +845,7 @@ function _xls_seo_url($string) {
 //Used to build anything that will be in a Name.
 function _xls_seo_name($string) {
 	$string = str_replace('\'','',$string);
+	$string = str_replace('"','',$string);
 	$string = str_replace(',','',$string);
 	$string = str_replace("&","and",$string);
 	$string = str_replace("+","and",$string);
