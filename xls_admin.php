@@ -382,6 +382,8 @@ class xlsws_config_types extends QBaseClass {
 	const EmailOptions = 24;
 	const ShippingRestrictions = 25;
 
+	const Facebook = 26;
+
 }
 
 
@@ -3428,6 +3430,12 @@ class xlsws_admin_seo_modules extends xlsws_admin {
 		$this->configPnls['google']->Name = _sp('Google Integration');
 		$this->configPnls['google']->Info = _sp('Google account information and settings');
 		$this->configPnls['google']->ConfigurationGuide = "<span style='font-size: 10pt'>If you are using Google Shopping (Google Merchant Center), your store data feed URL is: "._xls_site_url('/googlemerchant.xml'."</span>");
+
+
+		$this->configPnls['facebook'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Facebook , "configDone");
+		$this->configPnls['facebook']->Name = _sp('Facebook Integration');
+		$this->configPnls['facebook']->Info = _sp('Facebook information and settings');
+		$this->configPnls['facebook']->ConfigurationGuide = "<span style='font-size: 10pt'>To properly set up Facebook functionality, you need to register your site as an \"app\" at https://developers.facebook.com/apps/?action=create and get an ID. Please consult our documentation for specifics.</span>";
 	}
 
 

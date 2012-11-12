@@ -769,6 +769,21 @@ class xlsws_db_maintenance {
 		}
 
 
+		if ($intCurrentSchema==251)
+		{
+
+			$this->add_config_key('FACEBOOK_APPID' ,
+				"INSERT INTO `xlsws_configuration` (`title`, `key`, `value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`)
+			VALUES
+				('Facebook App ID', 'FACEBOOK_APPID', '', 'Create Facebook AppID', 26, 1, NOW(), NOW(), NULL, 0);
+			");
+			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
+			$config->Value="252";
+			$intCurrentSchema=252;
+			$config->Save();
+		}
+
+
 		$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
 		$strUpgradeText .= "<br/>Database schema version ".$config->Value."<br>";
 
