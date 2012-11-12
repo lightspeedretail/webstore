@@ -74,8 +74,7 @@ if(!isset($_SESSION['admin_auth'])
 	$password = md5(gmdate('d') .  $conf->Value);
 	$password2 = md5(date('d') .  $conf->Value);
 
-	if(isset($_POST['user']) && isset($_POST['password']) &&
-		($_POST['password'] == $password || $_POST['password'] == $password2))
+	if(isset($_POST['user']) && isset($_POST['password']) && ($_POST['password'] == $password || $_POST['password'] == $password2))
 	{
 		$_SESSION['admin_auth'] =  true;
 		session_commit();
@@ -83,10 +82,17 @@ if(!isset($_SESSION['admin_auth'])
 		// if session id is not set and add it in request uri
 		$strUrl = _xls_site_url('xls_admin.php?' . admin_sid());
 		$strUrl = str_replace("/index.php","",$strUrl); //We're not passing through our regular controller
+
 	}else{
-		$msg = "<h1>Cannot Connect</h1>Unauthorized admin access or session timed out from " . _xls_get_ip() . " at " . gmdate("Y-m-d H:i:s") . " GMT.<br>Please re-open the Admin Panel\n\n " ; //
-		_xls_log($msg . "Session vars: " . print_r($_SESSION , true) . "  \n\nServer vars: " .  print_r($_SERVER , true) . " . \n\n Post Vars: " . print_r($_POST , true));
-		die("<pre>$msg</pre>");
+		if (ini_get('session.use_only_cookies'))
+			$msg = "<h1>ERROR:</h1> <span style='font-family: arial; font-size: 15px;'>Your php.ini file has the setting <b>session.use_only_cookies</b> turned Off (or 0) and it needs to be On (or 1) to allow Admin Panel to log in.<P>Consult your ISP hosting provider or Web Administrator on how to change this setting. Some hosting providers may have a web interface such as cPanel to edit php.ini settings, other providers may require editing php.ini directly and restarting Apache.</span></P>";
+		elseif(isset($_POST['user']) && isset($_POST['password']) && $_POST['password'] != $password && $_POST['password'] != $password2)
+			$msg = "<h1>Invalid Password</h1><span style='font-family: arial; font-size: 15px;'>The store password entered into Tools->eCommerce->Setup is not correct. Please close Admin Panel and enter your correct store password, then click Save. The version number should appear in the lower left corner if the password is correct.</span>";
+
+		else
+		$msg = "<h1>Session Timed Out</h1><span style='font-family: arial; font-size: 15px;'>Your session has timed out. This can happen if you left Admin Panel open for a long period of time with no activity. Simply close this window and click on the Admin Panel button again to reopen.</span>" ;
+			_xls_log($msg . "Session vars: " . print_r($_SESSION , true) . "  \n\nServer vars: " .  print_r($_SERVER , true) . " . \n\n Post Vars: " . print_r($_POST , true));
+		die("$msg");
 	}
 }
 
