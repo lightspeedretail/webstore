@@ -866,6 +866,11 @@ function _xls_jssafe_name($string) {
 	return trim($string);
 }
 
+function _xls_meta_safe($string) {
+	$string = str_replace('"','\'',$string);
+	//$string = str_replace("&","and",$string);
+	return trim($string);
+}
 
 /**
  * Get the ID of the current customer object
@@ -1080,7 +1085,7 @@ function _xls_add_meta_redirect($url , $delay = 60) {
 function _xls_add_page_title($title) {
 	global $strPageTitle;
 	$strPageTitle = $title;
-	_xls_stack_put('xls_page_title',$title);
+	_xls_stack_put('xls_page_title',_xls_meta_safe($title));
 }
 
 /**
@@ -1114,7 +1119,7 @@ function _xls_format_email_subject($key='EMAIL_SUBJECT_CUSTOMER',$customer="", $
  * @param string $desc
  */
 function _xls_add_meta_desc($desc) {
-	_xls_stack_put('xls_meta_desc', strip_tags($desc));
+	_xls_stack_put('xls_meta_desc', strip_tags(_xls_meta_safe($desc)));
 }
 
 /**
