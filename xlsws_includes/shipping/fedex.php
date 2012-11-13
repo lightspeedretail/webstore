@@ -499,7 +499,7 @@ class fedex extends xlsws_class_shipping {
 	
 				if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
 					_xls_log(get_class($this) . " sending ".print_r($request,true),true);
-					_xls_log(get_class($this) . " receiving ".$response,true);
+					_xls_log(get_class($this) . " receiving ".print_r($response,true),true);
 				}
 	
 				if ($response->HighestSeverity != 'FAILURE' && $response -> HighestSeverity != 'ERROR') {
