@@ -649,12 +649,21 @@ font-size: 8px;
 -webkit-border-bottom-left-radius: 5px;
 }
 
+
 .SmallMenu {
-height: 150px;
-width: auto;
-max-width: 190px;
-font-size: 11px;
+    height: 150px;
+    width: auto;
+    max-width: 148px;
+    min-width: 146px;
+    font-size: 11px;
 }
+
+#ctlCategories { min-width: 10px; max-width: 170px; }
+#ctlFamilies { min-width: 10px; max-width: 128px; }
+#ctlClasses{ min-width: 10px; max-width: 127px; }
+#ctlKeywords { min-width: 10px; max-width: 129px; }
+#ctlProducts { min-width: 10px; max-width: 148px; }
+
 
 .tip {
 margin-top: 184px;
