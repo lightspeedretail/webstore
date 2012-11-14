@@ -390,7 +390,7 @@
 
 	        $strImageName = Images::GetImageName(mb_substr($objProduct->RequestUrl,0,60));
 	        if (Images::ExistsForOtherProduct($strImageName,$objProduct->ImageId))
-	            $strImageName = Images::GetImageName(mb_substr($objProduct->RequestUrl,0,60)."[".$objProduct->Rowid."]");
+	            $strImageName = Images::GetImageName(mb_substr($objProduct->RequestUrl,0,60)."-r".$objProduct->Rowid);
 
             $objImage->SaveImageData(
                 $strImageName, $blbImage
