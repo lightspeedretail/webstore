@@ -846,10 +846,10 @@ function _xls_seo_url($string) {
 function _xls_seo_name($string) {
 	$string = str_replace('\'','',$string);
 	$string = str_replace('"','',$string);
-	$string = str_replace(',','',$string);
+	$string = str_replace(array(',','?','!','.'),'',$string);
 	$string = str_replace("&","and",$string);
 	$string = str_replace("+","and",$string);
-	$string = str_replace(" ","-",$string);
+	$string = str_replace(array(" ",'/'),"-",$string);
 	$string = preg_replace("`\[.*\]`U","",$string);
 	$string = preg_replace('`&(amp;)?#?[A-Za-z0-9]+;`i','-',$string);
 	//$string = htmlentities($string, ENT_COMPAT, 'utf-8');
