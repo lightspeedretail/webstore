@@ -1701,10 +1701,10 @@ function _xls_show_captcha($strPage = "checkout") {
 
 function mb_pathinfo($filepath,$portion = null) {
 	preg_match('%^(.*?)[\\\\/]*(([^/\\\\]*?)(\.([^\.\\\\/]+?)|))[\\\\/\.]*$%im',$filepath,$m);
-	if($m[1]) $ret['dirname']=$m[1];
-	if($m[2]) $ret['basename']=$m[2];
-	if($m[5]) $ret['extension']=$m[5];
-	if($m[3]) $ret['filename']=$m[3];
+	if(isset($m[1])) $ret['dirname']=$m[1];
+	if(isset($m[2])) $ret['basename']=$m[2];
+	if(isset($m[5])) $ret['extension']=$m[5];
+	if(isset($m[3])) $ret['filename']=$m[3];
 	if ($portion==PATHINFO_DIRNAME) return $ret['dirname'];
 	if ($portion==PATHINFO_BASENAME) return $ret['basename'];
 	if ($portion==PATHINFO_EXTENSION) return $ret['extension'];
