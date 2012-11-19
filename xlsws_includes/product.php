@@ -166,18 +166,19 @@ class xlsws_product extends xlsws_index {
 
 		//price
 		$this->lblPrice = new QLabel($this->mainPnl,'lblPrice');
-		if ($this->prod->MasterModel && _xls_get_conf('MATRIX_PRICE') == 1)
+		if ($this->prod->MasterModel && $this->prod->HasPriceRange)
 			$this->lblPrice->Text = _sp("choose options for pricing");
 		else
-			$this->lblPrice->Text = _xls_currency($this->prod->Price);
+			$this->lblPrice->Text = _xls_currency($this->prod->GetPriceDisplay());
 
 		//price
 		$this->lblOriginalPrice = new QLabel($this->mainPnl,'lblOriginalPrice');
 		if(_xls_get_conf('ENABLE_SLASHED_PRICES' , 0)>0 ) {
-			if ($this->prod->MasterModel && _xls_get_conf('MATRIX_PRICE') == 1)
-				$this->lblOriginalPrice->Text = '';
-			elseif ($this->prod->SellWeb != 0 && $this->prod->SellWeb < $this->prod->Sell)
-				$this->lblOriginalPrice->Text = _sp("Regular Price").": <span class='price_slash'>"._xls_currency($this->prod->Sell)."</span>";
+
+			$strPrice = $this->prod->GetSlashedPrice();
+			if (strlen($strPrice)>0)
+				$this->lblOriginalPrice->Text = _sp("Regular Price").": <span class='price_slash'>"._xls_currency($strPrice)."</span>";
+
 		}
 		$this->lblOriginalPrice->HtmlEntities = false;	
 

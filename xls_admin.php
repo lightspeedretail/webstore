@@ -728,8 +728,8 @@ class xlsws_admin_config_panel extends QPanel{
 		case 'INVENTORY_OUT_ALLOW_ADD':
 			return array(2 => _sp("Display and Allow backorders"),1 => _sp("Display but Do Not Allow ordering") ,0 => _sp("Make product disappear") );
 		case 'MATRIX_PRICE':
-			return array(4 => _sp("Show Highest Price"),3 => _sp("Show Price Range"),
-				2 => _sp("Show \"Click for Pricing\"") ,1 => _sp("Show Lowest Price"),0 => _sp("Show Master Item Price") );
+			return array(Product::HIGHEST_PRICE => _sp("Show Highest Price"),Product::PRICE_RANGE => _sp("Show Price Range"),
+				Product::CLICK_FOR_PRICING => _sp("Show \"Click for Pricing\"") ,Product::LOWEST_PRICE => _sp("Show Lowest Price"),Product::MASTER_PRICE => _sp("Show Master Item Price") );
 
 
 		case 'SSL_NO_NEED_FORWARD':
