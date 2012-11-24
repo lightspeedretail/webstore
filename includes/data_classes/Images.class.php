@@ -455,7 +455,8 @@ class Images extends ImagesGen {
 		return Images::QuerySingle(
 			QQ::AndCondition(
 				QQ::Equal(QQN::Images()->Width, $intWidth),
-				QQ::Equal(QQN::Images()->Parent, $intRowid)
+				QQ::Equal(QQN::Images()->Parent, $intRowid),
+				QQ::NotEqual(QQN::Images()->Parent, QQN::Images()->Rowid)
 			)
 		);
 	}

@@ -85,7 +85,7 @@ if(!isset($_SESSION['admin_auth'])
 
 	}else{
 		if (ini_get('session.use_only_cookies'))
-			$msg = "<h1>ERROR:</h1> <span style='font-family: arial; font-size: 15px;'>Your php.ini file has the setting <b>session.use_only_cookies</b> turned Off (or 0) and it needs to be On (or 1) to allow Admin Panel to log in.<P>Consult your ISP hosting provider or Web Administrator on how to change this setting. Some hosting providers may have a web interface such as cPanel to edit php.ini settings, other providers may require editing php.ini directly and restarting Apache.</span></P>";
+			$msg = "<h1>ERROR:</h1> <span style='font-family: arial; font-size: 15px;'>Your php.ini file has the setting <b>session.use_only_cookies</b> turned On it needs to be Off to allow Admin Panel to log in.<P>Consult your ISP hosting provider or Web Administrator on how to change this setting. Some hosting providers may have a web interface such as cPanel to edit php.ini settings, other providers may require editing php.ini directly and restarting Apache.<br>&nbsp;<br><i>Note you may find both session.use_cookies and session.use_only_cookies -- verify you are changing the correct one.</i></span></P>";
 		elseif(isset($_POST['user']) && isset($_POST['password']) && $_POST['password'] != $password && $_POST['password'] != $password2)
 			$msg = "<h1>Invalid Password</h1><span style='font-family: arial; font-size: 15px;'>The store password entered into Tools->eCommerce->Setup is not correct. Please close Admin Panel and enter your correct store password, then click Save. The version number should appear in the lower left corner if the password is correct.</span>";
 
@@ -728,8 +728,8 @@ class xlsws_admin_config_panel extends QPanel{
 		case 'INVENTORY_OUT_ALLOW_ADD':
 			return array(2 => _sp("Display and Allow backorders"),1 => _sp("Display but Do Not Allow ordering") ,0 => _sp("Make product disappear") );
 		case 'MATRIX_PRICE':
-			return array(4 => _sp("Show Highest Price"),3 => _sp("Show Price Range"),
-				2 => _sp("Show \"Click for Pricing\"") ,1 => _sp("Show Lowest Price"),0 => _sp("Show Master Item Price") );
+			return array(Product::HIGHEST_PRICE => _sp("Show Highest Price"),Product::PRICE_RANGE => _sp("Show Price Range"),
+				Product::CLICK_FOR_PRICING => _sp("Show \"Click for Pricing\"") ,Product::LOWEST_PRICE => _sp("Show Lowest Price"),Product::MASTER_PRICE => _sp("Show Master Item Price") );
 
 
 		case 'SSL_NO_NEED_FORWARD':
@@ -2877,6 +2877,14 @@ class xlsws_admin_task_promorestrict_panel extends QPanel {
 	public $ctlClasses;
 	public $ctlKeywords;
 
+	public $lblPromoCode;
+	public $lblExcept;
+	public $lblCategories;
+	public $lblFamilies;
+	public $lblProducts;
+	public $lblClasses;
+	public $lblKeywords;
+
 	public $pxyAddNewPage;
 
 
@@ -3074,7 +3082,20 @@ class xlsws_admin_task_promorestrict_panel extends QPanel {
 		$this->pxyAddNewPage->AddAction( new QClickEvent() , new QAjaxControlAction($this , 'btnEdit_click'));
 		$this->pxyAddNewPage->AddAction( new QClickEvent() , new QTerminateAction());
 
+		$this->lblCategories = new QLabel($this);
+		$this->lblCategories->HtmlEntities = false;
 
+		$this->lblFamilies = new QLabel($this);
+		$this->lblFamilies->HtmlEntities = false;
+
+		$this->lblClasses = new QLabel($this);
+		$this->lblClasses->HtmlEntities = false;
+
+		$this->lblKeywords = new QLabel($this);
+		$this->lblKeywords->HtmlEntities = false;
+
+		$this->lblProducts = new QLabel($this);
+		$this->lblProducts->HtmlEntities = false;
 
 		$this->strTemplate = adminTemplate($page->Key.'.tpl.php');
 
@@ -3146,6 +3167,13 @@ class xlsws_admin_task_promorestrict_panel extends QPanel {
 		$this->ctlProductCodes->SelectedValues=$arrProducts;
 
 		$this->ctlExcept->SelectedValue=$objPromoCode->Except;
+
+		$this->lblCategories->strText = 'Categories <span id="ctlCa">('.count($arrCategories).')</span>';
+		$this->lblFamilies->strText = 'Families <span id="ctlFa"> ('.count($arrFamilies).')</span>';
+		$this->lblClasses->strText = 'Classes <span id="ctlCl"> ('.count($arrClasses).')</span>';
+		$this->lblKeywords->strText = 'Keywords <span id="ctlKe"> ('.count($arrKeywords).')</span>';
+		$this->lblProducts->strText = 'Products <span id="ctlPr"> ('.count($arrProducts).')</span>';
+
 
 	}
 

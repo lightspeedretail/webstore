@@ -46,13 +46,16 @@
         var intNewPos = -1;
         var strTemp = GetSelectValues(CONTROL);
         arrNewValues = strTemp.split(",");
+
+	    var x=0;
         for (var i = 0; i < arrNewValues.length - 1; i++) {
             if (arrNewValues[i] == 1) {
                 intNewPos = i;
+
             }
         }
 
-        if (intNewPos > 0)
+        if (intNewPos > -1)
          for (var i = 0; i < arrOldValues.length - 1; i++) {
             if (arrOldValues[i] == 1 && i != intNewPos) {
                 CONTROL.options[i].selected = true;
@@ -63,9 +66,12 @@
             if (arrOldValues[intNewPos] == 1) {
                 CONTROL.options[intNewPos].selected = false;
             } else {
-                CONTROL.options[intNewPos].selected = true;
+               CONTROL.options[intNewPos].selected = true;
             }
         }
+        for (var i = 0; i < arrOldValues.length - 1; i++)
+            if(CONTROL.options[i].selected == true) x=x+1;
+                document.getElementById(CONTROL.name.substr(0,5)).innerHTML = "(" + x + ")";
     }
 
 
@@ -78,13 +84,16 @@
                 strTemp += "0,";
             }
         }
+
         return strTemp;
     }
 
     function GetCurrentListValues(CONTROL) {
         var strValues = "";
         strValues = GetSelectValues(CONTROL);
-        arrOldValues = strValues.split(",")
+        arrOldValues = strValues.split(",");
+
+
     }
 </script>
 <li class="rounded" <?php if($_CONTROL->EditMode): ?>style="height:350px;"<?php endif; ?>>
@@ -101,20 +110,20 @@
 						<?php if($_CONTROL->EditMode): ?>
 <div class="module_task">
 <table>
-<td class="label">Set restrictions for</td>
+<td class="label">Make option</td>
 	<td><?php $_CONTROL->ctlPromoCode->RenderWithError(); ?></td>
-	<td class="label">to apply when</td>
+	<td class="label">available to customer when</td>
 	<td><?php $_CONTROL->ctlExcept->RenderWithError(); ?></td>
 </table>
 <P>
 	
 
 <table>
-	<td class="label left">Categories:<br><?php $_CONTROL->ctlCategories->RenderWithError(); ?></td>
-	<td class="label left">Families:<br><?php $_CONTROL->ctlFamilies->RenderWithError(); ?></td>
-	<td class="label left">Classes:<br><?php $_CONTROL->ctlClasses->RenderWithError(); ?></td>
-	<td class="label left">Keywords:<br><?php $_CONTROL->ctlKeywords->RenderWithError(); ?></td>
-	<td class="label left">Product Codes:<br><?php $_CONTROL->ctlProductCodes->RenderWithError(); ?></td>
+	<td class="label left"><?php $_CONTROL->lblCategories->Render(); ?>:<br><?php $_CONTROL->ctlCategories->RenderWithError(); ?></td>
+	<td class="label left"><?php $_CONTROL->lblFamilies->Render(); ?>:<br><?php $_CONTROL->ctlFamilies->RenderWithError(); ?></td>
+	<td class="label left"><?php $_CONTROL->lblClasses->Render(); ?>:<br><?php $_CONTROL->ctlClasses->RenderWithError(); ?></td>
+	<td class="label left"><?php $_CONTROL->lblKeywords->Render(); ?>:<br><?php $_CONTROL->ctlKeywords->RenderWithError(); ?></td>
+	<td class="label left"><?php $_CONTROL->lblProducts->Render(); ?>:<br><?php $_CONTROL->ctlProductCodes->RenderWithError(); ?></td>
 </table>
 
 	<div class="tip">Tip: Click in the scrollbar area to avoid accidentally clicking items.</div>
@@ -122,3 +131,6 @@
 </div>
 <?php endif; ?>
 </li>
+<script language="javascript">
+
+</script>
