@@ -197,6 +197,8 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
 #prodImageHolder {  background-color: white; margin:auto; padding: 9px; }
 #prodImageHolder img {max-width: 100%; display: block; margin-left: auto; margin-right: auto; overflow: hidden; }
 
+#pinterest { display: inline-block; display: -moz-box; vertical-align: top; }
+
 /***** Checkout page and Registration Page *****/
 #checkout legend { margin-bottom: 4px; text-transform: uppercase;  }
 #checkout .label { text-transform: uppercase; font-size: 0.9em;  }

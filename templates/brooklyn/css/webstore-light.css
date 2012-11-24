@@ -195,6 +195,8 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
 #product_details #SelectSize, #SelectColor { max-width: 188px; }
 #product_details #SelectSize { float: left; margin-right: 10px;}
 
+#pinterest { display: inline-block; display: -moz-box; vertical-align: top; }
+
 /***** Checkout page and Registration Page *****/
 #checkout legend { margin-bottom: 4px; text-transform: uppercase; color: #a1a1a1; }
 #checkout .label { text-transform: uppercase; font-size: 0.9em; }

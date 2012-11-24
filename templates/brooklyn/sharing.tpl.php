@@ -26,10 +26,11 @@
  */
 ?>
 <div id="sharingtools">
+	<div id="pinterest">
 	<a href="http://pinterest.com/pin/create/button/?url=<? echo $this->prod->CanonicalUrl; ?>&media=<? echo
 		_xls_site_url($this->prod->SmallImage,true); ?>&description=<? echo urlencode($this->prod->Name); ?>"
 	   class="pin-it-button" count-layout="none"><img border="0" src="//assets.pinterest.com/images/PinExt.png"
-	                                                  title="Pin It"/></a>
+	   title="Pin It"/></a></div>
     <div class="g-plusone" data-size="medium" data-annotation="none" data-width="50"></div>
 
 	<script>(function (d) {
