@@ -255,9 +255,9 @@ display:block;
 float:right;
 font-size:14px;
 font-weight:700;
-height:22px;
+/*height:29px;*/
 margin:1px 15px 0 0;
-height: 17px;
+height: 29px;
 padding:5px 15px;
 text-shadow:#000 1px 1px 1px;
 }
