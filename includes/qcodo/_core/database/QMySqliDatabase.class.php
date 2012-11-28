@@ -69,7 +69,7 @@
 
 			// Set NAMES (if applicable)
 			if (array_key_exists('encoding', $this->objConfigArray))
-				$this->NonQuery('SET NAMES ' . $this->objConfigArray['encoding'] . ';');
+				$this->NonQuery('SET NAMES \'' . $this->objConfigArray['encoding'] . '\';');
 		}
 
 		public function __get($strName) {

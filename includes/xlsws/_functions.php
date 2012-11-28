@@ -855,7 +855,7 @@ function _xls_seo_name($string) {
 	//$string = htmlentities($string, ENT_COMPAT, 'utf-8');
 	$string = preg_replace("`&([a-z])(acute|uml|circ|grave|ring|cedil|slash|tilde|caron|lig|quot|rsquo);`i","\\1", $string);
 	$string = str_replace('-amp-','-and-',$string);
-	$string = preg_replace( array("`[^a-z0-9{Cyrillic}{Greek}]/u`i","`[-]+`") , "-", $string);
+	$string = preg_replace( array("`[^a-z0-9{Cyrillic}{Greek}{Japanese}{Chinese}{Korean}{Hebrew}{Arabic}]/u`i","`[-]+`") , "-", $string);
 	return trim($string, '- ');
 }
 
