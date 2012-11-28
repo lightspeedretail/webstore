@@ -439,6 +439,7 @@ class xlsws_checkout extends xlsws_index {
         $this->order_display($objCart, $objControl);
         $this->update_order_display($objCart);
 
+	    $this->PaymentControl->Update();
         return $this->CartControl;
     }
 
