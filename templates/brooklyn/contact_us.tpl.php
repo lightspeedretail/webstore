@@ -33,6 +33,10 @@
 
 	<?php $this->lblError->Render(); ?>
 
+    <div class="row">
+		<?php $this->txtCustomPage->Render(); ?>
+	</div>
+
 	<div class="row">
 		<div class="five columns alpha >
 			<span class="label"><?php echo _sp("Name"); ?></span>
