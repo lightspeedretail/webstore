@@ -154,7 +154,7 @@ a:hover {  }
 #sidebar { display: block; float: left; height: auto; margin: 60px 0 0px 0; overflow: hidden; }
 #sidebar .clickbar {   margin: 5px 0px 0px 0px; padding-top: 11px; padding-bottom: 11px; color: #555555; border: 1px dotted #999999; font-weight: 700; text-transform: uppercase; text-align: center; cursor: pointer;}
 #sidebar .containers { border-top: none; font-size: 12px; height: auto; left: -5px; margin: -3px 0 5px; padding: 14px; width: 204px; display: none;}
-
+#sidebar #OrderLookup { clear: left; padding-top: 15px;}
 
 /***************** Slider ***********************/
 .products_slider { overflow: hidden; position: relative; border: 1px dotted #262626; margin-top: 30px;}
