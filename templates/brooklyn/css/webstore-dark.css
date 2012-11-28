@@ -262,6 +262,10 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
 #footer .bottomtabs a { color: #d0d0c7; font-size: 1.1em; font-weight: 400; }
 #footer .copyright { text-align: center; text-transform: uppercase; color: #83837d; font-size: 0.8em;  }
 
+/***** Email Cart *****/
+#emailcart { background-color: #151514; background: url("images/darkbg.gif"); width: 600px; height: 400px; padding: 20px; border: 1px solid black; -moz-box-shadow: 1px 1px 5px 6px #ccc; -webkit-box-shadow: 1px 1px 5px 6px #ccc;}
+#emailcart textarea { width: 520px; height: 50px;}
+
 /***** Global adjustments as we resize down ******/
 @media only screen and (max-width: 960px) { /*iPad and below */
     body { font-size: 12px; }
