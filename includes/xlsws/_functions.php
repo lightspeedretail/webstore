@@ -844,6 +844,7 @@ function _xls_seo_url($string) {
 //Makes our SEO hyphenated string from passed string
 //Used to build anything that will be in a Name.
 function _xls_seo_name($string) {
+	$string = str_replace(array('\n','\r',chr(13)),'',$string);
 	$string = str_replace('\'','',$string);
 	$string = str_replace('"','',$string);
 	$string = str_replace(array(',','?','!','.'),'',$string);
