@@ -104,8 +104,8 @@ class xlsws_product extends xlsws_index {
 
 
 		} else {
-			_xls_log("Product not found in product.php -> $XLSWS_VARS[product]");
-			_xls_display_msg("Sorry! Product not found.");
+			_xls_log("Attempting to access product where Sell on Web is turned off -> ".$this->prod->Code);
+			_xls_404();
 		}
 
 		$this->masterProductId = $this->prod->Rowid;
