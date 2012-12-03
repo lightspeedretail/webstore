@@ -247,12 +247,13 @@ class canadapost extends xlsws_class_shipping {
 		}
 
 		$selected = $fields['service']->SelectedValue;
-	
-		$strShipData=serialize(array(__class__,$weight,$address1,$zipcode));	
+		$config = $this->getConfigValues(get_class($this));
+
+		$strShipData=serialize(array(__class__,$weight,$address1,$zipcode));
 		if (_xls_stack_get('ShipBasedOn') != $strShipData) {
 			_xls_stack_put('ShipBasedOn',$strShipData);
 	
-			$config = $this->getConfigValues(get_class($this));
+
 			$this->make_CanadaPost_services($fields['service']);
 	
 			$fields['service']->RemoveAllItems();
@@ -311,22 +312,21 @@ class canadapost extends xlsws_class_shipping {
 				$fields['service']->Visible = false;				
 				return false;
 			}
-	
+
 	
 			foreach($oXML->ratesAndServicesResponse->product as $key=>$val) {
-	              $strKey = $val->name;
-	              $strRate = $val->rate;
-	              $strKey = $this->cleanMethodName($strKey);
-				  $ret[$strKey] = floatval($strRate) + floatval($config['markup']);
-				  
-				  $found++;
+				$strKey = $val->name;
+				$strRate = $val->rate;
+				$strKey = $this->cleanMethodName($strKey);
+				$ret[$strKey] = floatval($config['markup']) + floatval($this->cleanPrice($strRate));
+				$found++;
 				}
-				
+
 			asort($ret,SORT_NUMERIC);
 	
 			foreach ($ret as $key=>$val)
-				$fields['service']->AddItem("$key (" . _xls_currency(floatval($val) + floatval($config['markup'])) . ")" , $key);
-	
+				$fields['service']->AddItem("$key (" . _xls_currency(floatval($val)) . ")" , $key);
+
 			
 			if($found <=0) {
 				_xls_log("Canada Post: Could not get rates $country  , $zipcode .");
@@ -360,6 +360,7 @@ class canadapost extends xlsws_class_shipping {
 			$arr['msg'] = key($ret);
 		}
 
+
 		return $arr;
 	}
 	
@@ -371,5 +372,14 @@ class canadapost extends xlsws_class_shipping {
         $strName = trim($strName);
         return $strName;
     }
-    
+
+	public function cleanPrice($strName) {
+        $strName = html_entity_decode($strName);
+        $strName = strip_tags($strName);
+        $strName = str_replace('reg', '', $strName);
+        $strName = preg_replace("/[^A-Za-z0-9\.\-\ ]/", '', $strName);
+        $strName = trim($strName);
+        return $strName;
+    }
+
 }
