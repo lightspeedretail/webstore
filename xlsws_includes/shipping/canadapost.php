@@ -353,9 +353,11 @@ class canadapost extends xlsws_class_shipping {
 		if(isset($ret[$selected])) {
 			$fields['service']->SelectedValue = $selected;
 			$arr['price'] = $ret[$selected];
+			$arr['msg'] = $selected;
 		} else {
 			reset($ret);
 			$arr['price'] = current($ret);
+			$arr['msg'] = key($ret);
 		}
 
 		return $arr;
