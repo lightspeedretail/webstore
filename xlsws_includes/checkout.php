@@ -1042,12 +1042,14 @@ class xlsws_checkout extends xlsws_index {
             return false;
 
 		if (!$objCart->PaymentModule) {
-			$this->errSpan->Text = _sp("Shipping error. Please choose a valid payment method.");
+			$this->errSpan->Text = _sp("Payment error. Please choose a valid payment method.");
+			QApplication::Log(E_ERROR, 'Payment error', 'Please choose a valid payment method');
 			return false;
 		}
 		
 		if (!$objCart->ShippingModule) {
 			$this->errSpan->Text = _sp("Shipping error. Please choose a valid shipping method.");
+			QApplication::Log(E_ERROR, 'Shipping error', 'Please choose a valid shipping method');
 			return false;
 		}
 
@@ -1071,6 +1073,7 @@ class xlsws_checkout extends xlsws_index {
 				$this->errSpan->Text = ($mixResponse[1] != '' ? $mixResponse[1] : _sp('Error in processing payment'));
 			 	$this->ToggleCheckoutControls(true);
 			 	$objCart->PaymentData = $this->errSpan->Text; //Save error as part of cart in case of abandon
+				QApplication::Log(E_ERROR, 'Payment Decline', $objCart->PaymentModule." module returned ".$this->errSpan->Text);
 			 	//ToDo: verify this isn't an overwrite as a result of a duplicate
 			 	$objCart->Save();
             	return false;
