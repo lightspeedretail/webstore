@@ -65,7 +65,11 @@ class xlsws_sitemap extends xlsws_index {
 		}
 
 		$this->sitemap_pages = array();
-		$pages = CustomPage::LoadAll(QQ::Clause(QQ::OrderBy(QQN::CustomPage()->Title)));
+		$pages = CustomPage::QueryArray(
+			QQ::GreaterThan(QQN::CustomPage()->TabPosition,0),
+
+			QQ::Clause(QQ::OrderBy(QQN::CustomPage()->Title))
+		);
 
 		foreach($pages as $p)
 			$this->sitemap_pages[] = array('name' => $p->Title, 'link' => $p->Link, 'children' => array());
