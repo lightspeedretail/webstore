@@ -130,7 +130,7 @@ class destination_table extends xlsws_class_shipping {
             $unit = 0;
 
         // If the Base Charge is unset or lesser than 0, don't apply this module
-        if ($dest-BaseCharge == '' or $dest->BaseCharge < 0)
+        if ($dest->BaseCharge == '' or $dest->BaseCharge < 0)
             return false;
 
 		return array('price' => $dest->BaseCharge + ($unit*$dest->ShipRate)  ,  'product' =>  $config['product']);
