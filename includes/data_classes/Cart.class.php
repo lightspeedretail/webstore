@@ -323,6 +323,7 @@ class Cart extends CartGen {
 	 * Update Cart by removing Products which no longer exist or are unavailable
 	 */
 	public function UpdateMissingProducts() {
+		if ($this->Type != 1) return;
 		$blnResult=false;
 		foreach ($this->GetCartItemArray() as $objItem) {
 		
