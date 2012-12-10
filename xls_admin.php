@@ -6587,7 +6587,8 @@ class xlsws_admin_maintenance extends xlsws_admin {
 			$this->arrMPnls['MigrateURL']->ToolTip= _sp('Migrate URLs to SEO structure');
 		}
 
-		$ctPic = _dbx("SELECT count(*) as thecount FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0",'Query');
+		$strField = (_xls_get_conf('INVENTORY_FIELD_TOTAL','')==1 ? "inventory_total" : "inventory");
+		$ctPic = _dbx("SELECT count(*) as thecount FROM xlsws_product WHERE web=1 AND ".$strField.">0 AND inventory_reserved=0 AND inventory_avail=0 AND master_model=0",'Query');
 		$arrTotal = $ctPic->FetchArray();
 		if($arrTotal['thecount']>0) {
 			$this->arrMPnls['RecalculateAvail'] = new QPanel($this,'RecalculateAvail');

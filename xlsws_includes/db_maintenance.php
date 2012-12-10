@@ -981,7 +981,9 @@ class xlsws_db_maintenance {
 
 	public function RecalculateInventory() {
 
-		$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0  ORDER BY rowid LIMIT 1000", "Query");
+		$strField = (_xls_get_conf('INVENTORY_FIELD_TOTAL','')==1 ? "inventory_total" : "inventory");
+
+		$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 AND ".$strField.">0 AND inventory_reserved=0 AND inventory_avail=0 AND master_model=0 ORDER BY rowid desc LIMIT 1000", "Query");
 		while ($objItem = $arrProducts->FetchObject()) {
 			$objProduct = Product::Load($objItem->rowid);
 
@@ -990,10 +992,9 @@ class xlsws_db_maintenance {
 			//just pass it to the Avail so we have it for queries elsewhere
 			$objProduct->InventoryAvail=$objProduct->Inventory;
 			$objProduct->Save(false,true);
-
 		}
 
-		$ctPic = _dbx("SELECT count(*) as thecount FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0",'Query');
+		$ctPic = _dbx("SELECT count(*) as thecount FROM xlsws_product WHERE web=1 AND ".$strField.">0 AND inventory_reserved=0 AND inventory_avail=0 AND master_model=0",'Query');
 		$arrTotal = $ctPic->FetchArray();
 		return $arrTotal['thecount'];
 
