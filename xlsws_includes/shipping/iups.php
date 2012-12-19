@@ -363,12 +363,13 @@ class iups extends xlsws_class_shipping {
 		$selected = $fields['service']->SelectedValue;
 
 
-		$strShipData=serialize(array(__class__,$weight,$address1,$zipcode));	
+		$strShipData=serialize(array(__class__,$weight,$address1,$zipcode));
+		$this->make_iups_products($fields['service']);
 		if (_xls_stack_get('ShipBasedOn') != $strShipData) {
 			_xls_stack_put('ShipBasedOn',$strShipData);
 
 
-			$this->make_iups_products($fields['service']);
+
 	
 			$fields['service']->RemoveAllItems();
 	

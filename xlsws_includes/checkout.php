@@ -1012,16 +1012,18 @@ class xlsws_checkout extends xlsws_index {
     }
 
     protected function PrePaymentHooks() {
+	    $objCart = Cart::GetCart();
 		if (function_exists('_custom_before_order_process'))
-			_custom_before_order_process($cart);
+			_custom_before_order_process($objCart);
     
         return true;
     }
 
 
     protected function PostPaymentHooks() {
+	    $objCart = Cart::GetCart();
 		if (function_exists('_custom_after_order_process'))
-			_custom_before_after_process($cart);
+			_custom_before_after_process($objCart);
     
         return true;
     }
@@ -1037,7 +1039,7 @@ class xlsws_checkout extends xlsws_index {
 	    $this->CompleteUpdatePromoCode();
         $this->CompleteUpdateCart();
         $objCart = Cart::GetCart();
-
+	    $objCart->Save();
         if (!$this->PrePaymentHooks())
             return false;
 

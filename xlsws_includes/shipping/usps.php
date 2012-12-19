@@ -285,13 +285,13 @@ class usps extends xlsws_class_shipping {
 		if($selected && isset( $rates[$selected])) {
 			$fields['service']->SelectedValue = $selected;
 			$ret['price'] = $rates[$selected];
-			$ret['msg'] = $selected;
+			$ret['msg'] = $this->strModuleName." ".$selected;
 		} else {
 			reset($rates);
 			$c = key($rates);
 			$fields['service']->SelectedValue = $c;
 			$ret['price'] = $rates[$c];
-			$ret['msg'] = $c;
+			$ret['msg'] = $this->strModuleName." ".$c;
 		}
 
 		_xls_stack_add('usps_method' , $fields['service']->SelectedValue);
