@@ -154,7 +154,7 @@ a:hover {  }
 #sidebar { display: block; float: left; height: auto; margin: 60px 0 0px 0; overflow: hidden; }
 #sidebar .clickbar {   margin: 5px 0px 0px 0px; padding-top: 11px; padding-bottom: 11px; color: #555555; border: 1px dotted #999999; font-weight: 700; text-transform: uppercase; text-align: center; cursor: pointer;}
 #sidebar .containers { border-top: none; font-size: 12px; height: auto; left: -5px; margin: -3px 0 5px; padding: 14px; width: 204px; display: none;}
-
+#sidebar #OrderLookup { clear: left; padding-top: 15px;}
 
 /***************** Slider ***********************/
 .products_slider { overflow: hidden; position: relative; border: 1px dotted #262626; margin-top: 30px;}
@@ -185,7 +185,7 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
 #product_details .price { font-size: 1.8em; margin-top: 20px; }
 #product_details .price_reg { font-size: 0.8em; color: #555555;}
 #product_details .price_slash { text-decoration: line-through; }
-
+#product_details #lblTitle { word-wrap: break-word; }
 #product_details .addcart { width: 192px; background-color: #262626; color: white; height: 24px; padding-top: 12px; padding-bottom: 10px; margin-right: 10px; text-align: center;margin-bottom: 10px; cursor: pointer; float: left;}
 #product_details .addcart a { margin-top: 20px; color: white; text-transform: uppercase; font-size: 1.1em;}
 
@@ -194,6 +194,8 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
 
 #product_details #SelectSize, #SelectColor { max-width: 188px; }
 #product_details #SelectSize { float: left; margin-right: 10px;}
+
+#pinterest { display: inline-block; display: -moz-box; vertical-align: top; }
 
 /***** Checkout page and Registration Page *****/
 #checkout legend { margin-bottom: 4px; text-transform: uppercase; color: #a1a1a1; }
@@ -257,6 +259,9 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
 #footer .bottomtabs a { font-size: 1.1em; font-weight: 400; }
 #footer .copyright { text-align: center; text-transform: uppercase; color: #b7b7b7; font-size: 0.8em;  }
 
+/***** Email Cart *****/
+#emailcart { background-color: white; width: 600px; height: 400px; padding: 20px;}
+#emailcart textarea { width: 520px; height: 50px;}
 
 /***** Global adjustments as we resize down ******/
 @media only screen and (max-width: 960px) { /*iPad and below */
@@ -290,6 +295,5 @@ p.products_slider { font-size: 14px; font-weight: bold; margin: 8px 0 0 5px; col
     .products_slider, .products_slider_theme { display: none; }
     #footer .addresshours { height: 160px; }
 }
-
 
 

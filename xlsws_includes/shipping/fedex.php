@@ -499,7 +499,7 @@ class fedex extends xlsws_class_shipping {
 	
 				if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
 					_xls_log(get_class($this) . " sending ".print_r($request,true),true);
-					_xls_log(get_class($this) . " receiving ".$response,true);
+					_xls_log(get_class($this) . " receiving ".print_r($response,true),true);
 				}
 	
 				if ($response->HighestSeverity != 'FAILURE' && $response -> HighestSeverity != 'ERROR') {
@@ -566,11 +566,15 @@ class fedex extends xlsws_class_shipping {
 		if(isset($ret[$selected])) {
 			$fields['service']->SelectedValue = $selected;
 			$arr['price'] = floatval($ret[$selected])+ floatval($config['markup']);
+			$arr['msg'] = ucfirst(strtolower(str_replace("_" , " " , $selected)));
+			$arr['msg'] = str_replace("Fedex","FedEx",$arr['msg']);
 		} else {
 			reset($ret);
 			$selected = key($ret);
 			$fields['service']->SelectedValue = $selected;
 			$arr['price'] = floatval($ret[$selected])+ floatval($config['markup']);
+			$arr['msg'] = ucfirst(strtolower(str_replace("_" , " " , key($ret))));
+			$arr['msg'] = str_replace("Fedex","FedEx",$arr['msg']);
 		}
 		
 		return $arr;

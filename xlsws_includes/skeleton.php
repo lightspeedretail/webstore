@@ -518,6 +518,7 @@ EOS;
 					$objCurrentCart->Delete();			
 				}
 				$objCartInProgress->CustomerId=$customer->Rowid;
+				$objCartInProgress->DatetimeCre = QDateTime::Now();
 				$objCartInProgress->Save();
 							
 			}

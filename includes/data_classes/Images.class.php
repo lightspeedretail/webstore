@@ -72,7 +72,7 @@ class Images extends ImagesGen {
 		$intWidth = 0, $intHeight = 0, $intIndex = 0, $strClass = null,
 		$blnIsThumb = false, $strSection = 'product') {
 
-		$strName = pathinfo($strName, PATHINFO_FILENAME);
+		$strName = mb_pathinfo($strName, PATHINFO_FILENAME);
 
 		if (!empty($strClass))
 			$strName .= '-' . $strClass;
@@ -86,7 +86,7 @@ class Images extends ImagesGen {
 		$fileExt =  strtolower(_xls_get_conf('IMAGE_FORMAT','jpg'));
 		if ($intWidth==0 && $intHeight==0) $fileExt="png"; //The file from LS is always png
 
-		return $strSection . "/" . $strName[0] . "/" . $strName . '.' . $fileExt;
+		return $strSection . "/" . mb_substr($strName,0,1) . "/" . $strName . '.' . $fileExt;
 	}
 
 	/**
@@ -105,8 +105,9 @@ class Images extends ImagesGen {
 
 		$blnReturn = false;
 		foreach ($objImages as $objImage)
-		if ($objImage->Rowid != $intImageId)
-			$blnReturn= true;
+			if ($objImage->Rowid != $intImageId)
+				$blnReturn= true;
+
 		return $blnReturn;
 	}
 	public static function GetImagePath($strFile) {
@@ -454,7 +455,8 @@ class Images extends ImagesGen {
 		return Images::QuerySingle(
 			QQ::AndCondition(
 				QQ::Equal(QQN::Images()->Width, $intWidth),
-				QQ::Equal(QQN::Images()->Parent, $intRowid)
+				QQ::Equal(QQN::Images()->Parent, $intRowid),
+				QQ::NotEqual(QQN::Images()->Parent, QQN::Images()->Rowid)
 			)
 		);
 	}

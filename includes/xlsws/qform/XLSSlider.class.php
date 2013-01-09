@@ -57,6 +57,7 @@ class XLSSlider extends QPanel {
 		$this->links = array();
 		foreach($products as $prod) {
 			$this->links[$prod->Rowid] = array();
+			$this->links[$prod->Rowid]['prod'] = $prod;
 			$this->links[$prod->Rowid]['image'] = $prod->SliderImage;
 			$this->links[$prod->Rowid]['link'] = $prod->Link;
 			$this->links[$prod->Rowid]['title'] = $prod->Name;

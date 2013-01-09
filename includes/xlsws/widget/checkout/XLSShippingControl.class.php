@@ -354,6 +354,8 @@ class XLSShippingControl extends XLSCompositeControl {
     protected function CalculateShippingRate($objModule) {
         $objCart = Cart::GetCart();
 
+	    //Clear any prior error
+	    $this->ValidationError = '';
 
 	        $strShippingModule = $objCart->ShippingModule;
 	        $strShippingMethod = null;

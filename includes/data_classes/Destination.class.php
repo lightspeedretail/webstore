@@ -39,10 +39,11 @@ class Destination extends DestinationGen {
 
 	public static function GetDefaultOrdering($sql = false) {
 		if ($sql)
-			return 'ORDER BY `state` DESC, `zipcode1` DESC';
+			return 'ORDER BY `country` DESC, `state` DESC, `zipcode1` DESC';
 		else
 			return QQ::Clause(
 				QQ::OrderBy(
+					QQN::Destination()->Country, false,
 					QQN::Destination()->State, false,
 					QQN::Destination()->Zipcode1, false
 				)
@@ -82,9 +83,9 @@ class Destination extends DestinationGen {
 		}
 
 		return Destination::QueryArray(
-			QQ::AndCondition(
-				QQ::Equal(QQN::Destination()->Country,
-				$strCountry)
+			QQ::OrCondition(
+				QQ::Equal(QQN::Destination()->Country,'*'),
+				QQ::Equal(QQN::Destination()->Country,$strCountry)
 			),
 			Destination::GetDefaultOrdering()
 		);

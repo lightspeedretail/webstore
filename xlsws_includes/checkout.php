@@ -439,6 +439,7 @@ class xlsws_checkout extends xlsws_index {
         $this->order_display($objCart, $objControl);
         $this->update_order_display($objCart);
 
+	    $this->PaymentControl->Update();
         return $this->CartControl;
     }
 
@@ -1011,16 +1012,18 @@ class xlsws_checkout extends xlsws_index {
     }
 
     protected function PrePaymentHooks() {
+	    $objCart = Cart::GetCart();
 		if (function_exists('_custom_before_order_process'))
-			_custom_before_order_process($cart);
+			_custom_before_order_process($objCart);
     
         return true;
     }
 
 
     protected function PostPaymentHooks() {
+	    $objCart = Cart::GetCart();
 		if (function_exists('_custom_after_order_process'))
-			_custom_before_after_process($cart);
+			_custom_before_after_process($objCart);
     
         return true;
     }
@@ -1036,17 +1039,19 @@ class xlsws_checkout extends xlsws_index {
 	    $this->CompleteUpdatePromoCode();
         $this->CompleteUpdateCart();
         $objCart = Cart::GetCart();
-
+	    $objCart->Save();
         if (!$this->PrePaymentHooks())
             return false;
 
 		if (!$objCart->PaymentModule) {
-			$this->errSpan->Text = _sp("Shipping error. Please choose a valid payment method.");
+			$this->errSpan->Text = _sp("Payment error. Please choose a valid payment method.");
+			QApplication::Log(E_ERROR, 'Payment error', 'Please choose a valid payment method');
 			return false;
 		}
 		
 		if (!$objCart->ShippingModule) {
 			$this->errSpan->Text = _sp("Shipping error. Please choose a valid shipping method.");
+			QApplication::Log(E_ERROR, 'Shipping error', 'Please choose a valid shipping method');
 			return false;
 		}
 
@@ -1070,6 +1075,7 @@ class xlsws_checkout extends xlsws_index {
 				$this->errSpan->Text = ($mixResponse[1] != '' ? $mixResponse[1] : _sp('Error in processing payment'));
 			 	$this->ToggleCheckoutControls(true);
 			 	$objCart->PaymentData = $this->errSpan->Text; //Save error as part of cart in case of abandon
+				QApplication::Log(E_ERROR, 'Payment Decline', $objCart->PaymentModule." module returned ".$this->errSpan->Text);
 			 	//ToDo: verify this isn't an overwrite as a result of a duplicate
 			 	$objCart->Save();
             	return false;

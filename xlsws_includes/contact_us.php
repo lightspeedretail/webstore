@@ -39,6 +39,7 @@ class xlsws_contact_us extends xlsws_index {
 	protected $btnSubmit; //input button to submit the contact form
 	protected $lblError; //the label that shows an error message
 	protected $page = ''; //the current page
+	protected $txtCustomPage;
 
     protected $CaptchaControl;
 
@@ -175,7 +176,12 @@ class xlsws_contact_us extends xlsws_index {
 		$this->btnSubmit->AddAction(new QClickEvent() , new QServerAction('butSubmit_click'));
 		$this->btnSubmit->CausesValidation = true;
 
-
+		$this->txtCustomPage = new QLabel($this);
+		$objText = CustomPage::LoadByKey('contactus');
+		if ($objText) {
+			$this->txtCustomPage->HtmlEntities = false;
+			$this->txtCustomPage->Text = $objText->Page;
+		}
 
         
                 

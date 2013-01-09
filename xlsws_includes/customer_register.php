@@ -255,13 +255,17 @@ class xlsws_cregister extends xlsws_index {
 	
 	
 	private function CompleteRegistration() {
-		if($this->isLoggedIn())
+		if($this->isLoggedIn()) {
 			$objCustomer = Customer::LoadByRowId($this->customer->Rowid);
-		else
+			if ($this->PasswordControl->Password1->Text !== '')
+				$objCustomer->Password = md5(trim($this->PasswordControl->Password1->Text));
+		}
+		else {
 			$objCustomer = new Customer();
+			$objCustomer->Password = md5(trim($this->PasswordControl->Password1->Text));
+		}
 
 		$objCustomer->Email= strtolower(trim($this->BillingContactControl->Email));
-		$objCustomer->Password = md5(trim($this->PasswordControl->Password1->Text));
 		$objCustomer->Firstname = trim($this->txtCRFName->Text);
 		$objCustomer->Lastname = trim($this->txtCRLName->Text);
 		$objCustomer->Mainname = trim($this->txtCRFName->Text) . " " . trim($this->txtCRLName->Text);

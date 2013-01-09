@@ -221,14 +221,15 @@ class ups extends xlsws_class_shipping {
 		}
 
 
-		$strShipData=serialize(array(__class__,$weight,$address1,$zipcode));	
+		$strShipData=serialize(array(__class__,$weight,$address1,$zipcode));
+		$this->make_ups_products($fields['service']);
 		if (_xls_stack_get('ShipBasedOn') != $strShipData) {
 			_xls_stack_put('ShipBasedOn',$strShipData);
 	
 
 
 
-			$this->make_ups_products($fields['service']);
+
 	
 			$fields['service']->RemoveAllItems();
 	

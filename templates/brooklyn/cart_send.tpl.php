@@ -26,62 +26,45 @@
  */
 
 ?>
+<div id="emailcart" class="container">
+	<fieldset>
+	    <legend><?php echo _sp('Send Cart to your friend') ?></legend>
 
-<div class="modal_reg_box_wrap                                            ">
-	<div class="modal_reg_box_body">
-		<div class="modal_reg_box_header"><?php _xt("Send Cart to your friend") ?></div>
 
-		<div class="modal_reg_msg"><?php $_CONTROL->errSpan->Render() ?><?php $_CONTROL->objDefaultWaitIcon->Render(
-		) ?></div>
+			<?php $_CONTROL->errSpan->Render() ?><?php $_CONTROL->objDefaultWaitIcon->Render() ?>
+        <br clear="left">
 
-		<div class="modal_reg_input_wrap">
-						<span class="modal_reg_input_label">
-							<?php _xt("Name of Recipient") ?> *
-						</span>
 
-			<?php $_CONTROL->txtToName->RenderWithError(true) ?>
-		</div>
+	        <div class="five columns alpha omega">
+	            <span class="label"><?php echo _sp("Name of Recipient"); ?></span>
+				<?php $_CONTROL->txtToName->RenderWithError() ?>
+	        </div>
+	        <div class="five columns alpha omega">
+                <span class="label"><?php echo _sp("Email Address"); ?></span>
+				<?php $_CONTROL->txtToEmail->RenderWithError() ?>
+            </div>
 
-		<div class="modal_reg_input_wrap">
-						<span class="modal_reg_input_label">
-							<?php _xt("Email Address")?>*
-						</span>
+		<br clear="left">
+            <div class="nine columns alpha omega">
+                <span class="label"><?php echo _sp("Message"); ?></span>
+				<?php $_CONTROL->txtMsg->RenderWithError() ?>
+            </div>
 
-			<?php $_CONTROL->txtToEmail->RenderWithError(true) ?>
-		</div>
+        <br clear="left">
+            <div class="five columns alpha omega">
+                <span class="label"><?php echo _sp("Your Name"); ?></span> <span class="red">*</span>
+				<?php $_CONTROL->txtFromName->RenderWithError() ?>
+            </div>
+            <div class="five columns alpha omega">
+                <span class="label"><?php echo _sp("Your Email Address"); ?></span> <span class="red">*</span>
+				<?php $_CONTROL->txtFromEmail->RenderWithError() ?>
+            </div>
 
-		<div class="modal_reg_input_wrap">
-						<span class="modal_reg_input_label">
-							<?php _xt("Message") ?> *
-						</span>
+        <br clear="left">
+				<?php $_CONTROL->btnSend->Render('CssClass=button left rounded') ?>
+				<?php $_CONTROL->btnCancel->Render('CssClass=button left rounded') ?>
 
-			<?php $_CONTROL->txtMsg->RenderWithError() ?></div>
 
-		<div class="modal_reg_input_wrap">
-						<span class="modal_reg_input_label">
-							<?php _xt("Your Name") ?>*
-						</span>
+	</fieldset>
 
-			<?php $_CONTROL->txtFromName->RenderWithError() ?></div>
-
-		<div class="modal_reg_input_wrap">
-						<span class="modal_reg_input_label">
-							<?php _xt("Your Email Address") ?>*
-						</span>
-
-			<?php $_CONTROL->txtFromEmail->RenderWithError() ?></div>
-
-		<div class="modal_reg_input_wrap"><?php $_CONTROL->lblVerifyImage->Render() ?></div>
-
-		<div class="modal_reg_input_wrap">
-						<span class="modal_reg_input_label">
-							<?php _xt("Enter the letters from above") ?>*
-						</span>
-
-			<?php $_CONTROL->txtVerify->RenderWithError() ?></div>
-
-		<div class="model_reg_buttons" style="position: relative; top: -25px; left: 185px;">
-			<?php $_CONTROL->btnSend->Render('CssClass=button left rounded') ?>
-			<?php $_CONTROL->btnCancel->Render('CssClass=button left rounded') ?></div>
-	</div>
 </div>

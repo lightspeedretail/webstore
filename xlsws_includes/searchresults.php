@@ -185,9 +185,8 @@ class xlsws_searchresult extends xlsws_product_listing {
         global $XLSWS_VARS;
 
         $strPriceField = 'SellWeb';
-        $fltStartPrice = false;
-        $fltEndPrice = false;
-        $objCondition = false;
+        $fltStartPrice = '';
+        $fltEndPrice = '';
 
         if (_xls_get_conf('TAX_INCLUSIVE_PRICING') == '1')
             $strPriceField = 'SellTaxInclusive';
@@ -206,19 +205,19 @@ class xlsws_searchresult extends xlsws_product_listing {
                 $fltEndPrice = $XLSWS_VARS['endprice'];
         }
 
-        if ($fltStartPrice !== false && $fltEndPrice !== false)
+        if (!empty($fltStartPrice) && !empty($fltEndPrice))
             $objCondition = QQ::Between(
                 QQN::Product()->$strPriceField,
                 $fltStartPrice,
                 $fltEndPrice
             );
-        else if ($fltStartPrice !== false)
+        else if (!empty($fltStartPrice))
             $objCondition = QQ::GreaterOrEqual(
                 QQN::Product()->$strPriceField,
                 $XLSWS_VARS['startprice']
             );
-        else if ($fltEndPrice !== false)
-            $objCondition = QQ::LesserOrEqual(
+        else if (!empty($fltEndPrice))
+            $objCondition = QQ::LessOrEqual(
                 QQN::Product()->$strPriceField,
                 $XLSWS_VARS['endprice']
             );
@@ -310,11 +309,13 @@ class xlsws_searchresult extends xlsws_product_listing {
 
 	    $objUrl = _xls_url_object();    
 		$strCriteria = $objUrl->RouteId;
+
+		$strSearch = ($objUrl->ProductSearch == '') ? _sp('Search Results for Advanced Search') : _sp('Search Results for "'.$objUrl->ProductSearch.'"');
 		
         $this->crumbs[] = array(
             'link'=>$objUrl->RouteId . "/".XLSURL::KEY_PAGE."?q=".$objUrl->ProductSearch,
             'case'=> '',
-            'name'=>_sp('Search Results for "'.$objUrl->ProductSearch.'"')
+            'name'=>$strSearch
         );
 
         

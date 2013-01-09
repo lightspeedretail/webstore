@@ -43,6 +43,13 @@ require(__DATAGEN_CLASSES__ . '/ProductGen.class.php');
  *
  */
 class Product extends ProductGen {
+
+	const HIGHEST_PRICE = 4;
+	const PRICE_RANGE = 3;
+	const CLICK_FOR_PRICING = 2;
+	const LOWEST_PRICE = 1;
+	const MASTER_PRICE = 0;
+
 	// Define the Object Manager for semi-persistent storage
 	public static $Manager;
 
@@ -496,23 +503,23 @@ class Product extends ProductGen {
 			 
 			switch (_xls_get_conf('MATRIX_PRICE')) {
 
-				case 4: //Show Highest Price
+				case Product::HIGHEST_PRICE: //Show Highest Price
 					return $arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive); 
 
-				case 3: //Show Price Range
+				case Product::PRICE_RANGE: //Show Price Range
 					if ($arrMaster[0]->GetPrice($intQuantity, $taxExclusive) != $arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive))
 					return _xls_currency($arrMaster[0]->GetPrice($intQuantity, $taxExclusive))." - "._xls_currency($arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive));
 					else return $arrMaster[0]->GetPrice($intQuantity, $taxExclusive);
 					
-				case 2: //Show "Click for Pricing"
+				case Product::CLICK_FOR_PRICING: //Show "Click for Pricing"
 					if ($arrMaster[0]->GetPrice($intQuantity, $taxExclusive) != $arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive))
 						return _sp("Click for pricing");
 					else return $this->GetPrice($intQuantity, $taxExclusive);
 				
-				case 1: //Show Lowest Price
+				case Product::LOWEST_PRICE: //Show Lowest Price
 					return $arrMaster[0]->GetPrice($intQuantity, $taxExclusive);
 			
-				case 0: //Show Master Item Price
+				case Product::MASTER_PRICE: //Show Master Item Price
 				default:
 					return $this->GetPrice($intQuantity, $taxExclusive);
 			
@@ -529,7 +536,7 @@ class Product extends ProductGen {
 	 * @param integer defaults to 1
 	 * @return float or string
 	 */ //4 => _sp("Show Highest Price"),3 => _sp("Show Price Range"), 2 => _sp("Show \"Click for Pricing\"") ,1 => _sp("Show Lowest Price"),0 => _sp("Show Master Item Price")
-	public function GetSlashedPrice($intQuantity = 1, $taxExclusive = false) {
+	public function GetSlashedPrice($intQuantity = 1, $taxExclusive = false, $intMatrix = null) {
 
 		if(_xls_get_conf('TAX_INCLUSIVE_PRICING',0)) $taxExclusive = false; else $taxExclusive = true;
 
@@ -566,19 +573,23 @@ class Product extends ProductGen {
 			);
 
 			if (count($arrMaster)==0) return '';
+			if (is_null($intMatrix))
+				$intMatrix = _xls_get_conf('MATRIX_PRICE');
 
-			switch (_xls_get_conf('MATRIX_PRICE')) {
+			switch ($intMatrix) {
 
-			case 4: //Show Highest Price
-			case 3:
+			case Product::HIGHEST_PRICE: //Show Highest Price
+			case Product::PRICE_RANGE:
 				return ( $arrMaster[count($arrMaster)-1]->$strField > $arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive)) ? $arrMaster[count($arrMaster)-1]->$strField : "";
-			case 2: //Show "Click for Pricing"
+
+			case Product::CLICK_FOR_PRICING: //Show "Click for Pricing"
 				return '';
 
-			case 1: //Show Lowest Price
-				return $arrMaster[0]->$strField;
+			case Product::LOWEST_PRICE: //Show Lowest Price
+				return ( $arrMaster[0]->$strField > $arrMaster[0]->GetPrice($intQuantity, $taxExclusive)) ? $arrMaster[0]->$strField : "";
 
-			case 0: //Show Master Item Price
+
+			case Product::MASTER_PRICE: //Show Master Item Price
 			default:
 				return ($this->$strField > $this->GetPrice($intQuantity, $taxExclusive)) ? $this->$strField : "";;
 
@@ -587,6 +598,56 @@ class Product extends ProductGen {
 
 		}
 		else return ($this->$strField > $this->GetPrice($intQuantity, $taxExclusive)) ? $this->$strField : "";
+
+
+	}
+
+
+	/**
+	 * Will return true/false if the price has child products that vary
+	 * that it will optionally return a message for Master products.
+	 * @return bool
+	 */
+	public function GetHasPriceRange() {
+
+		if (_xls_get_conf('PRICE_REQUIRE_LOGIN',0) == 1 && !xlsws_index::isLoggedIn())
+			return false;
+		if (!$this->IsMaster())
+			return false;
+
+		$intQuantity=1;
+		$taxExclusive = false;
+
+		$objProdCondition = QQ::AndCondition(
+			QQ::Equal(QQN::Product()->Web, 1),
+			QQ::Equal(QQN::Product()->FkProductMasterId, $this->Rowid)
+		);
+
+		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) == 0) {
+			$objAvailCondition =
+				QQ::OrCondition(
+					QQ::GreaterThan(QQN::Product()->InventoryAvail, 0),
+					QQ::Equal(QQN::Product()->Inventoried, 0)
+				);
+
+			$objCondition = QQ::AndCondition(
+				$objProdCondition,
+				$objAvailCondition
+			);
+		}
+		else
+			$objCondition = $objProdCondition;
+
+		$arrMaster = Product::QueryArray($objCondition,
+			QQ::Clause(
+				QQ::OrderBy(QQN::Product()->SellWeb))
+		);
+
+		if (count($arrMaster)==0) return false;
+
+		if ($arrMaster[0]->GetPrice($intQuantity, $taxExclusive) != $arrMaster[count($arrMaster)-1]->GetPrice($intQuantity, $taxExclusive))
+			return true;
+		else return false;
 
 
 	}
@@ -1086,6 +1147,10 @@ class Product extends ProductGen {
 
 			case 'PageDescription':
 				return _xls_truncate($this->GetPageMeta('SEO_PRODUCT_DESCRIPTION'),255);
+
+			case 'HasPriceRange':
+				return $this->GetHasPriceRange();
+
 
 			default:
 				try { 

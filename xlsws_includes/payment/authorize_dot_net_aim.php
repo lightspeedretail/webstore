@@ -222,7 +222,7 @@ class authorize_dot_net_aim extends credit_card {
 		
 		$resp_vals = _xls_delim_to_array($resp , self::x_delim_char);
 		$resp_vals = array_values($resp_vals);
-
+		$resp_vals = explode(self::x_delim_char,$resp);
 		if($resp_vals[0] != '1' ) {
 			$this->paid_amount = 0;
 			$errortext = _sp($resp_vals[3]);

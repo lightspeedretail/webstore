@@ -60,7 +60,7 @@ class xlsws_db_maintenance {
 			  `name` varchar(32) NOT NULL,
 			  PRIMARY KEY  (`rowid`),
 			  UNIQUE KEY `name` (`name`)
-			) ENGINE=MyISAM DEFAULT CHARSET=latin1" , '2.0.1');
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8" , '2.0.1');
 
 			$this->insert_row('xlsws_view_log_type' , array('rowid' => 1 , 'name' =>  'index') , '2.0.1');
 			$this->insert_row('xlsws_view_log_type' , array('rowid' => 2 , 'name' =>  'categoryview') , '2.0.1');
@@ -769,6 +769,21 @@ class xlsws_db_maintenance {
 		}
 
 
+		if ($intCurrentSchema==251)
+		{
+
+			$this->add_config_key('FACEBOOK_APPID' ,
+				"INSERT INTO `xlsws_configuration` (`title`, `key`, `value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`)
+			VALUES
+				('Facebook App ID', 'FACEBOOK_APPID', '', 'Create Facebook AppID', 26, 1, NOW(), NOW(), NULL, 0);
+			");
+			$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
+			$config->Value="252";
+			$intCurrentSchema=252;
+			$config->Save();
+		}
+
+
 		$config = Configuration::LoadByKey("DATABASE_SCHEMA_VERSION");
 		$strUpgradeText .= "<br/>Database schema version ".$config->Value."<br>";
 
@@ -966,7 +981,9 @@ class xlsws_db_maintenance {
 
 	public function RecalculateInventory() {
 
-		$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0  ORDER BY rowid LIMIT 1000", "Query");
+		$strField = (_xls_get_conf('INVENTORY_FIELD_TOTAL','')==1 ? "inventory_total" : "inventory");
+
+		$arrProducts = _dbx("SELECT * FROM xlsws_product WHERE web=1 AND ".$strField.">0 AND inventory_reserved=0 AND inventory_avail=0 AND master_model=0 ORDER BY rowid desc LIMIT 1000", "Query");
 		while ($objItem = $arrProducts->FetchObject()) {
 			$objProduct = Product::Load($objItem->rowid);
 
@@ -975,10 +992,9 @@ class xlsws_db_maintenance {
 			//just pass it to the Avail so we have it for queries elsewhere
 			$objProduct->InventoryAvail=$objProduct->Inventory;
 			$objProduct->Save(false,true);
-
 		}
 
-		$ctPic = _dbx("SELECT count(*) as thecount FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0",'Query');
+		$ctPic = _dbx("SELECT count(*) as thecount FROM xlsws_product WHERE web=1 AND ".$strField.">0 AND inventory_reserved=0 AND inventory_avail=0 AND master_model=0",'Query');
 		$arrTotal = $ctPic->FetchArray();
 		return $arrTotal['thecount'];
 
@@ -1049,7 +1065,7 @@ class xlsws_db_maintenance {
 								$strNewImageName = substr($strNewImageName,0,-4) . ".jpg";
 							//echo "renaming ".$strExistingPath." to ".$strNewImageName."<br>";
 							$strPath = Images::GetImagePath($strNewImageName);
-							$arrPath = pathinfo($strPath);
+							$arrPath = mb_pathinfo($strPath);
 							$strFolder = $arrPath['dirname'];
 							if (!$objImage->SaveImageFolder($strFolder))
 								return "Halting: error creating folder ".$strFolder;

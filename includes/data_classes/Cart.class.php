@@ -213,10 +213,10 @@ class Cart extends CartGen {
             return $intIdStr;
     }
 
-    public function GetCartNextIdStr() {
+    public function GetCartNextIdStr($blnUseDb = true) {
         $strNextId = _xls_get_conf('NEXT_ORDER_ID', false);
         
-        if ($strNextId) {
+        if ($blnUseDb && $strNextId) {
             $intNextId = preg_replace("/[^0-9]/", "", $strNextId);
             return 'WO-' . $intNextId;
         }
@@ -323,6 +323,7 @@ class Cart extends CartGen {
 	 * Update Cart by removing Products which no longer exist or are unavailable
 	 */
 	public function UpdateMissingProducts() {
+		if ($this->Type != 1) return;
 		$blnResult=false;
 		foreach ($this->GetCartItemArray() as $objItem) {
 		
@@ -724,7 +725,7 @@ class Cart extends CartGen {
 
 		if ($objProduct->Rowid)
 			$objItem->ProductId = $objProduct->Rowid;
-
+		if (is_null($strDescription)) $strDescription="";
 		$objItem->CartType = $mixCartType;
 		$objItem->Description = $strDescription;
 		$objItem->GiftRegistryItem = $intGiftItemId;

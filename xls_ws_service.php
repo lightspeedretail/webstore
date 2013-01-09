@@ -388,9 +388,9 @@
             if (!$objImage->Created)
                 $objImage->Created = new QDateTime(QDateTime::Now);
 
-	        $strImageName = Images::GetImageName(substr($objProduct->RequestUrl,0,60));
+	        $strImageName = Images::GetImageName(mb_substr($objProduct->RequestUrl,0,60));
 	        if (Images::ExistsForOtherProduct($strImageName,$objProduct->ImageId))
-	            $strImageName = Images::GetImageName(substr($objProduct->RequestUrl,0,60)."[".$objProduct->Rowid."]");
+	            $strImageName = Images::GetImageName(mb_substr($objProduct->RequestUrl,0,60)."-r".$objProduct->Rowid);
 
             $objImage->SaveImageData(
                 $strImageName, $blbImage
@@ -594,6 +594,12 @@ EOS;
                 $product->Rowid = $intRowid;
             }
 
+	        $strName = trim($strName);
+	        $strCode = trim($strCode);
+			$strCode = str_replace('"','',$strCode);
+			$strCode = str_replace("'",'',$strCode);
+			if (empty($strName)) $strName='missing-name';
+			if (empty($strDescription)) $strDescription='';
             $product->Code = $strCode;
             $product->Name = $strName;
             $product->ClassName = $strClassName;
@@ -2760,6 +2766,13 @@ EOS;
                 _xls_log("SOAP ERROR : add_order " . $e);
                 return self::UNKNOWN_ERROR;
             }
+
+
+	        if (substr($strId,0,3)=="WO-")
+		        _xls_set_conf('NEXT_ORDER_ID',$cart->GetCartNextIdStr(false));
+	        
+
+
             return self::OK;
         }
         

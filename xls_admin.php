@@ -74,8 +74,7 @@ if(!isset($_SESSION['admin_auth'])
 	$password = md5(gmdate('d') .  $conf->Value);
 	$password2 = md5(date('d') .  $conf->Value);
 
-	if(isset($_POST['user']) && isset($_POST['password']) &&
-		($_POST['password'] == $password || $_POST['password'] == $password2))
+	if(isset($_POST['user']) && isset($_POST['password']) && ($_POST['password'] == $password || $_POST['password'] == $password2))
 	{
 		$_SESSION['admin_auth'] =  true;
 		session_commit();
@@ -83,10 +82,17 @@ if(!isset($_SESSION['admin_auth'])
 		// if session id is not set and add it in request uri
 		$strUrl = _xls_site_url('xls_admin.php?' . admin_sid());
 		$strUrl = str_replace("/index.php","",$strUrl); //We're not passing through our regular controller
+
 	}else{
-		$msg = "<h1>Cannot Connect</h1>Unauthorized admin access or session timed out from " . _xls_get_ip() . " at " . gmdate("Y-m-d H:i:s") . " GMT.<br>Please re-open the Admin Panel\n\n " ; //
-		_xls_log($msg . "Session vars: " . print_r($_SESSION , true) . "  \n\nServer vars: " .  print_r($_SERVER , true) . " . \n\n Post Vars: " . print_r($_POST , true));
-		die("<pre>$msg</pre>");
+		if (ini_get('session.use_only_cookies'))
+			$msg = "<h1>ERROR:</h1> <span style='font-family: arial; font-size: 15px;'>Your php.ini file has the setting <b>session.use_only_cookies</b> turned On it needs to be Off to allow Admin Panel to log in.<P>Consult your ISP hosting provider or Web Administrator on how to change this setting. Some hosting providers may have a web interface such as cPanel to edit php.ini settings, other providers may require editing php.ini directly and restarting Apache.<br>&nbsp;<br><i>Note you may find both session.use_cookies and session.use_only_cookies -- verify you are changing the correct one.</i></span></P>";
+		elseif(isset($_POST['user']) && isset($_POST['password']) && $_POST['password'] != $password && $_POST['password'] != $password2)
+			$msg = "<h1>Invalid Password</h1><span style='font-family: arial; font-size: 15px;'>The store password entered into Tools->eCommerce->Setup is not correct. Please close Admin Panel and enter your correct store password, then click Save. The version number should appear in the lower left corner if the password is correct.</span>";
+
+		else
+		$msg = "<h1>Session Timed Out</h1><span style='font-family: arial; font-size: 15px;'>Your session has timed out. This can happen if you left Admin Panel open for a long period of time with no activity. Simply close this window and click on the Admin Panel button again to reopen.</span>" ;
+			_xls_log($msg . "Session vars: " . print_r($_SESSION , true) . "  \n\nServer vars: " .  print_r($_SERVER , true) . " . \n\n Post Vars: " . print_r($_POST , true));
+		die("$msg");
 	}
 }
 
@@ -381,6 +387,8 @@ class xlsws_config_types extends QBaseClass {
 
 	const EmailOptions = 24;
 	const ShippingRestrictions = 25;
+
+	const Facebook = 26;
 
 }
 
@@ -720,8 +728,8 @@ class xlsws_admin_config_panel extends QPanel{
 		case 'INVENTORY_OUT_ALLOW_ADD':
 			return array(2 => _sp("Display and Allow backorders"),1 => _sp("Display but Do Not Allow ordering") ,0 => _sp("Make product disappear") );
 		case 'MATRIX_PRICE':
-			return array(4 => _sp("Show Highest Price"),3 => _sp("Show Price Range"),
-				2 => _sp("Show \"Click for Pricing\"") ,1 => _sp("Show Lowest Price"),0 => _sp("Show Master Item Price") );
+			return array(Product::HIGHEST_PRICE => _sp("Show Highest Price"),Product::PRICE_RANGE => _sp("Show Price Range"),
+				Product::CLICK_FOR_PRICING => _sp("Show \"Click for Pricing\"") ,Product::LOWEST_PRICE => _sp("Show Lowest Price"),Product::MASTER_PRICE => _sp("Show Master Item Price") );
 
 
 		case 'SSL_NO_NEED_FORWARD':
@@ -2198,7 +2206,7 @@ class xlsws_admin_cpage_panel extends QPanel {
 
 		if(!$this->page->Rowid){
 			$this->page->Save(true);
-			_rd($_SERVER['REQUEST_URI']);
+			_rd(_xls_site_url('xls_admin.php?page=cpage' . admin_sid()));
 		}else
 			$this->page->Save();
 
@@ -2869,6 +2877,14 @@ class xlsws_admin_task_promorestrict_panel extends QPanel {
 	public $ctlClasses;
 	public $ctlKeywords;
 
+	public $lblPromoCode;
+	public $lblExcept;
+	public $lblCategories;
+	public $lblFamilies;
+	public $lblProducts;
+	public $lblClasses;
+	public $lblKeywords;
+
 	public $pxyAddNewPage;
 
 
@@ -3066,7 +3082,20 @@ class xlsws_admin_task_promorestrict_panel extends QPanel {
 		$this->pxyAddNewPage->AddAction( new QClickEvent() , new QAjaxControlAction($this , 'btnEdit_click'));
 		$this->pxyAddNewPage->AddAction( new QClickEvent() , new QTerminateAction());
 
+		$this->lblCategories = new QLabel($this);
+		$this->lblCategories->HtmlEntities = false;
 
+		$this->lblFamilies = new QLabel($this);
+		$this->lblFamilies->HtmlEntities = false;
+
+		$this->lblClasses = new QLabel($this);
+		$this->lblClasses->HtmlEntities = false;
+
+		$this->lblKeywords = new QLabel($this);
+		$this->lblKeywords->HtmlEntities = false;
+
+		$this->lblProducts = new QLabel($this);
+		$this->lblProducts->HtmlEntities = false;
 
 		$this->strTemplate = adminTemplate($page->Key.'.tpl.php');
 
@@ -3138,6 +3167,13 @@ class xlsws_admin_task_promorestrict_panel extends QPanel {
 		$this->ctlProductCodes->SelectedValues=$arrProducts;
 
 		$this->ctlExcept->SelectedValue=$objPromoCode->Except;
+
+		$this->lblCategories->strText = 'Categories <span id="ctlCa">('.count($arrCategories).')</span>';
+		$this->lblFamilies->strText = 'Families <span id="ctlFa"> ('.count($arrFamilies).')</span>';
+		$this->lblClasses->strText = 'Classes <span id="ctlCl"> ('.count($arrClasses).')</span>';
+		$this->lblKeywords->strText = 'Keywords <span id="ctlKe"> ('.count($arrKeywords).')</span>';
+		$this->lblProducts->strText = 'Products <span id="ctlPr"> ('.count($arrProducts).')</span>';
+
 
 	}
 
@@ -3428,6 +3464,12 @@ class xlsws_admin_seo_modules extends xlsws_admin {
 		$this->configPnls['google']->Name = _sp('Google Integration');
 		$this->configPnls['google']->Info = _sp('Google account information and settings');
 		$this->configPnls['google']->ConfigurationGuide = "<span style='font-size: 10pt'>If you are using Google Shopping (Google Merchant Center), your store data feed URL is: "._xls_site_url('/googlemerchant.xml'."</span>");
+
+
+		$this->configPnls['facebook'] = new xlsws_admin_config_panel($this , $this , xlsws_config_types::Facebook , "configDone");
+		$this->configPnls['facebook']->Name = _sp('Facebook Integration');
+		$this->configPnls['facebook']->Info = _sp('Facebook information and settings');
+		$this->configPnls['facebook']->ConfigurationGuide = "<span style='font-size: 10pt'>To properly set up Facebook functionality, you need to register your site as an \"app\" at https://developers.facebook.com/apps/?action=create and get an ID. Please consult our documentation for specifics.</span>";
 	}
 
 
@@ -6545,7 +6587,8 @@ class xlsws_admin_maintenance extends xlsws_admin {
 			$this->arrMPnls['MigrateURL']->ToolTip= _sp('Migrate URLs to SEO structure');
 		}
 
-		$ctPic = _dbx("SELECT count(*) as thecount FROM xlsws_product WHERE web=1 AND (inventory>0 OR inventory_total>0) AND inventory_reserved=0 AND inventory_avail=0",'Query');
+		$strField = (_xls_get_conf('INVENTORY_FIELD_TOTAL','')==1 ? "inventory_total" : "inventory");
+		$ctPic = _dbx("SELECT count(*) as thecount FROM xlsws_product WHERE web=1 AND ".$strField.">0 AND inventory_reserved=0 AND inventory_avail=0 AND master_model=0",'Query');
 		$arrTotal = $ctPic->FetchArray();
 		if($arrTotal['thecount']>0) {
 			$this->arrMPnls['RecalculateAvail'] = new QPanel($this,'RecalculateAvail');

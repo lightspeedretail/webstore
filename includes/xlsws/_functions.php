@@ -842,16 +842,21 @@ function _xls_seo_url($string) {
 }
 
 //Makes our SEO hyphenated string from passed string
-//Used to build anything that will be in a Name. Allows spaces
+//Used to build anything that will be in a Name.
 function _xls_seo_name($string) {
+	$string = str_replace(array('\n','\r',chr(13)),'',$string);
 	$string = str_replace('\'','',$string);
+	$string = str_replace('"','',$string);
+	$string = str_replace(array(',','?','!','.'),'',$string);
 	$string = str_replace("&","and",$string);
+	$string = str_replace("+","and",$string);
+	$string = str_replace(array(" ",'/'),"-",$string);
 	$string = preg_replace("`\[.*\]`U","",$string);
 	$string = preg_replace('`&(amp;)?#?[A-Za-z0-9]+;`i','-',$string);
-	$string = htmlentities($string, ENT_COMPAT, 'utf-8');
+	//$string = htmlentities($string, ENT_COMPAT, 'utf-8');
 	$string = preg_replace("`&([a-z])(acute|uml|circ|grave|ring|cedil|slash|tilde|caron|lig|quot|rsquo);`i","\\1", $string);
 	$string = str_replace('-amp-','-and-',$string);
-	$string = preg_replace( array("`[^a-z0-9]`i","`[-]+`") , "-", $string);
+	$string = preg_replace( array("`[^a-z0-9{Cyrillic}{Greek}{Japanese}{Chinese}{Korean}{Hebrew}{Arabic}]/u`i","`[-]+`") , "-", $string);
 	return trim($string, '- ');
 }
 
@@ -862,6 +867,11 @@ function _xls_jssafe_name($string) {
 	return trim($string);
 }
 
+function _xls_meta_safe($string) {
+	$string = str_replace('"','\'',$string);
+	//$string = str_replace("&","and",$string);
+	return trim($string);
+}
 
 /**
  * Get the ID of the current customer object
@@ -1076,7 +1086,7 @@ function _xls_add_meta_redirect($url , $delay = 60) {
 function _xls_add_page_title($title) {
 	global $strPageTitle;
 	$strPageTitle = $title;
-	_xls_stack_put('xls_page_title',$title);
+	_xls_stack_put('xls_page_title',_xls_meta_safe($title));
 }
 
 /**
@@ -1110,7 +1120,7 @@ function _xls_format_email_subject($key='EMAIL_SUBJECT_CUSTOMER',$customer="", $
  * @param string $desc
  */
 function _xls_add_meta_desc($desc) {
-	_xls_stack_put('xls_meta_desc', strip_tags($desc));
+	_xls_stack_put('xls_meta_desc', strip_tags(_xls_meta_safe($desc)));
 }
 
 /**
@@ -1688,6 +1698,21 @@ function _xls_show_captcha($strPage = "checkout") {
 	else return false;
 	
 }
+
+
+function mb_pathinfo($filepath,$portion = null) {
+	preg_match('%^(.*?)[\\\\/]*(([^/\\\\]*?)(\.([^\.\\\\/]+?)|))[\\\\/\.]*$%im',$filepath,$m);
+	if(isset($m[1])) $ret['dirname']=$m[1];
+	if(isset($m[2])) $ret['basename']=$m[2];
+	if(isset($m[5])) $ret['extension']=$m[5];
+	if(isset($m[3])) $ret['filename']=$m[3];
+	if ($portion==PATHINFO_DIRNAME) return $ret['dirname'];
+	if ($portion==PATHINFO_BASENAME) return $ret['basename'];
+	if ($portion==PATHINFO_EXTENSION) return $ret['extension'];
+	if ($portion==PATHINFO_FILENAME) return $ret['filename'];
+	return $ret;
+}
+
 
 /**
  * Function for displaying what called function, useful for debugging

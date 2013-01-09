@@ -7,32 +7,32 @@
 	<script type="text/javascript" src="<?=  adminTemplate('js/jquery.min.js');  ?>"></script>
 	<script type="text/javascript" src="<?=  adminTemplate('js/jquery.ui.js');  ?>"></script>
 	<script type="text/javascript" src="<?=  adminTemplate('js/admin.js'); ?>"></script>
-	<script type="text/javascript" src="<?=  adminTemplate('js/corners.js'); ?>"></script>
+<!--	<script type="text/javascript" src="--><?//=  adminTemplate('js/corners.js'); ?><!--"></script>-->
 	<link rel="stylesheet" type="text/css" href="<?=  adminTemplate('css/superfish.css'); ?>" id="superfishcss"  />
 	<link rel="stylesheet" type="text/css" href="<?=  adminTemplate('css/admin.css'); ?>" id="admincss"  />
 
 	<script type="text/javascript">
-		$(document).ready(function(){
-			$("ul.sf-menu").superfish();
-		});
+//		$(document).ready(function(){
+//			$("ul.sf-menu").superfish();
+//		});
 		function doRefresh() {
-			$('.rounded').corners();
-			$('.rounded').corners();
+//			$('.rounded').corners();
+//			$('.rounded').corners();
 			/* test for double rounding */
 			$('table', $('#featureTabsc_info .tab')[0]).each(function () {
 				$('.native').hide();
 			});
 			$('#featureTabsc_info').show();
 			tab(0);
-			tooltip();
+//			tooltip();
 
 		}
 	</script>
 
 	<script type="text/javascript">
 		$(document).ready(function(){
-			$('.rounded').corners();
-			$('.rounded').corners(); /* test for double rounding */
+//			$('.rounded').corners();
+//			$('.rounded').corners(); /* test for double rounding */
 			$('table', $('#featureTabsc_info .tab')[0]).each(function(){$('.native').hide();});
 			$('#featureTabsc_info').show();
 		});
