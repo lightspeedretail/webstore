@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+<!-- Revision="$Revision: #1 $" -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <!--
+    $Date: 2011/04/06 $
+
+    AMAZON.COM CONFIDENTIAL.  This document and the information contained in it are
+    confidential and proprietary information of Amazon.com and may not be reproduced, 
+    distributed or used, in whole or in part, for any purpose other than as necessary 
+    to list products for sale on the www.amazon.com web site pursuant to an agreement 
+    with Amazon.com. 
+    -->
+    <xsd:include schemaLocation="amzn-base.xsd"/>
+    <xsd:element name="Shoes">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="ClothingType">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                            <xsd:enumeration value="Accessory"/>
+                            <xsd:enumeration value="Bag"/>
+                            <xsd:enumeration value="Shoes"/>
+                            <xsd:enumeration value="ShoeAccessory"/>
+                            <xsd:enumeration value="Handbag"/>
+                            <xsd:enumeration value="Eyewear"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:element>
+                <xsd:element name="VariationData" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Parentage" minOccurs="0">
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string">
+                                        <xsd:enumeration value="parent"/>
+                                        <xsd:enumeration value="child"/>
+                                    </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:element>
+                            <xsd:element name="Size" type="StringNotNull" minOccurs="0"/>
+                            <xsd:element name="Color" type="StringNotNull" minOccurs="0"/>
+                            <xsd:element name="VariationTheme" minOccurs="0">
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string">
+                                        <xsd:enumeration value="Size"/>
+                                        <xsd:enumeration value="Color"/>
+                                        <xsd:enumeration value="SizeColor"/>
+                                        <xsd:enumeration value="ColorName-MagnificationStrength"/>
+                                        <xsd:enumeration value="ColorName-LensColor"/>
+                                        <xsd:enumeration value="ColorName-LensWidth"/>
+                                    </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+                <xsd:element name="ClassificationData">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="CountryOfOrigin" type="CountryOfOriginType"
+                                minOccurs="0"/>
+                            <xsd:element name="ColorMap" type="String" minOccurs="0"/>
+                            <xsd:element name="SizeMap" type="StringNotNull" minOccurs="0"/>
+                            <xsd:element name="ArchType" type="LongString" minOccurs="0"/>
+                            <xsd:element name="ArmLength" type="LengthDimension" minOccurs="0"/>
+                            <xsd:element name="BeltStyle" type="String" minOccurs="0"/>
+                            <xsd:element name="BootOpeningCircumference" type="LengthDimension"
+                                minOccurs="0"/>
+                            <xsd:element name="BridgeWidth" type="LengthDimension" minOccurs="0"/>
+                            <xsd:element name="CareInstructions" type="String" minOccurs="0"/>
+                            <xsd:element name="ShoeClosureType" type="String" minOccurs="0"/>
+                            <xsd:element name="CountryProducedIn" type="String" minOccurs="0"/>
+                            <xsd:element name="CleatDescription" type="LongString" minOccurs="0"/>
+                            <xsd:element name="CleatMaterialType" type="LongString" minOccurs="0"/>
+                            <xsd:element name="Department" type="StringNotNull" minOccurs="0"/>
+                            <xsd:element name="ExternalTestingCertification" type="String"
+                                minOccurs="0" maxOccurs="6"/>
+                            <xsd:element name="FabricType" type="String" minOccurs="0"/>
+                            <xsd:element name="ImportDesignation" type="String" minOccurs="0" />
+                            <xsd:element name="CountryAsLabeled" type="CountryOfOriginType" minOccurs="0"/>
+                            <xsd:element name="FurDescription" type="LongString" minOccurs="0"/>
+                            <xsd:element name="FabricWash" type="String" minOccurs="0"/>
+                            <xsd:element name="FrameMaterialType" type="LongString" minOccurs="0"/>
+                            <xsd:element name="HeelHeight" type="LengthDimension" minOccurs="0"/>
+                            <xsd:element name="HeelType" type="String" minOccurs="0"/>
+                            <xsd:element name="InnerMaterial" type="LongString" minOccurs="0"/>
+                            <xsd:element name="IsStainResistant" type="xsd:boolean" minOccurs="0"/>
+                            <xsd:element name="ItemShape" type="LongString" minOccurs="0"/>
+                            <xsd:element name="LensColor" type="LongString" minOccurs="0"/>
+                            <xsd:element name="LensColorMap" type="LongString" minOccurs="0"/>
+                            <xsd:element name="LensHeight" type="LengthDimension" minOccurs="0"/>
+                            <xsd:element name="LensMaterialType" type="LongString" minOccurs="0"/>
+                            <xsd:element name="LensWidth" type="LengthDimension" minOccurs="0"/>
+                            <xsd:element name="LiningDescription" type="LongString" minOccurs="0"/>
+                            <xsd:element name="OccasionAndLifestyle" type="LongString" minOccurs="0"
+                                maxOccurs="10"/>
+                            <xsd:element name="MagnificationStrength" type="Dimension" minOccurs="0"/>
+                            <xsd:element name="MaterialComposition" type="LongString" minOccurs="0"/>
+                            <xsd:element name="MaterialType" type="String" minOccurs="0"
+                                maxOccurs="3"/>
+							<xsd:element name="ModelNumber" type="StringNotNull" minOccurs="0"/>
+                            <xsd:element name="ModelName" type="StringNotNull" minOccurs="0"/>
+                            <xsd:element name="ModelYear" type="FourDigitYear" minOccurs="0"/>
+                            <xsd:element name="OuterMaterialType" type="HundredString" minOccurs="0"/>
+                            <xsd:element name="MaterialOpacity" type="HundredString" minOccurs="0"/>
+                            <xsd:element name="PatternStyle" type="String" minOccurs="0"/>
+                            <xsd:element name="PerformanceRating" type="HundredString" minOccurs="0"
+                                maxOccurs="3"/>
+                            <xsd:element name="PlatformHeight" type="Dimension" minOccurs="0"/>
+                            <xsd:element name="PocketDescription" type="String" minOccurs="0"/>
+                            <xsd:element name="PolarizationType" type="LongString" minOccurs="0"/>
+                            <xsd:element name="Season" type="HundredString" minOccurs="0"/>
+                            <xsd:element name="ShaftHeight" type="StringLengthOptionalDimension"
+                                minOccurs="0"/>
+                            <xsd:element name="ShaftWidth" type="StringLengthOptionalDimension"
+                                minOccurs="0"/>
+                            <xsd:element name="ShaftDiameter" type="StringLengthOptionalDimension"
+                                minOccurs="0"/>
+                            <xsd:element name="ShoulderStrapDrop" type="LengthDimension"
+                                minOccurs="0"/>
+                            <xsd:element name="ShoeHeightMap" type="String" minOccurs="0"/>
+                            <xsd:element name="SpecialSizeType" type="String" minOccurs="0"/>
+                            <xsd:element name="SoleMaterial" type="LongString" minOccurs="0"/>
+                            <xsd:element name="StrapType" type="LongString" minOccurs="0"/>
+                            <xsd:element name="SpecialFeatures" type="LongString" minOccurs="0"
+                                maxOccurs="3"/>
+                            <xsd:element name="SpecificUses" type="StringNotNull" minOccurs="0"
+                                maxOccurs="3"/>
+                            <xsd:element name="Character" type="HundredString" minOccurs="0"/>
+                            <xsd:element name="ToeShape" type="HundredString" minOccurs="0"/>
+                            <xsd:element name="WaistSize" type="ClothingSizeDimension" minOccurs="0"/>
+                            <xsd:element name="WaistStyle" type="String" minOccurs="0"/>
+                            <xsd:element name="WheelType" type="String" minOccurs="0"/>
+                            <xsd:element name="WaterResistanceLevel" minOccurs="0">
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string">
+                                        <xsd:enumeration value="waterproof"/>
+                                        <xsd:enumeration value="not_water_resistant"/>
+                                        <xsd:enumeration value="water_resistant"/>
+                                    </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:element>
+                            <xsd:element name="PatternName" type="TwoThousandString" minOccurs="0"/>
+                            <xsd:element name="SafetyWarning" type="SuperLongStringNotNull"
+                                minOccurs="0"/>
+                            <xsd:element name="ManufacturerWarrantyType" type="StringNotNull"
+                                minOccurs="0"/>
+                            <xsd:element name="MfrWarrantyDescriptionLabor" type="StringNotNull"
+                                minOccurs="0"/>
+                            <xsd:element name="MfrWarrantyDescriptionParts" type="StringNotNull"
+                                minOccurs="0"/>
+                            <xsd:element name="SellerWarrantyDescription"
+                                type="SuperLongStringNotNull" minOccurs="0"/>
+                            <xsd:element name="StyleKeywords" type="LongStringNotNull" minOccurs="0"
+                                maxOccurs="3"/>
+                            <xsd:element name="StyleName" type="TwoThousandString" minOccurs="0"/>
+                            <xsd:element name="TeamName" type="StringNotNull" minOccurs="0"/>
+                            <xsd:element name="ToeStyle" type="LongString" minOccurs="0"/>
+                            <xsd:element name="NumberOfItems" type="xsd:positiveInteger"
+                                minOccurs="0"/>
+                            <xsd:element name="ItemDisplayWeight" type="WeightDimension"
+                                minOccurs="0"/>
+                            <xsd:element name="ItemDisplayVolume" type="VolumeDimension"
+                                minOccurs="0"/>
+                            <xsd:element name="ItemDisplayLength" type="LengthDimension"
+                                minOccurs="0"/>
+                            <xsd:element name="ItemDisplayWidth" type="LengthDimension"
+                                minOccurs="0"/>
+                            <xsd:element name="ItemDisplayHeight" type="LengthDimension"
+                                minOccurs="0"/>
+                            <xsd:element ref="Battery" minOccurs="0"/>
+                            <xsd:element name="BatteryCellComposition" type="BatteryCellTypeValues" minOccurs="0"/>
+                            <xsd:element name="BatteryDescription" type="String" minOccurs="0"/>
+                            <xsd:element name="BatteryFormFactor" type="String" minOccurs="0"/>
+                            <xsd:element name="LithiumBatteryWeight" type="xsd:decimal" minOccurs="0"/>
+                            <xsd:element name="SportType" type="String" minOccurs="0"/>
+                            <xsd:element name="ShellType" type="String" minOccurs="0"/>
+                            <xsd:element name="CollectionName" type="String" minOccurs="0"/>
+                            <xsd:element name="InsoleType" type="String" minOccurs="0"/>
+                            <xsd:element name="LeatherType" type="String" minOccurs="0"/>
+                            <xsd:element name="PronationCorrection" type="String" minOccurs="0"/>
+                            <xsd:element name="ShoeSafetyCodeIso20345" type="ShoeSafetyCodeIso20345Type" minOccurs="0"/>
+                            <xsd:element name="ShoeWidth" type="String" minOccurs="0"/>
+                            <xsd:element name="SurfaceRecommendation" type="String" minOccurs="0"/>
+                            <xsd:element name="VolumeCapacityName" type="VolumeDimension" minOccurs="0"/>
+                            <xsd:element name="NumberOfWheels" type="PositiveInteger" minOccurs="0"/>
+                            <xsd:element name="InsertMaterial" type="String" minOccurs="0"/>
+                            <xsd:element name="ShaftDiameterDerived" type="PositiveInteger" minOccurs="0"/>
+                            <xsd:element name="BatteryWeight" type="xsd:decimal" minOccurs="0"/>
+                            <xsd:element name="MaximumCircumference" type="LengthDimension" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:simpleType name="ShoeSafetyCodeIso20345Type">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="sb"/>
+            <xsd:enumeration value="s1"/>
+            <xsd:enumeration value="s2"/>
+            <xsd:enumeration value="s3"/>
+            <xsd:enumeration value="hro"/>
+            <xsd:enumeration value="p"/>
+            <xsd:enumeration value="e"/>
+            <xsd:enumeration value="wru"/>
+            <xsd:enumeration value="o"/>
+            <xsd:enumeration value="a"/>
+            <xsd:enumeration value="ci"/>
+            <xsd:enumeration value="hi"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

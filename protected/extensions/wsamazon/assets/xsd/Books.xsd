@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xsd:include schemaLocation="amzn-base.xsd"/>
+	<xsd:element name="Books">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ProductType">
+					<xsd:complexType>
+						<xsd:choice>
+							<xsd:element ref="BooksMisc"/>
+						</xsd:choice>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="BooksMisc">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Author" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Binding" type="BindingTypes" minOccurs="1"/>
+				<xsd:element name="DustJacket" type="DustJacketTypes" minOccurs="0"/>
+				<xsd:element name="Edition" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Illustrator" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="IsAdultProduct" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="IsFixedPrice" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Language" type="LanguageStringType" minOccurs="0"/>
+				<xsd:element name="PublicationDate" type="xsd:dateTime" minOccurs="0"/>
+				<xsd:element name="SignedBy" type="SignedByValues" minOccurs="0"/>
+				<xsd:element name="SourcedCountryCode" type="SourceCountryCodeValues" minOccurs="0"/>
+				<xsd:element name="Subject" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Volume" type="StringNotNull" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:simpleType name="BindingTypes">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value= "Accessory"/>
+			<xsd:enumeration value= "Album"/>
+			<xsd:enumeration value= "Audiocd"/>
+			<xsd:enumeration value= "Audiodownload"/>
+			<xsd:enumeration value= "Bathbook"/>
+			<xsd:enumeration value= "Boardbook"/>
+			<xsd:enumeration value= "Bondedleather"/>
+			<xsd:enumeration value= "Calendar"/>
+			<xsd:enumeration value= "Cardbook"/>
+			<xsd:enumeration value= "Cards"/>
+			<xsd:enumeration value= "Cassette"/>
+			<xsd:enumeration value= "Cdrom"/>
+			<xsd:enumeration value= "Comic"/>
+			<xsd:enumeration value= "Diary"/>
+			<xsd:enumeration value= "Dvdrom"/>
+			<xsd:enumeration value= "Flexibound"/>
+			<xsd:enumeration value= "Foambook"/>
+			<xsd:enumeration value= "Game"/>
+			<xsd:enumeration value= "Hardcover"/>
+			<xsd:enumeration value= "Hardcovercomic"/>
+			<xsd:enumeration value= "Hardcoverspiral"/>
+			<xsd:enumeration value= "Imitationleather"/>
+			<xsd:enumeration value= "Journal"/>
+			<xsd:enumeration value= "Kindleedition"/>
+			<xsd:enumeration value= "Leatherbound"/>
+			<xsd:enumeration value= "Library"/>
+			<xsd:enumeration value= "Libraryaudiocd"/>
+			<xsd:enumeration value= "Libraryaudiomp3"/>
+			<xsd:enumeration value= "Looseleaf"/>
+			<xsd:enumeration value= "Map"/>
+			<xsd:enumeration value= "Massmarket"/>
+			<xsd:enumeration value= "Microfiche"/>
+			<xsd:enumeration value= "Microfilm"/>
+			<xsd:enumeration value= "Miscsupplies"/>
+			<xsd:enumeration value= "Mook"/>
+			<xsd:enumeration value= "Mp3cd"/>
+			<xsd:enumeration value= "Pamphlet"/>
+			<xsd:enumeration value= "Paperback"/>
+			<xsd:enumeration value= "Paperbackbunko"/>
+			<xsd:enumeration value= "Paperbackshinsho"/>
+			<xsd:enumeration value= "Perfect"/>
+			<xsd:enumeration value= "Plasticcomb"/>
+			<xsd:enumeration value= "Popup"/>
+			<xsd:enumeration value= "Preloadeddigitalaudioplayer"/>
+			<xsd:enumeration value= "Ragbook"/>
+			<xsd:enumeration value= "Ringbound"/>
+			<xsd:enumeration value= "Roughcut"/>
+			<xsd:enumeration value= "School"/>
+			<xsd:enumeration value= "Sheetmusic"/>
+			<xsd:enumeration value= "Singleissuemagazine"/>
+			<xsd:enumeration value= "Slide"/>
+			<xsd:enumeration value= "Spiralbound"/>
+			<xsd:enumeration value= "Stationery"/>
+			<xsd:enumeration value= "Tankobonhardcover"/>
+			<xsd:enumeration value= "Tankobonsoftcover"/>
+			<xsd:enumeration value= "Textbook"/>
+			<xsd:enumeration value= "Toy"/>
+			<xsd:enumeration value= "Transparency"/>
+			<xsd:enumeration value= "Turtleback"/>
+			<xsd:enumeration value= "Unbound"/>
+			<xsd:enumeration value= "Vinylbound"/>
+			<xsd:enumeration value= "Wallchart"/>
+			<xsd:enumeration value= "Workbook"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:simpleType name="DustJacketTypes">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="NoDustJacket"/>
+			<xsd:enumeration value="LikeNew"/>
+			<xsd:enumeration value="VeryGood"/>
+			<xsd:enumeration value="Good"/>
+			<xsd:enumeration value="Acceptable"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:simpleType name="SignedByValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Author"/>
+			<xsd:enumeration value="Illustrator"/>
+			<xsd:enumeration value="Editor"/>
+			<xsd:enumeration value="Photographer"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:simpleType name="SourceCountryCodeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="JP"/>
+			<xsd:enumeration value="US"/>
+			<xsd:enumeration value="GB"/>
+			<xsd:enumeration value="DE"/>
+			<xsd:enumeration value="Unknown"/>
+		</xsd:restriction>
+	</xsd:simpleType>	
+	
+</xsd:schema>

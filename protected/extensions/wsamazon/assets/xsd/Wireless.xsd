@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!-- Revision="$Revision: #4 $" -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<!--
+
+	$Date: 2005/04/01 $
+
+	AMAZON.COM CONFIDENTIAL.  This document and the information contained in it are
+	confidential and proprietary information of Amazon.com and may not be reproduced, 
+	distributed or used, in whole or in part, for any purpose other than as necessary 
+	to list products for sale on the www.amazon.com web site pursuant to an agreement 
+	with Amazon.com.
+
+	-->
+	<xsd:include schemaLocation="amzn-base.xsd"/>
+	<xsd:element name="Wireless">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ProductType">
+					<xsd:complexType>
+						<xsd:choice>
+							<xsd:element ref="WirelessAccessories"/>
+							<xsd:element ref="WirelessDownloads"/>
+						</xsd:choice>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+	###############################################################
+	# WirelessAccessories Classification Data
+	###############################################################
+	-->
+	<xsd:element name="WirelessAccessories">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Color" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="ColorMap" minOccurs="0"/>
+				<xsd:element name="AdditionalFeatures" type="LongStringNotNull" minOccurs="0"/>
+				<xsd:element name="TalkTime" type="TimeDimension" minOccurs="0"/>
+				<xsd:element name="StandbyTime" type="TimeDimension" minOccurs="0"/>
+				<xsd:element name="ChargingTime" type="TimeDimension" minOccurs="0"/>
+				<xsd:element name="BatteryPower" type="BatteryPowerIntegerDimension" minOccurs="0"/>
+				<xsd:element name="Solar" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Refillable" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Extended" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Slim" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Auxiliary" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="BatteryType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="AntennaType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="CompatiblePhoneModels" type="StringNotNull" minOccurs="0" maxOccurs="18"/>
+				<xsd:element name="ManufacturerName" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Keywords" type="StringNotNull" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="ItemPackageQuantity" type="xsd:positiveInteger" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+	###############################################################
+	# WirelessDownloads Classification Data
+	###############################################################
+	-->
+	<xsd:element name="WirelessDownloads">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="CompatiblePhoneModels" type="StringNotNull" minOccurs="0" maxOccurs="18"/>
+				<xsd:element name="ManufacturerName" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="AdditionalFeatures" type="LongStringNotNull" minOccurs="0"/>
+				<xsd:element name="Keywords" type="StringNotNull" minOccurs="0" maxOccurs="5"/>
+                                <xsd:element name="ApplicationVersion" type="StringNotNull" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>
+

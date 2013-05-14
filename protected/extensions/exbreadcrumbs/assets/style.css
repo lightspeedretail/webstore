@@ -1,0 +1,25 @@
+@CHARSET "ISO-8859-1";
+
+.xbreadcrumbs LI {
+	border-right: none;
+	background: url(separator.gif) no-repeat right center;
+	padding-right: 15px;
+	padding-left: 10px;
+}
+
+.xbreadcrumbs LI.current a{
+    margin-top: 3px;
+}
+.xbreadcrumbs LI.current {
+	background: none;
+
+}
+
+.xbreadcrumbs LI UL LI {
+	background: none;
+}
+
+.xbreadcrumbs LI A.home {
+	background: url(home.gif) no-repeat left center;
+	padding-left: 20px;
+}

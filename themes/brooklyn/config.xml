@@ -1,0 +1,22 @@
+<config>
+    <viewset>cities</viewset>
+    <name>Brooklyn</name>
+    <thumbnail>brooklyn.png</thumbnail>
+    <version>2.0.0</version>
+    <description>Our default template, suitable for any type of business.</description>
+    <credit>Designed by LightSpeed</credit>
+    <subthemes>
+        <subtheme>
+            <name>Light</name>
+            <css>light</css>
+        </subtheme>
+        <subtheme>
+            <name>Dark</name>
+            <css>dark</css>
+        </subtheme>
+        <subtheme>
+            <name>Colorless</name>
+            <css>colorless</css>
+        </subtheme>
+    </subthemes>
+</config>

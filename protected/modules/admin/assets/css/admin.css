@@ -1,0 +1,129 @@
+body { padding-top: 60px; padding-bottom: 40px;}
+.sidebar-nav { padding: 9px 0; }
+.hero-unit { padding-left: 20px; padding-top: 10px; }
+input[type="text"] {  width: 240px; }
+select {  width:auto; }
+.hero-unit label {  font-size: 0.7em; font-weight: 600; text-align: right; padding-right: 5px;  }
+.hero-unit .helpertext ,.hero-unit .hint {  font-size: 0.6em; font-weight: 500; font-style: italic; text-align: left; padding-left: 5px; line-height: 15px; margin-top: 0px; vertical-align: text-top;}
+.onoff { float:left;width:120px;}
+.fieldtitle { width: 100px;}
+.iphone_switch_container { margin-top: -6px; }
+.editinstructions { font-size: 13px; line-height: 18px; padding-bottom: 16px; }
+.advancedlabel { font-size: 0.6em; padding-left: 3px; }
+.testlabel { background: url(img/warning.png); margin-left: 3px; width: 22px; height: 20px; display: inline-block; }
+.activelabel { background: url(img/green.png); margin-left: 3px;  margin-right: 4px;width: 13px; height: 14px; display: inline-block; }
+.inactivelabel { background: url(img/blank.png); margin-left: 3px;  margin-right: 4px; width: 13px; height: 14px; display: inline-block; }
+.errorMessage { font-size: 0.7em; color: #dd0000; }
+.bgchanged { background-color: #E3E4FA; }
+.bgwhite { background-color: #ffffff; }
+.bgalert { background-color: #F778A1; }
+.bgdelete { background-color: #aa3333; color: white; }
+.spaceafter {  margin-bottom: 10px; }
+.nobottom { padding-bottom: 0px; }
+pre {font-size: 0.8em; }
+
+#restrictions .row { margin-left: 0;}
+#restrictions .toplabel { font-size: 0.8em; margin-top: -7px;}
+#restrictions label { font-size: 0.7em; margin-bottom: 0px; font-weight: 600; text-transform: uppercase;}
+#restrictions .tip { font-size: 0.6em; margin-top: 4px;}
+#restrictions .listboxReset { font-size: 0.6em; text-decoration: underline;}
+#restrictions .span3 { width: 204px; }
+#restrictions .span2 { width: 165px; }
+#restrictions select.tall { font-size: 0.7em; width: 155px; height: 150px; margin-bottom: 0px;}
+#restrictions select.wider {  width: 205px; }
+#restrictions select option { padding-left: 0px;}
+.basic, .item, .destinationrates, .settiers { border-bottom: 1px dashed #0088CC;text-decoration: none;}
+#restrictions [class*="span"] { margin-left: 3px;}
+#buttonSavePCR { color: white;}
+#restrictions .dropdown { font-size: 0.9em; font-weight: 600;  padding-right: 5px; margin-top: 7px; }
+h3 { margin-top: 2px; }
+.editable-click, a.editable-click, a.editable-click:hover { color: #0088CC; border-bottom: 1px dashed #c5cccc; text-decoration: none;}
+.editable-empty { color: #999999;}
+.grid-view { padding-top: 0px; }
+
+.documentation { height: 2000px; overflow: hidden; border: 0px;}
+/* Shipping and Payment Modules */
+.inactivemodule { color: #c6c6c6;}
+
+/* promo codes */
+#newpromocode label { text-transform: uppercase; font-size: 0.8em; }
+#newpromocode #PromoCode_code { width: 190px; }
+#newpromocode #PromoCode_type {  margin-bottom: 10px; }
+#newpromocode #PromoCode_amount { width: 100px; }
+#newpromocode #PromoCode_qty_remaining,#newpromocode #PromoCode_threshold { width: 90px; }
+#newpromocode .tip { font-size: 0.6em; padding-top: 9px;}
+
+/* promo codes */
+#newtier label { text-transform: uppercase; font-size: 0.8em; }
+#newtier #ShippingTiers_start_price { width: 100px; }
+#newtier #ShippingTiers_end_price {  width: 100px; margin-bottom: 10px; }
+#newtier #ShippingTiers_rate { width: 100px; }
+
+/* Destinations */
+#newdestination #Destination_zipcode1,#newdestination #Destination_zipcode2  { width: 160px; }
+.destinations .tip { font-size: 0.7em; line-height: 14px; font-weight: normal; }
+/*.field_offerservices { line-height:25px; padding-bottom: 15px;  }*/
+.offerservices input[type="checkbox"]  { display: inline; margin-left: 4px; }
+.offerservices label { display: inline; }
+/*.field_offerservices .optionvalue.span5 { width: 57.4468% } */
+
+.search label { margin-left: 10px;margin-right: 8px; text-transform: uppercase; color: #a1a1a1; }
+#xlsSearch { width: 150px; }
+
+/* These are some specific tweaks for certain pages */
+#uspsAdminForm_offerservices .offerservices label { font-size: 0.6em; } /* because USPS labels are so big */
+.rememberMe { font-size: 0.8em; font-weight: 600; line-height: 17px; }
+/*.field_offerservices { line-height:25px; padding-bottom: 15px;  }*/
+
+.editorder { font-size: 0.7em;}
+.editorder label {   display: inline; }
+.editorder input[type="text"] {  font-size: 1.1em; height: 12px; width: 130px;}
+.editorder .button-column { width: 70px; }
+.editorder th {  background-color: #f9f9f9; text-align: left; font-size: 1.1em; font-weight: 600; }
+.editorder tbody {  text-align: left; font-size: 1.1em; font-weight: 500; }
+.editorder .delete {  color: #dd0000; }
+
+#sortable { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+#sortable li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; padding-bottom: 0.8em; font-size: 1.4em; height: 18px; background: none; background-color: #ffffff; cursor: pointer; }
+#sortable li span { position: absolute; margin-left: -1.3em; margin-top: 0.2em; background-color: #ffffff;  }
+
+.destinations input[type="text"] { width: 50px; }
+.destinations th {  background-color: #f9f9f9; text-align: left; font-size: 0.7em; font-weight: 600; width: 100px;}
+.destinations .destlabel { width: 150px;}
+
+#headerimage input {  }
+#headerimage img { margin-left: 20px; margin-top: -48px; margin-right: 50px; max-height: 125px; max-width: 600px; }
+#headerimage label { text-align: left; }
+
+.tier-grid input[type="text"] { width: 150px; margin-bottom: 2px; font-size: 0.8em; height: 14px;}
+.tier-grid th {  background-color: #f9f9f9; text-align: left; font-size: 0.7em; font-weight: 600; width: 100px;}
+.tier-grid .destlabel { width: 150px;}
+.tier-grid .editinstructions { font-size: 0.8em; }
+
+.grid-view pre { font-size: 0.8em; }
+#product-grid { font-size: 0.8em;}
+
+
+.newalert { background: url(img/warning.png) no-repeat; margin-left: 0px;  }
+
+.themeicon img {  width: 200px; height: 160px; }
+.themeicon {  border: 8px solid #EEEEEE; width: 200px; height: 160px;}
+.themeicon.selected {  border: 8px solid #c6d0e5; }
+.themeicon label { padding: 0px; margin: 0px; width: 200px; height: 160px; text-align: left; }
+.themeoptions { font-size: 0.8em; }
+.themeoptions select { margin-left: 13px; margin-top: 8px; width: 180px; }
+.themeselect { display: none; }
+.themeinstaller {  margin-left: 13px; font-size: 0.8em; font-weight: 600; }
+.themeinstallerdesc { margin-left: 13px; font-size: 0.7em; font-weight: 400; line-height: 18px;  }
+.themeinstallercredit { margin-left: 13px; font-size: 0.6em; font-weight: 300; line-height: 18px;  }
+
+/*.themeicon .selected {  border: 5px solid blue;}*/
+
+.hero-unit  legend { font-size: 0.7em; border: none; line-height: 18px; padding-bottom: 16px; }
+.maxhint { max-height: 20px; overflow: hidden; }
+.caret { display: none; }
+@media only screen and (max-width: 1001px) { /* through LightSpeed */
+    body { font-size: 13px;}
+    input[type="text"] {  width: 200px; }
+    #xlsSearch { width: 100px; }
+}

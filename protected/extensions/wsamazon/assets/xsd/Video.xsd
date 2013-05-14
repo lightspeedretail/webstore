@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Revision="$Revision: #1 $" -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<!--
+  			 $Date: 2009/09/25 $      
+         AMAZON.COM CONFIDENTIAL.  This document and the information contained in it are
+         confidential and proprietary information of Amazon.com and may not be reproduced,
+         distributed or used, in whole or in part, for any purpose other than as necessary 
+         to list products for sale on the www.amazon.com web site pursuant to an agreement
+         with Amazon.com.
+-->
+	<xsd:include schemaLocation="amzn-base.xsd"/>
+	<xsd:element name="Video">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ProductType">
+					<xsd:complexType>
+						<xsd:choice>
+							<xsd:element ref="VideoDVD"/>
+							<xsd:element ref="VideoVHS"/>
+						</xsd:choice>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+			###############################################################
+			# VideoDVD  Classification Data
+			###############################################################
+		-->
+	<xsd:element name="VideoDVD">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="BBFCRating" type="BBFC_Rating_Type" minOccurs="0"/>
+                                <xsd:element name="CNCRating" type="CNC_Rating_Type" minOccurs="0"/>
+                                <xsd:element name="FSKRating" type="FSK_Rating_Type" minOccurs="0"/>
+                                <xsd:element name="MPAARating" type="MPAARatingType" minOccurs="0"/>
+				<xsd:element name="MediaType" type="VideoDVDMediaType" minOccurs="0"/>
+				<xsd:element name="NumberOfItems" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfDiscs" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="RunTime" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="Format" type="VideoFormatType" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="DVDRegion" type="DVDRegionType" minOccurs="0" maxOccurs="2"/>
+				<xsd:element name="BluRayRegion" type="BluRayRegionType" minOccurs="0" maxOccurs="2"/>
+				<xsd:element name="AudioEncoding" type="AudioEncodingType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="Language" type="LanguageStringType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="SubtitleLanguage" type="LanguageStringType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="PublicationDate" type="xsd:dateTime" minOccurs="0"/>
+				<xsd:element name="TheatricalReleaseDate" type="xsd:dateTime" minOccurs="0"/>
+				<xsd:element name="Actor" type="MediumStringNotNull" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="Director" type="MediumStringNotNull" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="Host" type="MediumStringNotNull" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="Narrator" type="StringNotNull" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="Producer" type="MediumStringNotNull" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="PrimaryContributor" type="MediumStringNotNull" minOccurs="0" maxOccurs="10"/>
+                                <xsd:element name="SubjectContent" type="TwoFiftyStringNotNull" minOccurs="0" maxOccurs="2"/>
+                                <xsd:element name="IsAdultProduct" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Genre" type="StringNotNull" minOccurs="0"/>
+                                <xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+			###############################################################
+			# VideoVHS  Classification Data
+			###############################################################
+		-->
+	<xsd:element name="VideoVHS">
+		<xsd:complexType>
+			<xsd:sequence>
+                                <xsd:element name="BBFCRating" type="BBFC_Rating_Type" minOccurs="0"/>
+                                <xsd:element name="CNCRating" type="CNC_Rating_Type" minOccurs="0"/>
+                                <xsd:element name="FSKRating" type="FSK_Rating_Type" minOccurs="0"/>
+				<xsd:element name="MPAARating" type="MPAARatingType" minOccurs="0"/>
+				<xsd:element name="MediaType" type="VideoVHSMediaType" minOccurs="0"/>
+				<xsd:element name="NumberOfItems" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="RunTime" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="VideotapeRecordingSpeed" type="VideotapeRecordingSpeedType" minOccurs="0"/>
+				<xsd:element name="Format" type="VideoFormatType" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="AudioEncoding" type="AudioEncodingType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="Language" type="LanguageStringType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="SubtitleLanguage" type="LanguageStringType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="PublicationDate" type="xsd:dateTime" minOccurs="0"/>
+				<xsd:element name="TheatricalReleaseDate" type="xsd:dateTime" minOccurs="0"/>
+				<xsd:element name="Actor" type="MediumStringNotNull" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="Director" type="MediumStringNotNull" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="Host" type="MediumStringNotNull" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="Narrator" type="StringNotNull" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="Producer" type="MediumStringNotNull" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="PrimaryContributor" type="MediumStringNotNull" minOccurs="0" maxOccurs="10"/>
+                                <xsd:element name="SubjectContent" type="TwoFiftyStringNotNull" minOccurs="0" maxOccurs="2"/>
+                                <xsd:element name="IsAdultProduct" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Genre" type="StringNotNull" minOccurs="0"/>
+                                <xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+			###############################################################
+			# Video Data Types
+			###############################################################
+	-->
+	<xsd:simpleType name="VideoDVDMediaType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="dvd"/>
+			<xsd:enumeration value="hd_dvd"/>
+			<xsd:enumeration value="blu_ray"/>
+			<xsd:enumeration value="videodisc"/>
+			<xsd:enumeration value="dvd_i"/>
+			<xsd:enumeration value="dvd_r"/>
+			<xsd:enumeration value="umd"/>
+			<xsd:enumeration value="video_cd"/>
+			<xsd:enumeration value="mini_disc"/>
+			<xsd:enumeration value="laser_disc"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="VideoVHSMediaType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="VHStape"/>
+			<xsd:enumeration value="videotape"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="DVDRegionType">
+		<xsd:restriction base="xsd:integer">
+			<xsd:minInclusive value="0"/>
+			<xsd:maxInclusive value="8"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="BluRayRegionType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="region_a"/>
+			<xsd:enumeration value="region_b"/>
+			<xsd:enumeration value="region_c"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="VideoFormatType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="ac-3"/>
+			<xsd:enumeration value="dolby"/>
+			<xsd:enumeration value="thx"/>
+			<xsd:enumeration value="pal"/>
+			<xsd:enumeration value="ntsc"/>
+			<xsd:enumeration value="bw"/>
+			<xsd:enumeration value="color"/>
+			<xsd:enumeration value="subtitled"/>
+			<xsd:enumeration value="dubbed"/>
+			<xsd:enumeration value="closed-captioned"/>
+			<xsd:enumeration value="import"/>
+			<xsd:enumeration value="remastered"/>
+			<xsd:enumeration value="widescreen"/>
+			<xsd:enumeration value="hi-fidelity"/>
+			<xsd:enumeration value="collectors_edition"/>
+			<xsd:enumeration value="silent"/>
+			<xsd:enumeration value="directors_cut"/>
+			<xsd:enumeration value="full_screen"/>
+			<xsd:enumeration value="anamorphic"/>
+			<xsd:enumeration value="surround"/>
+			<xsd:enumeration value="dts_stereo"/>
+			<xsd:enumeration value="dvd_video"/>
+			<xsd:enumeration value="vhs"/>
+			<xsd:enumeration value="vhs_c"/>
+			<xsd:enumeration value="hybrid_sacd"/>
+			<xsd:enumeration value="digital_sound"/>
+			<xsd:enumeration value="deluxe_edition"/>
+			<xsd:enumeration value="special_extended_version"/>
+			<xsd:enumeration value="special_limited_edition"/>
+			<xsd:enumeration value="mono"/>
+			<xsd:enumeration value="dual_disc"/>
+			<xsd:enumeration value="value_price"/>
+			<xsd:enumeration value="multisystem"/>
+			<xsd:enumeration value="hd_dvd"/>
+			<xsd:enumeration value="blu_ray"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+        <xsd:simpleType name="BBFC_Rating_Type">
+                <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="U(Universal)"/>
+                        <xsd:enumeration value="PG(Parental Guidance)"/>
+                        <xsd:enumeration value="12"/>
+                        <xsd:enumeration value="15"/>
+                        <xsd:enumeration value="18"/>
+                        <xsd:enumeration value="Exempt"/>
+                </xsd:restriction>
+        </xsd:simpleType>
+        <xsd:simpleType name="CNC_Rating_Type">
+                <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="universal"/>
+                        <xsd:enumeration value="parental_guidance"/>
+                        <xsd:enumeration value="ages_12_and_over"/>
+                        <xsd:enumeration value="ages_16_and_over"/>
+                        <xsd:enumeration value="ages_18_and_over"/>
+                        <xsd:enumeration value="ages_18_and_over_x_rated"/>
+                </xsd:restriction>
+        </xsd:simpleType>
+        <xsd:simpleType name="FSK_Rating_Type">
+                <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="without_age_limitation"/>
+                        <xsd:enumeration value="ages_6_and_over"/>
+                        <xsd:enumeration value="ages_12_and_over"/>
+                        <xsd:enumeration value="ages_16_and_over"/>
+                        <xsd:enumeration value="ages_18_and_over"/>
+                </xsd:restriction>
+        </xsd:simpleType>
+	<xsd:simpleType name="MPAARatingType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="g"/>
+			<xsd:enumeration value="nc-17"/>
+			<xsd:enumeration value="pg"/>
+			<xsd:enumeration value="pg-13"/>
+			<xsd:enumeration value="nr"/>
+			<xsd:enumeration value="unrated"/>
+			<xsd:enumeration value="r"/>
+			<xsd:enumeration value="x"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="VideotapeRecordingSpeedType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Unknown"/>
+			<xsd:enumeration value="SP"/>
+			<xsd:enumeration value="EP"/>
+			<xsd:enumeration value="SLP"/>
+			<xsd:enumeration value="LP"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GetServiceStatusResponse xmlns="https://mws.amazonservices.com/Orders/2011-01-01">
+  <GetServiceStatusResult>
+    <!--Optional:-->
+    <Status>YELLOW</Status>
+    <!--Optional:-->
+    <Timestamp>2007-10-26T06:36:28</Timestamp>
+    <!--Optional:-->
+    <MessageId>string</MessageId>
+    <!--Optional:-->
+    <Messages>
+      <!--1 or more repetitions:-->
+      <Message>
+        <!--Optional:-->
+        <Locale>string</Locale>
+        <!--Optional:-->
+        <Text>string</Text>
+      </Message>
+    </Messages>
+  </GetServiceStatusResult>
+  <ResponseMetadata>
+    <RequestId>string</RequestId>
+  </ResponseMetadata>
+</GetServiceStatusResponse>

@@ -1,0 +1,2612 @@
+<?xml version="1.0"?>
+<!-- Revision="$Revision: #C_1 $" -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<!--
+$Date: 2012/03/22 $
+
+AMAZON.COM CONFIDENTIAL.  This document and the information contained in it are
+confidential and proprietary information of Amazon.com and may not be reproduced,
+distributed or used, in whole or in part, for any purpose other than as necessary
+to list products for sale on the www.amazon.com web site pursuant to an agreement
+with Amazon.com.
+-->
+	<xsd:include schemaLocation="amzn-base.xsd"/>
+	<xsd:element name="CameraPhoto">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ProductType">
+					<xsd:complexType>
+						<xsd:choice>
+							<xsd:element ref="FilmCamera"/>
+							<xsd:element ref="Camcorder"/>
+							<xsd:element ref="DigitalCamera"/>
+							<xsd:element ref="DigitalFrame"/>
+							<xsd:element ref="Binocular"/>
+							<xsd:element ref="SurveillanceSystem"/>
+							<xsd:element ref="Telescope"/>
+							<xsd:element ref="Microscope"/>
+							<xsd:element ref="Darkroom"/>
+							<xsd:element ref="Lens"/>
+							<xsd:element ref="LensAccessory"/>
+							<xsd:element ref="Filter"/>
+							<xsd:element ref="Film"/>
+							<xsd:element ref="BagCase"/>
+							<xsd:element ref="BlankMedia"/>
+							<xsd:element ref="PhotoPaper"/>
+							<xsd:element ref="Cleaner"/>
+							<xsd:element ref="Flash"/>
+							<xsd:element ref="TripodStand"/>
+							<xsd:element name="Lighting" type="LightingType"/>
+							<xsd:element ref="Projection"/>
+							<xsd:element ref="PhotoStudio"/>
+							<xsd:element ref="LightMeter"/>
+							<xsd:element ref="PowerSupply"/>
+							<xsd:element ref="OtherAccessory"/>
+						</xsd:choice>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element ref="Battery" minOccurs="0"/>
+				<xsd:element name="BatteryCellType" type="BatteryCellTypeValues" minOccurs="0"/>
+				<xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+				<xsd:element name="Manufacturer" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ModelName" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ModelNumber" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MfrPartNumber" type="FortyStringNotNull" minOccurs="0"/>
+				<xsd:element name="CustomerPackageType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="CanShipInOriginalContainer" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="IdentityPackageType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="StringNotNull">
+							<xsd:enumeration value="bulk"/>
+							<xsd:enumeration value="frustration_free"/>
+							<xsd:enumeration value="traditional"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Color" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Rebate" minOccurs="0" maxOccurs="2" >        
+					<xsd:complexType>                                           
+						<xsd:sequence>                                          
+							<xsd:element name="RebateStartDate" type="xsd:dateTime"/>
+							<xsd:element name="RebateEndDate" type="xsd:dateTime"/>
+							<xsd:element name="RebateMessage" type="TwoFiftyStringNotNull"/>
+						</xsd:sequence>                                         
+					</xsd:complexType>                                          
+				</xsd:element>
+				<xsd:element name="ColorMap" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ItemsIncluded" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Keywords" type="StringNotNull" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="PlatinumKeywords" type="StringNotNull" minOccurs="0"
+					maxOccurs="20"/>
+				<xsd:element name="AudioInput" type="StringNotNull" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="AutoFocusTechnology" type="StringNotNull" minOccurs="0"
+					maxOccurs="2"/>
+				<xsd:element name="BatteryTypeLithiumIon" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="BatteryTypeLithiumMetal" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="CompatibleDevices" type="StringNotNull" minOccurs="0"
+					maxOccurs="10"/>
+				<xsd:element name="CompatibleMountings" type="StringNotNull" minOccurs="0"
+					maxOccurs="5"/>
+				<xsd:element name="DeviceType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="DisplayTechnology" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="DisplayType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FilmSpeedRange" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Finderscope" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FormFactor" type="StringNotNull" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="GuideNumber" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="HardwarePlatform" type="MediumStringNotNull" minOccurs="0"/>
+				<xsd:element name="HasImageStabilizer" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="ImageArea" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ItemDisplayDiameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="ItemDisplayDepth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="ItemDisplayHeight" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="ItemDisplayLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="ItemDisplayWeight" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="ItemDisplayWidth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="ItemThickness" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="LensCoverage" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="LensSystemSpecialFunctions" type="StringNotNull" minOccurs="0"
+					maxOccurs="5"/>
+				<xsd:element name="LightSensitivity" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryEnergyContent" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryPackaging" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="batteries_contained_in_equipment"/>
+							<xsd:enumeration value="batteries_only"/>
+							<xsd:enumeration value="batteries_packed_with_equipment"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LithiumBatteryVoltage" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryWeight" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="ManufacturerWarrantyDescription" type="StringNotNull"
+					minOccurs="0"/>
+				<xsd:element name="ManufacturerWarrantyType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaximumApertureRange" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaximumHeight" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="MaximumLifetimeCharges" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="MaximumManufacturerWeightRecommended"
+					type="WeightIntegerDimension" minOccurs="0"/>
+				<xsd:element name="MediaType" type="StringNotNull" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="MemoryStorageCapacity" type="MemorySizeDimension" minOccurs="0"/>
+				<xsd:element name="MemoryTechnology" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MfrWarrantyDescriptionLabor" type="SuperLongStringNotNull"
+					minOccurs="0"/>
+				<xsd:element name="MfrWarrantyDescriptionParts" type="SuperLongStringNotNull"
+					minOccurs="0"/>
+				<xsd:element name="MicrophoneOperationMode" type="StringNotNull" minOccurs="0"
+					maxOccurs="5"/>
+				<xsd:element name="MinFocalRange" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="MinimumHeight" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="MountingType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumIonCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumMetalCells" type="xsd:positiveInteger"
+					minOccurs="0"/>
+				<xsd:element name="OpticalSensorResolution" type="PixelDimension" minOccurs="0"/>
+				<xsd:element name="OpticalSensorSize" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="OpticalSensorTechnology" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Parentage" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="parent"/>
+							<xsd:enumeration value="child"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="VariationTheme" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="CustomerPackageType"/>
+							<xsd:enumeration value="ColorName-CustomerPackageType"/>
+							<xsd:enumeration value="SizeName-CustomerPackageType"/>
+							<xsd:enumeration value="SizeName-ColorName-CustomerPackageType"/>
+							<xsd:enumeration value="StyleName-CustomerPackageType"/>
+							<xsd:enumeration value="SizeName-StyleName-CustomerPackageType"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="RangefinderType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="RechargeableBatteryIncluded" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="RemoteControlDescription" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="RemovableStorageInterface" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="RollQuantity" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SellerWarrantyDescription" type="SuperLongStringNotNull"
+					minOccurs="0"/>
+				<xsd:element name="SizeName" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ShootingModes" type="StringNotNull" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="SupportedImageType" type="ImageFormatTypeValues" minOccurs="0"
+					maxOccurs="5"/>
+				<xsd:element name="StyleName" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="VideoInput" type="StringNotNull" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="VideoInputFormat" type="StringNotNull" minOccurs="0"
+					maxOccurs="10"/>
+				<xsd:element name="VideoInputSpecialEffects" type="StringNotNull" minOccurs="0"
+					maxOccurs="5"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Film Camera Classification Data
+###############################################################
+-->
+	<xsd:element name="FilmCamera">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="CameraType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="point-and-shoot"/>
+							<xsd:enumeration value="slr"/>
+							<xsd:enumeration value="instant"/>
+							<xsd:enumeration value="single-use"/>
+							<xsd:enumeration value="large-format"/>
+							<xsd:enumeration value="medium-format"/>
+							<xsd:enumeration value="rangefinder"/>
+							<xsd:enumeration value="field"/>
+							<xsd:enumeration value="monorail"/>
+							<xsd:enumeration value="kids"/>
+							<xsd:enumeration value="3-d"/>
+							<xsd:enumeration value="micro"/>
+							<xsd:enumeration value="panorama"/>
+							<xsd:enumeration value="passport-and-id"/>
+							<xsd:enumeration value="underwater"/>
+							<xsd:enumeration value="other"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Durability" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="Features" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="FilmFormat" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="aps"/>
+							<xsd:enumeration value="16mm"/>
+							<xsd:enumeration value="35mm"/>
+							<xsd:enumeration value="110"/>
+							<xsd:enumeration value="120"/>
+							<xsd:enumeration value="2x3"/>
+							<xsd:enumeration value="4x5"/>
+							<xsd:enumeration value="5x7"/>
+							<xsd:enumeration value="6x8"/>
+							<xsd:enumeration value="8x10"/>
+							<xsd:enumeration value="8x20"/>
+							<xsd:enumeration value="10x12"/>
+							<xsd:enumeration value="11x14"/>
+							<xsd:enumeration value="12x20"/>
+							<xsd:enumeration value="14x17"/>
+							<xsd:enumeration value="16x20"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="FilmManagementFeatures" type="FilmManagementFeaturesTypeValues"
+					minOccurs="0"/>
+				<xsd:element name="FixedFocalLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="FocusType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="auto-focus"/>
+							<xsd:enumeration value="manual-focus"/>
+							<xsd:enumeration value="manual-and-auto-focus"/>
+							<xsd:enumeration value="focus-free"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LensThread" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="LensType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="fixed"/>
+							<xsd:enumeration value="interchangeable"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="OpticalZoomRange" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="MacroFocus" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="MinFocalLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="MaxFocalLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="MinAperture" type="ApertureDimension" minOccurs="0"/>
+				<xsd:element name="MaxAperture" type="ApertureDimension" minOccurs="0"/>
+				<xsd:element name="MinShutterSpeed" type="FourDecimal" minOccurs="0"/>
+				<xsd:element name="MaxShutterSpeed" type="FourDecimal" minOccurs="0"/>
+				<xsd:element name="MeteringMethods" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ISORange" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FlashType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="automatic"/>
+							<xsd:enumeration value="forced"/>
+							<xsd:enumeration value="fill"/>
+							<xsd:enumeration value="none"/>
+							<xsd:enumeration value="flash-override"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="FlashModes" type="StringNotNull" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="HotShoe" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="FlashSynchronization" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Red-EyeReduction" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="DiopterAdjustment" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Viewfinder" type="StringNotNull" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="LCD" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="DateImprint" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="MidrollChange" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="MidrollRewind" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="AutoRewind" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="AutoFilmAdvance" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="AutoFilmLoad" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="SelfTimer" type="TimeDimension" minOccurs="0"/>
+				<xsd:element name="RemoteIncluded" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="ContinuousShooting" type="ContinuousShootingDimension"
+					minOccurs="0"/>
+				<xsd:element name="BatteryType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BatteryIncluded" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="ExposureControl" minOccurs="0" maxOccurs="5">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="manual"/>
+							<xsd:enumeration value="automatic"/>
+							<xsd:enumeration value="program"/>
+							<xsd:enumeration value="manual-and-automatic"/>
+							<xsd:enumeration value="aperture-priority"/>
+							<xsd:enumeration value="shutter-speed-priority"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Size" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="compact"/>
+							<xsd:enumeration value="ultra-compact"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="PackageType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="body-only"/>
+							<xsd:enumeration value="multiple-lenses"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Remote" type="LongString" minOccurs="0"/>
+				<xsd:element name="WaterResistanceDepth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="WaterResistanceLevel" type="WaterResistantType" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Camcorder and Movie Camera Classification Data
+###############################################################
+-->
+	<xsd:element name="Camcorder">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="AnalogFormats" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="general"/>
+							<xsd:enumeration value="8mm"/>
+							<xsd:enumeration value="betacam-sp"/>
+							<xsd:enumeration value="hi-8"/>
+							<xsd:enumeration value="s-vhs"/>
+							<xsd:enumeration value="s-vhs-c"/>
+							<xsd:enumeration value="vhs"/>
+							<xsd:enumeration value="vhs-c"/>
+							<xsd:enumeration value="other"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="DigitalFormats" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="general"/>
+							<xsd:enumeration value="digital-betacam"/>
+							<xsd:enumeration value="dv"/>
+							<xsd:enumeration value="dvcam"/>
+							<xsd:enumeration value="dvcpro"/>
+							<xsd:enumeration value="minidv"/>
+							<xsd:enumeration value="micromv"/>
+							<xsd:enumeration value="digital8"/>
+							<xsd:enumeration value="dvd"/>
+							<xsd:enumeration value="minidisc"/>
+							<xsd:enumeration value="other"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="SensorType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="ccd"/>
+							<xsd:enumeration value="3-chip-ccd"/>
+							<xsd:enumeration value="cmos"/>
+							<xsd:enumeration value="progressive-scan-ccd"/>
+							<xsd:enumeration value="fixed-zoom-lens"/>
+							<xsd:enumeration value="interchangeable-lens"/>
+							<xsd:enumeration value="other-lens"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="FilmFormats" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="general"/>
+							<xsd:enumeration value="8mm"/>
+							<xsd:enumeration value="16mm"/>
+							<xsd:enumeration value="35mm"/>
+							<xsd:enumeration value="65mm"/>
+							<xsd:enumeration value="70mm"/>
+							<xsd:enumeration value="other"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LensType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="fixed-non-zoom"/>
+							<xsd:enumeration value="fixed-zoom"/>
+							<xsd:enumeration value="interchangeable"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="OpticalZoom" type="ZoomDimension" minOccurs="0"/>
+				<xsd:element name="DigitalZoom" type="ZoomDimension" minOccurs="0"/>
+				<xsd:element name="VideoResolution" type="PixelDimension" minOccurs="0"/>
+				<xsd:element name="ThreeDTechnology" type="ThreeDTechnologyTypeValues" minOccurs="0"/>
+				<xsd:element name="AlarmClock" type="LongString" minOccurs="0"/>
+				<xsd:element name="AnalogRBGInput" type="LongString" minOccurs="0"/>
+				<xsd:element name="Audio" type="AudioTypeValues" minOccurs="0"/>
+				<xsd:element name="LCDScreenSize" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="LCDSwivel" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Viewfinder" type="StringNotNull" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="MinAperture" type="ApertureDimension" minOccurs="0"/>
+				<xsd:element name="MaxAperture" type="ApertureDimension" minOccurs="0"/>
+				<xsd:element name="ImageStabilization" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="InfraredCapability" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="FirewireOutput" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="S-VideoOutput" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="USBOutput" minOccurs="0" maxOccurs="2">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="usb1.1"/>
+							<xsd:enumeration value="usb2.0"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="AVOutput" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Connectivity" type="LongString" minOccurs="0"/>
+				<xsd:element name="DigitalStillCapability" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="DigitalStillResolution" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Durability" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="ExternalMemoryType" type="ExternalMemoryTypeValues" minOccurs="0"/>
+				<xsd:element name="ExternalMemoryIncluded" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="ExternalMemorySize" type="MemorySizeDimension" minOccurs="0"/>
+				<xsd:element name="FixedFocalLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="FocusFeatures" type="LongString" minOccurs="0"/>
+				<xsd:element name="ImageFormat" type="ImageFormatTypeValues" minOccurs="0"
+					maxOccurs="2"/>
+				<xsd:element name="InternalMemorySize" type="MemorySizeDimension" minOccurs="0"/>
+				<xsd:element name="InternalMemoryType" type="LongString" minOccurs="0"/>
+				<xsd:element name="ISORange" type="LongString" minOccurs="0"/>
+				<xsd:element name="MaximumFocalLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="MediaStorage" type="LongString" minOccurs="0"/>
+				<xsd:element name="MinimumFocalLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="MPEGMovieMode" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="mpeg"/>
+							<xsd:enumeration value="mpeg2"/>
+							<xsd:enumeration value="mpeg4"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="USBStreaming" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="HeadphoneJack" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="FlyingEraseHeads" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Autolight" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="HotShoe" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element ref="ComputerPlatform" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="SoftwareIncluded" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BatteryType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="RechargeableBatteryIncluded" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="ACAdapterIncluded" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Remote" type="LongString" minOccurs="0"/>
+				<xsd:element name="RemoteIncluded" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="PlaybackFormat" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="pal"/>
+							<xsd:enumeration value="ntsc"/>
+							<xsd:enumeration value="multisystem"/>
+							<xsd:enumeration value="secam"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Features" minOccurs="0" maxOccurs="7">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="lcd-screen"/>
+							<xsd:enumeration value="mpeg"/>
+							<xsd:enumeration value="digital-still"/>
+							<xsd:enumeration value="memory-card-compatible"/>
+							<xsd:enumeration value="image-stabilization"/>
+							<xsd:enumeration value="insert-edit"/>
+							<xsd:enumeration value="underwater"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="TotalFirewirePorts" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="TotalNumberOfHDMIPorts" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="TotalUSB1.0Ports" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="TotalUSB1.1Ports" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="TotalUSB2.0Ports" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="TotalUSB3.0Ports" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="TotalUSBPorts" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="Touchscreen" type="TouchscreenTypeValues" minOccurs="0"/>
+				<xsd:element name="UseModes" type="StringNotNull" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="WaterResistanceDepth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="WaterResistanceLevel" type="WaterResistantType" minOccurs="0"/>
+				<xsd:element name="WirelessTechnology" type="LongString" minOccurs="0" maxOccurs="3"
+				/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Digital Camera Classification Data
+###############################################################
+-->
+	<xsd:element name="DigitalCamera">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Megapixels" type="PixelDimension" minOccurs="0"/>
+				<xsd:element name="OpticalZoom" type="ZoomDimension" minOccurs="0"/>
+				<xsd:element name="DigitalZoom" type="ZoomDimension" minOccurs="0"/>
+				<xsd:element name="InternalMemorySize" type="MemorySizeDimension" minOccurs="0"/>
+				<xsd:element name="ExternalMemorySize" type="MemorySizeDimension" minOccurs="0"/>
+				<xsd:element name="CameraType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="point-and-shoot"/>
+							<xsd:enumeration value="slr"/>
+							<xsd:enumeration value="3-d"/>
+							<xsd:enumeration value="macro"/>
+							<xsd:enumeration value="passport-and-id"/>
+							<xsd:enumeration value="underwater"/>
+							<xsd:enumeration value="other"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="FocusType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="automatic"/>
+							<xsd:enumeration value="manual"/>
+							<xsd:enumeration value="manual-and-auto"/>
+							<xsd:enumeration value="focus-free"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="SensorType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="ccd"/>
+							<xsd:enumeration value="super-ccd"/>
+							<xsd:enumeration value="cmos"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LCDScreenSize" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="LCDSwivel" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Viewfinder" type="StringNotNull" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="MinAperture" type="ApertureDimension" minOccurs="0"/>
+				<xsd:element name="MaxAperture" type="ApertureDimension" minOccurs="0"/>
+				<xsd:element name="ImageStabilization" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="InfraredCapability" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="FirewireOutput" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="S-VideoOutput" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="USBOutput" minOccurs="0" maxOccurs="2">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="usb1.1"/>
+							<xsd:enumeration value="usb2.0"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="AVOutput" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="DigitalStillCapability" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="DigitalStillResolution" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ExternalMemoryType" type="ExternalMemoryTypeValues" minOccurs="0"/>
+				<xsd:element name="ExternalMemoryIncluded" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Features" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="USBStreaming" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="HeadphoneJack" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="FlyingEraseHeads" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Autolight" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="HotShoe" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="LensThread" type="LengthDimension" minOccurs="0"/>
+				<xsd:element ref="ComputerPlatform" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="SoftwareIncluded" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BatteryType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="RechargeableBatteryIncluded" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="ACAdapterIncluded" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="RemoteIncluded" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Connectivity" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="usb"/>
+							<xsd:enumeration value="usb1.1"/>
+							<xsd:enumeration value="usb2.0"/>
+							<xsd:enumeration value="firewire"/>
+							<xsd:enumeration value="firewire2.0"/>
+							<xsd:enumeration value="serial"/>
+							<xsd:enumeration value="parallel"/>
+							<xsd:enumeration value="ieee1394"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="InternalMemoryType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="compact-flash"/>
+							<xsd:enumeration value="compact-flash-ii"/>
+							<xsd:enumeration value="pcmcia"/>
+							<xsd:enumeration value="pcmcia-ii"/>
+							<xsd:enumeration value="pcmcia-iii"/>
+							<xsd:enumeration value="smartmedia"/>
+							<xsd:enumeration value="memory-sticks"/>
+							<xsd:enumeration value="sd-multi-media"/>
+							<xsd:enumeration value="xd-picture-card"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="MaxImageResolution" type="PixelDimension" minOccurs="0"/>
+				<xsd:element name="UncompressedMode" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="tiff"/>
+							<xsd:enumeration value="raw"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="ThreeDTechnology" type="ThreeDTechnologyTypeValues" minOccurs="0"/>
+				<xsd:element name="AnalogRBGInput" type="LongString" minOccurs="0"/>
+				<xsd:element name="Audio" type="AudioTypeValues" minOccurs="0"/>
+				<xsd:element name="Durability" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="ExposureControl" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="FixedFocalLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="FlashModes" type="StringNotNull" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="FocusFeatures" type="LongString" minOccurs="0"/>
+				<xsd:element name="GeotaggingOrGPSFunctionality" type="LongString" minOccurs="0"/>
+				<xsd:element name="ImageFormat" type="ImageFormatTypeValues" minOccurs="0"
+					maxOccurs="2"/>
+				<xsd:element name="ISOEquivalency" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="ISORange" type="LongString" minOccurs="0"/>
+				<xsd:element name="LensType" type="LongString" minOccurs="0"/>
+				<xsd:element name="MacroFocus" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="MinShutterSpeed" type="FourDecimal" minOccurs="0"/>
+				<xsd:element name="MaxShutterSpeed" type="FourDecimal" minOccurs="0"/>
+				<xsd:element name="ManualExposureMode" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="MaximumFocalLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="MeteringMethods" type="LongString" minOccurs="0"/>
+				<xsd:element name="MinimumFocalLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="MovieMode" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="MaxMovieLength" type="TimeDimension" minOccurs="0"/>
+				<xsd:element name="AudioRecording" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="ContinuousShooting" type="ContinuousShootingDimension"
+					minOccurs="0"/>
+				<xsd:element name="NoiseReductionLevel" type="Dimension" minOccurs="0"/>
+				<xsd:element name="Remote" type="LongString" minOccurs="0"/>
+				<xsd:element name="SelfTimer" type="TimeDimension" minOccurs="0"/>
+				<xsd:element name="Size" type="LongString" minOccurs="0"/>
+				<xsd:element name="TotalFirewirePorts" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="TotalNumberOfHDMIPorts" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="TotalUSB1.0Ports" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="TotalUSB1.1Ports" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="TotalUSB2.0Ports" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="TotalUSB3.0Ports" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="TotalUSBPorts" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="Touchscreen" type="TouchscreenTypeValues" minOccurs="0"/>
+				<xsd:element name="UseModes" type="StringNotNull" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="VideoResolution" type="LongString" minOccurs="0"/>
+				<xsd:element name="WaterResistanceDepth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="WaterResistanceLevel" type="WaterResistantType" minOccurs="0"/>
+				<xsd:element name="WirelessTechnology" type="LongString" minOccurs="0" maxOccurs="3"
+				/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Binocular Classification Data
+###############################################################
+-->
+	<xsd:element name="Binocular">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="BinocularType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="binoculars"/>
+							<xsd:enumeration value="monoculars"/>
+							<xsd:enumeration value="laser-rangefinders"/>
+							<xsd:enumeration value="spotting-scopes"/>
+							<xsd:enumeration value="night-vision"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="FocusType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PrismType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ObjectiveLensDiameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="ExitPupilDiameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="FieldOfView" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="ApparentAngleOfView" type="DegreeDimension" minOccurs="0"/>
+				<xsd:element name="RealAngleOfView" type="DegreeDimension" minOccurs="0"/>
+				<xsd:element name="EyeRelief" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="DiopterAdjustmentRange" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Coating" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="EyepieceLensConstruction" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ObjectiveLensConstruction" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="TripodReady" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Features" minOccurs="0" maxOccurs="9">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="compact"/>
+							<xsd:enumeration value="full-size"/>
+							<xsd:enumeration value="image-stabilizing"/>
+							<xsd:enumeration value="waterproof"/>
+							<xsd:enumeration value="fogproof"/>
+							<xsd:enumeration value="zoom"/>
+							<xsd:enumeration value="uv-protection"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Magnification" type="ZoomDimension" minOccurs="0"/>
+				<xsd:element name="SpecificUses" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="tabletop"/>
+							<xsd:enumeration value="travel"/>
+							<xsd:enumeration value="hiking-and-outdoors"/>
+							<xsd:enumeration value="hunting-and-shooting"/>
+							<xsd:enumeration value="sports"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Surveillance System Classification Data
+###############################################################
+-->
+	<xsd:element name="SurveillanceSystem">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="SurveillanceSystemType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="cameras"/>
+							<xsd:enumeration value="complete-systems"/>
+							<xsd:enumeration value="monitors"/>
+							<xsd:enumeration value="network-systems"/>
+							<xsd:enumeration value="multiplexer"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="CameraType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="security-cameras"/>
+							<xsd:enumeration value="dummy-cameras"/>
+							<xsd:enumeration value="bullet-cameras"/>
+							<xsd:enumeration value="web-cameras"/>
+							<xsd:enumeration value="mirror-image-cameras"/>
+							<xsd:enumeration value="dome-cameras"/>
+							<xsd:enumeration value="spy-cameras"/>
+							<xsd:enumeration value="pinhole-cameras"/>
+							<xsd:enumeration value="miniature-cameras"/>
+							<xsd:enumeration value="nanny-cameras"/>
+							<xsd:enumeration value="pen-cameras"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="AlarmClock" type="LongString" minOccurs="0"/>
+				<xsd:element name="BodyType" type="LongString" minOccurs="0"/>
+				<xsd:element name="CompatibleCameraMount" type="LongString" minOccurs="0"/>
+				<xsd:element name="Durability" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="Features" minOccurs="0" maxOccurs="14">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="weatherproof"/>
+							<xsd:enumeration value="motion-detection"/>
+							<xsd:enumeration value="real-time"/>
+							<xsd:enumeration value="indoor"/>
+							<xsd:enumeration value="outdoor"/>
+							<xsd:enumeration value="black-and-white"/>
+							<xsd:enumeration value="color"/>
+							<xsd:enumeration value="night-vision"/>
+							<xsd:enumeration value="day-and-night-camera"/>
+							<xsd:enumeration value="adjustable-panning"/>
+							<xsd:enumeration value="submersible"/>
+							<xsd:enumeration value="wireless"/>
+							<xsd:enumeration value="ptz-system"/>
+							<xsd:enumeration value="digital-spy-camera"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="CameraAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="mounting-brackets"/>
+							<xsd:enumeration value="power-adapter"/>
+							<xsd:enumeration value="cable"/>
+							<xsd:enumeration value="sun-shield"/>
+							<xsd:enumeration value="camera-controller"/>
+							<xsd:enumeration value="transmitters"/>
+							<xsd:enumeration value="zoom-lens"/>
+							<xsd:enumeration value="pinhole-lens"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="ImageSensorType" type="LongString" minOccurs="0"/>
+				<xsd:element name="MaximumPanAngle" type="DegreeDimension" minOccurs="0"/>
+				<xsd:element name="MediaStorage" type="LongString" minOccurs="0"/>
+				<xsd:element name="MotorCapabilities" type="LongString" minOccurs="0"/>
+				<xsd:element name="MountType" type="LongString" minOccurs="0"/>
+				<xsd:element name="NightVision" type="LongString" minOccurs="0"/>
+				<xsd:element name="NumberofIncludedCameras" type="LongString" minOccurs="0"/>
+				<xsd:element name="Remote" type="LongString" minOccurs="0"/>
+				<xsd:element name="SignalType" type="LongString" minOccurs="0"/>
+				<xsd:element name="VideoResolution" type="LongString" minOccurs="0"/>
+				<xsd:element name="WirelessTechnology" type="LongString" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="ZoomRatio" type="LongString" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Telescope Classification Data
+###############################################################
+-->
+	<xsd:element name="Telescope">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="TelescopeType" minOccurs="0" maxOccurs="2">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="general"/>
+							<xsd:enumeration value="mirror-lens"/>
+							<xsd:enumeration value="schmidt-cassegrain"/>
+							<xsd:enumeration value="maksutov-cassegrain"/>
+							<xsd:enumeration value="reflecting"/>
+							<xsd:enumeration value="newtonian-reflector"/>
+							<xsd:enumeration value="rich-field-reflector"/>
+							<xsd:enumeration value="dobsonian-reflector"/>
+							<xsd:enumeration value="refracting"/>
+							<xsd:enumeration value="achromatic-refractor"/>
+							<xsd:enumeration value="apochromatic-refractor"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="TelescopeEyepiece" minOccurs="0" maxOccurs="2">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="erfle"/>
+							<xsd:enumeration value="kellner-and-rke"/>
+							<xsd:enumeration value="nagler"/>
+							<xsd:enumeration value="orthoscopic"/>
+							<xsd:enumeration value="plossl"/>
+							<xsd:enumeration value="sma"/>
+							<xsd:enumeration value="ultra-wide"/>
+							<xsd:enumeration value="zoom"/>
+							<xsd:enumeration value="telescope-eyepieces-general"/>
+							<xsd:enumeration value="other-eyepieces"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="MinAperture" type="ApertureDimension" minOccurs="0"/>
+				<xsd:element name="MaxAperture" type="ApertureDimension" minOccurs="0"/>
+				<xsd:element name="PrimaryAperture" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="under-80mm"/>
+							<xsd:enumeration value="80mm-90mm"/>
+							<xsd:enumeration value="100mm-150mm"/>
+							<xsd:enumeration value="150mm-200mm"/>
+							<xsd:enumeration value="over-200mm"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="FocalLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="ResolvingPower" type="ResolvingPowerDimension" minOccurs="0"/>
+				<xsd:element name="Mount" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="HighestUsefulMagnification" type="ZoomDimension" minOccurs="0"/>
+				<xsd:element name="LCDTiltAngle" type="DegreeDimension" minOccurs="0"/>
+				<xsd:element name="LowestUsefulMagnification" type="ZoomDimension" minOccurs="0"/>
+				<xsd:element name="OpticalTubeLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="OpticalTubeDiameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="OpticalCoatings" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MotorizedControls" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Viewfinder" type="StringNotNull" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="EyepieceType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="OutdoorUse" type="LongString" minOccurs="0"/>
+				<xsd:element name="PhotographicResolution" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="DawesLimit" type="DawesLimitDimension" minOccurs="0"/>
+				<xsd:element ref="ComputerPlatform" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="BatteryType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BatteryIncluded" type="xsd:boolean" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Microscope Classification Data
+###############################################################
+-->
+	<xsd:element name="Microscope">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="MicroscopeType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="digital-and-film-systems"/>
+							<xsd:enumeration value="educational-and-hobby"/>
+							<xsd:enumeration value="laboratory"/>
+							<xsd:enumeration value="stereo"/>
+							<xsd:enumeration value="other"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Features" minOccurs="0" maxOccurs="5"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Darkroom Equipment and Supplies Classification Data
+###############################################################
+-->
+	<xsd:element name="Darkroom">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Chemicals" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="black-and-white-film-developer"/>
+							<xsd:enumeration value="black-and-white-fixer"/>
+							<xsd:enumeration value="black-and-white-paper-developer"/>
+							<xsd:enumeration value="black-and-white-stop-baths"/>
+							<xsd:enumeration value="color-negative-film-chemicals"/>
+							<xsd:enumeration value="color-slide-film-chemicals"/>
+							<xsd:enumeration value="chemicals-for-prints-from-color-negatives"/>
+							<xsd:enumeration value="chemicals-for-prints-from-color-slides"/>
+							<xsd:enumeration value="processing-aids"/>
+							<xsd:enumeration value="retouching-chemicals"/>
+							<xsd:enumeration value="wash-aids"/>
+							<xsd:enumeration value="alternative-chemicals"/>
+							<xsd:enumeration value="other-chemicals"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Enlargers" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="enlargers-general"/>
+							<xsd:enumeration value="black-and-white-enlargers"/>
+							<xsd:enumeration value="color-enlargers"/>
+							<xsd:enumeration value="variable-contrast-enlargers"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Easels" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="easels-general"/>
+							<xsd:enumeration value="adjustable-easels"/>
+							<xsd:enumeration value="fixed-size-easels"/>
+							<xsd:enumeration value="borderless-easels"/>
+							<xsd:enumeration value="contact-printers"/>
+							<xsd:enumeration value="other-easels"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="EnlargingHeadAndAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="enlarging-heads-general"/>
+							<xsd:enumeration value="black-and-white-condenser-heads"/>
+							<xsd:enumeration value="color-dichronic-heads"/>
+							<xsd:enumeration value="variable-contrast-diffusion-heads"/>
+							<xsd:enumeration value="cold-light-heads"/>
+							<xsd:enumeration value="enlarging-head-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="OtherEnlargerAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="enlarger-lamps"/>
+							<xsd:enumeration value="enlarging-lens-accessories"/>
+							<xsd:enumeration value="focusing-aids"/>
+							<xsd:enumeration value="lens-boards"/>
+							<xsd:enumeration value="general-negative-carriers"/>
+							<xsd:enumeration value="below-35mm-negative-carriers"/>
+							<xsd:enumeration value="35mm-negative-carriers"/>
+							<xsd:enumeration value="medium-format-negative-carriers"/>
+							<xsd:enumeration value="large-format-negative-carriers"/>
+							<xsd:enumeration value="other-format-negative-carriers"/>
+							<xsd:enumeration value="printing-filters"/>
+							<xsd:enumeration value="timers"/>
+							<xsd:enumeration value="other-enlarger-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="AnalyzersAndExposureMeters" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="analyzers-and-accessories"/>
+							<xsd:enumeration value="darkroom-exposure-meters"/>
+							<xsd:enumeration value="densitometers-and-accessories"/>
+							<xsd:enumeration value="grey-cards-and-exposure-guides"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="SafelightsAndAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="black-and-white-safelights"/>
+							<xsd:enumeration value="color-safelights"/>
+							<xsd:enumeration value="safelight-filters"/>
+							<xsd:enumeration value="other-safelight-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="AirRegulators" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="air-cleaners"/>
+							<xsd:enumeration value="fans"/>
+							<xsd:enumeration value="louvers"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="WaterControlsAndFilters" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="flowmeters"/>
+							<xsd:enumeration value="thermometers"/>
+							<xsd:enumeration value="temperature-regulators"/>
+							<xsd:enumeration value="tempered-water-heaters"/>
+							<xsd:enumeration value="water-panels"/>
+							<xsd:enumeration value="water-control-accessories"/>
+							<xsd:enumeration value="water-filters"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="SinksAndAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="sinks-general"/>
+							<xsd:enumeration value="plastic-sinks"/>
+							<xsd:enumeration value="fiberglass-sinks"/>
+							<xsd:enumeration value="stainless-steel-sinks"/>
+							<xsd:enumeration value="sink-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="MixingEquipment" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="funnels"/>
+							<xsd:enumeration value="graduates"/>
+							<xsd:enumeration value="stirring-devices"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="GeneralDevelopingAndProcessingSupplies" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="aprons"/>
+							<xsd:enumeration value="blotter-books"/>
+							<xsd:enumeration value="changing-bags"/>
+							<xsd:enumeration value="control-strips"/>
+							<xsd:enumeration value="darkroom-pens"/>
+							<xsd:enumeration value="darkroom-pencils"/>
+							<xsd:enumeration value="darkroom-tapes"/>
+							<xsd:enumeration value="gloves"/>
+							<xsd:enumeration value="paper-safes"/>
+							<xsd:enumeration value="scales"/>
+							<xsd:enumeration value="storage-bottles-and-tanks"/>
+							<xsd:enumeration value="tray-siphons"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="FilmProcessingSupplies" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="film-dryers"/>
+							<xsd:enumeration value="film-reels"/>
+							<xsd:enumeration value="tanks"/>
+							<xsd:enumeration value="film-washers"/>
+							<xsd:enumeration value="developing-racks"/>
+							<xsd:enumeration value="film-hangers"/>
+							<xsd:enumeration value="film-squeegees"/>
+							<xsd:enumeration value="film-cleaning-brushes-and-cloths"/>
+							<xsd:enumeration value="film-cleaning-solutions"/>
+							<xsd:enumeration value="other-film-processing-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="PaperProcessingSupplies" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="print-drums"/>
+							<xsd:enumeration value="print-dryers"/>
+							<xsd:enumeration value="roller-bases"/>
+							<xsd:enumeration value="vertical-slot-processors"/>
+							<xsd:enumeration value="washers"/>
+							<xsd:enumeration value="trays-general"/>
+							<xsd:enumeration value="5x7-trays"/>
+							<xsd:enumeration value="8x10-trays"/>
+							<xsd:enumeration value="11x14-trays"/>
+							<xsd:enumeration value="12x16-trays"/>
+							<xsd:enumeration value="16x20-trays"/>
+							<xsd:enumeration value="20x24-trays"/>
+							<xsd:enumeration value="30x40-trays"/>
+							<xsd:enumeration value="other-paper-processing-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="TabletopProcessingSupplies" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="film-drums"/>
+							<xsd:enumeration value="paper-drums"/>
+							<xsd:enumeration value="processors"/>
+							<xsd:enumeration value="reels"/>
+							<xsd:enumeration value="wash-dry-modules"/>
+							<xsd:enumeration value="other-tabletop-processing-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Lens Classification Data
+###############################################################
+-->
+	<xsd:element name="Lens">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="CameraType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="camcorder"/>
+							<xsd:enumeration value="digital-camera"/>
+							<xsd:enumeration value="35mm-rangefinder"/>
+							<xsd:enumeration value="35mm-slr"/>
+							<xsd:enumeration value="aps"/>
+							<xsd:enumeration value="large-format"/>
+							<xsd:enumeration value="medium-format"/>
+							<xsd:enumeration value="underwater"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="CompatibleCameraMount" type="LongString" minOccurs="0"/>
+				<xsd:element name="FixedFocalLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="FocalType" type="LongString" minOccurs="0"/>
+				<xsd:element name="MinFocalLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="MaxFocalLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="LensType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="wide-angle"/>
+							<xsd:enumeration value="telephoto"/>
+							<xsd:enumeration value="zoom"/>
+							<xsd:enumeration value="macro"/>
+							<xsd:enumeration value="tilt-shift"/>
+							<xsd:enumeration value="fisheye"/>
+							<xsd:enumeration value="teleconverter"/>
+							<xsd:enumeration value="normal"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="FocusType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="manual-focus"/>
+							<xsd:enumeration value="auto-focus"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Features" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="WaterResistanceDepth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="WaterResistanceLevel" type="WaterResistantType" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Lens Accessory Classification Data
+###############################################################
+-->
+	<xsd:element name="LensAccessory">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ForUseWith" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="film-cameras"/>
+							<xsd:enumeration value="digital-cameras"/>
+							<xsd:enumeration value="camcorders"/>
+							<xsd:enumeration value="telescopes"/>
+							<xsd:enumeration value="microscopes"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="AccessoryType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="c-mounts"/>
+							<xsd:enumeration value="lens-scope-converters"/>
+							<xsd:enumeration value="lens-to-camera-adapters"/>
+							<xsd:enumeration value="remote-lens-controllers"/>
+							<xsd:enumeration value="extenders"/>
+							<xsd:enumeration value="series-vii-adapters"/>
+							<xsd:enumeration value="t-mounts"/>
+							<xsd:enumeration value="tripod-adapters"/>
+							<xsd:enumeration value="lens-boards"/>
+							<xsd:enumeration value="bayonets"/>
+							<xsd:enumeration value="lens-hoods"/>
+							<xsd:enumeration value="lens-supports"/>
+							<xsd:enumeration value="rapid-focusing-levers"/>
+							<xsd:enumeration value="shutters"/>
+							<xsd:enumeration value="diopters"/>
+							<xsd:enumeration value="mirror-scopes"/>
+							<xsd:enumeration value="lens-caps-general"/>
+							<xsd:enumeration value="lens-caps-up-to-48mm"/>
+							<xsd:enumeration value="lens-caps-49mm"/>
+							<xsd:enumeration value="lens-caps-52mm"/>
+							<xsd:enumeration value="lens-caps-55mm"/>
+							<xsd:enumeration value="lens-caps-58mm"/>
+							<xsd:enumeration value="lens-caps-62mm"/>
+							<xsd:enumeration value="lens-caps-67mm"/>
+							<xsd:enumeration value="lens-caps-72mm"/>
+							<xsd:enumeration value="lens-caps-77mm"/>
+							<xsd:enumeration value="lens-caps-82mm"/>
+							<xsd:enumeration value="lens-caps-86mm"/>
+							<xsd:enumeration value="lens-caps-95mm"/>
+							<xsd:enumeration value="lens-caps-other-sizes"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Filter Classification Data
+###############################################################
+-->
+	<xsd:element name="Filter">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ForUseWith" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="camcorders"/>
+							<xsd:enumeration value="digital-cameras"/>
+							<xsd:enumeration value="film-cameras"/>
+							<xsd:enumeration value="telescopes"/>
+							<xsd:enumeration value="binoculars"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="PackageType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="single-filter"/>
+							<xsd:enumeration value="filter-sets"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="MountType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="round"/>
+							<xsd:enumeration value="square"/>
+							<xsd:enumeration value="bayonet"/>
+							<xsd:enumeration value="other"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="ThreadSize" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="DropInSize" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="6-inch-wratten"/>
+							<xsd:enumeration value="cokin-a"/>
+							<xsd:enumeration value="cokin-p"/>
+							<xsd:enumeration value="lee-type"/>
+							<xsd:enumeration value="pro-optic-a"/>
+							<xsd:enumeration value="pro-optic-p"/>
+							<xsd:enumeration value="other"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="BayonetSize" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="b-3"/>
+							<xsd:enumeration value="b-39"/>
+							<xsd:enumeration value="b-50"/>
+							<xsd:enumeration value="b-6"/>
+							<xsd:enumeration value="b-60"/>
+							<xsd:enumeration value="b-70"/>
+							<xsd:enumeration value="b-93"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Durability" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="FilterType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="graduated"/>
+							<xsd:enumeration value="black-and-white-contrast"/>
+							<xsd:enumeration value="close-up"/>
+							<xsd:enumeration value="image-softening"/>
+							<xsd:enumeration value="neutral-density"/>
+							<xsd:enumeration value="general-polarizer"/>
+							<xsd:enumeration value="circular-polarizer"/>
+							<xsd:enumeration value="linear-polarizer"/>
+							<xsd:enumeration value="underwater"/>
+							<xsd:enumeration value="uv-and-protective"/>
+							<xsd:enumeration value="viewing-filters"/>
+							<xsd:enumeration value="lighting-and-compensation"/>
+							<xsd:enumeration value="cooling"/>
+							<xsd:enumeration value="flourescent"/>
+							<xsd:enumeration value="indoor"/>
+							<xsd:enumeration value="outdoor"/>
+							<xsd:enumeration value="warming"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="FilterColor" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="blue"/>
+							<xsd:enumeration value="brown"/>
+							<xsd:enumeration value="cyan"/>
+							<xsd:enumeration value="green"/>
+							<xsd:enumeration value="magenta"/>
+							<xsd:enumeration value="orange"/>
+							<xsd:enumeration value="red"/>
+							<xsd:enumeration value="red-orange"/>
+							<xsd:enumeration value="violet"/>
+							<xsd:enumeration value="yellow"/>
+							<xsd:enumeration value="yellow-green"/>
+							<xsd:enumeration value="yellow-orange"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LightingType" type="LongString" minOccurs="0"/>
+				<xsd:element name="SpecialEffect" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="center-spot"/>
+							<xsd:enumeration value="cross-screen"/>
+							<xsd:enumeration value="diffraction"/>
+							<xsd:enumeration value="double-exposure"/>
+							<xsd:enumeration value="enhancing"/>
+							<xsd:enumeration value="fog"/>
+							<xsd:enumeration value="hot-mirror"/>
+							<xsd:enumeration value="infrared"/>
+							<xsd:enumeration value="masks"/>
+							<xsd:enumeration value="multi-image"/>
+							<xsd:enumeration value="prism"/>
+							<xsd:enumeration value="sepia"/>
+							<xsd:enumeration value="special-contrast"/>
+							<xsd:enumeration value="speed"/>
+							<xsd:enumeration value="split-field"/>
+							<xsd:enumeration value="star-filters"/>
+							<xsd:enumeration value="other"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="SpecificUses" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="travel"/>
+							<xsd:enumeration value="hiking-and-outdoors"/>
+							<xsd:enumeration value="hunting-and-shooting"/>
+							<xsd:enumeration value="sports"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="WaterResistanceDepth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="WaterResistanceLevel" type="WaterResistantType" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Film Classification Data
+###############################################################
+-->
+	<xsd:element name="Film">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="FilmColor" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="black-and-white"/>
+							<xsd:enumeration value="color"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="FilmType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="print"/>
+							<xsd:enumeration value="slide"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Format" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="35mm"/>
+							<xsd:enumeration value="70mm"/>
+							<xsd:enumeration value="110"/>
+							<xsd:enumeration value="120"/>
+							<xsd:enumeration value="220"/>
+							<xsd:enumeration value="2x3"/>
+							<xsd:enumeration value="4x5"/>
+							<xsd:enumeration value="5x7"/>
+							<xsd:enumeration value="8x10"/>
+							<xsd:enumeration value="11x14"/>
+							<xsd:enumeration value="aps"/>
+							<xsd:enumeration value="micro"/>
+							<xsd:enumeration value="instant"/>
+							<xsd:enumeration value="other"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="ASA-ISO" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="ExposureCount" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="LightingType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="daylight"/>
+							<xsd:enumeration value="infrared"/>
+							<xsd:enumeration value="tungsten"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# BagCase Classification Data
+###############################################################
+-->
+	<xsd:element name="BagCase">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="BagCaseType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="binocular-cases"/>
+							<xsd:enumeration value="camcorder-cases"/>
+							<xsd:enumeration value="camera-cases"/>
+							<xsd:enumeration value="combination-cases"/>
+							<xsd:enumeration value="electronic-equipment-cases"/>
+							<xsd:enumeration value="filter-cases"/>
+							<xsd:enumeration value="lens-cases"/>
+							<xsd:enumeration value="lighting-cases"/>
+							<xsd:enumeration value="projection-cases"/>
+							<xsd:enumeration value="scope-cases"/>
+							<xsd:enumeration value="stand-cases"/>
+							<xsd:enumeration value="system-cases"/>
+							<xsd:enumeration value="telescope-cases"/>
+							<xsd:enumeration value="tripod-cases"/>
+							<xsd:enumeration value="light-meter-cases"/>
+							<xsd:enumeration value="other-purpose-cases"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="CompartmentQuantity" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="HoodType" type="LongString" minOccurs="0"/>
+				<xsd:element name="RollingFeatures" type="LongString" minOccurs="0"/>
+				<xsd:element name="SecurityFeatures" type="LongString" minOccurs="0"/>
+				<xsd:element name="Style" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="backpacks"/>
+							<xsd:enumeration value="beltpacks"/>
+							<xsd:enumeration value="briefcases"/>
+							<xsd:enumeration value="holster-style-cases"/>
+							<xsd:enumeration value="portfolios"/>
+							<xsd:enumeration value="print-cases"/>
+							<xsd:enumeration value="roller-cases"/>
+							<xsd:enumeration value="vests"/>
+							<xsd:enumeration value="wraps"/>
+							<xsd:enumeration value="waist-style-cases"/>
+							<xsd:enumeration value="compact-cases"/>
+							<xsd:enumeration value="pouches"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="MaterialType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="hard"/>
+							<xsd:enumeration value="soft"/>
+							<xsd:enumeration value="air"/>
+							<xsd:enumeration value="plastic"/>
+							<xsd:enumeration value="metal"/>
+							<xsd:enumeration value="cloth"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Features" minOccurs="0" maxOccurs="3">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="x-ray-protection"/>
+							<xsd:enumeration value="weatherproof"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="SpecificUses" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="travel"/>
+							<xsd:enumeration value="hiking-and-outdoors"/>
+							<xsd:enumeration value="hunting-and-shooting"/>
+							<xsd:enumeration value="sports"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="WaterResistanceDepth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="WaterResistanceLevel" type="WaterResistantType" minOccurs="0"/>
+				<xsd:element name="WeightLimit" type="Dimension" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Blank Media Classification Data
+###############################################################
+-->
+	<xsd:element name="BlankMedia">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="AnalogFormats" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="8mm-camcorder-tapes"/>
+							<xsd:enumeration value="beta"/>
+							<xsd:enumeration value="hi-8-cassettes"/>
+							<xsd:enumeration value="s-vhs"/>
+							<xsd:enumeration value="s-vhs-c"/>
+							<xsd:enumeration value="vhs"/>
+							<xsd:enumeration value="vhs-c"/>
+							<xsd:enumeration value="reel-tapes"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="DigitalFormats" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="minidv-cassettes"/>
+							<xsd:enumeration value="full-size-dv-cassettes"/>
+							<xsd:enumeration value="micromv"/>
+							<xsd:enumeration value="dvd"/>
+							<xsd:enumeration value="digital-beta-cassettes"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="MotionFilmFormats" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="8mm-film"/>
+							<xsd:enumeration value="super-8mm-film"/>
+							<xsd:enumeration value="16mm-film"/>
+							<xsd:enumeration value="super-16mm-film"/>
+							<xsd:enumeration value="35mm-film"/>
+							<xsd:enumeration value="65mm-film"/>
+							<xsd:enumeration value="70mm-film"/>
+							<xsd:enumeration value="other-film-formats"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="MediaColor" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="unknown_chromatism"/>
+							<xsd:enumeration value="black-and-white"/>
+							<xsd:enumeration value="color"/>
+							<xsd:enumeration value="tinted"/>
+							<xsd:enumeration value="colorized"/>
+							<xsd:enumeration value="color/black_and_white"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Count" type="xsd:positiveInteger" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Photo Paper Classification Data
+###############################################################
+-->
+	<xsd:element name="PhotoPaper">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="PaperType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="black-and-white"/>
+							<xsd:enumeration value="color-negative"/>
+							<xsd:enumeration value="color-reversal"/>
+							<xsd:enumeration value="ra-chemistry"/>
+							<xsd:enumeration value="other"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="PaperBase" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="polyester-based"/>
+							<xsd:enumeration value="fiber-based"/>
+							<xsd:enumeration value="resin-coated"/>
+							<xsd:enumeration value="other"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="PaperSurface" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="glossy"/>
+							<xsd:enumeration value="semi-glossy"/>
+							<xsd:enumeration value="matt"/>
+							<xsd:enumeration value="semi-matt"/>
+							<xsd:enumeration value="pearl"/>
+							<xsd:enumeration value="luster"/>
+							<xsd:enumeration value="satin"/>
+							<xsd:enumeration value="other"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="PaperGrade" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="grade-0"/>
+							<xsd:enumeration value="grade-1"/>
+							<xsd:enumeration value="grade-2"/>
+							<xsd:enumeration value="grade-3"/>
+							<xsd:enumeration value="grade-4"/>
+							<xsd:enumeration value="multigrade"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="PaperSize" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="10x10"/>
+							<xsd:enumeration value="10x12"/>
+							<xsd:enumeration value="10x20"/>
+							<xsd:enumeration value="11x14"/>
+							<xsd:enumeration value="12x17"/>
+							<xsd:enumeration value="16x20"/>
+							<xsd:enumeration value="20x24"/>
+							<xsd:enumeration value="20x30"/>
+							<xsd:enumeration value="24x30"/>
+							<xsd:enumeration value="3.5x5"/>
+							<xsd:enumeration value="30x40"/>
+							<xsd:enumeration value="4x5"/>
+							<xsd:enumeration value="4x6"/>
+							<xsd:enumeration value="5x7"/>
+							<xsd:enumeration value="8.5x11"/>
+							<xsd:enumeration value="8x10"/>
+							<xsd:enumeration value="roll"/>
+							<xsd:enumeration value="other"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Cleaner Classification Data
+###############################################################
+-->
+	<xsd:element name="Cleaner">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="CleanerType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="brushes"/>
+							<xsd:enumeration value="cloths"/>
+							<xsd:enumeration value="cleaning-kits"/>
+							<xsd:enumeration value="compressed-air"/>
+							<xsd:enumeration value="liquid-cleaners"/>
+							<xsd:enumeration value="refills"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Flash Classification Data
+###############################################################
+-->
+	<xsd:element name="Flash">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="FlashType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="handle-mount"/>
+							<xsd:enumeration value="macro"/>
+							<xsd:enumeration value="ring-light"/>
+							<xsd:enumeration value="shoe-mount"/>
+							<xsd:enumeration value="other"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="SlaveFlashes" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="slave-flashed-general"/>
+							<xsd:enumeration value="slave-transmitters-and-receivers"/>
+							<xsd:enumeration value="optical-slaves"/>
+							<xsd:enumeration value="slave-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Dedication" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="dedicated"/>
+							<xsd:enumeration value="non-dedicated"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# TripodStand Classification Data
+###############################################################
+-->
+	<xsd:element name="TripodStand">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ForUseWith" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="still-cameras"/>
+							<xsd:enumeration value="camcorders"/>
+							<xsd:enumeration value="still-camera-and-camcorders"/>
+							<xsd:enumeration value="telescopes"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="StandType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="camera-stands"/>
+							<xsd:enumeration value="monopods"/>
+							<xsd:enumeration value="tripods"/>
+							<xsd:enumeration value="car-window-mounts"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="SpecificUses" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="tabletop"/>
+							<xsd:enumeration value="travel"/>
+							<xsd:enumeration value="hiking-and-outdoors"/>
+							<xsd:enumeration value="hunting-and-shooting"/>
+							<xsd:enumeration value="sports"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Material" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="aluminum"/>
+							<xsd:enumeration value="carbon-fiber"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="HeadType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="geared-heads"/>
+							<xsd:enumeration value="ball-heads"/>
+							<xsd:enumeration value="camera-rotator-heads"/>
+							<xsd:enumeration value="pan-and-tilt-heads"/>
+							<xsd:enumeration value="video-heads"/>
+							<xsd:enumeration value="3-way-heads"/>
+							<xsd:enumeration value="panoramic-heads"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="PackageType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="head-only"/>
+							<xsd:enumeration value="legs-only"/>
+							<xsd:enumeration value="head-and-leg-units"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Lighting Classification Data
+###############################################################
+-->
+	<xsd:complexType name="LightingType">
+		<xsd:sequence>
+			<xsd:element name="ForUseWith" minOccurs="0">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="floodlights"/>
+						<xsd:enumeration value="spotlights"/>
+						<xsd:enumeration value="monolights"/>
+						<xsd:enumeration value="flashlights"/>
+						<xsd:enumeration value="ballasts"/>
+						<xsd:enumeration value="cables-and-connectors"/>
+						<xsd:enumeration value="flash-tubes"/>
+						<xsd:enumeration value="head-accessories"/>
+						<xsd:enumeration value="modeling-lamps"/>
+						<xsd:enumeration value="mounting-hardware"/>
+						<xsd:enumeration value="pack-accessories"/>
+						<xsd:enumeration value="special-bulbs"/>
+						<xsd:enumeration value="general-power-packs"/>
+						<xsd:enumeration value="1-head-outfits-power-packs"/>
+						<xsd:enumeration value="2-head-outfits-power-packs"/>
+						<xsd:enumeration value="3-head-outfits-power-packs"/>
+						<xsd:enumeration value="4-head-outfits-power-packs"/>
+						<xsd:enumeration value="slaves-general"/>
+						<xsd:enumeration value="flash-activated-slaves"/>
+						<xsd:enumeration value="infrared-slaves"/>
+						<xsd:enumeration value="radio-slaves"/>
+						<xsd:enumeration value="adapters"/>
+						<xsd:enumeration value="barndoors"/>
+						<xsd:enumeration value="cucoloris"/>
+						<xsd:enumeration value="diffusers"/>
+						<xsd:enumeration value="filters"/>
+						<xsd:enumeration value="flags"/>
+						<xsd:enumeration value="gobos"/>
+						<xsd:enumeration value="grids"/>
+						<xsd:enumeration value="inserts"/>
+						<xsd:enumeration value="liners"/>
+						<xsd:enumeration value="louvers"/>
+						<xsd:enumeration value="panel-systems"/>
+						<xsd:enumeration value="reflectors"/>
+						<xsd:enumeration value="snoots"/>
+						<xsd:enumeration value="soft-boxes"/>
+						<xsd:enumeration value="umbrellas"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="LightingType" minOccurs="0">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="continuous-output"/>
+						<xsd:enumeration value="strobe"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="PowerType" minOccurs="0">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="ac"/>
+						<xsd:enumeration value="dc"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Power" type="PowerDimension" minOccurs="0"/>
+			<xsd:element name="LightingSourceType" minOccurs="0">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="flourescent"/>
+						<xsd:enumeration value="hmi"/>
+						<xsd:enumeration value="tungsten"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="SpecialtyUse" minOccurs="0">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="underwater"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--
+###############################################################
+# Projection and Viewing Classification Data
+###############################################################
+-->
+	<xsd:element name="Projection">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ProjectionType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="slide-projectors"/>
+							<xsd:enumeration value="video-projectors"/>
+							<xsd:enumeration value="large-format-projectors"/>
+							<xsd:enumeration value="medium-format-projectors"/>
+							<xsd:enumeration value="multimedia-projectors"/>
+							<xsd:enumeration value="opaque-projectors"/>
+							<xsd:enumeration value="lightboxes"/>
+							<xsd:enumeration value="viewers"/>
+							<xsd:enumeration value="loupes"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LoupeMagnification" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="up-to-4x"/>
+							<xsd:enumeration value="5x-9x"/>
+							<xsd:enumeration value="10x-15x"/>
+							<xsd:enumeration value="above-15x"/>
+							<xsd:enumeration value="zoom"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="ProjectorLenses" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="35mm"/>
+							<xsd:enumeration value="large-format"/>
+							<xsd:enumeration value="medium-format"/>
+							<xsd:enumeration value="normal"/>
+							<xsd:enumeration value="telephoto"/>
+							<xsd:enumeration value="wide-angle"/>
+							<xsd:enumeration value="zoom"/>
+							<xsd:enumeration value="other-projector-lenses"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="ProjectionScreens" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="fast-fold-screens"/>
+							<xsd:enumeration value="free-standing-floor-screens"/>
+							<xsd:enumeration value="rear-projection-screens"/>
+							<xsd:enumeration value="tabletop-screens"/>
+							<xsd:enumeration value="tripod-mounted-screens"/>
+							<xsd:enumeration value="wall-and-ceiling-electric-screens"/>
+							<xsd:enumeration value="wall-and-ceiling-screens"/>
+							<xsd:enumeration value="other-projection-screens"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="AudioVisualProductAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="dissolve-and-control-units"/>
+							<xsd:enumeration value="lamps"/>
+							<xsd:enumeration value="stands"/>
+							<xsd:enumeration value="mounting-equipment"/>
+							<xsd:enumeration value="other-accessories"/>
+							<xsd:enumeration value="projector-trays-general"/>
+							<xsd:enumeration value="35mm-slide-projector-trays"/>
+							<xsd:enumeration value="medium-format-slide-projector-trays"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Photo Studio Classification Data
+###############################################################
+-->
+	<xsd:element name="PhotoStudio">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="StorageAndPresentationMaterials" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="hanging-bars"/>
+							<xsd:enumeration value="pages-general"/>
+							<xsd:enumeration value="negative-and-unmounted-slides-pages"/>
+							<xsd:enumeration value="mounted-slides-pages"/>
+							<xsd:enumeration value="prints-pages"/>
+							<xsd:enumeration value="other-media-pages"/>
+							<xsd:enumeration value="sleeves-general"/>
+							<xsd:enumeration value="negative-and-unmounted-slides-sleeves"/>
+							<xsd:enumeration value="mounted-slides-sleeves"/>
+							<xsd:enumeration value="prints-sleeves"/>
+							<xsd:enumeration value="other-media-sleeves"/>
+							<xsd:enumeration value="storage-binders-general"/>
+							<xsd:enumeration value="storage-binders-with-rings"/>
+							<xsd:enumeration value="storage-binders-without-rings"/>
+							<xsd:enumeration value="negatives-boxes"/>
+							<xsd:enumeration value="slides-boxes"/>
+							<xsd:enumeration value="prints-boxes"/>
+							<xsd:enumeration value="other-boxes"/>
+							<xsd:enumeration value="portfolios"/>
+							<xsd:enumeration value="presentation-boards"/>
+							<xsd:enumeration value="glassine-envelopes"/>
+							<xsd:enumeration value="kraft-envelopes"/>
+							<xsd:enumeration value="mailers"/>
+							<xsd:enumeration value="professional-photo-albums"/>
+							<xsd:enumeration value="other-professional-albums"/>
+							<xsd:enumeration value="sectional-frames"/>
+							<xsd:enumeration value="digital-frames"/>
+							<xsd:enumeration value="other-professional-frames"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="StudioSupplies" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="laminating-machines"/>
+							<xsd:enumeration value="mounting-press"/>
+							<xsd:enumeration value="mat-boards-general"/>
+							<xsd:enumeration value="pre-cut-mat-boards"/>
+							<xsd:enumeration value="heat-activated-boards"/>
+							<xsd:enumeration value="pressure-sensitive-boards"/>
+							<xsd:enumeration value="slide-mounters"/>
+							<xsd:enumeration value="copystands-general"/>
+							<xsd:enumeration value="tabletop-copystands"/>
+							<xsd:enumeration value="instant-copystands"/>
+							<xsd:enumeration value="other-copystands"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="PhotoBackgrounds" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="ceiling-to-floor"/>
+							<xsd:enumeration value="collapsible-discs"/>
+							<xsd:enumeration value="free-standing"/>
+							<xsd:enumeration value="graduated"/>
+							<xsd:enumeration value="wall-mounted"/>
+							<xsd:enumeration value="other-background-styles"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="PhotoBackgroundAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="posing-props"/>
+							<xsd:enumeration value="shooting-tables"/>
+							<xsd:enumeration value="shooting-tents"/>
+							<xsd:enumeration value="studio-accessories"/>
+							<xsd:enumeration value="support-equipment"/>
+							<xsd:enumeration value="other-background-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="PhotoBackgroundFabrics" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="canvas"/>
+							<xsd:enumeration value="muslins"/>
+							<xsd:enumeration value="seamless-paper"/>
+							<xsd:enumeration value="velour"/>
+							<xsd:enumeration value="other-background-fabrics"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="PhotoStudioAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="mounting-corners"/>
+							<xsd:enumeration value="mounting-squares"/>
+							<xsd:enumeration value="photographic-tapes"/>
+							<xsd:enumeration value="wire"/>
+							<xsd:enumeration value="picture-hangers"/>
+							<xsd:enumeration value="mats"/>
+							<xsd:enumeration value="mat-cutters"/>
+							<xsd:enumeration value="trimmers"/>
+							<xsd:enumeration value="replacement-blades"/>
+							<xsd:enumeration value="other-framing-accessories"/>
+							<xsd:enumeration value="mounts-general"/>
+							<xsd:enumeration value="slide-mounts"/>
+							<xsd:enumeration value="other-mounts"/>
+							<xsd:enumeration value="dry-mount-press-accessories"/>
+							<xsd:enumeration value="mounting-adhesives-general"/>
+							<xsd:enumeration value="dry-mount-tissue"/>
+							<xsd:enumeration value="laminating-film"/>
+							<xsd:enumeration value="print-finishing-lacquers"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Light Meter Classification Data
+###############################################################
+-->
+	<xsd:element name="LightMeter">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="CameraType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="film-camera"/>
+							<xsd:enumeration value="digital-camera"/>
+							<xsd:enumeration value="camcorder"/>
+							<xsd:enumeration value="universal"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="MeterType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="ambient"/>
+							<xsd:enumeration value="flash"/>
+							<xsd:enumeration value="ambient-and-flash"/>
+							<xsd:enumeration value="spot"/>
+							<xsd:enumeration value="color"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="MeterDisplay" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="analog"/>
+							<xsd:enumeration value="digital"/>
+							<xsd:enumeration value="led"/>
+							<xsd:enumeration value="match-needle"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Camera Power Supply Classification Data
+###############################################################
+-->
+	<xsd:element name="PowerSupply">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ForUseWith" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="film-cameras"/>
+							<xsd:enumeration value="digital-cameras"/>
+							<xsd:enumeration value="analog-camcorders-general"/>
+							<xsd:enumeration value="8mm-camcorders"/>
+							<xsd:enumeration value="betacam-sp-camcorders"/>
+							<xsd:enumeration value="hi-8-camcorders"/>
+							<xsd:enumeration value="s-vhs-camcorders"/>
+							<xsd:enumeration value="s-vhs-c-camcorders"/>
+							<xsd:enumeration value="vhs-camcorders"/>
+							<xsd:enumeration value="vhs-c-camcorders"/>
+							<xsd:enumeration value="other-analog-formats-camcorders"/>
+							<xsd:enumeration value="digital-camcorders-general"/>
+							<xsd:enumeration value="digital-betacam-camcorders"/>
+							<xsd:enumeration value="dv-camcorders"/>
+							<xsd:enumeration value="dvcam-camcorders"/>
+							<xsd:enumeration value="dvcpro-camcorders"/>
+							<xsd:enumeration value="minidv-camcorders"/>
+							<xsd:enumeration value="micromv-camcorders"/>
+							<xsd:enumeration value="digital8-camcorders"/>
+							<xsd:enumeration value="dvd-camcorders"/>
+							<xsd:enumeration value="minidisc-camcorders"/>
+							<xsd:enumeration value="other-digital-formats-camcorders"/>
+							<xsd:enumeration value="flashes"/>
+							<xsd:enumeration value="lighting"/>
+							<xsd:enumeration value="surveillence-products"/>
+							<xsd:enumeration value="other-products"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="CameraPowerSupplyType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="batteries-general"/>
+							<xsd:enumeration value="disposable-batteries"/>
+							<xsd:enumeration value="rechargeable-Batteries"/>
+							<xsd:enumeration value="external-batteries"/>
+							<xsd:enumeration value="battery-packs-general"/>
+							<xsd:enumeration value="shoulder-battery-packs"/>
+							<xsd:enumeration value="belt-battery-packs"/>
+							<xsd:enumeration value="dedicated-battery-packs"/>
+							<xsd:enumeration value="other-batteries-and-packs"/>
+							<xsd:enumeration value="adapters-general"/>
+							<xsd:enumeration value="ac-adapters"/>
+							<xsd:enumeration value="dc-adapters"/>
+							<xsd:enumeration value="battery-chargers"/>
+							<xsd:enumeration value="ac-power-supply"/>
+							<xsd:enumeration value="dc-power-supply"/>
+							<xsd:enumeration value="other-power-supplies"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="BatteryChemicalType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="lead-acid"/>
+							<xsd:enumeration value="lithium"/>
+							<xsd:enumeration value="lithium-ion"/>
+							<xsd:enumeration value="nickel-metal-hydride"/>
+							<xsd:enumeration value="nicd"/>
+							<xsd:enumeration value="silver-oxide"/>
+							<xsd:enumeration value="alkaline"/>
+							<xsd:enumeration value="other-battery-types"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="PowerSupplyAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="battery-holders"/>
+							<xsd:enumeration value="battery-testers"/>
+							<xsd:enumeration value="mounting-plates"/>
+							<xsd:enumeration value="cables-general"/>
+							<xsd:enumeration value="battery-power-cables"/>
+							<xsd:enumeration value="power-supply-cables"/>
+							<xsd:enumeration value="charger-cables"/>
+							<xsd:enumeration value="adapter-cables"/>
+							<xsd:enumeration value="other-cables"/>
+							<xsd:enumeration value="cigarette-connectors"/>
+							<xsd:enumeration value="xlr-connectors"/>
+							<xsd:enumeration value="dc-couplers"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Digital Frames Classification Data
+###############################################################
+-->
+	<xsd:element name="DigitalFrame">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="DisplaySize" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Touchscreen" type="TouchscreenTypeValues" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Other Accessory Classification Data
+###############################################################
+-->
+	<xsd:element name="OtherAccessory">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="CameraAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="close-up-accessories"/>
+							<xsd:enumeration value="viewfinders"/>
+							<xsd:enumeration value="motor-drives"/>
+							<xsd:enumeration value="eye-cups"/>
+							<xsd:enumeration value="winders"/>
+							<xsd:enumeration value="straps"/>
+							<xsd:enumeration value="remote-controls"/>
+							<xsd:enumeration value="cables-and-cords"/>
+							<xsd:enumeration value="other-camera-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="CamcorderAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="straps"/>
+							<xsd:enumeration value="remote-controls"/>
+							<xsd:enumeration value="cables-and-cords"/>
+							<xsd:enumeration value="other-camcorder-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="CleanerAccessory" type="CleanerAccessoryTypeValues" minOccurs="0"/>
+				<xsd:element name="LightingAccessoryType" type="LightingAccessoryTypeValues"
+					minOccurs="0"/>
+				<xsd:element name="TelescopeAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="barlow-lenses"/>
+							<xsd:enumeration value="collimators"/>
+							<xsd:enumeration value="remote-controls"/>
+							<xsd:enumeration value="electronic-drives"/>
+							<xsd:enumeration value="photo-adapters"/>
+							<xsd:enumeration value="finderscopes"/>
+							<xsd:enumeration value="diagonal-mirrors"/>
+							<xsd:enumeration value="erecting-prisms"/>
+							<xsd:enumeration value="motor-drives"/>
+							<xsd:enumeration value="illuminators"/>
+							<xsd:enumeration value="guiders"/>
+							<xsd:enumeration value="binocular-viewers"/>
+							<xsd:enumeration value="wedges"/>
+							<xsd:enumeration value="mounts"/>
+							<xsd:enumeration value="viewfinders"/>
+							<xsd:enumeration value="sky-maps"/>
+							<xsd:enumeration value="filters"/>
+							<xsd:enumeration value="dew-caps"/>
+							<xsd:enumeration value="other-telescope-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="TelescopeEyepiece" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="telescope-eyepieces-general"/>
+							<xsd:enumeration value="orthoscopic"/>
+							<xsd:enumeration value="kellner-and-rke"/>
+							<xsd:enumeration value="erfle"/>
+							<xsd:enumeration value="plossl"/>
+							<xsd:enumeration value="nagler"/>
+							<xsd:enumeration value="zoom"/>
+							<xsd:enumeration value="ultra-wide"/>
+							<xsd:enumeration value="sma"/>
+							<xsd:enumeration value="other-eyepieces"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="MicroscopeAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="boom-stands"/>
+							<xsd:enumeration value="bulbs"/>
+							<xsd:enumeration value="camera-adapters-and-mounts"/>
+							<xsd:enumeration value="eyepieces"/>
+							<xsd:enumeration value="inspection-systems"/>
+							<xsd:enumeration value="light-stands"/>
+							<xsd:enumeration value="microscope-cases"/>
+							<xsd:enumeration value="slides-and-slide-kits"/>
+							<xsd:enumeration value="other-microscope-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="FilterAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="adapter-rings"/>
+							<xsd:enumeration value="filter-caps"/>
+							<xsd:enumeration value="filter-holders"/>
+							<xsd:enumeration value="filter-hoods"/>
+							<xsd:enumeration value="gel-holder"/>
+							<xsd:enumeration value="step-down-ring"/>
+							<xsd:enumeration value="step-up-ring"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="FilmAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="mounting-equipment-and-cutters"/>
+							<xsd:enumeration value="slide-mounts"/>
+							<xsd:enumeration value="film-mailers"/>
+							<xsd:enumeration value="film-loaders"/>
+							<xsd:enumeration value="other-film-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="FlashAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="adapter-rings"/>
+							<xsd:enumeration value="battery-packs"/>
+							<xsd:enumeration value="camera-brackets"/>
+							<xsd:enumeration value="flash-bouncers"/>
+							<xsd:enumeration value="flash-diffusers"/>
+							<xsd:enumeration value="flash-filters"/>
+							<xsd:enumeration value="flash-pouches"/>
+							<xsd:enumeration value="flash-shoe-mounts"/>
+							<xsd:enumeration value="synch-and-pc-cords"/>
+							<xsd:enumeration value="other-flash-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="BagCaseAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="liners"/>
+							<xsd:enumeration value="rain-covers"/>
+							<xsd:enumeration value="replacement-parts"/>
+							<xsd:enumeration value="straps"/>
+							<xsd:enumeration value="belts"/>
+							<xsd:enumeration value="harnesses"/>
+							<xsd:enumeration value="inserts"/>
+							<xsd:enumeration value="other-bag-and-case-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="UnderwaterPhotographyAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="housings"/>
+							<xsd:enumeration value="rainguards"/>
+							<xsd:enumeration value="other-underwater-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LightMeterAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="caps"/>
+							<xsd:enumeration value="gray-cards"/>
+							<xsd:enumeration value="probes"/>
+							<xsd:enumeration value="straps"/>
+							<xsd:enumeration value="other-light-meter-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="TripodStandAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="monopad-accessories"/>
+							<xsd:enumeration value="camera-stand-accessories"/>
+							<xsd:enumeration value="tripod-head-accessories"/>
+							<xsd:enumeration value="tripod-leg-accessories"/>
+							<xsd:enumeration value="center-columns"/>
+							<xsd:enumeration value="tripod-adapters"/>
+							<xsd:enumeration value="tripod-straps"/>
+							<xsd:enumeration value="camera-mounts-and-clamps"/>
+							<xsd:enumeration value="plates"/>
+							<xsd:enumeration value="other-tripod-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="BinocularAccessories" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="straps"/>
+							<xsd:enumeration value="caps"/>
+							<xsd:enumeration value="other-binocular-accessories"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="CableLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="ForUseWith" type="LongString" minOccurs="0"/>
+				<xsd:element name="NightVision" type="LongString" minOccurs="0"/>
+				<xsd:element name="Mountingpattern" type="LongString" minOccurs="0"/>
+				<xsd:element name="NoiseReductionLevel" type="Dimension" minOccurs="0"/>
+				<xsd:element name="Features" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="OutdoorUse" type="LongString" minOccurs="0"/>
+				<xsd:element name="Durability" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="WaterResistanceDepth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="WaterResistanceLevel" type="WaterResistantType" minOccurs="0"/>
+				<xsd:element name="SpecificUses" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="travel"/>
+							<xsd:enumeration value="hiking-and-outdoors"/>
+							<xsd:enumeration value="hunting-and-shooting"/>
+							<xsd:enumeration value="sports"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+###############################################################
+# Camera and Photo type definitions
+###############################################################
+-->
+	<xsd:complexType name="ResolvingPowerDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:positiveInteger">
+				<xsd:attribute name="unitOfMeasure" type="ResolvingPowerUnitOfMeasure"
+					use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="DawesLimitDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:positiveInteger">
+				<xsd:attribute name="unitOfMeasure" type="DawesLimitUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="ResolvingPowerUnitOfMeasure">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="arcs-per-sec"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="DawesLimitUnitOfMeasure">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="arc*sec"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ThreeDTechnologyTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="active"/>
+			<xsd:enumeration value="passive"/>
+			<xsd:enumeration value="anaglyph"/>
+			<xsd:enumeration value="auto_stereoscopic"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AudioTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="mono"/>
+			<xsd:enumeration value="stereo"/>
+			<xsd:enumeration value="surround"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="CleanerAccessoryTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="brushes"/>
+			<xsd:enumeration value="cloths"/>
+			<xsd:enumeration value="cleaning-kits"/>
+			<xsd:enumeration value="compressed-air"/>
+			<xsd:enumeration value="liquid-cleaners"/>
+			<xsd:enumeration value="refills"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ExternalMemoryTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="cd-r"/>
+			<xsd:enumeration value="cd_rw"/>
+			<xsd:enumeration value="compact_flash_type_i_or_ii"/>
+			<xsd:enumeration value="compactflash_type_i"/>
+			<xsd:enumeration value="compactflash_type_ii"/>
+			<xsd:enumeration value="dvd_r"/>
+			<xsd:enumeration value="dvd_rw"/>
+			<xsd:enumeration value="memory_stick"/>
+			<xsd:enumeration value="memory-stick"/>
+			<xsd:enumeration value="micro_sdhc"/>
+			<xsd:enumeration value="micro_sdxc"/>
+			<xsd:enumeration value="microsd"/>
+			<xsd:enumeration value="mini_dvd"/>
+			<xsd:enumeration value="multimedia_card"/>
+			<xsd:enumeration value="mmc"/>
+			<xsd:enumeration value="mmc_micro"/>
+			<xsd:enumeration value="sdhc"/>
+			<xsd:enumeration value="sdxc"/>
+			<xsd:enumeration value="secure_digital"/>
+			<xsd:enumeration value="secure-digital"/>
+			<xsd:enumeration value="smartmedia_card"/>
+			<xsd:enumeration value="solid_state_drive"/>
+			<xsd:enumeration value="xd_picture_card"/>
+			<xsd:enumeration value="other"/>
+			<xsd:enumeration value="unknown"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="FilmManagementFeaturesTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="auto_film_advance"/>
+			<xsd:enumeration value="auto_rewind"/>
+			<xsd:enumeration value="midroll_rewind"/>
+			<xsd:enumeration value="auto_film_load"/>
+			<xsd:enumeration value="midroll_change"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ImageFormatTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="jpeg"/>
+			<xsd:enumeration value="raw"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="LightingAccessoryTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="c-mounts"/>
+			<xsd:enumeration value="lens-scope-converters"/>
+			<xsd:enumeration value="lens-to-camera-adapters"/>
+			<xsd:enumeration value="remote-lens-controllers"/>
+			<xsd:enumeration value="extenders"/>
+			<xsd:enumeration value="series-vii-adapters"/>
+			<xsd:enumeration value="t-mounts"/>
+			<xsd:enumeration value="tripod-adapters"/>
+			<xsd:enumeration value="lens-boards"/>
+			<xsd:enumeration value="bayonets"/>
+			<xsd:enumeration value="lens-hoods"/>
+			<xsd:enumeration value="lens-supports"/>
+			<xsd:enumeration value="rapid-focusing-levers"/>
+			<xsd:enumeration value="shutters"/>
+			<xsd:enumeration value="diopters"/>
+			<xsd:enumeration value="mirror-scopes"/>
+			<xsd:enumeration value="lens-caps-generals"/>
+			<xsd:enumeration value="lens-caps-up-to-48mm"/>
+			<xsd:enumeration value="lens-caps-49mm"/>
+			<xsd:enumeration value="lens-caps-52mm"/>
+			<xsd:enumeration value="lens-caps-55mm"/>
+			<xsd:enumeration value="lens-caps-58mm"/>
+			<xsd:enumeration value="lens-caps-62mm"/>
+			<xsd:enumeration value="lens-caps-67mm"/>
+			<xsd:enumeration value="lens-caps-72mm"/>
+			<xsd:enumeration value="lens-caps-77mm"/>
+			<xsd:enumeration value="lens-caps-82mm"/>
+			<xsd:enumeration value="lens-caps-86mm"/>
+			<xsd:enumeration value="lens-caps-95mm"/>
+			<xsd:enumeration value="lens-caps-other-sizes"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="TouchscreenTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="touch_screen"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

@@ -1,0 +1,654 @@
+<?xml version="1.0"?>
+<!-- Revision="$Revision: #10 $" -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<!--
+    $Date: 2012/04/02 $
+                                                                                                                       
+    AMAZON.COM CONFIDENTIAL.  This document and the information contained in it are
+    confidential and proprietary information of Amazon.com and may not be reproduced,
+    distributed or used, in whole or in part, for any purpose other than as necessary
+    to list products for sale on the www.amazon.com web site pursuant to an agreement
+    with Amazon.com.
+    -->
+	<xsd:include schemaLocation="amzn-base.xsd"/>
+	<!--
+    Please read the corresponding documentation that contains the recommended values for elements
+    of type StringNotNull.
+    -->
+	<xsd:element name="Sports">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ProductType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="SportingGoods"/>
+							<xsd:enumeration value="GolfClubHybrid"/>
+							<xsd:enumeration value="GolfClubIron"/>
+							<xsd:enumeration value="GolfClubPutter"/>
+							<xsd:enumeration value="GolfClubWedge"/>
+							<xsd:enumeration value="GolfClubWood"/>
+							<xsd:enumeration value="GolfClubs"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="VariationData" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="Parentage" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="parent"/>
+										<xsd:enumeration value="child"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="VariationTheme" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="AgeGenderCategory"/>
+										<xsd:enumeration value="Amperage"/>
+										<xsd:enumeration value="BikeRimSize"/>
+										<xsd:enumeration value="BikeRimSizeMaterial"/>
+										<xsd:enumeration value="BootSize"/>
+										<xsd:enumeration value="BootSizeCalfSize"/>
+										<xsd:enumeration value="CalfSize"/>
+										<xsd:enumeration value="Caliber"/>
+										<xsd:enumeration value="CaliberRounds"/>
+										<xsd:enumeration value="Capacity"/>
+										<xsd:enumeration value="Color"/>
+										<xsd:enumeration value="ColorDesign"/>
+										<xsd:enumeration value="ColorFlavor"/>
+										<xsd:enumeration value="ColorItemThickness"/>
+										<xsd:enumeration value="ColorLength"/>
+										<xsd:enumeration value="ColorLensColor"/>
+										<xsd:enumeration value="ColorQuantity"/>
+										<xsd:enumeration value="ColorRounds"/>
+										<xsd:enumeration value="ColorShaftMaterial"/>
+										<xsd:enumeration value="ColorShaftType"/>
+										<xsd:enumeration value="ColorShape"/>
+										<xsd:enumeration value="ColorSize"/>
+										<xsd:enumeration value="ColorStyle"/>
+										<xsd:enumeration value="ColorTensionLevel"/>
+										<xsd:enumeration value="ColorWattage"/>
+										<xsd:enumeration value="ColorWeight"/>
+										<xsd:enumeration value="ColorWheelSize"/>
+										<xsd:enumeration value="ColorWidth"/>
+										<xsd:enumeration value="Curvature"/>
+										<xsd:enumeration value="CurvatureHand"/>
+										<xsd:enumeration value="Design"/>
+										<xsd:enumeration value="DesignFlavor"/>
+										<xsd:enumeration value="DesignLength"/>
+										<xsd:enumeration value="DesignLensColor"/>
+										<xsd:enumeration value="DesignShaftMaterial"/>
+										<xsd:enumeration value="DesignShaftType"/>
+										<xsd:enumeration value="DesignShape"/>
+										<xsd:enumeration value="DesignSize"/>
+										<xsd:enumeration value="DesignStyle"/>
+										<xsd:enumeration value="DesignTensionLevel"/>
+										<xsd:enumeration value="DesignWeight"/>
+										<xsd:enumeration value="DesignWheelSize"/>
+										<xsd:enumeration value="DesignWidth"/>
+										<xsd:enumeration value="Diameter"/>
+										<xsd:enumeration value="DivingHoodThickness"/>
+										<xsd:enumeration value="FencingPommelType"/>
+										<xsd:enumeration value="FencingPommelTypeGripType"/>
+										<xsd:enumeration value="Flavor"/>
+										<xsd:enumeration value="FlavorSize"/>
+										<xsd:enumeration value="GolfFlex"/>
+										<xsd:enumeration value="GolfFlexGolfLoft"/>
+										<xsd:enumeration value="GolfFlexMaterial"/>
+										<xsd:enumeration value="GolfFlexShaftMaterial"/>
+										<xsd:enumeration value="GolfLoft"/>
+										<xsd:enumeration value="GolfLoftShaftMaterial"/>
+										<xsd:enumeration value="GripSize"/>
+										<xsd:enumeration value="GripSizeGripType"/>
+										<xsd:enumeration value="GripSizeHeadSize"/>
+										<xsd:enumeration value="GripType"/>
+										<xsd:enumeration value="Hand"/>
+										<xsd:enumeration value="HandBounceGolfFlex"/>
+										<xsd:enumeration value="HandBounceShaftTypeGolfFlex"/>
+										<xsd:enumeration value="HandClubGolfFlex"/>
+										<xsd:enumeration value="HandClubShaftTypeGolfFlex"/>
+										<xsd:enumeration value="HandGolfFlex"/>
+										<xsd:enumeration value="HandIronsGolfFlex"/>
+										<xsd:enumeration value="HandIronsLieAngleGolfFlex"/>
+										<xsd:enumeration value="HandIronsLieAngleShaftTypeGolfFlex"/>
+										<xsd:enumeration value="HandIronsShaftTypeGolfFlex"/>
+										<xsd:enumeration value="HandLength"/>
+										<xsd:enumeration value="HandLieAngle"/>
+										<xsd:enumeration value="HandLieAngleGolfFlex"/>
+										<xsd:enumeration value="HandLieAngleLength"/>
+										<xsd:enumeration value="HandLieAngleShaftType"/>
+										<xsd:enumeration value="HandLieAngleShaftTypeGolfFlex"/>
+										<xsd:enumeration value="HandLieAngleShaftTypeLength"/>
+										<xsd:enumeration value="HandGolfLoftBounceGolfFlex"/>
+										<xsd:enumeration value="HandGolfLoftBounceShaftTypeGolfFlex"/>
+										<xsd:enumeration value="HandGolfLoftGolfFlex"/>
+										<xsd:enumeration value="HandGolfLoftShaftTypeGolfFlex"/>
+										<xsd:enumeration value="HandModel"/>
+										<xsd:enumeration value="HandModelLength"/>
+										<xsd:enumeration value="HandModelShaftType"/>
+										<xsd:enumeration value="HandModelShaftTypeLength"/>
+										<xsd:enumeration value="HandShaftLength"/>
+										<xsd:enumeration value="HandShaftMaterialGolfFlex"/>
+										<xsd:enumeration value="HandShaftMaterialGolfFlexGolfLoft"/>
+										<xsd:enumeration value="HandShaftType"/>
+										<xsd:enumeration value="HandShaftTypeGolfFlex"/>
+										<xsd:enumeration value="HandShaftTypeLength"/>
+										<xsd:enumeration value="HandSize"/>
+										<xsd:enumeration value="HandTensionLevel"/>
+										<xsd:enumeration value="HandWeight"/>
+										<xsd:enumeration value="HandWoodGolfFlex"/>
+										<xsd:enumeration value="HandWoodShaftTypeGolfFlex"/>
+										<xsd:enumeration value="HeadSize"/>
+										<xsd:enumeration value="HeadSizeShape"/>
+										<xsd:enumeration value="Height"/>
+										<xsd:enumeration value="HeightSize"/>
+										<xsd:enumeration value="HeightStyle"/>
+										<xsd:enumeration value="HeightWeight"/>
+										<xsd:enumeration value="HeightWidth"/>
+										<xsd:enumeration value="ItemThickness"/>
+										<xsd:enumeration value="Length"/>
+										<xsd:enumeration value="LengthLineCapacity"/>
+										<xsd:enumeration value="LengthLineWeight"/>
+										<xsd:enumeration value="LengthMaterial"/>
+										<xsd:enumeration value="LengthShaftType"/>
+										<xsd:enumeration value="LengthSize"/>
+										<xsd:enumeration value="LengthStyle"/>
+										<xsd:enumeration value="LengthWeight"/>
+										<xsd:enumeration value="LengthWeightSupported"/>
+										<xsd:enumeration value="LengthWidth"/>
+										<xsd:enumeration value="LensColor"/>
+										<xsd:enumeration value="LensColorMaterial"/>
+										<xsd:enumeration value="LensColorShape"/>
+										<xsd:enumeration value="LineCapacity"/>
+										<xsd:enumeration value="LineCapacitySize"/>
+										<xsd:enumeration value="LineCapacityWeight"/>
+										<xsd:enumeration value="LineWeight"/>
+										<xsd:enumeration value="LineWeightSize"/>
+										<xsd:enumeration value="Material"/>
+										<xsd:enumeration value="MaterialShape"/>
+										<xsd:enumeration value="MaterialSize"/>
+										<xsd:enumeration value="MaterialStyle"/>
+										<xsd:enumeration value="MaterialTensionLevel"/>
+										<xsd:enumeration value="MaterialWeight"/>
+										<xsd:enumeration value="MaterialWheelSize"/>
+										<xsd:enumeration value="MaterialWidth"/>
+										<xsd:enumeration value="Quantity"/>
+										<xsd:enumeration value="QuantityShape"/>
+										<xsd:enumeration value="QuantitySize"/>
+										<xsd:enumeration value="QuantityWeight"/>
+										<xsd:enumeration value="Rounds"/>
+										<xsd:enumeration value="RoundsSize"/>
+										<xsd:enumeration value="ShaftMaterial"/>
+										<xsd:enumeration value="ShaftMaterialShaftType"/>
+										<xsd:enumeration value="ShaftType"/>
+										<xsd:enumeration value="Shape"/>
+										<xsd:enumeration value="ShapeSize"/>
+										<xsd:enumeration value="ShapeTensionLevel"/>
+										<xsd:enumeration value="ShapeWeight"/>
+										<xsd:enumeration value="Size"/>
+										<xsd:enumeration value="SizeStyle"/>
+										<xsd:enumeration value="SizeTensionLevel"/>
+										<xsd:enumeration value="SizeWattage"/>
+										<xsd:enumeration value="SizeWeight"/>
+										<xsd:enumeration value="SizeWeightSupported"/>
+										<xsd:enumeration value="SizeWheelSize"/>
+										<xsd:enumeration value="SizeWidth"/>
+										<xsd:enumeration value="Style"/>
+										<xsd:enumeration value="StyleTensionLevel"/>
+										<xsd:enumeration value="StyleWeight"/>
+										<xsd:enumeration value="StyleWheelSize"/>
+										<xsd:enumeration value="StyleWidth"/>
+										<xsd:enumeration value="TemperatureRating"/>
+										<xsd:enumeration value="TemperatureRatingColor"/>
+										<xsd:enumeration value="TemperatureRatingDesign"/>
+										<xsd:enumeration value="TemperatureRatingHand"/>
+										<xsd:enumeration value="TemperatureRatingLength"/>
+										<xsd:enumeration value="TemperatureRatingMaterial"/>
+										<xsd:enumeration value="TemperatureRatingShape"/>
+										<xsd:enumeration value="TemperatureRatingSize"/>
+										<xsd:enumeration value="TensionLevel"/>
+										<xsd:enumeration value="TensionLevelWeight"/>
+										<xsd:enumeration value="TensionLevelWeightSupported"/>
+										<xsd:enumeration value="Wattage"/>
+										<xsd:enumeration value="Weight"/>
+										<xsd:enumeration value="WeightSupported"/>
+										<xsd:enumeration value="WeightWidth"/>
+										<xsd:enumeration value="WheelSize"/>
+										<xsd:enumeration value="WheelSizeWeight"/>
+										<xsd:enumeration value="Width"/>
+										<xsd:enumeration value="CustomerPackageType"/>
+										<xsd:enumeration value="ColorName-CustomerPackageType"/>
+										<xsd:enumeration value="SizeName-CustomerPackageType"/>
+										<xsd:enumeration
+											value="SizeName-ColorName-CustomerPackageType"/>
+										<xsd:enumeration value="StyleName-CustomerPackageType"/>
+										<xsd:enumeration
+											value="SizeName-StyleName-CustomerPackageType"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+
+							<xsd:element name="AgeGenderCategory" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Amperage" type="AmperageDimension" minOccurs="0"/>
+							<xsd:element name="BikeRimSize" type="LengthDimension" minOccurs="0"/>
+							<xsd:element name="BootSize" type="Dimension" minOccurs="0"/>
+							<xsd:element name="Bounce" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="CalfSize" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Caliber" type="FourDecimal" minOccurs="0"/>
+							<xsd:element name="Capacity" type="VolumeDimension" minOccurs="0"/>
+							<xsd:element name="Club" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Color" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Curvature" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="CustomerPackageType" type="StringNotNull"
+								minOccurs="0"/>
+							<xsd:element name="Department" type="StringNotNull" minOccurs="0"
+								maxOccurs="5"/>
+							<xsd:element name="Design" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Diameter" type="LengthDimension" minOccurs="0"/>
+							<xsd:element name="DivingHoodThickness" type="LengthDimension"
+								minOccurs="0"/>
+							<xsd:element name="FencingPommelType" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Flavor" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="GolfFlex" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="GolfLoft" type="DegreeDimension" minOccurs="0"/>
+							<xsd:element name="GripSize" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="GripType" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Hand" type="xsd:string" minOccurs="0"/>
+							<xsd:element name="HeadSize" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Height" type="LengthDimension" minOccurs="0"/>
+							<xsd:element name="Irons" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="ItemThickness" type="LengthDimension" minOccurs="0"/>
+							<xsd:element name="Length" type="LengthDimension" minOccurs="0"/>
+							<xsd:element name="LensColor" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="LieAngle" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="LineCapacity" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="LineWeight" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Material" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Model" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="NumberOfItems" type="xsd:positiveInteger"
+								minOccurs="0"/>
+							<xsd:element name="Occupancy" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Quantity" type="xsd:positiveInteger" minOccurs="0"/>
+							<xsd:element name="Rounds" type="PositiveInteger" minOccurs="0"/>
+							<xsd:element name="ShaftLength" type="LengthDimension" minOccurs="0"/>
+							<xsd:element name="ShaftMaterial" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="ShaftType" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Shape" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Size" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Style" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="TemperatureRating" type="TemperatureRatingDimension"
+								minOccurs="0"/>
+							<xsd:element name="TensionLevel" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Volume" type="VolumeDimension" minOccurs="0"/>
+							<xsd:element name="Wattage" type="WattageDimension" minOccurs="0"/>
+							<xsd:element name="Weight" type="WeightDimension" minOccurs="0"/>
+							<xsd:element name="WeightSupported" type="WeightDimension" minOccurs="0"/>
+							<xsd:element name="WheelSize" type="LengthDimension" minOccurs="0"/>
+							<xsd:element name="Width" type="LengthDimension" minOccurs="0"/>
+							<xsd:element name="Wood" type="StringNotNull" minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="MaterialComposition" type="SuperLongStringNotNull" minOccurs="0"/>
+				<xsd:element name="Packaging" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="IsCustomizable" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="CustomizableTemplateName" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="IsAdultProduct" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="ModelYear" type="FourDigitYear" minOccurs="0"/>
+				<xsd:element name="Season" type="HundredString" minOccurs="0"/>
+				<xsd:element name="AccessLocation" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Action" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ActiveIngredients" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Alarm" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ApparentScaleSize" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="AvailableCourses" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BackingLineCapacity" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="Battery" minOccurs="0"/>
+				<xsd:element name="BatteryAverageLife" type="PositiveDimension" minOccurs="0"/>
+				<xsd:element name="BatteryAverageLifeStandby" type="PositiveDimension" minOccurs="0"/>
+				<xsd:element name="BatteryChargeTime" type="PositiveDimension" minOccurs="0"/>
+				<xsd:element name="BatteryLife" type="AssemblyTimeDimension" minOccurs="0"
+					maxOccurs="3"/>
+				<xsd:element name="BatteryTypeLithiumIon" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="BatteryTypeLithiumMetal" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="BeamWidth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="BearingMaterialType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BeltStyle" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BikeWeight" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="BladeGrind" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BladeLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="BladeShape" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BladeType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BMXBikeType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BoatFenderDiameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="BoilRateDescription" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BoomLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="BottomStyle" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BrakeType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BrakeWidth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="BreakingStrength" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="BTUs" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="Buildup" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BulbType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BurnTime" type="BurnTimeDimension" minOccurs="0"/>
+				<xsd:element name="CanShipInOriginalContainer" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Capability" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="CapType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="CareInstructions" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="CenterlineLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="ClosureType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="CollarType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ColorMap" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="CompatibleDevices" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="CompatibleHoseDiameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="CompatibleRopeDiameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Construction" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ControlProgramName" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="CoreMaterialType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="CountryAsLabeled" type="CountryOfOriginType" minOccurs="0"/>
+				<xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+				<xsd:element name="CourseCapacity" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="CoverageArea" type="AreaDimension" minOccurs="0"/>
+				<xsd:element name="CrankLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="CuffType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="CupSize" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Cycles" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="DeckLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="DeckWidth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Directions" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="DisplayFeatures" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="DisplayLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="DisplaySize" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="DisplayType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="DisplayVolume" type="VolumeDimension" minOccurs="0"/>
+				<xsd:element name="DisplayWeight" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="EffectiveEdgeLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="EngineDisplacement" minOccurs="0">
+					<xsd:complexType>
+						<xsd:simpleContent>
+							<xsd:extension base="xsd:decimal">
+								<xsd:attribute name="unitOfMeasure">
+									<xsd:simpleType>
+										<xsd:restriction base="xsd:string">
+											<xsd:enumeration value="CID"/>
+											<xsd:enumeration value="l"/>
+											<xsd:enumeration value="cc"/>
+										</xsd:restriction>
+									</xsd:simpleType>
+								</xsd:attribute>
+							</xsd:extension>
+						</xsd:simpleContent>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="EventName" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Eye" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="FabricType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FabricWash" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FillMaterialType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FishingLineType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FishType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FittingType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FitType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FloorArea" type="AreaDimension" minOccurs="0"/>
+				<xsd:element name="FloorLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="FloorWidth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="FlyLineNumber" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="FoldedLength" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FrameHeight" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="FrameMaterial" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FrameType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FrequencyBand" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FrontPleatType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FuelCapacity" type="VolumeDimension" minOccurs="0"/>
+				<xsd:element name="FuelType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Functions" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FurDescription" type="LongString" minOccurs="0"/>
+				<xsd:element name="GearDirection" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="GeographicCoverage" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="GloveType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="GripMaterialType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="GuardMaterialType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="HandleMaterial" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="HandleType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="HeatRating" type="TemperatureRatingDimension" minOccurs="0"/>
+				<xsd:element name="HP" type="Dimension" minOccurs="0"/>
+				<xsd:element name="HullShape" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="IdentityPackageType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="StringNotNull">
+							<xsd:enumeration value="bulk"/>
+							<xsd:enumeration value="frustration_free"/>
+							<xsd:enumeration value="traditional"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="ImportDesignation" type="String" minOccurs="0" />				
+				<xsd:element name="ImpactForce" type="Dimension" minOccurs="0"/>
+				<xsd:element name="Ingredients" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Inseam" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="InsulationType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Intensity" type="Dimension" minOccurs="0"/>
+				<xsd:element name="IsSigned" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="JerseyType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="KnifeFunction" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="LampType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="LaptopCapacity" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="LashLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="LeagueName" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="LegStyle" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="LensMaterial" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="LensShape" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="LifeVestType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="LightIntensity" type="Dimension" minOccurs="0"/>
+				<xsd:element name="LineWeight" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="LiningMaterial" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryEnergyContent" type="PositiveDimension"
+					minOccurs="0"/>
+				<xsd:element name="LithiumBatteryPackaging" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="batteries_contained_in_equipment"/>
+							<xsd:enumeration value="batteries_only"/>
+							<xsd:enumeration value="batteries_packed_with_equipment"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LithiumBatteryVoltage" type="PositiveDimension" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryWeight" type="PositiveDimension" minOccurs="0"/>
+				<xsd:element name="LoadCapacity" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="LockType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Loudness" type="Dimension" minOccurs="0"/>
+				<xsd:element name="LureWeight" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="ManufacturerDefinedQualityDescription" type="StringNotNull"
+					minOccurs="0"/>
+				<xsd:element name="MartialArtsType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaximumCompatibleBootSize" type="xsd:positiveInteger"
+					minOccurs="0"/>
+				<xsd:element name="MaximumCompatibleRopeDiameter" type="LengthDimension"
+					minOccurs="0"/>
+				<xsd:element name="MaximumHeight" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="MaximumInclinePercentage" type="xsd:positiveInteger"
+					minOccurs="0"/>
+				<xsd:element name="MaximumLegSize" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaximumMagnification" type="Dimension" minOccurs="0"/>
+				<xsd:element name="MaximumPitchSpeed" minOccurs="0">
+					<xsd:complexType>
+						<xsd:simpleContent>
+							<xsd:extension base="xsd:decimal">
+								<xsd:attribute name="unitOfMeasure">
+									<xsd:simpleType>
+										<xsd:restriction base="xsd:string">
+											<xsd:enumeration value="kilometer"/>
+											<xsd:enumeration value="mph"/>
+										</xsd:restriction>
+									</xsd:simpleType>
+								</xsd:attribute>
+							</xsd:extension>
+						</xsd:simpleContent>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="MaximumResistance" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="MaximumStrideLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="MaximumTensionRating" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="MaximumUserWeight" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="MaximumWeight" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="MaxWeightRecommendation" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="MechanicalStructure" type="SuperLongStringNotNull" minOccurs="0"/>
+				<xsd:element name="Memory" type="MemorySizeDimension" minOccurs="0"/>
+				<xsd:element name="MfrWarrantyDescriptionLabor" type="SuperLongStringNotNull"
+					minOccurs="0"/>
+				<xsd:element name="MfrWarrantyDescriptionParts" type="SuperLongStringNotNull"
+					minOccurs="0"/>
+				<xsd:element name="MfrWarrantyDescriptionType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MinimumCompatibleBootSize" type="xsd:positiveInteger"
+					minOccurs="0"/>
+				<xsd:element name="MinimumCompatibleRopeDiameter" type="LengthDimension"
+					minOccurs="0"/>
+				<xsd:element name="MinimumLegSize" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MinimumMagnification" type="Dimension" minOccurs="0"/>
+				<xsd:element name="MinimumTensionRating" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="MinimumTorsoFit" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MinimumWeightRecommendation" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="MonitorFeatures" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MotorSize" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="MountainBikeProportionalFrameSize" type="LengthDimension"
+					minOccurs="0"/>
+				<xsd:element name="MountainBikeType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MountType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MovementType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="NeckStyle" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="NumberOfBlades" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfCarriagePositions" type="xsd:positiveInteger"
+					minOccurs="0"/>
+				<xsd:element name="NumberOfDoors" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfExercises" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfFootPositions" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfGearLoops" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfHeadPositions" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfHolds" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfHorses" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfLevels" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumIonCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumMetalCells" type="xsd:positiveInteger"
+					minOccurs="0"/>
+				<xsd:element name="NumberOfPages" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfPieces" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfPockets" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfPoles" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfPrograms" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfResistanceLevels" type="xsd:positiveInteger"
+					minOccurs="0"/>
+				<xsd:element name="NumberOfSpeeds" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfSprings" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="ObjectiveLensSize" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="OperationMode" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Orientation" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="OuterMaterialType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PackedSize" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PadType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PatternStyle" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PeakHeight" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Pixels" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PlayerName" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PocketDescription" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PositionAccuracy" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PowerSource" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PPUCount" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PPUCountType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ProportionalFrameSize" type="Dimension" minOccurs="0"/>
+				<xsd:element name="PullType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Range" type="StringLengthOptionalDimension" minOccurs="0"/>
+				<xsd:element name="RearDerailleurCompatibleChainSize" type="LengthDimension"
+					minOccurs="0"/>
+				<xsd:element name="RecommendedWorkoutSpace" type="AreaDimensionOptionalUnit" minOccurs="0"/>
+				<xsd:element name="ReelDiameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="ReelModel" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Region" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Resistance" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="ResistanceMechanism" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Resolution" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="RiseStyle" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="RoadBikeProportionalFrameSize" type="LengthDimension"
+					minOccurs="0"/>
+				<xsd:element name="RoadBikeType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="RodLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="RodWeight" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="Routes" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="R-Value" type="PositiveDimension" minOccurs="0"/>
+				<xsd:element name="Scale" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ScreenColor" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ScreenSize" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="SeatHeight" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="SeatingCapacity" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="SellerWarrantyDescription" type="SuperLongStringNotNull"
+					minOccurs="0"/>
+				<xsd:element name="ShellMaterial" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ShirtType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ShoeWidth" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SizeMap" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SkillLevel" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SkiStyle" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SleepingCapacity" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="SleeveLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="SleeveType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SnowboardStyle" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SockHeight" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SockStyle" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SonarType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SpecialFeatures" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SpecificUsageForProduct" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Speed" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SpeedRating" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Sport" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="State" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="StaticElongationPercentage" type="Dimension" minOccurs="0"/>
+				<xsd:element name="StaticWeight" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="StrapType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Strength" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="StyleKeywords" type="StringNotNull" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="SupportType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SuspensionType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="TargetGender" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="StringNotNull">
+							<xsd:enumeration value="male"/>
+							<xsd:enumeration value="female"/>
+							<xsd:enumeration value="unisex"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="TargetZones" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="TeamName" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="TensionSupported" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="Theme" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ThreadSize" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="TopStyle" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="TopTubeLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="TrailerType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="TurnRadius" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="UIAAFallRating" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="UnderwireType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="UniformNumber" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="UsageCapacity" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="UVProtection" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="VolumeCapacityName" type="PositiveDimension" minOccurs="0"/>
+				<xsd:element name="WaistSize" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="WaistWidth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="WarmthRating" type="TemperatureRatingDimension" minOccurs="0"/>
+				<xsd:element name="Warnings" type="LongStringNotNull" minOccurs="0"/>
+				<xsd:element name="Warranty" type="SuperLongStringNotNull" minOccurs="0"/>
+				<xsd:element name="WaterBottleCapType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="WaterResistanceRating" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="WaterType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Wattage" type="Dimension" minOccurs="0"/>
+				<xsd:element name="Watts" type="WattageDimension" minOccurs="0"/>
+				<xsd:element name="WayPoints" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="WeightCapacity" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="WhatsInTheBox" type="SuperLongStringNotNull" minOccurs="0"/>
+				<xsd:element name="WheelType" type="StringNotNull" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

@@ -1,0 +1,798 @@
+<?xml version="1.0"?>
+<!-- Revision="$Revision: #12 $" -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<!--
+$Date: 2007/10/31 $
+AMAZON.COM CONFIDENTIAL.This document and the information contained in it areconfidential and proprietary information of Amazon.com and may not be reproduced,distributed or used, in whole or in part, for any purpose other than as necessary to list products for sale on the www.amazon.com web site pursuant to an agreement with Amazon.com.
+-->
+	<xsd:include schemaLocation="amzn-base.xsd"/>
+	<!--
+Please read the corresponding documentation that contains the recommended values for some elements of type StringNotNull.
+-->
+	<xsd:element name="Jewelry">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ProductType">
+					<xsd:complexType>
+						<xsd:choice>
+							<xsd:element ref="Watch"/>
+							<xsd:element ref="FashionNecklaceBraceletAnklet"/>
+							<xsd:element ref="FashionRing"/>
+							<xsd:element ref="FashionEarring"/>
+							<xsd:element ref="FashionOther"/>
+							<xsd:element ref="FineNecklaceBraceletAnklet"/>
+							<xsd:element ref="FineRing"/>
+							<xsd:element ref="FineEarring"/>
+							<xsd:element ref="FineOther"/>
+						</xsd:choice>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # Watch Classification Data
+     ###############################################################
+     -->
+	<xsd:element name="Watch">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="VariationData" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="Parentage">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="parent"/>
+										<xsd:enumeration value="child"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="VariationTheme" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="BandColor"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="BandColor" type="FortyStringNotNull" minOccurs="0"/>
+				<xsd:element name="BandMaterial" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BandLength" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BandWidth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="ClaspType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="CaseMaterial" type="StringNotNull" minOccurs="0" maxOccurs="2"/>
+				<xsd:element name="CaseSizeThickness" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="CaseSizeDiameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="MetalStamp" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="DialColor" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="DialColorMap" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BezelMaterial" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BezelFunction" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="GemType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Crystal" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MovementType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="CalendarType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="WaterResistantDepth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="ResaleType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="WarrantyType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SellerWarrantyDescription" type="SuperLongStringNotNull" minOccurs="0"/>
+				<xsd:element name="EstatePeriod" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+				<xsd:element name="ItemShape" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SpecialFeatures" type="StringNotNull" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="DisplayType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaximumWaterPressure" type="PressureDimension" minOccurs="0"/>
+				<xsd:element name="ModelYear" type="FourDigitYear" minOccurs="0"/>
+				<xsd:element name="Season" type="HundredString" minOccurs="0"/>
+				<xsd:element name="BatteryTypeLithiumIon" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="BatteryTypeLithiumMetal" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryEnergyContent" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryPackaging" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="batteries_contained_in_equipment"/>
+							<xsd:enumeration value="batteries_only"/>
+							<xsd:enumeration value="batteries_packed_with_equipment"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LithiumBatteryVoltage" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryWeight" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumIonCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumMetalCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element ref="Battery" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # FashionNecklaceBraceletAnklet Classification Data
+     ###############################################################
+        -->
+	<xsd:element name="FashionNecklaceBraceletAnklet">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="VariationData" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="Parentage">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="parent"/>
+										<xsd:enumeration value="child"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="VariationTheme" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="Length"/>
+										<xsd:enumeration value="MetalType"/>
+										<xsd:enumeration value="Length-MetalType"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="Length" type="LengthDimension" minOccurs="0"/>
+							<xsd:element name="MetalType" type="StringNotNull" minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="ClaspType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Material" type="StringNotNull" minOccurs="0" maxOccurs="4"/>
+				<xsd:element name="MetalStamp" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SettingType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Diameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Height" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Width" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="ChainType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ChainDescription" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="EstatePeriod" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="NumberOfStones" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="Stone" type="StoneType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="NumberOfPearls" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element ref="Pearl" minOccurs="0"/>
+				<xsd:element name="SellerWarrantyDescription" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ModelYear" type="FourDigitYear" minOccurs="0"/>
+				<xsd:element name="Season" type="HundredString" minOccurs="0"/>
+				<xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+				<xsd:element name="StyleKeywords" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="OccasionLifestyle" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="LithiumBatteryEnergyContent" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryPackaging" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="batteries_contained_in_equipment"/>
+							<xsd:enumeration value="batteries_only"/>
+							<xsd:enumeration value="batteries_packed_with_equipment"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LithiumBatteryVoltage" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryWeight" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumIonCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumMetalCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element ref="Battery" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # FashionRing Classification Data
+     ###############################################################
+        -->
+	<xsd:element name="FashionRing">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="VariationData" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="Parentage">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="parent"/>
+										<xsd:enumeration value="child"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="VariationTheme" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="RingSize"/>
+										<xsd:enumeration value="MetalType"/>
+										<xsd:enumeration value="MetalType-RingSize"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="RingSize" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:normalizedString">
+										<xsd:minLength value="1"/>
+										<xsd:maxLength value="13"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="MetalType" type="StringNotNull" minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="Material" type="StringNotNull" minOccurs="0" maxOccurs="4"/>
+				<xsd:element name="MetalStamp" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SettingType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Diameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Height" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Width" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Length" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="EstatePeriod" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="NumberOfStones" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="Stone" type="StoneType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="NumberOfPearls" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element ref="Pearl" minOccurs="0"/>
+				<xsd:element name="SellerWarrantyDescription" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ModelYear" type="FourDigitYear" minOccurs="0"/>
+				<xsd:element name="Season" type="HundredString" minOccurs="0"/>
+				<xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+				<xsd:element name="StyleKeywords" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="OccasionLifestyle" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="LithiumBatteryEnergyContent" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryPackaging" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="batteries_contained_in_equipment"/>
+							<xsd:enumeration value="batteries_only"/>
+							<xsd:enumeration value="batteries_packed_with_equipment"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LithiumBatteryVoltage" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryWeight" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumIonCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumMetalCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element ref="Battery" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # FashionEarring Classification Data
+     ###############################################################
+        -->
+	<xsd:element name="FashionEarring">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="VariationData" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="Parentage">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="parent"/>
+										<xsd:enumeration value="child"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="VariationTheme" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="MetalType"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="MetalType" type="StringNotNull" minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="Material" type="StringNotNull" minOccurs="0" maxOccurs="4"/>
+				<xsd:element name="MetalStamp" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SettingType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Diameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Height" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Width" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Length" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="BackFinding" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="EstatePeriod" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="NumberOfStones" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="Stone" type="StoneType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="NumberOfPearls" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element ref="Pearl" minOccurs="0"/>
+				<xsd:element name="SellerWarrantyDescription" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ModelYear" type="FourDigitYear" minOccurs="0"/>
+				<xsd:element name="Season" type="HundredString" minOccurs="0"/>
+				<xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+				<xsd:element name="StyleKeywords" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="OccasionLifestyle" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="LithiumBatteryEnergyContent" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryPackaging" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="batteries_contained_in_equipment"/>
+							<xsd:enumeration value="batteries_only"/>
+							<xsd:enumeration value="batteries_packed_with_equipment"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LithiumBatteryVoltage" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryWeight" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumIonCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumMetalCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element ref="Battery" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # FashionOther Classification Data
+     ###############################################################
+        -->
+	<xsd:element name="FashionOther">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="VariationData" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="Parentage">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="parent"/>
+										<xsd:enumeration value="child"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="VariationTheme" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="Length"/>
+										<xsd:enumeration value="MetalType"/>
+										<xsd:enumeration value="Length-MetalType"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="Length" type="LengthDimension" minOccurs="0"/>
+							<xsd:element name="MetalType" type="StringNotNull" minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="Material" type="StringNotNull" minOccurs="0" maxOccurs="4"/>
+				<xsd:element name="MetalStamp" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="TotalMetalWeight" type="JewelryWeightDimension" minOccurs="0"/>
+				<xsd:element name="Diameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Height" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Width" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="EstatePeriod" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="NumberOfStones" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="Stone" type="StoneType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="NumberOfPearls" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element ref="Pearl" minOccurs="0"/>
+				<xsd:element name="SellerWarrantyDescription" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ModelYear" type="FourDigitYear" minOccurs="0"/>
+				<xsd:element name="Season" type="HundredString" minOccurs="0"/>
+				<xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+				<xsd:element name="StyleKeywords" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="OccasionLifestyle" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="LithiumBatteryEnergyContent" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryPackaging" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="batteries_contained_in_equipment"/>
+							<xsd:enumeration value="batteries_only"/>
+							<xsd:enumeration value="batteries_packed_with_equipment"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LithiumBatteryVoltage" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryWeight" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumIonCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumMetalCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element ref="Battery" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # FineNecklaceBraceletAnklet Classification Data
+     ###############################################################
+        -->
+	<xsd:element name="FineNecklaceBraceletAnklet">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="VariationData" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="Parentage">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="parent"/>
+										<xsd:enumeration value="child"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="VariationTheme" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="Length"/>
+										<xsd:enumeration value="MetalType"/>
+										<xsd:enumeration value="SizePerPearl"/>
+										<xsd:enumeration value="TotalDiamondWeight"/>
+										<xsd:enumeration value="Length-TotalDiamondWeight"/>
+										<xsd:enumeration value="Length-SizePerPearl"/>
+										<xsd:enumeration value="MetalType-TotalDiamondWeight"/>
+										<xsd:enumeration value="MetalType-SizePerPearl"/>
+										<xsd:enumeration value="MetalStamp"/>
+										<xsd:enumeration value="GemType"/>
+										<xsd:enumeration value="GemType-MetalType"/>
+										<xsd:enumeration value="MetalType-MetalStamp"/>
+										<xsd:enumeration value="MetalType-Length"/>
+										<xsd:enumeration value="GemType-Length"/>
+										<xsd:enumeration value="StoneShape-MetalType"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="Length" type="LengthDimension" minOccurs="0"/>
+							<xsd:element name="MetalType" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="TotalDiamondWeight" type="JewelryWeightDimension" minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="ClaspType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Material" type="StringNotNull" minOccurs="0" maxOccurs="4"/>
+				<xsd:element name="MetalStamp" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SettingType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Certificate" type="CertificateType" minOccurs="0" maxOccurs="9"/>
+				<xsd:element name="TotalGemWeight" type="JewelryWeightDimension" minOccurs="0"/>
+				<xsd:element name="TotalMetalWeight" type="JewelryWeightDimension" minOccurs="0"/>
+				<xsd:element name="Diameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Height" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Width" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="ChainType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ChainDescription" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="EstatePeriod" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="NumberOfStones" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="Stone" type="StoneType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="NumberOfPearls" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element ref="Pearl" minOccurs="0"/>
+				<xsd:element name="Hallmark" type="LongString" minOccurs="0"/>
+				<xsd:element name="SellerWarrantyDescription" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ModelYear" type="FourDigitYear" minOccurs="0"/>
+				<xsd:element name="Season" type="HundredString" minOccurs="0"/>
+				<xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+				<xsd:element name="StyleKeywords" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="OccasionLifestyle" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="LithiumBatteryEnergyContent" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryPackaging" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="batteries_contained_in_equipment"/>
+							<xsd:enumeration value="batteries_only"/>
+							<xsd:enumeration value="batteries_packed_with_equipment"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LithiumBatteryVoltage" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryWeight" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumIonCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumMetalCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element ref="Battery" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # FineRing Classification Data
+     ###############################################################
+        -->
+	<xsd:element name="FineRing">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="VariationData" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="Parentage">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="parent"/>
+										<xsd:enumeration value="child"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="VariationTheme" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="RingSize"/>
+										<xsd:enumeration value="MetalType"/>
+										<xsd:enumeration value="SizePerPearl"/>
+										<xsd:enumeration value="TotalDiamondWeight"/>
+										<xsd:enumeration value="MetalType-RingSize"/>
+										<xsd:enumeration value="RingSize-TotalDiamondWeight"/>
+										<xsd:enumeration value="RingSize-SizePerPearl"/>
+										<xsd:enumeration value="MetalType-TotalDiamondWeight"/>
+										<xsd:enumeration value="MetalType-SizePerPearl"/>
+										<xsd:enumeration value="MetalStamp"/>
+										<xsd:enumeration value="GemType"/>
+										<xsd:enumeration value="GemType-MetalType"/>
+										<xsd:enumeration value="MetalType-MetalStamp"/>
+										<xsd:enumeration value="MetalType-RingSize"/>
+										<xsd:enumeration value="GemType-RingSize"/>
+										<xsd:enumeration value="StoneShape-MetalType"/>
+										<xsd:enumeration value="StoneShape-RingSize"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="RingSize" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:normalizedString">
+										<xsd:minLength value="1"/>
+										<xsd:maxLength value="13"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="MetalType" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="TotalDiamondWeight" type="JewelryWeightDimension" minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="Material" type="StringNotNull" minOccurs="0" maxOccurs="4"/>
+				<xsd:element name="MetalStamp" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SettingType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Certificate" type="CertificateType" minOccurs="0" maxOccurs="9"/>
+				<xsd:element name="TotalGemWeight" type="JewelryWeightDimension" minOccurs="0"/>
+				<xsd:element name="TotalMetalWeight" type="JewelryWeightDimension" minOccurs="0"/>
+				<xsd:element name="Diameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Height" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Width" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Length" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="ReSizable" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="SizingLowerRange" type="Dimension" minOccurs="0"/>
+				<xsd:element name="SizingUpperRange" type="Dimension" minOccurs="0"/>
+				<xsd:element name="EstatePeriod" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="NumberOfStones" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="Stone" type="StoneType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="NumberOfPearls" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element ref="Pearl" minOccurs="0"/>
+				<xsd:element name="Hallmark" type="LongString" minOccurs="0"/>
+				<xsd:element name="SellerWarrantyDescription" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ModelYear" type="FourDigitYear" minOccurs="0"/>
+				<xsd:element name="Season" type="HundredString" minOccurs="0"/>
+				<xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+				<xsd:element name="StyleKeywords" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="OccasionLifestyle" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="LithiumBatteryEnergyContent" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryPackaging" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="batteries_contained_in_equipment"/>
+							<xsd:enumeration value="batteries_only"/>
+							<xsd:enumeration value="batteries_packed_with_equipment"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LithiumBatteryVoltage" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryWeight" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumIonCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumMetalCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element ref="Battery" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # FineEarring Classification Data
+     ###############################################################
+        -->
+	<xsd:element name="FineEarring">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="VariationData" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="Parentage">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="parent"/>
+										<xsd:enumeration value="child"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="VariationTheme" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="MetalType"/>
+										<xsd:enumeration value="SizePerPearl"/>
+										<xsd:enumeration value="TotalDiamondWeight"/>
+										<xsd:enumeration value="MetalType-TotalDiamondWeight"/>
+										<xsd:enumeration value="MetalType-SizePerPearl"/>
+										<xsd:enumeration value="MetalStamp"/>
+										<xsd:enumeration value="GemType"/>
+										<xsd:enumeration value="GemType-MetalType"/>
+										<xsd:enumeration value="MetalType-MetalStamp"/>
+										<xsd:enumeration value="StoneShape-MetalType"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="MetalType" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="TotalDiamondWeight" type="JewelryWeightDimension" minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="Material" type="StringNotNull" minOccurs="0" maxOccurs="4"/>
+				<xsd:element name="MetalStamp" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SettingType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Certificate" type="CertificateType" minOccurs="0" maxOccurs="9"/>
+				<xsd:element name="TotalGemWeight" type="JewelryWeightDimension" minOccurs="0"/>
+				<xsd:element name="TotalMetalWeight" type="JewelryWeightDimension" minOccurs="0"/>
+				<xsd:element name="Diameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Height" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Width" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Length" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="BackFinding" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="EstatePeriod" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="NumberOfStones" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="Stone" type="StoneType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="NumberOfPearls" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element ref="Pearl" minOccurs="0"/>
+				<xsd:element name="Hallmark" type="LongString" minOccurs="0"/>
+				<xsd:element name="SellerWarrantyDescription" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ModelYear" type="FourDigitYear" minOccurs="0"/>
+				<xsd:element name="Season" type="HundredString" minOccurs="0"/>
+				<xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+				<xsd:element name="StyleKeywords" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="OccasionLifestyle" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="LithiumBatteryEnergyContent" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryPackaging" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="batteries_contained_in_equipment"/>
+							<xsd:enumeration value="batteries_only"/>
+							<xsd:enumeration value="batteries_packed_with_equipment"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LithiumBatteryVoltage" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryWeight" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumIonCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumMetalCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element ref="Battery" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # FineOther Classification Data
+     ###############################################################
+        -->
+	<xsd:element name="FineOther">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="VariationData" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="Parentage">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="parent"/>
+										<xsd:enumeration value="child"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="VariationTheme" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="Length"/>
+										<xsd:enumeration value="MetalType"/>
+										<xsd:enumeration value="SizePerPearl"/>
+										<xsd:enumeration value="TotalDiamondWeight"/>
+										<xsd:enumeration value="Length-TotalDiamondWeight"/>
+										<xsd:enumeration value="Length-SizePerPearl"/>
+										<xsd:enumeration value="MetalType-TotalDiamondWeight"/>
+										<xsd:enumeration value="MetalType-SizePerPearl"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="Length" type="LengthDimension" minOccurs="0"/>
+							<xsd:element name="MetalType" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="TotalDiamondWeight" type="JewelryWeightDimension" minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="Material" type="StringNotNull" minOccurs="0" maxOccurs="4"/>
+				<xsd:element name="MetalStamp" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SettingType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Certificate" type="CertificateType" minOccurs="0" maxOccurs="9"/>
+				<xsd:element name="TotalGemWeight" type="JewelryWeightDimension" minOccurs="0"/>
+				<xsd:element name="TotalMetalWeight" type="JewelryWeightDimension" minOccurs="0"/>
+				<xsd:element name="Diameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Height" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Width" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="EstatePeriod" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="NumberOfStones" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="Stone" type="StoneType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="NumberOfPearls" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element ref="Pearl" minOccurs="0"/>
+				<xsd:element name="Hallmark" type="LongString" minOccurs="0"/>
+				<xsd:element name="SellerWarrantyDescription" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ModelYear" type="FourDigitYear" minOccurs="0"/>
+				<xsd:element name="Season" type="HundredString" minOccurs="0"/>
+				<xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+				<xsd:element name="StyleKeywords" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="OccasionLifestyle" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="LithiumBatteryEnergyContent" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryPackaging" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="batteries_contained_in_equipment"/>
+							<xsd:enumeration value="batteries_only"/>
+							<xsd:enumeration value="batteries_packed_with_equipment"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LithiumBatteryVoltage" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryWeight" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumIonCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumMetalCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element ref="Battery" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # Stone  Classification Data
+     ###############################################################
+        -->
+	<xsd:complexType name="StoneType">
+		<xsd:sequence>
+			<xsd:element name="GemType" type="StringNotNull" minOccurs="0"/>
+			<xsd:element name="StoneCut" type="StringNotNull" minOccurs="0"/>
+			<xsd:element name="StoneColor" type="StringNotNull" minOccurs="0"/>
+			<xsd:element name="StoneClarity" type="StringNotNull" minOccurs="0"/>
+			<xsd:element name="StoneShape" type="StringNotNull" minOccurs="0"/>
+			<xsd:element name="StoneCreationMethod" type="StoneCreationMethod" minOccurs="0"/>
+			<xsd:element name="StoneTreatmentMethod" type="StringNotNull" minOccurs="0"/>
+			<xsd:element name="StoneHeight" type="JewelryLengthDimension" minOccurs="0"/>
+			<xsd:element name="StoneLength" type="JewelryLengthDimension" minOccurs="0"/>
+			<xsd:element name="StoneWidth" type="JewelryLengthDimension" minOccurs="0"/>
+			<xsd:element name="StoneWeight" type="JewelryWeightDimension" minOccurs="0"/>
+			<xsd:element name="LabCreated" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="Inscription" type="StringNotNull" minOccurs="0"/>
+			<xsd:element name="StoneDepthPercentage" type="FourDecimal" minOccurs="0"/>
+			<xsd:element name="StoneTablePercentage" type="FourDecimal" minOccurs="0"/>
+			<xsd:element name="StoneSymmetry" type="StringNotNull" minOccurs="0"/>
+			<xsd:element name="StonePolish" type="StringNotNull" minOccurs="0"/>
+			<xsd:element name="StoneGirdle" type="StringNotNull" minOccurs="0"/>
+			<xsd:element name="StoneCulet" type="StringNotNull" minOccurs="0"/>
+			<xsd:element name="StoneFluorescence" type="StringNotNull" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--
+     ###############################################################
+     # Pearl  Classification Data
+     ###############################################################
+        -->
+	<xsd:element name="Pearl">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="PearlType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PearlMinimumColor" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PearlLustre" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PearlShape" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PearlUniformity" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PearlSurfaceMarkingsAndBlemishes" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="NacreThickness" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PearlStringingMethod" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SizePerPearl" type="StringNotNull" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # Certificate Classification Data
+     ###############################################################
+        -->
+	<xsd:complexType name="CertificateType">
+		<xsd:sequence>
+			<xsd:element name="CertificateType" type="StringNotNull"/>
+			<xsd:element name="CertificateNumber" type="StringNotNull"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

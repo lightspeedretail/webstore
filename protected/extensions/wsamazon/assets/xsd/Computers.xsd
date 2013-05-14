@@ -1,0 +1,2347 @@
+<?xml version="1.0"?>
+<!-- edited with XMLSpy v2010 rel. 2 (http://www.altova.com) by sunil sachdev (amazon.com) -->
+<!-- Revision="$Revision: #C_1 $" -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<!--
+    $Date: 2012/03/23 $
+
+    AMAZON.COM CONFIDENTIAL.  This document and the information contained in it are
+    confidential and proprietary information of Amazon.com and may not be reproduced, 
+    distributed or used, in whole or in part, for any purpose other than as necessary 
+    to list products for sale on the www.amazon.com web site pursuant to an agreement 
+    with Amazon.com.
+    -->
+	<xsd:include schemaLocation="amzn-base.xsd"/>
+	<!--
+    Please read the corresponding documentation that contains the recommended values for elements
+    of type StringNotNull.
+    -->
+	<xsd:element name="Computers">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ProductType">
+					<xsd:complexType>
+						<xsd:choice>
+							<xsd:element ref="CarryingCaseOrBag"/>
+							<xsd:element ref="ComputerAddOn"/>
+							<xsd:element ref="ComputerComponent"/>
+							<xsd:element ref="ComputerCoolingDevice"/>
+							<xsd:element ref="ComputerDriveOrStorage"/>
+							<xsd:element ref="ComputerInputDevice"/>
+							<xsd:element ref="ComputerProcessor"/>
+							<xsd:element ref="ComputerSpeaker"/>
+							<xsd:element ref="Computer"/>
+							<xsd:element ref="FlashMemory"/>
+							<xsd:element ref="InkOrToner"/>
+							<xsd:element ref="Keyboards"/>
+							<xsd:element ref="MemoryReader"/>
+							<xsd:element ref="Monitor"/>
+							<xsd:element ref="Motherboard"/>
+							<xsd:element ref="NetworkingDevice"/>
+							<xsd:element ref="NotebookComputer"/>
+							<xsd:element ref="PersonalComputer"/>
+							<xsd:element ref="Printer"/>
+							<xsd:element ref="RamMemory"/>
+							<xsd:element ref="Scanner"/>
+							<xsd:element ref="SoundCard"/>
+							<xsd:element ref="SystemCabinet"/>
+							<xsd:element ref="SystemPowerDevice"/>
+							<xsd:element ref="TabletComputer"/>
+							<xsd:element ref="VideoCard"/>
+							<xsd:element ref="VideoProjector"/>
+							<xsd:element ref="Webcam"/>
+						</xsd:choice>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="AssemblyRequired" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element ref="Battery" minOccurs="0"/>
+				<xsd:element name="BatteryAverageLife" type="PositiveNonZeroDimension" minOccurs="0"/>
+				<xsd:element name="BatteryAverageLifeStandby" type="PositiveNonZeroDimension"
+					minOccurs="0"/>
+				<xsd:element name="BatteryChargeTime" type="PositiveNonZeroDimension" minOccurs="0"/>
+				<xsd:element name="Color" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ColorMap" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+				<xsd:element name="DisplayLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="DisplayVolume" type="VolumeDimension" minOccurs="0"/>
+				<xsd:element name="DisplayWeight" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="HarmonizedCode" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="IncludedComponents" type="StringNotNull" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="IsPortable" type="xsd:boolean" minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="ItemPackageQuantity" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryEnergyContent" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryPackaging" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="batteries_contained_in_equipment"/>
+							<xsd:enumeration value="batteries_only"/>
+							<xsd:enumeration value="batteries_packed_with_equipment"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LithiumBatteryVoltage" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryWeight" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="ManufacturerWarrantyType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MfrWarrantyDescriptionLabor" type="SuperLongStringNotNull"
+					minOccurs="0"/>
+				<xsd:element name="MfrWarrantyDescriptionParts" type="SuperLongStringNotNull"
+					minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumIonCells" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumMetalCells" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="PowerSource" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="RemoteIncluded" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Size" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SellerWarrantyDescription" type="SuperLongStringNotNull"
+					minOccurs="0"/>
+				<xsd:element name="Warnings" type="LongStringNotNull" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ComputerComponent">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="AdditionalFeatures" minOccurs="0"/>
+				<xsd:element ref="AudioOutputMode" minOccurs="0"/>
+				<xsd:element ref="ChipsetType" minOccurs="0"/>
+				<xsd:element name="ComponentMemoryStorageCapacity" minOccurs="0">
+					<xsd:complexType>
+						<xsd:simpleContent>
+							<xsd:extension base="PositiveInteger">
+								<xsd:attribute name="unitOfMeasure" type="MemorySizeUnitOfMeasure"
+									use="required"/>
+							</xsd:extension>
+						</xsd:simpleContent>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="CompatibleProcessorTypes" type="StringNotNull" minOccurs="0"
+					maxOccurs="4"/>
+				<xsd:element name="ComponentWirelessType" type="ComponentWirelessTypeValues"
+					minOccurs="0" maxOccurs="3"/>
+				<xsd:element name="CommunicationInterface" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="ComponentWriteSpeed" minOccurs="0"/>
+				<xsd:element name="ConnectorType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="DigitalAudioCapacity" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="DigitalMediaFormat" minOccurs="0"/>
+				<xsd:element ref="EffectiveInputArea" minOccurs="0"/>
+				<xsd:element name="FormFactor" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="HandOrientation" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="HasAutoFocus" minOccurs="0"/>
+				<xsd:element ref="HasProgrammableButtons" minOccurs="0"/>
+				<xsd:element ref="HolderCapacity" minOccurs="0"/>
+				<xsd:element name="InputType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="IsAmplifierIntegrated" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="KeyboardDescription" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaterialType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaxOperatingDistance" type="LengthIntegerDimension" minOccurs="0"/>
+				<xsd:element ref="MaximumOperatingDistance" minOccurs="0"/>
+				<xsd:element ref="MemorySlotsAvailable" minOccurs="0"/>
+				<xsd:element ref="MemoryStorageCapacity" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element name="MovementDetectionTechnology" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="NumberOfPorts" minOccurs="0"/>
+				<xsd:element ref="OutputWattage" minOccurs="0"/>
+				<xsd:element ref="RecordingCapacity" minOccurs="0"/>
+				<xsd:element name="ScannerResolution" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="SpeakerDiameter" minOccurs="0"/>
+				<xsd:element name="SpeakersMaxOutputPower" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="SpeakersNominalOutputPower" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="SpeakerOutputChannelQuantity" type="PositiveInteger"
+					minOccurs="0"/>
+				<xsd:element name="SpeakerSurroundSoundChannelConfiguration" type="StringNotNull"
+					minOccurs="0"/>
+				<xsd:element name="SpeedRating" type="TenStringNotNull" minOccurs="0"/>
+				<xsd:element name="Voltage" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="Wattage" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="WriteSpeed" type="FiveStringNotNull" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ComputerDriveOrStorage">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="ACAdapterIncluded" minOccurs="0"/>
+				<xsd:element ref="AutomaticBackupSoftwareIncluded" minOccurs="0"/>
+				<xsd:element ref="Averagelatency" minOccurs="0"/>
+				<xsd:element ref="Averageseektime" minOccurs="0"/>
+				<xsd:element ref="Averagewritetime" minOccurs="0"/>
+				<xsd:element ref="BufferSize" minOccurs="0"/>
+				<xsd:element ref="CableInterface" minOccurs="0" maxOccurs="4"/>
+				<xsd:element ref="CacheSize" minOccurs="0"/>
+				<xsd:element name="DataTransferRate" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element ref="DockingStationExternalInterface" minOccurs="0"/>
+				<xsd:element name="DriveMemoryStorageCapacity" type="MemorySizeIntegerDimension"
+					minOccurs="0"/>
+				<xsd:element ref="DriveRPM" minOccurs="0"/>
+				<xsd:element ref="HardDriveSize" minOccurs="0" maxOccurs="8"/>
+				<xsd:element ref="IncludedHarddrivedescription" minOccurs="0"/>
+				<xsd:element ref="InterfaceType" minOccurs="0"/>
+				<xsd:element ref="InternalConnector" minOccurs="0" maxOccurs="5"/>
+				<xsd:element ref="MemoryStorageCapacity" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="NASNetworkInterface" minOccurs="0" maxOccurs="3"/>
+				<xsd:element ref="NumberOfexternalBays" minOccurs="0"/>
+				<xsd:element ref="NumberOfHardDrives" minOccurs="0"/>
+				<xsd:element ref="NumberOfInternalBays" minOccurs="0"/>
+				<xsd:element ref="OpticalDriveType" minOccurs="0"/>
+				<xsd:element ref="PhysicalHardDriveFormFactor" minOccurs="0" maxOccurs="5"/>
+				<xsd:element ref="PlatformCompatability" minOccurs="0"/>
+				<xsd:element ref="RAID" minOccurs="0"/>
+				<xsd:element ref="SSDConnectorPins" minOccurs="0"/>
+				<xsd:element ref="SSDDriveArchitechture" minOccurs="0"/>
+				<xsd:element ref="StorageMaterialType" minOccurs="0"/>
+				<xsd:element ref="StorageReadSpeed" minOccurs="0"/>
+				<xsd:element ref="StorageWriteSpeed" minOccurs="0"/>
+				<xsd:element ref="TotalFirewire1600Connectors" minOccurs="0"/>
+				<xsd:element ref="TotalFirewire3200Connectors" minOccurs="0"/>
+				<xsd:element ref="TotalFirewire400Connectors" minOccurs="0"/>
+				<xsd:element ref="TotalFirewire800Connectors" minOccurs="0"/>
+				<xsd:element ref="TotalSataConnectors" minOccurs="0"/>
+				<xsd:element ref="TotalUSB1.0Connectors" minOccurs="0"/>
+				<xsd:element ref="TotalUSB1.1Connectors" minOccurs="0"/>
+				<xsd:element ref="TotalUSB2.0Connectors" minOccurs="0"/>
+				<xsd:element ref="TotalUSB3.0Connectors" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="InkOrToner">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element name="InkColor" type="StringNotNull" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="InkOrTonerCompatibleDevices" type="MediumStringNotNull"
+					minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Monitor">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="BuiltinSpeaker" minOccurs="0"/>
+				<xsd:element ref="ContrastRatio" minOccurs="0"/>
+				<xsd:element ref="DisplayResolutionMaximum" minOccurs="0"/>
+				<xsd:element name="DisplayTechnology" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="HasColorScreen" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element name="MonitorTunerTechnology" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="MonitorBrightness" minOccurs="0"/>
+				<xsd:element ref="MonitorConnectors" minOccurs="0" maxOccurs="5"/>
+				<xsd:element ref="ResponseTime" minOccurs="0"/>
+				<xsd:element ref="ScreenResolution" minOccurs="0"/>
+				<xsd:element ref="ScreenSize" minOccurs="0"/>
+				<xsd:element ref="TunerTechnology" minOccurs="0"/>
+				<xsd:element ref="ViewingAngle" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="NotebookComputer">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="AdditionalDrives" minOccurs="0" maxOccurs="10"/>
+				<xsd:element ref="Audio" minOccurs="0"/>
+				<xsd:element ref="CardReader" minOccurs="0"/>
+				<xsd:element ref="ComputerMemoryType" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="ComputerTunerTechnology" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="ComputerWirelessType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element ref="DisplayResolutionMaximum" minOccurs="0"/>
+				<xsd:element name="GraphicsCard" minOccurs="0" maxOccurs="2">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="GraphicsCardDescription" type="MediumStringNotNull"/>
+							<xsd:element name="GraphicsCardRamSize" type="MemorySizeDimension"/>
+							<xsd:element ref="GraphicsCardInterface"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="GraphicsCoProcessor" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="ConnectivityType" minOccurs="0"/>
+				<xsd:element ref="GraphicsChipsetBrand" minOccurs="0"/>
+				<xsd:element ref="GraphicsRAMType" minOccurs="0"/>
+				<xsd:element ref="HardDiskRotationalSpeed" minOccurs="0"/>
+				<xsd:element name="HardDiskTechnology" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="HardDriveInterface" minOccurs="0" maxOccurs="4"/>
+				<xsd:element name="HardDriveSize" type="MemorySizeDimension" maxOccurs="8"/>
+				<xsd:element name="HardwarePlatform" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="HasColorScreen" minOccurs="0"/>
+				<xsd:element ref="MaxExpandedMemorySupported" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element name="MonitorTunerTechnology" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="NumberOfAudioOutPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfDMIPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfEthernetPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfFirewirePorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfGamingPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfHDMIPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfLPT1PrinterPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfMicrophonePorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfPS2Ports" minOccurs="0"/>
+				<xsd:element ref="NumberOfSerialPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfUSB2.0Ports" minOccurs="0"/>
+				<xsd:element ref="NumberOfUSB3.0Ports" minOccurs="0"/>
+				<xsd:element ref="NumberOfVGAPorts" minOccurs="0"/>
+				<xsd:element name="NotebookDisplayTechnology" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="OperatingSystem" maxOccurs="2"/>
+				<xsd:element name="OpticalDeviceType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="OpticalDriveIntegrated" minOccurs="0"/>
+				<xsd:element ref="OpticalStorageDeviceType" minOccurs="0"/>
+				<xsd:element name="ProcessorBrand" type="StringNotNull"/>
+				<xsd:element ref="ProcessorCount" minOccurs="0"/>
+				<xsd:element name="ProcessorSocket" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ProcessorSpeed" type="FrequencyDimension"/>
+				<xsd:element ref="ProcessorType" minOccurs="0"/>
+				<xsd:element name="RAMSize" type="MemorySizeDimension"/>
+				<xsd:element ref="RAMClockSpeed" minOccurs="0"/>
+				<xsd:element ref="RAMFormFactor" minOccurs="0"/>
+				<xsd:element ref="RAMTechnology" minOccurs="0"/>
+				<xsd:element ref="RearWebcamResolution" minOccurs="0"/>
+				<xsd:element ref="ResponseTime" minOccurs="0"/>
+				<xsd:element ref="ScreenResolution" minOccurs="0"/>
+				<xsd:element ref="ScreenSize" minOccurs="0"/>
+				<xsd:element ref="Series" minOccurs="0"/>
+				<xsd:element ref="SoftwareIncluded" minOccurs="0"/>
+				<xsd:element ref="Speaker" minOccurs="0"/>
+				<xsd:element ref="TabletInputMethod" minOccurs="0" maxOccurs="5"/>
+				<xsd:element ref="TunerTechnology" minOccurs="0"/>
+				<xsd:element name="U-RackSize" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element ref="ViewingAngle" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+				<xsd:element ref="WirelessCarrier" minOccurs="0" maxOccurs="3"/>
+				<xsd:element ref="WirelessType" minOccurs="0" maxOccurs="3"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="PersonalComputer">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="AdditionalDrives" minOccurs="0" maxOccurs="10"/>
+				<xsd:element ref="Audio" minOccurs="0"/>
+				<xsd:element ref="CardReader" minOccurs="0"/>
+				<xsd:element ref="ComputerMemoryType" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="ComputerTunerTechnology" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="ComputerWirelessType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element ref="ConnectivityType" minOccurs="0"/>
+				<xsd:element ref="DisplayResolutionMaximum" minOccurs="0"/>
+				<xsd:element name="GraphicsCard" minOccurs="0" maxOccurs="2">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="GraphicsCardDescription" type="MediumStringNotNull"/>
+							<xsd:element name="GraphicsCardRamSize" type="MemorySizeDimension"/>
+							<xsd:element ref="GraphicsCardInterface"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element ref="GraphicsChipsetBrand" minOccurs="0"/>
+				<xsd:element name="GraphicsCoProcessor" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="GraphicsRAMType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="HardDiskRotationalSpeed" minOccurs="0"/>
+				<xsd:element name="HardDiskTechnology" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="HardDriveInterface" minOccurs="0" maxOccurs="4"/>
+				<xsd:element ref="HardDriveSize" minOccurs="0" maxOccurs="8"/>
+				<xsd:element name="HardwarePlatform" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="MaxExpandedMemorySupported" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="NumberOfAudioOutPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfDMIPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfEthernetPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfFirewirePorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfGamingPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfHDMIPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfLPT1PrinterPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfMicrophonePorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfPS2Ports" minOccurs="0"/>
+				<xsd:element ref="NumberOfSerialPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfUSB2.0Ports" minOccurs="0"/>
+				<xsd:element ref="NumberOfUSB3.0Ports" minOccurs="0"/>
+				<xsd:element ref="NumberOfVGAPorts" minOccurs="0"/>
+				<xsd:element ref="OperatingSystem" maxOccurs="2"/>
+				<xsd:element name="OpticalDeviceType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="OpticalStorageDeviceType" minOccurs="0"/>
+				<xsd:element ref="OpticalDriveIntegrated" minOccurs="0"/>
+				<xsd:element name="ProcessorBrand" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="ProcessorCount" minOccurs="0"/>
+				<xsd:element name="ProcessorSocket" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ProcessorSpeed" type="FrequencyDimension" minOccurs="0"/>
+				<xsd:element ref="ProcessorType" minOccurs="0"/>
+				<xsd:element ref="RAMClockSpeed" minOccurs="0"/>
+				<xsd:element ref="RAMFormFactor" minOccurs="0"/>
+				<xsd:element name="RAMSize" type="MemorySizeDimension" minOccurs="0"/>
+				<xsd:element ref="RAMTechnology" minOccurs="0"/>
+				<xsd:element ref="RearWebcamResolution" minOccurs="0"/>
+				<xsd:element ref="ResponseTime" minOccurs="0"/>
+				<xsd:element ref="ScreenResolution" minOccurs="0"/>
+				<xsd:element ref="Series" minOccurs="0"/>
+				<xsd:element ref="SoftwareIncluded" minOccurs="0"/>
+				<xsd:element ref="Speaker" minOccurs="0"/>
+				<xsd:element ref="TabletInputMethod" minOccurs="0" maxOccurs="5"/>
+				<xsd:element ref="TunerTechnology" minOccurs="0"/>
+				<xsd:element name="U-RackSize" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element ref="ViewingAngle" minOccurs="0"/>
+				<xsd:element name="NotebookDisplayTechnology" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="ScreenSize" minOccurs="0"/>
+				<xsd:element ref="HasColorScreen" minOccurs="0"/>
+				<xsd:element name="DisplayTechnology" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MonitorTunerTechnology" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+				<xsd:element ref="WirelessCarrier" minOccurs="0" maxOccurs="3"/>
+				<xsd:element ref="WirelessType" minOccurs="0" maxOccurs="3"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Printer">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element name="HasGreyScale" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="LightSourceType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaxInputSheetCapacity" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="MaxPrintResolutionBlackWhite" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaxPrintResolutionColor" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaxPrintSpeedBlackWhite" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="MaxPrintSpeedColor" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="MaxScanningSize" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MinScanningSize" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PrinterMediaSizeMaximum" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PrinterOutputType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="PrinterWirelessType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element ref="PrintingMediaType" minOccurs="0"/>
+				<xsd:element name="PrintingTechnology" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ScanRate" type="HundredFiftyStringNotNull" minOccurs="0"/>
+				<xsd:element name="ScannerResolution" type="StringNotNull" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Scanner">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element name="HasGreyScale" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="LightSourceType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaxInputSheetCapacity" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="MaxPrintResolutionBlackWhite" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaxPrintResolutionColor" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaxPrintSpeedBlackWhite" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaxPrintSpeedColor" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaxScanningSize" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MinScanningSize" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PrinterMediaSizeMaximum" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PrinterOutputType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="PrinterWirelessType" minOccurs="0" maxOccurs="3"/>
+				<xsd:element ref="PrintingMediaType" minOccurs="0"/>
+				<xsd:element name="PrintingTechnology" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ScanRate" type="HundredFiftyStringNotNull" minOccurs="0"/>
+				<xsd:element name="ScannerResolution" type="StringNotNull" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="VideoProjector">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element name="HasGreyScale" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="LightSourceType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ScannerResolution" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="AspectRatio" minOccurs="0"/>
+				<xsd:element ref="AudibleNoise" minOccurs="0"/>
+				<xsd:element ref="BuiltinSpeaker" minOccurs="0"/>
+				<xsd:element ref="ContrastRatio" minOccurs="0"/>
+				<xsd:element ref="DisplayResolutionMaximum" minOccurs="0"/>
+				<xsd:element ref="DisplayTechnology" minOccurs="0"/>
+				<xsd:element ref="ImageDiagonalSize" minOccurs="0"/>
+				<xsd:element ref="InputVideoCompatability" minOccurs="0" maxOccurs="3"/>
+				<xsd:element ref="InputVideoConnectors" minOccurs="0"/>
+				<xsd:element ref="KeystoneCorrection" minOccurs="0"/>
+				<xsd:element ref="LampLife" minOccurs="0"/>
+				<xsd:element ref="LampWattage" minOccurs="0"/>
+				<xsd:element name="Lens" type="String" minOccurs="0"/>
+				<xsd:element ref="MaximumHorizontalRefreshRate" minOccurs="0"/>
+				<xsd:element ref="MaximumImageSize" minOccurs="0"/>
+				<xsd:element ref="MaximumThrowDistance" minOccurs="0"/>
+				<xsd:element ref="MaximumThrowRatio" minOccurs="0"/>
+				<xsd:element ref="MaximumVerticalRefreshRate" minOccurs="0"/>
+				<xsd:element ref="MediaInput" minOccurs="0"/>
+				<xsd:element ref="MinimumHorizontalRefreshRate" minOccurs="0"/>
+				<xsd:element ref="MinimumImageSize" minOccurs="0"/>
+				<xsd:element ref="MinimumThrowDistance" minOccurs="0"/>
+				<xsd:element ref="MinimumThrowRatio" minOccurs="0"/>
+				<xsd:element ref="MinimumVerticalRefreshRate" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="ProjectorBrightness" minOccurs="0"/>
+				<xsd:element ref="Remote" minOccurs="0"/>
+				<xsd:element ref="ScreenResolution" minOccurs="0"/>
+				<xsd:element ref="ScreenTrigger" minOccurs="0"/>
+				<xsd:element ref="ThreeDReady" minOccurs="0"/>
+				<xsd:element ref="WirelessStandard" minOccurs="0"/>
+				<xsd:element ref="Zoom" minOccurs="0"/>
+				<xsd:element ref="ZoomRatio" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="CarryingCaseOrBag">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="CheckpointTSAFriendly" minOccurs="0"/>
+				<xsd:element ref="CompatibleDeviceSize" minOccurs="0"/>
+				<xsd:element ref="CompatibleDeviceFormFactor" minOccurs="0" maxOccurs="6"/>
+				<xsd:element ref="HandOrientation" minOccurs="0"/>
+				<xsd:element ref="HolderCapacity" minOccurs="0"/>
+				<xsd:element ref="MaterialType" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ComputerAddOn">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="ACAdapterCurrent" minOccurs="0"/>
+				<xsd:element ref="CableLength" minOccurs="0"/>
+				<xsd:element ref="CableSpeed" minOccurs="0"/>
+				<xsd:element ref="CableType" minOccurs="0"/>
+				<xsd:element ref="CompatibleDevices" minOccurs="0"/>
+				<xsd:element ref="CompatibleDeviceSize" minOccurs="0"/>
+				<xsd:element ref="Conductor" minOccurs="0"/>
+				<xsd:element ref="ConnectionType" minOccurs="0"/>
+				<xsd:element ref="ConnectorNumber" minOccurs="0"/>
+				<xsd:element ref="MaximumHorizontalVideoResolution" minOccurs="0"/>
+				<xsd:element ref="MaximumVerticalVideoResolution" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="NumberOfFans" minOccurs="0"/>
+				<xsd:element ref="NumberOfMonitorConnections" minOccurs="0"/>
+				<xsd:element ref="PrivacyScreenMaterialType" minOccurs="0"/>
+				<xsd:element ref="PrivacyScreenSize" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ComputerCoolingDevice">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="AdditionalFeatures" minOccurs="0"/>
+				<xsd:element ref="CoolingType" minOccurs="0"/>
+				<xsd:element ref="CPUSocketCompatability" minOccurs="0" maxOccurs="20"/>
+				<xsd:element ref="FanIncluded" minOccurs="0"/>
+				<xsd:element ref="FanLED" minOccurs="0"/>
+				<xsd:element ref="FanMaximumAirflow" minOccurs="0"/>
+				<xsd:element ref="FanMaximumNoiseLevel" minOccurs="0"/>
+				<xsd:element ref="FanMaximumSpeed" minOccurs="0"/>
+				<xsd:element ref="FanPowerConnector" minOccurs="0"/>
+				<xsd:element ref="HeatsinkMaterial" minOccurs="0"/>
+				<xsd:element ref="LargestFanSize" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ComputerInputDevice">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="AdditionalFeatures" minOccurs="0"/>
+				<xsd:element ref="BuiltInMicrophone" minOccurs="0"/>
+				<xsd:element ref="DeviceHardwareCompatability" minOccurs="0"/>
+				<xsd:element ref="DeviceSoftwareCompatability" minOccurs="0"/>
+				<xsd:element ref="HeadphoneStyle" minOccurs="0"/>
+				<xsd:element ref="InputDeviceDesignStyle" minOccurs="0"/>
+				<xsd:element ref="InputDeviceInterfaceTechnology" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="NoiseCanceling" minOccurs="0"/>
+				<xsd:element ref="NumberOfButtons" minOccurs="0"/>
+				<xsd:element ref="PresentationRemoteLaserColor" minOccurs="0"/>
+				<xsd:element ref="PresentationRemoteMemory" minOccurs="0"/>
+				<xsd:element ref="PresentationRemoteOperatingDistance" minOccurs="0"/>
+				<xsd:element ref="PrimaryHeadphoneUse" minOccurs="0"/>
+				<xsd:element ref="TrackingMethod" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ComputerProcessor">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="AdditionalFeatures" minOccurs="0"/>
+				<xsd:element ref="CacheMemory" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="ProcessorBrand" minOccurs="0"/>
+				<xsd:element ref="ProcessorCoolingDevice" minOccurs="0"/>
+				<xsd:element ref="ProcessorCount" minOccurs="0"/>
+				<xsd:element ref="ProcessorSeries" minOccurs="0"/>
+				<xsd:element ref="ProcessorSocket" minOccurs="0"/>
+				<xsd:element ref="ProcessorSpeed" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ComputerSpeaker">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="AdditionalFeatures" minOccurs="0"/>
+				<xsd:element ref="AudioOutputMode" minOccurs="0"/>
+				<xsd:element ref="CommunicationInterface" minOccurs="0"/>
+				<xsd:element ref="DigitalAudioCapacity" minOccurs="0"/>
+				<xsd:element ref="FrequencyRange" minOccurs="0"/>
+				<xsd:element ref="InputType" minOccurs="0"/>
+				<xsd:element ref="MaximumOperatingDistance" minOccurs="0"/>
+				<xsd:element ref="MemorySlotsAvailable" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="MovementDetectionTechnology" minOccurs="0"/>
+				<xsd:element ref="NumberOfSatelliteSpeakers" minOccurs="0"/>
+				<xsd:element ref="OutputWattage" minOccurs="0"/>
+				<xsd:element ref="RecordingCapacity" minOccurs="0"/>
+				<xsd:element ref="RemoteIncluded" minOccurs="0"/>
+				<xsd:element ref="SpeakerDiameter" minOccurs="0"/>
+				<xsd:element ref="SpeakerOutputChannelQuantity" minOccurs="0"/>
+				<xsd:element ref="SpeakersMaximumOutputPower" minOccurs="0"/>
+				<xsd:element ref="SpeakersNominalOutputPower" minOccurs="0"/>
+				<xsd:element ref="SpeakerSurroundSoundChannelConfiguration" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Computer">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="CableLength" minOccurs="0"/>
+				<xsd:element ref="ConnectionInterface" minOccurs="0" maxOccurs="3"/>
+				<xsd:element ref="ConnectorNumber" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="NumberOfUSBHubConnectorPorts" minOccurs="0"/>
+				<xsd:element ref="PressureLevels" minOccurs="0"/>
+				<xsd:element ref="TabletMaximumDataRate" minOccurs="0"/>
+				<xsd:element ref="TabletMinimumSystemRequirements" minOccurs="0"/>
+				<xsd:element ref="TabletResolution" minOccurs="0"/>
+				<xsd:element ref="TabletSurfaceActiveArea" minOccurs="0"/>
+				<xsd:element ref="TVTunerMemory" minOccurs="0"/>
+				<xsd:element ref="TVTunerVideoOutputInterface" minOccurs="0" maxOccurs="5"/>
+				<xsd:element ref="TVTunerVideoStandard" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="FlashMemory">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="AdditionalFeatures" minOccurs="0"/>
+				<xsd:element ref="AudioOutputMode" minOccurs="0"/>
+				<xsd:element ref="CommunicationInterface" minOccurs="0"/>
+				<xsd:element ref="DigitalAudioCapacity" minOccurs="0"/>
+				<xsd:element ref="MemoryCardType" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="MovementDetectionTechnology" minOccurs="0"/>
+				<xsd:element ref="RecordingCapacity" minOccurs="0"/>
+				<xsd:element ref="SpeedClassRating" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+				<xsd:element ref="WirelessStandard" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Keyboards">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="HandOrientation" minOccurs="0"/>
+				<xsd:element ref="InputDeviceDesignStyle" minOccurs="0"/>
+				<xsd:element ref="KeyboardDescription" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+				<xsd:element ref="WirelessInputDeviceProtocol" minOccurs="0"/>
+				<xsd:element ref="WirelessInputDeviceTechnology" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="MemoryReader">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="AdditionalFeatures" minOccurs="0"/>
+				<xsd:element ref="AudioOutputMode" minOccurs="0"/>
+				<xsd:element ref="CardReaderInterface" minOccurs="0"/>
+				<xsd:element ref="CommunicationInterface" minOccurs="0"/>
+				<xsd:element ref="CompatibleMemoryCard" minOccurs="0" maxOccurs="8"/>
+				<xsd:element ref="DigitalAudioCapacity" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="MovementDetectionTechnology" minOccurs="0"/>
+				<xsd:element ref="ReadSpeed" minOccurs="0"/>
+				<xsd:element ref="RecordingCapacity" minOccurs="0"/>
+				<xsd:element ref="SpeedClassRating" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+				<xsd:element ref="WirelessStandard" minOccurs="0"/>
+				<xsd:element ref="WriteSpeed" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Motherboard">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="AdditionalFeatures" minOccurs="0"/>
+				<xsd:element ref="CPUSocketType" minOccurs="0"/>
+				<xsd:element ref="FrontSideBusSpeed" minOccurs="0"/>
+				<xsd:element ref="GraphicsCardInterface" minOccurs="0" maxOccurs="2"/>
+				<xsd:element ref="HDMIPorts" minOccurs="0"/>
+				<xsd:element ref="IntegratedAudioChannels" minOccurs="0"/>
+				<xsd:element ref="MaxEthernetSpeed" minOccurs="0"/>
+				<xsd:element ref="MaxMemorySupported" minOccurs="0"/>
+				<xsd:element ref="MemoryStandard" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="MotherboardFormFactor" minOccurs="0"/>
+				<xsd:element ref="MultiGPUTechnology" minOccurs="0"/>
+				<xsd:element ref="Northbridge" minOccurs="0"/>
+				<xsd:element ref="NumberOfeSATAPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfEthernetPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfFireWire400Ports" minOccurs="0"/>
+				<xsd:element ref="NumberOfFireWire800Ports" minOccurs="0"/>
+				<xsd:element ref="NumberOfIDEPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfMemorySlots" minOccurs="0"/>
+				<xsd:element ref="NumberOfPCIExpressSlots" minOccurs="0"/>
+				<xsd:element ref="NumberOfSATAPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfUSBPorts" minOccurs="0"/>
+				<xsd:element ref="OnboardVideo" minOccurs="0"/>
+				<xsd:element ref="SATARAID" minOccurs="0"/>
+				<xsd:element ref="SATAStandardsSupported" minOccurs="0" maxOccurs="3"/>
+				<xsd:element ref="Southbridge" minOccurs="0"/>
+				<xsd:element ref="SPDIFOutput" minOccurs="0"/>
+				<xsd:element ref="TypeOfMemorySlot" minOccurs="0"/>
+				<xsd:element ref="USBPortType" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="NetworkingDevice">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="AdditionalFeatures" minOccurs="0"/>
+				<xsd:element ref="AdditionalFunctionality" minOccurs="0" maxOccurs="4"/>
+				<xsd:element ref="IPProtocolStandards" minOccurs="0"/>
+				<xsd:element ref="LANPortBandwidth" minOccurs="0"/>
+				<xsd:element ref="LANPortNumber" minOccurs="0"/>
+				<xsd:element ref="MaxDownstreamTransmissionRate" minOccurs="0"/>
+				<xsd:element ref="MaxUpstreamTransmissionRate" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="ModemType" minOccurs="0"/>
+				<xsd:element ref="NetworkAdapterType" minOccurs="0"/>
+				<xsd:element ref="OperatingSystemCompatability" minOccurs="0"/>
+				<xsd:element ref="SecurityProtocol" minOccurs="0"/>
+				<xsd:element ref="SimultaneousSessions" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+				<xsd:element ref="WirelessDataTransferRate" minOccurs="0"/>
+				<xsd:element ref="WirelessRouterTransmissionBand" minOccurs="0"/>
+				<xsd:element ref="WirelessTechnology" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="RamMemory">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="AdditionalFeatures" minOccurs="0"/>
+				<xsd:element ref="CasLatency" minOccurs="0"/>
+				<xsd:element ref="ComputerMemoryFormFactor" minOccurs="0"/>
+				<xsd:element ref="ComputerMemoryTechnology" minOccurs="0"/>
+				<xsd:element ref="MaxMemorySpeed" minOccurs="0"/>
+				<xsd:element ref="MemoryCapacityPerSTICK" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="MultiChannelKit" minOccurs="0"/>
+				<xsd:element ref="NumberOfMemorySticks" minOccurs="0"/>
+				<xsd:element ref="RAMClockSpeed" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="VoltageRating" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="SoundCard">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="AdditionalFeatures" minOccurs="0"/>
+				<xsd:element ref="BundledSoftware" minOccurs="0"/>
+				<xsd:element ref="Channels" minOccurs="0"/>
+				<xsd:element ref="LineIn" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="OpticalIn" minOccurs="0"/>
+				<xsd:element ref="OpticalOut" minOccurs="0"/>
+				<xsd:element ref="SampleRate" minOccurs="0"/>
+				<xsd:element ref="SoundCardInterface" minOccurs="0"/>
+				<xsd:element ref="SoundCardMinSystemRequirements" minOccurs="0"/>
+				<xsd:element ref="SpeakerOut" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="SystemCabinet">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="AdditionalFeatures" minOccurs="0"/>
+				<xsd:element ref="AirDuctLocation" minOccurs="0"/>
+				<xsd:element ref="ExpansionSlots" minOccurs="0"/>
+				<xsd:element ref="ExternalBayType" minOccurs="0" maxOccurs="5"/>
+				<xsd:element ref="HotswapBayType" minOccurs="0" maxOccurs="5"/>
+				<xsd:element ref="InternalBayType" minOccurs="0" maxOccurs="5"/>
+				<xsd:element ref="MaterialType" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="MotherboardCompatibility" minOccurs="0"/>
+				<xsd:element ref="PanelWindowLocation" minOccurs="0"/>
+				<xsd:element ref="PowerSupplyMaxOutput" minOccurs="0"/>
+				<xsd:element ref="PowerSupplyMounting" minOccurs="0"/>
+				<xsd:element ref="SystemCabinetFormFactor" minOccurs="0"/>
+				<xsd:element ref="TotalFrontPanelAudioInPorts" minOccurs="0"/>
+				<xsd:element ref="TotalFrontPanelAudioOutPorts" minOccurs="0"/>
+				<xsd:element ref="TotalFrontPaneleSataPorts" minOccurs="0"/>
+				<xsd:element ref="TotalFrontPanelFirewire400Ports" minOccurs="0"/>
+				<xsd:element ref="TotalFrontPanelFirewire800Ports" minOccurs="0"/>
+				<xsd:element ref="TotalFrontPanelUSB1.0Ports" minOccurs="0"/>
+				<xsd:element ref="TotalFrontPanelUSB1.1Ports" minOccurs="0"/>
+				<xsd:element ref="TotalFrontPanelUSB2.0Ports" minOccurs="0"/>
+				<xsd:element ref="TotalFrontPanelUSB3.0Ports" minOccurs="0"/>
+				<xsd:element ref="TotalNumberOfExternalBays" minOccurs="0"/>
+				<xsd:element ref="TotalNumberOfHotswapBays" minOccurs="0"/>
+				<xsd:element ref="TotalNumberOfInternalBays" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="SystemPowerDevice">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="AdditionalFeatures" minOccurs="0"/>
+				<xsd:element ref="EnergyEfficiencyRating" minOccurs="0"/>
+				<xsd:element ref="MainPowerConnector" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="Modular" minOccurs="0"/>
+				<xsd:element ref="NumberOfSATAPowerConnectors" minOccurs="0"/>
+				<xsd:element ref="PCIExpressConnectorConfiguration" minOccurs="0"/>
+				<xsd:element ref="PowerFactorCorrection" minOccurs="0"/>
+				<xsd:element ref="PowerSupplyFormFactor" minOccurs="0"/>
+				<xsd:element ref="PowerSupplyMaxOutput" minOccurs="0"/>
+				<xsd:element ref="SLICertification" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TabletComputer">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="AdditionalDrives" minOccurs="0" maxOccurs="10"/>
+				<xsd:element ref="Audio" minOccurs="0"/>
+				<xsd:element ref="BatteryChargeCycles" minOccurs="0"/>
+				<xsd:element ref="CardReader" minOccurs="0"/>
+				<xsd:element ref="ComputerMemoryType" minOccurs="0" maxOccurs="10"/>
+				<xsd:element ref="ConnectivityType" minOccurs="0"/>
+				<xsd:element ref="DisplayResolutionMaximum" minOccurs="0"/>
+				<xsd:element ref="FrontWebcamResolution" minOccurs="0"/>
+				<xsd:element name="GraphicsCard" minOccurs="0" maxOccurs="2">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="GraphicsDescription" type="MediumStringNotNull"/>
+							<xsd:element name="GraphicsRAMSize" type="MemorySizeDimension"/>
+							<xsd:element ref="GraphicsCardInterface"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element ref="GraphicsChipsetBrand" minOccurs="0"/>
+				<xsd:element ref="GraphicsCoProcessor" minOccurs="0"/>
+				<xsd:element ref="GraphicsRAMType" minOccurs="0"/>
+				<xsd:element ref="HardDiskRotationalSpeed" minOccurs="0"/>
+				<xsd:element ref="HardDiskTechnology" minOccurs="0"/>
+				<xsd:element ref="HardDriveInterface" minOccurs="0" maxOccurs="4"/>
+				<xsd:element ref="HardDriveSize" minOccurs="0" maxOccurs="8"/>
+				<xsd:element ref="HardwarePlatform" minOccurs="0"/>
+				<xsd:element ref="HasColorScreen" minOccurs="0"/>
+				<xsd:element ref="MaxExpandedMemorySupported" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="NotebookDisplayTechnology" minOccurs="0"/>
+				<xsd:element ref="NumberOfAudioOutPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfDMIPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfEthernetPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfFirewirePorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfGamingPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfHDMIPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfLPT1PrinterPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfMicrophonePorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfPS2Ports" minOccurs="0"/>
+				<xsd:element ref="NumberOfSerialPorts" minOccurs="0"/>
+				<xsd:element ref="NumberOfUSB2.0Ports" minOccurs="0"/>
+				<xsd:element ref="NumberOfUSB3.0Ports" minOccurs="0"/>
+				<xsd:element ref="NumberOfVGAPorts" minOccurs="0"/>
+				<xsd:element ref="OperatingSystem" maxOccurs="2"/>
+				<xsd:element ref="OpticalDriveIntegrated" minOccurs="0"/>
+				<xsd:element ref="OpticalStorageDeviceType" minOccurs="0"/>
+				<xsd:element ref="ProcessorBrand" minOccurs="0"/>
+				<xsd:element ref="ProcessorCount" minOccurs="0"/>
+				<xsd:element ref="ProcessorSocket" minOccurs="0"/>
+				<xsd:element ref="ProcessorSpeed" minOccurs="0"/>
+				<xsd:element ref="ProcessorType" minOccurs="0"/>
+				<xsd:element ref="RAMClockSpeed" minOccurs="0"/>
+				<xsd:element ref="RAMFormFactor" minOccurs="0"/>
+				<xsd:element ref="RAMSize" minOccurs="0"/>
+				<xsd:element ref="RAMTechnology" minOccurs="0"/>
+				<xsd:element ref="RearWebcamResolution" minOccurs="0"/>
+				<xsd:element ref="ResponseTime" minOccurs="0"/>
+				<xsd:element ref="ScreenResolution" minOccurs="0"/>
+				<xsd:element ref="ScreenSize" minOccurs="0"/>
+				<xsd:element ref="Series" minOccurs="0"/>
+				<xsd:element ref="SoftwareIncluded" minOccurs="0"/>
+				<xsd:element ref="Speaker" minOccurs="0"/>
+				<xsd:element ref="TabletInputMethod" minOccurs="0" maxOccurs="5"/>
+				<xsd:element ref="TunerTechnology" minOccurs="0"/>
+				<xsd:element ref="ViewingAngle" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+				<xsd:element ref="WirelessCarrier" minOccurs="0" maxOccurs="3"/>
+				<xsd:element ref="WirelessType" minOccurs="0" maxOccurs="3"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="VideoCard">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="AdditionalFeatures" minOccurs="0"/>
+				<xsd:element ref="CoreClock" minOccurs="0"/>
+				<xsd:element ref="EffectiveMemoryClock" minOccurs="0"/>
+				<xsd:element ref="GraphicsCardCooler" minOccurs="0"/>
+				<xsd:element ref="GraphicsCardInterface" minOccurs="0" maxOccurs="2"/>
+				<xsd:element ref="GraphicsCardMaxResolution" minOccurs="0"/>
+				<xsd:element ref="GraphicsCardMemoryInterface" minOccurs="0"/>
+				<xsd:element ref="GraphicsCardMemoryType" minOccurs="0"/>
+				<xsd:element ref="GraphicsChipsetBrand" minOccurs="0"/>
+				<xsd:element ref="GraphicsCoProcessor" minOccurs="0"/>
+				<xsd:element ref="GraphicsRAMSize" minOccurs="0" maxOccurs="2"/>
+				<xsd:element ref="GraphicsRAMType" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="MultiGPUTechnology" minOccurs="0"/>
+				<xsd:element ref="ShaderClock" minOccurs="0"/>
+				<xsd:element ref="ThreeDAPI" minOccurs="0" maxOccurs="3"/>
+				<xsd:element ref="TotalCompositePorts" minOccurs="0"/>
+				<xsd:element ref="TotalDVIPorts" minOccurs="0"/>
+				<xsd:element ref="TotalHDMIPorts" minOccurs="0"/>
+				<xsd:element ref="TotalMiniHDMIPorts" minOccurs="0"/>
+				<xsd:element ref="TotalSVideoOutPorts" minOccurs="0"/>
+				<xsd:element ref="TotalVGAOutPorts" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Webcam">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="VariationData" minOccurs="0"/>
+				<xsd:element ref="BuiltInMicrophone" minOccurs="0"/>
+				<xsd:element ref="CameraType" minOccurs="0"/>
+				<xsd:element ref="DigitalStillResolution" minOccurs="0"/>
+				<xsd:element ref="ImageSensor" minOccurs="0"/>
+				<xsd:element ref="InputType" minOccurs="0"/>
+				<xsd:element ref="MaxWebcamImageResolution" minOccurs="0"/>
+				<xsd:element ref="MinimumSystemRequirements" minOccurs="0"/>
+				<xsd:element ref="ModelNumber" minOccurs="0"/>
+				<xsd:element ref="NetworkingProtocol" minOccurs="0"/>
+				<xsd:element ref="VideoCallingResolution" minOccurs="0"/>
+				<xsd:element ref="Voltage" minOccurs="0"/>
+				<xsd:element ref="Wattage" minOccurs="0"/>
+				<xsd:element ref="WebcamVideoCaptureResolution" minOccurs="0"/>
+				<xsd:element ref="WirelessStandard" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+	###############################################################
+	# Computers Elements
+	###############################################################
+	-->
+	<xsd:element name="VariationData">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Parentage">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="parent"/>
+							<xsd:enumeration value="child"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="VariationTheme" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string"/>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ModelNumber" type="FortyStringNotNull"/>
+	<xsd:element name="ThreeDAPI" type="ThirtyString"/>
+	<xsd:element name="ThreeDReady" type="TwentyString"/>
+	<xsd:element name="ACAdapterCurrent" type="CurrentFiveDigitDimension"/>
+	<xsd:element name="ACAdapterIncluded" type="xsd:boolean"/>
+	<xsd:element name="AdditionalDrives" type="AdditionalDrivesTypeValues"/>
+	<xsd:element name="AdditionalFeatures" type="LongString"/>
+	<xsd:element name="AdditionalFunctionality" type="ThirtyString"/>
+	<xsd:element name="AirDuctLocation" type="TenString"/>
+	<xsd:element name="AspectRatio" type="String"/>
+	<xsd:element name="AudibleNoise" type="SevenDigitDecimal"/>
+	<xsd:element name="Audio" type="HundredString"/>
+	<xsd:element name="AudioOutputMode" type="String"/>
+	<xsd:element name="AutomaticBackupSoftwareIncluded" type="xsd:boolean"/>
+	<xsd:element name="Averagelatency" type="TenDigitInteger"/>
+	<xsd:element name="Averageseektime" type="TenDigitInteger"/>
+	<xsd:element name="Averagewritetime" type="TenDigitInteger"/>
+	<xsd:element name="BatteryChargeCycles" type="SixDigitInteger"/>
+	<xsd:element name="BufferSize" type="MemorySizeIntegerDimension"/>
+	<xsd:element name="BuiltInMicrophone" type="SuperLongString"/>
+	<xsd:element name="BuiltinSpeaker" type="FiveDigitInteger"/>
+	<xsd:element name="BundledSoftware" type="LongString"/>
+	<xsd:element name="CableInterface" type="TwentyString"/>
+	<xsd:element name="CableLength" type="LengthSevenDigitDimension"/>
+	<xsd:element name="CableSpeed" type="DataTransferSpeedDimension"/>
+	<xsd:element name="CableType" type="String"/>
+	<xsd:element name="CacheMemory" type="MemorySizeIntegerDimension"/>
+	<xsd:element name="CacheSize" type="MemorySizeIntegerDimension"/>
+	<xsd:element name="CameraType" type="SuperLongString"/>
+	<xsd:element name="CardReader" type="CardReaderTypeValues"/>
+	<xsd:element name="CardReaderInterface" type="CardReaderInterfaceTypeValues"/>
+	<xsd:element name="CasLatency" type="ThreeDigitInteger"/>
+	<xsd:element name="Channels" type="ThreeDigitDecimal"/>
+	<xsd:element name="CheckpointTSAFriendly" type="ThirtyString"/>
+	<xsd:element name="ChipsetType" type="String"/>
+	<xsd:element name="CommunicationInterface" type="SuperLongString"/>
+	<xsd:element name="CompatibleDeviceFormFactor" type="TwentyString"/>
+	<xsd:element name="CompatibleDevices" type="MediumString"/>
+	<xsd:element name="CompatibleDeviceSize" type="FiveDigitDecimal"/>
+	<xsd:element name="CompatibleMemoryCard" type="CompatibleMemoryCardTypeValues"/>
+	<xsd:element name="CompatibleProcessorTypes" type="String"/>
+	<xsd:element name="ComponentWriteSpeed" type="FiveDigitInteger"/>
+	<xsd:element name="ComputerMemoryFormFactor" type="TwentyString"/>
+	<xsd:element name="ComputerMemoryTechnology" type="String"/>
+	<xsd:element name="ComputerMemoryType" type="ComputerMemoryTypeValues"/>
+	<xsd:element name="ComputerWirelessType" type="ComputerWirelessTypeValues"/>
+	<xsd:element name="Conductor" type="String"/>
+	<xsd:element name="ConnectionInterface" type="ConnectionTypeValues"/>
+	<xsd:element name="ConnectionType" type="ConnectionTypeValues"/>
+	<xsd:element name="ConnectivityType" type="SuperLongString"/>
+	<xsd:element name="ConnectorNumber" type="ThreeDigitInteger"/>
+	<xsd:element name="ConnectorType" type="String"/>
+	<xsd:element name="ContrastRatio" type="TenString"/>
+	<xsd:element name="CoolingType" type="TwentyString"/>
+	<xsd:element name="CoreClock" type="FrequencyIntegerDimension"/>
+	<xsd:element name="CPUSocketCompatability" type="TwentyString"/>
+	<xsd:element name="CPUSocketType" type="ThirtyString"/>
+	<xsd:element name="DeviceHardwareCompatability" type="MediumString"/>
+	<xsd:element name="DeviceSoftwareCompatability" type="MediumString"/>
+	<xsd:element name="DigitalAudioCapacity" type="String"/>
+	<xsd:element name="DigitalMediaFormat" type="DigitalMediaFormatTypeValues"/>
+	<xsd:element name="DigitalStillResolution" type="ResolutionFiveDigitDimension"/>
+	<xsd:element name="DisplayResolutionMaximum" type="FortyString"/>
+	<xsd:element name="DisplayTechnology" type="String"/>
+	<xsd:element name="DockingStationExternalInterface"
+		type="DockingStationExternalInterfaceTypeValues"/>
+	<xsd:element name="DriveRPM" type="TenDigitInteger"/>
+	<xsd:element name="EffectiveInputArea" type="String"/>
+	<xsd:element name="EffectiveMemoryClock" type="FrequencyIntegerDimension"/>
+	<xsd:element name="EnergyEfficiencyRating" type="ThirtyString"/>
+	<xsd:element name="ExpansionSlots" type="ThreeDigitInteger"/>
+	<xsd:element name="ExternalBayType" type="LengthFourDigitDimension"/>
+	<xsd:element name="FanIncluded" type="TwoDigitInteger"/>
+	<xsd:element name="FanLED" type="String"/>
+	<xsd:element name="FanMaximumAirflow" type="AirflowDimension"/>
+	<xsd:element name="FanMaximumNoiseLevel" type="NoiseLevelSixDigitDimension"/>
+	<xsd:element name="FanMaximumSpeed" type="SpeedSixDigitDimension"/>
+	<xsd:element name="FanPowerConnector" type="TwentyString"/>
+	<xsd:element name="FrequencyRange" type="String"/>
+	<xsd:element name="FrontSideBusSpeed" type="PositiveInteger"/>
+	<xsd:element name="FrontWebcamResolution" type="ResolutionFiveDigitDimension"/>
+	<xsd:element name="GraphicsCardCooler" type="TwentyString"/>
+	<xsd:element name="GraphicsCardInterface" type="GraphicsCardInterfaceTypeValues"/>
+	<xsd:element name="GraphicsCardMaxResolution" type="TwentyString"/>
+	<xsd:element name="GraphicsCardMemoryInterface" type="MemoryInterfaceDimension"/>
+	<xsd:element name="GraphicsCardMemoryType" type="TwentyString"/>
+	<xsd:element name="GraphicsChipsetBrand" type="String"/>
+	<xsd:element name="GraphicsCoProcessor" type="String"/>
+	<xsd:element name="GraphicsDescription" type="MediumString"/>
+	<xsd:element name="GraphicsRAMSize" type="MemorySizeDimension"/>
+	<xsd:element name="GraphicsRAMType" type="GraphicsRAMTypeValues"/>
+	<xsd:element name="HandOrientation" type="String"/>
+	<xsd:element name="HardDiskRotationalSpeed" type="Dimension"/>
+	<xsd:element name="HardDiskTechnology" type="String"/>
+	<xsd:element name="HardDriveInterface" type="HardDriveInterfaceTypeValues"/>
+	<xsd:element name="HardDriveSize" type="MemorySizeDimension"/>
+	<xsd:element name="HardwarePlatform" type="String"/>
+	<xsd:element name="HasAutoFocus" type="xsd:boolean"/>
+	<xsd:element name="HasColorScreen" type="xsd:boolean"/>
+	<xsd:element name="HasProgrammableButtons" type="xsd:boolean"/>
+	<xsd:element name="HDMIPorts" type="ThreeDigitInteger"/>
+	<xsd:element name="HeadphoneStyle" type="String"/>
+	<xsd:element name="HeatsinkMaterial" type="TwentyString"/>
+	<xsd:element name="HolderCapacity" type="String"/>
+	<xsd:element name="HotswapBayType" type="LengthFourDigitDimension"/>
+	<xsd:element name="ImageDiagonalSize" type="LengthSevenDigitDimension"/>
+	<xsd:element name="ImageSensor" type="SuperLongString"/>
+	<xsd:element name="IncludedHarddrivedescription" type="HundredString"/>
+	<xsd:element name="InputDeviceDesignStyle" type="String"/>
+	<xsd:element name="InputDeviceInterfaceTechnology"
+		type="InputDeviceInterfaceTechnologyTypeValues"/>
+	<xsd:element name="InputType" type="InputTypeValues"/>
+	<xsd:element name="InputVideoCompatability" type="TwentyString"/>
+	<xsd:element name="InputVideoConnectors" type="InputVideoConnectorsTypeValues"/>
+	<xsd:element name="IntegratedAudioChannels" type="ThreeDigitInteger"/>
+	<xsd:element name="InterfaceType" type="InterfaceTypeValues"/>
+	<xsd:element name="InternalBayType" type="LengthFourDigitDimension"/>
+	<xsd:element name="InternalConnector" type="InternalConnectorTypeValues"/>
+	<xsd:element name="IPProtocolStandards" type="IPProtocolStandardsTypeValues"/>
+	<xsd:element name="KeyboardDescription" type="String"/>
+	<xsd:element name="KeystoneCorrection" type="LengthSevenDigitDimension"/>
+	<xsd:element name="LampLife" type="BurnTimeSixDigitDimension"/>
+	<xsd:element name="LampWattage" type="FiveDigitInteger"/>
+	<xsd:element name="LANPortBandwidth" type="String"/>
+	<xsd:element name="LANPortNumber" type="ThreeDigitInteger"/>
+	<xsd:element name="LargestFanSize" type="LengthFiveDigitDimension"/>
+	<xsd:element name="LineIn" type="HundredString"/>
+	<xsd:element name="MainPowerConnector" type="TwentyString"/>
+	<xsd:element name="MaterialType" type="String"/>
+	<xsd:element name="MaxDownstreamTransmissionRate"
+		type="DataTransferSpeedFiveDigitIntegerDimension"/>
+	<xsd:element name="MaxEthernetSpeed" type="MaxEthernetSpeedTypeValues"/>
+	<xsd:element name="MaxExpandedMemorySupported" type="MemorySizeDimension"/>
+	<xsd:element name="MaximumHorizontalRefreshRate" type="FrequencyFiveDigitIntegerDimension"/>
+	<xsd:element name="MaximumHorizontalVideoResolution" type="FiveDigitInteger"/>
+	<xsd:element name="MaximumImageSize" type="LengthSevenDigitDimension"/>
+	<xsd:element name="MaximumOperatingDistance" type="LengthIntegerDimension"/>
+	<xsd:element name="MaximumThrowDistance" type="SevenDigitDecimal"/>
+	<xsd:element name="MaximumThrowRatio" type="TenString"/>
+	<xsd:element name="MaximumVerticalRefreshRate" type="FrequencyFiveDigitIntegerDimension"/>
+	<xsd:element name="MaximumVerticalVideoResolution" type="FiveDigitInteger"/>
+	<xsd:element name="MaxMemorySpeed" type="Dimension"/>
+	<xsd:element name="MaxMemorySupported" type="MemorySizeIntegerDimension"/>
+	<xsd:element name="MaxUpstreamTransmissionRate"
+		type="DataTransferSpeedFiveDigitIntegerDimension"/>
+	<xsd:element name="MaxWebcamImageResolution" type="ResolutionFiveDigitDimension"/>
+	<xsd:element name="MediaInput" type="String"/>
+	<xsd:element name="MemoryCapacityPerSTICK" type="MemorySizeFiveDigitIntegerDimension"/>
+	<xsd:element name="MemoryCardType" type="MemoryCardTypeValues"/>
+	<xsd:element name="MemorySlotsAvailable" type="String"/>
+	<xsd:element name="MemoryStandard" type="String"/>
+	<xsd:element name="MemoryStorageCapacity" type="MemorySizeIntegerDimension"/>
+	<xsd:element name="MinimumHorizontalRefreshRate" type="FrequencyFiveDigitIntegerDimension"/>
+	<xsd:element name="MinimumImageSize" type="LengthSevenDigitDimension"/>
+	<xsd:element name="MinimumSystemRequirements" type="HundredString"/>
+	<xsd:element name="MinimumThrowDistance" type="SevenDigitDecimal"/>
+	<xsd:element name="MinimumThrowRatio" type="TenString"/>
+	<xsd:element name="MinimumVerticalRefreshRate" type="FrequencyFiveDigitIntegerDimension"/>
+	<xsd:element name="ModemType" type="ModemTypeValues"/>
+	<xsd:element name="Modular" type="SuperLongString"/>
+	<xsd:element name="MonitorBrightness" type="LuminanceFiveDigitDimension"/>
+	<xsd:element name="MonitorConnectors" type="MonitorConnectorsTypeValues"/>
+	<xsd:element name="MotherboardCompatibility" type="MediumString"/>
+	<xsd:element name="MotherboardFormFactor" type="TwentyString"/>
+	<xsd:element name="MovementDetectionTechnology" type="xsd:boolean"/>
+	<xsd:element name="MultiChannelKit" type="ThreeDigitInteger"/>
+	<xsd:element name="MultiGPUTechnology" type="TwentyString"/>
+	<xsd:element name="NASNetworkInterface" type="DataTransferSpeedIntegerDimension"/>
+	<xsd:element name="NetworkAdapterType" type="SuperLongString"/>
+	<xsd:element name="NetworkingProtocol" type="ThirtyString"/>
+	<xsd:element name="NoiseCanceling" type="TwentyString"/>
+	<xsd:element name="Northbridge" type="String"/>
+	<xsd:element name="NotebookDisplayTechnology" type="String"/>
+	<xsd:element name="NumberOfAudioOutPorts" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfButtons" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfDMIPorts" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfeSATAPorts" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfEthernetPorts" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfexternalBays" type="TenDigitInteger"/>
+	<xsd:element name="NumberOfFans" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfFireWire400Ports" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfFireWire800Ports" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfFirewirePorts" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfGamingPorts" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfHardDrives" type="PositiveInteger"/>
+	<xsd:element name="NumberOfHDMIPorts" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfIDEPorts" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfInternalBays" type="TenDigitInteger"/>
+	<xsd:element name="NumberOfLithiumIonCells" type="PositiveInteger"/>
+	<xsd:element name="NumberOfLithiumMetalCells" type="PositiveInteger"/>
+	<xsd:element name="NumberOfLPT1PrinterPorts" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfMemorySlots" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfMemorySticks" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfMicrophonePorts" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfMonitorConnections" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfPCIExpressSlots" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfPorts" type="PositiveInteger"/>
+	<xsd:element name="NumberOfPS2Ports" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfSATAPorts" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfSATAPowerConnectors" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfSatelliteSpeakers" type="TwoDigitDecimal"/>
+	<xsd:element name="NumberOfSerialPorts" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfUSB2.0Ports" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfUSB3.0Ports" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfUSBHubConnectorPorts" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfUSBPorts" type="ThreeDigitInteger"/>
+	<xsd:element name="NumberOfVGAPorts" type="ThreeDigitInteger"/>
+	<xsd:element name="OnboardVideo" type="ThirtyString"/>
+	<xsd:element name="OperatingSystem" type="StringNotNull"/>
+	<xsd:element name="OperatingSystemCompatability" type="MediumString"/>
+	<xsd:element name="OpticalDriveIntegrated" type="PositiveInteger"/>
+	<xsd:element name="OpticalDriveType" type="String"/>
+	<xsd:element name="OpticalIn" type="String"/>
+	<xsd:element name="OpticalOut" type="MediumString"/>
+	<xsd:element name="OpticalStorageDeviceType" type="String"/>
+	<xsd:element name="OutputWattage" type="PositiveInteger"/>
+	<xsd:element name="PanelWindowLocation" type="TenString"/>
+	<xsd:element name="PCIExpressConnectorConfiguration" type="MediumString"/>
+	<xsd:element name="PhysicalHardDriveFormFactor" type="Dimension"/>
+	<xsd:element name="PlatformCompatability" type="ThirtyString"/>
+	<xsd:element name="PowerFactorCorrection" type="SuperLongString"/>
+	<xsd:element name="PowerSource" type="String"/>
+	<xsd:element name="PowerSupplyFormFactor" type="String"/>
+	<xsd:element name="PowerSupplyMaxOutput" type="PowerSixDigitDimension"/>
+	<xsd:element name="PowerSupplyMounting" type="String"/>
+	<xsd:element name="PresentationRemoteLaserColor" type="String"/>
+	<xsd:element name="PresentationRemoteMemory" type="MemorySizeFiveDigitDimension"/>
+	<xsd:element name="PresentationRemoteOperatingDistance" type="LengthFiveDigitDimension"/>
+	<xsd:element name="PressureLevels" type="PressureLevelSixDigitIntegerDimension"/>
+	<xsd:element name="PrimaryHeadphoneUse" type="String"/>
+	<xsd:element name="PrintingMediaType" type="PrintingMediaTypeValues"/>
+	<xsd:element name="PrinterWirelessType" type="PrinterWirelessTypeValues"/>
+	<xsd:element name="PrivacyScreenMaterialType" type="String"/>
+	<xsd:element name="PrivacyScreenSize" type="TwoDigitInteger"/>
+	<xsd:element name="ProcessorBrand" type="FortyString"/>
+	<xsd:element name="ProcessorCoolingDevice" type="String"/>
+	<xsd:element name="ProcessorCount" type="PositiveInteger"/>
+	<xsd:element name="ProcessorSeries" type="ProcessorSeriesTypeValues"/>
+	<xsd:element name="ProcessorSocket" type="String"/>
+	<xsd:element name="ProcessorSpeed" type="FrequencyDimension"/>
+	<xsd:element name="ProcessorType" type="ProcessorTypeValues"/>
+	<xsd:element name="ProjectorBrightness" type="LuminanceFiveDigitDimension"/>
+	<xsd:element name="RAID" type="String"/>
+	<xsd:element name="RAMClockSpeed" type="FiveDigitInteger"/>
+	<xsd:element name="RAMFormFactor" type="String"/>
+	<xsd:element name="RAMSize" type="MemorySizeDimension"/>
+	<xsd:element name="RAMTechnology" type="String"/>
+	<xsd:element name="ReadSpeed" type="DataTransferSpeedIntegerDimension"/>
+	<xsd:element name="RearWebcamResolution" type="ResolutionFiveDigitDimension"/>
+	<xsd:element name="RecordingCapacity" type="TimeIntegerDimension"/>
+	<xsd:element name="Remote" type="String"/>
+	<xsd:element name="RemoteIncluded" type="String"/>
+	<xsd:element name="ResponseTime" type="PositiveInteger"/>
+	<xsd:element name="SampleRate" type="FrequencyThreeDigitIntegerDimension"/>
+	<xsd:element name="SATARAID" type="SevenString"/>
+	<xsd:element name="SATAStandardsSupported" type="ThirtyString"/>
+	<xsd:element name="ScannerResolution" type="String"/>
+	<xsd:element name="ScreenResolution" type="FortyString"/>
+	<xsd:element name="ScreenSize" type="LengthDimension"/>
+	<xsd:element name="ScreenTrigger" type="VoltageFiveDigitIntegerDimension"/>
+	<xsd:element name="SecurityProtocol" type="String"/>
+	<xsd:element name="Series" type="FortyString"/>
+	<xsd:element name="ShaderClock" type="FrequencyIntegerDimension"/>
+	<xsd:element name="SimultaneousSessions" type="TenDigitInteger"/>
+	<xsd:element name="SLICertification" type="String"/>
+	<xsd:element name="SoftwareIncluded" type="LongString"/>
+	<xsd:element name="SoundCardInterface" type="SoundCardInterfaceTypeValues"/>
+	<xsd:element name="SoundCardMinSystemRequirements" type="LongString"/>
+	<xsd:element name="Southbridge" type="String"/>
+	<xsd:element name="SPDIFOutput" type="String"/>
+	<xsd:element name="Speaker" type="HundredString"/>
+	<xsd:element name="SpeakerDiameter" type="LengthDimension"/>
+	<xsd:element name="SpeakerOut" type="HundredString"/>
+	<xsd:element name="SpeakerOutputChannelQuantity" type="PositiveInteger"/>
+	<xsd:element name="SpeakersMaximumOutputPower" type="WattageDimension"/>
+	<xsd:element name="SpeakersNominalOutputPower" type="WattageDimension"/>
+	<xsd:element name="SpeakerSurroundSoundChannelConfiguration" type="String"/>
+	<xsd:element name="SpeedClassRating" type="SpeedClassRatingTypeValues"/>
+	<xsd:element name="SpeedRating" type="TenString"/>
+	<xsd:element name="SSDConnectorPins" type="PositiveInteger"/>
+	<xsd:element name="SSDDriveArchitechture" type="TenString"/>
+	<xsd:element name="StorageMaterialType" type="String"/>
+	<xsd:element name="StorageReadSpeed" type="HundredString"/>
+	<xsd:element name="StorageWriteSpeed" type="HundredString"/>
+	<xsd:element name="SystemCabinetFormFactor" type="String"/>
+	<xsd:element name="TabletInputMethod" type="TabletInputMethodTypeValues"/>
+	<xsd:element name="TabletMaximumDataRate" type="TabletDataRateDimension"/>
+	<xsd:element name="TabletMinimumSystemRequirements" type="MediumString"/>
+	<xsd:element name="TabletResolution" type="TabletResolutionDimension"/>
+	<xsd:element name="TabletSurfaceActiveArea" type="TabletActiveSurfaceAreaDimension"/>
+	<xsd:element name="TotalCompositePorts" type="PositiveInteger"/>
+	<xsd:element name="TotalDVIPorts" type="PositiveInteger"/>
+	<xsd:element name="TotalFirewire1600Connectors" type="PositiveInteger"/>
+	<xsd:element name="TotalFirewire3200Connectors" type="PositiveInteger"/>
+	<xsd:element name="TotalFirewire400Connectors" type="PositiveInteger"/>
+	<xsd:element name="TotalFirewire800Connectors" type="PositiveInteger"/>
+	<xsd:element name="TotalFrontPanelAudioInPorts" type="PositiveInteger"/>
+	<xsd:element name="TotalFrontPanelAudioOutPorts" type="PositiveInteger"/>
+	<xsd:element name="TotalFrontPaneleSataPorts" type="PositiveInteger"/>
+	<xsd:element name="TotalFrontPanelFirewire400Ports" type="PositiveInteger"/>
+	<xsd:element name="TotalFrontPanelFirewire800Ports" type="PositiveInteger"/>
+	<xsd:element name="TotalFrontPanelUSB1.0Ports" type="PositiveInteger"/>
+	<xsd:element name="TotalFrontPanelUSB1.1Ports" type="PositiveInteger"/>
+	<xsd:element name="TotalFrontPanelUSB2.0Ports" type="PositiveInteger"/>
+	<xsd:element name="TotalFrontPanelUSB3.0Ports" type="PositiveInteger"/>
+	<xsd:element name="TotalHDMIPorts" type="PositiveInteger"/>
+	<xsd:element name="TotalMiniHDMIPorts" type="PositiveInteger"/>
+	<xsd:element name="TotalNumberOfExternalBays" type="ThreeDigitInteger"/>
+	<xsd:element name="TotalNumberOfHotswapBays" type="ThreeDigitInteger"/>
+	<xsd:element name="TotalNumberOfInternalBays" type="ThreeDigitInteger"/>
+	<xsd:element name="TotalSataConnectors" type="PositiveInteger"/>
+	<xsd:element name="TotalSVideoOutPorts" type="PositiveInteger"/>
+	<xsd:element name="TotalUSB1.0Connectors" type="PositiveInteger"/>
+	<xsd:element name="TotalUSB1.1Connectors" type="PositiveInteger"/>
+	<xsd:element name="TotalUSB2.0Connectors" type="PositiveInteger"/>
+	<xsd:element name="TotalUSB3.0Connectors" type="PositiveInteger"/>
+	<xsd:element name="TotalVGAOutPorts" type="PositiveInteger"/>
+	<xsd:element name="TrackingMethod" type="TwentyString"/>
+	<xsd:element name="TunerTechnology" type="String"/>
+	<xsd:element name="TVTunerMemory" type="MemorySizeTenDigitIntegerDimension"/>
+	<xsd:element name="TVTunerVideoOutputInterface" type="TwentyString"/>
+	<xsd:element name="TVTunerVideoStandard" type="String"/>
+	<xsd:element name="TypeOfMemorySlot" type="FourDigitMinimumTwoDigitInteger"/>
+	<xsd:element name="URacksize" type="PositiveInteger"/>
+	<xsd:element name="USBPortType" type="ThreeDigitInteger"/>
+	<xsd:element name="VideoCallingResolution" type="ResolutionFiveDigitDimension"/>
+	<xsd:element name="ViewingAngle" type="PositiveInteger"/>
+	<xsd:element name="Voltage" type="Dimension"/>
+	<xsd:element name="VoltageRating" type="VoltageSevenDigitDecimalDimension"/>
+	<xsd:element name="Wattage" type="PositiveInteger"/>
+	<xsd:element name="WebcamVideoCaptureResolution" type="ResolutionFiveDigitDimension"/>
+	<xsd:element name="WirelessCarrier" type="WirelessCarrierTypeValues"/>
+	<xsd:element name="WirelessDataTransferRate" type="DataTransferSpeedFiveDigitIntegerDimension"/>
+	<xsd:element name="WirelessInputDeviceProtocol" type="WirelessInputDeviceProtocolTypeValues"/>
+	<xsd:element name="WirelessInputDeviceTechnology" type="WirelessInputDeviceTechnologyTypeValues"/>
+	<xsd:element name="WirelessRouterTransmissionBand" type="String"/>
+	<xsd:element name="WirelessStandard" type="WirelessStandardTypeValues"/>
+	<xsd:element name="WirelessTechnology" type="String"/>
+	<xsd:element name="WirelessType" type="WirelessTypeValues"/>
+	<xsd:element name="WriteSpeed" type="DataTransferSpeedTenIntegerDimension"/>
+	<xsd:element name="Zoom" type="TwentyString"/>
+	<xsd:element name="ZoomRatio" type="TenString"/>
+
+	<!--
+	######################################
+	#Old Declared Types
+	######################################
+	-->
+	<xsd:simpleType name="ComputerWirelessTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="2.4_ghz_radio_frequency"/>
+			<xsd:enumeration value="5.8_ghz_radio_frequency"/>
+			<xsd:enumeration value="54g"/>
+			<xsd:enumeration value="802_11_A"/>
+			<xsd:enumeration value="802_11_AB"/>
+			<xsd:enumeration value="802_11_ABG"/>
+			<xsd:enumeration value="802_11_AG"/>
+			<xsd:enumeration value="802_11_B"/>
+			<xsd:enumeration value="802_11_BGN"/>
+			<xsd:enumeration value="802_11_G"/>
+			<xsd:enumeration value="802_11_G_108Mbps"/>
+			<xsd:enumeration value="802_11_G_54Mbps"/>
+			<xsd:enumeration value="802_11_N"/>
+			<xsd:enumeration value="900_mhz_radio_frequency"/>
+			<xsd:enumeration value="bluetooth"/>
+			<xsd:enumeration value="dect"/>
+			<xsd:enumeration value="dect_6.0"/>
+			<xsd:enumeration value="infrared"/>
+			<xsd:enumeration value="irda"/>
+			<xsd:enumeration value="radio_frequency"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PrintingMediaTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="back_print_film"/>
+			<xsd:enumeration value="banner_paper"/>
+			<xsd:enumeration value="card_stock"/>
+			<xsd:enumeration value="envelopes"/>
+			<xsd:enumeration value="fabric"/>
+			<xsd:enumeration value="glossy_film"/>
+			<xsd:enumeration value="glossy_photo_paper"/>
+			<xsd:enumeration value="high_resolution_paper"/>
+			<xsd:enumeration value="labels"/>
+			<xsd:enumeration value="paper_plain"/>
+			<xsd:enumeration value="transparencies"/>
+			<xsd:enumeration value="unknown"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PrinterWirelessTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="2.4_ghz_radio_frequency"/>
+			<xsd:enumeration value="5.8_ghz_radio_frequency"/>
+			<xsd:enumeration value="54g"/>
+			<xsd:enumeration value="802_11_A"/>
+			<xsd:enumeration value="802_11_AB"/>
+			<xsd:enumeration value="802_11_ABG"/>
+			<xsd:enumeration value="802_11_AG"/>
+			<xsd:enumeration value="802_11_B"/>
+			<xsd:enumeration value="802_11_BGN"/>
+			<xsd:enumeration value="802_11_G"/>
+			<xsd:enumeration value="802_11_G_108Mbps"/>
+			<xsd:enumeration value="802_11_G_54Mbps"/>
+			<xsd:enumeration value="802_11_N"/>
+			<xsd:enumeration value="900_mhz_radio_frequency"/>
+			<xsd:enumeration value="bluetooth"/>
+			<xsd:enumeration value="dect"/>
+			<xsd:enumeration value="dect_6.0"/>
+			<xsd:enumeration value="infrared"/>
+			<xsd:enumeration value="irda"/>
+			<xsd:enumeration value="radio_frequency"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<!--
+		New Defined Types
+	-->
+	<xsd:simpleType name="AdditionalDrivesTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="blu_ray"/>
+			<xsd:enumeration value="blu_ray_re"/>
+			<xsd:enumeration value="blu_ray_rom"/>
+			<xsd:enumeration value="blu_ray_rw"/>
+			<xsd:enumeration value="cd_rom"/>
+			<xsd:enumeration value="cd_rw"/>
+			<xsd:enumeration value="dvd"/>
+			<xsd:enumeration value="dvd_cd_rw"/>
+			<xsd:enumeration value="dvd_minus_rw"/>
+			<xsd:enumeration value="dvd_plus_minus_rw"/>
+			<xsd:enumeration value="dvd_plus_r"/>
+			<xsd:enumeration value="dvd_plus_rw"/>
+			<xsd:enumeration value="dvd_r"/>
+			<xsd:enumeration value="dvd_ram"/>
+			<xsd:enumeration value="dvd_rom"/>
+			<xsd:enumeration value="dvd_rw"/>
+			<xsd:enumeration value="floppy"/>
+			<xsd:enumeration value="ide_tape_drive"/>
+			<xsd:enumeration value="jazz"/>
+			<xsd:enumeration value="scsi_cdrom"/>
+			<xsd:enumeration value="scsi_tape_drive"/>
+			<xsd:enumeration value="thumb_drive"/>
+			<xsd:enumeration value="zip"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="CardReaderTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="compactflash_type_i"/>
+			<xsd:enumeration value="compactflash_type_ii"/>
+			<xsd:enumeration value="hs_mmc"/>
+			<xsd:enumeration value="memory_stick"/>
+			<xsd:enumeration value="memory_stick_duo"/>
+			<xsd:enumeration value="memory_stick_micro"/>
+			<xsd:enumeration value="memory_stick_pro"/>
+			<xsd:enumeration value="memory_stick_pro_duo"/>
+			<xsd:enumeration value="memory_stick_pro_hg_duo"/>
+			<xsd:enumeration value="memory_stick_select"/>
+			<xsd:enumeration value="memory_stick_xc"/>
+			<xsd:enumeration value="memory_stick_xc_hg_micro"/>
+			<xsd:enumeration value="memory_stick_xc_micro"/>
+			<xsd:enumeration value="MiCard"/>
+			<xsd:enumeration value="microsd"/>
+			<xsd:enumeration value="micro_sdhc"/>
+			<xsd:enumeration value="micro_sdxc"/>
+			<xsd:enumeration value="minisd"/>
+			<xsd:enumeration value="mini_sdhc"/>
+			<xsd:enumeration value="mini_sdxc"/>
+			<xsd:enumeration value="mmc_micro"/>
+			<xsd:enumeration value="multimedia_card"/>
+			<xsd:enumeration value="multimedia_card_mobile"/>
+			<xsd:enumeration value="multimedia_card_plus"/>
+			<xsd:enumeration value="rs_mmc"/>
+			<xsd:enumeration value="sdhc"/>
+			<xsd:enumeration value="sdio"/>
+			<xsd:enumeration value="sdxc"/>
+			<xsd:enumeration value="secure_digital"/>
+			<xsd:enumeration value="secure_mmc"/>
+			<xsd:enumeration value="smartmedia_card"/>
+			<xsd:enumeration value="transflash"/>
+			<xsd:enumeration value="xd_picture_card"/>
+			<xsd:enumeration value="xd_picture_card_h"/>
+			<xsd:enumeration value="xd_picture_card_m"/>
+			<xsd:enumeration value="xd_picture_card_m_plus"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="CardReaderInterfaceTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="firewire_1600"/>
+			<xsd:enumeration value="firewire_3200"/>
+			<xsd:enumeration value="firewire_400"/>
+			<xsd:enumeration value="firewire_800"/>
+			<xsd:enumeration value="firewire_esata"/>
+			<xsd:enumeration value="usb1.0"/>
+			<xsd:enumeration value="usb1.1"/>
+			<xsd:enumeration value="usb2.0"/>
+			<xsd:enumeration value="usb3.0"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="CompatibleMemoryCardTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="compactflash_type_i"/>
+			<xsd:enumeration value="compactflash_type_ii"/>
+			<xsd:enumeration value="hs_mmc"/>
+			<xsd:enumeration value="memory_stick"/>
+			<xsd:enumeration value="memory_stick_duo"/>
+			<xsd:enumeration value="memory_stick_micro"/>
+			<xsd:enumeration value="memory_stick_pro"/>
+			<xsd:enumeration value="memory_stick_pro_duo"/>
+			<xsd:enumeration value="memory_stick_pro_hg_duo"/>
+			<xsd:enumeration value="memory_stick_select"/>
+			<xsd:enumeration value="memory_stick_xc"/>
+			<xsd:enumeration value="memory_stick_xc_hg_micro"/>
+			<xsd:enumeration value="memory_stick_xc_micro"/>
+			<xsd:enumeration value="MiCard"/>
+			<xsd:enumeration value="microsd"/>
+			<xsd:enumeration value="micro_sdhc"/>
+			<xsd:enumeration value="micro_sdxc"/>
+			<xsd:enumeration value="minisd"/>
+			<xsd:enumeration value="mini_sdhc"/>
+			<xsd:enumeration value="mini_sdxc"/>
+			<xsd:enumeration value="mmc_micro"/>
+			<xsd:enumeration value="multimedia_card"/>
+			<xsd:enumeration value="multimedia_card_mobile"/>
+			<xsd:enumeration value="multimedia_card_plus"/>
+			<xsd:enumeration value="rs_mmc"/>
+			<xsd:enumeration value="sdhc"/>
+			<xsd:enumeration value="sdio"/>
+			<xsd:enumeration value="sdxc"/>
+			<xsd:enumeration value="secure_digital"/>
+			<xsd:enumeration value="secure_mmc"/>
+			<xsd:enumeration value="smartmedia_card"/>
+			<xsd:enumeration value="transflash"/>
+			<xsd:enumeration value="xd_picture_card"/>
+			<xsd:enumeration value="xd_picture_card_h"/>
+			<xsd:enumeration value="xd_picture_card_m"/>
+			<xsd:enumeration value="xd_picture_card_m_plus"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ComponentWirelessTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="2.4_ghz_radio_frequency"/>
+			<xsd:enumeration value="5.8_ghz_radio_frequency"/>
+			<xsd:enumeration value="54g"/>
+			<xsd:enumeration value="802_11_A"/>
+			<xsd:enumeration value="802_11_AB"/>
+			<xsd:enumeration value="802_11_ABG"/>
+			<xsd:enumeration value="802_11_AG"/>
+			<xsd:enumeration value="802_11_B"/>
+			<xsd:enumeration value="802_11_BGN"/>
+			<xsd:enumeration value="802_11_G"/>
+			<xsd:enumeration value="802_11_G_108Mbps"/>
+			<xsd:enumeration value="802_11_G_54Mbps"/>
+			<xsd:enumeration value="802_11_N"/>
+			<xsd:enumeration value="900_mhz_radio_frequency"/>
+			<xsd:enumeration value="bluetooth"/>
+			<xsd:enumeration value="dect"/>
+			<xsd:enumeration value="dect_6.0"/>
+			<xsd:enumeration value="infrared"/>
+			<xsd:enumeration value="irda"/>
+			<xsd:enumeration value="radio_frequency"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ComputerMemoryTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="72_pin_edo_simm"/>
+			<xsd:enumeration value="ddr2_sdram"/>
+			<xsd:enumeration value="ddr3_sdram"/>
+			<xsd:enumeration value="ddr_dram"/>
+			<xsd:enumeration value="ddr_sdram"/>
+			<xsd:enumeration value="dimm"/>
+			<xsd:enumeration value="dram"/>
+			<xsd:enumeration value="edo_dram"/>
+			<xsd:enumeration value="eeprom"/>
+			<xsd:enumeration value="eprom"/>
+			<xsd:enumeration value="fpm_dram"/>
+			<xsd:enumeration value="fpm_ram"/>
+			<xsd:enumeration value="l2_cache"/>
+			<xsd:enumeration value="micro_dimm"/>
+			<xsd:enumeration value="pc2_4200"/>
+			<xsd:enumeration value="pc2_4300"/>
+			<xsd:enumeration value="pc2_5300"/>
+			<xsd:enumeration value="pc2_5400"/>
+			<xsd:enumeration value="pc2_6000"/>
+			<xsd:enumeration value="pc_100_sdram"/>
+			<xsd:enumeration value="pc_1066"/>
+			<xsd:enumeration value="pc_133_sdram"/>
+			<xsd:enumeration value="pc_1600"/>
+			<xsd:enumeration value="pc_2100_ddr"/>
+			<xsd:enumeration value="pc_2700_ddr"/>
+			<xsd:enumeration value="pc_3000"/>
+			<xsd:enumeration value="pc_3200_ddr"/>
+			<xsd:enumeration value="pc_3500_ddr"/>
+			<xsd:enumeration value="pc_3700"/>
+			<xsd:enumeration value="pc_4000_ddr"/>
+			<xsd:enumeration value="pc_4200"/>
+			<xsd:enumeration value="pc_4300"/>
+			<xsd:enumeration value="pc_4400"/>
+			<xsd:enumeration value="pc_66_sdram"/>
+			<xsd:enumeration value="pc_800"/>
+			<xsd:enumeration value="rambus"/>
+			<xsd:enumeration value="rdram"/>
+			<xsd:enumeration value="rimm"/>
+			<xsd:enumeration value="sdram"/>
+			<xsd:enumeration value="sgram"/>
+			<xsd:enumeration value="simm"/>
+			<xsd:enumeration value="sipp"/>
+			<xsd:enumeration value="sldram"/>
+			<xsd:enumeration value="sodimm"/>
+			<xsd:enumeration value="sorimm"/>
+			<xsd:enumeration value="sram"/>
+			<xsd:enumeration value="unknown"/>
+			<xsd:enumeration value="vram"/>
+			<xsd:enumeration value="wram"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ConnectionTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="express_card"/>
+			<xsd:enumeration value="firewire_1600"/>
+			<xsd:enumeration value="firewire_3200"/>
+			<xsd:enumeration value="firewire_400"/>
+			<xsd:enumeration value="firewire_800"/>
+			<xsd:enumeration value="firewire_esata"/>
+			<xsd:enumeration value="pci"/>
+			<xsd:enumeration value="pci_x_1"/>
+			<xsd:enumeration value="pci_x_16"/>
+			<xsd:enumeration value="pci_x_4"/>
+			<xsd:enumeration value="pci_x_8"/>
+			<xsd:enumeration value="pcmcia"/>
+			<xsd:enumeration value="usb1.0"/>
+			<xsd:enumeration value="usb1.1"/>
+			<xsd:enumeration value="usb2.0"/>
+			<xsd:enumeration value="usb3.0"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="DigitalMediaFormatTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="3480_tape_cartridge"/>
+			<xsd:enumeration value="4_mm_tape"/>
+			<xsd:enumeration value="6250_magstar_tape"/>
+			<xsd:enumeration value="8_mm"/>
+			<xsd:enumeration value="8_mm_tape"/>
+			<xsd:enumeration value="abridged"/>
+			<xsd:enumeration value="ac-3"/>
+			<xsd:enumeration value="adobe_ebook_reader"/>
+			<xsd:enumeration value="adpcm"/>
+			<xsd:enumeration value="adult"/>
+			<xsd:enumeration value="aiff"/>
+			<xsd:enumeration value="ali"/>
+			<xsd:enumeration value="alx"/>
+			<xsd:enumeration value="amazon_ebook_reader"/>
+			<xsd:enumeration value="anamorphic"/>
+			<xsd:enumeration value="animated"/>
+			<xsd:enumeration value="antique_books"/>
+			<xsd:enumeration value="antique_reproduction_map"/>
+			<xsd:enumeration value="atlas"/>
+			<xsd:enumeration value="atrac3"/>
+			<xsd:enumeration value="audiobook"/>
+			<xsd:enumeration value="aus_import"/>
+			<xsd:enumeration value="authorized_bootleg"/>
+			<xsd:enumeration value="avi"/>
+			<xsd:enumeration value="bargain_price"/>
+			<xsd:enumeration value="best_of"/>
+			<xsd:enumeration value="blu_ray"/>
+			<xsd:enumeration value="blu_spec_cd"/>
+			<xsd:enumeration value="blu_spec_cd_and_dvd"/>
+			<xsd:enumeration value="bookplus_reader"/>
+			<xsd:enumeration value="box_calendar"/>
+			<xsd:enumeration value="box_set"/>
+			<xsd:enumeration value="braille"/>
+			<xsd:enumeration value="bsides"/>
+			<xsd:enumeration value="bw"/>
+			<xsd:enumeration value="cab"/>
+			<xsd:enumeration value="cast_recording"/>
+			<xsd:enumeration value="ca_import"/>
+			<xsd:enumeration value="cd"/>
+			<xsd:enumeration value="cd-4"/>
+			<xsd:enumeration value="cd-6"/>
+			<xsd:enumeration value="cd-single"/>
+			<xsd:enumeration value="cd_and_blu_ray"/>
+			<xsd:enumeration value="cd_and_dvd"/>
+			<xsd:enumeration value="cd_rom"/>
+			<xsd:enumeration value="classical"/>
+			<xsd:enumeration value="clay_animation"/>
+			<xsd:enumeration value="clean"/>
+			<xsd:enumeration value="closed-captioned"/>
+			<xsd:enumeration value="clv"/>
+			<xsd:enumeration value="cod"/>
+			<xsd:enumeration value="collectors_edition"/>
+			<xsd:enumeration value="color"/>
+			<xsd:enumeration value="compact_flash"/>
+			<xsd:enumeration value="compilation"/>
+			<xsd:enumeration value="complete"/>
+			<xsd:enumeration value="copy_protected_cd"/>
+			<xsd:enumeration value="criterion"/>
+			<xsd:enumeration value="csv"/>
+			<xsd:enumeration value="cutout"/>
+			<xsd:enumeration value="cx_encoding"/>
+			<xsd:enumeration value="dat_tape"/>
+			<xsd:enumeration value="deluxe_edition"/>
+			<xsd:enumeration value="desk_calendar"/>
+			<xsd:enumeration value="dff"/>
+			<xsd:enumeration value="digital_8"/>
+			<xsd:enumeration value="digital_sound"/>
+			<xsd:enumeration value="directors_cut"/>
+			<xsd:enumeration value="diskette35"/>
+			<xsd:enumeration value="diskette525"/>
+			<xsd:enumeration value="dlt"/>
+			<xsd:enumeration value="doc"/>
+			<xsd:enumeration value="dolby"/>
+			<xsd:enumeration value="double_cd"/>
+			<xsd:enumeration value="double_lp"/>
+			<xsd:enumeration value="drama_enhanced"/>
+			<xsd:enumeration value="dts_stereo"/>
+			<xsd:enumeration value="dual_disc"/>
+			<xsd:enumeration value="dubbed"/>
+			<xsd:enumeration value="dvd_and_blu_ray"/>
+			<xsd:enumeration value="dvd_audio"/>
+			<xsd:enumeration value="dvd_ram"/>
+			<xsd:enumeration value="dvd_region"/>
+			<xsd:enumeration value="dvd_rom"/>
+			<xsd:enumeration value="dvd_single"/>
+			<xsd:enumeration value="dvd_video"/>
+			<xsd:enumeration value="dvt"/>
+			<xsd:enumeration value="electronic_software_download"/>
+			<xsd:enumeration value="engagement_calendar"/>
+			<xsd:enumeration value="enhanced"/>
+			<xsd:enumeration value="everybook"/>
+			<xsd:enumeration value="exe"/>
+			<xsd:enumeration value="explicit_lyrics"/>
+			<xsd:enumeration value="extended_play"/>
+			<xsd:enumeration value="extra_tracks"/>
+			<xsd:enumeration value="facsimile"/>
+			<xsd:enumeration value="flash"/>
+			<xsd:enumeration value="folded_map"/>
+			<xsd:enumeration value="full-length"/>
+			<xsd:enumeration value="full_screen"/>
+			<xsd:enumeration value="gif"/>
+			<xsd:enumeration value="globe"/>
+			<xsd:enumeration value="gold_cd"/>
+			<xsd:enumeration value="hd_dvd"/>
+			<xsd:enumeration value="hi-fidelity"/>
+			<xsd:enumeration value="highlights"/>
+			<xsd:enumeration value="hi_8"/>
+			<xsd:enumeration value="hqcd"/>
+			<xsd:enumeration value="html"/>
+			<xsd:enumeration value="hybrid_sacd"/>
+			<xsd:enumeration value="illustrated"/>
+			<xsd:enumeration value="import"/>
+			<xsd:enumeration value="ipk"/>
+			<xsd:enumeration value="jad"/>
+			<xsd:enumeration value="jar"/>
+			<xsd:enumeration value="jpg"/>
+			<xsd:enumeration value="jp_import"/>
+			<xsd:enumeration value="karaoke"/>
+			<xsd:enumeration value="kindle_blog"/>
+			<xsd:enumeration value="kindle_book"/>
+			<xsd:enumeration value="kindle_magazine"/>
+			<xsd:enumeration value="kindle_newspaper"/>
+			<xsd:enumeration value="large_print"/>
+			<xsd:enumeration value="laser_printed"/>
+			<xsd:enumeration value="letterboxed"/>
+			<xsd:enumeration value="limited_collectors_edition"/>
+			<xsd:enumeration value="limited_edition"/>
+			<xsd:enumeration value="live"/>
+			<xsd:enumeration value="magazine_subscription"/>
+			<xsd:enumeration value="maxi_single"/>
+			<xsd:enumeration value="mdb"/>
+			<xsd:enumeration value="mde"/>
+			<xsd:enumeration value="memory_stick"/>
+			<xsd:enumeration value="microsoft_reader_desktop"/>
+			<xsd:enumeration value="minidisc"/>
+			<xsd:enumeration value="minidv"/>
+			<xsd:enumeration value="miniseries"/>
+			<xsd:enumeration value="mobipocket_ebook"/>
+			<xsd:enumeration value="mono"/>
+			<xsd:enumeration value="movie_tie_in"/>
+			<xsd:enumeration value="mp3_audio"/>
+			<xsd:enumeration value="mpeg"/>
+			<xsd:enumeration value="mpeg_2_5"/>
+			<xsd:enumeration value="multisystem"/>
+			<xsd:enumeration value="mvi"/>
+			<xsd:enumeration value="mvi_plus_cd"/>
+			<xsd:enumeration value="newsletter_subscription"/>
+			<xsd:enumeration value="newspaper_subscription"/>
+			<xsd:enumeration value="nintendo"/>
+			<xsd:enumeration value="ntsc"/>
+			<xsd:enumeration value="numbered_edition"/>
+			<xsd:enumeration value="online_game_code"/>
+			<xsd:enumeration value="original_antique_map"/>
+			<xsd:enumeration value="original_recording"/>
+			<xsd:enumeration value="pal"/>
+			<xsd:enumeration value="palm_ebook_reader"/>
+			<xsd:enumeration value="pdb"/>
+			<xsd:enumeration value="pdf"/>
+			<xsd:enumeration value="photocopy"/>
+			<xsd:enumeration value="playstation"/>
+			<xsd:enumeration value="popout_map"/>
+			<xsd:enumeration value="pqa"/>
+			<xsd:enumeration value="prc"/>
+			<xsd:enumeration value="print"/>
+			<xsd:enumeration value="print_and_cd_rom"/>
+			<xsd:enumeration value="print_and_dvd_rom"/>
+			<xsd:enumeration value="prn"/>
+			<xsd:enumeration value="processor386"/>
+			<xsd:enumeration value="pulldown_wall_map"/>
+			<xsd:enumeration value="raised_relief_map"/>
+			<xsd:enumeration value="rar"/>
+			<xsd:enumeration value="realaudio_g2"/>
+			<xsd:enumeration value="real_audio"/>
+			<xsd:enumeration value="registration_code"/>
+			<xsd:enumeration value="reissued"/>
+			<xsd:enumeration value="remastered"/>
+			<xsd:enumeration value="remixes"/>
+			<xsd:enumeration value="rental"/>
+			<xsd:enumeration value="restored"/>
+			<xsd:enumeration value="ringle"/>
+			<xsd:enumeration value="roughcut"/>
+			<xsd:enumeration value="sacd"/>
+			<xsd:enumeration value="secam"/>
+			<xsd:enumeration value="sega"/>
+			<xsd:enumeration value="sheet_music"/>
+			<xsd:enumeration value="shm_cd"/>
+			<xsd:enumeration value="silent"/>
+			<xsd:enumeration value="sis"/>
+			<xsd:enumeration value="sit"/>
+			<xsd:enumeration value="smart_media"/>
+			<xsd:enumeration value="soundtrack"/>
+			<xsd:enumeration value="special_edition"/>
+			<xsd:enumeration value="special_extended_version"/>
+			<xsd:enumeration value="special_limited_edition"/>
+			<xsd:enumeration value="student_edition"/>
+			<xsd:enumeration value="studio"/>
+			<xsd:enumeration value="subtitled"/>
+			<xsd:enumeration value="supratitled"/>
+			<xsd:enumeration value="surround"/>
+			<xsd:enumeration value="tarot"/>
+			<xsd:enumeration value="teachers_edition"/>
+			<xsd:enumeration value="threeD"/>
+			<xsd:enumeration value="thx"/>
+			<xsd:enumeration value="tiff"/>
+			<xsd:enumeration value="topaz_ebook"/>
+			<xsd:enumeration value="tv_tie_in"/>
+			<xsd:enumeration value="txt"/>
+			<xsd:enumeration value="uk_import"/>
+			<xsd:enumeration value="ultimate_edition"/>
+			<xsd:enumeration value="umd"/>
+			<xsd:enumeration value="unabridged"/>
+			<xsd:enumeration value="unknown_format"/>
+			<xsd:enumeration value="us_import"/>
+			<xsd:enumeration value="value_price"/>
+			<xsd:enumeration value="vhd"/>
+			<xsd:enumeration value="vhs"/>
+			<xsd:enumeration value="vhs_c"/>
+			<xsd:enumeration value="vqf"/>
+			<xsd:enumeration value="wall_calendar"/>
+			<xsd:enumeration value="wall_map"/>
+			<xsd:enumeration value="wav"/>
+			<xsd:enumeration value="widescreen"/>
+			<xsd:enumeration value="wks"/>
+			<xsd:enumeration value="wma"/>
+			<xsd:enumeration value="xd_card"/>
+			<xsd:enumeration value="xls"/>
+			<xsd:enumeration value="xml"/>
+			<xsd:enumeration value="zip"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="GraphicsCardInterfaceTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="agp"/>
+			<xsd:enumeration value="integrated"/>
+			<xsd:enumeration value="pci"/>
+			<xsd:enumeration value="pci_e"/>
+			<xsd:enumeration value="unknown"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="InputDeviceInterfaceTechnologyTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="1_4_inch_audio"/>
+			<xsd:enumeration value="2_5_mm_audio"/>
+			<xsd:enumeration value="3_5_mm_audio"/>
+			<xsd:enumeration value="bluetooth"/>
+			<xsd:enumeration value="infrared"/>
+			<xsd:enumeration value="multipronged_audio"/>
+			<xsd:enumeration value="ps/2"/>
+			<xsd:enumeration value="radio_frequency"/>
+			<xsd:enumeration value="usb"/>
+			<xsd:enumeration value="usb1.0"/>
+			<xsd:enumeration value="usb1.1"/>
+			<xsd:enumeration value="usb2.0"/>
+			<xsd:enumeration value="usb3.0"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="InputTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="firewire_1600"/>
+			<xsd:enumeration value="firewire_3200"/>
+			<xsd:enumeration value="firewire_400"/>
+			<xsd:enumeration value="firewire_800"/>
+			<xsd:enumeration value="firewire_esata"/>
+			<xsd:enumeration value="usb1.0"/>
+			<xsd:enumeration value="usb1.1"/>
+			<xsd:enumeration value="usb2.0"/>
+			<xsd:enumeration value="usb3.0"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="InputVideoConnectorsTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="component_video"/>
+			<xsd:enumeration value="composite_video"/>
+			<xsd:enumeration value="dvi_x_1"/>
+			<xsd:enumeration value="dvi_x_2"/>
+			<xsd:enumeration value="dvi_x_4"/>
+			<xsd:enumeration value="d_sub"/>
+			<xsd:enumeration value="hdmi"/>
+			<xsd:enumeration value="mini_hdmi"/>
+			<xsd:enumeration value="s_video"/>
+			<xsd:enumeration value="vga"/>
+
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="InterfaceTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="eide"/>
+			<xsd:enumeration value="fibre_channel"/>
+			<xsd:enumeration value="ide"/>
+			<xsd:enumeration value="pci_x_16"/>
+			<xsd:enumeration value="pci_x_4"/>
+			<xsd:enumeration value="pci_x_8"/>
+			<xsd:enumeration value="sas"/>
+			<xsd:enumeration value="sata_1_5_gb"/>
+			<xsd:enumeration value="sata_3_0_gb"/>
+			<xsd:enumeration value="sata_6_0_gb"/>
+			<xsd:enumeration value="scsi"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="InternalConnectorTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="eide"/>
+			<xsd:enumeration value="fibre_channel"/>
+			<xsd:enumeration value="ide"/>
+			<xsd:enumeration value="pci_express_x4"/>
+			<xsd:enumeration value="pci_express_x8"/>
+			<xsd:enumeration value="serial_scsi"/>
+			<xsd:enumeration value="serial_ata150"/>
+			<xsd:enumeration value="serial_ata300"/>
+			<xsd:enumeration value="serial_ata600"/>
+			<xsd:enumeration value="scsi"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="IPProtocolStandardsTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="802_11_ABG"/>
+			<xsd:enumeration value="802_11_ABGN"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="MaxEthernetSpeedTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="ethernet_10base_t"/>
+			<xsd:enumeration value="ethernet_100base_t"/>
+			<xsd:enumeration value="ethernet_100base_tx"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="MemoryCardTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="compactflash_type_i"/>
+			<xsd:enumeration value="compactflash_type_ii"/>
+			<xsd:enumeration value="hs_mmc"/>
+			<xsd:enumeration value="memory_stick"/>
+			<xsd:enumeration value="memory_stick_duo"/>
+			<xsd:enumeration value="memory_stick_micro"/>
+			<xsd:enumeration value="memory_stick_pro"/>
+			<xsd:enumeration value="memory_stick_pro_duo"/>
+			<xsd:enumeration value="memory_stick_pro_hg_duo"/>
+			<xsd:enumeration value="memory_stick_select"/>
+			<xsd:enumeration value="memory_stick_xc"/>
+			<xsd:enumeration value="memory_stick_xc_hg_micro"/>
+			<xsd:enumeration value="memory_stick_xc_micro"/>
+			<xsd:enumeration value="MiCard"/>
+			<xsd:enumeration value="microsd"/>
+			<xsd:enumeration value="micro_sdhc"/>
+			<xsd:enumeration value="micro_sdxc"/>
+			<xsd:enumeration value="minisd"/>
+			<xsd:enumeration value="mini_sdhc"/>
+			<xsd:enumeration value="mini_sdxc"/>
+			<xsd:enumeration value="mmc_micro"/>
+			<xsd:enumeration value="multimedia_card"/>
+			<xsd:enumeration value="multimedia_card_mobile"/>
+			<xsd:enumeration value="multimedia_card_plus"/>
+			<xsd:enumeration value="rs_mmc"/>
+			<xsd:enumeration value="sdhc"/>
+			<xsd:enumeration value="sdio"/>
+			<xsd:enumeration value="sdxc"/>
+			<xsd:enumeration value="secure_digital"/>
+			<xsd:enumeration value="secure_mmc"/>
+			<xsd:enumeration value="smartmedia_card"/>
+			<xsd:enumeration value="transflash"/>
+			<xsd:enumeration value="xd_picture_card"/>
+			<xsd:enumeration value="xd_picture_card_h"/>
+			<xsd:enumeration value="xd_picture_card_m"/>
+			<xsd:enumeration value="xd_picture_card_m_plus"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="MonitorConnectorsTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="audio_video_port"/>
+			<xsd:enumeration value="dmi"/>
+			<xsd:enumeration value="ethernet"/>
+			<xsd:enumeration value="gameport"/>
+			<xsd:enumeration value="hdmi"/>
+			<xsd:enumeration value="ieee_1394"/>
+			<xsd:enumeration value="ps/2"/>
+			<xsd:enumeration value="serial_interface"/>
+			<xsd:enumeration value="usb2.0"/>
+			<xsd:enumeration value="usb3.0"/>
+			<xsd:enumeration value="vga"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ProcessorSeriesTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="athlon_64"/>
+			<xsd:enumeration value="athlon_64_x2"/>
+			<xsd:enumeration value="intel_atom_230"/>
+			<xsd:enumeration value="intel_atom_330"/>
+			<xsd:enumeration value="intel_atom_n450"/>
+			<xsd:enumeration value="intel_atom_n455"/>
+			<xsd:enumeration value="intel_atom_z520"/>
+			<xsd:enumeration value="intel_atom_z530"/>
+			<xsd:enumeration value="intel_xeon"/>
+			<xsd:enumeration value="pentium_4"/>
+			<xsd:enumeration value="sempron"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="SoundCardInterfaceTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="express_card"/>
+			<xsd:enumeration value="firewire_1600"/>
+			<xsd:enumeration value="firewire_3200"/>
+			<xsd:enumeration value="firewire_400"/>
+			<xsd:enumeration value="firewire_800"/>
+			<xsd:enumeration value="firewire_esata"/>
+			<xsd:enumeration value="pci"/>
+			<xsd:enumeration value="pci_x_1"/>
+			<xsd:enumeration value="pci_x_16"/>
+			<xsd:enumeration value="pci_x_4"/>
+			<xsd:enumeration value="pci_x_8"/>
+			<xsd:enumeration value="pcmcia"/>
+			<xsd:enumeration value="usb1.0"/>
+			<xsd:enumeration value="usb1.1"/>
+			<xsd:enumeration value="usb2.0"/>
+			<xsd:enumeration value="usb3.0"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="SpeedClassRatingTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="class_10"/>
+			<xsd:enumeration value="class_2"/>
+			<xsd:enumeration value="class_4"/>
+			<xsd:enumeration value="class_6"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="TabletInputMethodTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="buttons"/>
+			<xsd:enumeration value="dial"/>
+			<xsd:enumeration value="handwriting_recognition"/>
+			<xsd:enumeration value="keyboard"/>
+			<xsd:enumeration value="keypad"/>
+			<xsd:enumeration value="keypad_stroke"/>
+			<xsd:enumeration value="keypad_stroke"/>
+			<xsd:enumeration value="microphone"/>
+			<xsd:enumeration value="touch_screen"/>
+			<xsd:enumeration value="touch_screen_stylus_pen"/>
+			<xsd:enumeration value="trackpoint_pointing_device"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="WirelessCarrierTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="att "/>
+			<xsd:enumeration value="sprintpcs"/>
+			<xsd:enumeration value="t_mobile"/>
+			<xsd:enumeration value="verizon"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="WirelessInputDeviceProtocolTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="2.4_ghz_radio_frequency"/>
+			<xsd:enumeration value="5.8_ghz_radio_frequency"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="WirelessInputDeviceTechnologyTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="bluetooth"/>
+			<xsd:enumeration value="infrared"/>
+			<xsd:enumeration value="ps/2"/>
+			<xsd:enumeration value="radio_frequency"/>
+			<xsd:enumeration value="usb"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="WirelessStandardTypeValues">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="802_11_A"/>
+			<xsd:enumeration value="802_11_ABG"/>
+			<xsd:enumeration value="802_11_ABGN"/>
+			<xsd:enumeration value="802_11_AG"/>
+			<xsd:enumeration value="802_11_B"/>
+			<xsd:enumeration value="802_11_G"/>
+			<xsd:enumeration value="bluetooth"/>
+			<xsd:enumeration value="infrared"/>
+			<xsd:enumeration value="radio_frequency"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<!--
+	###############################################################
+	# Computers Elements and Data Types
+	###############################################################
+	-->
+	<xsd:complexType name="AirflowDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="SixDigitInteger">
+				<xsd:attribute name="unitOfMeasure" type="AirflowUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="BurnTimeSixDigitDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="SixDigitInteger">
+				<xsd:attribute name="unitOfMeasure" type="BurnTimeUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="CurrentFiveDigitDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="FiveDigitDecimal">
+				<xsd:attribute name="unitOfMeasure" type="CurrentUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="DataTransferSpeedDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="Dimension">
+				<xsd:attribute name="unitOfMeasure" type="DataTransferSpeedUnitOfMeasure"
+					use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="DataTransferSpeedFiveDigitIntegerDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="FiveDigitInteger">
+				<xsd:attribute name="unitOfMeasure" type="DataTransferSpeedUnitOfMeasure"
+					use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="DataTransferSpeedIntegerDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="PositiveInteger">
+				<xsd:attribute name="unitOfMeasure" type="DataTransferSpeedUnitOfMeasure"
+					use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="DataTransferSpeedTenIntegerDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="TenDigitInteger">
+				<xsd:attribute name="unitOfMeasure" type="DataTransferSpeedUnitOfMeasure"
+					use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="FrequencyThreeDigitIntegerDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="ThreeDigitInteger">
+				<xsd:attribute name="unitOfMeasure" type="FrequencyUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="FrequencyFiveDigitIntegerDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="FiveDigitInteger">
+				<xsd:attribute name="unitOfMeasure" type="FrequencyUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="LengthFiveDigitDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="FiveDigitDecimal">
+				<xsd:attribute name="unitOfMeasure" type="LengthUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="LengthFourDigitDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="FourDigitDecimal">
+				<xsd:attribute name="unitOfMeasure" type="LengthUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="LengthSevenDigitDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="SevenDigitDecimal">
+				<xsd:attribute name="unitOfMeasure" type="LengthUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="LuminanceFiveDigitDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="FiveDigitInteger">
+				<xsd:attribute name="unitOfMeasure" type="LuminanceUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="MemoryInterfaceDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="FiveDigitInteger">
+				<xsd:attribute name="unitOfMeasure" type="MemoryInterfaceUnitOfMeasure"
+					use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="MemorySizeFiveDigitDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="FiveDigitDecimal">
+				<xsd:attribute name="unitOfMeasure" type="MemorySizeUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="MemorySizeFiveDigitIntegerDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="FiveDigitInteger">
+				<xsd:attribute name="unitOfMeasure" type="MemorySizeUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="MemorySizeTenDigitIntegerDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="TenDigitInteger">
+				<xsd:attribute name="unitOfMeasure" type="MemorySizeUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="NoiseLevelSixDigitDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="SixDigitInteger">
+				<xsd:attribute name="unitOfMeasure" type="NoiseLevelUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="PowerSixDigitDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="SixDigitDecimal">
+				<xsd:attribute name="unitOfMeasure" type="PowerUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="PressureLevelSixDigitIntegerDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="SixDigitInteger">
+				<xsd:attribute name="unitOfMeasure" type="PressureLevelUnitOfMeasure" use="required"
+				/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="ResolutionFiveDigitDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="FiveDigitDecimal">
+				<xsd:attribute name="unitOfMeasure" type="ResolutionUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="SpeedSixDigitDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="SixDigitInteger">
+				<xsd:attribute name="unitOfMeasure" type="SpeedUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="TabletDataRateDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="SixDigitInteger">
+				<xsd:attribute name="unitOfMeasure" type="TabletDataRateUnitOfMeasure"
+					use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="TabletActiveSurfaceAreaDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="TenString">
+				<xsd:attribute name="unitOfMeasure" type="LengthUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="TabletResolutionDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="SixDigitInteger">
+				<xsd:attribute name="unitOfMeasure" type="TabletResolutionUnitOfMeasure"
+					use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="VoltageSevenDigitDecimalDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="SevenDigitDecimal">
+				<xsd:attribute name="unitOfMeasure" type="VoltageUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="VoltageFiveDigitIntegerDimension">
+		<xsd:simpleContent>
+			<xsd:extension base="FiveDigitInteger">
+				<xsd:attribute name="unitOfMeasure" type="VoltageUnitOfMeasure" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!--
+    ##################################################
+    # Unit of Measure Types
+    ##################################################
+    -->
+	<xsd:simpleType name="AirflowUnitOfMeasure">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="CFM"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="DataTransferSpeedUnitOfMeasure">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="kbps"/>
+			<xsd:enumeration value="mbps"/>
+			<xsd:enumeration value="gbps"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="MemoryInterfaceUnitOfMeasure">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="bits"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PressureLevelUnitOfMeasure">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="levels"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="TabletDataRateUnitOfMeasure">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="PPS"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="TabletResolutionUnitOfMeasure">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="lpi"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

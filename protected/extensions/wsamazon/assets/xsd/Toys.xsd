@@ -1,0 +1,167 @@
+<?xml version="1.0"?>
+<!-- Revision="$Revision: #13 $" -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<!--
+    $Date: 2007/08/27 $
+
+    AMAZON.COM CONFIDENTIAL.  This document and the information contained in it are
+    confidential and proprietary information of Amazon.com and may not be reproduced, 
+    distributed or used, in whole or in part, for any purpose other than as necessary 
+    to list products for sale on the www.amazon.com web site pursuant to an agreement 
+    with Amazon.com.
+    -->
+	<xsd:include schemaLocation="amzn-base.xsd"/>
+	<!--
+    ###############################################################
+    # ToysAndGames Classification Data
+    ###############################################################
+    -->
+	<!-- For ItemType element use the values toys-and-games-->
+	<xsd:element name="Toys">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ProductType">
+					<xsd:complexType>
+						<xsd:choice>
+							<xsd:element ref="ToysAndGames"/>
+							<xsd:element ref="Hobbies"/>
+							<xsd:element ref="CollectibleCard"/>
+							<xsd:element ref="Costume"/>
+						</xsd:choice>
+					</xsd:complexType>
+				</xsd:element>
+				<!--
+            ###########################################################
+            # Attributes common to all Toys Product Types
+            ###########################################################
+            -->
+				<xsd:element ref="Battery" minOccurs="0"/>
+				<xsd:element name="AssemblyInstructions" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:normalizedString">
+							<xsd:maxLength value="1500"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element ref="AgeRecommendation" minOccurs="1"/>
+				<xsd:element name="AssemblyTime" type="AssemblyTimeDimension" minOccurs="0"/>
+				<xsd:element ref="ColorSpecification" minOccurs="0"/>
+				<xsd:element name="Edition" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="IsAdultProduct" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="IsAssemblyRequired" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="ManufacturerSafetyWarning" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:normalizedString">
+							<xsd:maxLength value="1500"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="ManufacturerWarrantyDescription" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="WeightRecommendation" minOccurs="0"/>
+				<xsd:element name="NumberOfPieces" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfPlayers" type="TwentyStringNotNull" minOccurs="0"/>
+				<xsd:element name="PartNumber" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="Recall" minOccurs="0"/>
+				<xsd:element name="Size" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SizeMap" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="StyleName" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SubjectCharacter" type="StringNotNull" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+   ##################################################
+   # TOYS_AND_GAMES Classification Data
+   ##################################################
+   -->
+	<xsd:element name="ToysAndGames">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+				<xsd:element name="EducationalObjective" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="IsElectric" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="MaterialType" type="StringNotNull" minOccurs="0"/>
+				<!-- plant_or_animal_product_type -->
+				<xsd:element name="AnimalType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Publisher" type="StringNotNull" minOccurs="0"/>
+				<!-- StyleKeywords - used for doll-type required for dolls item types -->
+				<xsd:element name="StyleKeywords" type="LongString" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="ProductTheme" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ToyAwardName" type="ToyAwardType" minOccurs="0" maxOccurs="5"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+   ##################################################
+   # HOBBIES Classification Data
+   ##################################################
+   -->
+	<xsd:element name="Hobbies">
+		<xsd:complexType>
+			<xsd:sequence>
+				<!-- active_surface_area -->
+				<xsd:element name="WingArea" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BrakeStyle" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ControlType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+				<xsd:element name="DriveSystem" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="EducationalObjective" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FrameMaterialType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FuelCapacity" type="VolumeDimension" minOccurs="0"/>
+				<xsd:element name="FuelType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="IsElectric" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="MaterialType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaximumRange" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="MaximumSpeed" type="SpeedDimension" minOccurs="0"/>
+				<xsd:element name="MotorType" type="StringNotNull" minOccurs="0"/>
+				<!-- plant_or_animal_product_type -->
+				<xsd:element name="AnimalType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Publisher" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="RadioBandsSupported" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="RailType" type="StringNotNull" minOccurs="0"/>
+				<!-- scale_name -->
+				<xsd:element name="Scale" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SkillLevel" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SuspensionType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ProductTheme" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="TireType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ToyAwardName" type="ToyAwardType" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="WheelDiameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="WheelType" type="StringNotNull" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+   ##################################################
+   # COLLECTIBLE_CARD Classification Data
+   ##################################################
+   -->
+	<xsd:element name="CollectibleCard">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Collection" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="EducationalObjective" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Genre" type="StringNotNull" minOccurs="0"/>
+				<!-- initial_print_run_rarity -->
+				<xsd:element name="Rarity" type="StringNotNull" minOccurs="0"/>
+				<!-- item_part_numer -->
+				<xsd:element name="CardNumber" type="StringNotNull" minOccurs="0"/>
+				<!-- Used to specify "specific_uses_for_product" -->
+				<xsd:element name="CardType" type="StringNotNull" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+   ##################################################
+   # COSTUME Classification Data
+   ##################################################
+   -->
+	<xsd:element name="Costume">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+				<xsd:element name="MaterialType" type="StringNotNull" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>
