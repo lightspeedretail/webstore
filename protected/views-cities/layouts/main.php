@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<?= _xls_get_conf('LANG_CODE', 'en-US') ?>">
+<html lang="<?= Yii::app()->language ?>">
 	<!-- <head> section -->
 	<?php echo $this->renderPartial("/site/_head",null,true,false); ?>
 

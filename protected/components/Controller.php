@@ -29,7 +29,6 @@ class Controller extends CController
 
 	/* These are public variables that are used in our layout, so we have to define them.
 	*/
-	public $pageLanguage;
 	public $pageDescription;
 	public $pageCanonicalUrl;
 	public $pageImageUrl;
@@ -87,7 +86,6 @@ class Controller extends CController
 
 		$this->pageTitle =
 			Yii::app()->name =  _xls_get_conf('STORE_NAME', 'LightSpeed Web Store');
-		$this->pageLanguage = _xls_get_conf('LANG_CODE', 'en');
 		$this->pageCanonicalUrl = $this->getCanonicalUrl();
 		$this->pageDescription = _xls_get_conf('STORE_TAGLINE');
 		$this->pageImageUrl ='';

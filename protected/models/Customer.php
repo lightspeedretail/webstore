@@ -271,7 +271,7 @@ class Customer extends BaseCustomer
 		$this->modified = new CDbExpression('NOW()');
 
 		if (empty($this->preferred_language))
-			$this->preferred_language = _xls_get_conf('LANG_CODE','en');
+			$this->preferred_language =  Yii::app()->language;
 
 		if (empty($this->currency))
 			$this->currency = _xls_get_conf('CURRENCY_DEFAULT','USD');

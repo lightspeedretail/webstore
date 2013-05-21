@@ -67,18 +67,22 @@ class Configuration extends BaseConfiguration
 	{
 		$objConfig = Configuration::model()->findAllByAttributes(array('param'=>'1'),array('order'=>'key_name'));
 
+		$objTheme = Configuration::model()->find('key_name=?', array('THEME'));
+		$objLangCode = Configuration::model()->find('key_name=?', array('LANG_CODE'));
+
 		$fp = fopen(Yii::app()->basepath."/config/wsconfig.php","w");
 
 		fwrite($fp,"<?php
 return
 	array(
-		'theme'=>'"._xls_get_conf('THEME')."',
+		'theme'=>'".$objTheme->key_value."',
+		'language'=>'".$objLangCode->key_value."',
 		'params'=>array(
 ");
 
 
 		foreach ($objConfig as $oConfig)
-			fwrite($fp,"\t\t'".$oConfig->key_name."'=>'".$oConfig->key_value."',".chr(13));
+			fwrite($fp,"\t\t'".$oConfig->key_name."'=>'".str_replace('\'','\\\'',$oConfig->key_value)."',".chr(13));
 
 
 		fwrite($fp,"		),

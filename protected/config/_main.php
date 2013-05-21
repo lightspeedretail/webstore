@@ -26,8 +26,8 @@ return CMap::mergeArray(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
 	'name'=>'Web Store',
 	//'theme'=>'brooklyn', //pulled from wsconfig
-	'language' => 'en_us',
-	'sourceLanguage' => 'en_us',
+	//'language' => 'en', //pulled from wsconfig
+	'sourceLanguage' => 'en',
 
 	// preloading 'log' component
 	'preload'=>array(

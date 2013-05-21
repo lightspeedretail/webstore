@@ -47,7 +47,7 @@
 
 	    /* <![CDATA[ */
 	    var google_conversion_id = <?= _xls_get_conf('GOOGLE_ADWORDS','0'); ?>
-	    var google_conversion_language = "<?= _xls_get_conf('LANG_CODE','en'); ?>";
+	    var google_conversion_language = "<?=  Yii::app()->language ?>";
 	    var google_conversion_format = "3";
 	    var google_conversion_color = "ffffff";
 	    var google_conversion_label = "purchase";

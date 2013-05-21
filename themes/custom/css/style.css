@@ -201,12 +201,14 @@ a:hover {  text-decoration: none;   }
 #product_details .addcart { height: 24px; padding-top: 12px; padding-bottom: 10px; margin-right: 10px; text-align: center;margin-bottom: 10px; cursor: pointer; float: left; height: 40px;}
 #product_details .addcart a { margin-top: 20px;  text-transform: uppercase; font-size: 1.1em;}
 
+#product_details #Product_intQty { width: 50px; border-left: 2px; border-right: 0px; text-align: center;}
+#product_details label[for=Product_intQty]{ margin-top: -20px;}
 #product_details .wishlist {  height: 24px; padding-top: 12px; padding-bottom: 10px; margin-right: 5px; margin-left: 0px; text-align: center;margin-bottom: 10px; cursor: pointer; float: left; height: 40px;}
 #product_details .wishlist a { margin-top: 20px;  text-transform: uppercase; font-size: 1.1em;}
 #product_details .previewimage { margin-right: 10px;}
 
 #product_details #SelectSize { float: left; margin-right: 10px;}
-#product_details #lblTitle { word-wrap: break-word; }
+#product_details .title { word-wrap: break-word; }
 #pinterest { display: inline-block; display: -moz-box; vertical-align: top; }
 
 #product_details .grid-view table.items tr.odd { }
@@ -216,6 +218,14 @@ a:hover {  text-decoration: none;   }
 #product_details .grid-view td { vertical-align: top; }
 
 #product_details #photos legend { font-size: 0.7em;}
+
+#autoadd { margin-top: 30px; }
+#autoadd .items th { background: none; height: 4px; padding:0px; background-color: black; }
+#autoadd .summary { font-weight: normal; font-size: 0.7em;}
+#autoadd #autoadd_c0 { margin-right: 0px; border-right: 0px; }
+
+
+
 /***** Checkout page and Registration Page *****/
 #checkout .row-fluid { padding-bottom: 10px; }
 #checkout label { margin-bottom: 0px;}
