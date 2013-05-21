@@ -118,7 +118,7 @@ class PromoCode extends BasePromoCode
 		}
 
 		if (!$objPromoCode->enabled) {
-			$this->addError($attribute,Yii::t('global','Promo Code is invalid.'));
+			$this->addError($attribute,Yii::t('global','Promo Code is invalid'));
 			return;
 		}
 
@@ -147,7 +147,7 @@ class PromoCode extends BasePromoCode
 
 		if (!is_null($objPromoCode->threshold))
 			if ($objPromoCode->Threshold > Yii::app()->shoppingcart->subtotal) {
-				$this->addError($attribute,Yii::t('global','{label} only valid when cart exceeds {amount}.',
+				$this->addError($attribute,Yii::t('global','{label} only valid when your purchases total at least {amount}.',
 					array('{label}'=>$strLabel,'{amount}'=>_xls_currency($objPromoCode->threshold))));
 				return;
 			}
@@ -172,7 +172,7 @@ class PromoCode extends BasePromoCode
 			}
 
 			if ($bolApplied==false) {
-				$this->addError($attribute,Yii::t('yii','{label} cannot be used with your cart items.',array('{label}'=>$strLabel)));
+				$this->addError($attribute,Yii::t('yii','We are sorry, but one or more of the items in your cart cannot be used with {label}.',array('{label}'=>$strLabel)));
 				return;
 			}
 
@@ -188,7 +188,7 @@ class PromoCode extends BasePromoCode
 
 			//If we have reached this point and $bolApplied is still false, none of our items qualify
 			if (!$bolApplied) {
-				$this->addError($attribute,Yii::t('yii','{label} cannot be used with your cart items.',array('{label}'=>$strLabel)));
+				$this->addError($attribute,Yii::t('yii','We are sorry, but one or more of the items in your cart cannot be used with {label}.',array('{label}'=>$strLabel)));
 				return;
 			}
 		}
@@ -238,8 +238,8 @@ class PromoCode extends BasePromoCode
 
 
 	protected function IsShipping() {
-		if (isset($this->LsCodeArray[0]) && $this->LsCodeArray[0]=="shipping:")
-			return true;
+		if($this->module == "freeshipping")
+				return true;
 		return false;
 	}
 
@@ -265,9 +265,10 @@ class PromoCode extends BasePromoCode
 				$boolReturn = true;
 
 			if (substr($strCode, 0,8) == "keyword:") {
+				$productTags = ProductTags::model()->findAllByAttributes(array('product_id'=>$objItem->product->id));
 				$strKeyword = trim(substr($strCode,8,255));
-				foreach ($this->productTags as $tag)
-					if ($tag->tag==$strKeyword)
+				foreach ($productTags as $tag)
+					if ($tag->tag->tag==$strKeyword)
 						$boolReturn = true;
 			}
 

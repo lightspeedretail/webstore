@@ -6,7 +6,6 @@
  * The followings are the available columns in table '{{wishlist}}':
  * @property string $id
  * @property string $registry_name
- * @property string $registry_password
  * @property string $registry_description
  * @property integer $visibility
  * @property string $event_date
@@ -43,14 +42,14 @@ abstract class BaseWishlist extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('registry_name, registry_password, event_date, html_content, after_purchase, customer_id, gift_code, created, modified', 'required'),
+			array('registry_name, event_date, html_content, after_purchase, customer_id, gift_code, created, modified', 'required'),
 			array('visibility, after_purchase', 'numerical', 'integerOnly'=>true),
-			array('registry_name, registry_password, ship_option, gift_code', 'length', 'max'=>100),
+			array('registry_name, ship_option, gift_code', 'length', 'max'=>100),
 			array('customer_id', 'length', 'max'=>20),
 			array('registry_description', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, registry_name, registry_password, registry_description, visibility, event_date, html_content, ship_option, after_purchase, customer_id, gift_code, created, modified', 'safe', 'on'=>'search'),
+			array('id, registry_name, registry_description, visibility, event_date, html_content, ship_option, after_purchase, customer_id, gift_code, created, modified', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -75,7 +74,6 @@ abstract class BaseWishlist extends CActiveRecord
 		return array(
 			'id' => 'ID',
 			'registry_name' => 'Registry Name',
-			'registry_password' => 'Registry Password',
 			'registry_description' => 'Registry Description',
 			'visibility' => 'Visibility',
 			'event_date' => 'Event Date',
@@ -102,7 +100,6 @@ abstract class BaseWishlist extends CActiveRecord
 
 		$criteria->compare('id',$this->id,true);
 		$criteria->compare('registry_name',$this->registry_name,true);
-		$criteria->compare('registry_password',$this->registry_password,true);
 		$criteria->compare('registry_description',$this->registry_description,true);
 		$criteria->compare('visibility',$this->visibility);
 		$criteria->compare('event_date',$this->event_date,true);

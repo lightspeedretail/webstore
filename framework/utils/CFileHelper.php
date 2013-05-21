@@ -284,7 +284,7 @@ class CFileHelper
 			self::mkdir(dirname($dst),$options,true);
 
 		$mode=isset($options['newDirMode']) ? $options['newDirMode'] : 0777;
-		$res=mkdir($dst, $mode);
+		$res=@mkdir($dst, $mode);
 		chmod($dst,$mode);
 		return $res;
 	}

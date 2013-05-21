@@ -27,6 +27,22 @@ class Document extends BaseDocument
 		return Document::model()->findByAttributes(array('order_str'=>$strIdStr));
 	}
 
+	public static function GetCartLastIdStr() {
+		// Since id_str is a text field, we have to read in and strip out nonnumeric
+		$intIdStr = Yii::app()->db->createCommand('SELECT SUBSTRING(order_str, 4)
+                AS id_num
+                FROM xlsws_document
+                WHERE order_str LIKE "WO-%"
+                ORDER BY (id_num + 0) DESC
+                LIMIT 1;')->queryScalar();
+
+
+		if (empty($intIdStr))
+			return 0;
+		else
+			return $intIdStr;
+	}
+
 
 	/**
 	 * Stripped down version of AddItemToCart for use with the SOAP uploader

@@ -105,7 +105,7 @@ class moneris extends WsPayment
 		$mpgTxn = new mpgTransaction($txnArray);
 
 		/************************ Set AVS and CVD *****************************/
-		if ($this->config['avs']==1) $mpgTxn->setAvsInfo($mpgAvsInfo);
+		//if ($this->config['avs']==1) $mpgTxn->setAvsInfo($mpgAvsInfo);
 		if ($this->config['ccv']==1) $mpgTxn->setCvdInfo($mpgCvdInfo);
 
 		/****************************** Request Object *******************************/

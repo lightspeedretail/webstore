@@ -22,6 +22,7 @@ class Product extends BaseProduct
 
 	public $rowBookendFront=false;
 	public $rowBookendBack=false;
+	public $intQty;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -54,9 +55,11 @@ class Product extends BaseProduct
 		return array_merge(
 			parent::attributeLabels(),
 			array(
-				'SliderImage'=>'This is an active address',
+				'SliderImageTag'=>'Item',
+				'TitleTag'=>'',
 				'Title'=>'Product',
 				'sell'=>'Price',
+				'intQty'=>'Qty'
 				)
 		);
 	}
@@ -377,18 +380,47 @@ class Product extends BaseProduct
 
 	}
 
-	public static function ConvertSEO() {
+	public static function ConvertSEO($id=null) {
 
 		//Because our product table is potentially huge, we can't risk loading everything into an array and having PHP crash,
 		//so we just have to do this directly with the db
-		$matches=Yii::app()->db->createCommand('SELECT id,title,code from '.Product::model()->tableName().' order by id')->query();
+		if (!is_null($id))
+		{
+			if($id==-1)
+				$matches=Yii::app()->db->createCommand('SELECT id,title,code FROM '.Product::model()->tableName().' WHERE request_url IS NULL AND title is not null ORDER BY id LIMIT 1000')->query();
+			else
+				$matches=Yii::app()->db->createCommand('SELECT id,title,code FROM '.Product::model()->tableName().' WHERE id='.$id.' ORDER BY id')->query();
+
+		}
+		else
+			$matches=Yii::app()->db->createCommand('SELECT id,title,code FROM '.Product::model()->tableName().' WHERE web=1 ORDER BY id')->query();
 		while(($row=$matches->read())!==false)
 			Product::model()->updateByPk($row['id'],
-				array('request_url'=>_xls_seo_url(_xls_get_conf('SEO_URL_CODES' , 0) ? _xls_parse_language($row['title'])."-".$row['code'] : $row['title'])));
+				array('request_url'=>self::BuildRequestUrl($row['id'],$row['title'],$row['code'])));
 
 
 	}
 
+
+	public static function BuildRequestUrl($id,$title,$code)
+	{
+		$strRequest = _xls_parse_language($title);
+		if (Yii::app()->params['SEO_URL_CODES'])
+			$strRequest .= "-".$code;
+
+		if (Yii::app()->params['SEO_URL_CATEGORIES'])
+		{
+			$strBread = Category::getBreadcrumbByProductId($id,'names');
+
+			if (!empty($strBread))
+				$strRequest = array_pop($strBread)."-".$strRequest;
+
+		}
+
+		return _xls_seo_url($strRequest);
+
+
+	}
 
 	/**
 	 * Gets the URL referring to the Product image
@@ -768,7 +800,7 @@ class Product extends BaseProduct
 					$high = $arrMaster[0]->getPriceValue($intQuantity, $taxInclusive);
 					$low = $arrMaster[count($arrMaster)-1]->getPriceValue($intQuantity, $taxInclusive);
 						if ( $high != $low) return _xls_currency($high)." - "._xls_currency($low);
-					else return $high;
+					else return _xls_currency($high);
 
 				case Product::CLICK_FOR_PRICING:
 					if ($arrMaster[0]->getPriceValue($intQuantity, $taxInclusive) != $arrMaster[count($arrMaster)-1]->getPriceValue($intQuantity, $taxInclusive))
@@ -881,6 +913,7 @@ class Product extends BaseProduct
 	public function CalculateReservedInventory() {
 
 
+		//Pending orders not yet converted to Invoice
 		$intReservedA = $this->getDbConnection()->createCommand(
 					"SELECT SUM(qty) FROM ".CartItem::model()->tableName()." AS a
 					LEFT JOIN ".Cart::model()->tableName()." AS b ON a.cart_id=b.id
@@ -893,12 +926,13 @@ class Product extends BaseProduct
 		if (empty($intReservedA))
 			$intReservedA=0;
 
+		//Unattached orders (made independently in LightSpeed)
 		$intReservedB = $this->getDbConnection()->createCommand(
 					"SELECT SUM(qty) from ".DocumentItem::model()->tableName()." AS a
 					LEFT JOIN ".Document::model()->tableName()." AS b ON a.document_id=b.id
 					WHERE
 					a.product_id=". $this->id." AND b.order_type=".CartType::order."
-					AND (b.status='".OrderStatus::Requested."');")->queryScalar();
+					AND cart_id IS NULL AND left(order_str,3)='WO-' AND (b.status='".OrderStatus::Requested."');")->queryScalar();
 
 		if (empty($intReservedB))
 			$intReservedB=0;
@@ -917,6 +951,33 @@ class Product extends BaseProduct
 		if (!$this->save())
 			return false;
 		else return true;
+	}
+
+	public static function RecalculateInventory() {
+
+		$strField = (_xls_get_conf('INVENTORY_FIELD_TOTAL','')==1 ? "inventory_total" : "inventory");
+
+
+		$dbC = Yii::app()->db->createCommand();
+		$dbC->setFetchMode(PDO::FETCH_OBJ);//fetch each row as Object
+
+		$dbC->select()->from('xlsws_product')->where('web=1 AND '.$strField.'>0 AND inventory_reserved=0 AND inventory_avail=0 AND master_model=0')->order('id')->limit(200);
+
+		foreach ($dbC->queryAll() as $objItem) {
+
+			$objProduct = Product::model()->findByPk($objItem->id);
+			$objProduct->SetAvailableInventory();
+		}
+
+		$matches=Yii::app()->db->createCommand("SELECT count(*) as thecount FROM ".Product::model()->tableName()."
+		WHERE web=1 AND ".$strField.">0 AND inventory_reserved=0
+		AND inventory_avail=0 AND master_model=0")->queryScalar();
+
+		return $matches;
+
+
+
+
 	}
 
 	/**
@@ -1153,6 +1214,18 @@ class Product extends BaseProduct
 		));
 	}
 
+	/**
+	 * Retrieves a list of models based on the current search/filter conditions.
+	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+	 */
+	public function related()
+	{
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$this->getSliderCriteria(0),
+		));
+	}
+
 
 	/**
 	 * Since Validate tests to make sure certain fields have values, populate requirements here such as the modified timestamp
@@ -1180,6 +1253,18 @@ class Product extends BaseProduct
 		return parent::afterSave();
 	}
 
+	public function getTitleTag()
+	{
+		return CHtml::link($this->Title,$this->GetLink());
+	}
+
+	public function getSliderImageTag()
+	{
+		return CHtml::image(Images::GetLink($this->image_id,ImagesType::slider));
+
+	}
+
+
 
 	public function __get($strName) {
 		switch ($strName) {
@@ -1187,8 +1272,6 @@ class Product extends BaseProduct
 			case 'Name':
 				return $this->Title;
 
-			case 'TitleTag':
-				return CHtml::link($this->Title,$this->GetLink());
 
 
 			case 'IsMaster':
@@ -1241,9 +1324,6 @@ class Product extends BaseProduct
 
 			case 'ListingImage':
 				return $this->GetImageLink(ImagesType::listing);
-
-			case 'ListingImageTag':
-				return CHtml::image(Images::GetLink($this->image_id,ImagesType::listing));
 
 			case 'MiniImage':
 				return $this->GetImageLink(ImagesType::mini);

@@ -24,6 +24,7 @@ class DefaultController extends AdminBaseController
 	const SEO_URL = 21;
 	const SEO_PRODUCT = 22;
 	const SEO_CATEGORY = 23;
+	const THEME_PHOTOS = 29;
 
 	public function actions()
 	{
@@ -49,25 +50,7 @@ class DefaultController extends AdminBaseController
 	public function beforeAction($action)
 	{
 
-		$arrSidebars =  Modules::getSidebars(false); //Get active and inactive
-		$menuSidebar = array();
-		foreach ($arrSidebars as $sidebar) {
-			try {
-				$widget=$this->createWidget("application.extensions.$sidebar->module.$sidebar->module",array());
-			}
-			catch (Exception $e) {
-				Yii::log("Missing widget ".$e, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-			}
-			if (isset($widget))
-			{
-				$menuSidebar[$sidebar->module] = array('label'=>$widget->sidebarName, 'url'=>array('default/sidebar', 'id'=>$sidebar->id));
-				unset($widget);
-			}
-
-		}
-
-		$this->menuItems = array_merge(
-			array(
+		$this->menuItems = array(
 			array('label'=>'Store', 'linkOptions'=>array('class'=>'nav-header')),
 				array('label'=>'Store Information', 'url'=>array('default/edit', 'id'=>self::STORE_INFORMATION)),
 				array('label'=>'Email Sending Options', 'url'=>array('default/edit', 'id'=>self::EMAIL_SENDING_OPTIONS)),
@@ -87,8 +70,7 @@ class DefaultController extends AdminBaseController
 				array('label'=>'Product Meta Data', 'url'=>array('default/edit', 'id'=>self::SEO_PRODUCT)),
 				array('label'=>'Category/Custom Title Format', 'url'=>array('default/edit', 'id'=>self::SEO_CATEGORY)),
 				array('label'=>'Category Meta Data', 'url'=>array('default/categorymeta')),
-			array('label'=>'Sidebars', 'linkOptions'=>array('class'=>'nav-header')),
-				),$menuSidebar
+
 
 		);
 
@@ -116,7 +98,7 @@ class DefaultController extends AdminBaseController
 				return "To edit the actual language strings, use the Translation menu options under ".CHtml::link("Database",$this->createUrl("databaseadmin/index"));
 
 			case self::PRODUCT_PHOTOS:
-				return "Note that these settings are used as photos are uploaded from LightSpeed. After changing these settings, check the Reupload Photo checkbox on a product card, then Save and Update Store to view the resulting changes.";
+				return "Photo sizes are now under the ".CHtml::link("Themes->Set Photo Sizes",$this->createUrl('theme/edit',array('id'=>self::THEME_PHOTOS)))." menu.";
 
 			case self::SEO_PRODUCT:
 				return "<P>These settings control the Page Title and Meta Description using keys that represent product information. Each of these keys is wrapped with a percentage ({) sign. Most represent fields in the Product Card. {crumbtrail} and {rcrumbtrail} (reverse crumbtrail) are the product's category path. Below is the available list of keys:</p><P>{storename}, {name}, {description}, {shortdescription}, {longdescription}, {price}, {family}, {class}, {crumbtrail}, {rcrumbtrail}</p>";
@@ -210,6 +192,8 @@ class DefaultController extends AdminBaseController
 
 		curl_setopt($ch, CURLOPT_HEADER, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
 		curl_setopt($ch, CURLOPT_HTTPHEADER,
@@ -219,7 +203,7 @@ class DefaultController extends AdminBaseController
 
 		$resp = curl_exec($ch);
 		curl_close($ch);
-
+		
 		$oXML= json_decode($resp);
 		return $oXML;
 	}

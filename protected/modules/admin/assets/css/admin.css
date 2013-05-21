@@ -106,7 +106,7 @@ h3 { margin-top: 2px; }
 
 .newalert { background: url(img/warning.png) no-repeat; margin-left: 0px;  }
 
-.themeicon img {  width: 200px; height: 160px; }
+.themeicon img {  width: 200px; height: 160px; border:1px solid #a0a0a0; }
 .themeicon {  border: 8px solid #EEEEEE; width: 200px; height: 160px;}
 .themeicon.selected {  border: 8px solid #c6d0e5; }
 .themeicon label { padding: 0px; margin: 0px; width: 200px; height: 160px; text-align: left; }
@@ -116,7 +116,8 @@ h3 { margin-top: 2px; }
 .themeinstaller {  margin-left: 13px; font-size: 0.8em; font-weight: 600; }
 .themeinstallerdesc { margin-left: 13px; font-size: 0.7em; font-weight: 400; line-height: 18px;  }
 .themeinstallercredit { margin-left: 13px; font-size: 0.6em; font-weight: 300; line-height: 18px;  }
-
+.themetitle { font-size: 0.7em; font-weight: bold; margin-left: 8px; display: inline; width: 143px;  float: left;}
+.themeversion { font-size: 0.7em; font-weight: normal; margin-left: 8px; width: 50px;  float: left; text-align: right;}
 /*.themeicon .selected {  border: 5px solid blue;}*/
 
 .hero-unit  legend { font-size: 0.7em; border: none; line-height: 18px; padding-bottom: 16px; }

@@ -55,51 +55,80 @@
 
 	            <?php if (!_xls_get_conf('DISABLE_CART', false)): ?>
 		            <div class="row">
-		               <div class="wishlist span6">
-			               <?php if (_xls_get_conf('ENABLE_WISH_LIST'))
-				               echo CHtml::ajaxLink(
-				               Yii::t('product','Add to Wish List'),array('wishlist/add'),
-				               array('data'=>array('id'=>$model->id,'qty'=>1,
-					                    'size'=>'js:$("#SelectSize option:selected").val()',
-					                    'color'=>'js:$("#SelectColor option:selected").val()'),
-					               'type'=>'POST',
-					               'success' => 'function(data) {
+			            <?php if (_xls_get_conf('ENABLE_WISH_LIST'))
+				            echo CHtml::tag('div',array(
+					            'class'=>'wishlist span5',
+					            'onClick'=>CHtml::ajax(array(
+						            'url'=>array('wishlist/add'),
+						            'data'=>array('id'=>$model->id,
+							            'qty'=>'js:$("#'.CHtml::activeId($model,'intQty').'").val()',
+							            'size'=>'js:$("#SelectSize option:selected").val()',
+							            'color'=>'js:$("#SelectColor option:selected").val()'),
+						            'type'=>'POST',
+						            'success' => 'function(data) {
 					                if (data=="multiple")
 					                    $("#WishitemShare").dialog("open");
-					                 else alert(data); }',
-				               ));
-			               ?>
-		               </div>
-		                <?= CHtml::tag('div',array(
-					        'class'=>'addcart span5',
-					        'onClick'=>CHtml::ajax(array(
-						        'class'=>'addcart',
-						        'url'=>array('cart/AddToCart'),
-						        //If we are viewing a matrix product, Add To Cart needs to pass selected options, otherwise just our model id
-						        'data'=>($model->IsMaster ?
-							        'js:{"'.'product_size'.'": $("#SelectSize option:selected").val(),
+					                 else alert(data); }'
+					            )),
+				            ),CHtml::link(Yii::t('product', 'Add to Wish List'), '#'));
+			            ?>
+
+			            <div class="span1" <?php echo (_xls_get_conf('SHOW_QTY_ENTRY') ? '' : 'style="display:none"'); ?>>
+					            <?php echo $form->labelEx($model,'intQty'); ?>
+					            <?php echo $form->textField($model,'intQty'); ?>
+			            </div>
+
+			            <?= CHtml::tag('div',array(
+				            'class'=>'addcart span5',
+				            'onClick'=>CHtml::ajax(array(
+					            'url'=>array('cart/AddToCart'),
+					            //If we are viewing a matrix product, Add To Cart needs to pass selected options, otherwise just our model id
+					            'data'=>($model->IsMaster ?
+						            'js:{"'.'product_size'.'": $("#SelectSize option:selected").val(),
 							            "'.'product_color'.'": $("#SelectColor option:selected").val(),
 							            "'.'id'.'": '.$model->id.',
-							            "'.'qty'.'": 1 }'
-							            : array('id'=>$model->id,'qty'=>1)),
-						        'type'=>'POST',
-						        'dataType'=>'json',
-						        'success' => 'js:function(data){
+							            "'.'qty'.'": $("#'.CHtml::activeId($model,'intQty').'").val() }'
+						            : array('id'=>$model->id,'qty'=>'js:$("#'.CHtml::activeId($model,'intQty').'").val()')),
+					            'type'=>'POST',
+					            'dataType'=>'json',
+					            'success' => 'js:function(data){
 				                    if (data.action=="alert") {
 				                      alert(data.errormsg);
 									} else if (data.action=="success") {
-										$("#shoppingcart").html(data.shoppingcart);
+										'.(_xls_get_conf('AFTER_ADD_CART') ?
+						                'window.location.href="'.$this->createUrl("/cart").'"' :
+						                '$("#shoppingcart").html(data.shoppingcart);').'
 									}}'
-						        )),
-				            ),CHtml::link(Yii::t('product', 'Add to Cart'), '#'));
-		               ?>
+				            )),
+			            ),CHtml::link(Yii::t('product', 'Add to Cart'), '#'));
+			            ?>
 					</div>
 
+		            <div class="row">
+			            <div class="span11">
+				            <?php
+				            $this->widget('zii.widgets.grid.CGridView', array(
+					            'id' => 'autoadd',
+					            'dataProvider' => $model->autoadd(),
+					            'showTableOnEmpty'=>false,
+					            'selectableRows'=>0,
+					            'emptyText'=>'',
+					            'summaryText' => Yii::t('global',
+						            'The following related products will be added to your cart automatically with this purchase:'),
+					            'hideHeader'=>false,
+					            'columns' => array(
+						            'SliderImageTag:html',
+						            'TitleTag:html',
+						            'Price',
+					            ),
+				            ));
+				            ?>
+			            </div>
+		            </div>
+
 	            <?php endif; ?>
 
-	            <?php if (_xls_get_conf('SHOW_QTY_ENTRY', '0')): ?>
-					<?php //$this->txtQty->Render(); ?>
-	            <?php endif; ?>
+
 
 	        </div>
 		</div><!-- end of top row -->
@@ -121,39 +150,20 @@
 				<?php endif; ?>
 	        </div>
 
-	        <div class="row">
-	            <div class="span4 clearfix">
-		            <?php
-	                    $this->widget('zii.widgets.grid.CGridView', array(
-							'id' => 'autoadd',
-							'dataProvider' => $model->autoadd(),
-							'showTableOnEmpty'=>false,
-							'selectableRows'=>0,
-			                'emptyText'=>'',
-							'summaryText' => Yii::t('global',
-								'The following related products will be added to your cart automatically with this purchase:'),
-							'hideHeader'=>true,
-						    'columns' => array(
-							    'SliderImageTag:html',
-							    'TitleTag:html',
-							    'Price',
-						    ),
-						));
-					?>
-		        </div>
-	        </div>
+
 
 		</div><!-- end of middle row -->
 
 	    <div class="row-fluid">
 	        <div class="span10">
 				<?php
-				if ($dataProviderRelated):
-					echo Yii::t('global','Other items you may be interested in:');
 					$this->widget('ext.JCarousel.JCarousel', array(
-						'dataProvider' => $dataProviderRelated,
+						'dataProvider' => $model->related(),
 						'thumbUrl' => '$data->SliderImage',
 						'imageUrl' => '$data->Link',
+						'summaryText' => Yii::t('global',
+							'Other items you may be interested in:'),
+						'emptyText'=>'',
 						'titleText' => '$data->Title',
 						'captionText' => '$data->Title."<br>"._xls_currency($data->sell)',
 						'target' => 'do-not-delete-this',
@@ -162,7 +172,7 @@
 						'skin' => 'slider',
 						'clickCallback'=>'window.location.href=itemSrc;'
 					));
-				endif; ?>
+				?>
 	        </div>
 	    </div>
 

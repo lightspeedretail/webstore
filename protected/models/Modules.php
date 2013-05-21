@@ -89,6 +89,15 @@ class Modules extends BaseModules
 
 	}
 
+	public static function Active($str)
+	{
+		foreach(self::getSidebars(true) as $obj)
+			if($obj->module==$str) return true;
+
+		return false;
+
+	}
+
 	public static function getSidebars($active=true)
 	{
 		$criteria = new CDbCriteria();

@@ -9,6 +9,12 @@
  */
 class ProductTags extends BaseProductTags
 {
+
+	public function primaryKey()
+	{
+		return "tag_id";
+	}
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return ProductTags the static model class

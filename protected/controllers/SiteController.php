@@ -230,6 +230,14 @@ class SiteController extends Controller
 			$objCustomer = Customer::model()->findByAttributes(array('record_type'=>Customer::REGISTERED,'email'=>$model->email));
 			if($objCustomer instanceof Customer)
 			{
+				if (is_null($objCustomer->password))
+				{
+					$response_array = array(
+						'status'=>"failure",
+						'message'=> Yii::t('global','Your email address was found but only as a registered Facebook user. Log in via Facebook.'));
+					echo json_encode($response_array);
+					return;
+				}
 
 				$strHtmlBody =$this->renderPartial('/mail/_forgotpassword',array('model'=>$objCustomer), true);
 				$strSubject = Yii::t('global','Password reminder');

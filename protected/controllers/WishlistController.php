@@ -82,8 +82,6 @@ class WishlistController extends Controller
 	public function actionEdit()
 	{
 
-
-
 		//We should only show this option to a logged in user
 		if (Yii::app()->user->isGuest)
 			throw new CHttpException(404, Yii::t('global','You must be logged in to edit Wish Lists.'));
@@ -94,7 +92,7 @@ class WishlistController extends Controller
 
 		$this->breadcrumbs = array(
 			'My Wish Lists'=>$this->createUrl("/wishlist"),
-			'Edit Wish List'=>$this->createUrl("wishlist/edit"),
+			'Edit Wish List'=>$this->createUrl("wishlist/edit",array('code'=>$strCode)),
 		);
 
 		if (!($objWishlist instanceof Wishlist))
@@ -138,7 +136,7 @@ class WishlistController extends Controller
 
 		}
 
-		$this->render('create',array('model'=>$model));
+		$this->render('/wishlist/create',array('model'=>$model));
 
 	}
 
@@ -168,7 +166,7 @@ class WishlistController extends Controller
 		);
 
 		//We pass a dummy model of WishListItem to get our edit form ready
-		$this->render('view',array(
+		$this->render('/wishlist/view',array(
 			'model'=>$objWishlist,
 			'formmodel'=>new WishlistEditForm(),
 			'WishlistShare'=>$WishlistShare,
@@ -190,12 +188,12 @@ class WishlistController extends Controller
 			if($model->validate())
 			{
 				$objCustomer = customer::LoadByEmail($model->email);
-				$objWishlists = Wishlist::model()->findAllByAttributes(array('customer_id'=>$objCustomer->id));
+				$objWishlists = Wishlist::model()->findAllByAttributes(array('customer_id'=>$objCustomer->id,'visibility'=>Wishlist::PUBLICLIST));
 
 			}
 		}
 		//We pass a dummy model of WishListItem to get our edit form ready
-		$this->render('search',array(
+		$this->render('/wishlist/search',array(
 			'objWishlists'=>$objWishlists,
 			'model'=>$model,
 		));
@@ -329,7 +327,7 @@ class WishlistController extends Controller
 
 
 	public function actionEdititem()
-	{ error_log(__FUNCTION__);
+	{
 
 		if (Yii::app()->user->isGuest)
 			throw new CHttpException(404,'The requested page does not exist.');
@@ -474,7 +472,7 @@ class WishlistController extends Controller
 			'priority'=>$objWishrow->priority,
 			'comment'=>$objWishrow->comment
 		);
-error_log(json_encode($arrReturn));
+
 		echo json_encode($arrReturn);
 	}
 

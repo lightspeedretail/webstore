@@ -35,14 +35,11 @@ class CartPayment extends BaseCartPayment
 	public function __get($strName) {
 		switch ($strName) {
 			case 'payment_name':
-				try {
-					return Yii::app()->getComponent($this->payment_module)->Name;
-				}
-
-				catch(Exception $e) {
-					Yii::log("error trying to get name of ".$this->payment_module." module", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-					return "Unknown";
-				}
+				$c = Yii::app()->getComponent($this->payment_module);
+				if ($c)
+					return  $c->Name;
+				else
+					return "";
 				break;
 
 

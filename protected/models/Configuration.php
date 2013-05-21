@@ -47,6 +47,21 @@ class Configuration extends BaseConfiguration
 	}
 
 
+	public static function SetHighestWO()
+	{
+
+			$strOriginalNextId = _xls_get_conf('NEXT_ORDER_ID', false);
+			$intLastId = preg_replace("/[^0-9]/", "", Cart::GetCartLastIdStr());
+			$intDocLastId = preg_replace("/[^0-9]/", "", Document::GetCartLastIdStr());
+			if ($intDocLastId >$intLastId) $intLastId= $intDocLastId;
+			$intNextId = intval($intLastId) + 1;
+			if ($strOriginalNextId > $intNextId) $intNextId= $strOriginalNextId;
+			$strNextId = 'WO-' . $intNextId;
+
+			_xls_set_conf('NEXT_ORDER_ID',$strNextId);
+
+	}
+
 
 	public static function exportConfig()
 	{
@@ -327,6 +342,8 @@ return array(
 				return array(1 => _sp("Only when going to Checkout"),0 => _sp("At all times including browsing product pages"));
 			case 'ALLOW_GUEST_CHECKOUT':
 				return array(1 => _sp("without registering (default)"),0 => _sp("only after creating an account"));
+			case 'AFTER_ADD_CART':
+				return array(0 => _sp("Stay on page"),1 => _sp("Redirect to Edit Cart page"));
 
 
 			case 'PRODUCTS_PER_ROW':
@@ -456,6 +473,12 @@ return array(
 
 		if (substr($this->key_name,0,8)=="FACEBOOK")
 			$this->exportFacebook();
+
+		if ($this->key_name=="SEO_URL_CATEGORIES")
+		{
+			Yii::app()->params['SEO_URL_CATEGORIES'] = $this->key_value;
+			Product::ConvertSEO();
+		}
 
 
 

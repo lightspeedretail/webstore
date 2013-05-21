@@ -18,7 +18,7 @@ class monerisAdminForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('label,store_id,api_token,ccv,avs,live,restrictcountry,ls_payment_method','required'),
+			array('label,store_id,api_token,ccv,live,restrictcountry,ls_payment_method','required'),
 		);
 	}
 
@@ -61,10 +61,10 @@ class monerisAdminForm extends CFormModel
 					'type'=>'dropdownlist',
 					'items'=>array('1'=>'Yes','0'=>'No'),
 				),
-				'avs'=>array(
-					'type'=>'dropdownlist',
-					'items'=>array('1'=>'Yes','0'=>'No'),
-				),
+//				'avs'=>array(
+//					'type'=>'dropdownlist',
+//					'items'=>array('1'=>'Yes','0'=>'No'),
+//				),
 				'live'=>array(
 					'type'=>'dropdownlist',
 					'items'=>array('live'=>'Live','test'=>'Sandbox'),

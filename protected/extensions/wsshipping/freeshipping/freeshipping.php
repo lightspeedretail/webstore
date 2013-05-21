@@ -12,7 +12,7 @@ class freeshipping extends WsShipping
 
 		$arrReturn = array();
 		//cause it's free
-		$desc = isset($config['offerservices']) ? $config['offerservices'] : Yii::t('global','Standard 3-5 Business Days');
+		$desc = isset($this->config['offerservices']) ? $this->config['offerservices'] : Yii::t('global','Standard 3-5 Business Days');
 		$arrReturn['price']=0;
 		$arrReturn['level']=$desc;
 		$arrReturn['label'] = $desc;
@@ -23,18 +23,6 @@ class freeshipping extends WsShipping
 	}
 
 
-	public function qualifies()
-	{
-		$config = $this->getConfigValues(get_class($this));
-
-		if ($this->objCart->subtotal < $config['rate']) {
-			$userMsg = _sp("Subtotal does not qualify for free shipping, you must purchase at least " . _xls_currency($config['rate']) . " worth of merchandise.");
-			return array('price' => -1, 'error' => $userMsg);
-
-		}
-
-
-	}
 
 	public function getThreshold()
 	{
@@ -56,110 +44,53 @@ class freeshipping extends WsShipping
 		if (strlen($this->config['enddate'])>0 && $this->config['enddate'] != "0000-00-00")
 			if ($this->config['enddate']<date("Y-m-d")) return false;
 
+		if ($this->threshold>0 && $this->objCart->subtotal<$this->threshold)
+			return false;
+
 		return parent::check();
 	}
 
-	public function install() {
+
+	public function syncPromoCode() {
 
 		$config = $this->getConfigValues(get_class($this));
-		//If there's a promo code entered from last time, is it one already in the table?
-		if (strlen($config['promocode'])>0)
-			$objPromoCode = PromoCode::LoadByCodeShipping($config['promocode']);
+		$strPromoCode=$config['promocode']; //Entered promo code
 
-		//If not, do we have one with the class name we need to update?
-		if (!$objPromoCode)
-			$objPromoCode = PromoCode::LoadByCodeShipping(get_class($this).":");
+		$objPromoCode = PromoCode::LoadByShipping(get_class($this));
 
 
 		if (!$objPromoCode) { //If we're this far without an object, create one
-			$objPromoCode = new PromoCode;
-			$objPromoCode->Lscodes = "shipping:,";
-			$objPromoCode->Except = 0;
-			$objPromoCode->Enabled = 1;
+			$objPromoCode = new PromoCode();
+			$objPromoCode->lscodes = "shipping:,";
+			$objPromoCode->exception = 0;
+			$objPromoCode->enabled = 1;
+			$objPromoCode->module = get_class($this);
 		}
 
-		$objPromoCode->Enabled=1;
-		$objPromoCode->Save();
-
-	}
-	public function remove() {
-
-		//When we're turning this module off, on our way out the door....
-		$config = $this->getConfigValues(get_class($this));
-		//If there's a promo code entered from last time, is it one already in the table?
-		if (strlen($config['promocode'])>0)
-			$objPromoCode = PromoCode::LoadByCodeShipping($config['promocode']);
-
-		//If not, do we have one with the class name we need to update?
-		if (!$objPromoCode)
-			$objPromoCode = PromoCode::LoadByCodeShipping(get_class($this).":");
-
-
-		if (!$objPromoCode) { //If we're this far without an object, create one
-			$objPromoCode = new PromoCode;
-			$objPromoCode->Lscodes = "shipping:,";
-			$objPromoCode->Except = 0;
-			$objPromoCode->Enabled = 1;
-		}
-
-		$objPromoCode->Enabled=0;
-		$objPromoCode->Save();
-	}
-
-	private function syncPromoCode($vals) {
-
-		$config = $this->getConfigValues(get_class($this));
-		$strPromoCode=$vals['promocode']->Text; //Entered promo code
-
-		//If there's a promo code entered from last time, is it one already in the table?
-		if (strlen($config['promocode'])>0)
-			$objPromoCode = PromoCode::LoadByCodeShipping($config['promocode']);
-
-		//If not, do we have one with the class name we need to update?
-		if (!$objPromoCode)
-			$objPromoCode = PromoCode::LoadByCodeShipping(get_class($this).":");
-
-
-		if (!$objPromoCode) { //If we're this far without an object, create one
-			$objPromoCode = new PromoCode;
-			$objPromoCode->Lscodes = "shipping:,";
-			$objPromoCode->Except = 0;
-			$objPromoCode->Enabled = 1;
-		}
 
 		//Sync any fields with the promo code table
-		if (strlen($vals['promocode']->Text)==0)
+		if (strlen($strPromoCode)==0)
 			$strPromoCode=get_class($this).":";
+		$objPromoCode->code = $strPromoCode;
+
+		$objPromoCode->valid_from =
+			isset($config['startdate']) && !empty($config['startdate']) ?  $config['startdate'] :  null;
+		$objPromoCode->valid_until =
+			isset($config['enddate']) && !empty($config['enddate']) ? $config['enddate'] :  null;
+
+		$objPromoCode->amount = 0;
+		$objPromoCode->type = PromoCodeType::Percent; //Needs to be 0% so UpdatePromoCode() returns valid test
+		$objPromoCode->threshold = ($config['rate'] == "" ? "0" : $config['rate']);
+		if ($config['qty_remaining']=='')
+			$objPromoCode->qty_remaining = -1;
 		else
-			$strPromoCode=$vals['promocode']->Text;
+			$objPromoCode->qty_remaining = $config['qty_remaining'];
 
-
-		$objPromoCode->ValidFrom = $vals['startdate']->Text;
-		$objPromoCode->ValidUntil = $vals['enddate']->Text;
-		$objPromoCode->Code = $strPromoCode;
-
-		$objPromoCode->Amount = 0;
-		$objPromoCode->Type = 1; //Needs to be 0% so UpdatePromoCode() returns valid test
-		$objPromoCode->Threshold = ($vals['rate']->Text == "" ? "0" : $vals['rate']->Text);
-		if ($vals['qty_remaining']->Text=='')
-			$objPromoCode->QtyRemaining = -1;
-		else
-			$objPromoCode->QtyRemaining = $vals['qty_remaining']->Text;
-
-		$objPromoCode->Save();
+		$objPromoCode->save();
 
 
 
 	}
 
-	public function __get($strName) {
-		switch ($strName) {
-			case 'Name':
-				return $this->name();
 
-			default:
-				return parent::__get($strName);
-
-		}
-	}
 }

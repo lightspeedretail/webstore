@@ -1,5 +1,4 @@
-<div class="span12 clickbar" onclick="$('#WishList').slideToggle('fast');"
-     xmlns="http://www.w3.org/1999/html"><?= Yii::t('global','Wish Lists'); ?></div>
+<div class="span12 clickbar" onclick="$('#WishList').slideToggle('fast');"><?= Yii::t('global','Wish Lists'); ?></div>
 
 <div class="containers" id="WishList" style="display:hidden;">
 	<?php

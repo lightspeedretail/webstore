@@ -68,11 +68,6 @@ class ProductController extends Controller
 		if ($model->request_url != Yii::app()->getRequest()->getQuery('name'))
 			_xls_301($model->Link);
 
-		if(!empty($model->image_id))
-			$strPrimaryImage = CHtml::image(Images::GetLink($model->image_id,ImagesType::pdetail));
-		else $strPrimaryImage='';
-
-
 		//Set breadcrumbs
 		$this->breadcrumbs = $model->Breadcrumbs;
 		$this->pageImageUrl = _xls_site_url($model->SmallImage,true);
@@ -94,11 +89,10 @@ class ProductController extends Controller
 		$this->setPageTitle($model->PageTitle);
 		$this->CanonicalUrl = $this->createAbsoluteUrl($model->Link);
 		$this->returnUrl = $this->CanonicalUrl;
-		$dataProvider = $model->GetSliderDataProvider();
+		$model->intQty=1;
 		$this->render('index',array(
 			'model'=>$model,
 			'WishlistAddForm'=>$objWishlistAddForm,
-			'dataProviderRelated'=>$dataProvider,
 		));
 
 	}

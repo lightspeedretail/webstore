@@ -161,6 +161,7 @@ class PaymentsController extends AdminBaseController
 		$model = new PromoCode();
 		$model->lscodes="freeshipping:";
 
+
 		$this->registerAsset("js/promoset.js");
 
 		$this->render("promocodes", array('model'=>$model));

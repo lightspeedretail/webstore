@@ -106,9 +106,7 @@ class Controller extends CController
 			Yii::app()->end();
 		}
 
-	//$this->menuwidget = $this->widget('application.extensions.wsmenu.wsmenu');
-
-		//$this->searchPnl=$this->renderPartial('search',array(),true);
+		Yii::app()->shoppingcart->UpdateMissingProducts();
 
 		//Run other functions to create some data we always need
 		$this->buildGoogle();

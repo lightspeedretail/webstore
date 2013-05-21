@@ -92,7 +92,7 @@ class Category extends BaseCategory
 				//unset($objItem);
 				# Append the child into result array and parse its children
 					$children = self::parseTree($objRet, $objItem->id);
-					if ($objItem->child_count>0 || is_array($children))
+					if ($objItem->child_count>0 || is_array($children) || Yii::app()->params['DISPLAY_EMPTY_CATEGORY'])
 						$return[] = array(
 						'text'=>CHtml::link($objItem->label,$objItem->Link),
 						'label' => $objItem->label,

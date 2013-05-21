@@ -32,7 +32,7 @@
     <h3>Customers</h3>
 	<div class="span8">
 	    <div class="editinstructions">
-			<?php echo Yii::t('admin','You can make adjustments to customer accounts here. Change the pricing level, or mark an account to have Administrator Access to Admin panel (use caution!).'); ?>
+			<?php echo Yii::t('admin','You can make adjustments to customer accounts here. View wishlists, or mark an account to have Administrator Access to Admin panel (use caution!).'); ?>
 	    </div>
     </div>
         <div class="clearfix search">

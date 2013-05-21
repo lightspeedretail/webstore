@@ -19,6 +19,7 @@ class InstallController extends Controller
 	
 	public function init() {
 
+		set_time_limit(300);
 		//We override init() to keep our system from trying to autoload stuff we haven't finished converting yet
 	}
 
@@ -33,7 +34,11 @@ class InstallController extends Controller
 	public function beforeAction($action)
 	{
 
-		if (strlen(_xls_get_conf('LSKEY'))>0 && $action->id != "exportconfig" && $action->id != "upgrade" && $action->id != "fixlink")
+		if (strlen(_xls_get_conf('LSKEY'))>0 &&
+			$action->id != "exportconfig" &&
+			$action->id != "upgrade" &&
+			$action->id != "fixlink" &&
+			$action->id != "migratephotos")
 		{
 			error_log("stopped because key was "._xls_get_conf('LSKEY')." on action ".$action->id);
 
@@ -86,17 +91,21 @@ class InstallController extends Controller
 
 		$this->online = _xls_number_only($_POST['online']);
 
-		if ($this->online==1) $retval = $this->actionConvertStepZero();
-		if ($this->online >=2 && $this->online<=17) $retval = $this->actionConvertStep1();
-		if ($this->online==18) $retval = $this->actionConvertStep2();
+		if ($this->online==1)                       $retval = $this->actionConvertStart();
+		if ($this->online >=2 && $this->online<=17) $retval = $this->actionConvertAddressBook();
+		if ($this->online==18)                      $retval = $this->actionConvertModules();
 		if ($this->online>=19 && $this->online<=23) $retval = $this->actionConvertGoogle();
-		if ($this->online==24) $retval = $this->actionConvertStep3();
-		if ($this->online==25) $retval = $this->actionConvertStep4();
-		if ($this->online==26) $retval = $this->actionConvertStep5();
-		if ($this->online==28) $retval = $this->actionConvertStep6();
-		if ($this->online==29) $retval = $this->actionConvertStep7();
-		if ($this->online>=32 && $this->online<=44) $retval = $this->actionConvertStep8();
-		if ($this->online==45) $retval = $this->actionConvertStep9();
+		if ($this->online==24)                      $retval = $this->actionConvertKeywordsToTags();
+		if ($this->online==25)                      $retval = $this->actionConvertFamilies();
+		if ($this->online==26)                      $retval = $this->actionConvertClasses();
+		if ($this->online==28)                      $retval = $this->actionConvertDestinationTables();
+		if ($this->online==29)                      $retval = $this->actionDropcartfields();
+		if ($this->online==30)                      $retval = $this->actionConvertProductSEO();
+		if ($this->online>=32 && $this->online<=44) $retval = $this->actionImportAmazon();
+		if ($this->online==45)                      $retval = $this->actionDropcustomerfields();
+		if ($this->online==46)                      $retval = $this->actionDropProductFields();
+		if ($this->online==47)                      $retval = $this->actionCalculateInventory();
+		if ($this->online==48)                      $retval = $this->actionUpdateConfiguration();
 
 
 		echo $retval;
@@ -107,8 +116,12 @@ class InstallController extends Controller
 	/**
 	 * Before we do anything else, write our config table to our params file for faster access
 	 */
-	protected function actionConvertStepZero()
+	protected function actionConvertStart()
 	{
+
+
+		Configuration::exportConfig();
+		Configuration::exportLogging();
 
 		return json_encode(array('result'=>"success",'makeline'=>2,'total'=>50));
 
@@ -117,7 +130,7 @@ class InstallController extends Controller
 	/**
 	 * Extract shipping and billing address information, create address book and map to the carts
 	 */
-	protected function actionConvertStep1()
+	protected function actionConvertAddressBook()
 	{
 
 		$sql = "select * from xlsws_cart where billaddress_id IS NULL and address_bill IS NOT NULL order by id limit 500";
@@ -380,7 +393,7 @@ class InstallController extends Controller
 	/**
 	 * Rename modules, load google
 	 */
-	protected function actionConvertStep2()
+	protected function actionConvertModules()
 	{
 		//Change country to ID instead of text string based on xlsws_countries
 		$strCountry = _xls_get_conf('DEFAULT_COUNTRY');
@@ -573,8 +586,11 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 	}
 
 
-
-	protected function actionConvertStep3()
+	/**
+	 * 24: Convert the keyword columns into the new tags table
+	 * @return string
+	 */
+	protected function actionConvertKeywordsToTags()
 	{
 
 
@@ -618,10 +634,10 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 	}
 
 	/**
-	 * Convert families into Ids and attach
+	 * 25: Convert families into Ids and attach
 	 * @return string
 	 */
-	protected function actionConvertStep4()
+	protected function actionConvertFamilies()
 	{
 		//families
 		$sql = "insert ignore into xlsws_family (family) select distinct family from xlsws_product where coalesce(family,'')<>'' order by family";
@@ -639,10 +655,10 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 	}
 
 	/**
-	 * Convert classes into Ids and attach
+	 * 26 Convert classes into Ids and attach
 	 * @return string
 	 */
-	public function actionConvertStep5()
+	public function actionConvertClasses()
 	{
 		//class
 		$sql = "insert ignore into xlsws_classes (class_name) select distinct class_name from xlsws_product where coalesce(class_name,'')<>'' order by class_name";
@@ -658,9 +674,9 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 
 	/**
-	 * Change destination tables and map to country/state ids
+	 * 28 Change destination tables and map to country/state ids
 	 */
-	protected function actionConvertStep6()
+	protected function actionConvertDestinationTables()
 	{
 		//Convert Wish List items to new formats
 		//Ship to me
@@ -705,9 +721,9 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 	}
 
 	/**
-	 * Drop fields no longer needed
+	 * 29 Drop fields no longer needed
 	 */
-	protected function actionConvertStep7()
+	protected function actionDropCartfields()
 	{
 
 		$sqlstrings = "ALTER TABLE `xlsws_cart` DROP `first_name`;
@@ -742,43 +758,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		ALTER TABLE `xlsws_cart` DROP `tracking_number`;
 		ALTER TABLE `xlsws_cart` DROP `email`;
 		ALTER TABLE `xlsws_cart` DROP `cost_total`;
-		ALTER TABLE `xlsws_cart` DROP `sell_total`;
-
-		ALTER TABLE `xlsws_customer` DROP `address1_1`;
-		ALTER TABLE `xlsws_customer` DROP `address1_2`;
-		ALTER TABLE `xlsws_customer` DROP `address2_1`;
-		ALTER TABLE `xlsws_customer` DROP `address_2_2`;
-		ALTER TABLE `xlsws_customer` DROP `city1`;
-		ALTER TABLE `xlsws_customer` DROP `city2`;
-		ALTER TABLE `xlsws_customer` DROP `country1`;
-		ALTER TABLE `xlsws_customer` DROP `country2`;
-		ALTER TABLE `xlsws_customer` DROP `homepage`;
-		ALTER TABLE `xlsws_customer` DROP `phone1`;
-		ALTER TABLE `xlsws_customer` DROP `phonetype1`;
-		ALTER TABLE `xlsws_customer` DROP `phone2`;
-		ALTER TABLE `xlsws_customer` DROP `phonetype2`;
-		ALTER TABLE `xlsws_customer` DROP `phone3`;
-		ALTER TABLE `xlsws_customer` DROP `phonetype3`;
-		ALTER TABLE `xlsws_customer` DROP `phone4`;
-		ALTER TABLE `xlsws_customer` DROP `phonetype4`;
-		ALTER TABLE `xlsws_customer` DROP `state1`;
-		ALTER TABLE `xlsws_customer` DROP `state2`;
-		ALTER TABLE `xlsws_customer` DROP `zip1`;
-		ALTER TABLE `xlsws_customer` DROP `zip2`;
-		ALTER TABLE `xlsws_customer` DROP `mainname`;
-
-		ALTER TABLE `xlsws_product` DROP `family`;
-		ALTER TABLE `xlsws_product` DROP `class_name`;
-		ALTER TABLE `xlsws_product` DROP `web_keyword1`;
-		ALTER TABLE `xlsws_product` DROP `web_keyword2`;
-		ALTER TABLE `xlsws_product` DROP `web_keyword3`;
-		ALTER TABLE `xlsws_product` DROP `meta_desc`;
-		ALTER TABLE `xlsws_product` DROP `meta_keyword`;
-		ALTER TABLE `xlsws_wishlist_item` DROP `registry_status`;
-
-		ALTER TABLE `xlsws_wishlist_item` ADD CONSTRAINT `xlsws_wishlist_item_ibfk_1` FOREIGN KEY (`registry_id`) REFERENCES `xlsws_wishlist` (`id`);
-
-		DROP TABLE `xlsws_gift_registry_receipents`;";
+		ALTER TABLE `xlsws_cart` DROP `sell_total`;";
 
 		$arrSql = explode(";",$sqlstrings);
 
@@ -788,16 +768,41 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 
 
-		return json_encode(array('result'=>"success",'makeline'=>32,'tag'=>'Installing Amazon categories (group 1 of 14)','total'=>50));
+		return json_encode(array('result'=>"success",'makeline'=>30,'tag'=>'Creating SEO-friendly URLs','total'=>50));
 
 	}
 
 
 	/**
-	 * load amazon, 24 files starts at online 32
+	 * 30 Create request_urls and export any photos (from pre 2.5 installs)
+	 */
+	public function actionConvertProductSEO()
+	{
+		//First, run our request_url creation if needed
+		Product::ConvertSEO(-1);
+		Category::ConvertSEO();
+
+		$matches=Yii::app()->db->createCommand('SELECT count(*) FROM '.Product::model()->tableName().' WHERE request_url IS NULL AND title is not null')->queryScalar();
+		if ($matches>0)
+			return json_encode(array('result'=>"success",'makeline'=>30,'tag'=>'Creating SEO-friendly URLs '.$matches.' remaining','total'=>50));
+		else
+		{
+			//Getting ready for photo convert, drop any orphaned images with blobs
+			_dbx("delete a from xlsws_images as a left join xlsws_product as b on a.id=b.image_id where image_path is null and a.id=a.parent and b.id is null;");
+			echo json_encode(array('result'=>"success",'makeline'=>32,'tag'=>'Installing Amazon categories (group 1 of 14)','total'=>50));
+
+		}
+
+
+	}
+
+
+
+	/**
+	 * 32-44 load amazon, 24 files
 	 * @return string
 	 */
-	protected function actionConvertStep8()
+	protected function actionImportAmazon()
 	{
 
 		$arr = array();
@@ -855,11 +860,108 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		return json_encode(array('result'=>"success",'makeline'=>$this->online,'tag'=>'Installing Amazon categories (group '.($this->online-31)." of 14)", 'total'=>50));
 	}
 
+
 	/**
-	 * Cleanup details, config options that have changed, NULL where we had 0's, etc.
+	 * 45 Drop unused customer fields
 	 * @return string
 	 */
-	protected function actionConvertStep9()
+	protected function actionDropcustomerfields()
+	{
+
+		$sqlstrings =
+		"ALTER TABLE `xlsws_customer` DROP `address1_1`;
+		ALTER TABLE `xlsws_customer` DROP `address1_2`;
+		ALTER TABLE `xlsws_customer` DROP `address2_1`;
+		ALTER TABLE `xlsws_customer` DROP `address_2_2`;
+		ALTER TABLE `xlsws_customer` DROP `city1`;
+		ALTER TABLE `xlsws_customer` DROP `city2`;
+		ALTER TABLE `xlsws_customer` DROP `country1`;
+		ALTER TABLE `xlsws_customer` DROP `country2`;
+		ALTER TABLE `xlsws_customer` DROP `homepage`;
+		ALTER TABLE `xlsws_customer` DROP `phone1`;
+		ALTER TABLE `xlsws_customer` DROP `phonetype1`;
+		ALTER TABLE `xlsws_customer` DROP `phone2`;
+		ALTER TABLE `xlsws_customer` DROP `phonetype2`;
+		ALTER TABLE `xlsws_customer` DROP `phone3`;
+		ALTER TABLE `xlsws_customer` DROP `phonetype3`;
+		ALTER TABLE `xlsws_customer` DROP `phone4`;
+		ALTER TABLE `xlsws_customer` DROP `phonetype4`;
+		ALTER TABLE `xlsws_customer` DROP `state1`;
+		ALTER TABLE `xlsws_customer` DROP `state2`;
+		ALTER TABLE `xlsws_customer` DROP `zip1`;
+		ALTER TABLE `xlsws_customer` DROP `zip2`;
+		ALTER TABLE `xlsws_customer` DROP `mainname`;";
+
+		$arrSql = explode(";",$sqlstrings);
+
+		foreach ($arrSql as $strSql)
+			if (!empty($strSql))
+				Yii::app()->db->createCommand($strSql)->execute();
+
+
+
+		return json_encode(array('result'=>"success",'makeline'=>46,'tag'=>'Removing unused database fields','total'=>50));
+
+	}
+
+
+	/**
+	 * 46 Drop product fields
+	 * @return string
+	 */
+	protected function actionDropProductFields()
+	{
+
+		$sqlstrings = "ALTER TABLE `xlsws_product` DROP `family`;
+		ALTER TABLE `xlsws_product` DROP `class_name`;
+		ALTER TABLE `xlsws_product` DROP `web_keyword1`;
+		ALTER TABLE `xlsws_product` DROP `web_keyword2`;
+		ALTER TABLE `xlsws_product` DROP `web_keyword3`;
+		ALTER TABLE `xlsws_product` DROP `meta_desc`;
+		ALTER TABLE `xlsws_product` DROP `meta_keyword`;
+		ALTER TABLE `xlsws_wishlist_item` DROP `registry_status`;
+
+		ALTER TABLE `xlsws_wishlist_item` ADD CONSTRAINT `xlsws_wishlist_item_ibfk_1` FOREIGN KEY (`registry_id`) REFERENCES `xlsws_wishlist` (`id`);";
+
+		$arrSql = explode(";",$sqlstrings);
+
+		foreach ($arrSql as $strSql)
+			if (!empty($strSql))
+				Yii::app()->db->createCommand($strSql)->execute();
+
+
+
+		return json_encode(array('result'=>"success",'makeline'=>47,'tag'=>'Calculating available inventory','total'=>50));
+
+	}
+
+	/**
+	 * 47 Create request_urls and export any photos (from pre 2.5 installs)
+	 */
+	public function actionCalculateInventory()
+	{
+		//First, run our request_url creation if needed
+		$matches = Product::RecalculateInventory();
+
+		if ($matches>0)
+			return json_encode(array('result'=>"success",'makeline'=>47,'tag'=>'Calculating available inventory '.$matches.' products remaining','total'=>50));
+		else
+		{
+			return json_encode(array('result'=>"success",'makeline'=>48,'tag'=>'Final cleanup','total'=>50));
+
+		}
+
+
+	}
+
+
+
+
+	/**
+	 * 48 Cleanup details, config options that have changed, NULL where we had 0's, etc.
+	 * @return string
+	 */
+	protected function actionUpdateConfiguration()
 	{
 
 
@@ -896,6 +998,8 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 		_dbx("update xlsws_wishlist_item set cart_item_id=null where cart_item_id=0;");
 		_dbx("update xlsws_wishlist_item set purchased_by=null where purchased_by=0;");
+		_dbx("update xlsws_wishlist set visibility=".Wishlist::PERSONALLIST);
+		_dbx("ALTER TABLE `xlsws_wishlist` DROP `registry_password`;");
 		_dbx("update xlsws_promo_code set valid_from=null where valid_from='0000-00-00';");
 		_dbx("update xlsws_promo_code set valid_until=null where valid_until='0000-00-00';");
 		_dbx("delete from xlsws_configuration where `key_name`='PHONE_TYPES';");
@@ -924,7 +1028,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		_dbx("update xlsws_configuration set sort_order=sort_order+8 where configuration_type_id=19");
 		_dbx("update xlsws_configuration set `key_name`='THEME',title='Site Theme',options='THEME',
 			configuration_type_id=0,sort_order=2,param=0 where `key_name`='DEFAULT_TEMPLATE'");
-		_dbx("update xlsws_configuration set `key_name`='CHILD_THEME',title='Theme color scheme',
+		_dbx("update xlsws_configuration set `key_name`='CHILD_THEME',title='Theme {color} scheme',
 			options='CHILD_THEME',sort_order=3,param=0,configuration_type_id=0 where `key_name`='DEFAULT_TEMPLATE_THEME'");
 		_dbx("INSERT INTO `xlsws_configuration`
 			(`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `options`, `template_specific`, `param`, `required`)
@@ -950,12 +1054,13 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		_dbx("UPDATE `xlsws_configuration` SET `key_value`='300' where `key_name`='DATABASE_SCHEMA_VERSION'");
 		_dbx("UPDATE `xlsws_customer` SET `pricing_level`=1 where pricing_level is null");
 
-		_dbx("INSERT INTO `xlsws_modules` (`active`, `module`, `category`, `version`, `name`, `sort_order`,
-				`configuration`, `modified`, `created`)
+		_dbx("INSERT INTO `xlsws_modules` (`active`, `module`, `category`, `version`, `name`, `sort_order`,	`configuration`, `modified`, `created`)
 				VALUES (1, 'wsamazon', 'CEventProduct,CEventPhoto,CEventOrder', 1, 'Amazon MWS', 2, NULL, '2013-04-04 11:34:38', NULL);");
-
 		return json_encode(array('result'=>"success",'makeline'=>50,'total'=>50));
 
 	}
+
+
+
 
 }

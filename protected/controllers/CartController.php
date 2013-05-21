@@ -422,11 +422,6 @@ class CartController extends Controller
 	public function actionCheckout()
 	{
 
-
-		Yii::app()->clientScript->registerScriptFile(
-			Yii::app()->baseUrl.'/js/checkout.js'
-		);
-
 		//We shouldn't be in this controller if we don't have any products in our cart
 		if (!Yii::app()->shoppingcart->itemCount)
 		{
@@ -876,18 +871,27 @@ class CartController extends Controller
 			$objPaymentModule = Modules::model()->findByPk($model->paymentProvider);
 			if ($objPaymentModule instanceof Modules)
 			{
-				$subForm = Yii::app()->getComponent($objPaymentModule->module)->subform;
-				if(isset($subForm))
-					if (isset($_POST[$subForm]))
-					{
-						$paymentForms[$objPaymentModule->id]->attributes = $_POST[$subForm];
-						$paymentForms[$objPaymentModule->id]->validate();
-					}
+				$objModule = Yii::app()->getComponent($objPaymentModule->module);
+				if (!$objModule)
+				{
+					Yii::log("Error missing module ".$objPaymentModule->module, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+					$model->paymentProvider=null;
+				}
+				else
+				{
+					$subForm = $objModule->subform;
+					if(isset($subForm))
+						if (isset($_POST[$subForm]))
+						{
+							$paymentForms[$objPaymentModule->id]->attributes = $_POST[$subForm];
+							$paymentForms[$objPaymentModule->id]->validate();
+						}
 
-				Yii::app()->clientScript->registerScript('payment',
-					'$(document).ready(function(){
-						changePayment(\''.$objPaymentModule->id.'\')
-					    });');
+					Yii::app()->clientScript->registerScript('payment',
+						'$(document).ready(function(){
+							changePayment(\''.$objPaymentModule->id.'\')
+						    });');
+				}
 			} else $model->paymentProvider=null;
 		}
 
@@ -1101,7 +1105,7 @@ class CartController extends Controller
 		if (_xls_get_conf('EMAIL_SEND_STORE',0)==1) {
 			$strHtmlBody =$this->renderPartial('/mail/_customerreceipt', array('cart'=>$objCart), true);
 			$strSubject = _xls_format_email_subject(
-				'EMAIL_SUBJECT_CUSTOMER',$objCart->customer->first_name.' '.$objCart->customer->last_name,
+				'EMAIL_SUBJECT_OWNER',$objCart->customer->first_name.' '.$objCart->customer->last_name,
 				$objCart->id_str
 			);
 
@@ -1399,6 +1403,7 @@ class CartController extends Controller
 		//}
 
 	}
+
 
 	/**
 	 * Called by AJAX function from checkout for Calculate Shipping. Builds a grid of shipping scenarios including
