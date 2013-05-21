@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<?= _xls_get_conf('LANG_CODE', 'en') ?>">
+<html lang="<?= Yii::app()->language ?>">
 <head>
     <title><?php echo CHtml::encode(_xls_get_conf('STORE_NAME')); ?></title>
 

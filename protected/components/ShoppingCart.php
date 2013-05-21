@@ -56,10 +56,14 @@ class ShoppingCart extends CApplicationComponent
 				if (!is_null($intCustomerid))
 					$objCart = Cart::LoadLastCartInProgress($intCustomerid);
 				if (is_null($objCart))
+					$objCart = new Cart();
+
+				//Logged in customers get a "real" cart
+				if(is_null($objCart) && !is_null($intCustomerid))
+				{
 					$objCart = Cart::InitializeCart();
-
-				Yii::app()->user->setState('cartid',$objCart->id);
-
+					Yii::app()->user->setState('cartid',$objCart->id);
+				}
 
 			} else {
 
@@ -67,9 +71,7 @@ class ShoppingCart extends CApplicationComponent
 				if (!$objCart) {
 					//something has happened to the database object
 					Yii::log("Could not find cart ".$intCartId.", creating new one.", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-					//unset(Yii::app()->session['cartid']);
 					$objCart = Cart::InitializeCart();
-					//Yii::app()->session['cartid'] = $objCart->id;
 					Yii::app()->user->setState('cartid',$objCart->id);
 				}
 
@@ -78,6 +80,34 @@ class ShoppingCart extends CApplicationComponent
 			$this->_model = $objCart;
 		}
 		return $this->_model;
+	}
+
+
+	/**
+	 * Since calling our model doesn't necessarily really create a db record (to avoid blank carts all over the place),
+	 * this function purposely creates a record when we need one (i.e. when adding a product to the cart)
+	 */
+	protected function createCart()
+	{
+		$intCartId = Yii::app()->user->getState('cartid');
+
+		if(empty($intCartId)) {
+
+			$objCustomer = Customer::GetCurrent();
+			$intCustomerid = null;
+
+			if ($objCustomer instanceof Customer)
+				$intCustomerid = $objCustomer->id;
+
+			$objCart = null;
+			if (!is_null($intCustomerid))
+				$objCart = Cart::LoadLastCartInProgress($intCustomerid);
+			if (is_null($objCart))
+				$objCart = Cart::InitializeCart();
+
+			$this->_model = $objCart;
+			Yii::app()->user->setState('cartid',$objCart->id);
+		}
 	}
 
 	public function getIsActive()
@@ -105,7 +135,8 @@ class ShoppingCart extends CApplicationComponent
 			$arrPastItems = $objCartInProgress->cartItems;
 
 			//Merge in any new items we had in our cart from this session
-			if (count($arrPastItems)>0) {
+			if (count($arrPastItems)>0)
+			{
 				foreach($arrPastItems as $objItem) {
 					$objProduct = Product::model()->findbyPk($objItem->product_id);
 					$this->model->AddToCart($objProduct,$objItem->qty,$objItem->description,
@@ -117,6 +148,7 @@ class ShoppingCart extends CApplicationComponent
 					Yii::app()->user->setFlash('success',Yii::t('cart','Your prior cart has been restored.'));
 					$objCartInProgress->delete();
 				}
+				$this->model->UpdateMissingProducts();
 			}
 
 		}
@@ -245,11 +277,17 @@ class ShoppingCart extends CApplicationComponent
 	 */
 	public function addProduct($mixProduct,$intQuantity = 1,$intGiftItemId = null, $auto=null)
 	{
+		$cartid=Yii::app()->user->getState('cartid');
+		if (empty($cartid))
+			$this->createCart();
 
 		if ($mixProduct instanceof Product)
 			$objProduct = $mixProduct;
 		else
 			$objProduct = Product::model()->findByPk($mixProduct);
+
+		if(!(_xls_get_conf('QTY_FRACTION_PURCHASE')))
+			$intQuantity = intval($intQuantity);
 
 		if ($objProduct instanceof Product)
 		{
@@ -287,9 +325,16 @@ class ShoppingCart extends CApplicationComponent
 	 */
 	public function save()
 	{
-		return $this->model->save();
+		$retVal = $this->model->save();
+		if (!$retVal)
+			Yii::log("Error saving cart ".print_r($this->model->getErrors()), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		return $retVal;
 	}
 
+	public function getErrors()
+	{
+		return $this->model->getErrors();
+	}
 	/**
 	 * Create a Link to view the cart after checkout. Used for receipt viewing.
 	 * @return mixed
@@ -325,6 +370,16 @@ class ShoppingCart extends CApplicationComponent
 
 		return true;
 	}
+
+
+	public function UpdateMissingProducts()
+	{
+
+		if( Yii::app()->user->getState('cartid')>0)
+			$this->model->UpdateMissingProducts();
+
+	}
+
 
 	/**
 	 * Disassociate the cart with the current session. Should be done after payment
@@ -484,6 +539,11 @@ class ShoppingCart extends CApplicationComponent
 			case 'tax_total':
 			case 'TaxTotal':
 				return $this->model->TaxTotal;
+
+			case 'subtotal':
+				if (empty($this->model->subtotal))
+					return 0;
+			else return $this->model->subtotal;
 
 			case 'Taxes':
 				return $this->model->Taxes;

@@ -122,6 +122,16 @@ class AdminBaseController extends CController
 		{
 			if ($item->options=="BOOL") $this->registerOnOff($item->id,"Configuration_{$i}_key_value",$item->key_value);
 			if ($item->options=="PASSWORD") $model[$i]->key_value=_xls_decrypt($model[$i]->key_value);
+			$model[$i]->title = Yii::t('global',$item->title,
+				array(
+					'{color}'=>_xls_regionalize('color'),
+					'{check}'=>_xls_regionalize('check'),
+				));
+			$model[$i]->helper_text = Yii::t('global',$item->helper_text,
+				array(
+					'{color}'=>_xls_regionalize('color'),
+					'{check}'=>_xls_regionalize('check'),
+				));
 		}
 
 
@@ -166,10 +176,13 @@ class AdminBaseController extends CController
 
 
 						//If we happen to be updating a module that includes a promo code, we need to throw that to our restrictions
-						if (isset($model->promocode) && !empty($model->promocode))
-							$strPromoCode = $model->promocode;
-						else $strPromoCode = $id.":";
-						PromoCode::model()->updateAll(array('code'=>$strPromoCode),'module=:module',array(':module'=>$id));
+						if (isset($model->promocode))
+							Yii::app()->getComponent($id)->syncPromoCode();
+//						&& !empty($model->promocode))
+//							$strPromoCode = $model->promocode;
+//						else $strPromoCode = $id.":";
+//						$formDefinition = $model->getAdminForm();
+//						PromoCode::model()->updateAll(array('code'=>$strPromoCode),'module=:module',array(':module'=>$id));
 
 						$this->updateMenuAfterEdit($id);
 

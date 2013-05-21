@@ -159,7 +159,7 @@ class usps extends WsShipping
 		asort($rates);
 		$arrServices = array();
 		foreach($rates as $desc=>$returnval) {
-			$arrReturn['price']=floatval($returnval)+ floatval($config['markup']);
+			$arrReturn['price']=floatval($returnval);
 			$arrReturn['level']=$desc;
 			$arrReturn['label'] = $desc;
 

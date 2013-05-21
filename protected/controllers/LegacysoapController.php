@@ -493,10 +493,8 @@ class LegacySoapController extends Controller
 				// Now save the product
 				try {
 
-					$objProduct->inventory_reserved=$objProduct->CalculateReservedInventory();
-					$objProduct->inventory_avail=$objProduct->Inventory;
 					$objProduct->save();
-
+					$objProduct->SetAvailableInventory();
 					//Create event
 					$objEvent = new CEventProduct('LegacysoapController','onUpdateInventory',$objProduct);
 					_xls_raise_events('CEventProduct',$objEvent);
@@ -674,10 +672,6 @@ class LegacySoapController extends Controller
 		$objProduct->web = $blnOnWeb;
 		$objProduct->featured = $blnFeatured;
 
-		$objProduct->request_url =
-			_xls_seo_url(_xls_get_conf('SEO_URL_CODES' , 0) ?
-				_xls_parse_language($strName)."-".$strCode : _xls_parse_language($strName));
-
 
 
 		$fltReserved = $objProduct->CalculateReservedInventory();
@@ -794,6 +788,9 @@ class LegacySoapController extends Controller
 			}
 
 		}
+
+		Product::ConvertSEO($intRowid); //Build request_url
+
 
 		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=1;')->execute();
 
@@ -2029,13 +2026,7 @@ class LegacySoapController extends Controller
 		if ($objCart instanceof Cart)
 			$objDocument->cart_id = $objCart->id;
 
-//		$objDocument->Email = $strEmail;
-//		$objDocument->Phone = _xls_number_only($strPhone);
-//		$objDocument->ShippingSell = $fltShippingSell;
-//		$objDocument->ShippingCost = $fltShippingCost;
-//
 		$objDocument->status = $strStatus;
-		//$objDocument->Zipcode = $strZipcode;
 
 		if (!$objDocument->save())
 		{
@@ -2046,6 +2037,11 @@ class LegacySoapController extends Controller
 			$objCart->document_id = $objDocument->id;
 			$objCart->save();
 		}
+
+		if (substr($strId,0,3)=="WO-")
+			Configuration::SetHighestWO();
+
+
 
 		return self::OK;
 	}
@@ -2098,12 +2094,7 @@ class LegacySoapController extends Controller
 		if (!$retVal)
 			return self::UNKNOWN_ERROR;
 
-		$objProduct->inventory_reserved=$objProduct->CalculateReservedInventory();
-		//Since $objProduct->Inventory isn't the real inventory column, it's a calculation,
-		//just pass it to the Avail so we have it for queries elsewhere
-		$objProduct->inventory_avail=$objProduct->Inventory;
-		$objProduct->save();
-
+		$objProduct->SetAvailableInventory();
 
 		return self::OK;
 	}

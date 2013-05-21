@@ -17,7 +17,7 @@ class storepickup extends WsShipping
 	{
 
 
-		$price = isset($this->config['markup']) ? $this->config['markup'] : 0;
+		$price = 0;
 		$desc = isset($this->config['offerservices']) ? $this->config['offerservices'] : Yii::t('global','Available during normal business hours');
 		$ret[$desc] = $price;
 

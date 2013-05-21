@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="<?= _xls_get_conf('LANG_CODE', 'en-US') ?>">
+<html lang="<?= Yii::app()->language ?>">
 	<!-- <head> section -->
 	<?php echo $this->renderPartial("/site/_head",null,true,false); ?>
 
 	<body>
-		<?php $this->widget('ext.blueprintgrid.JBlueprintGrid'); ?>
 		<?php echo $this->sharingHeader; ?>
 		<div id="container" class="container-fluid text-center">
 
@@ -25,8 +24,6 @@
 		<?php echo $this->sharingFooter; ?>
 
 		<?php echo $this->loginDialog; ?>
-
-		<?php $this->widget('ext.blueprintgrid.JBlueprintGrid'); ?>
 
 	</body>
 </html>

@@ -270,7 +270,7 @@ class ups extends WsShipping
 		$this->customerclassification = $this->config['customerclassification'];
 		$this->pickuptype = $this->config['ratecode'];
 		$this->currency = $this->objCart->currency;
-
+		$this->residential = ($this->CheckoutForm->shippingResidential==1 ? 1 : 0);
 		$weight = $this->objCart->Weight;
 		$this->weight_type = strtoupper(_xls_get_conf('WEIGHT_UNIT', 'lb'));
 		$this->weight_type .= "S"; // Add KGS or LBS
@@ -428,8 +428,6 @@ class ups extends WsShipping
 		$this->t_state= $this->CheckoutForm->shippingState;
 		$this->t_country = $this->CheckoutForm->shippingCountry;
 		$this->weight = $this->objCart->Weight;
-		$this->residential=$this->residential;
-		$this->package_type=$this->package_type;
 		$this->l = $this->objCart->Length;
 		$this->w = $this->objCart->Width;
 		$this->h = $this->objCart->Height;
@@ -449,8 +447,7 @@ class ups extends WsShipping
 		$retval = array();
 
 		foreach($oXML->RatedShipment as $key=>$val)
-			if(array_key_exists((string)$val->Service->Code,$this->my_service_types))
-				$retval[$this->my_service_types[''.$val->Service->Code]] = floatval($val->TotalCharges->MonetaryValue);
+				$retval[''.$val->Service->Code] = floatval($val->TotalCharges->MonetaryValue);
 
 		return $retval;
 	}

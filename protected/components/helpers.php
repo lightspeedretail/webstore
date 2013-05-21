@@ -54,6 +54,22 @@ function _xls_site_url($strUrlPath =  '') {
 	return _xls_site_dir($usessl) . '/' . $strUrlPath;
 }
 
+function _xls_regionalize($str)
+{
+	$c = Yii::app()->params['DEFAULT_COUNTRY'];
+	switch ($str)
+	{
+		case 'color':
+			if ($c==224) return 'color'; else return 'colour';
+
+		case 'check':
+			if ($c==224) return 'check'; else return 'cheque';
+
+		default:
+			return $str;
+	}
+}
+
 /**
  * Return the Base URL for the site
  * Also perform http/https conversion if need be.
@@ -134,7 +150,7 @@ function _xls_raise_events($strEvent,$objEvent)
 
 	//Raise events
 	foreach ($objModules as $objModule) {
-		Yii::log('Running event '.$objEvent->onAction.' '.$objModule->module, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+		Yii::log('Running event '.$strEvent.' '.$objModule->module, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 		$objModule->instanceHandle->raiseEvent($objEvent->onAction,$objEvent);
 	}
 }

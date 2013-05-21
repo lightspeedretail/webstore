@@ -231,18 +231,20 @@ class Cart extends BaseCart
 			return $intIdStr;
 	}
 
-	public function GetCartNextIdStr() {
+	public function GetCartNextIdStr($blnUseDb = true) {
 
 		if (!is_null($this->id_str)) return $this->id_str;
 
 		$strNextId = _xls_get_conf('NEXT_ORDER_ID', false);
 
-		if ($strNextId) {
+		if ($blnUseDb && $strNextId) {
 			$intNextId = preg_replace("/[^0-9]/", "", $strNextId);
 			return 'WO-' . $intNextId;
 		}
 		else {
 			$intLastId = preg_replace("/[^0-9]/", "", Cart::GetCartLastIdStr());
+			$intDocLastId = preg_replace("/[^0-9]/", "", Document::GetCartLastIdStr());
+			if ($intDocLastId >$intLastId) $intLastId= $intDocLastId;
 			$intNextId = intval($intLastId) + 1;
 			$strNextId = 'WO-' . $intNextId;
 			return $strNextId;
@@ -363,13 +365,14 @@ class Cart extends BaseCart
 	 * Update Cart by removing Products which no longer exist or are unavailable
 	 */
 	public function UpdateMissingProducts() {
+
 		$blnResult=false;
 		foreach ($this->cartItems as $objItem) {
 
 			if (!$objItem->product || $objItem->product->web != 1) {
-				CartMessages::CreateMessage($this->id,
+				Yii::app()->user->setFlash('warning',
 					Yii::t('cart','The product {product} is no longer available on this site and has been removed from your cart.',
-						array('{product}'=>$objItem->description)));
+						array('{product}'=>"<strong>".$objItem->description."</strong>")));
 				$objItem->delete();
 				$blnResult = true;
 			}
@@ -378,17 +381,17 @@ class Cart extends BaseCart
 			if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) != 2) { //IOW, unless we allow backordering
 				if ($objItem->product->inventoried) {
 					if ($objItem->product->Inventory==0) {
-						CartMessages::CreateMessage($this->id,
+						Yii::app()->user->setFlash('warning',
 							Yii::t('cart','The product {product} is now out of stock and has been removed from your cart.',
-								array('{product}'=>$objItem->description)));
+								array('{product}'=>"<strong>".$objItem->description."</strong>")));
 						$objItem->delete();
 						$blnResult = true;
 
 					}
 					elseif ($objItem->qty > $objItem->product->Inventory) {
-						CartMessages::CreateMessage($this->id,
+						Yii::app()->user->setFlash('warning',
 							Yii::t('cart','The product {product} now has less stock available than the amount you requested. Your cart quantity has been reduced to match what is available.',
-								array('{product}'=>$objItem->description)));
+								array('{product}'=>"<strong>".$objItem->description."</strong>")));
 						$objItem->qty=$objItem->product->Inventory;
 						$objItem->save();
 						$blnResult = true;
@@ -1219,6 +1222,12 @@ class Cart extends BaseCart
 					return $this->taxCode->code;
 				else
 					return '';
+
+			case 'payment':
+				if (isset($this->payment))
+					return parent::__get($strName);
+				else
+					return new CartPayment();
 
 			case 'Taxes':
 				$arrTaxes = Tax::model()->findAll(array('order'=>'id'));

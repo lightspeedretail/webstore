@@ -81,6 +81,8 @@ class SystemController extends AdminBaseController
 			case self::PROCESSORS:
 				return "<P>For advanced use, this page can be used to augment or replace certain Web Store functionality with external processors. Third-party extensions can be designed to be displayed among these options. See our development documentation for details.</p>";
 
+			case self::SECURITY:
+				return "Note that Enabling SSL will not work before you have actually ordered and installed your SSL certificate. Turning this option on without the certificate actually installed on your site will cause Web Store to be non-functional.";
 
 			default:
 				return null;

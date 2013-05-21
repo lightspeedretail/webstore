@@ -91,13 +91,15 @@ class MyaccountController extends Controller
 				}
 
 				if ($model->scenario=="create") $model->record_type = Customer::NORMAL_USER;
-				if (!$model->save()) {
+				if (!$model->save())
+				{
 					//Put plain text passwords back for form refresh
 					$model->password = $strPassword;
 					$model->password_repeat = $strPassword;
 					Yii::log("Error creating new user ".print_r($model->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				}
-				else {
+				else
+				{
 
 					if (Yii::app()->user->isGuest)
 					{
@@ -196,8 +198,9 @@ class MyaccountController extends Controller
 
 	protected function triggerEmailCampaign($objCustomer,$strTrigger)
 	{
+		
 		$objEvent = new CEventCustomer('MyAccountController',$strTrigger,$objCustomer);
-		_xls_raise_events($strTrigger,$objEvent);
+		_xls_raise_events('CEventCustomer',$objEvent);
 
 
 	}

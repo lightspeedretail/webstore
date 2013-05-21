@@ -1,5 +1,6 @@
 <?php
 set_time_limit(300);
+define('VERSION',"3.0.0");
 define('DBARRAY_NUM', MYSQL_NUM);define('DBARRAY_ASSOC', MYSQL_ASSOC);define('DBARRAY_BOTH', MYSQL_BOTH);if (!defined('DB_EXPLAIN')) { define('DB_EXPLAIN', false);}if (!defined('DB_QUERIES')) { define('DB_QUERIES', false);}
 
 
@@ -45,6 +46,38 @@ switch ($step)
 	break;
 
 }
+
+function xls_check_file_signatures($complete = false)
+{
+	$checked = array();
+	$checked['<b>--File Signatures Check for ' . _xls_version() . '--</b>'] = "pass";
+
+	include("protected/modules/admin/signatures.php");
+
+	$fn = unserialize($signatures);
+	if (!isset($signatures)) {
+		$checked['Signature File in /includes'] = "fail";
+	}
+
+	foreach ($fn as $key => $value) {
+
+		if (!file_exists($key)) {
+			$checked[$key] = "MISSING";
+		} else {
+			$hashes = explode(",", $value);
+			$hashfile = md5_file($key);
+			if (!in_array($hashfile, $hashes)) {
+				$checked[$key] = "modified";
+			} elseif (_xls_version() != $versions[array_search($hashfile, $hashes)] || $complete) {
+				$checked[$key] = $versions[array_search($hashfile, $hashes)];
+			}
+		}
+
+
+	}
+	return $checked;
+}
+
 function makeHtaccess()
 {
 	//Update Rewrite Base in htaccess
@@ -101,7 +134,7 @@ function makeSymbolicLink()
 }
 function  _xls_version()
 {
-	return "3.0.0";
+	return VERSION;
 }
 
 function displayForm()
@@ -202,7 +235,7 @@ function displayNotAcceptable($checkenv)
 		//For 2.1.x upgrade, have the upgrades been run?
 		if ($_SERVER['REQUEST_URI'] ==  "/install.php?check") {
 			//$checkenv = array_merge($checkenv, xls_check_upgrades());
-			//$checkenv = array_merge($checkenv, xls_check_file_signatures());
+			$checkenv = array_merge($checkenv, xls_check_file_signatures());
 		}
 
 	} else {
@@ -299,7 +332,7 @@ function displayFormTwo()
 						    document.getElementById('stats').innerHTML = obj.tag;
 					    else document.getElementById('stats').innerHTML = "";
 					    <?php if(isset($_GET['debug'])): ?>
-						    document.getElementById('stats').innerHTML = "online "+online + " total "+obj.total + " perc " + perc;
+						    document.getElementById('stats').innerHTML = "Running line "+online + " of " + obj.total + " (" + perc + "%)";
 					    <?php endif; ?>
 					    if (online==obj.total) {
 						    clearInterval(pinttimer);
@@ -530,6 +563,7 @@ class DB_Class {
 				$this->schemaNumber=$res[0]['id'];
 			else $this->schemaNumber=0;
 		} else $this->schemaNumber=0;
+
 
 	}
 
@@ -795,6 +829,7 @@ function runInstall($db,$sqlline = 0)
 			zipAndFolders();
 			if ($upgrade) $db->changedb('old');
 			if ($upgrade) if ($db->schemaNumber<217) up217($db);
+			$tag = "Applying pre-3.0 changes. Line #".$sqlline;
 			
 		case 3:
 		case 4:
@@ -806,19 +841,24 @@ function runInstall($db,$sqlline = 0)
 		case 10:
 			if ($upgrade) $db->changedb('old');
 			if ($upgrade) if ($db->schemaNumber==217) up250($db,$sqlline);
+			$tag = "Applying pre-3.0 changes. Line #".$sqlline;
 			break;
 		case 11:
 			if ($upgrade) $db->changedb('old');
 			if ($upgrade) if ($db->schemaNumber==250) up251($db);
+			$tag = "Applying pre-3.0 changes. Line #".$sqlline;
 			break;
 		case 12:
 			if ($upgrade) $db->changedb('old');
 			if ($upgrade) if ($db->schemaNumber==251) up252($db);
+			$tag = "Creating new tables. Line #".$sqlline;
 			break;
 
 		case 13:
 			$db->changedb('new');
 			initialCreateTables($db); //Create all tables at once
+			if (!$upgrade)
+				initialConfigLoad($db);
 			break;
 
 		default:
@@ -834,11 +874,13 @@ function runInstall($db,$sqlline = 0)
 				$db->query('SET NAMES utf8');
 				$db->query('SET FOREIGN_KEY_CHECKS=0');
 				$db->query($sqlStringtoRun);
+				if ($sqlline<28) $tag = "Creating tables";
+				if ($sqlline>=28 && $sqlline<=75) $tag = "Processing images table";
+
 			}
 
 			if ($sqlline==$total && !$upgrade)
 			{
-				initialConfigLoad($db);
 				initialDataLoad($db);
 			}
 
@@ -848,12 +890,15 @@ function runInstall($db,$sqlline = 0)
 				makeHtaccess();
 				makeSymbolicLink();
 				installMainConfig();
+				$tag = "Halfway there, stand by...";
 			}
 
 	}
 
 
-	return json_encode(array('result'=>"success",'line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
+	if (isset($tag))
+		return json_encode(array('result'=>"success",'line'=>$sqlline,'tag'=>$tag,'total'=>$total,'upgrade'=>$upgrade));
+		else return json_encode(array('result'=>"success",'line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
 
 }
 
@@ -1243,42 +1288,6 @@ function initialCreateTables($db)
 	engine=innodb
 	DEFAULT charset=utf8;
 
-	CREATE TABLE `{newdbname}`.`xlsws_gift_registry_receipents`
-	  (
-	     `rowid`           INT(11) NOT NULL auto_increment,
-	     `registry_id`     INT(11) NOT NULL,
-	     `customer_id`     INT(11) DEFAULT NULL,
-	     `receipent_name`  VARCHAR(100) NOT NULL,
-	     `receipent_email` VARCHAR(100) NOT NULL,
-	     `email_sent`      TINYINT(1) DEFAULT '0',
-	     `created`         DATETIME NOT NULL,
-	     `modified`        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	     PRIMARY KEY (`rowid`),
-	     KEY `registry_id` (`registry_id`),
-	     KEY `customer_id` (`customer_id`)
-	  )
-	engine=innodb
-	DEFAULT charset=utf8;
-
-	CREATE TABLE `{newdbname}`.`xlsws_images`
-	  (
-	     `rowid`      BIGINT(20) unsigned NOT NULL auto_increment,
-	     `image_path` VARCHAR(255) DEFAULT NULL,
-	     `image_data` MEDIUMBLOB,
-	     `width`      MEDIUMINT(9) DEFAULT NULL,
-	     `height`     MEDIUMINT(9) DEFAULT NULL,
-	     `checksum`   VARCHAR(32) DEFAULT NULL,
-	     `parent`     BIGINT(20) DEFAULT NULL,
-	     `index` int(11) DEFAULT NULL,
-  		 `product_id` bigint(20) unsigned DEFAULT NULL,
-	     `created`    DATETIME NOT NULL,
-	     `modified`   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	     PRIMARY KEY (`rowid`),
-	     UNIQUE KEY `width` (`width`, `height`, `parent`),
-	     KEY `parent` (`parent`)
-	  )
-	engine=innodb
-	DEFAULT charset=utf8;
 
 	CREATE TABLE `{newdbname}`.`xlsws_modules`
 	  (
@@ -1350,6 +1359,26 @@ function initialCreateTables($db)
 	engine=innodb
 	DEFAULT charset=utf8;
 
+	CREATE TABLE `{newdbname}`.`xlsws_images`
+	  (
+	     `id`      BIGINT(20) unsigned NOT NULL auto_increment,
+	     `image_path` VARCHAR(255) DEFAULT NULL,
+	     `width`      MEDIUMINT(9) DEFAULT NULL,
+	     `height`     MEDIUMINT(9) DEFAULT NULL,
+	     `parent`     BIGINT(20) DEFAULT NULL,
+	     `index` int(11) DEFAULT NULL,
+  		 `product_id` bigint(20) unsigned DEFAULT NULL,
+	     `created`    DATETIME NOT NULL,
+	     `modified`   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	     PRIMARY KEY (`id`),
+	     UNIQUE KEY `width` (`width`, `height`, `parent`),
+	     KEY `index` (`index`),
+	     KEY `product_id` (`product_id`),
+	     KEY `image_path` (`image_path`),
+	     KEY `parent` (`parent`)
+	  )
+	engine=innodb
+	DEFAULT charset=utf8;
 
 	CREATE TABLE `{newdbname}`.`xlsws_product_category_assn`
 	  (
@@ -1593,10 +1622,6 @@ function initialMigrateTables()
 	SELECT *
 	FROM   `{olddbname}`.`xlsws_gift_registry_items`;
 
-	INSERT INTO `{newdbname}`.`xlsws_gift_registry_receipents`
-	SELECT *
-	FROM   `{olddbname}`.`xlsws_gift_registry_receipents`;
-
 	INSERT INTO `{newdbname}`.`xlsws_modules`
 	SELECT *
 	FROM   `{olddbname}`.`xlsws_modules`;
@@ -1617,26 +1642,34 @@ function initialMigrateTables()
 	SELECT *
 	FROM   `{olddbname}`.`xlsws_product_related`;
 
-	INSERT INTO `{newdbname}`.`xlsws_images` (rowid,image_path,width,height,checksum,parent,created,modified) SELECT rowid,image_path,width,height,checksum,parent,created,modified FROM `{olddbname}`.`xlsws_images`;
+	INSERT INTO `{newdbname}`.`xlsws_images` (id,image_path,width,height,parent,created,modified) SELECT rowid,image_path,width,height,parent,created,modified FROM `{olddbname}`.`xlsws_images`;
 
-	update `{newdbname}`.`xlsws_images` as a left join `{newdbname}`.`xlsws_product` as b on b.image_id=a.rowid set a.product_id=b.rowid;
+	update `{newdbname}`.`xlsws_images` as a left join `{newdbname}`.`xlsws_product` as b on b.image_id=a.id set a.product_id=b.rowid;
 
-	update `{newdbname}`.`xlsws_images` as a left join `{newdbname}`.`xlsws_images` as b on b.rowid=a.parent set a.product_id=b.product_id where a.rowid<>a.parent;
+	update `{newdbname}`.`xlsws_images` as a left join `{newdbname}`.`xlsws_images` as b on b.id=a.parent set a.product_id=b.product_id where a.id<>a.parent;
 
 	UPDATE `{newdbname}`.`xlsws_images` set `index`=0 where product_id IS NOT NULL;
 
-	update `{newdbname}`.`xlsws_images` as a left join `{olddbname}`.`xlsws_product_image_assn` as b on b.image_id=a.rowid set a.product_id=b.product_id where a.product_id is null and b.product_id is not null;
 
-	update `{newdbname}`.`xlsws_images` as a left join `{newdbname}`.`xlsws_images` as b on b.rowid=a.parent set a.product_id=b.product_id where a.rowid<>a.parent and a.product_id is null;
+	update `{newdbname}`.`xlsws_images` as a left join `{olddbname}`.`xlsws_product_image_assn` as b on b.image_id=a.id set a.product_id=b.product_id where a.product_id is null and b.product_id is not null;
 
-	update `{newdbname}`.`xlsws_images` set `index`=1 where `index` is null and image_path like '%-add.%';
-	update `{newdbname}`.`xlsws_images` set `index`=1 where `index` is null and image_path like '%-add-%';
-	update `{newdbname}`.`xlsws_images` set `index`=2 where `index` is null and image_path like '%-add-1.%';
-	update `{newdbname}`.`xlsws_images` set `index`=2 where `index` is null and image_path like '%-add-1-%';
-	update `{newdbname}`.`xlsws_images` set `index`=3 where `index` is null and image_path like '%-add-2.%';
-	update `{newdbname}`.`xlsws_images` set `index`=3 where `index` is null and image_path like '%-add-2-%';
-	update `{newdbname}`.`xlsws_images` set `index`=4 where `index` is null and image_path like '%-add-3.%';
-	update `{newdbname}`.`xlsws_images` set `index`=4 where `index` is null and image_path like '%-add-3-%';
+	update `{newdbname}`.`xlsws_images` as a left join `{newdbname}`.`xlsws_images` as b on b.id=a.parent set a.product_id=b.product_id where a.id<>a.parent and a.product_id is null;
+
+	update `{newdbname}`.`xlsws_images` set `index`=4 where `index` is null and image_path is not null and image_path like '%_3_add.%';
+	update `{newdbname}`.`xlsws_images` set `index`=4 where `index` is null and image_path is not null and image_path like '%-add-3.%';
+	update `{newdbname}`.`xlsws_images` set `index`=4 where `index` is null and image_path is not null and image_path like '%-add-3-%';
+	update `{newdbname}`.`xlsws_images` set `index`=4 where `index` is null and image_path is not null and image_path like '%_2_add.%';
+	update `{newdbname}`.`xlsws_images` set `index`=3 where `index` is null and image_path is not null and image_path like '%-add-2.%';
+	update `{newdbname}`.`xlsws_images` set `index`=3 where `index` is null and image_path is not null and image_path like '%-add-2-%';
+	update `{newdbname}`.`xlsws_images` set `index`=2 where `index` is null and image_path is not null and image_path like '%_1_add.%';
+	update `{newdbname}`.`xlsws_images` set `index`=2 where `index` is null and image_path is not null and image_path like '%-add-1.%';
+	update `{newdbname}`.`xlsws_images` set `index`=2 where `index` is null and image_path is not null and image_path like '%-add-1-%';
+	update `{newdbname}`.`xlsws_images` set `index`=1 where `index` is null and image_path is not null and image_path like '%_add.%';
+	update `{newdbname}`.`xlsws_images` set `index`=1 where `index` is null and image_path is not null and image_path like '%-add.%';
+	update `{newdbname}`.`xlsws_images` set `index`=1 where `index` is null and image_path is not null and image_path like '%-add-%';
+
+
+
 
 	INSERT INTO `{newdbname}`.`xlsws_promo_code`
 	SELECT *
@@ -1688,8 +1721,6 @@ function migrateTwoFiveToThree()
 	alter table {newdbname}.xlsws_family CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
 	alter table {newdbname}.xlsws_gift_registry CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
 	alter table {newdbname}.xlsws_gift_registry_items CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_gift_registry_receipents CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_images CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
 	alter table {newdbname}.xlsws_modules CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
 	alter table {newdbname}.xlsws_product CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
 	alter table {newdbname}.xlsws_product_qty_pricing CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
@@ -1734,11 +1765,6 @@ function migrateTwoFiveToThree()
 	ALTER TABLE `{newdbname}`.`xlsws_product` CHANGE `image_id` `image_id` BIGINT(20) unsigned NULL;
 	ALTER TABLE `{newdbname}`.`xlsws_promo_code` CHANGE `except` `exception` TINYINT(1)  NOT NULL  DEFAULT '0';
 	ALTER TABLE `{newdbname}`.`xlsws_tax` CHANGE `max` `max_tax` DOUBLE  NULL  DEFAULT '0';
-	ALTER TABLE `{newdbname}`.`xlsws_images` DROP `image_data`;
-	ALTER TABLE `{newdbname}`.`xlsws_images` DROP `checksum`;
-
-	ALTER TABLE `{newdbname}`.`xlsws_images` ADD INDEX (`product_id`);
-	ALTER TABLE `{newdbname}`.`xlsws_images` ADD INDEX (`index`);
 
 	ALTER TABLE `{newdbname}`.`xlsws_state` ADD `country_id` INT  UNSIGNED  NULL  DEFAULT NULL  AFTER `id`;
 
@@ -1939,16 +1965,18 @@ function migrateTwoFiveToThree()
 
 
 	CREATE TABLE IF NOT EXISTS `{newdbname}`.`xlsws_stringsource` (
-	  `id` int(11) NOT NULL auto_increment,
-	  `category` varchar(32) default NULL,
-	  `message` text,
-	  PRIMARY KEY  (`id`)
+	  `id` int(11) NOT NULL AUTO_INCREMENT,
+	  `category` varchar(32) DEFAULT NULL,
+	  `message` varchar(1024) DEFAULT '',
+	  PRIMARY KEY (`id`),
+	  KEY `category` (`category`),
+	  KEY `message` (`message`(255))
 	) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 	CREATE TABLE IF NOT EXISTS `{newdbname}`.`xlsws_stringtranslate` (
 	  `id` int(11) NOT NULL,
 	  `language` varchar(16) NOT NULL default '',
-	  `translation` text,
+	  `translation` varchar(1024),
 	  PRIMARY KEY  (`id`,`language`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -2121,7 +2149,7 @@ function migrateTwoFiveToThree()
 	ALTER TABLE `{newdbname}`.`xlsws_customer` ADD `email_verified` INT  NULL  DEFAULT NULL  AFTER `email`;
 
 
-
+	ALTER TABLE `{newdbname}`.`xlsws_images` ADD FOREIGN KEY (`product_id`) REFERENCES `xlsws_product` (`id`);
 
 	ALTER TABLE `{newdbname}`.`xlsws_cart` MODIFY COLUMN `first_name` VARCHAR(64) DEFAULT NULL AFTER `id_str`;
 	ALTER TABLE `{newdbname}`.`xlsws_cart` MODIFY COLUMN `last_name` VARCHAR(64) DEFAULT NULL AFTER `first_name`;
@@ -2144,7 +2172,6 @@ function migrateTwoFiveToThree()
 	ALTER TABLE `{newdbname}`.`xlsws_cart` ADD CONSTRAINT `fk_shiprecord` FOREIGN KEY (`shipping_id`) REFERENCES `xlsws_cart_shipping` (`id`);
 	ALTER TABLE `{newdbname}`.`xlsws_cart` ADD CONSTRAINT `fk_payrecord` FOREIGN KEY (`payment_id`) REFERENCES `xlsws_cart_payment` (`id`);
 	ALTER TABLE `{newdbname}`.`xlsws_cart` DROP `discount`;
-	ALTER TABLE `{newdbname}`.`xlsws_images` ADD FOREIGN KEY (`product_id`) REFERENCES `xlsws_product` (`id`);
 	ALTER TABLE `{newdbname}`.`xlsws_customer` ADD `default_billing_id` BIGINT(20) UNSIGNED  NULL  DEFAULT NULL  AFTER `company`;
 	ALTER TABLE `{newdbname}`.`xlsws_customer` ADD `default_shipping_id` BIGINT(20) UNSIGNED NULL  DEFAULT NULL  AFTER `default_billing_id`;
 	ALTER TABLE `{newdbname}`.`xlsws_customer` ADD FOREIGN KEY (`default_billing_id`) REFERENCES `xlsws_customer_address` (`id`);
@@ -2280,10 +2307,11 @@ function migrateTwoFiveToThree()
 
 	ALTER TABLE `xlsws_category` CHANGE `meta_keywords` `google_extra` VARCHAR(255)  NULL  DEFAULT NULL;
 	ALTER TABLE `xlsws_modules` ADD `version` INT  NULL  DEFAULT NULL  AFTER `category`;
-	INSERT INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`)
+	INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`)
 	VALUES
-		('Share Cart Email Subject Line', 'EMAIL_SUBJECT_CART', '{storename} Cart for {customername}', 'Configure Email Subject line with variables for Customer Email', 24, 10, '2012-08-28 14:07:09', '2012-08-28 14:07:09', NULL, 0, 1),
-		('Wishlist Email Subject Line', 'EMAIL_SUBJECT_WISHLIST', '{storename} Wishlist for {customername}', 'Configure Email Subject line with variables for Customer Email', 24, 10, '2012-08-28 14:07:09', '2012-08-28 14:07:09', NULL, 0, 1);
+		('Share Cart Email Subject Line', 'EMAIL_SUBJECT_CART', '{storename} Cart for {customername}', 'Configure Email Subject line with variables for Customer Email', 24, 10, '2012-08-28 14:07:09', '2012-08-28 14:07:09', NULL, 0, 1);
+	INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`)
+	VALUES	('Wishlist Email Subject Line', 'EMAIL_SUBJECT_WISHLIST', '{storename} Wishlist for {customername}', 'Configure Email Subject line with variables for Customer Email', 24, 10, '2012-08-28 14:07:09', '2012-08-28 14:07:09', NULL, 0, 1);
 	ALTER TABLE `xlsws_configuration` CHANGE `helper_text` `helper_text` VARCHAR(255)  CHARACTER SET utf8  COLLATE utf8_general_ci  NULL  DEFAULT '';
 
 	ALTER TABLE `xlsws_cart` CHANGE `linkid` `linkid` VARCHAR(64)  NULL  DEFAULT NULL;
@@ -2298,7 +2326,7 @@ function migrateTwoFiveToThree()
 	UPDATE `xlsws_configuration` SET `helper_text` = '' WHERE `key_name` = 'EMAIL_SEND_CUSTOMER';
 	UPDATE `xlsws_configuration` SET `helper_text` = 'Email store on every order' WHERE `key_name` = 'EMAIL_SEND_STORE';
 	UPDATE `xlsws_configuration` SET `helper_text` = '' WHERE `key_name` = 'STORE_NAME';
-	INSERT INTO `xlsws_configuration` (`id`, `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`) VALUES (NULL, 'System Logging', 'DEBUG_LOGGING', 'error', '', '1', '21', '2013-02-07 11:13:36', '2012-03-08 09:57:38', 'LOGGING', '0', '1');
+	INSERT IGNORE INTO `xlsws_configuration` (`id`, `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`) VALUES (NULL, 'System Logging', 'DEBUG_LOGGING', 'error', '', '1', '21', '2013-02-07 11:13:36', '2012-03-08 09:57:38', 'LOGGING', '0', '1');
 	UPDATE `xlsws_configuration` SET `configuration_type_id` = '25', `sort_order` = '3' WHERE `key_name` = 'WEIGHT_UNIT';
 	UPDATE `xlsws_configuration` SET `configuration_type_id` = '25', `sort_order` = '4' WHERE `key_name` = 'DIMENSION_UNIT';
 	UPDATE `xlsws_configuration` SET `configuration_type_id` = '25', `sort_order` = '5' WHERE `key_name` = 'SHIPPING_TAXABLE';
@@ -2325,24 +2353,23 @@ function migrateTwoFiveToThree()
 	update xlsws_configuration set `key_value`='brooklyn' where `key_name`='DEFAULT_TEMPLATE';
 	update xlsws_configuration set `title`='Non-inventoried Item Display Message' where `key_name`='INVENTORY_NON_TITLE';
 
-	INSERT INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`) VALUES ('Photo Processor', 'CEventPhoto', 'wsphoto', 'Component that handles photos', '28', '1', CURRENT_TIMESTAMP, NULL, 'CEventPhoto', '0', '1');
-	INSERT INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`) VALUES ('Recommendation Processor', 'PROCESSOR_RECOMMEND', 'wsrecommend', 'Component that handles additional product recommendations', '28', '2', CURRENT_TIMESTAMP,NULL,  'PROCESSOR_RECOMMEND', '0', '1');
-	INSERT INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`) VALUES ('Menu Processor', 'PROCESSOR_MENU', 'wsmenu', 'Component that handles menu display', '28', '2', CURRENT_TIMESTAMP, NULL, 'PROCESSOR_MENU', '0', '1');
-	INSERT INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`) VALUES ('Language Menu shows', 'PROCESSOR_LANGMENU', 'wslanglinks', 'Component that handles language menu display', '15', '2', CURRENT_TIMESTAMP, NULL, 'PROCESSOR_LANGMENU', '0', '1');
-	INSERT INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`) VALUES ('Delivery Speed format', 'SHIPPING_FORMAT', '{label} ({price})', 'Formatting for Delivery Speed. The variables {label} and {price} can be used.', '25', '5', CURRENT_TIMESTAMP, NULL, NULL, '0', '1');
-	INSERT INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`) VALUES ('Products Per Row', 'PRODUCTS_PER_ROW', '3', 'Products per row on grid. (Note this number must be divisible evenly into 12. That\'s why \'5\' is missing.)', '8', '3', CURRENT_TIMESTAMP, NULL, 'PRODUCTS_PER_ROW', '0', '1');
+	INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`) VALUES ('Photo Processor', 'CEventPhoto', 'wsphoto', 'Component that handles photos', '28', '1', CURRENT_TIMESTAMP, NULL, 'CEventPhoto', '0', '1');
+	INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`) VALUES ('Menu Processor', 'PROCESSOR_MENU', 'wsmenu', 'Component that handles menu display', '28', '2', CURRENT_TIMESTAMP, NULL, 'PROCESSOR_MENU', '0', '1');
+	INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`) VALUES ('Language Menu shows', 'PROCESSOR_LANGMENU', 'wslanglinks', 'Component that handles language menu display', '15', '2', CURRENT_TIMESTAMP, NULL, 'PROCESSOR_LANGMENU', '0', '1');
+	INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`) VALUES ('Delivery Speed format', 'SHIPPING_FORMAT', '{label} ({price})', 'Formatting for Delivery Speed. The variables {label} and {price} can be used.', '25', '5', CURRENT_TIMESTAMP, NULL, NULL, '0', '1');
+	INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`) VALUES ('Products Per Row', 'PRODUCTS_PER_ROW', '3', 'Products per row on grid. (Note this number must be divisible evenly into 12. That\'s why \'5\' is missing.)', '8', '3', CURRENT_TIMESTAMP, NULL, 'PRODUCTS_PER_ROW', '0', '1');
 	ALTER TABLE `xlsws_configuration` ADD `required` INT  NULL  DEFAULT NULL  AFTER `param`;
-	INSERT INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `options`, `template_specific`, `param`, `required`)
+	INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `options`, `template_specific`, `param`, `required`)
 VALUES ('Home page', 'HOME_PAGE', '*products', 'Home page viewers should first see', 19, 4, 'HOME_PAGE', 0, 1, NULL);
-INSERT INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `options`, `template_specific`, `param`, `required`)
+INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `options`, `template_specific`, `param`, `required`)
 VALUES ('Use Short Description', 'USE_SHORT_DESC', 1, 'Home page viewers should first see', 19, 5, 'BOOL', 0, 1, NULL);
 	ALTER TABLE `xlsws_customer` ADD INDEX (`facebook`);
-INSERT INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES ('Facebook Secret Key', 'FACEBOOK_SECRET', '', 'Secret Key found with your App ID', 26, 2, CURRENT_TIMESTAMP, NULL, NULL, 0, 0, NULL);
-INSERT INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES ('Show Facebook Comments on Product details', 'FACEBOOK_COMMENTS', 0, '', 26, 3, CURRENT_TIMESTAMP, NULL, 'BOOL', 0, 0, NULL);
-INSERT INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES ('Show Post to Wall after checkout', 'FACEBOOK_CHECKOUT', 0, '', 26, 4, CURRENT_TIMESTAMP, NULL, 'BOOL', 0, 0, NULL);
-INSERT INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES ('Share to Wall Caption', 'FACEBOOK_WALL_CAPTION', 'I found some great deals at {storename}!', '', 26, 5, CURRENT_TIMESTAMP, NULL, NULL, 0, 0, NULL);
-INSERT INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES ('Share to Wall Button', 'FACEBOOK_WALL_PUBLISH', 'Post to your wall', '', 26, 7, CURRENT_TIMESTAMP, NULL, NULL, 0, 0, NULL);
-INSERT INTO `xlsws_modules` (`active`, `module`, `category`, `version`, `name`, `sort_order`, `configuration`, `modified`, `created`)
+INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES ('Facebook Secret Key', 'FACEBOOK_SECRET', '', 'Secret Key found with your App ID', 26, 2, CURRENT_TIMESTAMP, NULL, NULL, 0, 0, NULL);
+INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES ('Show Facebook Comments on Product details', 'FACEBOOK_COMMENTS', 0, '', 26, 3, CURRENT_TIMESTAMP, NULL, 'BOOL', 0, 0, NULL);
+INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES ('Show Post to Wall after checkout', 'FACEBOOK_CHECKOUT', 0, '', 26, 4, CURRENT_TIMESTAMP, NULL, 'BOOL', 0, 0, NULL);
+INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES ('Share to Wall Caption', 'FACEBOOK_WALL_CAPTION', 'I found some great deals at {storename}!', '', 26, 5, CURRENT_TIMESTAMP, NULL, NULL, 0, 0, NULL);
+INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES ('Share to Wall Button', 'FACEBOOK_WALL_PUBLISH', 'Post to your wall', '', 26, 7, CURRENT_TIMESTAMP, NULL, NULL, 0, 0, NULL);
+INSERT IGNORE INTO `xlsws_modules` (`active`, `module`, `category`, `version`, `name`, `sort_order`, `configuration`, `modified`, `created`)
 VALUES (1, 'wsphoto', 'CEventPhoto', 1, 'Web Store Internal', 1, NULL, NULL, NULL);
 DELETE FROM `xlsws_configuration` where `key_name`='PRODUCT_ENLARGE_SHOW_LIGHTBOX';
 DELETE FROM `xlsws_configuration` where `key_name`='DEBUG_DELETE_DUPES';
@@ -2351,12 +2378,13 @@ DELETE FROM `xlsws_configuration` where `key_name`='DB_BACKUP_FOLDER';
 DELETE FROM `xlsws_configuration` where `key_name`='DEBUG_TEMPLATE';
 DELETE FROM `xlsws_configuration` where `key_name`='HTML_EMAIL';
 DELETE FROM `xlsws_configuration` where `key_name`='SESSION_HANDLER';
-INSERT INTO `xlsws_configuration` ( `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES ('Jpg Image Quality (1 to 100)', 'IMAGE_QUALITY', '75', 'Compression for JPG images', '17', '15', CURRENT_TIMESTAMP, NULL, NULL, '0', '1', '1');
-INSERT INTO `xlsws_configuration` ( `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES ('Jpg Sharpen (1 to 50)', 'IMAGE_SHARPEN', '25', 'Sharpening for JPG images', '17', '16', CURRENT_TIMESTAMP, NULL, NULL, '0', '1', '1');
-INSERT INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES ('Image Background Color Fill', 'IMAGE_BACKGROUND', '#FFFFFF', 'Optional image background color (#HEX)', 17, 20, CURRENT_TIMESTAMP, NULL, NULL, 1, 1, 0);
+INSERT IGNORE INTO `xlsws_configuration` ( `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES ('Jpg Image Quality (1 to 100)', 'IMAGE_QUALITY', '75', 'Compression for JPG images', '17', '15', CURRENT_TIMESTAMP, NULL, NULL, '0', '1', '1');
+INSERT IGNORE INTO `xlsws_configuration` ( `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES ('Jpg Sharpen (1 to 50)', 'IMAGE_SHARPEN', '25', 'Sharpening for JPG images', '17', '16', CURRENT_TIMESTAMP, NULL, NULL, '0', '1', '1');
+INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES ('Image Background {color} Fill', 'IMAGE_BACKGROUND', '#FFFFFF', 'Optional image background color (#HEX)', 17, 20, CURRENT_TIMESTAMP, NULL, NULL, 1, 1, 0);
 ALTER TABLE `xlsws_cart` CHANGE `ip_host` `origin` VARCHAR(255)  CHARACTER SET utf8  COLLATE utf8_general_ci  NULL  DEFAULT NULL;
-INSERT INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `options`, `template_specific`, `param`, `required`)
-VALUES ('Installed', 'INSTALLED', 0, '', 0, 0, 'BOOL', 0, 1, NULL);
+INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `options`, `template_specific`, `param`, `required`) VALUES ('Installed', 'INSTALLED', 0, '', 0, 0, 'BOOL', 0, 1, NULL);
+INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `options`, `template_specific`, `param`, `required`) VALUES ('Use Categories in Product URLs', 'SEO_URL_CATEGORIES', 0, 'This will include the Category path when creating the SEO formatted URLs.',21,2, 'BOOL', 0, 1, NULL);
+INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES ('Use Quantity Entry Blank', 'SHOW_QTY_ENTRY', '0', 'If enabled, show freeform qty entry for Add To Cart', '19', '12', CURRENT_TIMESTAMP, NULL, 'BOOL', '1', '1', NULL);
 UPDATE xlsws_configuration set key_value='dark' where key_value='webstore-dark' AND key_name='DEFAULT_TEMPLATE_THEME';
 UPDATE xlsws_configuration set key_value='light' where key_value='webstore-light' AND key_name='DEFAULT_TEMPLATE_THEME';
 UPDATE xlsws_configuration set key_value='Hurry, only {qty} left in stock!' where key_name='INVENTORY_LOW_TITLE';
@@ -2365,6 +2393,13 @@ DELETE FROM xlsws_configuration where key_name='INVENTORY_DISPLAY_LEVEL';
 UPDATE xlsws_configuration set title='Display Inventory on Product Details' where key_name='INVENTORY_DISPLAY';
 UPDATE xlsws_configuration set title='Authorized IPs For LightSpeed uploading (USE WITH CAUTION)',helper_text='List of IP Addresses (comma separated) which are allowed to upload products and download orders. NOTE: DO NOT USE THIS OPTION IF YOU DO NOT HAVE A STATIC IP ADDRESS' where key_name='LSAUTH_IPS';
 DELETE FROM `xlsws_configuration` where `key_name`='DEFAULT_EXPIRY_GIFT_REGISTRY';
+UPDATE xlsws_configuration set title='Update {color} options',helper_text='Enable this option to have the {color} drop-down menu populated on each size change.' where key_name='ENABLE_COLOR_FILTER';
+UPDATE xlsws_configuration set title='Product {color} Label',helper_text='Rename {color} Option of LightSpeed to this' where key_name='PRODUCT_COLOR_LABEL';
+UPDATE xlsws_configuration set title='Image Background {color} Fill',helper_text='Optional image background {color} (#HEX)' where key_name='IMAGE_BACKGROUND';
+UPDATE xlsws_configuration set configuration_type_id=29 where key_name like '%IMAGE_WIDTH';
+UPDATE xlsws_configuration set configuration_type_id=29 where key_name like '%IMAGE_HEIGHT';
+UPDATE xlsws_modules set category='theme' where category='template';
+INSERT IGNORE INTO `xlsws_configuration` (`id`, `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES (NULL, 'After adding item to cart', 'AFTER_ADD_CART', '0', 'What should site do after shopper adds item to cart', '4', '5', '2009-04-06 10:34:34', '2009-04-06 10:34:34', 'AFTER_ADD_CART', '0', '1', NULL);
 
 	SET FOREIGN_KEY_CHECKS=1";
 }
@@ -2403,14 +2438,14 @@ function initialConfigLoad($db)
 	$db->add_config_key("INVENTORY_FIELD_TOTAL","Inventory should include Virtual Warehouses",0,"If selected yes, the inventory figure shown will be that of  available, reserved and inventory in warehouses. If no, only that of available in store will be shown",11,3,"BOOL");
 	$db->add_config_key("INVENTORY_NON_TITLE","Non-inventoried Item Display Message","Available on request","Title to be shown for products that are not normally stocked",11,9,"");
 	$db->add_config_key("SHIP_RESTRICT_DESTINATION","Only Ship To Defined Destinations",0,"If selected yes, web shopper can only choose addresses in defined Destinations. See Destinations for more information",25,1,"BOOL");
-	$db->add_config_key("LISTING_IMAGE_WIDTH","Product Grid image width",180,"Product Listing Image Width. Comes in search or category listing page",17,1,"INT");
-	$db->add_config_key("LISTING_IMAGE_HEIGHT","Product Grid image height",190,"Product Listing Image Height. Comes in search or category listing page",17,2,"INT");
-	$db->add_config_key("DETAIL_IMAGE_WIDTH","Product Detail Image Width",256,"Product Detail Page Image Width. When the product is being viewed in the product detail page.",17,5,"INT");
-	$db->add_config_key("DETAIL_IMAGE_HEIGHT","Product Detail Image Width",256,"Product Detail Page Image Height. When the product is being viewed in the product detail page.",17,6,"INT");
+	$db->add_config_key("LISTING_IMAGE_WIDTH","Product Grid image width",180,"Product Listing Image Width. Comes in search or category listing page",29,1,"INT");
+	$db->add_config_key("LISTING_IMAGE_HEIGHT","Product Grid image height",190,"Product Listing Image Height. Comes in search or category listing page",29,2,"INT");
+	$db->add_config_key("DETAIL_IMAGE_WIDTH","Product Detail Image Width",256,"Product Detail Page Image Width. When the product is being viewed in the product detail page.",29,5,"INT");
+	$db->add_config_key("DETAIL_IMAGE_HEIGHT","Product Detail Image Width",256,"Product Detail Page Image Height. When the product is being viewed in the product detail page.",29,6,"INT");
 	$db->add_config_key("PRODUCT_SIZE_LABEL","Product Size Label","Size","Rename Size Option of LightSpeed to this",8,2,NULL);
 	$db->add_config_key("PRODUCT_COLOR_LABEL","Product Color Label","Color","Rename Color Option of LightSpeed to this",8,1,NULL);
-	$db->add_config_key("MINI_IMAGE_WIDTH","Shopping Cart image width",30,"Mini Cart Image Width. For images in the mini cart for every page.",17,3,"INT");
-	$db->add_config_key("MINI_IMAGE_HEIGHT","Shopping Cart image height",30,"Mini Cart Image Height. For images in the mini cart for every page.",17,4,"INT");
+	$db->add_config_key("MINI_IMAGE_WIDTH","Shopping Cart image width",30,"Mini Cart Image Width. For images in the mini cart for every page.",29,3,"INT");
+	$db->add_config_key("MINI_IMAGE_HEIGHT","Shopping Cart image height",30,"Mini Cart Image Height. For images in the mini cart for every page.",29,4,"INT");
 	$db->add_config_key("TAX_INCLUSIVE_PRICING","Tax Inclusive Pricing",0,"If selected yes, all prices will be shown tax inclusive in webstore.",15,6,"BOOL");
 	$db->add_config_key("ENCODING","Browser Encoding","UTF-8","What character encoding would you like to use for your visitors?  UTF-8 should be normal for all users.",15,10,"ENCODING");
 	$db->add_config_key("TIMEZONE","Web Store Time Zone","America/New_York","The timezone in which your Web Store should display and store time.",15,4,"TIMEZONE");
@@ -2485,12 +2520,12 @@ function initialConfigLoad($db)
 	$db->add_config_key("SEO_PRODUCT_DESCRIPTION","Product Meta Description format","{longdescription}","Which elements appear in the Meta Description",22,3,"NULL");
 	$db->add_config_key("SEO_CATEGORY_TITLE","Category pages Title format","{name} : {storename}","Which elements appear in the title of a category page",23,1,"NULL");
 	$db->add_config_key("SEO_CUSTOMPAGE_TITLE","Custom pages Title format","{name} : {storename}","Which elements appear in the title of a custom page",23,2,"NULL");
-	$db->add_config_key("CATEGORY_IMAGE_WIDTH","Category Page Image Width",180,"if using a Category Page image",17,7,"INT");
-	$db->add_config_key("CATEGORY_IMAGE_HEIGHT","Category Page Image Width",180,"if using a Category Page image",17,8,"INT");
-	$db->add_config_key("PREVIEW_IMAGE_WIDTH","Preview Thumbnail (Product Detail Page) Width",60,"Preview Thumbnail image",17,9,"INT");
-	$db->add_config_key("PREVIEW_IMAGE_HEIGHT","Preview Thumbnail (Product Detail Page) Height",60,"Preview Thumbnail image",17,10,"INT");
-	$db->add_config_key("SLIDER_IMAGE_WIDTH","Slider Image Width",90,"Slider on custom pages",17,11,"INT");
-	$db->add_config_key("SLIDER_IMAGE_HEIGHT","Slider Image Height",90,"Slider on custom pages",17,12,"INT");
+	$db->add_config_key("CATEGORY_IMAGE_WIDTH","Category Page Image Width",180,"if using a Category Page image",29,7,"INT");
+	$db->add_config_key("CATEGORY_IMAGE_HEIGHT","Category Page Image Width",180,"if using a Category Page image",29,8,"INT");
+	$db->add_config_key("PREVIEW_IMAGE_WIDTH","Preview Thumbnail (Product Detail Page) Width",60,"Preview Thumbnail image",29,9,"INT");
+	$db->add_config_key("PREVIEW_IMAGE_HEIGHT","Preview Thumbnail (Product Detail Page) Height",60,"Preview Thumbnail image",29,10,"INT");
+	$db->add_config_key("SLIDER_IMAGE_WIDTH","Slider Image Width",90,"Slider on custom pages",29,11,"INT");
+	$db->add_config_key("SLIDER_IMAGE_HEIGHT","Slider Image Height",90,"Slider on custom pages",29,12,"INT");
 	$db->add_config_key("IMAGE_FORMAT","Image Format","jpg","Use .jpg or .png format for images. JPG files are smaller but slightly lower quality. PNG is higher quality and supports transparency, but has a larger file size.",17,18,"IMAGE_FORMAT");
 	$db->add_config_key("ENABLE_CATEGORY_IMAGE","Display Image on Category Page (when set)",0,"Requires a defined Category image under SEO settings",17,13,"BOOL");
 	$db->add_config_key("SHIP_SAME_BILLSHIP","Require Billing and Shipping Address to Match",0,"Locks the Shipping and Billing are same checkbox to not allow separate shipping address.",25,2,"BOOL");
@@ -2499,7 +2534,7 @@ function initialConfigLoad($db)
 	$db->add_config_key("STORE_ADDRESS2","Store City, State, Postal","Anytown, NY 12345","Address line 2",2,6,"NULL");
 	$db->add_config_key("STORE_HOURS","Store Operating Hours","MON-FRI: 9AM-9PM SAT: 11AM-6PM SUN: CLOSED","Store hours. Use &lt;br&gt; tag to create two lines if desired.",2,7,"NULL");
 	$db->add_config_key("DEFAULT_TEMPLATE_THEME","Template theme","light","If supported, changable colo(u)rs for template files.",0,2,"DEFAULT_TEMPLATE_THEME");
-	$db->add_config_key("GOOGLE_MPN","Product Codes are Manufacturer Part Numbers in Google Shopping",1,"If your Product Codes are Manufacturer Part Numbers, turn this on to apply this to Google Shopping feed.",20,4,"BOOL");
+	$db->add_config_key("GOOGLE_MPN","Product Codes are Manufacturer Part Numbers in Google Shopping",0,"If your Product Codes are Manufacturer Part Numbers, turn this on to apply this to Google Shopping feed.",20,4,"BOOL");
 	$db->add_config_key("EMAIL_SUBJECT_WISHLIST","Wishlist Email Subject Line","{storename} Wishlist for {customername}","Configure Email Subject line with variables for Customer Email",24,10,NULL);
 	$db->add_config_key("FACEBOOK_APPID","Facebook App ID",'',"Create Facebook AppID",26,1,NULL);
 	$db->add_config_key("EMAIL_SUBJECT_CART","Share Cart Email Subject Line","{storename} Cart for {customername}","Configure Email Subject line with variables for Customer Email",24,10,NULL);
@@ -3127,6 +3162,7 @@ function up217($db)
 
 	$db->add_config_key('DATABASE_SCHEMA_VERSION' ,'Database Schema Version',
 			'217',  'Used for tracking schema changes',  '',  '',  NULL);
+	$db->query("UPDATE `xlsws_configuration` SET `value`='217' where `key`='DATABASE_SCHEMA_VERSION'");
 	
 }
 
@@ -3451,40 +3487,40 @@ function up250($db,$sqlline)
 
 
 
-		$db->query("UPDATE `xlsws_configuration` SET `title`='Product Grid image width', `configuration_type_id`=17, `sort_order`=1,options='INT',template_specific=1
+		$db->query("UPDATE `xlsws_configuration` SET `title`='Product Grid image width', `configuration_type_id`=29, `sort_order`=1,options='INT',template_specific=1
 					where `key`='LISTING_IMAGE_WIDTH'");
-		$db->query("UPDATE `xlsws_configuration` SET `title`='Product Grid image height', `configuration_type_id`=17, `sort_order`=2 ,options='INT' ,template_specific=1
+		$db->query("UPDATE `xlsws_configuration` SET `title`='Product Grid image height', `configuration_type_id`=29, `sort_order`=2 ,options='INT' ,template_specific=1
 					where `key`='LISTING_IMAGE_HEIGHT'");
 
-		$db->query("UPDATE `xlsws_configuration` SET `title`='Shopping Cart image width', `configuration_type_id`=17, `sort_order`=3 ,options='INT',template_specific=1
+		$db->query("UPDATE `xlsws_configuration` SET `title`='Shopping Cart image width', `configuration_type_id`=29, `sort_order`=3 ,options='INT',template_specific=1
 					where `key`='MINI_IMAGE_WIDTH'");
-		$db->query("UPDATE `xlsws_configuration` SET `title`='Shopping Cart image height', `configuration_type_id`=17, `sort_order`=4 ,options='INT',template_specific=1
+		$db->query("UPDATE `xlsws_configuration` SET `title`='Shopping Cart image height', `configuration_type_id`=29, `sort_order`=4 ,options='INT',template_specific=1
 					where `key`='MINI_IMAGE_HEIGHT'");
 
-		$db->query("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Width', `configuration_type_id`=17, `sort_order`=5 ,options='INT' ,template_specific=1
+		$db->query("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Width', `configuration_type_id`=29, `sort_order`=5 ,options='INT' ,template_specific=1
 					where `key`='DETAIL_IMAGE_WIDTH'");
-		$db->query("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Height', `configuration_type_id`=17, `sort_order`=6 ,options='INT' ,template_specific=1
+		$db->query("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Height', `configuration_type_id`=29, `sort_order`=6 ,options='INT' ,template_specific=1
 					where `key`='DETAIL_IMAGE_HEIGHT'");
 
 
 		$db->add_config_key('CATEGORY_IMAGE_WIDTH' ,
 			'Category Page Image Width',
-					'180', 'if using a Category Page image', 17, 7,  'INT',1);
+					'180', 'if using a Category Page image', 29, 7,  'INT',1);
 		$db->add_config_key('CATEGORY_IMAGE_HEIGHT' ,
 			'Category Page Image Height',
-					'180', 'if using a Category Page image', 17, 8,  'INT',1);
+					'180', 'if using a Category Page image', 29, 8,  'INT',1);
 		$db->add_config_key('PREVIEW_IMAGE_WIDTH' ,
 			'Preview Thumbnail (Product Detail Page) Width',
-					'30', 'Preview Thumbnail image', 17, 9,  'INT',1);
+					'30', 'Preview Thumbnail image', 29, 9,  'INT',1);
 		$db->add_config_key('PREVIEW_IMAGE_HEIGHT' ,
 			'Preview Thumbnail (Product Detail Page) Height',
-					'30', 'Preview Thumbnail image', 17, 10,  'INT',1);
+					'30', 'Preview Thumbnail image', 29, 10,  'INT',1);
 		$db->add_config_key('SLIDER_IMAGE_WIDTH' ,
 			'Slider Image Width',
-					'90', 'Slider on custom pages', 17, 11,  'INT',1);
+					'90', 'Slider on custom pages', 29, 11,  'INT',1);
 		$db->add_config_key('SLIDER_IMAGE_HEIGHT' ,
 			'Slider Image Height',
-					'90', 'Slider on custom pages', 17, 12,  'INT',1);
+					'90', 'Slider on custom pages', 29, 12,  'INT',1);
 		$db->add_config_key('IMAGE_FORMAT' ,
 			'Image Format',
 					'jpg', 'Use .jpg or .png format for images. JPG files are smaller but slightly lower quality. PNG is higher quality and supports transparency, but has a larger file size.', 17, 18,  'IMAGE_FORMAT',0);
@@ -3495,8 +3531,8 @@ function up250($db,$sqlline)
 		$db->add_config_key('ENABLE_CATEGORY_IMAGE' ,
 			'Display Image on Category Page (when set)',
 					'0', 'Requires a defined Category image under SEO settings', 17, 13,  'BOOL',1);
-		$db->query("update `xlsws_configuration` set template_specific=1 where `key` like '%_IMAGE_WIDTH'");
-		$db->query("update `xlsws_configuration` set template_specific=1 where `key` like '%_IMAGE_HEIGHT'");
+		$db->query("update `xlsws_configuration` set template_specific=1,`configuration_type_id`=29 where `key` like '%_IMAGE_WIDTH'");
+		$db->query("update `xlsws_configuration` set template_specific=1,`configuration_type_id`=29 where `key` like '%_IMAGE_HEIGHT'");
 		$db->query("update `xlsws_configuration` set template_specific=1 where `key` = 'DEFAULT_TEMPLATE_THEME'");
 		$db->query("update `xlsws_configuration` set template_specific=1 where `key` = 'PRODUCTS_PER_PAGE'");
 
@@ -3742,44 +3778,6 @@ function parse_php_info()
 
 	$checked['<b>Note: Specific template code changes are not checked.</b>'] = "pass";
 
-	return $checked;
-}
- function xls_check_file_signatures($complete = false)
-{
-	$checked = array();
-	$checked['<b>--File Signatures Check for ' . _xls_version() . '--</b>'] = "pass";
-
-	include("includes/signatures.php");
-
-	$template = _dbx_first_cell("select `value` from xlsws_configuration where `key`='DEFAULT_TEMPLATE'");
-
-	$fn = unserialize($signatures);
-	if (!isset($signatures)) {
-		$checked['Signature File in /includes'] = "fail";
-	}
-
-	foreach ($fn as $key => $value) {
-
-		if (strstr($key, '/templates') && !strstr($key, '/templates/' . $template)) {
-			//skip not our template
-		} else {
-
-			if (!file_exists($key)) {
-				$checked[$key] = "MISSING";
-			} else {
-				$hashes = explode(",", $value);
-				$hashfile = md5_file($key);
-				if (!in_array($hashfile, $hashes)) {
-					$checked[$key] = "modified";
-				} elseif (_xls_version() != $versions[array_search($hashfile, $hashes)] || $complete) {
-					$checked[$key] = $versions[array_search($hashfile, $hashes)];
-				}
-			}
-
-		}
-
-
-	}
 	return $checked;
 }
 

@@ -63,9 +63,7 @@ class FBIdentity extends CUserIdentity
 
 			    //New user to our site using Facebook, so set up an account
 			    $model = new Customer();
-			    $model->scenario = 'create';
-			    $model->password = "facebook";
-			    $model->password_repeat = "facebook";
+			    $model->scenario = 'createfb';
 			    $results = Yii::app()->facebook->api('/me');
 			    $model->first_name = $results['first_name'];
 			    $model->last_name = $results['last_name'];

@@ -3,13 +3,22 @@
 class ThemeController extends AdminBaseController
 {
 	public $controllerName = "Themes";
-	public $externalUrl = "http://gallery.lightspeedwebstore.com";
+	public $externalUrl = "gallery.lightspeedwebstore.com";
+
+	const THEME_PHOTOS = 29;
+
+	public function actions()
+	{
+		return array(
+			'edit'=>'admin.edit',
+		);
+	}
 
 	public function accessRules()
 	{
 		return array(
 			array('allow',
-				'actions'=>array('index','gallery','header','manage','upload'),
+				'actions'=>array('index','edit','gallery','header','manage','upload'),
 				'roles'=>array('admin'),
 			),
 		);
@@ -22,6 +31,7 @@ class ThemeController extends AdminBaseController
 		$this->menuItems =
 			array(
 				array('label'=>'Manage My Themes', 'url'=>array('theme/manage')),
+				array('label'=>'Set Photo Sizes for '.ucfirst(Yii::app()->theme->name), 'url'=>array('theme/edit','id'=>self::THEME_PHOTOS)),
 				array('label'=>'View Theme Gallery', 'url'=>array('theme/gallery')),
 				array('label'=>'Upload Theme .Zip', 'url'=>array('theme/upload')),
 				array('label'=>'Set Header Image', 'url'=>array('theme/header'))
@@ -34,6 +44,18 @@ class ThemeController extends AdminBaseController
 
 	}
 
+
+	public function getInstructions($id)
+	{
+		switch($id)
+		{
+
+			case self::THEME_PHOTOS:
+				return "Note that these settings are used as photos are uploaded from LightSpeed. These sizes are saved for each theme.";
+		}
+	}
+
+
 	public function actionIndex()
 	{
 		$this->render('index');
@@ -42,10 +64,76 @@ class ThemeController extends AdminBaseController
 	public function actionManage()
 	{
 		//Get list
-		$arrThemes = $this->InstalledThemes;
+		$arrThemes = $this->getInstalledThemes();
 
 		if (isset($_POST['theme']))
 		{
+
+
+			if (_xls_get_conf('THEME') != $_POST['theme'])
+			{
+				//we're going to swap out template information
+
+				$objCurrentSettings = Modules::model()->findByAttributes(array(
+					'module'=>_xls_get_conf('THEME'),
+					'category'=>'theme'));
+
+				if (!$objCurrentSettings)
+					$objCurrentSettings = new Modules;
+
+				$objCurrentSettings->module = _xls_get_conf('THEME');
+				$objCurrentSettings->category = 'theme';
+
+				$arrDimensions = array();
+				//We can't use the ORM because template_specific doesn't exist there (due to upgrade problems)
+				$arrItems = Configuration::model()->findAllByAttributes(array('template_specific'=>1));
+				foreach ($arrItems as $objConf) {
+					$arrDimensions[$objConf->key_name] = $objConf->key_value;
+
+
+				}
+				$objCurrentSettings->configuration = serialize($arrDimensions);
+				$objCurrentSettings->active = 0;
+				$objCurrentSettings->save();
+
+				//Now that we've saved the current settings, see if there are new ones to load
+				$objNewSettings = Modules::model()->findByAttributes(array(
+				'module'=>$_POST['theme'],
+				'category'=>'theme'));
+				if ($objNewSettings) {
+					//We found settings, load them
+
+					$arrDimensions = unserialize($objNewSettings->configuration);
+					foreach($arrDimensions as $key=>$val)
+						_xls_set_conf($key,$val);
+				}
+				else {
+					//If we don't have old settings saved already, then we can do two things. First, we see
+					//if there is an Options.xml for defaults we create. If not, then we just leave the Config table
+					//as is and use those settings, we'll save it next time.
+					$fnOptions = $this->getConfigFile($_POST['theme']);
+					if (file_exists($fnOptions)) {
+						$strXml = file_get_contents($fnOptions);
+
+						// Parse xml for response values
+						$oXML = new SimpleXMLElement($strXml);
+
+						if($oXML->defaults) {
+							foreach ($oXML->defaults as $item)
+							{
+								$objKey = Configuration::model()->findByAttributes(array('key_name'=>$item->key_name));
+								if ($objKey && $objKey->template_specific==1)
+								_xls_set_conf($item->key_name,$item->key_value);
+
+							}
+						}
+					}
+				}
+
+
+
+			}
+
 			_xls_set_conf('THEME',$_POST['theme']);
 			Yii::app()->theme = $_POST['theme'];
 
@@ -56,7 +144,8 @@ class ThemeController extends AdminBaseController
 
 			Yii::app()->user->setFlash('success',Yii::t('admin','Theme set as "{theme}" at {time}.',
 				array('{theme}'=>ucfirst(Yii::app()->theme->name),'{time}'=>date("d F, Y  h:i:sa"))));
-			$arrThemes = $this->InstalledThemes;
+			$arrThemes = $this->getInstalledThemes();
+			$this->beforeAction('manage');
 
 		}
 
@@ -195,16 +284,29 @@ class ThemeController extends AdminBaseController
 		$d = dir(YiiBase::getPathOfAlias('webroot')."/themes");
 		while (false!== ($filename = $d->read())) {
 			if ($filename[0] != ".") {
-				$fnOptions = YiiBase::getPathOfAlias('webroot')."/themes/".$filename."/config.xml";
+				$fnOptions = $this->getConfigFile($filename);
 				if (file_exists($fnOptions)) {
 					$strXml = file_get_contents($fnOptions);
 					$oXML = new SimpleXMLElement($strXml);
+					$arr[$filename]['name'] = $oXML->name;
+					$arr[$filename]['version'] = $oXML->version;
 					$arr[$filename]['img'] = $this->buildThemeChooser($oXML);
 					$arr[$filename]['options'] =  CHtml::dropDownList("subtheme-".strtolower($oXML->name),_xls_get_conf('CHILD_THEME'),$this->buildSubThemes($filename));
 				}
 			}
 		}
 		$d->close();
+
+		$strTheme = Yii::app()->theme->name;
+
+		if (isset($arr[$strTheme]))
+		{
+			$hold[$strTheme] = $arr[$strTheme];
+			unset($arr[$strTheme]);
+			$newarray = $hold + $arr;
+			$arr = $newarray;
+
+		}
 
 		return $arr;
 	}
@@ -250,7 +352,7 @@ class ThemeController extends AdminBaseController
 
 	protected function buildSubThemes($filename)
 	{
-		$fnOptions = YiiBase::getPathOfAlias('webroot')."/themes/".$filename."/config.xml";
+		$fnOptions = $this->getConfigFile($filename);
 		$arr = array();
 
 		if (file_exists($fnOptions)) {
@@ -288,5 +390,10 @@ class ThemeController extends AdminBaseController
 
 	}
 
+
+	protected function getConfigFile($filename)
+	{
+		return YiiBase::getPathOfAlias('webroot')."/themes/".$filename."/config.xml";
+	}
 
 }

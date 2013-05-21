@@ -51,16 +51,9 @@ class Family extends BaseFamily
 
 	protected function GetPageMeta($strConf = 'SEO_CUSTOMPAGE_TITLE') {
 
-		$strItem = _xls_get_conf($strConf, '%storename%');
 		$strCrumbNames = '';
 		$strCrumbNamesR = '';
 
-		$arrPatterns = array(
-			"%storename%",
-			"%name%",
-			"%title%",
-			"%crumbtrail%",
-			"%rcrumbtrail%");
 		$arrCrumb = _xls_get_crumbtrail();
 
 		foreach ($arrCrumb as $crumb) {
@@ -68,16 +61,18 @@ class Family extends BaseFamily
 			$strCrumbNamesR = $crumb['name']." ".$strCrumbNamesR;
 		}
 
-		$arrItems = array(
-			_xls_get_conf('STORE_NAME',''),
-			$this->family,
-			$this->family,
-			$strCrumbNames,
-			$strCrumbNamesR,
-		);
+		$strItem = Yii::t('global',_xls_get_conf($strConf, '{storename}'),
+			array(
+				'{storename}'=>_xls_get_conf('STORE_NAME',''),
+				'{name}'=>$this->family,
+				'{title}'=>$this->family,
+				'{crumbtrail}'=>$strCrumbNames,
+				'{rcrumbtrail}'=>$strCrumbNamesR,
 
 
-		return str_replace($arrPatterns, $arrItems, $strItem);
+			));
+
+		return $strItem;
 
 	}
 

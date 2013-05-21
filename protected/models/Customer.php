@@ -52,15 +52,16 @@ class Customer extends BaseCustomer
 			array('last_login', 'safe'),
 
 
-			array('email', 'required','on'=>'create'),
-			array('first_name,last_name,mainphone', 'required','on'=>'create,update,updatepassword'),
+			array('email', 'required','on'=>'create,createfb,update'),
+			array('first_name,last_name', 'required','on'=>'create,createfb,update,updatepassword'),
+			array('mainphone', 'required','on'=>'create,update,updatepassword'),
 			array('password,password_repeat', 'required','on'=>'create,updatepassword'),
 
 			// email has to be a valid email address
 			array('email', 'email'),
 			array('email,email_repeat', 'safe'),
-			array('email', 'validateEmailUnique','on'=>'create'),
-			array('email_repeat', 'validateEmailRepeat','on'=>'create'),
+			array('email', 'validateEmailUnique','on'=>'create,createfb,update'),
+			array('email_repeat', 'validateEmailRepeat','on'=>'create,createfb'),
 			// verifyCode needs to be entered correctly
 			//array('verifyCode', 'captcha', 'allowEmpty'=>!CCaptcha::checkRequirements()),
 
@@ -89,6 +90,17 @@ class Customer extends BaseCustomer
 				$this->addError('email',
 				Yii::t('checkout','Email address already exists in system. Please log in.')
 			);
+		} elseif($this->email != '') {
+
+			$objCustomer = Customer::GetCurrent();
+			$obj = Customer::model()->findAll('email = :email AND id <> :id',array(':email'=>$this->email,':id'=>$objCustomer->id));
+			if (count($obj)>0)
+			{
+				$this->addError('email',
+					Yii::t('checkout','This email address already exists in our system for another account.')
+				);
+			}
+
 		}
 	}
 	/**
@@ -259,7 +271,7 @@ class Customer extends BaseCustomer
 		$this->modified = new CDbExpression('NOW()');
 
 		if (empty($this->preferred_language))
-			$this->preferred_language = _xls_get_conf('LANG_CODE','en');
+			$this->preferred_language =  Yii::app()->language;
 
 		if (empty($this->currency))
 			$this->currency = _xls_get_conf('CURRENCY_DEFAULT','USD');

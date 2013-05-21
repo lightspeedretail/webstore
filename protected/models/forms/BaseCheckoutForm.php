@@ -107,7 +107,7 @@ class BaseCheckoutForm extends CFormModel
 			array('shippingFirstName,shippingLastName,shippingAddress1,shippingCity,shippingPostal,shippingCountry',
 				'validateShippingBlock','on'=>'CalculateShipping,formSubmitGuest,formSubmitCreatingAccount,formSubmitExistingAccount'),
 
-			array('acceptTerms,shippingProvider,shippingPriority','required',
+			array('acceptTerms,shippingProvider,shippingPriority,paymentProvider','required',
 				'on'=>'formSubmit,formSubmitCreatingAccount,formSubmitExistingAccount'),
 
 			array('cardNumber,cardExpiryMonth, cardExpiryYear,cardType,cardCVV,cardNameOnCard','validateCard',
@@ -357,7 +357,7 @@ class BaseCheckoutForm extends CFormModel
 		foreach($objModules as $obj)
 		{
 			$moduleValue = $obj->module;
-			$objModule = Yii::app()->getComponent($moduleValue);error_log($moduleValue." ".$objModule->setCheckoutForm($this)->Show);
+			$objModule = Yii::app()->getComponent($moduleValue);
 			if (!$objModule)
 				Yii::log("Error missing module ".$moduleValue, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			elseif($objModule->setCheckoutForm($this)->Show)
@@ -579,7 +579,9 @@ class BaseCheckoutForm extends CFormModel
 	/** for cached shipping */
 	public function getSavedScenarios()
 	{
-		if (isset(Yii::app()->session['ship.scenarios.cache'])) {
+		if (isset(Yii::app()->session['ship.scenarios.cache']) &&
+			!empty(Yii::app()->session['ship.scenarios.cache'])
+		) {
 			$strReturn = "{";
 
 			$outercount=0;
