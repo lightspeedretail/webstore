@@ -2400,6 +2400,7 @@ UPDATE xlsws_configuration set configuration_type_id=29 where key_name like '%IM
 UPDATE xlsws_configuration set configuration_type_id=29 where key_name like '%IMAGE_HEIGHT';
 UPDATE xlsws_modules set category='theme' where category='template';
 INSERT IGNORE INTO `xlsws_configuration` (`id`, `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES (NULL, 'After adding item to cart', 'AFTER_ADD_CART', '0', 'What should site do after shopper adds item to cart', '4', '5', '2009-04-06 10:34:34', '2009-04-06 10:34:34', 'AFTER_ADD_CART', '0', '1', NULL);
+INSERT IGNORE INTO `xlsws_configuration` (`id`, `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES (NULL, 'Send test email on Save', 'EMAIL_TEST', '0', 'When clicking Save, system will attempt to send a test email through', '5', '20', '2012-05-22 07:55:29', '2012-04-13 10:07:41', 'BOOL', '0', '0', NULL);
 
 	SET FOREIGN_KEY_CHECKS=1";
 }
@@ -2502,7 +2503,6 @@ function initialConfigLoad($db)
 	$db->add_config_key("PRICE_REQUIRE_LOGIN","Require login to view prices",0,"System will not display prices to anyone not logged in.",3,3,"BOOL");
 	$db->add_config_key("UPLOADER_TIMESTAMP","Last timestamp uploader ran",0,"Internal",0,0,"NULL");
 	$db->add_config_key("GOOGLE_ANALYTICS","Google Analytics Code (format: UA-00000000-0)","","Google Analytics code for tracking",20,1,"NULL");
-	//$db->add_config_key("EMAIL_SEND_SHIPPING","Send Ship Alert when Tracking # is detected",1,"Option whether to email receipts when a new tracking number is detected from an order downloaded from LightSpeed",5,4,"BOOL");
 	$db->add_config_key("STORE_TAGLINE","Store Tagline","Amazing products available to order online!","Used as default for Title bar for home page",2,4,"NULL");
 
 	$db->add_config_key("LOG_ROTATE_DAYS","Log Rotate Days",30,"How many days System Log should be retained.",1,30,"INT");

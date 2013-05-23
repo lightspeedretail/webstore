@@ -53,25 +53,32 @@ class Images extends BaseImages
 		if ($objImage && $objImage->ImageFileExists())
 			return Images::GetImageUri($objImage->image_path,$AbsoluteUrl);
 
-		else
-		{
+
 		list($intWidth, $intHeight) = ImagesType::GetSize($intType);
-//
-//		//Does original size image exist?
-//		$objParentImage = Images::LoadByParent($id);
-//		if ($objParentImage && $objParentImage->ImageFileExists()) {
-//			$thumb = $objParentImage->CreateThumb($intWidth, $intHeight);
-//			if ($thumb) return Images::GetImageUri($thumb->image_path);
-//		}
-//		else {
-			if ($intWidth==0) $intWidth = 100;
-			if ($intHeight==0) $intHeight = 100;
-			$objParentImage = Images::ShowFallback($intWidth, $intHeight);
-			$thumb = $objParentImage->CreateThumb($intWidth, $intHeight);
-			if ($thumb) return Images::GetImageUri($thumb->image_path,$AbsoluteUrl);
-				else return self::GetImageFallbackPath($AbsoluteUrl);
-//		}
+
+		//Does original size image exist?
+		$objParentImage = Images::LoadByParent($id);
+		if ($objParentImage && $objParentImage->ImageFileExists()) {
+
+			$objProduct = Product::model()->findByPk($objParentImage->product_id);
+			$blbImage = imagecreatefrompng(Images::GetImagePath($objParentImage->image_path));
+			$objEvent = new CEventPhoto('Images','onUploadPhoto',$blbImage,$objProduct,$objParentImage->index);
+			_xls_raise_events('CEventPhoto',$objEvent);
+
+			$objImage = Images::LoadByRowidSize($id, $intType);
+			if ($objImage && $objImage->ImageFileExists())
+				return Images::GetImageUri($objImage->image_path,$AbsoluteUrl);
 		}
+
+		//If we haven't returned by this point, we don't have any image, so show default missing
+		if ($intWidth==0) $intWidth = 100;
+		if ($intHeight==0) $intHeight = 100;
+		$objParentImage = Images::ShowFallback($intWidth, $intHeight);
+		$thumb = $objParentImage->CreateThumb($intWidth, $intHeight);
+		if ($thumb) return Images::GetImageUri($thumb->image_path,$AbsoluteUrl);
+		else return self::GetImageFallbackPath($AbsoluteUrl);
+
+
 
 	}
 
@@ -491,7 +498,7 @@ class Images extends BaseImages
 
 	public static function LoadByParent($intParent) {
 
-		return Images::model()->find('parent=:t1 AND parent=id', array(':t1'=>$intParent));
+		return Images::model()->find('id=:id AND parent=:t1', array(':id'=>$intParent,':t1'=>$intParent));
 
 
 	}

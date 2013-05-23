@@ -383,7 +383,8 @@ return array(
 					'wslangdropdown'=>'Language options as dropdown',
 					'wslangflags'=>'Language options as flags',
 				);
-
+			case 'EMAIL_TEST':
+				return array(1=>'On',0=>'Off');
 
 		}
 

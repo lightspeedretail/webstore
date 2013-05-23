@@ -1,7 +1,11 @@
 <div id="menubar" class="row-fluid">
 
 	<div class="span2">
-		<?php $this->widget('application.extensions.wsmenu.wsmenu'); //products dropdown menu ?>
+		<?php $this->widget('application.extensions.wsmenu.wsmenu', array(
+			'categories'=> Category::GetTree(),
+			'menuheader'=> Yii::t('global','Products'),
+			'showarrow'=>true,
+		)); //products dropdown menu ?>
 	</div>
 
 	<div class="span7">

@@ -92,20 +92,23 @@ class InstallController extends Controller
 		$this->online = _xls_number_only($_POST['online']);
 
 		if ($this->online==1)                       $retval = $this->actionConvertStart();
-		if ($this->online >=2 && $this->online<=17) $retval = $this->actionConvertAddressBook();
-		if ($this->online==18)                      $retval = $this->actionConvertModules();
-		if ($this->online>=19 && $this->online<=23) $retval = $this->actionConvertGoogle();
-		if ($this->online==24)                      $retval = $this->actionConvertKeywordsToTags();
-		if ($this->online==25)                      $retval = $this->actionConvertFamilies();
-		if ($this->online==26)                      $retval = $this->actionConvertClasses();
-		if ($this->online==28)                      $retval = $this->actionConvertDestinationTables();
-		if ($this->online==29)                      $retval = $this->actionDropcartfields();
-		if ($this->online==30)                      $retval = $this->actionConvertProductSEO();
+		if ($this->online==2) $retval = $this->actionConvertAddressBook();
+		if ($this->online==8)                      $retval = $this->actionConvertModules();
+		if ($this->online>=9 && $this->online<=13) $retval = $this->actionConvertGoogle();
+		if ($this->online==14)                      $retval = $this->actionConvertKeywordsToTags();
+		if ($this->online==15)                      $retval = $this->actionConvertFamilies();
+		if ($this->online==16)                      $retval = $this->actionConvertClasses();
+		if ($this->online==18)                      $retval = $this->actionConvertDestinationTables();
+		if ($this->online==19)                      $retval = $this->actionDropcartfields1();
+		if ($this->online==20)                      $retval = $this->actionDropcartfields2();
+		if ($this->online==21)                      $retval = $this->actionDropcartfields3();
+		if ($this->online==25)                      $retval = $this->actionConvertProductSEO();
 		if ($this->online>=32 && $this->online<=44) $retval = $this->actionImportAmazon();
 		if ($this->online==45)                      $retval = $this->actionDropcustomerfields();
-		if ($this->online==46)                      $retval = $this->actionDropProductFields();
-		if ($this->online==47)                      $retval = $this->actionCalculateInventory();
-		if ($this->online==48)                      $retval = $this->actionUpdateConfiguration();
+		if ($this->online==46)                      $retval = $this->actionDropMoreCartfields();
+		if ($this->online==47)                      $retval = $this->actionDropProductFields();
+		if ($this->online==48)                      $retval = $this->actionCalculateInventory();
+		if ($this->online==49)                      $retval = $this->actionUpdateConfiguration();
 
 
 		echo $retval;
@@ -123,7 +126,7 @@ class InstallController extends Controller
 		Configuration::exportConfig();
 		Configuration::exportLogging();
 
-		return json_encode(array('result'=>"success",'makeline'=>2,'total'=>50));
+		return json_encode(array('result'=>"success",'makeline'=>2,'tag'=>'Converting cart addresses','total'=>50));
 
 	}
 
@@ -133,7 +136,7 @@ class InstallController extends Controller
 	protected function actionConvertAddressBook()
 	{
 
-		$sql = "select * from xlsws_cart where billaddress_id IS NULL and address_bill IS NOT NULL order by id limit 500";
+		$sql = "select * from xlsws_cart where billaddress_id IS NULL and address_bill IS NOT NULL order by id limit 50";
 		$results=Yii::app()->db->createCommand($sql)->queryAll();
 
 		foreach($results AS $result) {
@@ -195,6 +198,10 @@ class InstallController extends Controller
 					$objAddress->modified = $result['datetime_cre'];
 					$objAddress->active = 1;
 
+
+					if (empty($objAddress->address2)) $objAddress->address2=null;
+					if (empty($objAddress->company)) $objAddress->company=null;
+
 					$blnFound = false;
 					if ($result['customer_id']>0) {
 
@@ -250,6 +257,8 @@ class InstallController extends Controller
 							Yii::app()->db->createCommand("upDATE xlsws_cart set customer_id=".$cid." where id=".$result['id'])->execute();
 						}
 
+						$result['customer_id'] = $objC->id;
+						$objAddress->customer_id=$result['customer_id'];
 					}
 
 
@@ -260,7 +269,7 @@ class InstallController extends Controller
 						}
 						else
 							$cid = $objAddress->id;
-						Yii::app()->db->createCommand("UPdate xlsws_cart set billaddress_id=".$cid." where id=".$result['id'])->execute();
+						Yii::app()->db->createCommand("update xlsws_cart set billaddress_id=".$cid." where id=".$result['id'])->execute();
 
 					}
 				}
@@ -270,43 +279,47 @@ class InstallController extends Controller
 					Yii::app()->db->createCommand("update xlsws_cart set address_bill=null where id=".$result['id'])->execute();
 				}
 
-			$objAddress = new CustomerAddress;
+				$objAddress = new CustomerAddress;
 
 
-			$objCountry = Country::LoadByCode($result['ship_country']);
-			if ($objCountry) {
-				$objAddress->country_id = $objCountry->id;
+				$objCountry = Country::LoadByCode($result['ship_country']);
+				if ($objCountry) {
+					$objAddress->country_id = $objCountry->id;
 
-				$objState = State::LoadByCode($result['ship_state'],$objCountry->id);
-				if ($objState)
-					$objAddress->state_id = $objState->id;
-			}
-
-
+					$objState = State::LoadByCode($result['ship_state'],$objCountry->id);
+					if ($objState)
+						$objAddress->state_id = $objState->id;
+				}
 
 
-			$objAddress->first_name = $result['ship_firstname'];
-			$objAddress->last_name = $result['ship_lastname'];
-			$objAddress->company = $result['ship_company'];
-			$objAddress->address1 = $result['ship_address1'];
-			$objAddress->address2 = $result['ship_address2'];
-			$objAddress->city = $result['ship_city'];
 
 
-			$objAddress->postal = $result['ship_zip'];
-			$objAddress->phone = $result['ship_phone'];
-			$objAddress->residential = CustomerAddress::RESIDENTIAL;
-			$objAddress->created = $result['datetime_cre'];
-			$objAddress->modified = $result['datetime_cre'];
-			$objAddress->active = 1;
+				$objAddress->first_name = $result['ship_firstname'];
+				$objAddress->last_name = $result['ship_lastname'];
+				$objAddress->company = $result['ship_company'];
+				$objAddress->address1 = $result['ship_address1'];
+				$objAddress->address2 = $result['ship_address2'];
+				$objAddress->city = $result['ship_city'];
 
-			$blnFound = false;
+
+				$objAddress->postal = $result['ship_zip'];
+				$objAddress->phone = $result['ship_phone'];
+				$objAddress->residential = CustomerAddress::RESIDENTIAL;
+				$objAddress->created = $result['datetime_cre'];
+				$objAddress->modified = $result['datetime_cre'];
+				$objAddress->active = 1;
+				if (empty($objAddress->address2)) $objAddress->address2=null;
+				if (empty($objAddress->company)) $objAddress->company=null;
+
+
+				$blnFound = false;
 			if ($result['customer_id']>0) {
+
+
 
 				//See if this is already in our database
 				$objPriorAddress = CustomerAddress::model()->findByAttributes(array(
 					'address1'=>$objAddress->address1,
-					'address2'=>$objAddress->address2,
 					'city'=>$objAddress->city,
 					'postal'=>$objAddress->postal,
 					'first_name'=>$objAddress->first_name,
@@ -376,13 +389,9 @@ class InstallController extends Controller
 		$results2=Yii::app()->db->createCommand(
 			"select count(*) from xlsws_cart where billaddress_id IS NULL and address_bill IS NOT NULL")->queryScalar();
 
-		if ($results2==0) $remain=18;
+		if ($results2==0) $remain=8;
 		else
-		{
-			$remain = round(18 - ($results2/1250));
-			if ($remain<1) $remain=1;
-			if ($remain>17) $remain=17;
-		}
+			$remain=2;
 
 		return json_encode(array('result'=>"success",'makeline'=>$remain,'total'=>50,'tag'=>'Converting cart addresses, '.$results2.' remaining'));
 
@@ -391,7 +400,7 @@ class InstallController extends Controller
 
 
 	/**
-	 * Rename modules, load google
+	 * 8 Rename modules, load google
 	 */
 	protected function actionConvertModules()
 	{
@@ -497,13 +506,13 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		}
 
 
-		return json_encode(array('result'=>"success",'makeline'=>19,'tag'=>'Installing Google categories (group 1 of 6)','total'=>50));
+		return json_encode(array('result'=>"success",'makeline'=>9,'tag'=>'Installing Google categories (group 1 of 6)','total'=>50));
 
 	}
 
 
 	/**
-	 * load amazon, Convert our web keywords into new tags table
+	 * 9-13 load amazon, Convert our web keywords into new tags table
 	 */
 	protected function actionConvertGoogle()
 	{
@@ -511,7 +520,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 		//Load google categories
 		_dbx('SET FOREIGN_KEY_CHECKS=0');
-		if ($this->online==19)
+		if ($this->online==9)
 			Yii::app()->db->createCommand()->truncateTable(CategoryGoogle::model()->tableName());
 		$file = fopen(YiiBase::getPathOfAlias('ext.wsgoogle.assets')."/googlecategories.txt", "r");
 		if ($file)
@@ -520,11 +529,11 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 				$ct++;
 				if (
-					($ct>=1 && $ct<=1000 && $this->online==19) ||
-					($ct>=1001 && $ct<=2000 && $this->online==20) ||
-					($ct>=2001 && $ct<=3000 && $this->online==21) ||
-					($ct>=3001 && $ct<=4000 && $this->online==22) ||
-					($ct>=4001 && $ct<=5000 && $this->online==23)
+					($ct>=1 && $ct<=1000 && $this->online==9) ||
+					($ct>=1001 && $ct<=2000 && $this->online==10) ||
+					($ct>=2001 && $ct<=3000 && $this->online==11) ||
+					($ct>=3001 && $ct<=4000 && $this->online==12) ||
+					($ct>=4001 && $ct<=5000 && $this->online==13)
 				)
 				{
 					$objGC = new CategoryGoogle();
@@ -545,7 +554,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 			}
 		fclose($file);
 
-		if ($this->online==23)
+		if ($this->online==13)
 		{
 			for ($x=1; $x<=9; $x++)
 				_dbx("update xlsws_category_google set `name".$x."`=null where `name".$x."`=''");
@@ -581,13 +590,13 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		}
 		_dbx('SET FOREIGN_KEY_CHECKS=1');
 
-		return json_encode(array('result'=>"success",'makeline'=>($this->online+1),'tag'=>'Installing Google categories (group '.($this->online-17)." of 6)",'total'=>50));
+		return json_encode(array('result'=>"success",'makeline'=>($this->online+1),'tag'=>'Installing Google categories (group '.($this->online-7)." of 6)",'total'=>50));
 
 	}
 
 
 	/**
-	 * 24: Convert the keyword columns into the new tags table
+	 * 14: Convert the keyword columns into the new tags table
 	 * @return string
 	 */
 	protected function actionConvertKeywordsToTags()
@@ -629,7 +638,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 			_dbx("insert into xlsws_product_tags set product_id=".$result['product_id'].", tag_id=".$result['tag_id']);
 		}
 
-		return json_encode(array('result'=>"success",'makeline'=>25,'total'=>50));
+		return json_encode(array('result'=>"success",'makeline'=>15,'total'=>50));
 
 	}
 
@@ -651,11 +660,11 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		foreach ($objFamilies as $obj)
 			$obj->UpdateChildCount();
 
-		return json_encode(array('result'=>"success",'makeline'=>26,'total'=>50));
+		return json_encode(array('result'=>"success",'makeline'=>16,'total'=>50));
 	}
 
 	/**
-	 * 26 Convert classes into Ids and attach
+	 * 16 Convert classes into Ids and attach
 	 * @return string
 	 */
 	public function actionConvertClasses()
@@ -668,13 +677,13 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 		Classes::ConvertSEO();
 
-		return json_encode(array('result'=>"success",'makeline'=>28,'total'=>50));
+		return json_encode(array('result'=>"success",'makeline'=>18,'total'=>50));
 	}
 
 
 
 	/**
-	 * 28 Change destination tables and map to country/state ids
+	 * 18 Change destination tables and map to country/state ids
 	 */
 	protected function actionConvertDestinationTables()
 	{
@@ -713,17 +722,18 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		_dbx("ALTER TABLE `xlsws_destination` ADD FOREIGN KEY (`country`) REFERENCES `xlsws_country` (`id`);");
 		_dbx("ALTER TABLE `xlsws_destination` ADD FOREIGN KEY (`taxcode`) REFERENCES `xlsws_tax_code` (`lsid`);");
 		_dbx("ALTER TABLE `xlsws_category` CHANGE `custom_page` `custom_page` INT(11)  UNSIGNED  NULL  DEFAULT NULL;");
+		_dbx("UPDATE `xlsws_category` set `custom_page`=null where `custom_page`=0;");
 		_dbx("ALTER TABLE `xlsws_category` ADD FOREIGN KEY (`custom_page`) REFERENCES `xlsws_custom_page` (`id`);");
 		_dbx("ALTER TABLE `xlsws_country` DROP `code_a3`;");
 		_dbx("update `xlsws_shipping_tiers` set `class_name`='tieredshipping';");
 
-		return json_encode(array('result'=>"success",'makeline'=>29,'tag'=>'Applying database schema changes','total'=>50));
+		return json_encode(array('result'=>"success",'makeline'=>19,'tag'=>'Applying database schema changes','total'=>50));
 	}
 
 	/**
-	 * 29 Drop fields no longer needed
+	 * 19 Drop fields no longer needed
 	 */
-	protected function actionDropCartfields()
+	protected function actionDropCartfields1()
 	{
 
 		$sqlstrings = "ALTER TABLE `xlsws_cart` DROP `first_name`;
@@ -733,48 +743,75 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		ALTER TABLE `xlsws_cart` DROP `ship_firstname`;
 		ALTER TABLE `xlsws_cart` DROP `ship_lastname`;
 		ALTER TABLE `xlsws_cart` DROP `ship_company`;
-		ALTER TABLE `xlsws_cart` DROP `ship_address1`;
-		ALTER TABLE `xlsws_cart` DROP `ship_address2`;
-		ALTER TABLE `xlsws_cart` DROP `ship_city`;
-		ALTER TABLE `xlsws_cart` DROP `ship_zip`;
-		ALTER TABLE `xlsws_cart` DROP `ship_state`;
-		ALTER TABLE `xlsws_cart` DROP `ship_country`;
-		ALTER TABLE `xlsws_cart` DROP `ship_phone`;
-		ALTER TABLE `xlsws_cart` DROP `zipcode`;
-		ALTER TABLE `xlsws_cart` DROP `contact`;
-		ALTER TABLE `xlsws_cart` DROP `company`;
-		ALTER TABLE `xlsws_cart` DROP `full_name`;
-		ALTER TABLE `xlsws_cart` DROP `phone`;
-		ALTER TABLE `xlsws_cart` DROP `shipping_method`;
-		ALTER TABLE `xlsws_cart` DROP `shipping_module`;
-		ALTER TABLE `xlsws_cart` DROP `shipping_data`;
-		ALTER TABLE `xlsws_cart` DROP `shipping_cost`;
-		ALTER TABLE `xlsws_cart` DROP `shipping_sell`;
-		ALTER TABLE `xlsws_cart` DROP `payment_method`;
-		ALTER TABLE `xlsws_cart` DROP `payment_module`;
-		ALTER TABLE `xlsws_cart` DROP `payment_data`;
-		ALTER TABLE `xlsws_cart` DROP `payment_amount`;
-		ALTER TABLE `xlsws_cart` DROP `datetime_posted`;
-		ALTER TABLE `xlsws_cart` DROP `tracking_number`;
-		ALTER TABLE `xlsws_cart` DROP `email`;
-		ALTER TABLE `xlsws_cart` DROP `cost_total`;
-		ALTER TABLE `xlsws_cart` DROP `sell_total`;";
+		ALTER TABLE `xlsws_cart` DROP `ship_address1`;";
 
 		$arrSql = explode(";",$sqlstrings);
 
 		foreach ($arrSql as $strSql)
-			if (!empty($strSql))
+			if (!empty($strSql)) {
+				//Yii::log("running statement ".$strSql, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				Yii::app()->db->createCommand($strSql)->execute();
+			}
 
 
 
-		return json_encode(array('result'=>"success",'makeline'=>30,'tag'=>'Creating SEO-friendly URLs','total'=>50));
+		return json_encode(array('result'=>"success",'makeline'=>20,'tag'=>'Creating SEO-friendly URLs','total'=>50));
+
+	}
+	/**
+	 * 20 Drop fields no longer needed
+	 */
+	protected function actionDropCartfields2()
+	{
+
+		$sqlstrings = "ALTER TABLE `xlsws_cart` DROP `ship_address2`;
+		ALTER TABLE `xlsws_cart` DROP `ship_city`;
+		ALTER TABLE `xlsws_cart` DROP `ship_zip`;
+		ALTER TABLE `xlsws_cart` DROP `ship_state`;";
+
+		$arrSql = explode(";",$sqlstrings);
+
+		foreach ($arrSql as $strSql)
+			if (!empty($strSql)) {
+				//Yii::log("running statement ".$strSql, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				Yii::app()->db->createCommand($strSql)->execute();
+			}
+
+
+
+		return json_encode(array('result'=>"success",'makeline'=>21,'tag'=>'Creating SEO-friendly URLs','total'=>50));
+
+	}
+	/**
+	 * 21 Drop fields no longer needed
+	 */
+	protected function actionDropCartfields3()
+	{
+
+		$sqlstrings = "
+		ALTER TABLE `xlsws_cart` DROP `ship_country`;
+		ALTER TABLE `xlsws_cart` DROP `ship_phone`;
+		ALTER TABLE `xlsws_cart` DROP `zipcode`;
+		ALTER TABLE `xlsws_cart` DROP `contact`;
+		ALTER TABLE `xlsws_cart` DROP `company`;";
+
+		$arrSql = explode(";",$sqlstrings);
+
+		foreach ($arrSql as $strSql)
+			if (!empty($strSql)) {
+				//Yii::log("running statement ".$strSql, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				Yii::app()->db->createCommand($strSql)->execute();
+			}
+
+
+
+		return json_encode(array('result'=>"success",'makeline'=>25,'tag'=>'Creating SEO-friendly URLs','total'=>50));
 
 	}
 
 
 	/**
-	 * 30 Create request_urls and export any photos (from pre 2.5 installs)
+	 * 25 Create request_urls and export any photos (from pre 2.5 installs)
 	 */
 	public function actionConvertProductSEO()
 	{
@@ -784,7 +821,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 		$matches=Yii::app()->db->createCommand('SELECT count(*) FROM '.Product::model()->tableName().' WHERE request_url IS NULL AND title is not null')->queryScalar();
 		if ($matches>0)
-			return json_encode(array('result'=>"success",'makeline'=>30,'tag'=>'Creating SEO-friendly URLs '.$matches.' remaining','total'=>50));
+			return json_encode(array('result'=>"success",'makeline'=>25,'tag'=>'Creating SEO-friendly URLs '.$matches.' remaining','total'=>50));
 		else
 		{
 			//Getting ready for photo convert, drop any orphaned images with blobs
@@ -857,7 +894,10 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		}
 		$this->online++;
 
-		return json_encode(array('result'=>"success",'makeline'=>$this->online,'tag'=>'Installing Amazon categories (group '.($this->online-31)." of 14)", 'total'=>50));
+		if ($this->online-31 == 14)
+			return json_encode(array('result'=>"success",'makeline'=>$this->online,'tag'=>'Removing unused database fields 1', 'total'=>50));
+			else
+				return json_encode(array('result'=>"success",'makeline'=>$this->online,'tag'=>'Installing Amazon categories (group '.($this->online-31)." of 14)", 'total'=>50));
 	}
 
 
@@ -900,13 +940,50 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 
 
-		return json_encode(array('result'=>"success",'makeline'=>46,'tag'=>'Removing unused database fields','total'=>50));
+		return json_encode(array('result'=>"success",'makeline'=>46,'tag'=>'Removing unused database fields 2','total'=>50));
 
 	}
 
 
 	/**
-	 * 46 Drop product fields
+	 * 46 Drop fields no longer needed
+	 */
+	protected function actionDropMoreCartfields()
+	{
+
+		$sqlstrings = "ALTER TABLE `xlsws_cart` DROP `full_name`;
+		ALTER TABLE `xlsws_cart` DROP `phone`;
+		ALTER TABLE `xlsws_cart` DROP `shipping_method`;
+		ALTER TABLE `xlsws_cart` DROP `shipping_module`;
+		ALTER TABLE `xlsws_cart` DROP `shipping_data`;
+		ALTER TABLE `xlsws_cart` DROP `shipping_cost`;
+		ALTER TABLE `xlsws_cart` DROP `shipping_sell`;
+		ALTER TABLE `xlsws_cart` DROP `payment_method`;
+		ALTER TABLE `xlsws_cart` DROP `payment_module`;
+		ALTER TABLE `xlsws_cart` DROP `payment_data`;
+		ALTER TABLE `xlsws_cart` DROP `payment_amount`;
+		ALTER TABLE `xlsws_cart` DROP `datetime_posted`;
+		ALTER TABLE `xlsws_cart` DROP `tracking_number`;
+		ALTER TABLE `xlsws_cart` DROP `email`;
+		ALTER TABLE `xlsws_cart` DROP `cost_total`;
+		ALTER TABLE `xlsws_cart` DROP `sell_total`;";
+
+		$arrSql = explode(";",$sqlstrings);
+
+		foreach ($arrSql as $strSql)
+			if (!empty($strSql))
+				Yii::app()->db->createCommand($strSql)->execute();
+
+
+
+		return json_encode(array('result'=>"success",'makeline'=>47,'tag'=>'Removing unused database fields 3','total'=>50));
+
+	}
+
+
+
+	/**
+	 * 47 Drop product fields
 	 * @return string
 	 */
 	protected function actionDropProductFields()
@@ -931,12 +1008,12 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 
 
-		return json_encode(array('result'=>"success",'makeline'=>47,'tag'=>'Calculating available inventory','total'=>50));
+		return json_encode(array('result'=>"success",'makeline'=>48,'tag'=>'Calculating available inventory','total'=>50));
 
 	}
 
 	/**
-	 * 47 Create request_urls and export any photos (from pre 2.5 installs)
+	 * 48 Create request_urls and export any photos (from pre 2.5 installs)
 	 */
 	public function actionCalculateInventory()
 	{
@@ -944,10 +1021,10 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		$matches = Product::RecalculateInventory();
 
 		if ($matches>0)
-			return json_encode(array('result'=>"success",'makeline'=>47,'tag'=>'Calculating available inventory '.$matches.' products remaining','total'=>50));
+			return json_encode(array('result'=>"success",'makeline'=>48,'tag'=>'Calculating available inventory '.$matches.' products remaining','total'=>50));
 		else
 		{
-			return json_encode(array('result'=>"success",'makeline'=>48,'tag'=>'Final cleanup','total'=>50));
+			return json_encode(array('result'=>"success",'makeline'=>49,'tag'=>'Final cleanup','total'=>50));
 
 		}
 
@@ -958,7 +1035,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 
 	/**
-	 * 48 Cleanup details, config options that have changed, NULL where we had 0's, etc.
+	 * 49 Cleanup details, config options that have changed, NULL where we had 0's, etc.
 	 * @return string
 	 */
 	protected function actionUpdateConfiguration()

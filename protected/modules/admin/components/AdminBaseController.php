@@ -112,14 +112,22 @@ class AdminBaseController extends CController
 						Yii::app()->user->setFlash('error',print_r($item->getErrors(),true));
 					else
 						$item->postConfigurationChange();
+
+					if($item->key_name=='EMAIL_TEST' && $item->key_value==1)
+						$this->sendEmailTest();
+
 				}
 				Yii::app()->user->setFlash('success',Yii::t('cart','Configuration updated on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
+
+
+
 			}
 		}
 
 
 		foreach ($model as $i=>$item)
 		{
+			if ($item->key_name=="EMAIL_TEST") $item->key_value=0;
 			if ($item->options=="BOOL") $this->registerOnOff($item->id,"Configuration_{$i}_key_value",$item->key_value);
 			if ($item->options=="PASSWORD") $model[$i]->key_value=_xls_decrypt($model[$i]->key_value);
 			$model[$i]->title = Yii::t('global',$item->title,

@@ -6,8 +6,10 @@ You should not hard-code point sizes for fonts, you should use em or percentages
 so it degrades gracefully on smaller screens. Use http://pxtoem.com/ for conversion.
 See base.css for base point sizes used.
 
-We recommend placing customizations in webstore-custom.css which overrides elements in this
-file, and leaving this file untouched.
+We recommend placing customizations in custom.css which overrides elements in this
+file, and leaving this file untouched. This file contains no coloring information, that's all in light.css and dark.css which can be
+ chosen from Admin Panel->Themes . You can also selectively override anything using custom.css which is loaded last,
+ or you can choose custom in Admin Panel->Themes to use that color file exclusively.
 */
 
 /**** Global settings ******/
@@ -60,19 +62,20 @@ a:hover {  text-decoration: none;   }
 #menubar { margin-bottom: 10px; height: 47px; border-bottom: 1px dotted #aaaaaa; }
 #menutabs { margin-top: 3px; margin-left: -26px;}
 .menutab {  font-size: 1em; font-weight: 600; text-align: center; text-transform: uppercase; cursor: pointer; }
+.menutab a {  color: #444444; }
 .innertab a { text-decoration: none;}
 .menuheight { height: 48px; }
 .menuunderline { }
 .menuunderline:hover { border-bottom: 5px solid #000000;}
 
-#nav_products { font-weight: 600; height: 47px; text-decoration: none; z-index: 2000; border-bottom: 0px; text-align: left; cursor: pointer; margin-left: 9px;}
+#nav_products { font-weight: 600; height: 47px; text-decoration: none; z-index: 2000; border-bottom: 0px; text-align: left; cursor: pointer; margin-left: 9px; margin-top: 3px;}
 #nav_products .productstab { height: 45px; margin-top: 2px;}
-#nav_products .dropspace { margin-top: 25px; } /* push dropdown menu down from underneath PRODUCTS tab */
+#nav_products .dropspace { margin-top: 10px; } /* push dropdown menu down from underneath PRODUCTS tab */
  /* all this to create dropdown and popout menu effects */
 #nav_products a { display: block; margin-right: 3px; padding: 0 0 0 0 ; text-decoration: none;  z-index: 2000;}
 #nav_products ul { border: none; line-height: 1; list-style: none; list-style-type: none; margin: 0px 0 0px 0px; padding-bottom: 20px;z-index: 2000;}
 #nav_products ul a {  border-bottom: 1px dotted #cccccc; z-index: 2000;}
-#nav_products li { float: left; width: 10em; height: 29px;  z-index: 2000;}
+#nav_products li { float: left; width: 10em; height: 30px;  z-index: 2000; line-height:19px !important; }
 #nav_products li ul { left: -999em; position: absolute; width: 10em; height: 29px; z-index: 2000;}
 #nav_products li ul ul { margin: -33px 0 0 180px; z-index: 2000;}
 #nav_products ul li ul li a { font-size: 1em; font-weight: 700; padding: 8px 10px; width: 160px; border-bottom: 1px dotted #cccccc; z-index: 2000;}
