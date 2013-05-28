@@ -102,24 +102,21 @@ class TaxCode extends BaseTaxCode
 
 	public static function VerifyAnyDestination() {
 
-		//We only need this when we are NOT using restricted shipping
-		if (_xls_get_conf('SHIP_RESTRICT_DESTINATION')==0)
-		{
-			$objAnyDest = Destination::model()->findByAttributes(array('country'=>null,'state'=>null));
+		$objAnyDest = Destination::model()->findByAttributes(array('country'=>null,'state'=>null));
 
-			if (!($objAnyDest instanceof Destination)) {
-				$objTax = TaxCode::GetNoTaxCode();
-				if ($objTax) {
-					$objNewAny = new Destination;
-					$objNewAny->country=null;
-					$objNewAny->state=null;
-					$objNewAny->zipcode1='';
-					$objNewAny->zipcode2='';
-					$objNewAny->taxcode=$objTax->lsid;
-					$objNewAny->save();
-				}
+		if (!($objAnyDest instanceof Destination)) {
+			$objTax = TaxCode::GetNoTaxCode();
+			if ($objTax) {
+				$objNewAny = new Destination;
+				$objNewAny->country=null;
+				$objNewAny->state=null;
+				$objNewAny->zipcode1='';
+				$objNewAny->zipcode2='';
+				$objNewAny->taxcode=$objTax->lsid;
+				$objNewAny->save();
 			}
 		}
+
 
 	}
 }

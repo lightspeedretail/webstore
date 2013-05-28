@@ -28,6 +28,23 @@
 			<?php echo $form->textArea($model,'registry_description'); ?>
 			<?php echo $form->error($model,'registry_description'); ?>
 	    </div>
+		<div class="row-fluid">
+			<?php echo $form->label($model,'event_date'); ?>
+			<?php $this->widget('zii.widgets.jui.CJuiDatePicker', array(
+				'model' => $model,
+				'attribute' => 'event_date',
+				'options' => array(
+					'showAnim' => 'fold',
+					'dateFormat' => 'yy-mm-dd', // save to db format
+					'altField' => '#self_pointing_id',
+					'altFormat' => _xls_convert_date_to_js(_xls_get_conf('DATE_FORMAT','Y-m-d')), // show to user format
+				),
+				'htmlOptions' => array(
+					'style' => 'height:20px;'
+				),
+			));	?>
+			<?php echo $form->error($model,'event_date'); ?>
+	    </div>
         <div class="row-fluid spaceafter">
 	            <?php echo $form->labelEx($model,'visibility'); ?>
 		        <?php echo $form->radioButtonList($model,'visibility',$model->getVisibilities(), array('separator'=>'')); ?>

@@ -84,7 +84,7 @@ class WishlistController extends Controller
 
 		//We should only show this option to a logged in user
 		if (Yii::app()->user->isGuest)
-			throw new CHttpException(404, Yii::t('global','You must be logged in to edit Wish Lists.'));
+			throw new CHttpException(404, Yii::t('wishlist','You must be logged in to edit Wish Lists.'));
 
 		$strCode = Yii::app()->getRequest()->getParam('code');
 
@@ -96,10 +96,10 @@ class WishlistController extends Controller
 		);
 
 		if (!($objWishlist instanceof Wishlist))
-			throw new CHttpException(404,Yii::t('global','The requested Wish List does not exist.'));
+			throw new CHttpException(404,Yii::t('wishlist','The requested Wish List does not exist.'));
 
 		if ($objWishlist->visibility == Wishlist::PRIVATELIST && $objWishlist->customer_id != Yii::app()->user->id)
-			throw new CHttpException(404,Yii::t('global','The requested Wish List is not viewable.'));
+			throw new CHttpException(404,Yii::t('wishlist','The requested Wish List is not viewable.'));
 
 		// collect user input data
 		if(isset($_POST['Wishlist']))
@@ -205,7 +205,7 @@ class WishlistController extends Controller
 
 		if (Yii::app()->user->isGuest)
 		{
-			echo Yii::t('global',"You must be logged in to add to a wish list. Please sign in and try again.");
+			echo Yii::t('wishlist',"You must be logged in to add to a wish list. Please sign in and try again.");
 			return;
 		}
 
@@ -243,7 +243,7 @@ class WishlistController extends Controller
 						}
 						else
 						{
-							echo Yii::t('cart',"Please choose options before selecting {button}",
+							echo Yii::t('wishlist',"Please choose options before selecting {button}",
 								array('{button}'=>Yii::t('product', 'Add to Wish List')));
 							return;
 						}
@@ -280,12 +280,12 @@ class WishlistController extends Controller
 							$objWishItem->product_id = $intProductId;
 							$objWishItem->qty = $intQty;
 							if ($objWishItem->save())
-								echo Yii::t('global','Item has been added to your Wish List.');
+								echo Yii::t('wishlist','Item has been added to your Wish List.');
 							else
 							{
 								Yii::log("error saving wishlist item ".print_r($objWishItem->getErrors(),true),
 									'error', 'application.'.__CLASS__.".".__FUNCTION__);
-								echo Yii::t('global','An error occurred adding this item to your Wish List.');
+								echo Yii::t('wishlist','An error occurred adding this item to your Wish List.');
 							}
 
 							break;

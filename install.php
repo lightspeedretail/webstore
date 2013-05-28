@@ -991,7 +991,7 @@ function initialCreateTables($db)
 	     `html_email`           TINYINT(1) DEFAULT '1',
 	     `password`             VARCHAR(255) DEFAULT NULL,
 	     `temp_password`        VARCHAR(255) DEFAULT NULL,
-	     `allow_login`          TINYINT(1) DEFAULT '1',
+	     `allow_login`          TINYINT(1) DEFAULT NULL,
 	     `created`              DATETIME NOT NULL,
 	     `modified`             TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	     PRIMARY KEY (`rowid`),
@@ -1255,7 +1255,7 @@ function initialCreateTables($db)
 	     `registry_name`        VARCHAR(100) NOT NULL,
 	     `registry_password`    VARCHAR(100) NOT NULL,
 	     `registry_description` TEXT,
-	     `event_date`           DATE NOT NULL,
+	     `event_date`           DATE NULL,
 	     `html_content`         TEXT NOT NULL,
 	     `ship_option`          VARCHAR(100) DEFAULT NULL,
 	     `customer_id`          INT(11) NOT NULL,
@@ -2401,6 +2401,8 @@ UPDATE xlsws_configuration set configuration_type_id=29 where key_name like '%IM
 UPDATE xlsws_modules set category='theme' where category='template';
 INSERT IGNORE INTO `xlsws_configuration` (`id`, `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES (NULL, 'After adding item to cart', 'AFTER_ADD_CART', '0', 'What should site do after shopper adds item to cart', '4', '5', '2009-04-06 10:34:34', '2009-04-06 10:34:34', 'AFTER_ADD_CART', '0', '1', NULL);
 INSERT IGNORE INTO `xlsws_configuration` (`id`, `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES (NULL, 'Send test email on Save', 'EMAIL_TEST', '0', 'When clicking Save, system will attempt to send a test email through', '5', '20', '2012-05-22 07:55:29', '2012-04-13 10:07:41', 'BOOL', '0', '0', NULL);
+INSERT IGNORE INTO `xlsws_configuration` (`id`, `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES (NULL, 'Appending ?group=1 (=2 etc) to Url will break feed into groups of', 'GOOGLE_PARSE', '5000', 'For large db\'s, break up google merchant feed', '20', '5', '2012-09-26 12:20:00', '2012-08-28 14:07:09', NULL, '0', '1', NULL);
+
 
 	SET FOREIGN_KEY_CHECKS=1";
 }
@@ -2452,7 +2454,7 @@ function initialConfigLoad($db)
 	$db->add_config_key("TIMEZONE","Web Store Time Zone","America/New_York","The timezone in which your Web Store should display and store time.",15,4,"TIMEZONE");
 	$db->add_config_key("ENABLE_SSL","Enable SSL","","You must have SSL/https enabled on your site to use SSL.",16,2,"BOOL");
 	$db->add_config_key("RESET_GIFT_REGISTRY_PURCHASE_STATUS","Number Of Hours Before Purchase Status Is Reset",6,"A visitor may add an item to cart from gift registry but may never order it. The option will reset the status to available for purchase after the specified number of hours since it was added to cart.",7,3,"INT");
-	$db->add_config_key("CURRENCY_FORMAT","Currency Printing Format","%n","Currency will be printed in this format. Please see http://www.php.net/money_format for more details.",15,8,"");
+	$db->add_config_key("CURRENCY_FORMAT","Currency Printing Format","%n","Currency will be printed in this format. Please see http://www.php.net/money_format for more details.",0,8,"");
 	$db->add_config_key("LOCALE","Locale","en_US","Locale for your web store. See http://www.php.net/money_format for more information",15,1,"");
 
 	$db->add_config_key("STORE_PHONE","Store Phone","555-555-1212","Phone number displayed in email footer.",2,2,NULL);
@@ -2527,7 +2529,7 @@ function initialConfigLoad($db)
 	$db->add_config_key("SLIDER_IMAGE_WIDTH","Slider Image Width",90,"Slider on custom pages",29,11,"INT");
 	$db->add_config_key("SLIDER_IMAGE_HEIGHT","Slider Image Height",90,"Slider on custom pages",29,12,"INT");
 	$db->add_config_key("IMAGE_FORMAT","Image Format","jpg","Use .jpg or .png format for images. JPG files are smaller but slightly lower quality. PNG is higher quality and supports transparency, but has a larger file size.",17,18,"IMAGE_FORMAT");
-	$db->add_config_key("ENABLE_CATEGORY_IMAGE","Display Image on Category Page (when set)",0,"Requires a defined Category image under SEO settings",17,13,"BOOL");
+	$db->add_config_key("ENABLE_CATEGORY_IMAGE","Display Image on Category Page (when set)",0,"Requires a defined Category image under SEO settings",0,13,"BOOL");
 	$db->add_config_key("SHIP_SAME_BILLSHIP","Require Billing and Shipping Address to Match",0,"Locks the Shipping and Billing are same checkbox to not allow separate shipping address.",25,2,"BOOL");
 	$db->add_config_key("DEBUG_LS_SOAP_CALL","Debug SOAP Calls",0,"Debug",1,17,"BOOL");
 	$db->add_config_key("STORE_ADDRESS1","Store Address","123 Main St.","Address line 1",2,5,"NULL");
@@ -3530,7 +3532,7 @@ function up250($db,$sqlline)
 
 		$db->add_config_key('ENABLE_CATEGORY_IMAGE' ,
 			'Display Image on Category Page (when set)',
-					'0', 'Requires a defined Category image under SEO settings', 17, 13,  'BOOL',1);
+					'0', 'Requires a defined Category image under SEO settings', 0, 13,  'BOOL',1);
 		$db->query("update `xlsws_configuration` set template_specific=1,`configuration_type_id`=29 where `key` like '%_IMAGE_WIDTH'");
 		$db->query("update `xlsws_configuration` set template_specific=1,`configuration_type_id`=29 where `key` like '%_IMAGE_HEIGHT'");
 		$db->query("update `xlsws_configuration` set template_specific=1 where `key` = 'DEFAULT_TEMPLATE_THEME'");

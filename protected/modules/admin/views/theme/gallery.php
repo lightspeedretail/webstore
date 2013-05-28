@@ -1,7 +1,7 @@
 <div class="span9">
 	<div class="hero-unit nobottom">
 
-		<h3><?php echo Yii::t('global','Install themes from the LightSpeed Gallery'); ?></h3>
+		<h3><?php echo Yii::t('admin','Install themes from the LightSpeed Gallery'); ?></h3>
 		<div class="editinstructions">
 			<?php echo Yii::t('admin','To install a theme, click it and then click Install. The theme will be downloaded from our gallery to your Web Store and available for you to use.'); ?>
 		</div>

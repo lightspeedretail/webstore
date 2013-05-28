@@ -31,11 +31,15 @@ class Stringsource extends BaseStringsource
 
 		$criteria=new CDbCriteria;
 		$criteria->alias = 'Stringsource';
-		$criteria->select = 'Stringsource.id,stringtranslates.id,message,category,translation';
-		$criteria->join='LEFT JOIN xlsws_stringtranslate stringtranslates ON Stringsource.id=stringtranslates.id';
-		$criteria->compare('stringtranslates.language',$this->dest);
-		$criteria->compare('category',$this->category);
-		$criteria->compare('stringtranslates.translation',$this->string,true);
+		$criteria->select = 'Stringsource.id,message,category';
+		$criteria->addCondition('category = :cat');
+		if (!empty($this->string))
+		{
+			$criteria->addCondition('stringtranslates.translation = :string');
+			$criteria->params = array(':cat'=>$this->category,':string'=>$this->string);
+		}
+		else
+			$criteria->params = array(':cat'=>$this->category);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -53,6 +57,16 @@ class Stringsource extends BaseStringsource
 	public function getCategories()
 	{
 		return CHtml::listData(Stringsource::model()->findAllByAttributes(array(),array('distinct'=>true,'order'=>'category')), 'category', 'category');
+	}
+
+	public function getTranslated($dest,$id)
+	{
+
+		$model = Stringtranslate::model()->findByAttributes(array('id'=>$id,'language'=>$dest));
+		if ($model)
+			return $model->translation;
+		else return "";
+
 
 	}
 

@@ -247,7 +247,7 @@ class BaseCheckoutForm extends CFormModel
 			'billingState'=>'State/Province',
 			'billingPostal'=>'Zip/Postal',
 			'billingCountry'=>'Country',
-			'billingSameAsShipping'=>'My shipping address is also my billing address',
+			'billingSameAsShipping'=>Yii::app()->params['SHIP_SAME_BILLSHIP'] ? 'We require your billing and shipping addresses to match' : 'My shipping address is also my billing address',
 			'billingResidential'=>'This is a residential address',
 			'shippingLabel'=>'Label for this address (i.e. Home, Work)',
 			'shippingFirstName'=>'First Name',
@@ -294,7 +294,18 @@ class BaseCheckoutForm extends CFormModel
 	 */
 	public function getCountries() {
 
-		return CHtml::listData(Country::model()->findAllByAttributes(array('active'=>1),array('order'=>'sort_order,country')), 'id', 'country');
+		$criteria=new CDbCriteria();
+		$criteria->select="t1.id,t1.country";
+		$criteria->alias="t1";
+		$criteria->compare('active','1');
+		$criteria->order="sort_order,t1.country";
+		if (Yii::app()->params['SHIP_RESTRICT_DESTINATION'])
+			$criteria->join="JOIN ".Destination::model()->tableName().
+				" ON `".Destination::model()->tableName()."`.`country` = `t1`.`id`";
+
+		$model = Country::model()->findAll($criteria);
+
+		return CHtml::listData($model, 'id', 'country');
 
 	}
 
@@ -308,13 +319,26 @@ class BaseCheckoutForm extends CFormModel
 	public function getStates($type = 'billing',$intCountry = null) {
 
 		if (is_null($intCountry))
-			$intCountry = (int)_xls_get_conf('DEFAULT_COUNTRY',224);
+			$intCountry = _xls_get_conf('DEFAULT_COUNTRY',224);
 
 		//These are only on first display so state list defaults to chosen country
 		if ($type=='billing') $intCountry = $this->billingCountry;
 		if ($type=='shipping') $intCountry = $this->shippingCountry;
 
-		$arrStates = CHtml::listData(State::model()->findAllByAttributes(array('country_id'=>$intCountry,'active'=>1),array('order'=>'sort_order,state')), 'id', 'code');
+		$criteria=new CDbCriteria();
+		$criteria->select="t1.id,t1.code";
+		$criteria->alias="t1";
+		$criteria->addCondition('country_id ='.$intCountry);
+		$criteria->addCondition('active=1');
+		$criteria->order="sort_order,t1.state";
+		if (Yii::app()->params['SHIP_RESTRICT_DESTINATION'])
+			$criteria->join="JOIN ".Destination::model()->tableName().
+				" ON `".Destination::model()->tableName()."`.`state` = `t1`.`id`";
+
+		$model = State::model()->findAll($criteria);
+
+		$arrStates =  CHtml::listData($model, 'id', 'code');
+
 		if (count($arrStates)==0)
 			$arrStates[null]="n/a";
 		return $arrStates;

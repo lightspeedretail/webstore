@@ -21,7 +21,26 @@ class freeshippingAdminForm extends CFormModel
 		return array(
 			array('label,restrictcountry,offerservices,product','required'),
 			array('rate,startdate,enddate,promocode,qty_remaining','safe'),
+			array('startdate,enddate','valiDates'),
 		);
+	}
+
+
+	/**
+	 * @param $attribute
+	 * @param $params
+	 */
+	public function valiDates($attribute, $params)
+	{
+		if ( $this->startdate != '' && $this->enddate != '')
+		{
+			if ($this->startdate > $this->enddate)
+				$this->addError($attribute,
+					Yii::t('yii','End Date can\'t come before Start Date.',
+						array('{attribute}'=>$this->getAttributeLabel($attribute)))
+				);
+		}
+
 	}
 
 	/**

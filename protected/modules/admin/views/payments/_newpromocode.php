@@ -45,7 +45,6 @@
 			    'success'=>'js:function(data) {
 	                if (data=="success")
 	                window.location.reload();
-	                else alert(data);
                  }',
 		    ),array('id'=>'btnSubmit','class'=>'btn btn-primary btn-small')); ?>
     </div>

@@ -16,7 +16,7 @@
 
 	<meta name="google-site-verification" content="<?= $this->pageGoogleVerify; ?>"/>
 
-	<link rel="Shortcut Icon" href="favicon.ico" type="image/x-icon"/>
+	<link rel="Shortcut Icon" href="<?=Yii::app()->baseUrl."/images/favicon.ico" ?>" type="image/x-icon"/>
 
 	<?php Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl.'/css/base.css'); ?>
 	<?php Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->baseUrl.'/css/style.css'); ?>

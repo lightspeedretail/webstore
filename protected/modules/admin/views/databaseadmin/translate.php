@@ -15,7 +15,7 @@
 ?>
 <div class="span9">
 
-    <h3><?php echo Yii::t('global','Translation for {dest}',array('{dest}'=>$model->dest)); ?></h3>
+    <h3><?php echo Yii::t('admin','Translation for {dest}',array('{dest}'=>$model->dest)); ?></h3>
 	<div class="span8">
 	    <div class="editinstructions">
 			<?php echo Yii::t('admin','Click on the phrase to change the foreign language translation. The original appears on the left. Any strings inside {curly braces} must be left intact.'); ?>
@@ -45,7 +45,7 @@
 		    array(
 			    'class' => 'editable.EditableColumn',
 			    'name' => 'message',
-			    'value' => '($data->stringtranslates === null) ? "Error" : $data->stringtranslates[0]->translation',
+			    'value' => '($data->stringtranslates === null) ? "Error" : $data->getTranslated("'.$model->dest.'",$data->id)',
 			    'editable' => array(
 				    'title'=>'Translation',
 				    'url' => $this->createUrl('databaseadmin/translate?dest='.$model->dest),
@@ -64,9 +64,6 @@
 				    ),
 			    )
 		    ),
-
-
-
 
 		),
     ));

@@ -20,6 +20,8 @@ class canadapost extends WsShipping
 
 	public function run()
 	{
+		if(!isset($this->config['offerservices'])) return false;
+
 		$weight = $this->objCart->Weight;
 
 		if(_xls_get_conf('WEIGHT_UNIT', 'kg') != 'kg')

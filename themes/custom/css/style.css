@@ -47,7 +47,7 @@ a:hover {  text-decoration: none;   }
 .spaceafter {  margin-bottom: 10px; }
 .remove-bottom { padding-bottom: 0px  !important; margin-bottom: 0px  !important;}
 /***** Heady *****/
-#headerimage { padding-bottom: 30px; overflow: hidden;}
+#headerimage { margin-top: 5px; padding-bottom: 30px; overflow: hidden;}
 #viewport { clear: both; }
 #langdrop select { font-size: 0.7em; height: 33px;}
 
@@ -289,10 +289,12 @@ a:hover {  text-decoration: none;   }
 #orderdisplay .qtybox { width: 30px;}
 #orderdisplay fieldset { display:inline-block;  border-bottom: 2px dotted #e7e7e7; }
 .myaddress { margin-left: 0px !important; padding-bottom: 10px !important; height: 125px;}
+.myaddress .default { color: #9c9c9c; font-size: 0.9em; font-style: italic; font-weight: 600;}
 
 /***** Order/SRO/Quote Display *****/
 #wishlistdisplay .rowborder { border-bottom: 1px dotted #aaaaaa;}
 #wishlistdisplay .cartlabel { text-transform: uppercase; font-size: 0.9em; font-weight: 600; }
+#wishlistdisplay .event_date { font-size: 0.8em;  margin-bottom: 20px; margin-top: -20px;}
 #wishlistdisplay .qtybox { width: 30px; font-size: 1.1em; margin-bottom: 7px; border: 3px; border-bottom: 1px solid black; text-align: center; padding: 2px; height: 15px;}
 #wishlistdisplay .light { font-weight: 300; }
 #wishlistdisplay .heading { font-size: 1.3em; }

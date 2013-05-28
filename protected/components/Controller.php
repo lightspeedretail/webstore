@@ -77,7 +77,7 @@ class Controller extends CController
 
 		// filter out garbage requests
 		$uri = Yii::app()->request->requestUri;
-		if (strpos($uri, 'favicon') || strpos($uri, 'robots'))
+		if (strpos($uri, 'favicon') || strpos($uri, 'robot'))
 			Yii::app()->end();
 
 		//Set defaults

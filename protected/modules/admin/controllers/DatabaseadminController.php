@@ -218,7 +218,7 @@ class DatabaseadminController extends AdminBaseController
 					Product::model()->deleteByPk($_POST['pk']);
 					echo "delete";
 				}
-			} else echo Yii::t('global','You cannot change a product code here. Delete the code to remove it manually from the Web Store database');
+			} else echo Yii::t('admin','You cannot change a product code here. Delete the code to remove it manually from the Web Store database');
 
 		} else {
 
@@ -321,6 +321,13 @@ class DatabaseadminController extends AdminBaseController
 			$value = Yii::app()->getRequest()->getPost('value');
 
 			$string=Stringtranslate::model()->findByAttributes(array('language'=>$strDestLang,'id'=>$pk));
+			if(!$string)
+			{
+				$string = new Stringtranslate();
+				$string->id = $pk;
+				$string->language = $strDestLang;
+			}
+
 			$string->translation=$value;
 			$string->save();
 

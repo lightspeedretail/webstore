@@ -36,10 +36,9 @@ class Wishlist extends BaseWishlist
 		return array(
 			'id' => 'ID',
 			'registry_name' => 'Name your Wish List',
-			'registry_password' => 'Password (Optional)',
 			'registry_description' => 'Description (Optional)',
 			'visibility' => 'Visibility',
-			'event_date' => 'Event Date',
+			'event_date' => 'Event Date (Optional)',
 			'html_content' => 'Html Content',
 			'ship_option' => 'Ship Option',
 			'customer_id' => 'Customer',
@@ -71,9 +70,9 @@ class Wishlist extends BaseWishlist
 		return array(
 			array('registry_name,visibility,ship_option,after_purchase', 'required'),
 			array('visibility', 'numerical', 'integerOnly'=>true),
-			array('registry_name, registry_password, ship_option, gift_code', 'length', 'max'=>100),
+			array('registry_name, ship_option, gift_code', 'length', 'max'=>100),
 			array('customer_id', 'length', 'max'=>20),
-			array('registry_description,deleteMe', 'safe'),
+			array('registry_description,event_date,deleteMe', 'safe'),
 		);
 	}
 
@@ -277,6 +276,8 @@ class Wishlist extends BaseWishlist
 		if ($this->isNewRecord)
 			$this->created = new CDbExpression('NOW()');
 		$this->modified = new CDbExpression('NOW()');
+
+		if($this->event_date=='') $this->event_date = null;
 
 		return parent::beforeValidate();
 	}

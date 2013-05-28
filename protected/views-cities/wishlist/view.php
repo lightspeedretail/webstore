@@ -3,6 +3,7 @@
 
     <div class="span5">
         <h1><?= Yii::t('global','Wish List') ?>: <?= $model->registry_name; ?></h1>
+	    <div class="event_date"><?php if($model->event_date) echo Yii::t('global','Event Date').": ".$model->event_date; ?></div>
     </div>
 	<?php if ($model->IsMine): ?>
 		<?= CHtml::tag('div',array(
@@ -32,71 +33,71 @@
     </div>
 
 	<?php foreach ($model->wishlistItems as $item): ?>
-	    <div class="row-fluid rowborder midrow">
-	        <div class="span2 list_item">
-			<span class="list_image">
-				<a href="<?= $item->product->Link; ?>">
-	                <img src="<?= $item->product->SmallImage ?>" />
-	            </a>
-			</span>
-	        </div>
-	        <div class="span3">
-	            <a href="<?php echo $item->product->Link; ?>"><?=  _xls_truncate($item->product->Title, 65, "...\n", true); ?></a>
-		        <?= ($item->comment ? "<div class=\"comment\">".$item->comment."</div>" : "") ?>
-	        </div>
+		<?php if ($item->product != null): ?>
+		    <div class="row-fluid rowborder midrow">
+		        <div class="span2 list_item">
+				<span class="list_image">
+					<a href="<?= $item->product->Link; ?>">
+		                <img src="<?= $item->product->SmallImage ?>" />
+		            </a>
+				</span>
+		        </div>
+		        <div class="span3">
+		            <a href="<?php echo $item->product->Link; ?>"><?=  _xls_truncate($item->product->Title, 65, "...\n", true); ?></a>
+			        <?= ($item->comment ? "<div class=\"comment\">".$item->comment."</div>" : "") ?>
+		        </div>
 
-	        <div class="span2">
-		        <span id="qty-<?= $item->id ?>" class="cart_qty">
-			        <?= $item->qty; ?>
-		        </span>
-		        <?= ($item->priority <> 1 ? "<div class=\"comment\">".$item->Priority."</div>" : "") ?>
-	        </div>
-	        <div class="span3 link">
-		        <?php
-		        if (is_null($item->cart_item_id) && $item->product->IsAvailable)
-			        echo CHtml::ajaxLink(
-			            Yii::t('product', 'Add to Cart'),
-				        array('cart/AddToCart'),
-				        array('data'=>array(
-					        'id'=>$item->product_id,
-					        'qty'=>$item->qty,
-					        'wishid'=>$item->id,
-				        ),
-				        'type'=>'POST',
-					    'dataType'=>'json',
-				        'success' => 'js:function(data){
-		                    if (data.action=="alert") {
-		                      alert(data.errormsg);
-							} else if (data.action=="success") {
-								$("#shoppingcart").html(data.shoppingcart);
-				                $("#addToCart'.$item->id.'").prop("disabled", true);
-				                $("#addToCart'.$item->id.'").addClass("disabled");
-				        }}'
-			        ), array('id'=>'addToCart'.$item->id, 'class'=>'addcart'));
-			   else echo $item->PurchaseStatus;
-		     ?>
-	        </div>
-	        <div class="span2 centeritem">
-		        <?php echo CHtml::ajaxLink(Yii::t('global','Edit'),array('wishlist/edititem'),
-			              array(
-				          'type' => 'POST',
-				          'dataType'=>'json',
-			              'success'=>'js:function(data){
-			                    $("#WishlistEditForm_qty").val(data.qty);
-			                    $("#WishlistEditForm_qty_received").val(data.qty_received);
-			                    $("#WishlistEditForm_priority").val(data.priority);
-			                    $("#WishlistEditForm_comment").val(data.comment);
-			                    $("#WishlistEditForm_code").val(data.code);
-			                    $("#WishlistEditForm_id").val(data.id);
-	                            $("#WishitemEdit").dialog("open");
-								}',
-			              'data'=>array('code'=>$model->gift_code,'id'=>$item->id)
-			              ), array('id'=>'editItem'.$item->id, 'class'=>'editwish'));
-		        ?>
-	        </div>
-
-
-	    </div>
+		        <div class="span2">
+			        <span id="qty-<?= $item->id ?>" class="cart_qty">
+				        <?= $item->qty; ?>
+			        </span>
+			        <?= ($item->priority <> 1 ? "<div class=\"comment\">".$item->Priority."</div>" : "") ?>
+		        </div>
+		        <div class="span3 link">
+			        <?php
+			        if (is_null($item->cart_item_id) && $item->product->IsAvailable)
+				        echo CHtml::ajaxLink(
+				            Yii::t('product', 'Add to Cart'),
+					        array('cart/AddToCart'),
+					        array('data'=>array(
+						        'id'=>$item->product_id,
+						        'qty'=>$item->qty,
+						        'wishid'=>$item->id,
+					        ),
+					        'type'=>'POST',
+						    'dataType'=>'json',
+					        'success' => 'js:function(data){
+			                    if (data.action=="alert") {
+			                      alert(data.errormsg);
+								} else if (data.action=="success") {
+									$("#shoppingcart").html(data.shoppingcart);
+					                $("#addToCart'.$item->id.'").prop("disabled", true);
+					                $("#addToCart'.$item->id.'").addClass("disabled");
+					        }}'
+				        ), array('id'=>'addToCart'.$item->id, 'class'=>'addcart'));
+				   else echo $item->PurchaseStatus;
+			     ?>
+		        </div>
+		        <div class="span2 centeritem">
+			        <?php echo CHtml::ajaxLink(Yii::t('global','Edit'),array('wishlist/edititem'),
+				              array(
+					          'type' => 'POST',
+					          'dataType'=>'json',
+				              'success'=>'js:function(data){
+				                    $("#WishlistEditForm_qty").val(data.qty);
+				                    $("#WishlistEditForm_qty_received").val(data.qty_received);
+				                    $("#WishlistEditForm_priority").val(data.priority);
+				                    $("#WishlistEditForm_comment").val(data.comment);
+				                    $("#WishlistEditForm_code").val(data.code);
+				                    $("#WishlistEditForm_id").val(data.id);
+		                            $("#WishitemEdit").dialog("open");
+									}',
+				              'data'=>array('code'=>$model->gift_code,'id'=>$item->id)
+				              ), array('id'=>'editItem'.$item->id, 'class'=>'editwish'));
+			        ?>
+		        </div>
+		    </div>
+		<?php endif; ?>
 	<?php endforeach; ?>
 
 	<?php if (count($model->wishlistItems)==0): ?>

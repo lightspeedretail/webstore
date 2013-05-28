@@ -103,9 +103,14 @@ class MyaccountController extends Controller
 
 					if (Yii::app()->user->isGuest)
 					{
+						$model->record_type = Customer::REGISTERED;
+						$model->allow_login = Customer::NORMAL_USER;
+
 						if(_xls_get_conf('MODERATE_REGISTRATION',0))
 						{
-							if ($model->scenario=="create") $model->record_type = Customer::UNAPPROVED_USER;
+							if ($model->scenario=="create")
+								$model->allow_login = Customer::UNAPPROVED_USER;
+
 							Yii::app()->user->setFlash('success',
 								Yii::t('customer','Your account has been created but must be approved before you can log in. You will receive confirmation when you have been approved.'));
 						} else {
@@ -155,7 +160,7 @@ class MyaccountController extends Controller
 			$this->redirect($this->createUrl("/myaccount"));
 
 		$model = new CustomerAddress();
-		$model->country_id = (int)_xls_get_conf('DEFAULT_COUNTRY',224);
+		$model->country_id = _xls_get_conf('DEFAULT_COUNTRY',224);
 		$checkout = new CheckoutForm();
 
 		//For logged in users we grab the current model
@@ -164,7 +169,7 @@ class MyaccountController extends Controller
 		$id = Yii::app()->getRequest()->getParam('id');
 
 		$objAddress = CustomerAddress::model()->findByPk($id);
-		if ($objAddress instanceof CustomerAddress && $objAddress->customer_id == Yii::app()->user->id)
+		if ($id && $objAddress instanceof CustomerAddress && $objAddress->customer_id == Yii::app()->user->id)
 			$model = $objAddress;
 
 		// collect user input data
@@ -178,10 +183,21 @@ class MyaccountController extends Controller
 				if (!$model->save())
 					Yii::log("Error creating new customer address ".print_r($model->getErrors(),true),
 						'error', 'application.'.__CLASS__.".".__FUNCTION__);
+
+				if ($model->makeDefaultBilling)
+					$objCustomer->default_billing_id=$model->id;
+				if ($model->makeDefaultShipping)
+					$objCustomer->default_shipping_id=$model->id;
+				$objCustomer->save();
+
+
 				$this->redirect($this->createUrl("/myaccount"));
 
 			}
 		}
+
+		if($id && $objCustomer->default_billing_id==$model->id) $model->makeDefaultBilling=1;
+		if($id && $objCustomer->default_shipping_id==$model->id) $model->makeDefaultShipping=1;
 
 		$this->render('address',array('model'=>$model,'checkout'=>$checkout));
 

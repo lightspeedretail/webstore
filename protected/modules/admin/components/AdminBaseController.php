@@ -75,7 +75,7 @@ class AdminBaseController extends CController
       ',CClientScript::POS_HEAD);
 
 		if (_xls_get_conf('STORE_OFFLINE')>1)
-			Yii::app()->user->setFlash('warning',Yii::t('global','Your store is currently set offline for maintenance -- you can access it via the url {url}',
+			Yii::app()->user->setFlash('warning',Yii::t('admin','Your store is currently set offline for maintenance -- you can access it via the url {url}',
 			array('{url}'=>Yii::app()->createAbsoluteUrl('site/index',array('offline'=>_xls_get_conf('STORE_OFFLINE'))))));
 
 		return parent::beforeAction($action);
@@ -117,7 +117,7 @@ class AdminBaseController extends CController
 						$this->sendEmailTest();
 
 				}
-				Yii::app()->user->setFlash('success',Yii::t('cart','Configuration updated on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
+				Yii::app()->user->setFlash('success',Yii::t('admin','Configuration updated on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
 
 
 
@@ -130,12 +130,12 @@ class AdminBaseController extends CController
 			if ($item->key_name=="EMAIL_TEST") $item->key_value=0;
 			if ($item->options=="BOOL") $this->registerOnOff($item->id,"Configuration_{$i}_key_value",$item->key_value);
 			if ($item->options=="PASSWORD") $model[$i]->key_value=_xls_decrypt($model[$i]->key_value);
-			$model[$i]->title = Yii::t('global',$item->title,
+			$model[$i]->title = Yii::t('admin',$item->title,
 				array(
 					'{color}'=>_xls_regionalize('color'),
 					'{check}'=>_xls_regionalize('check'),
 				));
-			$model[$i]->helper_text = Yii::t('global',$item->helper_text,
+			$model[$i]->helper_text = Yii::t('admin',$item->helper_text,
 				array(
 					'{color}'=>_xls_regionalize('color'),
 					'{check}'=>_xls_regionalize('check'),

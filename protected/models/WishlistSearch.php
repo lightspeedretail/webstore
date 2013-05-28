@@ -42,7 +42,7 @@ class WishlistSearch extends CFormModel
 		$objCustomer = Customer::LoadByEmail($this->email);
 		if (!($objCustomer instanceof Customer)) {
 			$this->addError($attribute,
-				Yii::t('yii','Email address not found')
+				Yii::t('global','Email address not found')
 			);
 			return;
 		}
@@ -54,7 +54,7 @@ class WishlistSearch extends CFormModel
 					visibility=".Wishlist::PUBLICLIST.";")->queryScalar();
 		if ($intQty==0) {
 			$this->addError($attribute,
-				Yii::t('yii','No publicly searchable wish lists for this email address.')
+				Yii::t('wishlist','No publicly searchable wish lists for this email address.')
 			);
 			return;
 		}

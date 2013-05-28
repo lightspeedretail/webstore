@@ -24,6 +24,8 @@ class SearchController extends Controller
 	 */
 	public $subcategories;
 
+	protected $strBreadcrumbCat;
+
 	/**
 	 * Display and process our Advanced Search form. On submit, we build a URL and redirect so our
 	 * regular search function processes it.
@@ -186,8 +188,12 @@ class SearchController extends Controller
 		//Convert rows to objects for our view layer so it's consistent
 		$model = Product::model()->populateRecords($rows,false);
 
-		$this->breadcrumbs = array(
+		if (empty($this->strBreadcrumbCat))
+			$this->breadcrumbs = array(
 			Yii::t('global','Searching for "{terms}"',array('{terms}'=>$strQ))=>'',
+		);
+		else $this->breadcrumbs = array(
+			Yii::t('global','Searching for "{terms}" in category "{category}"',array('{terms}'=>$strQ,'{category}'=>$this->strBreadcrumbCat))=>'',
 		);
 		$this->CanonicalUrl = $this->createAbsoluteUrl('/search/results',$formModel->attributes,'',"&amp;");
 
@@ -329,10 +335,11 @@ class SearchController extends Controller
 		if(isset($formModel['cat'])  && $formModel['cat']>0)
 		{
 			$objCategory = Category::model()->findbyPk($formModel['cat']);
+			$this->strBreadcrumbCat = $objCategory->label;
 			$intIdArray = array($objCategory->id);
 			$intIdArray = array_merge($intIdArray, $objCategory->GetBranchPath());
 			unset($arrBind[':cat']);
-			$objCommand->leftJoin('xlsws_product_category_assn t3', 't3.product_id = t.id');
+			$objCommand->leftJoin('xlsws_product_category_assn t4', 't4.product_id = t.id');
 			$objCommand->where(array('AND', '(' . $strWhere . ') ' . $strInv . ' AND web=1', array('in', 'category_id', $intIdArray)));
 		}
 

@@ -1,7 +1,7 @@
 <div class="span9">
 	<div class="hero-unit nobottom">
 
-		<h3><?php echo Yii::t('global','Manage My Themes'); ?></h3>
+		<h3><?php echo Yii::t('admin','Manage My Themes'); ?></h3>
 		<div class="editinstructions">
 			<?php echo Yii::t('admin','Choose the theme you wish to use. Change {color} options for the theme below the image. Click Set to switch to this theme. Your currently active theme is always listed first.',array('{color}'=>_xls_regionalize('color'))); ?>
 		</div>

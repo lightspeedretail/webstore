@@ -28,11 +28,25 @@ class GoogleMerchant extends CAction
 		echo '		<link>'._xls_site_url().'</link>'.chr(13);
 		echo '		<description><![CDATA['._xls_get_conf('STORE_TAGLINE').']]></description>'.chr(13);
 
+		$sql = 'SELECT * FROM '.Product::model()->tableName().' WHERE current=1 AND web=1 '.$strQueryAddl.' ORDER BY id';
+
+		if(isset($_GET['group']))
+		{
+			$intGroup = _xls_number_only($_GET['group']);
+			if ($intGroup<1) $intGroup=1;
+			$parse = _xls_get_conf('GOOGLE_PARSE',5000);
+			switch ($intGroup)
+			{
+				case 1: $sql .= " limit ".$parse; break;
+				default:
+					$sql .= " limit ".((($intGroup-1)*$parse)).",".$parse; break;
+
+			}
 
 
-		$arrProducts=Yii::app()->db->createCommand(
-			'SELECT * FROM '.Product::model()->tableName().' WHERE current=1 AND web=1 '.$strQueryAddl.' ORDER BY id'
-			)->query();
+		}
+
+		$arrProducts=Yii::app()->db->createCommand($sql)->query();
 		
 		while(($arrItem=$arrProducts->read())!==false)
 		{

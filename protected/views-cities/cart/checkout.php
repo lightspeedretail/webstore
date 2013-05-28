@@ -262,7 +262,8 @@
 				<div class="span9">
 					<div class="rememberMe">
 						<?php echo $form->checkBox($model,'billingSameAsShipping',array(
-							'onclick'=>'js:jQuery($("#CustomerContactBillingAddress")).toggle()'
+							'onclick'=>'js:jQuery($("#CustomerContactBillingAddress")).toggle()',
+							'disabled'=>Yii::app()->params['SHIP_SAME_BILLSHIP']
 						)); ?>
 						<?php echo $form->label($model,'billingSameAsShipping'); ?>
 						<?php echo $form->error($model,'billingSameAsShipping'); ?>
@@ -408,11 +409,7 @@
 								} else if (data.action=="success") {
 									$("#' . CHtml::activeId($model,'promoCode') .'_em_").html(data.errormsg).show();
 									$("#cartItems").html(data.cartitems);
-									if (savedShippingProviders) {
-										savedTotalScenarios = data.totals;
-										savedShippingPrices = data.prices;
-										updateCart(pickedShippingPriority);
-									}
+									updateShippingAuto();
 								}
 			                }'),
 	                    array('id' => 'CheckoutForm_btnPromoCode')); ?>

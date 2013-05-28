@@ -41,10 +41,11 @@ class PromoCode extends BasePromoCode
 		// will receive user inputs.
 		return array(
 			array('code', 'required', 'on'=>'checkout'),
+			array('amount', 'required', 'on'=>'create'),
 			array('code', 'validatePromocode', 'on'=>'checkout'),
 			array('enabled, exception, type, qty_remaining', 'numerical', 'integerOnly'=>true, 'on'=>'create'),
-			array('amount, threshold', 'numerical', 'on'=>'create'),
 			array('code,amount,type', 'required', 'on'=>'create'),
+			array('amount, threshold', 'numerical', 'on'=>'create'),
 			array('code', 'length', 'max'=>255),
 			array('enabled,exception,amount,type,valid_from, valid_until, threshold,qty_remaining,lscodes', 'safe'),
 			// The following rule is used by search().

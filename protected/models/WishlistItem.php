@@ -68,16 +68,16 @@ class WishlistItem extends BaseWishlistItem
 	{
 
 		if (is_null($this->cart_item_id) && !$this->product->IsAvailable)
-				return Yii::t('global','Item Unavailable');
+				return Yii::t('wishlist','Item Unavailable');
 		elseif (is_null($this->cart_item_id))
-				return Yii::t('global','Not purchased');
+				return Yii::t('wishlist','Not purchased');
 		elseif ($this->cartItem->cart->cart_type == CartType::cart)
-			return Yii::t('global','Being Purchased');
+			return Yii::t('wishlist','Being Purchased');
 		elseif ($this->purchased_by == Yii::app()->user->id)
-			return Yii::t('global','Purchased on {date}',
+			return Yii::t('wishlist','Purchased on {date}',
 				array('{date}'=>date(_xls_get_conf('DATE_FORMAT','Y-m-d'),strtotime($this->cartItem->datetime_added))));
 		else
-			return Yii::t('global','Gifted on {date}',
+			return Yii::t('wishlist','Gifted on {date}',
 				array('{date}'=>date(_xls_get_conf('DATE_FORMAT','Y-m-d'),strtotime($this->cartItem->datetime_added))));
 
 

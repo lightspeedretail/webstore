@@ -2,7 +2,6 @@
 	<legend><?= Yii::t('global','Hover over image to zoom') ?></legend>
 	<?php $this->widget('ext.Yii-Image-Zoomer.YiiImageZoomer',array(
 		'multiple_zoom'=>count($model->AdditionalImages)>=1 ? true:false,
-		'imagefolder'=>'images',
 		'single_image'=>$model->Images,
 		'images'=>$model->Images,
 		'cursorshade'=>true,
@@ -19,7 +18,7 @@
 		'initzoomablefade'=>true,
 		'zoomablefade'=>true,
 		'speed'=>300,
-		'zIndex'=>4,
+		'zIndex'=>4
 	));
 	?>
 </div>

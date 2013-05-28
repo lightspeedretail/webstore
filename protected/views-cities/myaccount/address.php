@@ -26,7 +26,14 @@
 	        <div class="span5 rememberMe">
 		        <?php echo $form->checkbox($model,'active'); ?>
 		        <?php echo $form->labelEx($model,'active'); ?>
-		        <?php echo $form->error($model,'active'); ?>
+		        <?php echo $form->error($model,'active'); ?><br>
+		        <?php echo $form->checkbox($model,'makeDefaultBilling'); ?>
+		        <?php echo $form->labelEx($model,'makeDefaultBilling'); ?>
+		        <?php echo $form->error($model,'makeDefaultBilling'); ?><br>
+		        <?php echo $form->checkbox($model,'makeDefaultShipping'); ?>
+		        <?php echo $form->labelEx($model,'makeDefaultShipping'); ?>
+		        <?php echo $form->error($model,'makeDefaultShipping'); ?>
+
 	        </div>
         </div>
 
@@ -81,7 +88,7 @@
             <div class="span2">
 				<?php echo $form->labelEx($model,'state_id'); ?>
 				<?php echo $form->dropDownList($model,'state_id',
-	            $model->getStates('billing'),array('prompt' =>'--')); ?>
+					$checkout->getStates('myaccount',$model->country_id),array('prompt' =>'--')); ?>
 				<?php echo $form->error($model,'state_id'); ?>
             </div>
             <div class="span3">

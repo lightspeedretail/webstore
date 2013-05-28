@@ -49,7 +49,7 @@ class australiapost extends WsShipping
 		if ($height<15) $height=15;
 		if ($weight<1) $weight=1;
 
-		if(empty($this->config['originpostcode']) )
+		if(empty($this->config['originpostcode']) || empty($this->config['offerservices']) )
 			return FALSE;
 
 		$ret = array();

@@ -78,7 +78,7 @@ class AjaxController extends AdminBaseController
 	{
 		$blnShipping = false;
 
-		$errormsg = Yii::t('global',"An error occurred saving Promo Code restrictions. Please check your System Log.");
+		$errormsg = Yii::t('admin',"An error occurred saving Promo Code restrictions. Please check your System Log.");
 
 		$arrRPost = Yii::app()->getRequest()->getPost('RestrictionForm');
 		$arrSPost = Yii::app()->getRequest()->getPost('ShippingRestrictionForm');

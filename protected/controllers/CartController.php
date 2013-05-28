@@ -454,6 +454,7 @@ class CartController extends Controller
 		if(isset($_POST['CheckoutForm']))
 		{
 			$model->attributes=$_POST['CheckoutForm'];
+			if(Yii::app()->params['SHIP_SAME_BILLSHIP']) $model->billingSameAsShipping=1;
 
 			$cacheModel = clone $model;
 			unset($cacheModel->cardNumber);
@@ -571,7 +572,7 @@ class CartController extends Controller
 					$objCart->shipaddress_id = $model->intShippingAddress;
 				else
 				{
-					if (empty($model->shippingLabel)) $model->shippingLabel= Yii::t('checkout','Unlabeled address');
+					if (empty($model->shippingLabel)) $model->shippingLabel = Yii::t('global','Unlabeled Address');
 					$objAddress = new CustomerAddress;
 					$objAddress->customer_id=$intCustomerId;
 					$objAddress->address_label = $model->shippingLabel;
@@ -902,6 +903,9 @@ class CartController extends Controller
 			        $(this).attr("disabled",true);
 			        $(this).parents("form").submit();
 			})',CClientScript::POS_READY);
+
+
+
 
 
 		$this->render('checkout',array('model'=>$model,'paymentForms'=>$paymentForms));
@@ -1380,7 +1384,7 @@ class CartController extends Controller
 						$objPromoCode->amount
 					)));
 
-				$arrReturn['cartitems'] = $this->renderPartial('/cart/_cartitems',null,true);
+				$arrReturn['cartitems'] = $this->renderPartial('/cart/_cartitems',array('model'=>Yii::app()->shoppingcart),true);
 				$arrTotals = $this->calculateTotalScenarios(Yii::app()->session['ship.modules.cache'],Yii::app()->session['ship.prices.cache']);
 				Yii::app()->session['ship.scenarios.cache'] = $arrReturn['totals'] = $arrTotals['totals'];
 				$arrReturn['prices'] = $arrTotals['prices'];
@@ -1420,6 +1424,7 @@ class CartController extends Controller
 		{
 			//We run the items through the model for verification
 			$model->attributes=$_POST['CheckoutForm'];
+			if(Yii::app()->params['SHIP_SAME_BILLSHIP']) $model->billingSameAsShipping=1;
 			$model->scenario = 'CalculateShipping';
 			if(!$model->validate()) {
 				$arrErrors = $model->getErrors();

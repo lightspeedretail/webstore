@@ -34,7 +34,7 @@
 
     <div class="pull-right">
 	<?php
-	echo CHtml::ajaxButton(Yii::t('global','Create New Destination'),
+	echo CHtml::ajaxButton(Yii::t('admin','Create New Destination'),
 		array('shipping/newtier'),
 		array(
 			'type'=>"POST",
@@ -45,7 +45,7 @@
     <h3>Destinations</h3>
     <div class="editinstructions">
 		<p><?php echo Yii::t('admin','Define a destination including the appropriate tax code that applies to that location. (Tax Codes are downloaded from your LightSpeed tax setup.) Destinations are applied from specific to general, so for example US/California will be used before US/Any. Zip/Postal codes are optional if you need to define a very specific area. List order does not matter.');?></p>
-		<p><?php echo Yii::t('admin','The final Any/Any entry will apply if the customer shipping address does not match any other line. To delete an entry, choose Delete from the top of the Select Country dropdown.'); ?></p>
+		<p><?php echo Yii::t('admin','The final Any/Any entry will apply if the customer shipping address does not match any other line. To delete an entry, choose Delete from the top of the Select Country dropdown. (Note Any/Any is ignored if Only Ship to Defined Destinations is active.)'); ?></p>
     </div>
 	    <?php $this->widget('bootstrap.widgets.TbGridView', array(
 	    'id' => 'user-grid',

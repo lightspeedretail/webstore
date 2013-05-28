@@ -71,7 +71,7 @@ class CustompageController extends AdminBaseController
 					Yii::app()->user->setFlash('error',print_r($model->getErrors(),true));
 				else
 				{
-					Yii::app()->user->setFlash('success',Yii::t('cart','Custom page added on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
+					Yii::app()->user->setFlash('success',Yii::t('admin','Custom page added on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
 					_rd($this->createUrl("custompage/edit",array('id'=>$model->id)));
 				}
 			}
@@ -111,7 +111,7 @@ class CustompageController extends AdminBaseController
 					else
 					{
 						Yii::app()->user->setFlash('success',
-							Yii::t('cart','Custom page updated on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
+							Yii::t('admin','Custom page updated on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
 						$this->beforeAction('edit'); //In case we renamed one and we want to update menu
 
 					}

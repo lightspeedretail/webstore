@@ -106,7 +106,7 @@ class SystemController extends AdminBaseController
 
 		_dbx("DELETE xlsws_family.* from xlsws_family left join xlsws_product on xlsws_family.id=xlsws_product.family_id where xlsws_product.id is null");
 
-		Yii::app()->user->setFlash('success',Yii::t('cart','Deleted categories and families removed {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
+		Yii::app()->user->setFlash('success',Yii::t('admin','Deleted categories and families removed {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
 
 		$this->render("purge");
 
@@ -126,7 +126,7 @@ class SystemController extends AdminBaseController
 
 
 		$intIdStr = Yii::app()->db->createCommand("select count(*) ".$sql)->queryScalar();
-
+		_dbx("set foreign_key_checks=0;");
 		_dbx("DELETE P, C ".$sql);
 
 
@@ -139,8 +139,8 @@ class SystemController extends AdminBaseController
 		_dbx("OPTIMIZE table xlsws_product_related");
 		_dbx("OPTIMIZE table xlsws_category");
 		_dbx("OPTIMIZE table xlsws_product_category_assn");
-
-		Yii::app()->user->setFlash('success',Yii::t('cart','{qty} old carts removed {time}.',array('{qty}'=>$intIdStr, '{time}'=>date("d F, Y  h:i:sa"))));
+		_dbx("set foreign_key_checks=1;");
+		Yii::app()->user->setFlash('success',Yii::t('admin','{qty} old carts removed {time}.',array('{qty}'=>$intIdStr, '{time}'=>date("d F, Y  h:i:sa"))));
 
 		$this->render("erasecarts");
 

@@ -15,6 +15,9 @@ class CustomerAddress extends BaseCustomerAddress
 
 	const RESIDENTIAL = 1;
 	const BUSINESS = 0;
+
+	public $makeDefaultBilling;
+	public $makeDefaultShipping;
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return CustomerAddress the static model class
@@ -22,6 +25,28 @@ class CustomerAddress extends BaseCustomerAddress
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
+	}
+
+
+	/**
+	 * @return array validation rules for model attributes.
+	 */
+	public function rules()
+	{
+		// NOTE: you should only define rules for those attributes that
+		// will receive user inputs.
+		return array(
+			array('modified,address1,first_name,last_name,city', 'required'),
+			array('active, residential', 'numerical', 'integerOnly'=>true),
+			array('customer_id', 'length', 'max'=>20),
+			array('address_label, first_name, last_name, company, address1, address2, city', 'length', 'max'=>255),
+			array('state_id, country_id', 'length', 'max'=>11),
+			array('postal, phone', 'length', 'max'=>64),
+			array('created,makeDefaultBilling,makeDefaultShipping', 'safe'),
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+			array('id, customer_id, address_label, active, first_name, last_name, company, address1, address2, city, state_id, postal, country_id, phone, residential, modified, created', 'safe', 'on'=>'search'),
+		);
 	}
 
 	/**
@@ -36,7 +61,13 @@ class CustomerAddress extends BaseCustomerAddress
 			array(
 				'address_label'=>'Address Label (Home, Work)',
 				'residential'=>'This is a residential address',
-				'active'=>'This is an active address',
+				'active'=>'Show this address on checkout',
+				'address1'=>'Address',
+				'address2'=>'Address Line 2 (Apt/Unit)',
+				'makeDefaultBilling'=>'Default billing address',
+				'makeDefaultShipping'=>'Default shipping address',
+
+
 
 		));
 	}
@@ -50,13 +81,10 @@ class CustomerAddress extends BaseCustomerAddress
 	 */
 	public function getStates($type = 'billing',$intCountry = null) {
 
-		if (is_null($intCountry))
-			$intCountry = (int)_xls_get_conf('DEFAULT_COUNTRY',224);
+		$obj = new CheckoutForm();
+		return $obj->getStates($type,$intCountry);
 
-		//These are only on first display so state list defaults to chosen country
-		if ($type=='billing') $intCountry = $this->country_id;
 
-		return CHtml::listData(State::model()->findAllByAttributes(array('country_id'=>$intCountry,'active'=>1),array('order'=>'sort_order,state')), 'id', 'code');
 	}
 
 
@@ -137,9 +165,12 @@ class CustomerAddress extends BaseCustomerAddress
 	protected function beforeValidate() {
 		if ($this->isNewRecord) {
 			$this->created = new CDbExpression('NOW()');
-			if (empty($this->address_label))
-				$this->address_label = Yii::t('global','Unlabeled Address');
+
 		}
+
+		if (empty($this->address_label))
+			$this->address_label = Yii::t('global','Unlabeled Address');
+
 		if (empty($this->state_id))
 			$this->state_id=null;
 		$this->modified = new CDbExpression('NOW()');

@@ -18,27 +18,28 @@
 	'focus'=>array($model,'email'),
 ));   ?>
 	<?php echo $form->errorSummary($model); ?>
-       <div class="row">
-            <div class="span4">
+       <div class="row-fluid">
+	       <div class="clearfix"></div>
+            <div class="span12">
 				<?php echo $form->labelEx($model,'email'); ?>
 				<?php echo $form->textField($model,'email'); ?>
 				<?php echo $form->error($model,'email'); ?>
             </div>
 
-            <div class="span4">
+            <div class="span12">
 				<?php echo $form->labelEx($model,'password'); ?>
 				<?php echo $form->passwordField($model,'password'); ?>
 				<?php echo $form->error($model,'password'); ?>
             </div>
-            <div class="span4">
+            <div class="span12">
 				<?php echo $form->checkBox($model,'rememberMe'); ?>
 				<?php echo $form->label($model,'rememberMe'); ?>
 				<?php echo $form->error($model,'rememberMe'); ?>
             </div>
 	    </div>
 
-	    <div class="row">
-		    <div class="span4">
+	    <div class="row-fluid">
+		    <div class="span12">
 			    <?php echo CHtml::ajaxLink(Yii::t('global','Forgot Password?'),
 				    array('site/forgotpassword'),
 					array(
@@ -57,8 +58,8 @@
 			</div>
 		</div>
 
-	    <div class="row shortrow buttons">
-		    <div class="span4">
+	    <div class="row-fluid shortrow buttons">
+		    <div class="span12">
 				<?php
 				echo CHtml::ajaxSubmitButton(Yii::t('global','Login'),
 					array('site/login'),

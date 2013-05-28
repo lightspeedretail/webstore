@@ -83,6 +83,8 @@ class usps extends WsShipping
 	public function run()
 	{
 
+		if(!isset($this->config['offerservices'])) return false;
+
 		if (!is_null($this->CheckoutForm)) {
 			$arrReturn = $this->total(null,
 				$this->objCart,

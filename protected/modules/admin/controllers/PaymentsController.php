@@ -61,7 +61,7 @@ class PaymentsController extends AdminBaseController
 		if (count($objModules)==0 && $action->id=="index")
 		{
 			$this->noneActive=1;
-			Yii::app()->user->setFlash('error',Yii::t('cart','WARNING: You have no payment modules activated. No one can checkout.'));
+			Yii::app()->user->setFlash('error',Yii::t('admin','WARNING: You have no payment modules activated. No one can checkout.'));
 		}
 
 		return parent::beforeAction($action);
@@ -178,7 +178,7 @@ class PaymentsController extends AdminBaseController
 			Yii::log("User clicked Delete all Used Promo Codes", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			Yii::app()->db->createCommand('DELETE FROM `xlsws_promo_code` WHERE `qty_remaining` = 0 AND module IS NULL')->execute();
 			Yii::app()->user->setFlash('success',
-				Yii::t('customer','Used promo codes have been deleted.'));
+				Yii::t('admin','Used promo codes have been deleted.'));
 
 		}
 		if (isset($_POST['DeleteExpired']))
@@ -187,7 +187,7 @@ class PaymentsController extends AdminBaseController
 			Yii::app()->db->createCommand('DELETE FROM `xlsws_promo_code` WHERE module IS NULL AND valid_until IS NOT NULL AND
 							date_format(coalesce(valid_until,\'2099-12-31\'),\'%Y-%m-%d\')<\''.date("Y-m-d").'\'')->execute();
 			Yii::app()->user->setFlash('success',
-				Yii::t('customer','Expired promo codes have been deleted.'));
+				Yii::t('admin','Expired promo codes have been deleted.'));
 
 		}
 		if (isset($_POST['DeleteSingleUse']))
@@ -195,7 +195,7 @@ class PaymentsController extends AdminBaseController
 			Yii::log("User clicked Delete all Single Use Promo Codes", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			Yii::app()->db->createCommand('DELETE FROM `xlsws_promo_code` WHERE `qty_remaining` = 0 or `qty_remaining` = 1 AND module IS NULL')->execute();
 			Yii::app()->user->setFlash('success',
-				Yii::t('customer','Single use promo codes have been deleted.'));
+				Yii::t('admin','Single use promo codes have been deleted.'));
 
 		}
 		if (isset($_POST['DeleteEverything']))
@@ -203,54 +203,57 @@ class PaymentsController extends AdminBaseController
 			Yii::log("User clicked Delete all Single Use Promo Codes", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			Yii::app()->db->createCommand('DELETE FROM `xlsws_promo_code` WHERE module IS NULL')->execute();
 			Yii::app()->user->setFlash('success',
-				Yii::t('customer','Single use promo codes have been deleted.'));
+				Yii::t('admin','Single use promo codes have been deleted.'));
 
 		}
 		if (isset($_POST['buttonCreate']) && isset($_POST['PromotaskForm']))
 		{
 			$model->attributes = $_POST['PromotaskForm'];
 
-			$strCodes = str_replace(",","\n",$model->createCodes);
-			$strCodes = str_replace("\t","\n",$strCodes);
-			$strCodes = str_replace("\r","",$strCodes);
-			$arrCodes = explode("\n",$strCodes);
+			$model->setScenario('copy');
+			if ($model->validate())
+			{
+				$strCodes = str_replace(",","\n",$model->createCodes);
+				$strCodes = str_replace("\t","\n",$strCodes);
+				$strCodes = str_replace("\r","",$strCodes);
+				$arrCodes = explode("\n",$strCodes);
 
-			$objCodeTemplate = PromoCode::model()->findByPk($model->existingCodes);
+				$objCodeTemplate = PromoCode::model()->findByPk($model->existingCodes);
 
-			$intFailures=0;
-			$intSuccesses=0;
+				$intFailures=0;
+				$intSuccesses=0;
 
-			foreach($arrCodes as $strCodeToCreate) {
+				foreach($arrCodes as $strCodeToCreate) {
 
-				$strCodeToCreate = trim($strCodeToCreate);
+					$strCodeToCreate = trim($strCodeToCreate);
 
-				if (strlen($strCodeToCreate)>0) { //Since we may have blank lines, verify the code is legitimate
-					$objNewCode = new PromoCode;
-					$objNewCode->code = $strCodeToCreate;
-					$objNewCode->qty_remaining = 1;
-					$objNewCode->enabled = 1;
-					$objNewCode->exception = $objCodeTemplate->exception;
-					$objNewCode->type = $objCodeTemplate->type;
-					$objNewCode->amount = $objCodeTemplate->amount;
-					$objNewCode->valid_from = $objCodeTemplate->valid_from;
-					$objNewCode->valid_until = $objCodeTemplate->valid_until;
-					$objNewCode->lscodes = $objCodeTemplate->lscodes;
-					$objNewCode->threshold = $objCodeTemplate->threshold;
+					if (strlen($strCodeToCreate)>0) { //Since we may have blank lines, verify the code is legitimate
+						$objNewCode = new PromoCode;
+						$objNewCode->code = $strCodeToCreate;
+						$objNewCode->qty_remaining = 1;
+						$objNewCode->enabled = 1;
+						$objNewCode->exception = $objCodeTemplate->exception;
+						$objNewCode->type = $objCodeTemplate->type;
+						$objNewCode->amount = $objCodeTemplate->amount;
+						$objNewCode->valid_from = $objCodeTemplate->valid_from;
+						$objNewCode->valid_until = $objCodeTemplate->valid_until;
+						$objNewCode->lscodes = $objCodeTemplate->lscodes;
+						$objNewCode->threshold = $objCodeTemplate->threshold;
 
-					if ($objNewCode->save())
-						$intSuccesses++;
-					else
-					{
-						Yii::log("Error creating new code in batch ".print_r($objNewCode->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-						$intFailures++;
+						if ($objNewCode->save())
+							$intSuccesses++;
+						else
+						{
+							Yii::log("Error creating new code in batch ".print_r($objNewCode->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+							$intFailures++;
+						}
 					}
 				}
+
+				Yii::app()->user->setFlash('success',$intSuccesses." codes created successfully.".
+						($intFailures>0 ? " ".$intFailures." codes failed to save." : ""));
+
 			}
-
-			Yii::app()->user->setFlash('success',$intSuccesses." codes created successfully.".
-					($intFailures>0 ? " ".$intFailures." codes failed to save." : ""));
-
-
 
 		}
 
@@ -289,14 +292,14 @@ class PaymentsController extends AdminBaseController
 		{
 			$objPromo = new PromoCode();
 			$objPromo->attributes = $_POST['PromoCode'];
+			$objPromo->setScenario('create');
 			if ($objPromo->validate())
 			{
 				if($objPromo->save())
 					echo "success";
-				else echo print_r($objPromo->getErrors,true);
+
 			}
-			else
-				echo print_r($objPromo->getErrors,true);
+
 
 
 		}

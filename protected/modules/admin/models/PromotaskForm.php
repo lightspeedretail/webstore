@@ -23,6 +23,7 @@ class PromotaskForm extends CFormModel
 	{
 		return array(
 			array('createCodes,existingCodes','safe'),
+			array('createCodes,existingCodes','required','on'=>'copy'),
 			array('deleteUsed,deleteExpired,deleteSingleUse,deleteEverything','safe'),
 		);
 	}

@@ -1128,6 +1128,9 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 			VALUES ('Language Options', 'LANG_OPTIONS', 'en:English,fr:français',
 			 '', 0,0, NULL, 0, 0, 1)");
 
+		_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`='0' where `key_name`='CURRENCY_FORMAT'");
+		_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`='0' where `key_name`='LOCALE'");
+		_dbx("UPDATE `xlsws_configuration` SET `title`='Default Locale (Language) Code' where `key_name`='LANG_CODE'");
 		_dbx("UPDATE `xlsws_configuration` SET `key_value`='300' where `key_name`='DATABASE_SCHEMA_VERSION'");
 		_dbx("UPDATE `xlsws_customer` SET `pricing_level`=1 where pricing_level is null");
 

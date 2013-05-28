@@ -34,7 +34,7 @@
 
     <div class="pull-right">
 	<?php
-	echo CHtml::ajaxButton(Yii::t('global','Create New State'),
+	echo CHtml::ajaxButton(Yii::t('admin','Create New State'),
 		array('shipping/newstate'),
 		array(
 			'type'=>"POST",

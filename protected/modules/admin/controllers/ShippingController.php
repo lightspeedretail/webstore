@@ -73,7 +73,7 @@ class ShippingController extends AdminBaseController
 		$objModules = Modules::model()->findAllByAttributes(array('category'=>'shipping','active'=>1));
 
 		if (count($objModules)==0)
-			Yii::app()->user->setFlash('error',Yii::t('cart','WARNING: You have no shipping modules activated. No one can checkout.'));
+			Yii::app()->user->setFlash('error',Yii::t('admin','WARNING: You have no shipping modules activated. No one can checkout.'));
 		else {
 			$blnRestrictionWarning=false;
 
@@ -89,7 +89,7 @@ class ShippingController extends AdminBaseController
 					}
 
 				if ($blnRestrictionWarning)
-					Yii::app()->user->setFlash('warning',Yii::t('cart','WARNING: You have product restrictions set on all active shipping modules. This could lead to a scenario where a customer orders an item and no shipping method applies. Check your restrictions carefully to avoid gaps in coverage.'));
+					Yii::app()->user->setFlash('warning',Yii::t('admin','WARNING: You have product restrictions set on all active shipping modules. This could lead to a scenario where a customer orders an item and no shipping method applies. Check your restrictions carefully to avoid gaps in coverage.'));
 			}
 
 		}

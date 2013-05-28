@@ -71,8 +71,8 @@ class flatrateAdminForm extends CFormModel
 					'items'=>Country::getAdminRestrictionList(true),
 				),
 				'markup'=>array(
-					'type'=>'text',
-					'maxlength'=>4,
+					'type'=>'hidden',
+					'value'=>0,
 				),
 				'product'=>array(
 					'type'=>'text',

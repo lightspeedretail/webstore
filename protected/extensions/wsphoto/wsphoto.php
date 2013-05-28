@@ -177,7 +177,10 @@ class wsphoto extends CApplicationComponent {
 			);
 
 			if (!($objThumbImage instanceof Images))
+			{
 				$objThumbImage = new Images();
+				Images::model()->deleteAllByAttributes(array('width'=>$intNewHeight,'height'=>$intNewHeight,'parent'=>$objImage->id)); //sanity check to prevent SQL UNIQUE errors
+			}
 
 			$objThumbImage->image_path = $strNewThumbnail;
 			$objThumbImage->width = $intNewWidth;

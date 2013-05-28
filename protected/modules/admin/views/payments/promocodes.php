@@ -5,7 +5,7 @@
 			'autoOpen'=>false,
 			'modal'=>'true',
 			'width'=>'800',
-			'height'=>'353',
+			'height'=>'363',
 			'scrolling'=>'no',
 			'resizable'=>false,
 			'position'=>'center',
@@ -19,8 +19,8 @@
 			'title'=>'Add New Promo Code',
 			'autoOpen'=>false,
 			'modal'=>'true',
-			'width'=>'500',
-			'height'=>'245',
+			'width'=>'640',
+			'height'=>'275',
 			'scrolling'=>'no',
 			'resizable'=>false,
 			'position'=>'center',
@@ -34,7 +34,7 @@
 
     <div class="pull-right">
 	<?php
-	echo CHtml::ajaxButton(Yii::t('global','Create New Code'),
+	echo CHtml::ajaxButton(Yii::t('admin','Create New Code'),
 		array('payments/newpromo'),
 		array(
 			'type'=>"POST",

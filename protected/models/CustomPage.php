@@ -81,7 +81,7 @@ class CustomPage extends BaseCustomPage
 
 	public function getLabel()
 	{
-		return $this->title;
+		return Yii::t('tabs',$this->title);
 	}
 	public function getUrl()
 	{

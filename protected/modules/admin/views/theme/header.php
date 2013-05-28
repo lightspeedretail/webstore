@@ -1,7 +1,7 @@
 <div class="span9">
 	<div class="hero-unit">
 
-		<h3><?php echo Yii::t('global','Header and Email Image'); ?></h3>
+		<h3><?php echo Yii::t('admin','Header and Email Image'); ?></h3>
 		<div class="editinstructions">
 
 
