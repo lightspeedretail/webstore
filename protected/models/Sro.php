@@ -84,7 +84,7 @@ class Sro extends BaseSro
 	 */
 	public function getLink() {
 
-		return Yii::app()->createAbsoluteUrl('sro/view',array('getuid'=>$this->GenerateLink()));
+		return Yii::app()->createAbsoluteUrl('sro/view',array('code'=>$this->GenerateLink()));
 
 	}
 

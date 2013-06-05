@@ -66,7 +66,7 @@ class freeshippingAdminForm extends CFormModel
 	public function getAdminForm()
 	{
 		return array(
-			'title' => 'Note: You can '.CHtml::link('Set Product Restrictions','#',array('class'=>'basic','id'=>get_class($this))) .' for this module.',
+			'title' => 'Note: You can '.CHtml::link('Set Product Restrictions','#',array('class'=>'basic','id'=>get_class($this))) .' for this module. If you use the optional promo code, you need to put Free Shipping to the top of the list under '.CHtml::link('Set Display Order',Yii::app()->controller->createUrl("shipping/order")),
 
 			'elements'=>array(
 				'label'=>array(

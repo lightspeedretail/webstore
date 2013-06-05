@@ -16,7 +16,6 @@ class ProductController extends Controller
 {
 	public $layout='//layouts/column2';
 	public $objProduct;
-	public $sharingTools;
 
 	/**
 	 * Declares class-based actions.
@@ -73,12 +72,6 @@ class ProductController extends Controller
 		$this->pageImageUrl = _xls_site_url($model->SmallImage,true);
 
 
-		if(_xls_get_conf('SHOW_SHARING' , 0)) {
-			//We have to redo these here to pass along product information
-			$this->sharingTools  = $this->renderPartial('/site/_sharing_tools',array('product'=>$model),true);
-		}
-		else $this->sharing="";
-
 		$objWishlistAddForm = new WishlistAddForm();
 		$objWishlistAddForm->id = $this->objProduct->id;
 		$objWishlistAddForm->qty = 1;
@@ -87,6 +80,7 @@ class ProductController extends Controller
 
 
 		$this->setPageTitle($model->PageTitle);
+		$this->pageDescription = $model->PageDescription;
 		$this->CanonicalUrl = $this->createAbsoluteUrl($model->Link);
 		$this->returnUrl = $this->CanonicalUrl;
 		$model->intQty=1;

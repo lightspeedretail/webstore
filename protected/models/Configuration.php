@@ -348,7 +348,7 @@ return array(
 
 			case 'SSL_NO_NEED_FORWARD':
 				return array(1 => _sp("Only when going to Checkout"),0 => _sp("At all times including browsing product pages"));
-			case 'ALLOW_GUEST_CHECKOUT':
+			case 'REQUIRE_ACCOUNT':
 				return array(1 => _sp("without registering (default)"),0 => _sp("only after creating an account"));
 			case 'AFTER_ADD_CART':
 				return array(0 => _sp("Stay on page"),1 => _sp("Redirect to Edit Cart page"));

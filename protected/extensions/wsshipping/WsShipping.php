@@ -78,16 +78,24 @@ class WsShipping extends WsExtension
 	public function check()
 	{
 
+		$blnCheckAffected = $this->checkAffected();
+		$blnCheckCode = $this->checkCode();
 
-		if (!$this->checkAffected())
+		if (!$blnCheckAffected)
 			Yii::log(get_class($this).' Shipping not shown due to product restrictions','info', 'application.'.__CLASS__.".".__FUNCTION__);
-		if (!$this->checkCode())
+		if (!$blnCheckCode)
 			Yii::log(get_class($this).' Shipping not shown due to promo code on shipper','info', 'application.'.__CLASS__.".".__FUNCTION__);
-		if (!parent::check())
-			Yii::log(get_class($this).' Shipping not shown due to geographic restrictions','info', 'application.'.__CLASS__.".".__FUNCTION__);
 
-		if ($this->checkAffected() && $this->checkCode())
-			return parent::check();
+		if ($blnCheckAffected && $blnCheckCode)
+		{
+			if (!parent::check())
+			{
+				Yii::log(get_class($this).' Shipping not shown due to geographic restrictions','info', 'application.'.__CLASS__.".".__FUNCTION__);
+				return false;
+			}
+			else return true;
+
+		}
 		else return false;
 
 	}
@@ -122,9 +130,12 @@ class WsShipping extends WsExtension
 	{
 		//Does this item have a promo code?
 		if (isset($this->config['promocode']))
-			if (strlen($this->config['promocode'])>0) {
+			if (!empty($this->config['promocode']))
+			{
+				Yii::log(get_class($this) . " module requires promo code '".$this->config['promocode']."', checking...", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 				$cart = $this->objCart;
-				if ($cart->fk_promo_id > 0) {
+				if ($cart->fk_promo_id > 0)
+				{
 					$pcode = PromoCode::model()->findbyPk($cart->fk_promo_id);
 					if ($pcode->code == $this->config['promocode']) return true;
 
@@ -132,6 +143,7 @@ class WsShipping extends WsExtension
 				return false;
 
 			}
+
 		return true;
 	}
 

@@ -144,8 +144,14 @@ class Product extends BaseProduct
 	public function getWebLongDescription()
 	{
 		if(_xls_get_conf('LANG_MENU',0))
-			return _xls_parse_language($this->description_long);
-		else return $this->description_long;
+			$strDesc = _xls_parse_language($this->description_long);
+		else $strDesc = $this->description_long;
+
+		if (_xls_get_conf('HTML_DESCRIPTION') == 0)
+			return nl2br($strDesc);
+		else
+			return $strDesc;
+
 	}
 
 	/**
@@ -751,10 +757,10 @@ class Product extends BaseProduct
 		$criteria->distinct = true;
 		$criteria->alias = 'Product';
 		$criteria->join='LEFT JOIN '.ProductRelated::model()->tableName().' as ProductRelated ON ProductRelated.related_id=Product.id';
-		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0)==Product::InventoryAllowBackorders)
-			$criteria->condition = 'ProductRelated.product_id=:id AND web=1 AND autoadd='.$autoadd.' AND parent IS NULL';
-		else
+		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0)==Product::InventoryMakeDisappear)
 			$criteria->condition = 'ProductRelated.product_id=:id AND inventory_avail>0 AND web=1 AND autoadd='.$autoadd.' AND parent IS NULL';
+		else
+			$criteria->condition = 'ProductRelated.product_id=:id AND web=1 AND autoadd='.$autoadd.' AND parent IS NULL';
 		$criteria->params = array(':id'=>$this->id);
 		$criteria->limit = _xls_get_conf('MAX_PRODUCTS_IN_SLIDER',64);
 		$criteria->order = 'Product.id DESC';

@@ -171,33 +171,34 @@ function displayForm()
         <h2>Welcome!</h2>
         <div class="hero-unit">
 	        <p>This process will install Web Store 3.0, optionally importing your old 2.x information. This initial page will set up the database for you, and then you will be redirected for additional setup steps. We've made install as simple as possible to get you going on your new eCommerce store!</p>
+	        <p><strong>Warning: Do not close this browser window until your setup has completed. Doing so will cause an incomplete install and you will have to begin again.</strong></p>
 	     </div>
 
         <h2>Install</h2>
         <label>Enter your database connection information below. <strong>Note: This database must already exist and be blank.</strong></label>
 
         <!-- Search form with input field and button -->
-        <form action="install.php<?php if(isset($_GET['debug'])) echo "?debug"; ?>" method="POST" class="well form-search">
+        <form id="installform" action="install.php<?php if(isset($_GET['debug'])) echo "?debug"; ?>" method="POST" class="well form-search">
 	        <table class="table table-striped">
 		        <tr>
 			        <td nowrap>MySQL Database Host (Server name or IP):</td>
-					<td><input name="dbhost" value="<?php echo $dbhost; ?>" type="text" class="input-medium"></td>
+					<td><input id="dbhost" name="dbhost" value="<?php echo $dbhost; ?>" type="text" class="input-medium"></td>
 		        </tr>
 		        <tr>
 			        <td nowrap>MySQL Port:</td>
-					<td><input name="dbport" value="<?php echo $dbport; ?>" type="text" class="input-medium"></td>
+					<td><input id="dbport" name="dbport" value="<?php echo $dbport; ?>" type="text" class="input-medium"></td>
 		        </tr>
 		        <tr>
 			        <td nowrap>MySQL Username:</td>
-					<td><input name="dbusername" value="<?php echo $dbusername; ?>" type="text" class="input-medium"></td>
+					<td><input id="dbusername" name="dbusername" value="<?php echo $dbusername; ?>" type="text" class="input-medium"></td>
 		        </tr>
 		        <tr>
 			        <td nowrap>MySQL Password:</td>
-					<td><input name="dbpass" value="<?php echo $dbpass; ?>" type="password" class="input-medium"></td>
+					<td><input id="dbpass" name="dbpass" value="<?php echo $dbpass; ?>" type="password" class="input-medium"></td>
 		        </tr>
 		        <tr>
 			        <td nowrap>Database Name:</td>
-					<td><input name="dbname" value="<?php echo $dbname; ?>" type="text" class="input-medium"></td>
+					<td><input id="dbname" name="dbname" value="<?php echo $dbname; ?>" type="text" class="input-medium"></td>
 
 		        </tr>
             </table>
@@ -290,7 +291,7 @@ function displayFormTwo()
 	<h2><?php echo $headerstring; ?></h2>
 	<div class="hero-unit">
 
-	    <p><?php echo $quip; ?></p>
+	    <p id="quip"><?php echo $quip; ?></p>
 
 	    <div class="progress progress-striped active">
 	        <div class="bar" id="progressbar" style="width: 0%;"></div>
@@ -350,6 +351,14 @@ function displayFormTwo()
 			    }
 			    else {
 				    clearInterval(pinttimer);
+
+				    if(data.indexOf("Table 'xlsws_customer' already exists")>0)
+					    data = "Helpful information: This appears to be an error caused by installing into a database that is not blank. Web Store 3 requires a blank database to install.\n\n" + data;
+
+				    data = "An error has occured. If this does not appear to be an issue you can easily remedy based on the information below, please contact Web Store technical support for additional assistance.\n\n" + data;
+				    document.getElementById('progressbar').style.width = 0;
+				    document.getElementById('stats').innerHTML = "";
+				    document.getElementById('quip').innerHTML = "Error, install halted.";
 				    alert(data);
 			    }
 		    });
@@ -359,7 +368,17 @@ function displayFormTwo()
 	    function runUpgrade(key)
 	    {
 
-		    if (prunning==1) return;
+		    if (prunning>1200)
+		    {
+			    clearInterval(pinttimer);
+			    prunning=0;
+			    alert("The install process has become unresponsive. This may indicate a problem with the database. Please contact technical support for additional information. Error information may be available in the xlsws_log table of your database for troubleshooting purposes.");
+			    document.getElementById('progressbar').style.width = 0;
+			    document.getElementById('stats').innerHTML = "Check xlsws_log for error information.";
+			    document.getElementById('quip').innerHTML = "Error, install halted.";
+
+		    }
+		    if (prunning>0) { prunning++; return; }
 		    prunning=1;
 		    var postvar = "online="+ online + "&total=" + total +
 			    "&dbname=" + "<?php echo $_POST['dbname'] ?>" +
@@ -389,6 +408,10 @@ function displayFormTwo()
 						    prunning=0;
 					    }
 
+				    }
+				    else {
+					    clearInterval(pinttimer);
+					    alert(obj.result);
 				    }
 			    }
 			    else {
@@ -453,7 +476,19 @@ function displayHeader()
 function displayFooter()
 {
 	?>
-
+	<script>
+		$('#installform').submit(validate);
+	    function validate(){
+		    var dbhost = $('#dbhost').val();
+		    if (!$.trim(dbhost)) {alert('Database Host is required!'); return false; }
+		    var dbusername = $('#dbusername').val();
+		    if (!$.trim(dbusername)) {alert('Database Username is required!'); return false; }
+		    var dbpass = $('#dbpass').val();
+		    if (!$.trim(dbpass)) {alert('Database Password is required!'); return false; }
+		    var dbname = $('#dbname').val();
+		    if (!$.trim(dbname)) {alert('Database name is required!'); return false; }
+	    }
+	</script>
 	</body>
 	</html>
 	<?php
@@ -2248,7 +2283,7 @@ function migrateTwoFiveToThree()
 	  PRIMARY KEY (`id`),
 	  KEY `product_id` (`product_id`),
 	  CONSTRAINT `xlsws_task_queue_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `xlsws_product` (`id`)
-	) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 	update `{newdbname}`.xlsws_state as a set country_id=(select id from `{newdbname}`.xlsws_country as b where country_code=code);
 	ALTER TABLE `{newdbname}`.`xlsws_state` ADD `active` INT(11)  UNSIGNED  NULL  DEFAULT NULL  AFTER `avail`;
@@ -2550,8 +2585,8 @@ function initialDataLoad($db)
 	$sql = array();
 
 
-	$sql[] = "insert into xlsws_country set id=39,code='CA', region='NA', active=1, sort_order=2, country='Canada', zip_validate_preg='/^[ABCEGHJKLMNPRSTVXY]\d[A-Z]( )?\d[A-Z]\d$/'";
-	$sql[] = "insert into xlsws_country set id=13,code='AU', region='AU', active=1, sort_order=4, country='Australia', zip_validate_preg='/\d{4}/'";
+	$sql[] = "insert into xlsws_country set id=39,code='CA', region='NA', active=1, sort_order=2, country='Canada', zip_validate_preg='/^[ABCEGHJKLMNPRSTVXY]\\d[A-Z]( )?\\d[A-Z]\\d$/'";
+	$sql[] = "insert into xlsws_country set id=13,code='AU', region='AU', active=1, sort_order=4, country='Australia', zip_validate_preg='/\\d{4}/'";
 	$sql[] = "insert into xlsws_country set id=224,code='US', region='NA', active=1, sort_order=1, country='United States', zip_validate_preg='/^([0-9]{5})(-[0-9]{4})?$/i'";
 
 	$sql[] = "insert into xlsws_country set id=1,code='AF', region='AS', active=1, sort_order=100, country='Afghanistan'";

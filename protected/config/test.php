@@ -13,6 +13,7 @@ return CMap::mergeArray(
 			/* uncomment the following to provide test database connection */
 			'db'=>array(
 				'connectionString' => 'mysql:host=localhost;dbname=copper-unittest',
+				'schemaCachingDuration'=>0,
 			),
 		),
 		// autoloading model and component classes

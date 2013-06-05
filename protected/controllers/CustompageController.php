@@ -39,21 +39,19 @@ class CustompageController extends Controller
 	 */
 	public function actionIndex()
 	{
-		$objCustomPage = CustomPage::LoadByRequestUrl(Yii::app()->getRequest()->getQuery('id'));
-		if (!($objCustomPage instanceof CustomPage))
+		$model = CustomPage::LoadByRequestUrl(Yii::app()->getRequest()->getQuery('id'));
+		if (!($model instanceof CustomPage))
 			_xls_404();
 
-		$this->pageTitle=$objCustomPage->PageTitle;
-		$this->pageDescription=$objCustomPage->meta_description;
+		$this->pageTitle=$model->PageTitle;
+		$this->pageDescription=$model->meta_description;
 		$this->pageImageUrl = '';
 		$this->breadcrumbs = array(
-			$objCustomPage->title=>$objCustomPage->RequestUrl,
+			$model->title=>$model->RequestUrl,
 		);
 
-		$dataProvider = $objCustomPage->GetSliderDataProvider();
-
-		$this->CanonicalUrl = $objCustomPage->CanonicalUrl;
-		$this->render('index',array('objCustomPage'=>$objCustomPage,'dataProvider'=>$dataProvider));
+		$this->CanonicalUrl = $model->CanonicalUrl;
+		$this->render('index',array('model'=>$model,'objCustomPage'=>$model));
 
 
 
@@ -66,19 +64,18 @@ class CustompageController extends Controller
 	public function actionContact()
 	{
 
-		$objCustomPage = CustomPage::LoadByRequestUrl("contact-us");
-		$this->pageTitle=$objCustomPage->PageTitle;
-		$this->pageDescription=$objCustomPage->meta_description;
+		$model = CustomPage::LoadByRequestUrl("contact-us");
+		$this->pageTitle=$model->PageTitle;
+		$this->pageDescription=$model->meta_description;
 		$this->breadcrumbs = array(
-			$objCustomPage->title=>$objCustomPage->RequestUrl,
+			$model->title=>$model->RequestUrl,
 		);
-		$dataProvider = $objCustomPage->GetSliderDataProvider();
 
-		$model=new ContactForm;
+		$ContactForm=new ContactForm;
 		if(isset($_POST['ContactForm']))
 		{
-			$model->attributes=$_POST['ContactForm'];
-			if($model->validate())
+			$ContactForm->attributes=$_POST['ContactForm'];
+			if($ContactForm->validate())
 			{
 
 				$objEmail = new EmailQueue;
@@ -86,12 +83,12 @@ class CustompageController extends Controller
 				if (!Yii::app()->user->isGuest) {
 					$objCustomer = Customer::GetCurrent();
 					$objEmail->customer_id = $objCustomer->id;
-					$model->fromName = $objCustomer->mainname;
-					$model->fromEmail = $objCustomer->email;
+					$ContactForm->fromName = $objCustomer->mainname;
+					$ContactForm->fromEmail = $objCustomer->email;
 				}
 
-				$strHtmlBody =$this->renderPartial('/mail/_contactform', array('model'=>$model), true);
-				$strSubject = Yii::t('email','Contact Us:').$model->contactSubject;
+				$strHtmlBody =$this->renderPartial('/mail/_contactform', array('model'=>$ContactForm), true);
+				$strSubject = Yii::t('email','Contact Us:').$ContactForm->contactSubject;
 				$objEmail->htmlbody = $strHtmlBody;
 				$objEmail->subject = $strSubject;
 				$orderEmail = _xls_get_conf('ORDER_FROM','');
@@ -122,20 +119,21 @@ class CustompageController extends Controller
 
 			} else {
 				Yii::app()->user->setFlash('error',Yii::t('cart','Please check your form for errors.'));
-				//Yii::app()->user->setFlash('error',print_r($model->getErrors(),true));
+				if (YII_DEBUG)
+					Yii::app()->user->setFlash('error',print_r($ContactForm->getErrors(),true));
 			}
 		}
 
 		if (!Yii::app()->user->isGuest){
 			$objCustomer = Customer::GetCurrent();
-			$model->fromName = $objCustomer->mainname;
-			$model->fromEmail = $objCustomer->email;
+			$ContactForm->fromName = $objCustomer->mainname;
+			$ContactForm->fromEmail = $objCustomer->email;
 
 		}
 
-		$this->CanonicalUrl = $objCustomPage->CanonicalUrl;
+		$this->CanonicalUrl = $model->CanonicalUrl;
 
-		$this->render('contact',array('model'=>$model,'objCustomPage'=>$objCustomPage,'dataProvider'=>$dataProvider));
+		$this->render('contact',array('ContactForm'=>$ContactForm,'model'=>$model));
 	}
 
 

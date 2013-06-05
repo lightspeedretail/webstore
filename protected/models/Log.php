@@ -35,6 +35,7 @@ class Log extends BaseLog
 	{
 
 		$criteria=new CDbCriteria;
+		$criteria->compare('message',$this->message,true,'OR');
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

@@ -85,8 +85,8 @@ class BaseCheckoutForm extends CFormModel
 	public function rules()
 	{
 		//Do we require a person to create an account
-		if (_xls_get_conf('ALLOW_GUEST_CHECKOUT',0))
-			$retArray = array('createPassword,createPassword_repeat','required','on'=>'formSubmitCreatingAccount');
+		if (_xls_get_conf('REQUIRE_ACCOUNT',0))
+			$retArray = array('createPassword,createPassword_repeat','required','on'=>'formSubmitCreatingAccount,formSubmitGuest');
 		else $retArray = array('createPassword,createPassword_repeat','safe');
 
 		return array(
@@ -104,8 +104,11 @@ class BaseCheckoutForm extends CFormModel
 			array('billingAddress1,billingCity, billingPostal, billingCountry',
 				'validateBillingBlock','on'=>'formSubmitGuest,formSubmitCreatingAccount'),
 
-			array('shippingFirstName,shippingLastName,shippingAddress1,shippingCity,shippingPostal,shippingCountry',
+			array('shippingFirstName,shippingLastName,shippingAddress1,shippingCity,shippingCountry',
 				'validateShippingBlock','on'=>'CalculateShipping,formSubmitGuest,formSubmitCreatingAccount,formSubmitExistingAccount'),
+
+			array('shippingPostal,billingPostal',
+				'validatePostal','on'=>'CalculateShipping,formSubmitGuest,formSubmitCreatingAccount,formSubmitExistingAccount'),
 
 			array('acceptTerms,shippingProvider,shippingPriority,paymentProvider','required',
 				'on'=>'formSubmit,formSubmitCreatingAccount,formSubmitExistingAccount'),
@@ -148,6 +151,28 @@ class BaseCheckoutForm extends CFormModel
 					Yii::t('yii','{attribute} cannot be blank.',
 					array('{attribute}'=>$this->getAttributeLabel($attribute)))
 				);
+
+	}
+
+	public function validatePostal($attribute, $params)
+	{
+		if($attribute=='shippingPostal' && $this->shippingCountry==0) return;
+		if($attribute=='billingPostal' && ($this->billingCountry==0 || $this->billingSameAsShipping==1)) return;
+
+
+		if($attribute=='shippingPostal') $obj = Country::Load($this->shippingCountry);
+		if($attribute=='billingPostal') $obj = Country::Load($this->billingCountry);
+
+		if ($this->$attribute == '')
+			$this->addError($attribute,
+				Yii::t('yii','{attribute} cannot be blank.',
+					array('{attribute}'=>$this->getAttributeLabel($attribute))));
+		elseif (!is_null($obj->zip_validate_preg) && !_xls_validate_zip($this->$attribute,$obj->zip_validate_preg))
+			$this->addError($attribute,
+				Yii::t('yii','{attribute} is invalid.',
+					array('{attribute}'=>$this->getAttributeLabel($attribute))));
+
+
 
 	}
 

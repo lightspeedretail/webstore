@@ -444,6 +444,20 @@ class ShoppingCart extends CApplicationComponent
 	//These are pass-through functions which go currently to our cart object
 
 
+	public function getIsTaxIn()
+	{
+
+		if($this->model->id>0)
+		{
+			if ($this->model->tax_code_id>0 && _xls_get_conf('TAX_INCLUSIVE_PRICING')=='1')
+				return true;
+			else return false;
+		}
+		else
+			if (_xls_get_conf('TAX_INCLUSIVE_PRICING')=='1') return true; else return false;
+
+	}
+
 	public function SetIdStr()
 	{
 		$this->model->SetIdStr();
@@ -516,10 +530,6 @@ class ShoppingCart extends CApplicationComponent
 
 		switch ($strName) {
 
-			case 'IsTaxIn':
-				if ($this->model->tax_code_id>0 && _xls_get_conf('TAX_INCLUSIVE_PRICING')=='1')
-					return true;
-				else return false;
 
 			case 'CartItems':
 			case 'cartItems':

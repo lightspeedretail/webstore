@@ -97,38 +97,32 @@ class CustomPage extends BaseCustomPage
 		$this->title = $string;
 	}
 
-	public function GetSliderDataProvider() {
-		if (!empty($this->product_tag))
-		{
+	public function taggedProducts()
+	{
 
-			$dataProvider = new CActiveDataProvider('Product',
-				array('criteria' => $this->SliderCriteria,
-					'pagination' => array(
-						'pageSize' => _xls_get_conf('MAX_PRODUCTS_IN_SLIDER',64),
-					),
-				));
-			if($dataProvider->itemCount==0) {
-				Yii::log('Custom Page '.$this->request_url.' tag "'.$this->product_tag.'" matches no products',
-					CLogger::LEVEL_WARNING,
-					'application.'.__CLASS__.".".__FUNCTION__);
-				$dataProvider = null;
-			}
+		$dataProvider = new CActiveDataProvider('Product',
+			array('criteria' => $this->SliderCriteria,
+				'pagination' => array(
+					'pageSize' => _xls_get_conf('MAX_PRODUCTS_IN_SLIDER',64),
+				),
+			));
 
-		} else $dataProvider = null;
-
-	return $dataProvider;
+		return $dataProvider;
 	}
 
 	private function GetSliderCriteria()
 	{
+		if (empty($this->product_tag))
+			$this->product_tag = "";
+
 		$criteria = new CDbCriteria();
 		$criteria->distinct = true;
 		$criteria->alias = 'Product';
 		$criteria->join='LEFT JOIN '.ProductTags::model()->tableName().' as ProductTags ON ProductTags.product_id=Product.id LEFT JOIN '.Tags::model()->tableName().' as Tags ON ProductTags.tag_id=Tags.id';
-		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0)==Product::InventoryAllowBackorders)
-			$criteria->condition = 'web=1 AND Tags.tag=:tag AND parent IS NULL';
-		else
+		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0)==Product::InventoryMakeDisappear)
 			$criteria->condition = 'inventory_avail>0 AND web=1 AND Tags.tag=:tag AND parent IS NULL';
+		else
+			$criteria->condition = 'web=1 AND Tags.tag=:tag AND parent IS NULL';
 		$criteria->params = array(':tag'=>$this->product_tag);
 		$criteria->limit = _xls_get_conf('MAX_PRODUCTS_IN_SLIDER',64);
 		$criteria->order = _xls_get_sort_order(); //'Product.id DESC';

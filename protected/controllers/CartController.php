@@ -470,6 +470,8 @@ class CartController extends Controller
 			else
 				$model->setScenario('formSubmitGuest');
 
+			//Copy address book to field if necessary
+			$model = $this->FillFieldsFromPreselect($model);
 			//Validate our primary CheckoutForm model here
 			$valid=$model->validate();
 
@@ -726,8 +728,6 @@ class CartController extends Controller
 				$objCart->payment_id = $objPayment->id;
 				$objCart->save();
 
-				//Copy address book to field if necessary
-				$model = $this->FillFieldsFromPreselect($model);
 
 				/* RUN PAYMENT HERE */
 				//See if we have a subform for our payment module, set that as part of running payment module
@@ -1426,6 +1426,7 @@ class CartController extends Controller
 			$model->attributes=$_POST['CheckoutForm'];
 			if(Yii::app()->params['SHIP_SAME_BILLSHIP']) $model->billingSameAsShipping=1;
 			$model->scenario = 'CalculateShipping';
+			$model = $this->FillFieldsFromPreselect($model);
 			if(!$model->validate()) {
 				$arrErrors = $model->getErrors();
 				if (count($arrErrors)>0)
@@ -1433,7 +1434,7 @@ class CartController extends Controller
 					echo CJSON::encode(array("result"=>"error",
 						"errormsg"=>Yii::t('checkout',
 							'Oops, cannot calculate shipping quite yet. Please complete shipping address information and click Calculate again.')));
-					Yii::log("Checkout Errors ".print_r($arrErrors,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+					Yii::log("Checkout Errors ".print_r($arrErrors,true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 					return;
 				}
 			}

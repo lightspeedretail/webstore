@@ -1709,7 +1709,7 @@ class LegacySoapController extends Controller
 		if(!$this->check_passkey($passkey))
 			return self::FAIL_AUTH;
 
-
+		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=0;')->execute();
 		$objSRO = Sro::LoadByLsId($strId);
 
 		if($objSRO){
@@ -1743,7 +1743,7 @@ class LegacySoapController extends Controller
 
 		if (!$objSRO->save())
 			Yii::log("Error saving SRO ".print_r($objSRO->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-
+		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=1;')->execute();
 		return self::OK;
 
 	}
@@ -1780,7 +1780,7 @@ class LegacySoapController extends Controller
 
 		if(!$objSRO)
 			return self::UNKNOWN_ERROR;
-
+		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=0;')->execute();
 		$objProduct = Product::model()->findByPk($intProductId);
 
 		if ($objProduct instanceof Product)
@@ -1790,7 +1790,7 @@ class LegacySoapController extends Controller
 				$fltSell, $fltDiscount, CartType::sro);
 
 		}
-
+		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=1;')->execute();
 		return self::OK;
 	}
 
@@ -1825,7 +1825,7 @@ class LegacySoapController extends Controller
 
 		if(!$objSRO)
 			return self::UNKNOWN_ERROR;
-
+		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=0;')->execute();
 		// ignore if all are empty
 		if((trim($strFamily) == '')   &&  (trim($strDescription) == ''))
 			return self::OK;
@@ -1843,59 +1843,10 @@ class LegacySoapController extends Controller
 		if (!$objRepair->save())
 			Yii::log("Error adding SRO Repair Item ".print_r($objRepair->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 
-		//$sro->AssociateSroRepair($repair);
-
+		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=1;')->execute();
 		return self::OK;
 
 	}
-
-
-
-
-
-	/**
-	 * Deletes a sro given by ID
-	 *
-	 * @param string $passkey
-	 * @param string $strId
-	 * @return string
-	 */
-//	public function delete_sro($passkey , $strId ){
-//
-//
-//		if(!$this->check_passkey($passkey))
-//			return self::FAIL_AUTH;
-//
-//		$sro = Sro::LoadByLsId($strId);
-//
-//		if($sro){
-//
-//			//load the lines
-//			$repairs = $sro->GetSroRepairArray();
-//			foreach($repairs as $repair)
-//				$repair->Delete();
-//
-//			$cart = Cart::LoadByRowid($sro->CartId);
-//
-//			if($cart){
-//
-//				$items = $cart->GetCartItemArray();
-//
-//				foreach($items as $item)
-//					$item->Delete();
-//
-//				$cart->Delete();
-//			}
-//
-//			$sro->Delete();
-//
-//		}
-//
-//
-//		return self::OK;
-//
-//	}
-
 
 
 

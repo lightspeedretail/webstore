@@ -93,6 +93,8 @@ class SystemController extends AdminBaseController
 	public function actionLog()
 	{
 		$model = new Log();
+		if (isset($_GET['q']))
+			$model->message = $_GET['q']; //we actually use this variable to search in several fields
 
 		$this->render("log", array('model'=>$model));
 
@@ -100,13 +102,38 @@ class SystemController extends AdminBaseController
 
 	public function actionPurge()
 	{
-		_dbx("DELETE xlsws_category.* FROM xlsws_category
+		$sql1 = "DELETE xlsws_category.* FROM xlsws_category
 				LEFT JOIN xlsws_category_addl ON xlsws_category_addl.id = xlsws_category.id
-				WHERE xlsws_category_addl.id IS NULL");
+				WHERE xlsws_category_addl.id IS NULL";
 
-		_dbx("DELETE xlsws_family.* from xlsws_family left join xlsws_product on xlsws_family.id=xlsws_product.family_id where xlsws_product.id is null");
+		$sql2 ="DELETE xlsws_family.* from xlsws_family left join xlsws_product on xlsws_family.id=xlsws_product.family_id where xlsws_product.id is null";
+		$success=0;
 
-		Yii::app()->user->setFlash('success',Yii::t('admin','Deleted categories and families removed {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
+		try {
+			Yii::app()->db->createCommand($sql1)->execute();
+			$success=1;
+
+		}
+		catch (Exception $e)
+		{
+			Yii::app()->user->setFlash('error',Yii::t('admin','Could not purge categories. Cannot remove deleted categories that are still assigned to products.'));
+		}
+
+		if ($success)
+		{
+			try {
+				Yii::app()->db->createCommand($sql2)->execute();
+				$success=1;
+
+			}
+			catch (Exception $e)
+			{
+				Yii::app()->user->setFlash('error',Yii::t('admin','Could not purge families.'));
+			}
+		}
+
+		if ($success)
+			Yii::app()->user->setFlash('success',Yii::t('admin','Done. This option has removed any categories and families you deleted in LightSpeed that may have been left on Web Store. {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
 
 		$this->render("purge");
 

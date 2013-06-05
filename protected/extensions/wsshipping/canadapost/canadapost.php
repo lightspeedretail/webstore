@@ -97,7 +97,7 @@ class canadapost extends WsShipping
 			$strKey = $val->name;
 			$strRate = $val->rate;
 			$strKey = $this->cleanMethodName($strKey);
-			$ret[$strKey] = floatval($this->config['markup']) + floatval($this->cleanPrice($strRate));
+			$ret[$strKey] = floatval($this->cleanPrice($strRate));
 			$found++;
 		}
 

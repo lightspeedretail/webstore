@@ -78,7 +78,7 @@
 		    <fieldset class="span10">
 		        <legend><?php echo Yii::t('checkout','Create a Free Account!'); ?></legend>
 		        <div class="row-fluid spaceafter">
-					<?php if (_xls_get_conf('ALLOW_GUEST_CHECKOUT',0))
+					<?php if (_xls_get_conf('REQUIRE_ACCOUNT',0))
 			        echo Yii::t('checkout',
 				        'Enter a password to create your account.');
 			        else echo Yii::t('checkout',

@@ -45,9 +45,9 @@ class YiiImageZoomer extends CWidget
 	
 	/** 
 	* @var string $imagefolder - used to specify the images folder path
-	* @default : "/images"
+	* @default : "images"
 	*/
-   	public $imagefolder='/images';
+   	public $imagefolder='images';
     
 	/** 
 	* @var boolean $cursorshade - used to enable or disable cursor shade
@@ -279,7 +279,7 @@ SETUP;
 		if(!empty($this->single_image))
 		{
 			//if the imageFolder exists  
-			if(is_dir($this->imagefolder))
+			if(is_dir(Yii::getPathOfAlias('webroot') .'/'.$this->imagefolder))
 			{	
 				//if the image file exists than generate the html string and return it
 				if(file_exists(Yii::getPathOfAlias('webroot') .'/'.$this->imagefolder. '/'.$this->single_image['image']))

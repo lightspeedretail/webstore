@@ -30,7 +30,7 @@ class moneris extends WsPayment
 		$type='purchase';
 		$cust_id='';
 		$order_id=$this->objCart->id_str;
-		$amount=round($this->objCart->total,2);
+		$amount=number_format(round($this->objCart->total,2),2, '.', '');
 		$pan=_xls_number_only($this->CheckoutForm->cardNumber);
 		$expiry_date=$this->CheckoutForm->cardExpiryMonth.substr($this->CheckoutForm->cardExpiryYear,2,2);
 		$crypt='7';
@@ -121,25 +121,24 @@ class moneris extends WsPayment
 		$mpgResponse=$mpgHttpPost->getMpgResponse();
 
 		$response = $mpgResponse->getMessage();
+		$code = $mpgResponse->getResponseCode();
 
-		if(substr($response,0,8) != "APPROVED") {
+		if($code>=1 && $code<=50) {
+			//We have success
+			$arrReturn['success']=true;
+			$arrReturn['amount_paid']=$mpgResponse->getTransAmount();
+			$arrReturn['result']=$mpgResponse->getAuthCode();
+			$arrReturn['payment_date']=$mpgResponse->getTransDate()." ".$mpgResponse->getTransTime();
+			if($this->config['live'] == 'test')
+				$arrReturn['amount_paid']=0;
+
+		} else {
 			//unsuccessful
 			$arrReturn['success']=false;
 			$arrReturn['amount_paid']=0;
 			$arrReturn['result'] = Yii::t('global',$response);
 			Yii::log("Declined: ".$response, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 
-		} else {
-
-			//We have success
-			$arrReturn['success']=true;
-			$arrReturn['amount_paid']=$mpgResponse->getTransAmount();
-			$arrReturn['result']=$mpgResponse->getAuthCode();
-			if($this->config['live'] == 'test')
-			{
-				$arrReturn['amount_paid']=0;
-				$arrReturn['result']="TEST ".$response;
-			}
 
 		}
 

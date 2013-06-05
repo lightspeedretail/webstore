@@ -90,7 +90,11 @@ class MyaccountController extends Controller
 					$model->password_repeat = $model->password;
 				}
 
-				if ($model->scenario=="create") $model->record_type = Customer::NORMAL_USER;
+				if ($model->scenario=="create")
+				{
+					$model->allow_login = Customer::NORMAL_USER;
+					$model->record_type = Customer::REGISTERED;
+				}
 				if (!$model->save())
 				{
 					//Put plain text passwords back for form refresh
@@ -103,13 +107,13 @@ class MyaccountController extends Controller
 
 					if (Yii::app()->user->isGuest)
 					{
-						$model->record_type = Customer::REGISTERED;
-						$model->allow_login = Customer::NORMAL_USER;
 
 						if(_xls_get_conf('MODERATE_REGISTRATION',0))
 						{
-							if ($model->scenario=="create")
-								$model->allow_login = Customer::UNAPPROVED_USER;
+
+							$model->allow_login = Customer::UNAPPROVED_USER;
+							$model->save();
+
 
 							Yii::app()->user->setFlash('success',
 								Yii::t('customer','Your account has been created but must be approved before you can log in. You will receive confirmation when you have been approved.'));
@@ -131,6 +135,7 @@ class MyaccountController extends Controller
 								Yii::app()->user->setFlash('error',
 									Yii::t('customer','Your account has been created but we had an error logging you in.'));
 						}
+
 						$this->redirect($this->createUrl("/site"));
 					}
 					else

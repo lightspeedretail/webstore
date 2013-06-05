@@ -59,7 +59,7 @@ class WsExtension extends CComponent
 		if (!isset($this->config['markup']))
 			$this->config['markup']=0;
 		$objModule = Modules::LoadByName(get_class($this));
-		if ($objModule instanceof  Modules)
+		if ($objModule instanceof Modules)
 			$this->active = $objModule->active;
 		else
 			$this->active = false;
@@ -219,7 +219,8 @@ class WsExtension extends CComponent
 		$objModule = Modules::model()->findByAttributes(array('module'=>$strClass));
 		if ($objModule instanceof Modules) {
 
-			try{
+			try
+			{
 				$arr = unserialize($objModule->configuration);
 			}catch(Exception $e){
 				Yii::log("Could not unserialize " . $strClass. " . Error : " . $e, 'error', 'application.'.__CLASS__.".".__FUNCTION__);

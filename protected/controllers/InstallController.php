@@ -1121,7 +1121,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		_dbx("INSERT INTO `xlsws_configuration`
 			(`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `options`, `template_specific`, `param`, `required`)
 			VALUES ('Moderate Customer Registration', 'MODERATE_REGISTRATION', '0',
-			 'If enabled, customer registrations will need to be moderated before they are approved.', 3, 1, 'BOOL', 0, 0, 1)");
+			 'If enabled, customer registrations will need to be moderated before they are approved.', 0, 1, 'BOOL', 0, 0, 1)");
 
 		_dbx("INSERT INTO `xlsws_configuration`
 			(`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `options`, `template_specific`, `param`, `required`)
@@ -1129,6 +1129,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 			 '', 0,0, NULL, 0, 0, 1)");
 
 		_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`='0' where `key_name`='CURRENCY_FORMAT'");
+		_dbx("UPDATE `xlsws_configuration` SET `title`='Require account creation',`key_name`='REQUIRE_ACCOUNT',options='BOOL' where `key_name`='ALLOW_GUEST_CHECKOUT'");
 		_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`='0' where `key_name`='LOCALE'");
 		_dbx("UPDATE `xlsws_configuration` SET `title`='Default Locale (Language) Code' where `key_name`='LANG_CODE'");
 		_dbx("UPDATE `xlsws_configuration` SET `key_value`='300' where `key_name`='DATABASE_SCHEMA_VERSION'");

@@ -571,10 +571,11 @@ class Cart extends BaseCart
 					$objItem->tax_in=0;
 					$objItem->save();
 				}
-				elseif ($objItem->cart_type == CartType::cart && $objItem->tax_in) {
+				elseif ($objItem->cart_type == CartType::cart && $objItem->tax_in)
+				{
 					// Set Tax Exclusive price
-					$objItem->sell_base = $objItem->product->PriceValue;
-					$objItem->sell = $objItem->sell_base*$objItem->qty;
+					$objItem->sell = $objItem->sell_base = $objItem->product->PriceValue;
+					$objItem->sell_total = $objItem->sell_base*$objItem->qty;
 					$objItem->tax_in = 0;
 					$objItem->save();
 				}
@@ -589,8 +590,8 @@ class Cart extends BaseCart
 				// Set back tax inclusive prices
 				if ($objItem->tax_in ==0)
 				{
-					$objItem->sell_base = $objItem->product->PriceValue;
-					$objItem->sell = $objItem->sell_base*$objItem->qty; //$objItem->product->getPriceValue($objItem->qty,true);
+					$objItem->sell = $objItem->sell_base = $objItem->product->PriceValue;
+					$objItem->sell_total = $objItem->sell_base*$objItem->qty; //$objItem->product->getPriceValue($objItem->qty,true);
 					$objItem->tax_in=1;
 					$objItem->save();
 				}

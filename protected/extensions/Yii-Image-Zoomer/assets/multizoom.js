@@ -18,9 +18,10 @@
 // Nov 5th, 2012: Unofficial update to v1.5.1m for integration with multi-zoom (adds multiple images to be zoomed via thumbnail activated image swapping)
 // Nov 28th, 2012: Version 2.1 w/Multi Zoom, updates - new features and bug fixes
 
+if (!window.location.origin) window.location.origin = window.location.protocol+"//"+window.location.host;
 var featuredimagezoomer = { // the two options for Featured Image Zoomer:
-	loadinggif: 'images/spinner.gif', // full path or URL to "loading" gif
-	magnifycursor: 'crosshair' // value for CSS's 'cursor' property when over the zoomable image
+    loadinggif: window.location.origin + '/images/spinner.gif', // full path or URL to "loading" gif
+    magnifycursor: 'crosshair' // value for CSS's 'cursor' property when over the zoomable image
 };
 
 	//////////////// No Need To Edit Beyond Here ////////////////

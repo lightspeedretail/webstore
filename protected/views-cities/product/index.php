@@ -11,7 +11,8 @@
 			        <?= $this->renderPartial('/product/_photos', array('model'=>$model), true); ?>
 	            </div>
 	            <div class="row-fluid">
-		            <?= $this->sharingTools; ?>
+		            <?php if(_xls_get_conf('SHOW_SHARING'))
+			            echo $this->renderPartial('/site/_sharing_tools',array('product'=>$model),true); ?>
 	            </div>
 	        </div>
 

@@ -51,12 +51,12 @@ class wsborderlookup extends CWidget {
 				if($model->orderType ==CartType::order) {
 					$objCustomer = Customer::LoadByEmail($model->emailPhone);
 					$objCart = Cart::model()->findByAttributes(array('id_str'=>$model->orderId,'customer_id'=>$objCustomer->id));
-					_rd($objCart->Link);
+					Yii::app()->controller->redirect($objCart->Link);
 				}
 
 				if($model->orderType ==CartType::sro) {
 					$objSro = Sro::model()->findByAttributes(array('customer_email_phone'=>$model->emailPhone,'ls_id'=>$model->orderId));
-					_rd($objSro->Link);
+					Yii::app()->controller->redirect($objSro->Link);
 				}
 			}
 		}
