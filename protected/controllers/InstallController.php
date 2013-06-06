@@ -264,12 +264,13 @@ class InstallController extends Controller
 
 					if (!$blnFound) {
 						if (!$objAddress->save()) {
-							Yii::log("Import Error ".print_r($objAddress->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-							return print_r($objAddress->getErrors(),true);
+							//We have a corrupt billing address, just blank it out so import goes on
+							Yii::app()->db->createCommand("update xlsws_cart set address_bill=null where id=".$result['id'])->execute();
 						}
-						else
+						else {
 							$cid = $objAddress->id;
-						Yii::app()->db->createCommand("update xlsws_cart set billaddress_id=".$cid." where id=".$result['id'])->execute();
+							Yii::app()->db->createCommand("update xlsws_cart set billaddress_id=".$cid." where id=".$result['id'])->execute();
+						}
 
 					}
 				}
@@ -474,6 +475,13 @@ class InstallController extends Controller
 				$objModule->save();
 			}
 		}
+
+		//fix for bad 2.5.2 configuration string
+		$objModule =  Modules::model()->findByAttributes(array('module'=>'storepickup'));
+		$conf = $objModule->configuration;
+		$conf = str_replace('s:12"Store Pickup"','s:12:"Store Pickup"',$conf);
+		$objModule->configuration = $conf;
+		$objModule->save();
 
 
 		_dbx("INSERT INTO `xlsws_modules` (`active`, `module`, `category`, `version`, `name`, `sort_order`, `configuration`, `modified`, `created`)

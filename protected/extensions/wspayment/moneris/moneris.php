@@ -119,9 +119,19 @@ class moneris extends WsPayment
 		/******************************* Response ************************************/
 
 		$mpgResponse=$mpgHttpPost->getMpgResponse();
+		if (isset($mpgResponse->responseData['title']) && stripos($mpgResponse->responseData['title'],'Error')>0)
+		{
+			$code=500;
+			$response =  Yii::t('global','Error: The credit card processor is currently unreachable.');
+			Yii::log("Moneris system error: ".print_r($mpgResponse,true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		}
+		else
+		{
+			$response = $mpgResponse->getMessage();
+			$code = $mpgResponse->getResponseCode();
+		}
 
-		$response = $mpgResponse->getMessage();
-		$code = $mpgResponse->getResponseCode();
+
 
 		if($code>=1 && $code<=50) {
 			//We have success

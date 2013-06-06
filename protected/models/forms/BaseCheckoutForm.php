@@ -343,12 +343,12 @@ class BaseCheckoutForm extends CFormModel
 	 */
 	public function getStates($type = 'billing',$intCountry = null) {
 
+		//These are only on first display so state list defaults to chosen country
+		if ($type=='billing' && !is_null($this->billingCountry) && is_null($intCountry)) $intCountry = $this->billingCountry;
+		if ($type=='shipping'&& !is_null($this->shippingCountry) && is_null($intCountry)) $intCountry = $this->shippingCountry;
+
 		if (is_null($intCountry))
 			$intCountry = _xls_get_conf('DEFAULT_COUNTRY',224);
-
-		//These are only on first display so state list defaults to chosen country
-		if ($type=='billing') $intCountry = $this->billingCountry;
-		if ($type=='shipping') $intCountry = $this->shippingCountry;
 
 		$criteria=new CDbCriteria();
 		$criteria->select="t1.id,t1.code";

@@ -136,15 +136,18 @@ class Destination extends BaseDestination
 	 * @return object :: The matching destination
 	 */
 	public static function LoadMatching($country, $state, $zip) {
+		//We may get id numbers instead of text strings so convert here
+		if (is_numeric($country)) $country = Country::CodeById($country);
+		if (is_numeric($state)) $state = State::CodeById($state);
+
 		$arrDestinations = Destination::LoadByCountry($country);
 
 		$objState = State::LoadByCode($state,$country);
 		$zip = preg_replace('/[^A-Z0-9]/', '',strtoupper($zip));
 
 		foreach ($arrDestinations as $objDestination) {
-			if (($objDestination->state == null) ||
-				($objDestination->state == $objState->id)
-				) {
+			if ($objDestination->state == null || $objDestination->state == $objState->id)
+			{
 
 				$zipStart = $objDestination->Zipcode1;
 				$zipEnd = $objDestination->Zipcode2;

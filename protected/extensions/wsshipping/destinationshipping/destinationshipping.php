@@ -14,6 +14,8 @@ class destinationshipping extends WsShipping
 		$zipcode = $this->CheckoutForm->shippingPostal;
 
 
+		Yii::log("DESTINATION TABLE: searching for $country/$state/$zipcode", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+
 		if(!isset($this->config['per'])) {
 			Yii::log("DESTINATION TABLE: could not get destination shipping unit.", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return false;
@@ -43,7 +45,8 @@ class destinationshipping extends WsShipping
 
 		// If the Base Charge is unset or lesser than 0, don't apply this module
 		if ($model->base_charge == '' || $model->base_charge == null) {
-			Yii::log("DESTINATION TABLE: Base charge not set for entry '".$model->label."'", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			$label = Country::CodeById($model->country)."/".State::CodeById($model->state);
+			Yii::log("DESTINATION TABLE: Base charge not set for entry '".$label."'", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return false;
 		}
 

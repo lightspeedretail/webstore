@@ -1191,15 +1191,6 @@ class CartController extends Controller
 
 		}
 
-
-		/** Because we get State and Country as ID numbers from the form,
-		 * but the modules expect text labels, translate here
-		 */
-		$CheckoutForm->billingState = State::CodeById($CheckoutForm->billingState);
-		$CheckoutForm->billingCountry = Country::CodeById($CheckoutForm->billingCountry);
-		$CheckoutForm->shippingState = State::CodeById($CheckoutForm->shippingState);
-		$CheckoutForm->shippingCountry = Country::CodeById($CheckoutForm->shippingCountry);
-
 		return $CheckoutForm;
 
 	}
@@ -1426,6 +1417,7 @@ class CartController extends Controller
 			$model->attributes=$_POST['CheckoutForm'];
 			if(Yii::app()->params['SHIP_SAME_BILLSHIP']) $model->billingSameAsShipping=1;
 			$model->scenario = 'CalculateShipping';
+			//Copy address book to field if necessary
 			$model = $this->FillFieldsFromPreselect($model);
 			if(!$model->validate()) {
 				$arrErrors = $model->getErrors();
@@ -1441,8 +1433,17 @@ class CartController extends Controller
 
 			Yii::log("Successfully validated shipping request", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
-			//Copy address book to field if necessary
-			$CheckoutForm = $this->FillFieldsFromPreselect($model);
+
+			//Clone the model because we're going to make some changes we may not want to retain
+			$CheckoutForm = clone $model;
+
+			/** Because we get State and Country as ID numbers from the form,
+			 * but the modules expect text labels, translate here
+			 */
+			$CheckoutForm->billingState = State::CodeById($CheckoutForm->billingState);
+			$CheckoutForm->billingCountry = Country::CodeById($CheckoutForm->billingCountry);
+			$CheckoutForm->shippingState = State::CodeById($CheckoutForm->shippingState);
+			$CheckoutForm->shippingCountry = Country::CodeById($CheckoutForm->shippingCountry);
 
 			$CheckoutForm->shippingPostal = str_replace(" ","",$CheckoutForm->shippingPostal);
 			//Calculate tax since that may change depending on shipping address
@@ -1452,11 +1453,9 @@ class CartController extends Controller
 			if (!$objDestination) $objDestination = Destination::LoadDefault();
 			if (!$objDestination)
 			{
-				echo CJSON::encode(array("result"=>"error",
-					"errormsg"=>Yii::t('checkout',
-						'Website configuration error. No tax destinations have been defined by the Store Administrator. Cannot continue.')));
-				Yii::log("Website configuration error. No tax destinations have been defined by the Store Administrator. Cannot continue",
-					'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				$err = 'Website configuration error. No tax destinations have been defined by the Store Administrator. Cannot continue.';
+				echo CJSON::encode(array("result"=>"error","errormsg"=>Yii::t('checkout',$err)));
+				Yii::log($err,'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				return;
 			}
 			Yii::app()->shoppingcart->tax_code_id = $objDestination->taxcode;

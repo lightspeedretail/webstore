@@ -112,6 +112,8 @@ class WsExtension extends CComponent
 		{
 			$this->CheckoutForm = $mixForm;
 
+
+
 			return $this;
 		}
 		else throw new CException('CheckoutForm not passed to module');
