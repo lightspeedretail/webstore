@@ -71,12 +71,12 @@ a:hover {  text-decoration: none;   }
 #nav_products { font-weight: 600; height: 47px; text-decoration: none; z-index: 2000; border-bottom: 0px; text-align: left; cursor: pointer; margin-left: 9px; margin-top: 3px;}
 #nav_products .productstab { height: 45px; margin-top: 2px;}
 #nav_products .dropspace { margin-top: 10px; } /* push dropdown menu down from underneath PRODUCTS tab */
-/* all this to create dropdown and popout menu effects */
+ /* all this to create dropdown and popout menu effects */
 #nav_products a { display: block; margin-right: 3px; padding: 0 0 0 0 ; text-decoration: none;  z-index: 2000;}
 #nav_products ul { border: none; line-height: 1; list-style: none; list-style-type: none; margin: 0px 0 0px 0px; padding-bottom: 20px;z-index: 2000;}
 #nav_products ul a {  border-bottom: 1px dotted #cccccc; z-index: 2000;}
 #nav_products li { float: left; width: 10em; height: 30px;  z-index: 2000; line-height:19px !important; }
-#nav_products li ul { left: auto; position: absolute; width: 10em; height: 29px; z-index: 2000;}
+#nav_products li ul { left: -999em; position: absolute; width: 10em; height: 29px; z-index: 2000;}
 #nav_products li ul ul { margin: -33px 0 0 180px; z-index: 2000;}
 #nav_products ul li ul li a { font-size: 1em; font-weight: 700; padding: 8px 10px; width: 160px; border-bottom: 1px dotted #cccccc; z-index: 2000;}
 #nav_products ul li ul li a:hover { border-bottom: 1px dotted #cccccc; z-index: 2000;}
@@ -153,16 +153,16 @@ a:hover {  text-decoration: none;   }
 #shoppingcartbottom .cart_label  { padding-bottom: 2px; float:left; font-size: 0.95em; text-align: right; font-weight: 500;}
 #shoppingcartbottom .cart_price { padding-bottom: 2px;float:left; font-size: 1.1em; text-align: right; font-weight: 500;}
 #shoppingcartbottom .subtotallabel { font-weight: 600; }
-/* checkout button */
+    /* checkout button */
 #shoppingcartcheckout {  clear:both;  height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
 #shoppingcartcheckout .checkoutlink {  margin: auto;  text-align: center; }
 #shoppingcartcheckout .checkoutlink a { margin-top: 20px;  text-decoration: none;}
 #shoppingcartcheckout .checkoutarrow { margin-right: 15px; position: relative; text-align: right; top: -17px; }
-/* edit cart button */
+    /* edit cart button */
 #shoppingcarteditcart {  clear:both;  height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center;margin-bottom: 10px; cursor: pointer;  text-transform: uppercase; }
 #shoppingcarteditcart .editlink {  margin: auto;  text-align: center; }
 #shoppingcarteditcart .editlink a { margin-top: 20px;  text-decoration: none;}
-/* continue shopping button */
+    /* continue shopping button */
 #shoppingcartcontinue {  height: 45px; padding-top: 12px; padding-bottom: 10px; text-align: center;margin-bottom: 10px; cursor: pointer;  text-transform: uppercase; }
 #shoppingcartcontinue .editlink {  margin: auto;  text-align: center; }
 #shoppingcartcontinue .editlink a { margin-top: 20px;  text-decoration: none;}
@@ -240,7 +240,7 @@ a:hover {  text-decoration: none;   }
 #checkout .red,#contact-form .red, .customer_reg_err_msg {  font-size: 1.1em;text-transform: uppercase; }
 #checkout fieldset { border-bottom: 2px dotted #e7e7e7; margin-bottom: 20px; padding-bottom: 10px; }
 #checkout #Payforms fieldset { border-bottom: none; }
-/* tweaks for specific fields. They all have IDs so it makes it easy */
+  /* tweaks for specific fields. They all have IDs so it makes it easy */
 #checkout label[for=CheckoutForm_receiveNewsletter], #checkout label[for=CheckoutForm_billingSameAsShipping],
 #checkout label[for=CheckoutForm_acceptTerms],#checkout label[for=CustomerAddress_active] ,
 #checkout label[for=CustomerAddress_residential], #checkout label[for=Customer_newsletter_subscribe] { display: inline;}

@@ -1,8 +1,8 @@
 <?php
 
 // change the following paths if necessary
-$yii=dirname(__FILE__).'/framework/yii.php';
-$config=dirname(__FILE__).'/protected/config/main.php';
+$yii=dirname(__FILE__).'/core/framework/yii.php';
+$config=dirname(__FILE__).'/config/main.php';
 
 if(!file_exists($config))
 {

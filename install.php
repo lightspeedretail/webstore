@@ -16,7 +16,7 @@ define ('__VIRTUAL_DIRECTORY__', '');
 
 
 //Installer can only run if the site hasn't been set up
-if(file_exists("protected/config/main.php") && $_SERVER['REQUEST_URI'] != __SUBDIRECTORY__ . "/install.php?check")
+if(file_exists("config/main.php") && $_SERVER['REQUEST_URI'] != __SUBDIRECTORY__ . "/install.php?check")
 {
 	header("Location: index.php");
 	exit;
@@ -123,13 +123,21 @@ Sitemap: http://www.example.com/store/sitemap.xml
 function makeSymbolicLink()
 {
 
-	$symfile = "protected/views";
+	$symfile = "core/protected/views";
 	$strOriginal =  "views-cities";
 
 	@unlink($symfile);
 	$retVal = symlink($strOriginal, $symfile);
 	if (!$retVal)
 		die("cannot create symbolic link 'views' to point to 'views-cities'");
+
+	$symfile =  "themes/brooklyn";
+	$strOriginal = "../core/themes/brooklyn";
+
+	@unlink($symfile);
+	$retVal = symlink($strOriginal, $symfile);
+	if (!$retVal)
+		die("cannot create symbolic link 'themes/brooklyn' to point to '../core/themes/brooklyn'");
 
 }
 function  _xls_version()
@@ -146,9 +154,9 @@ function displayForm()
 	$dbpass = "";
 	$dbname = "";
 
-	if (file_exists("protected/config/wsdb.php"))
+	if (file_exists("config/wsdb.php"))
 	{
-		$arrSql = require("protected/config/wsdb.php");
+		$arrSql = require("config/wsdb.php");
 		if(isset($arrSql['username'])) $dbusername = $arrSql['username'];
 		if(isset($arrSql['password'])) $dbpass = $arrSql['password'];
 		if(isset($arrSql['connectionString']))
@@ -368,7 +376,7 @@ function displayFormTwo()
 	    function runUpgrade(key)
 	    {
 
-		    if (prunning>1200)
+		    if (prunning>2400)
 		    {
 			    clearInterval(pinttimer);
 			    prunning=0;
@@ -519,9 +527,9 @@ return array(
 
 );";
 
-	@mkdir("protected/config",0755,true);
-	$fp2 = fopen("protected/config/wsdb.php","w");
-	if ($fp2 === false) die("Error, can't write file protected/config/wsdb.php");
+	@mkdir("config",0755,true);
+	$fp2 = fopen("config/wsdb.php","w");
+	if ($fp2 === false) die("Error, can't write file config/wsdb.php");
 	fwrite($fp2,$strtoexport);
 	fclose($fp2);
 
@@ -533,7 +541,7 @@ return array(
 
 );";
 
-	$fp2 = fopen("protected/config/wsemail.php","w");
+	$fp2 = fopen("config/wsemail.php","w");
 	fwrite($fp2,$strtoexport);
 	fclose($fp2);
 
@@ -727,11 +735,11 @@ function zipAndFolders()
 	if (!file_exists('assets')) {
 		@mkdir('assets');
 	}
-	if (!file_exists('protected/runtime')) {
-		@mkdir('protected/runtime');
+	if (!file_exists('runtime')) {
+		@mkdir('runtime');
 	}
-	if (!file_exists('protected/runtime/cache')) {
-		@mkdir('protected/runtime/cache');
+	if (!file_exists('runtime/cache')) {
+		@mkdir('runtime/cache');
 	}
 }
 /**
@@ -802,7 +810,7 @@ function decompress($zipFile = '', $dirFromZip = '', $zipDir=null)
 function createDbConnection()
 {
 	//Since we have our db information already saved in the Yii file, read it back here
-	$dbinfo = require(dirname(__FILE__).'/protected/config/wsdb.php');
+	$dbinfo = require(dirname(__FILE__).'/config/wsdb.php');
 
 	$dbusername = $dbinfo['username'];
 	$dbpassword = $dbinfo['password'];
@@ -939,14 +947,14 @@ function runInstall($db,$sqlline = 0)
 
 function installMainConfig()
 {
-	$configtext = file_get_contents("protected/config/_main.php");
-	$fp2 = fopen("protected/config/main.php","w");
+	$configtext = file_get_contents("core/protected/config/_main.php");
+	$fp2 = fopen("config/main.php","w");
 	fwrite($fp2,$configtext);
 	fclose($fp2);
 
 	//shell which will be updated later
-	$configtext = file_get_contents("protected/config/_wsfacebook.php");
-	$fp2 = fopen("protected/config/wsfacebook.php","w");
+	$configtext = file_get_contents("core/protected/config/_wsfacebook.php");
+	$fp2 = fopen("config/wsfacebook.php","w");
 	fwrite($fp2,$configtext);
 	fclose($fp2);
 
@@ -2433,6 +2441,9 @@ UPDATE xlsws_configuration set title='Product {color} Label',helper_text='Rename
 UPDATE xlsws_configuration set title='Image Background {color} Fill',helper_text='Optional image background {color} (#HEX)' where key_name='IMAGE_BACKGROUND';
 UPDATE xlsws_configuration set configuration_type_id=29 where key_name like '%IMAGE_WIDTH';
 UPDATE xlsws_configuration set configuration_type_id=29 where key_name like '%IMAGE_HEIGHT';
+UPDATE xlsws_configuration set configuration_type_id=24, key_value='Thank you, {storename}' where key_name ='EMAIL_SIGNATURE';
+UPDATE xlsws_configuration set options='BOOL' where key_name = 'ENABLE_SLASHED_PRICES';
+UPDATE xlsws_configuration set key_value=1 where key_value=2 AND key_name = 'ENABLE_SLASHED_PRICES';
 UPDATE xlsws_modules set category='theme' where category='template';
 INSERT IGNORE INTO `xlsws_configuration` (`id`, `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES (NULL, 'After adding item to cart', 'AFTER_ADD_CART', '0', 'What should site do after shopper adds item to cart', '4', '5', '2009-04-06 10:34:34', '2009-04-06 10:34:34', 'AFTER_ADD_CART', '0', '1', NULL);
 INSERT IGNORE INTO `xlsws_configuration` (`id`, `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES (NULL, 'Send test email on Save', 'EMAIL_TEST', '0', 'When clicking Save, system will attempt to send a test email through', '5', '20', '2012-05-22 07:55:29', '2012-04-13 10:07:41', 'BOOL', '0', '0', NULL);
@@ -2458,7 +2469,7 @@ function initialConfigLoad($db)
 	$db->add_config_key("EMAIL_FROM","Store Email","","From which address emails will be sent",2,3,NULL);
 	$db->add_config_key("STORE_NAME","Store Name","LightSpeed Web Store","",2,1,NULL);
 	$db->add_config_key("EMAIL_BCC","BCC Address","","Enter an email address here if you would like to get BCCed on all emails sent by the webstore.",5,2,NULL);
-	$db->add_config_key("EMAIL_SIGNATURE","Email Signature","Thank you, LightSpeed Web Store","Email signature for all outgoing emails",5,10,NULL);
+	$db->add_config_key("EMAIL_SIGNATURE","Email Signature","Thank you, {storename}","Email signature for all outgoing emails",24,10,NULL);
 	$db->add_config_key("ENABLE_WISH_LIST","Enable Wish List",1,"",7,1,"BOOL");
 	$db->add_config_key("ENABLE_SRO","Display My Repairs (SROs) under My Account",0,"If your store uses SROs for repairs and uploads them to Web Store, turn this option on to allow customers to view pending repairs.",6,4,"BOOL");
 	$db->add_config_key("DATE_FORMAT","Date Format","m/d/Y","The date format to be used in store. Please see http://www.php.net/date for more information",15,3,NULL);
@@ -3770,17 +3781,17 @@ function parse_php_info()
 	$checked['/assets folder must be writeable'] = (is_writable(
 		__DOCROOT__ . __SUBDIRECTORY__ . '/assets'
 	) ? "pass" : "fail");
-	 if (file_exists('protected/runtime'))
-		 $checked['/protected/runtime folder must be writeable'] = (is_writable(
-		__DOCROOT__ . __SUBDIRECTORY__ . '/protected/runtime'
+	 if (file_exists('runtime'))
+		 $checked['/runtime folder must be writeable'] = (is_writable(
+		__DOCROOT__ . __SUBDIRECTORY__ . '/runtime'
 	) ? "pass" : "fail");
-	 if (file_exists('protected/runtime/cache'))
-		 $checked['/protected/runtime/cache folder must be writeable'] = (is_writable(
-		__DOCROOT__ . __SUBDIRECTORY__ . '/protected/runtime/cache'
+	 if (file_exists('runtime/cache'))
+		 $checked['/runtime/cache folder must be writeable'] = (is_writable(
+		__DOCROOT__ . __SUBDIRECTORY__ . '/runtime/cache'
 	) ? "pass" : "fail");
-	 if (file_exists('protected/config'))
-	 $checked['/protected/config folder must be writeable'] = (is_writable(
-		__DOCROOT__ . __SUBDIRECTORY__ . '/protected/config'
+	 if (file_exists('config'))
+	 $checked['/config folder must be writeable'] = (is_writable(
+		__DOCROOT__ . __SUBDIRECTORY__ . '/config'
 	) ? "pass" : "fail");
 
 	//If any of our items fail, be helpful and show them where the php.ini is. Otherwise, we hide it since working servers shouldn't advertise this
