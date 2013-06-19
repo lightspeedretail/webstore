@@ -14,7 +14,7 @@ define('ADVANCED_SEARCH_DEFAULT_OPERATOR', 'and');
 //Create alias for custom includes
 Yii::setPathOfAlias("config",dirname(__FILE__)."/../config");
 Yii::setPathOfAlias("custom",dirname(__FILE__)."/../custom");
-Yii::setPathOfAlias('editable', dirname(__FILE__).'/core/protected/extensions/x-editable');
+Yii::setPathOfAlias('editable', dirname(__FILE__).DIRECTORY_SEPARATOR.'../core/protected/extensions/x-editable');
 Yii::setPathOfAlias('ext', dirname(__FILE__).DIRECTORY_SEPARATOR.'../core/protected/extensions');
 Yii::setPathOfAlias('extensions', dirname(__FILE__).DIRECTORY_SEPARATOR.'../core/protected/extensions');
 
