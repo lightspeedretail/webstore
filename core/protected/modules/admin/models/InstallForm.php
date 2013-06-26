@@ -132,7 +132,7 @@ class InstallForm extends CFormModel
 	public function getPage2()
 	{
 		return array(
-			'title'=>'Enter a store password and verify the server timezone. The encryption keys are used to encrypt all passwords, you can generally accept the randomly generated ones below.',
+			'title'=>'Enter a store password and verify the server timezone. The encryption keys are used to encrypt all passwords, you can generally accept the randomly generated ones below. <b>Type in your store password even if this is an upgrade. Your new store password will be reset to what is entered here.</b>',
 
 
 			'elements'=>array(
@@ -274,6 +274,11 @@ class InstallForm extends CFormModel
 				break;
 
 			case 4:
+				if (is_null($this->EMAIL_SMTP_SERVER)) $this->EMAIL_SMTP_SERVER='';
+				if (is_null($this->EMAIL_SMTP_PORT)) $this->EMAIL_SMTP_PORT='';
+				if (is_null($this->EMAIL_SMTP_USERNAME)) $this->EMAIL_SMTP_USERNAME='';
+				if (is_null($this->EMAIL_SMTP_PASSWORD)) $this->EMAIL_SMTP_PASSWORD='';
+
 				_xls_set_conf('EMAIL_SMTP_SERVER',$this->EMAIL_SMTP_SERVER);
 				_xls_set_conf('EMAIL_SMTP_PORT',$this->EMAIL_SMTP_PORT);
 				_xls_set_conf('EMAIL_SMTP_USERNAME',$this->EMAIL_SMTP_USERNAME);

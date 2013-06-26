@@ -52,7 +52,7 @@ function xls_check_file_signatures($complete = false)
 	$checked = array();
 	$checked['<b>--File Signatures Check for ' . _xls_version() . '--</b>'] = "pass";
 
-	include("protected/modules/admin/signatures.php");
+	include("core/protected/modules/admin/signatures.php");
 
 	$fn = unserialize($signatures);
 	if (!isset($signatures)) {
@@ -740,6 +740,9 @@ function zipAndFolders()
 	}
 	if (!file_exists('runtime/cache')) {
 		@mkdir('runtime/cache');
+	}
+	if (!file_exists('themes')) {
+		@mkdir('themes');
 	}
 }
 /**
@@ -2028,18 +2031,191 @@ function migrateTwoFiveToThree()
 
 	INSERT INTO `{newdbname}`.`xlsws_stringsource` (`id`, `category`, `message`)
 	VALUES
-		(1, 'unittest', 'Sample Text'),
-		(2, 'CheckoutForm', 'First Name'),
-		(3, 'CheckoutForm', 'Last Name'),
-		(6, 'CheckoutForm', 'Email Address');
+	(21, 'cart', 'Qty'),
+	(22, 'cart', 'SubTotal'),
+	(23, 'cart', 'Checkout'),
+	(24, 'cart', 'Edit Cart'),
+	(97, 'cart', 'Description'),
+	(98, 'cart', 'Price'),
+	(99, 'cart', 'Total'),
+	(100, 'cart', 'Shipping'),
+	(130, 'cart', 'Thank you for your order!'),
+	(131, 'cart', 'Order ID'),
+	(132, 'cart', 'Date'),
+	(133, 'cart', 'Status'),
+	(134, 'cart', 'Payment'),
+	(135, 'cart', 'Authorization'),
+	(136, 'cart', 'Notes'),
+	(137, 'cart', 'Promo Code {code} Applied'),
+	(202, 'cart', 'Clear Cart'),
+	(203, 'cart', 'Are you sure you want to erase your cart items?'),
+	(204, 'cart', 'Email Cart'),
+	(205, 'cart', 'Continue Shopping'),
+	(206, 'cart', 'Update Cart'),
+	(20, 'checkout', 'Shopping Cart'),
+	(73, 'checkout', 'Choose your shipping address'),
+	(74, 'checkout', 'Or enter a new address'),
+	(75, 'checkout', 'Shipping Address'),
+	(88, 'checkout', 'Choose your billing address'),
+	(89, 'checkout', 'Billing Address'),
+	(90, 'checkout', 'Promo Code'),
+	(91, 'checkout', 'Enter a Promotional Code here to receive a discount.'),
+	(92, 'checkout', 'Apply Promo Code'),
+	(93, 'checkout', 'Shipping'),
+	(96, 'checkout', 'Click to Calculate Shipping'),
+	(101, 'checkout', 'Payment'),
+	(109, 'checkout', 'Submit your order'),
+	(111, 'checkout', 'I hereby agree to the Terms and Conditions of shopping with {storename}'),
+	(128, 'checkout', 'Customer Contact'),
+	(188, 'checkout', 'Billing'),
+	(77, 'CheckoutForm', 'Label for this address (i.e. Home, Work)'),
+	(78, 'CheckoutForm', 'First Name'),
+	(79, 'CheckoutForm', 'Last Name'),
+	(80, 'CheckoutForm', 'Address'),
+	(81, 'CheckoutForm', 'Address 2 (optional)'),
+	(82, 'CheckoutForm', 'City'),
+	(83, 'CheckoutForm', 'Country'),
+	(84, 'CheckoutForm', 'State/Province'),
+	(85, 'CheckoutForm', 'Zip/Postal'),
+	(86, 'CheckoutForm', 'This is a residential address'),
+	(87, 'CheckoutForm', 'My shipping address is also my billing address'),
+	(94, 'CheckoutForm', 'Shipping Method'),
+	(95, 'CheckoutForm', 'Delivery Speed'),
+	(102, 'CheckoutForm', 'Payment Provider'),
+	(103, 'CheckoutForm', 'Card Type'),
+	(104, 'CheckoutForm', 'Card Number'),
+	(105, 'CheckoutForm', 'CVV'),
+	(106, 'CheckoutForm', 'Expiry Month'),
+	(107, 'CheckoutForm', 'Expiry Year'),
+	(108, 'CheckoutForm', 'Cardholder Name'),
+	(110, 'CheckoutForm', 'Comments'),
+	(112, 'CheckoutForm', 'Accept Terms'),
+	(198, 'CheckoutForm', 'Phone'),
+	(186, 'email', 'Dear'),
+	(187, 'email', 'Thank you for your order with'),
+	(194, 'email', 'This email is a confirmation for the order. To view details or track your order, click on the visit link:'),
+	(195, 'email', 'Please refer to your order ID '),
+	(196, 'email', ' if you want to contact us about this order.'),
+	(197, 'email', 'Thank you, {storename}'),
+	(199, 'email', '{storename} Order Notification {orderid}'),
+	(7, 'global', '{description} : {storename}'),
+	(8, 'global', '{longdescription}'),
+	(9, 'global', 'Hover over image to zoom'),
+	(14, 'global', 'The following related products will be added to your cart automatically with this purchase:'),
+	(16, 'global', 'Other items you may be interested in:'),
+	(19, 'global', 'Submit'),
+	(25, 'global', 'Order Lookup'),
+	(26, 'global', 'Wish Lists'),
+	(27, 'global', 'View all my wish lists'),
+	(28, 'global', 'Create a Wish List'),
+	(29, 'global', 'Search for a wish list'),
+	(30, 'global', 'Logout'),
+	(31, 'global', 'Products'),
+	(55, 'global', 'SEARCH'),
+	(56, 'global', 'About Us'),
+	(57, 'global', 'Terms and Conditions'),
+	(58, 'global', 'Privacy Policy'),
+	(59, 'global', 'Sitemap'),
+	(60, 'global', 'Copyright'),
+	(61, 'global', 'All Rights Reserved'),
+	(62, 'global', '{storename} : {storetagline}'),
+	(63, 'global', 'First'),
+	(64, 'global', 'Last'),
+	(65, 'global', 'Previous'),
+	(66, 'global', 'Next'),
+	(67, 'global', 'Size'),
+	(68, 'global', 'Select {label}...'),
+	(69, 'global', 'Color'),
+	(70, 'global', 'Edit Cart'),
+	(71, 'global', 'Checkout'),
+	(72, 'global', 'Fields with {*} are required.'),
+	(76, 'global', 'You must accept Terms and Conditions'),
+	(113, 'global', '{label} ({price})'),
+	(114, 'global', 'Available during normal business hours'),
+	(115, 'global', 'Welcome'),
+	(116, 'global', 'Edit Profile'),
+	(117, 'global', 'My Addresses'),
+	(118, 'global', 'Add new address'),
+	(119, 'global', 'Default Billing Address'),
+	(120, 'global', 'Default Shipping Address'),
+	(121, 'global', 'My Orders'),
+	(122, 'global', 'Awaiting Processing'),
+	(123, 'global', 'My Wish Lists'),
+	(124, 'global', 'Click here to create a wish list.'),
+	(125, 'global', 'You have not created any wish list yet.'),
+	(126, 'global', 'Create a new address book entry'),
+	(127, 'global', 'Update your account'),
+	(129, 'global', 'Enter a new password here to change your password'),
+	(138, 'global', 'New Wish List'),
+	(140, 'global', 'Name'),
+	(141, 'global', 'Contains'),
+	(142, 'global', 'Description'),
+	(143, 'global', 'Edit'),
+	(144, 'global', 'Create a new Wish List'),
+	(159, 'global', '{items} item|{items} items'),
+	(161, 'global', 'Wish List'),
+	(162, 'global', 'View All Lists'),
+	(163, 'global', 'Settings'),
+	(164, 'global', 'Share'),
+	(165, 'global', 'Qty'),
+	(166, 'global', 'Status'),
+	(176, 'global', 'Update'),
+	(177, 'global', 'DELETE THIS ITEM'),
+	(180, 'global', 'Send'),
+	(181, 'global', 'Wish List Search'),
+	(183, 'global', 'Search for a wish list by email address'),
+	(184, 'global', 'Promo Code'),
+	(185, 'global', 'Promo Code applied at {amount}.'),
+	(189, 'global', 'Item'),
+	(190, 'global', 'Price'),
+	(191, 'global', 'SubTotal'),
+	(192, 'global', 'Total'),
+	(193, 'global', 'Payment Data'),
+	(200, 'global', '{name} : {storename}'),
+	(10, 'product', 'Regular Price'),
+	(11, 'product', '{qty} Available'),
+	(12, 'product', 'Add to Wish List'),
+	(13, 'product', 'Add to Cart'),
+	(15, 'product', 'Product Description'),
+	(32, 'tabs', 'Products'),
+	(51, 'tabs', 'New Products'),
+	(52, 'tabs', 'Top Products'),
+	(53, 'tabs', 'Promotions'),
+	(54, 'tabs', 'Contact Us'),
+	(17, 'wishlist', 'Add to Wish List'),
+	(18, 'wishlist', 'Add to what list'),
+	(139, 'wishlist', 'Click on the wish list name to view list contents, or click on edit to make changes to settings.'),
+	(145, 'wishlist', 'Name your Wish List'),
+	(146, 'wishlist', 'Description (Optional)'),
+	(147, 'wishlist', 'Event Date (Optional)'),
+	(148, 'wishlist', 'Visibility'),
+	(149, 'wishlist', 'Public, searchable by my email address'),
+	(150, 'wishlist', 'Personal, shared only by a special URL'),
+	(151, 'wishlist', 'Private, only viewable with my login'),
+	(152, 'wishlist', 'None'),
+	(153, 'wishlist', 'Ship Option'),
+	(154, 'wishlist', 'Leave the item in the Wish List, marked as Purchased'),
+	(155, 'wishlist', 'Delete the item automatically from Wish List'),
+	(156, 'wishlist', 'After purchase'),
+	(157, 'wishlist', 'My Wish List'),
+	(158, 'wishlist', 'Item has been added to your Wish List.'),
+	(160, 'wishlist', 'Please check out my Wish List at {url}'),
+	(167, 'wishlist', 'You can share this wish list with anyone using the URL: {url}'),
+	(168, 'wishlist', 'Edit Wish List Item'),
+	(169, 'wishlist', 'Qty Desired'),
+	(170, 'wishlist', 'Qty Received'),
+	(171, 'wishlist', 'Priority'),
+	(172, 'wishlist', 'Item Comment (max 500 characters)'),
+	(173, 'wishlist', 'Low Priority'),
+	(174, 'wishlist', 'Normal Priority'),
+	(175, 'wishlist', 'High Priority'),
+	(178, 'wishlist', 'Share my Wish List'),
+	(179, 'wishlist', 'Share via email'),
+	(182, 'wishlist', 'Click on the wish list name to view.'),
+	(201, 'wishlist', 'Please check out my shopping cart at {url}'),
+	(207, 'wishlist', 'Share my Cart'),
+	(208, 'wishlist', 'No publicly searchable wish lists for this email address.');
 
-	INSERT INTO `{newdbname}`.`xlsws_stringtranslate` (`id`, `language`, `translation`)
-	VALUES
-		(1, 'de', 'Beispieltext'),
-		(1, 'fr', 'Exemple de texte'),
-		(2, 'fr', 'Nom'),
-		(3, 'fr', 'Nom de famille'),
-		(6, 'fr', 'Adresse Courriel');
 
 
 
@@ -2436,10 +2612,10 @@ DELETE FROM xlsws_configuration where key_name='INVENTORY_DISPLAY_LEVEL';
 UPDATE xlsws_configuration set title='Display Inventory on Product Details' where key_name='INVENTORY_DISPLAY';
 UPDATE xlsws_configuration set title='Authorized IPs For LightSpeed uploading (USE WITH CAUTION)',helper_text='List of IP Addresses (comma separated) which are allowed to upload products and download orders. NOTE: DO NOT USE THIS OPTION IF YOU DO NOT HAVE A STATIC IP ADDRESS' where key_name='LSAUTH_IPS';
 DELETE FROM `xlsws_configuration` where `key_name`='DEFAULT_EXPIRY_GIFT_REGISTRY';
-UPDATE xlsws_configuration set title='Update {color} options',helper_text='Enable this option to have the {color} drop-down menu populated on each size change.' where key_name='ENABLE_COLOR_FILTER';
 UPDATE xlsws_configuration set title='Product {color} Label',helper_text='Rename {color} Option of LightSpeed to this' where key_name='PRODUCT_COLOR_LABEL';
 UPDATE xlsws_configuration set title='Image Background {color} Fill',helper_text='Optional image background {color} (#HEX)' where key_name='IMAGE_BACKGROUND';
 UPDATE xlsws_configuration set configuration_type_id=29 where key_name like '%IMAGE_WIDTH';
+DELETE from xlsws_configuration where key_name = 'ENABLE_COLOR_FILTER';
 UPDATE xlsws_configuration set configuration_type_id=29 where key_name like '%IMAGE_HEIGHT';
 UPDATE xlsws_configuration set configuration_type_id=24, key_value='Thank you, {storename}' where key_name ='EMAIL_SIGNATURE';
 UPDATE xlsws_configuration set options='BOOL' where key_name = 'ENABLE_SLASHED_PRICES';
@@ -2448,16 +2624,14 @@ UPDATE xlsws_modules set category='theme' where category='template';
 INSERT IGNORE INTO `xlsws_configuration` (`id`, `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES (NULL, 'After adding item to cart', 'AFTER_ADD_CART', '0', 'What should site do after shopper adds item to cart', '4', '5', '2009-04-06 10:34:34', '2009-04-06 10:34:34', 'AFTER_ADD_CART', '0', '1', NULL);
 INSERT IGNORE INTO `xlsws_configuration` (`id`, `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES (NULL, 'Send test email on Save', 'EMAIL_TEST', '0', 'When clicking Save, system will attempt to send a test email through', '5', '20', '2012-05-22 07:55:29', '2012-04-13 10:07:41', 'BOOL', '0', '0', NULL);
 INSERT IGNORE INTO `xlsws_configuration` (`id`, `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES (NULL, 'Appending ?group=1 (=2 etc) to Url will break feed into groups of', 'GOOGLE_PARSE', '5000', 'For large db\'s, break up google merchant feed', '20', '5', '2012-09-26 12:20:00', '2012-08-28 14:07:09', NULL, '0', '1', NULL);
-
+INSERT IGNORE INTO `xlsws_configuration` (`id`, `title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`, `required`) VALUES (NULL, 'Homepage Title format', 'SEO_HOMEPAGE_TITLE', '{storename} : {storetagline}', 'Format for homepage title', '22', '5', '2012-09-26 12:20:00', '2012-08-28 14:07:09', NULL, '0', '1', NULL);
+DELETE FROM `xlsws_configuration` where `key_name`='HTML_DESCRIPTION';
 
 	SET FOREIGN_KEY_CHECKS=1";
 }
 
 function initialConfigLoad($db)
 {
-
-
-	$db->add_config_key('HTML_DESCRIPTION' , 'Ignore line breaks in long description', '0', 'If you are utilizing HTML primarily within your web long descriptions, you may want this option on', 8,8 ,'BOOL');
 
 	$db->add_config_key("LSAUTH_IPS","Authorized IPs For LightSpeed uploading (USE WITH CAUTION)","","List of IP Addresses (comma separated) which are allowed to upload products and download orders. NOTE: DO NOT USE THIS OPTION IF YOU DO NOT HAVE A STATIC IP ADDRESS",16,4,"");
 	$db->add_config_key("DISABLE_CART","Disable Cart","","If selected, products will only be shown but not sold",4,4,"BOOL");
@@ -2524,13 +2698,11 @@ function initialConfigLoad($db)
 	$db->add_config_key("SITEMAP_SHOW_PRODUCTS","Show products in Sitemap",0,"Enable this option if you want to show products in your sitemap page. If you have a very large product database, we recommend you turn off this option",8,14,"BOOL");
 	$db->add_config_key("NEXT_ORDER_ID","Next Order Id",30000,"What is the next order id webstore will use? This value will incremented at every order submission.",15,11,"PINT");
 	$db->add_config_key("SHIPPING_TAXABLE","Add taxes for shipping fees",0,"Enable this option if you want taxes to be calculated for shipping fees and applied to the total.",25,5,"BOOL");
-	$db->add_config_key("HTML_DESCRIPTION","Ignore line breaks in long description",0,"If you are utilizing HTML primarily within your web long descriptions, you may want this option on",8,15,"BOOL");
 	$db->add_config_key("MATRIX_PRICE","In Product Grid, when child product prices vary",3,"How should system treat child products when different child products have different prices.",8,8,"MATRIX_PRICE");
 	$db->add_config_key("CHILD_SEARCH","Show child products in search results",0,"If you want child products from a size color matrix to show up in search results, enable this option",8,10,"BOOL");
 	$db->add_config_key("EMAIL_SMTP_SECURITY_MODE","Security mode for outbound SMTP",0,"Automatic based on SMTP Port, or force security.",5,15,"EMAIL_SMTP_SECURITY_MODE");
 	$db->add_config_key("MAX_PRODUCTS_IN_SLIDER","Maximum Products in Slider",64,"For a custom page, max products in slider",8,16,"INT");
 	$db->add_config_key("DATABASE_SCHEMA_VERSION","Database Schema Version",250,"Used for tracking schema changes",0,0,NULL);
-	$db->add_config_key("ENABLE_COLOR_FILTER","Update color options",1,"Enable this option to have the color drop-down menu populated on each size change.",8,7,"BOOL");
 	$db->add_config_key("MODERATE_REGISTRATION","Moderate Customer Registration",0,"If enabled, customer registrations will need to be moderated before they are approved",3,1,"BOOL");
 	$db->add_config_key("FEATURED_KEYWORD","Featured Keyword","featured","If this keyword is one of your product keywords, the product will be featured on the Web Store homepage.",8,13,NULL);
 	$db->add_config_key("DEBUG_PAYMENTS","Debug Payment Methods",0,"If selected, WS log all activity for credit card processing and other payment methods.",1,18,"BOOL");
@@ -2596,8 +2768,8 @@ function initialDataLoad($db)
 	$sql = array();
 
 
-	$sql[] = "insert into xlsws_country set id=39,code='CA', region='NA', active=1, sort_order=2, country='Canada', zip_validate_preg='/^[ABCEGHJKLMNPRSTVXY]\\d[A-Z]( )?\\d[A-Z]\\d$/'";
-	$sql[] = "insert into xlsws_country set id=13,code='AU', region='AU', active=1, sort_order=4, country='Australia', zip_validate_preg='/\\d{4}/'";
+	$sql[] = "insert into xlsws_country set id=39,code='CA', region='NA', active=1, sort_order=2, country='Canada', zip_validate_preg='/^[ABCEGHJKLMNPRSTVXY]\\\d[A-Z]( )?\\\d[A-Z]\\\d$/'";
+	$sql[] = "insert into xlsws_country set id=13,code='AU', region='AU', active=1, sort_order=4, country='Australia', zip_validate_preg='/\\\d{4}/'";
 	$sql[] = "insert into xlsws_country set id=224,code='US', region='NA', active=1, sort_order=1, country='United States', zip_validate_preg='/^([0-9]{5})(-[0-9]{4})?$/i'";
 
 	$sql[] = "insert into xlsws_country set id=1,code='AF', region='AS', active=1, sort_order=100, country='Afghanistan'";
@@ -3160,7 +3332,6 @@ function up217($db)
 {
 	//We make the assumption the customer is at least on 2.0.8, and start running updates from that point that apply. Anything redundant is ignored.
 
-	$db->add_config_key('HTML_DESCRIPTION' , 'Ignore line breaks in long description', '0', 'If you are utilizing HTML primarily within your web long descriptions, you may want this option on', 8,8 ,'BOOL');
 	$db->add_config_key('MATRIX_PRICE' , 'Hide price of matrix master product', '3', 'If you do not want to show the price of your master product in a size/color matrix, turn this option on', 8,9 ,'BOOL');
 
 	$db->add_table('xlsws_promo_code' , "CREATE TABLE `xlsws_promo_code` (
@@ -3201,8 +3372,6 @@ function up217($db)
 	$db->add_config_key('EMAIL_SMTP_SECURITY_MODE' , 'Security mode for outbound SMTP',  '0',  'Automatic based on SMTP Port, or force security.',  '5',  '8', 'EMAIL_SMTP_SECURITY_MODE');
 
 	$db->add_config_key('MAX_PRODUCTS_IN_SLIDER' , 'Maximum Products in Slider', '64',  'For a custom page, max products in slider.',  '8',  '11', 'PINT');
-	$db->add_config_key('ENABLE_COLOR_FILTER' , 'Update color options', '0',  'Enable this option to have the color drop-down menu populated on each size change.',  '8',  '5',  'BOOL');
-
 
 	$db->query("ALTER TABLE xlsws_family MODIFY COLUMN family varchar (255)");
 
@@ -3300,7 +3469,6 @@ function up250($db,$sqlline)
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=4 where `key`='PRODUCT_SORT_FIELD'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=5 where `key`='ENABLE_FAMILIES'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=6 where `key`='ENABLE_FAMILIES_MENU_LABEL'");
-		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=7 where `key`='ENABLE_COLOR_FILTER'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=8 where `key`='MATRIX_PRICE'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=9 where `key`='ENABLE_SLASHED_PRICES'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=10 where `key`='CHILD_SEARCH'");
@@ -3308,7 +3476,6 @@ function up250($db,$sqlline)
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=12 where `key`='DISPLAY_EMPTY_CATEGORY'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=13 where `key`='FEATURED_KEYWORD'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=14 where `key`='SITEMAP_SHOW_PRODUCTS'");
-		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=15 where `key`='HTML_DESCRIPTION'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=16 where `key`='MAX_PRODUCTS_IN_SLIDER'");
 
 
@@ -3752,6 +3919,7 @@ function parse_php_info()
 	$phpinfo['session']['session.use_cookies'] == "On" ? "pass" : "fail");
 //	$checked['session.use_only_cookies must be turned Off'] = (
 //	$phpinfo['session']['session.use_only_cookies'] == "Off" ? "pass" : "fail");
+	$checked['Zip Library'] = isset($phpinfo['zip']) ? "pass" : "fail";
 	$checked['Soap Library'] = ($phpinfo['soap']['Soap Client'] == "enabled" ? "pass" : "fail");
 	$checked['OpenSSL'] = ($phpinfo['openssl']['OpenSSL support'] == "enabled" ? "pass" : "fail");
 

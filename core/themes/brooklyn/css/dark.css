@@ -16,7 +16,7 @@ h1, h2, h3, h4, h5, h6 { color: #bcbcb5; }
 input, input:focus { color: #232323;  background-color: #848478;; border: 10px solid #848478; }
 select, input[type="text"], input[type="password"], input[type="email"],input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus { color: #232323;  background-color: #e5e5e5; border: 10px solid #e5e5e5; }
 legend  {  color: #a1a1a1;  }
-a, a:visited {  color: #bbbbbb;}
+a, a:visited {  color: #97978A;}
 a:hover {   color: #bcbcb5; }
 .darkbutton, .darkbutton a { background-color: #848478; color: white;  }
 .lightbutton, .lightbutton a {  background-color: #353534; color: white; }
@@ -25,10 +25,10 @@ a:hover {   color: #bcbcb5; }
 .smalldarkbutton a, .smalllightbutton a { color: white; }
 
 /***** Login/Logout button *****/
-#login, #login a { background-color: #262626; color: white;  }
+#login, #login a, #login a:visited { background-color: #353534; color: white;  }
 
 /***** Navigation (Products dropdown) and tabs *****/
-#menubar { border-bottom: 1px dotted #aaaaaa; }
+#menubar { border-bottom: 0px; }
 .menuunderline:hover { border-bottom: 5px solid #bcbcb5;}
 
 #nav_products ul a { color: white; border-bottom: 1px dotted #cccccc;}
@@ -42,6 +42,7 @@ a:hover {   color: #bcbcb5; }
 .breadcrumbs a { color: #bbbbbb; }
 
 /***** Product Grid *****/
+.product_cell_graphic  { background: white;}
 .product_cell_label  { color: #ffffff; background: #262626;}
 .product_cell_label .product_cell_price_slash { color: #7f7f7f;}
 .product_cell a { color: #ffffff;}
@@ -54,7 +55,7 @@ a:hover {   color: #bcbcb5; }
 
 
 /***** Search Box *****/
-#searchentry { border-bottom: 5px solid black;  }
+#searchentry { border-bottom: 4px solid #6A6A65;  }
 #searchentry .search_box input { color: #aaaaaa; border: 0px; border-color: transparent; background-color: #10100f; }
 #searchentry .searchTextBox .searched { color: #151514; }
 
@@ -95,6 +96,7 @@ a:hover {   color: #bcbcb5; }
 
 #product_details .grid-view table.items tr.odd { background-color: white; }
 #product_details .grid-view table.items tr.even { background-color: white; }
+#product_details .targetarea { padding-top: 10px; }
 
 
 #product_details #photos legend { font-size: 0.7em;}

@@ -172,6 +172,16 @@ function _xls_convert_errors($arrErrors)
 	}
 	return $newArray;
 }
+function _xls_convert_errors_display($arrErrors)
+{
+	$strReturn = "\n";
+	foreach ($arrErrors as $key=>$value)
+	{
+		$strReturn .= $key.": ".$value."\n";
+
+	}
+	return $strReturn;
+}
 
 //from http://bavotasan.com/2011/convert-hex-color-to-rgb-using-php/
 function hex2rgb($hex) {
@@ -1188,12 +1198,25 @@ function _xls_add_page_title($title) {
 function _xls_add_formatted_page_title($title) {
 
 	_xls_stack_put('xls_page_title',
-		Yii::t('global',_xls_get_conf('SEO_CUSTOMPAGE_TITLE'),
+		_xls_get_formatted_page_title($title));
+
+}
+
+/**
+ * Set the page title combined with storename (or other wildcard pattern)
+ * @param string $title
+ */
+function _xls_get_formatted_page_title($title,$meta = null) {
+
+	if(is_null($meta)) $meta = _xls_get_conf('SEO_CUSTOMPAGE_TITLE');
+
+	return
+		Yii::t('global',$meta,
 		array(
 			'{name}'=>$title,
 			'{storename}'=>_xls_get_conf('STORE_NAME','LightSpeed Web Store'),
-		)));
-
+			'{storetagline}'=>_xls_get_conf('STORE_TAGLINE','Amazing products available to order online!'),
+		));
 
 }
 
@@ -1698,4 +1721,20 @@ function _xls_convert_date_to_js($strFormat)
 	$strFormat = str_replace("m","mm",$strFormat);
 	return $strFormat;
 
+}
+
+function recurse_copy($src,$dst) {
+	$dir = opendir($src);
+	@mkdir($dst);
+	while(false !== ( $file = readdir($dir)) ) {
+		if (( $file != '.' ) && ( $file != '..' )) {
+			if ( is_dir($src . '/' . $file) ) {
+				recurse_copy($src . '/' . $file,$dst . '/' . $file);
+			}
+			else {
+				copy($src . '/' . $file,$dst . '/' . $file);
+			}
+		}
+	}
+	closedir($dir);
 }

@@ -293,14 +293,25 @@ class ShoppingCart extends CApplicationComponent
 		if(!(_xls_get_conf('QTY_FRACTION_PURCHASE')))
 			$intQuantity = intval($intQuantity);
 
+		/*
+		 *  public function AddProduct($objProduct,
+			$intQuantity = 1,
+			$mixCartType = 0,
+			$intGiftItemId = null,
+			$strDescription = false,
+			$fltSell = false,
+			$fltDiscount = false)
+		 */
 		if ($objProduct instanceof Product)
 		{
 			$this->clearCachedShipping();
-			$retVal =  $this->model->AddProduct($objProduct,$intQuantity,false,$intGiftItemId);
+
+			//Actually add product to cart
+			$retVal =  $this->model->AddProduct($objProduct,$intQuantity,CartType::cart,$intGiftItemId);
 
 			if (is_numeric($retVal) && is_null($auto)) //prevent circular logic adding
 				foreach($objProduct->productRelateds as $objProductAdditional) {
-					if($objProductAdditional->related->IsAvailable &&
+					if($objProductAdditional->related->IsAddable &&
 						$objProductAdditional->autoadd==1 &&
 						$objProductAdditional->related->master_model==0) {
 						$this->addProduct($objProductAdditional->related,$objProductAdditional->qty,null,true);
@@ -453,13 +464,19 @@ class ShoppingCart extends CApplicationComponent
 
 		if($this->model->id>0)
 		{
-			if (!$this->model->taxCode->IsNoTax() && _xls_get_conf('TAX_INCLUSIVE_PRICING')=='1')
-				return true;
-			else return false;
+			if($this->model->taxCode->IsNoTax()) return false;
+			if (Yii::app()->params['TAX_INCLUSIVE_PRICING']) return true;
+
+			return false;
 		}
 		else
-			if (_xls_get_conf('TAX_INCLUSIVE_PRICING')=='1') return true; else return false;
+			if (Yii::app()->params['TAX_INCLUSIVE_PRICING']) return true; else return false;
 
+	}
+
+	public function getPromoCode()
+	{
+		return $this->model->PromoCode;
 	}
 
 	public function SetIdStr()
@@ -523,7 +540,7 @@ class ShoppingCart extends CApplicationComponent
 		unset(Yii::app()->session['ship.priorityRadio.cache']);
 		unset(Yii::app()->session['ship.prices.cache']);
 		unset(Yii::app()->session['ship.scenarios.cache']);
-
+		unset(Yii::app()->session['ship.cartscenarios.cache']);
 	}
 
 	/**

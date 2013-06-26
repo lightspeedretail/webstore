@@ -197,7 +197,8 @@ class MyaccountController extends Controller
 					$objCustomer->default_shipping_id=$model->id;
 				$objCustomer->save();
 
-
+				Yii::app()->shoppingcart->UpdateCartCustomer();
+				Yii::app()->shoppingcart->save();
 				$this->redirect($this->createUrl("/myaccount"));
 
 			}

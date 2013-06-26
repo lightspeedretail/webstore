@@ -1,4 +1,4 @@
-<?php if($model->TaxTotal): ?>
+<?php if($model->TaxTotal && Yii::app()->params['TAX_INCLUSIVE_PRICING']=='0'): ?>
 	<?php foreach($model->Taxes as $tax=>$taxvalue): ?>
 		<?php if($taxvalue): ?>
 			<div class="row-fluid remove-bottom">

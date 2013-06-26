@@ -64,7 +64,11 @@ if (!isset($model)) $model = Yii::app()->shoppingcart;
 		        <div class="span2 offset6 cart_price"><?= Yii::t('cart',"Total"); ?></div>
 		        <div class="span2 cart_price"><span id="cartTotal"><?= _xls_currency($model->total); ?></span></div>
 		</div>
-
+		<?php if($model->PromoCode): ?>
+			<div class="row-fluid remove-bottom">
+			     <div class="span4 offset6 promoCode"><?= Yii::t('cart',"Promo Code {code} Applied",array('{code}'=>"<strong>".$model->PromoCode."</strong>")); ?></div>
+			</div>
+		<?php endif; ?>
 
 
 </div>

@@ -36,7 +36,8 @@ class LicenseController extends AdminBaseController
 		if(isset($_POST['InstallForm']))
 		{
 			$model->scenario = "page".$_POST['InstallForm']['page'];
-			if (isset($_POST['buttonSkip']) && $_POST['InstallForm']['page']==4) $model->scenario = "page-skip".$_POST['InstallForm']['page'];
+			if (isset($_POST['buttonSkip']) && $_POST['InstallForm']['page']==4)
+				$model->scenario = "page-skip".$_POST['InstallForm']['page'];
 			$model->attributes = $_POST['InstallForm'];
 
 			if ($model->validate())

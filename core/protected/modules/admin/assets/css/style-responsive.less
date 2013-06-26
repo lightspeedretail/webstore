@@ -1,0 +1,562 @@
+// Default Mixins
+//===================================================================
+.rounded-corners(@radius: 0px) {
+	-webkit-border-radius: @radius;
+  	-moz-border-radius: @radius;
+  	border-radius: @radius;
+}
+
+/* Higher than 1200 (desktop devices)
+====================================================================== */
+@media (min-width: 1200px) {
+	
+	#content {
+		padding: 20px;
+		margin-left: -2px;
+	}
+	
+	#sidebar-left {
+		background: transparent;
+		margin: -1px 0px 0px 25px;
+		padding-top: 0px;
+	}
+	
+	.sidebar-nav > ul{
+		margin: 0px 0px 0px -20px;
+	}
+	
+	footer {
+		margin: 20px -20px 0px -20px;
+		padding: 10px 20px;
+		position: relative;
+		z-index: 2;
+	}
+	
+}
+
+/* Higher than 960 (desktop devices)
+====================================================================== */
+@media only screen and (min-width: 980px) and (max-width: 1199px){
+	
+	#content {
+		padding: 10px;
+		margin-left: -2px;
+		overflow: hidden;
+	}
+	
+	.dark {
+		padding: 10px;
+		top: -10px;
+		right: -10px;
+		margin-bottom: -40px;
+		margin-right: -20px;	
+	}
+	
+	#sidebar-left {
+		background: transparent;
+		margin: -1px 0px 0px 20px;
+		padding-top: 0px;
+	}
+	
+	.sidebar-nav > ul{
+		margin: 0px 0px 0px -20px;
+	}
+	
+	.stats-date .range {
+		font-size: 18px;
+		font-weight: 300;
+	}
+
+	.stat {
+		
+		.left {
+			
+			.number {
+				font-size: 22px;
+				font-weight: 300;
+			}
+			
+			.title {
+				font-size: 10px;
+			}
+		}
+		
+		.right .percent {
+			text-align: center;
+			font-size: 12px;
+			line-height: 16px;
+		}
+	}
+	
+	.sparkLineStats li .number {
+		font-size: 16px;
+		font-weight: 700; 
+		padding:0 5px; 
+		color: #FA5833;
+	}
+	
+	/* Page: Tasks
+	=================================================================== */
+	.task {
+		
+		.desc {
+			display: inline-block;
+			width: 70%;
+			padding: 10px 10px;
+			font-size: 12px;
+			
+			.title {
+				font-size: 16px;
+				margin-bottom: 5px;
+			}
+		}
+		
+		.time {
+			display: inline-block;
+			float: right;
+			width: 20%;
+			padding: 10px 10px;
+			font-size: 12px;
+			text-align: right;
+			
+			.date {
+				font-size: 16px;
+				margin-bottom: 5px;	
+			}
+		}
+		
+	}
+	
+	ul.messages-list {
+
+		li {
+
+			a {
+				
+				.date {
+					display: none
+
+				}
+
+			}
+		}	
+	}
+
+	footer {
+		margin: 20px -20px 0px -20px;
+		padding: 10px 20px;
+		position: relative;
+		z-index: 2;
+	}
+	
+}
+
+/* Tablet Portrait (devices and browsers)
+====================================================================== */
+@media only screen and (min-width: 768px) and (max-width: 979px) {
+	
+	#content {
+		padding: 10px;
+		margin-left: -2px;
+		overflow: hidden;
+	}
+	
+	#sidebar-left {
+		background: transparent;
+		margin: -1px 0px 0px 20px;
+		padding-top: 0px;
+	}
+	
+	.sidebar-nav > ul{
+		margin: 0px 0px 0px -20px;
+	}
+	
+	.dark {
+		padding: 10px;
+		top: -10px;
+		right: -10px;
+		margin-bottom: -40px;
+		margin-right: -20px;	
+	}
+	
+	.noMargin {
+		margin-left: 0px !important;
+	}
+	
+	.btn-navbar {
+		display: none !important;
+	}
+	
+	.nav-collapse,
+  	.nav-collapse.collapse {
+    	height: auto !important;
+    	overflow: visible !important;
+		margin-left: -20px !important;
+  	}
+	
+	.sidebar-nav{
+		padding:0;
+		margin-bottom:0;
+	}
+	
+	.stats-date .range {
+		font-size: 16px;
+		font-weight: 300;
+	}
+
+	.stat {
+		
+		.left {
+			
+			.number {
+				font-size: 16px;
+				font-weight: 300;
+			}
+			
+			.title {
+				font-size: 9px;
+			}
+			
+		}
+		
+		.right .percent {
+			text-align: center;
+			font-size: 12px;
+			line-height: 16px;
+		}
+		
+	}
+
+	.box-small-link {
+		font-size: 20px;
+	}
+	
+	.sparkLineStats li .number {
+		font-size: 14px;
+		font-weight: 700; 
+		padding:0 5px; 
+		color: #FA5833;
+	}
+	
+	/* Page: Tasks
+	=================================================================== */
+	.task {
+		border-bottom: 1px solid #f9f9f9;
+		margin-bottom: 1px;
+		
+		.desc {
+			display: inline-block;
+			width: 65%;
+			padding: 10px 10px;
+			font-size: 10px;
+			margin-right: -20px;
+			
+			.title{
+				font-size: 14px;
+				margin-bottom: 5px;
+			}
+		}
+		
+		.time {
+			display: inline-block;
+			float: right;
+			width: 25%;
+			padding: 10px 10px;
+			font-size: 10px;
+			text-align: right;
+			
+			.date {
+				font-size: 14px;
+				margin-bottom: 5px;	
+			}
+		}
+	}
+
+	.task.high {
+		border-left: 2px solid rgba(250,96,61,1);
+	}
+
+	.task.medium {
+		border-left: 2px solid rgba(250,187,61,1);
+	}
+
+	.task.low {
+		border-left: 2px solid rgba(120,205,81,1);
+	}
+	
+	.timeslot {
+		
+		.task {
+			
+			span {
+				border: 2px solid rgba(103, 194, 239, 1);
+				background: rgba(103, 194, 239, .1);
+				padding: 5px;
+				display: block;
+				font-size: 10px;
+				
+					span {
+						border: 0px;
+						background: transparent;
+						padding: 0px;
+					}
+					
+					span.details{
+						font-size: 14px;
+						margin-bottom: 0px;
+					}
+
+					span.remaining{
+						font-size: 12px;
+					}
+						
+			}
+			
+		}
+		
+	}
+	
+	footer {
+		margin: 20px -20px 0px -20px;
+		padding: 10px 20px;
+		position: relative;
+		z-index: 2;
+	}
+	
+}
+
+/* All Mobile Sizes (devices and browser)
+====================================================================== */
+@media only screen and (max-width: 767px) {
+	
+	#content {
+		overflow: hidden;
+		.rounded-corners;
+	}
+	
+	.dark {
+		padding: 10px;
+		top: 0px;
+		right: 0px;
+		margin-bottom: 0px;
+		margin-right: 0px;	
+		position: relative;
+		border: 4px solid #f9f9f9;
+		.rounded-corners;
+	}
+	
+	.sidebar-nav > ul{
+		border-top: 1px solid rgba(0,0,0,.1);
+		border-bottom: 1px solid rgba(255,255,255,.5);	
+	}
+	
+	.nav-tabs.nav-stacked > li {
+	  	margin: 0px !important;
+		border-top: 1px solid rgba(255,255,255,.5);
+		border-bottom: 1px solid rgba(0,0,0,.1);
+	}
+	
+	.nav-tabs.nav-stacked > li > a {
+	  	margin: 0px !important;
+		font-size: 14px;
+		padding: 12px 0px;
+		color: #aaa;
+		text-shadow: 0px 1px 0px #fff;
+	}
+	
+	.nav-tabs.nav-stacked > li > ul > li > a {
+		font-size: 12px;
+	}
+
+	.nav-tabs.nav-stacked > li > a > i {
+		display: inline;
+		margin-right: 10px;
+	}
+	
+	.nav-tabs.nav-stacked > li > ul > li > a > i {
+		display: inline;
+		margin-right: 10px;
+	}
+	
+	.nav-tabs.nav-stacked  > li.active > a {
+	  	border: 0px;
+	}
+	
+	.nav-tabs.nav-stacked  > li.active > ul {
+	  	border: 0px;
+	}
+	
+	/* Page: Tasks
+	=================================================================== */
+	.task {
+		border-bottom: 1px solid #f9f9f9;
+		margin-bottom: 1px;
+		
+		.desc {
+			display: inline-block;
+			width: 65%;
+			padding: 10px 10px;
+			font-size: 10px;
+			margin-right: -20px;
+			
+			.title{
+				font-size: 14px;
+				margin-bottom: 5px;
+			}
+		}
+		
+		.time {
+			display: inline-block;
+			float: right;
+			width: 25%;
+			padding: 10px 10px;
+			font-size: 10px;
+			text-align: right;
+			
+			.date {
+				font-size: 14px;
+				margin-bottom: 5px;	
+			}
+		}
+	}
+
+	.task.high {
+		border-left: 2px solid rgba(250,96,61,1);
+	}
+
+	.task.medium {
+		border-left: 2px solid rgba(250,187,61,1);
+	}
+
+	.task.low {
+		border-left: 2px solid rgba(120,205,81,1);
+	}
+	
+	.timeslot {
+		
+		.task {
+			
+			span {
+				border: 2px solid rgba(103, 194, 239, 1);
+				background: rgba(103, 194, 239, .1);
+				padding: 5px;
+				display: block;
+				font-size: 10px;
+				
+				span {
+					border: 0px;
+					background: transparent;
+					padding: 0px;
+				}
+				
+				span.details {
+					font-size: 14px;
+					margin-bottom: 0px;
+				}
+
+				span.remaining {
+					font-size: 12px;
+				}
+
+			}
+			
+		}
+		
+	}
+	
+}
+
+/* Mobile Landscape Size to Tablet Portrait (devices and browsers)
+====================================================================== */
+@media only screen and (min-width: 480px) and (max-width: 767px) {
+	
+	body {
+		padding: 0px;
+	}
+	
+	#content {
+		padding: 5px;
+	}
+	
+	.stat {
+		width: 50%;
+		margin: 10px 0% 0% 0%;
+		float: left;
+	}
+		
+	.quick-button,
+	.quick-button-small {
+		margin-bottom: 20px;
+	}
+	
+	.pull-right {
+		width: 100%;
+		margin: 10px auto;
+		text-align: center;
+	}
+	
+	.fc-button-today,
+	.fc-button-month,
+	.fc-button-agendaWeek,
+	.fc-button-agendaDay {
+		display: none;
+	}
+	
+	footer {
+		padding: 10px 20px;
+		position: relative;
+		z-index: 2;
+	}
+	
+}
+
+/* Mobile Portrait Size to Mobile Landscape Size (devices and browsers)
+=================================================================== */
+@media only screen and (max-width: 479px) {
+	
+	body {
+		padding: 0px;
+	}
+	
+	#content {
+		padding: 5px;
+	}
+	
+	.stat {
+		width: 100%;
+		margin: 1% 0% 0% 0%;
+		float: left;
+	}
+		
+	.quick-button,
+	.quick-button-small {
+		margin-bottom: 20px;
+	}
+	
+	.pull-right {
+		width: 100%;
+		margin: 10px auto;
+		text-align: center;
+	}
+	
+	.fc-button-today,
+	.fc-button-month,
+	.fc-button-agendaWeek,
+	.fc-button-agendaDay {
+		display: none;
+	}
+	
+	table,
+	.pagination {
+		font-size: 10px;
+	}
+	
+	.pagination {
+		padding: 5px;
+	}
+	
+	footer {
+		padding: 10px 20px;
+	}
+	
+}

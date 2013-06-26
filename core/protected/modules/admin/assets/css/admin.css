@@ -123,6 +123,14 @@ h3 { margin-top: 2px; }
 .themeversion { font-size: 0.7em; font-weight: normal; margin-left: 8px; width: 50px;  float: left; text-align: right;}
 /*.themeicon .selected {  border: 5px solid blue;}*/
 
+#thememanage .theme {
+   margin-left: 0px;
+}
+
+
+#btnCopy { display: hidden;}
+#btnClean { display: hidden;}
+
 .hero-unit  legend { font-size: 0.7em; border: none; line-height: 18px; padding-bottom: 16px; }
 .maxhint { max-height: 20px; overflow: hidden; }
 .caret { display: none; }

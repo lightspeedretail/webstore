@@ -93,8 +93,6 @@ class TaxCode extends BaseTaxCode
 		if (strtolower($this->code) == 'notax')
 			return true;
 
-
-
 		return false;
 	}
 

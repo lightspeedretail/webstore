@@ -63,6 +63,9 @@ class ProductController extends Controller
 		if (!$model)
 			throw new CHttpException(404,'The requested page does not exist.');
 
+		if(!$model->IsDisplayable)
+			throw new CHttpException(404,'The requested page does not exist.');
+
 		//If our request_url (based on description) has changed, redirect properly
 		if ($model->request_url != Yii::app()->getRequest()->getQuery('name'))
 			_xls_301($model->Link);
@@ -95,7 +98,7 @@ class ProductController extends Controller
 	/**
 	 * Ajax responder, when choosing a size from a matrix dropdown on the product display page, get available colors
 	 */
-	public function actionGetcolors()
+	public function actionGetColors()
 	{
 
 		if(Yii::app()->request->isAjaxRequest) {

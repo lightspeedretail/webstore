@@ -32,7 +32,7 @@
 		<?php echo $form->error($model,'threshold'); ?>
     </div>
     <div class="span2 tip">
-        Other settings can be adjusted after saving.
+       Second row items are optional. Other fields can be adjusted after saving.
     </div>
 </div>
 

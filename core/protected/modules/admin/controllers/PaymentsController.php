@@ -10,7 +10,7 @@ class PaymentsController extends AdminBaseController
 	{
 		return array(
 			array('allow',
-				'actions'=>array('index','module','newpromo','order','promocodes','promotasks','updatepromo'),
+				'actions'=>array('index','module','newpromo','order','promocodes','cardtypes','promotasks','updatepromo'),
 				'roles'=>array('admin'),
 			),
 		);
@@ -49,6 +49,7 @@ class PaymentsController extends AdminBaseController
 			array(
 				array('label'=>'Payment Setup', 'linkOptions'=>array('class'=>'nav-header')),
 				array('label'=>'Set Display Order', 'url'=>array('payments/order')),
+				array('label'=>'Credit Card Types', 'url'=>array('payments/cardtypes')),
 				array('label'=>'Promo Codes', 'url'=>array('payments/promocodes')),
 				array('label'=>'Promo Code Tasks', 'url'=>array('payments/promotasks')),
 
@@ -307,5 +308,22 @@ class PaymentsController extends AdminBaseController
 
 	}
 
+
+	public function actionCardtypes()
+	{
+		$model = new CreditCard();
+
+		$pk = Yii::app()->getRequest()->getPost('pk');
+		$name = Yii::app()->getRequest()->getPost('name');
+		$value = Yii::app()->getRequest()->getPost('value');
+		if($pk)
+		{
+			CreditCard::model()->updateByPk($pk,array($name=>$value));
+			echo "success";
+		}
+
+		$this->render("cardtypes", array('model'=>$model));
+
+	}
 
 }

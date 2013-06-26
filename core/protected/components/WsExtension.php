@@ -306,9 +306,13 @@ class WsExtension extends CComponent
 
 			switch($this->config['restrictcountry']) {
 				case 'CUS':
-					if ($this->CheckoutForm->shippingCountry=="US" &&
-						($this->CheckoutForm->shippingState =="AK" || $this->CheckoutForm->shippingState=="HI"))
+					if ($this->CheckoutForm->shippingCountry=="US")
+					{
+						if($this->CheckoutForm->shippingState =="AK" || $this->CheckoutForm->shippingState=="HI")
 						return false;
+						else return true;
+					}
+					return false;
 					break;
 
 				case 'NORAM':

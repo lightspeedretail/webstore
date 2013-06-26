@@ -69,83 +69,24 @@ class ThemeController extends AdminBaseController
 		if (isset($_POST['theme']))
 		{
 
-
-			if (_xls_get_conf('THEME') != $_POST['theme'])
+			if (isset($_POST['yt2']) && $_POST['yt2']=="btnClean")
 			{
-				//we're going to swap out template information
-
-				$objCurrentSettings = Modules::model()->findByAttributes(array(
-					'module'=>_xls_get_conf('THEME'),
-					'category'=>'theme'));
-
-				if (!$objCurrentSettings)
-					$objCurrentSettings = new Modules;
-
-				$objCurrentSettings->module = _xls_get_conf('THEME');
-				$objCurrentSettings->category = 'theme';
-
-				$arrDimensions = array();
-				//We can't use the ORM because template_specific doesn't exist there (due to upgrade problems)
-				$arrItems = Configuration::model()->findAllByAttributes(array('template_specific'=>1));
-				foreach ($arrItems as $objConf) {
-					$arrDimensions[$objConf->key_name] = $objConf->key_value;
-
-
-				}
-				$objCurrentSettings->configuration = serialize($arrDimensions);
-				$objCurrentSettings->active = 0;
-				$objCurrentSettings->save();
-
-				//Now that we've saved the current settings, see if there are new ones to load
-				$objNewSettings = Modules::model()->findByAttributes(array(
-				'module'=>$_POST['theme'],
-				'category'=>'theme'));
-				if ($objNewSettings) {
-					//We found settings, load them
-
-					$arrDimensions = unserialize($objNewSettings->configuration);
-					foreach($arrDimensions as $key=>$val)
-						_xls_set_conf($key,$val);
-				}
-				else {
-					//If we don't have old settings saved already, then we can do two things. First, we see
-					//if there is an Options.xml for defaults we create. If not, then we just leave the Config table
-					//as is and use those settings, we'll save it next time.
-					$fnOptions = $this->getConfigFile($_POST['theme']);
-					if (file_exists($fnOptions)) {
-						$strXml = file_get_contents($fnOptions);
-
-						// Parse xml for response values
-						$oXML = new SimpleXMLElement($strXml);
-
-						if($oXML->defaults) {
-							foreach ($oXML->defaults as $item)
-							{
-								$objKey = Configuration::model()->findByAttributes(array('key_name'=>$item->key_name));
-								if ($objKey && $objKey->template_specific==1)
-								_xls_set_conf($item->key_name,$item->key_value);
-
-							}
-						}
-					}
-				}
-
-
+				$arrThemes = $this->changeTheme($_POST);
+				$arrThemes = $this->cleanTheme($_POST);
 
 			}
 
-			_xls_set_conf('THEME',$_POST['theme']);
-			Yii::app()->theme = $_POST['theme'];
+			if (isset($_POST['yt1']) && $_POST['yt1']=="btnCopy")
+			{
+				$arrThemes = $this->changeTheme($_POST);
+				$arrThemes = $this->copyTheme($_POST);
 
+			}
 
-			if (isset($_POST['subtheme-'.$_POST['theme']]))
-				_xls_set_conf('CHILD_THEME',$_POST['subtheme-'.$_POST['theme']]);
-
-
-			Yii::app()->user->setFlash('success',Yii::t('admin','Theme set as "{theme}" at {time}.',
-				array('{theme}'=>ucfirst(Yii::app()->theme->name),'{time}'=>date("d F, Y  h:i:sa"))));
-			$arrThemes = $this->getInstalledThemes();
-			$this->beforeAction('manage');
+			if (isset($_POST['yt0']) && $_POST['yt0']=="btnSet")
+			{
+				$arrThemes = $this->changeTheme($_POST);
+			}
 
 		}
 
@@ -232,7 +173,7 @@ class ThemeController extends AdminBaseController
 
 					if ($file->type == "image/jpg" || $file->type == "image/png" || $file->type == "image/jpeg")
 					{
-						$path = str_replace("/protected","/images/header/",Yii::app()->basePath);
+						$path = str_replace("/core/protected","/images/header/",Yii::app()->basePath);
 						$retVal = $file->saveAs($path.$file->name);
 						if ($retVal)
 						{
@@ -276,6 +217,166 @@ class ThemeController extends AdminBaseController
 		extractZip($file,'',$path);
 
 		return true;
+	}
+
+	protected function changeTheme($post)
+	{
+		if (_xls_get_conf('THEME') != $post['theme'])
+		{
+			//we're going to swap out template information
+
+			$objCurrentSettings = Modules::model()->findByAttributes(array(
+				'module'=>_xls_get_conf('THEME'),
+				'category'=>'theme'));
+
+			if (!$objCurrentSettings)
+				$objCurrentSettings = new Modules;
+
+			$objCurrentSettings->module = _xls_get_conf('THEME');
+			$objCurrentSettings->category = 'theme';
+
+			$arrDimensions = array();
+			//We can't use the ORM because template_specific doesn't exist there (due to upgrade problems)
+			$arrItems = Configuration::model()->findAllByAttributes(array('template_specific'=>1));
+			foreach ($arrItems as $objConf) {
+				$arrDimensions[$objConf->key_name] = $objConf->key_value;
+
+
+			}
+			$objCurrentSettings->configuration = serialize($arrDimensions);
+			$objCurrentSettings->active = 0;
+			$objCurrentSettings->save();
+
+			//Now that we've saved the current settings, see if there are new ones to load
+			$objNewSettings = Modules::model()->findByAttributes(array(
+				'module'=>$post['theme'],
+				'category'=>'theme'));
+			if ($objNewSettings) {
+				//We found settings, load them
+
+				$arrDimensions = unserialize($objNewSettings->configuration);
+				foreach($arrDimensions as $key=>$val)
+					_xls_set_conf($key,$val);
+			}
+			else {
+				//If we don't have old settings saved already, then we can do two things. First, we see
+				//if there is an Options.xml for defaults we create. If not, then we just leave the Config table
+				//as is and use those settings, we'll save it next time.
+				$fnOptions = $this->getConfigFile($post['theme']);
+				if (file_exists($fnOptions)) {
+					$strXml = file_get_contents($fnOptions);
+
+					// Parse xml for response values
+					$oXML = new SimpleXMLElement($strXml);
+
+					if($oXML->defaults) {
+						foreach ($oXML->defaults as $item)
+						{
+							$objKey = Configuration::model()->findByAttributes(array('key_name'=>$item->key_name));
+							if ($objKey && $objKey->template_specific==1)
+								_xls_set_conf($item->key_name,$item->key_value);
+
+						}
+					}
+				}
+			}
+		}
+
+
+		_xls_set_conf('THEME',$post['theme']);
+		Yii::app()->theme = $post['theme'];
+
+
+		if (isset($post['subtheme-'.$post['theme']]))
+			_xls_set_conf('CHILD_THEME',$post['subtheme-'.$post['theme']]);
+
+
+		Yii::app()->user->setFlash('success',Yii::t('admin','Theme set as "{theme}" at {time}.',
+			array('{theme}'=>ucfirst(Yii::app()->theme->name),'{time}'=>date("d F, Y  h:i:sa"))));
+		$arrThemes = $this->getInstalledThemes();
+		$this->beforeAction('manage');
+
+		return $arrThemes;
+	}
+
+	protected function copyTheme($post)
+	{
+
+		//To create a complete copy, we need to copy our viewset first, and then the theme in use over it so we get it all
+		//Later on, the cleanup will strip out anything unused
+		$original = Yii::app()->theme->name;
+		$tcopy = $original."-copy";
+
+		if(file_exists("themes/$tcopy"))
+		{Yii::app()->user->setFlash('error',Yii::t('admin','Theme {theme} already exists, cannot create new copy',
+			array('{theme}'=>ucfirst($tcopy),'{time}'=>date("d F, Y  h:i:sa"))));
+
+			return $this->changeTheme($post);
+		}
+
+
+		recurse_copy("themes/$original","themes/$tcopy");
+		recurse_copy("core/protected/views","themes/$tcopy/views");
+		recurse_copy("themes/$original","themes/$tcopy");
+		$fnOptions = $this->getConfigFile($tcopy);
+		$arr = array();
+
+		if (file_exists($fnOptions)) {
+			$strXml = file_get_contents($fnOptions);
+			$oXML = new SimpleXMLElement($strXml);
+			$strXml = str_replace("<name>".$oXML->name."</name>","<name>".$oXML->name."-copy</name>",$strXml);
+			file_put_contents($fnOptions,$strXml);
+		}
+
+
+		$arrThemes = $this->getInstalledThemes();
+		$this->beforeAction('manage');
+
+		$post['theme'] = $tcopy;
+
+		Yii::app()->user->setFlash('warning',Yii::t('admin','Copy {theme} created!',
+			array('{theme}'=>ucfirst($tcopy),'{time}'=>date("d F, Y  h:i:sa"))));
+
+		return $this->changeTheme($post);
+
+	}
+
+
+	protected function cleanTheme($post)
+	{
+
+		//Compare files in core views with files in our theme, and remove any theme files that match
+		//to let the master files bleed through
+		$original = Yii::app()->theme->name;
+
+		if (stripos($original,"-copy")===false)
+		{
+			Yii::app()->user->setFlash('error',Yii::t('admin','Clean can only be applied to a copy of a theme. {theme} was not modified.',
+				array('{theme}'=>ucfirst($original),'{time}'=>date("d F, Y  h:i:sa"))));
+			return $this->changeTheme($post);
+
+		}
+
+		$fileArray = $this->getFilesFromDir("core/protected/views");
+		$ct=0;
+		foreach($fileArray as $filename)
+		{
+			if ($filename != "core/protected/views/site/index.php")
+			{
+				$localthemefile = str_replace("core/protected/","themes/$original/",$filename);
+				if(file_exists($localthemefile) && md5_file($filename)==md5_file($localthemefile))
+				{
+					unlink($localthemefile);
+					$ct++;
+				}
+			}
+		}
+
+		Yii::app()->user->setFlash('warning',Yii::t('admin','{fcount} files were unmodified from the original and have been cleared out of {theme}',
+			array('{fcount}'=>$ct,'{theme}'=>ucfirst($original),'{time}'=>date("d F, Y  h:i:sa"))));
+
+		return $this->changeTheme($post);
+
 	}
 
 	protected function getInstalledThemes()
@@ -394,6 +495,43 @@ class ThemeController extends AdminBaseController
 	protected function getConfigFile($filename)
 	{
 		return YiiBase::getPathOfAlias('webroot')."/themes/".$filename."/config.xml";
+	}
+
+	protected function getFilesFromDir($dir)
+	{
+
+		$files = array();
+		if ($dir != "./.git") if ($handle = opendir($dir)) {
+			while (false !== ($file = readdir($handle))) {
+				if ($file != "." && $file != "..") {
+					if(is_dir($dir.'/'.$file)) {
+						$dir2 = $dir.'/'.$file;
+						$files[] = $this->getFilesFromDir($dir2);
+					}
+					else
+						if ($file != ".DS_Store")
+							$files[] = $dir.'/'.$file;
+				}
+			}
+			closedir($handle);
+		}
+
+		return $this->array_flat($files);
+	}
+
+	protected function array_flat($array)
+	{
+		$tmp=array();
+		foreach($array as $a) {
+			if(is_array($a)) {
+				$tmp = array_merge($tmp, $this->array_flat($a));
+			}
+			else {
+				$tmp[] = $a;
+			}
+		}
+
+		return $tmp;
 	}
 
 }

@@ -336,13 +336,15 @@ class InstallController extends Controller
 					$objAddress->customer_id=$result['customer_id'];
 			}
 
-				if (!$blnFound){
+				if (!$blnFound)
+				{
 					if (!$objAddress->save())
 						Yii::log("Import Error ".print_r($objAddress->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 					else
+					{
 						$cid = $objAddress->id;
-					Yii::app()->db->createCommand("update xlsws_cart set shipaddress_id=".$cid." where id=".$result['id'])->execute();
-
+						Yii::app()->db->createCommand("update xlsws_cart set shipaddress_id=".$cid." where id=".$result['id'])->execute();
+					}
 				}
 			}
 
@@ -478,10 +480,13 @@ class InstallController extends Controller
 
 		//fix for bad 2.5.2 configuration string
 		$objModule =  Modules::model()->findByAttributes(array('module'=>'storepickup'));
-		$conf = $objModule->configuration;
-		$conf = str_replace('s:12"Store Pickup"','s:12:"Store Pickup"',$conf);
-		$objModule->configuration = $conf;
-		$objModule->save();
+		if ($objModule instanceof Modules)
+		{
+			$conf = $objModule->configuration;
+			$conf = str_replace('s:12"Store Pickup"','s:12:"Store Pickup"',$conf);
+			$objModule->configuration = $conf;
+			$objModule->save();
+		}
 
 
 		_dbx("INSERT INTO `xlsws_modules` (`active`, `module`, `category`, `version`, `name`, `sort_order`, `configuration`, `modified`, `created`)
@@ -512,6 +517,13 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 			$obj->save();
 
 		}
+		$obj = Configuration::LoadByKey('LANG_CODE');
+		$obj->key_value = strtolower($obj->key_value);
+		$obj->save();
+		$obj = Configuration::LoadByKey('LANGUAGES');
+		$obj->key_value = strtolower($obj->key_value);
+		$obj->save();
+
 
 
 		return json_encode(array('result'=>"success",'makeline'=>9,'tag'=>'Installing Google categories (group 1 of 6)','total'=>50));

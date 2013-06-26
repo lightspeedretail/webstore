@@ -70,6 +70,21 @@ class Controller extends CController
 
 		$this->logoutUrl = $this->createUrl("site/logout");
 
+		if(!Yii::app()->theme)
+		{
+			if(_xls_get_conf('theme'))
+			{
+				$symfile =  "themes/brooklyn";
+				$strOriginal = "../core/themes/brooklyn";
+
+				@unlink($symfile);
+				$retVal = symlink($strOriginal, $symfile);
+				if (!$retVal)
+					die("cannot create symbolic link 'themes/brooklyn' to point to '../core/themes/brooklyn'");
+			} else
+				die("you have no theme set");
+		}
+
 		if ( Yii::app()->theme && file_exists('webroot.themes.'.Yii::app()->theme->name.'.layouts.column2'))
 			$this->layout='webroot.themes.'.Yii::app()->theme->name.'.layouts.column2';
 

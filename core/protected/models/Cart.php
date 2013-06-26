@@ -201,12 +201,15 @@ class Cart extends BaseCart
 					$objCustomer->defaultShipping->state,
 					$objCustomer->defaultShipping->postal);
 
-				if($objDestination) {
-					$this->tax_code_id = $objDestination->taxcode;
+				if(!$objDestination)
+					$objDestination = Destination::LoadDefault();
 
-					if ($objDestination->taxcode0->IsNoTax() && _xls_get_conf('TAX_INCLUSIVE_PRICING'))
-						Yii::app()->user->setFlash('warning',Yii::t('global','Note: Because of your default shipping address, prices will be displayed without tax.'));
-				}
+				$this->tax_code_id = $objDestination->taxcode;
+
+				if ($objDestination->taxcode0->IsNoTax() && Yii::app()->params['TAX_INCLUSIVE_PRICING'])
+					Yii::app()->user->setFlash('warning',Yii::t('global','Note: Because of your default shipping address, prices will be displayed without tax.'));
+
+
 			}
 		}
 
@@ -610,7 +613,7 @@ class Cart extends BaseCart
 	 * Update Cart by setting taxes for Shipping if applicable
 	 */
 	public function UpdateTaxShipping() {
-		if (_xls_get_conf('SHIPPING_TAXABLE', '0') != '1')
+		if(Yii::app()->params['SHIPPING_TAXABLE'] != '1')
 			return;
 
 		if (!isset($this->shipping->shipping_sell))
@@ -620,7 +623,7 @@ class Cart extends BaseCart
 		$intNoTax = 999;
 		if ($objNoTax) $intNoTax = $objNoTax->lsid;
 
-		if (_xls_get_conf('TAX_INCLUSIVE_PRICING', '0') == '0')
+		if (Yii::app()->params['TAX_INCLUSIVE_PRICING'] == '0')
 			if ($this->tax_code_id == $intNoTax)
 				return;
 
@@ -655,8 +658,7 @@ class Cart extends BaseCart
 		// Legacy behavior assumes that the ShippingSell price does
 		// not already contain taxes and that they must be added.
 		//
-		if ((_xls_get_conf('TAX_INCLUSIVE_PRICING', '0') == '1') &&
-			($this->tax_code_id != $intNoTax)) {
+		if (Yii::app()->params['TAX_INCLUSIVE_PRICING'] == '1' && $this->tax_code_id != $intNoTax) {
 			$this->shipping->shipping_sell += array_sum($taxes);
 		}
 
@@ -736,8 +738,11 @@ class Cart extends BaseCart
 	 * Attempt to add product to cart. If product cannot be added, the error string is returned. Otherwise, the row id is returned.
 	 * @param $objProduct
 	 * @param int $intQuantity
-	 * @param bool $mixCartType
-	 * @param int $intGiftItemId
+	 * @param int $mixCartType
+	 * @param null $intGiftItemId
+	 * @param bool $strDescription
+	 * @param bool $fltSell
+	 * @param bool $fltDiscount
 	 * @return bool|string
 	 */
 	public function AddProduct($objProduct,
@@ -764,8 +769,8 @@ class Cart extends BaseCart
 		}
 
 		// Verify inventory
-		if (!$objProduct->HasInventory(true) && $mixCartType==CartType::cart) {
-				return Yii::t('cart',_xls_get_conf('INVENTORY_ZERO_NEG_TITLE', 'Please Call'));
+		if (!$objProduct->getIsAddable() && $mixCartType==CartType::cart) {
+				return Yii::t('cart',_xls_get_conf('INVENTORY_ZERO_NEG_TITLE', 'This item is not currently available'));
 		}
 
 		// Ensure product is Saleable
@@ -787,10 +792,7 @@ class Cart extends BaseCart
 		if ($fltSell==false) $fltSell = $objProduct->getPriceValue(1,$intTaxIn);
 		if ($fltDiscount==false) $fltDiscount=0;
 
-
-
-
-			foreach ($this->cartItems as $item) {
+		foreach ($this->cartItems as $item) {
 
 			if ($item->product_id == $objProduct->id &&
 				$item->code == $objProduct->OriginalCode &&
@@ -1106,6 +1108,18 @@ class Cart extends BaseCart
 		}
 		return $total;
 	}
+
+	public function getPromoCode()
+	{
+		if($this->fk_promo_id)
+		{
+			$obj = PromoCode::model()->findByPk($this->fk_promo_id);
+			if ($obj) return $obj->code;
+			return "unknown";
+		}
+		return null;
+	}
+
 	/**
 	 * Called by session management to periodically sweep away old carts, based on config cart life
 	 */

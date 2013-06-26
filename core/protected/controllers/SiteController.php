@@ -45,7 +45,7 @@ class SiteController extends Controller
 		switch ($homePage)
 		{
 			case "*index":
-				$this->render("index");
+				$this->render("/site/index");
 				break;
 
 			case "*products":
@@ -70,6 +70,11 @@ class SiteController extends Controller
 				$model = Product::model()->findAll($criteria);
 
 				$model = $this->createBookends($model);
+
+				$this->pageTitle=_xls_get_formatted_page_title(
+					null,_xls_get_conf('SEO_HOMEPAGE_TITLE','{storename} : {storetagline}')
+				);
+
 
 				//We leech off the grid file from search
 				if ( Yii::app()->theme && file_exists('webroot.themes.'.Yii::app()->theme->name.'.search.grid'))
@@ -99,10 +104,11 @@ class SiteController extends Controller
 					$objCustomPage->title=>$objCustomPage->RequestUrl,
 				);
 
-				$dataProvider = $objCustomPage->GetSliderDataProvider();
+				$dataProvider = $objCustomPage->taggedProducts();
 
 				$this->CanonicalUrl = $objCustomPage->CanonicalUrl;
-				$this->render('/custompage/index',array('objCustomPage'=>$objCustomPage,'dataProvider'=>$dataProvider));
+				$this->render('/custompage/index',array('model'=>$objCustomPage,'dataProvider'=>$dataProvider));
+				break;
 
 		}
 

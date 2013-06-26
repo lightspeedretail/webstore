@@ -42,6 +42,7 @@ class CustomerAddress extends BaseCustomerAddress
 			array('address_label, first_name, last_name, company, address1, address2, city', 'length', 'max'=>255),
 			array('state_id, country_id', 'length', 'max'=>11),
 			array('postal, phone', 'length', 'max'=>64),
+			array('postal','validatePostal'),
 			array('created,makeDefaultBilling,makeDefaultShipping', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
@@ -72,6 +73,26 @@ class CustomerAddress extends BaseCustomerAddress
 		));
 	}
 
+	/**
+	 * @param $attribute
+	 * @param $params
+	 */
+	public function validatePostal($attribute, $params)
+	{
+		$obj = Country::Load($this->country_id);
+
+		if ($this->$attribute == '')
+			$this->addError($attribute,
+				Yii::t('yii','{attribute} cannot be blank.',
+					array('{attribute}'=>$this->getAttributeLabel($attribute))));
+		elseif (!is_null($obj->zip_validate_preg) && !_xls_validate_zip($this->$attribute,$obj->zip_validate_preg))
+			$this->addError($attribute,
+				Yii::t('yii','{attribute} format is incorrect for this country.',
+					array('{attribute}'=>$this->getAttributeLabel($attribute))));
+
+
+
+	}
 
 	//Called both from original form when displayed, and from AJAX query as Country changes (via Cart Controller)
 	/**

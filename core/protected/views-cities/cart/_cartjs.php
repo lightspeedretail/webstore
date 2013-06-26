@@ -16,6 +16,7 @@ If we have gone to checkout previously, we can load our cached shipping informat
     var savedTaxes = <?= $model->getSavedTax() ?>;
     var savedShippingPrices = <?= $model->getSavedPrices() ?>;
     var savedTotalScenarios = <?= $model->getSavedScenarios() ?>;
+    var savedCartScenarios = <?= $model->getSavedCartScenarios() ?>;
     var pickedShippingProvider = '<?= $model->shippingProvider; ?>';
     var pickedShippingPriority = '<?= $model->shippingPriority; ?>';
     function updateShippingPriority(id)	{
@@ -28,20 +29,22 @@ If we have gone to checkout previously, we can load our cached shipping informat
     }
     function updateCart(id)	{
         if(id) {
-            $("#cartShipping").html(savedShippingPrices[pickedShippingProvider][id]);
-            $("#cartTaxes").html(savedTaxes[pickedShippingProvider][id]);
-            $("#cartTotal").html(savedTotalScenarios[pickedShippingProvider][id]);
+	        $("#cartItems").html(savedCartScenarios[pickedShippingProvider]);
+	        $("#cartShipping").html(savedShippingPrices[pickedShippingProvider][id]);
+	        $("#cartTaxes").html(savedTaxes[pickedShippingProvider][id]);
+	        $("#cartTotal").html(savedTotalScenarios[pickedShippingProvider][id]);
             pickedShippingPriority = id;
             $("#ytCheckoutForm_shippingPriority").val(id);
         }
     }
     function updateShippingAuto() {
-        if( $("#<?= CHtml::activeId($model,'shippingAddress1') ?>").val() &&
+        if(    ( $("#<?= CHtml::activeId($model,'intShippingAddress') ?>").val() ) ||
+	        (   $("#<?= CHtml::activeId($model,'shippingAddress1') ?>").val() &&
                 $("#<?= CHtml::activeId($model,'shippingAddress2') ?>").val() &&
                 $("#<?= CHtml::activeId($model,'shippingCity') ?>").val() &&
                 $("#<?= CHtml::activeId($model,'shippingState') ?>").val() &&
                 $("#<?= CHtml::activeId($model,'shippingPostal') ?>").val()
-                )
+                ))
             $("#btnCalculate").click();
     }
     function updateTax(data) {

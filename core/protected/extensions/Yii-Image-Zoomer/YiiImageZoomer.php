@@ -178,6 +178,12 @@ class YiiImageZoomer extends CWidget
 	*/
 	public $single_image=array();
 
+	/**
+	* @var array $single_image- this is where you specify the image for single image zoom
+	* @default: empty array
+	*/
+	public $css_thumbs = "thumbs";
+
 	
 	//Below are the parameters which cannot be customized and these are meant to be used within the class
 		
@@ -197,8 +203,15 @@ class YiiImageZoomer extends CWidget
 	* .it specifies the description area or we can say that the container 
 	*  where the image description will be displayed.
 	*/
-	private $descArea='description';
-	
+	public $descArea='description';
+
+	/**
+	* @var string $targetArea- string variable used internally in the class
+	* .it specifies the description area or we can say that the container
+	*  where the image description will be displayed.
+	*/
+	public $css_target='targetarea';
+
 	/**  
 	* @var array $js_options- array used internally in the class for storing the javascript options which are passed to the script later on. 
 	*/
@@ -284,7 +297,7 @@ SETUP;
 				//if the image file exists than generate the html string and return it
 				if(file_exists(Yii::getPathOfAlias('webroot') .'/'.$this->imagefolder. '/'.$this->single_image['image']))
 				{
-					$html='<div class="targetarea">';
+					$html='<div class="'.$this->css_target.'">';
 					$html.= '<img src="'.Yii::app()->baseUrl.'/'.$this->imagefolder.'/'.$this->single_image['image'].'"  id="image1" /> </div>';
 					$html.='<div id="'.$this->descArea.'">'.$this->single_image['image_desc'].'</div>';
 					return $html;
@@ -341,10 +354,10 @@ SETUP;
 				}
 			}
 			//generate the html to display
-			$html='<div class="targetarea">';
+			$html='<div class="'.$this->css_target.'">';
 			$html.='<img id="image1" alt="'.$this->images['0']['image_alt'].'" title=" " src="'.Yii::app()->baseUrl.'/'.$this->imagefolder.'/'.$this->images['0']['image'].'"/></div>';
 			$html.='<div id="'.$this->descArea.'">'.$this->images['0']['image_desc'].'</div>';
-			$html.='<div class="image1 thumbs">';
+			$html.='<div class="'.$this->css_thumbs.'">';
 			
 			//loop through the images to fetch image based data  and genrate the html to display
 			foreach($this->images as $image)

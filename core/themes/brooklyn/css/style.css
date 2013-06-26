@@ -104,7 +104,7 @@ a:hover {  text-decoration: none;   }
 .subcategories a { text-decoration: underline; padding-right: 10px;}
 .product_cell { min-height: 300px !important; vertical-align: baseline; cursor: pointer; margin-bottom: 10px; margin-left: 5px  !important;}
 .product_cell_graphic { height: 225px; margin: auto;}
-.product_cell img { max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; margin-top: 10px;}
+.product_cell img { max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; margin-top: 10px; padding-top: 20px;}
 .product_cell_label  { clear: both; margin: auto;  padding-top: 0; padding-left: 2px; padding-right: 2px; text-transform:uppercase; height: 65px; vertical-align: bottom;  text-align: center;}
 .product_cell_label .product_cell_price {padding: 0px;}
 .product_cell_label .product_cell_price_slash { text-decoration: line-through;  padding-right: 10px; }
@@ -178,6 +178,7 @@ a:hover {  text-decoration: none;   }
 #genericcart .cartdecor {  }
 #genericcart .centeritem { text-align: center; }
 #genericcart .rightitem { text-align: right; }
+#genericcart .promoCode { font-size: 0.9em; text-align: right;  }
 /* when editing cart */
 #genericcart input[type="text"],#genericcart input[type="text"]:focus { font-size: 1.1em; margin-bottom: 7px; border: 3px; border-bottom: 1px solid black; text-align: center; padding: 2px; height: 15px; }
 
@@ -221,6 +222,7 @@ a:hover {  text-decoration: none;   }
 #product_details .grid-view td { vertical-align: top; }
 
 #product_details #photos legend { font-size: 0.7em;}
+#product_details .thumbs, #product_details .targetarea { margin-left: 0px;margin-bottom: 10px;}
 
 #autoadd { margin-top: 30px; }
 #autoadd .items th { background: none; height: 4px; padding:0px; background-color: black; }

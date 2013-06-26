@@ -55,7 +55,7 @@
 		        </div>
 		        <div class="span3 link">
 			        <?php
-			        if (is_null($item->cart_item_id) && $item->product->IsAvailable)
+			        if (is_null($item->cart_item_id) && $item->product->IsAddable)
 				        echo CHtml::ajaxLink(
 				            Yii::t('product', 'Add to Cart'),
 					        array('cart/AddToCart'),

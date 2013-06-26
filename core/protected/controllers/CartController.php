@@ -19,7 +19,7 @@ class CartController extends Controller
 	 * Set our layout file
 	 * @var string
 	 */
-	public $layout='//layouts/column1';
+	public $layout='/layouts/column1';
 	/**
 	 * Used to flag a guest checkout
 	 * @var
@@ -40,9 +40,7 @@ class CartController extends Controller
 	public function init()
 	{
 		parent::init();
-		if ( Yii::app()->theme && file_exists('webroot.themes.'.Yii::app()->theme->name.'.layouts.column1'))
-			$this->layout='webroot.themes.'.Yii::app()->theme->name.'.layouts.column1';
-		else $this->layout="//layouts/column1";
+		$this->layout="/layouts/column1";
 	}
 
 
@@ -69,9 +67,7 @@ class CartController extends Controller
 	public function actionIndex()
 	{
 
-		if ( Yii::app()->theme && file_exists('webroot.themes.'.Yii::app()->theme->name.'.layouts.column2'))
-			$this->layout='webroot.themes.'.Yii::app()->theme->name.'.layouts.column2';
-		else $this->layout="//layouts/column2";
+		$this->layout="/layouts/column2";
 
 		//Set breadcrumbs
 		$this->breadcrumbs = array(
@@ -80,6 +76,8 @@ class CartController extends Controller
 
 		//$this->layout = '//layouts/column2';
 		$this->intEditMode = 1;
+
+		Yii::app()->shoppingcart->UpdateCart();
 
 		//Populate our Email Cart popup box
 		$CartShare = new ShareForm();
@@ -148,7 +146,7 @@ class CartController extends Controller
 	 */
 	public function actionReceipt()
 	{
-		$this->layout='//layouts/column2';
+		$this->layout='/layouts/column2';
 
 		$strLink = Yii::app()->getRequest()->getQuery('getuid');
 		if (empty($strLink))
@@ -416,7 +414,7 @@ class CartController extends Controller
 
 	/**
 	 * Displays and processes the checkout form. This is our big function which validates everything and calls for
-	 * order completion when done.
+	 * order completion when done. ToDo: Needs to be broken down into subfunctions
 	 */
 	public function actionCheckout()
 	{
@@ -727,13 +725,18 @@ class CartController extends Controller
 				$objCart->payment_id = $objPayment->id;
 				$objCart->save();
 
+				$modelCheckout = clone $model;
+				$modelCheckout->billingState = State::CodeById($model->billingState);
+				$modelCheckout->billingCountry = Country::CodeById($model->billingCountry);
+				$modelCheckout->shippingState = State::CodeById($model->shippingState);
+				$modelCheckout->shippingCountry = Country::CodeById($model->shippingCountry);
 
 				/* RUN PAYMENT HERE */
 				//See if we have a subform for our payment module, set that as part of running payment module
 				if(isset($paymentSubformModel))
-					$arrPaymentResult = Yii::app()->getComponent($objPaymentModule->module)->setCheckoutForm($model)->setSubForm($paymentSubformModel)->run();
+					$arrPaymentResult = Yii::app()->getComponent($objPaymentModule->module)->setCheckoutForm($modelCheckout)->setSubForm($paymentSubformModel)->run();
 				else
-					$arrPaymentResult = Yii::app()->getComponent($objPaymentModule->module)->setCheckoutForm($model)->run();
+					$arrPaymentResult = Yii::app()->getComponent($objPaymentModule->module)->setCheckoutForm($modelCheckout)->run();
 
 
 				//If we have a full Jump submit form, render it out here
@@ -789,6 +792,7 @@ class CartController extends Controller
 			if (isset(Yii::app()->session['checkout.cache'])) {
 				$model = Yii::app()->session['checkout.cache'];
 				$model->clearErrors();
+
 			}
 			else {
 				//If this is the first time we're displaying the Checkout form, set some defaults
@@ -839,18 +843,24 @@ class CartController extends Controller
 
 		$this->objCart = Yii::app()->shoppingcart;
 
-		//echo $model->shippingProvider; die();
 		if (is_null($model->shippingProvider)) $model->shippingProvider=-1;
 		if (is_null($model->shippingPriority)) $model->shippingPriority=-1;
 
 		//If we have a default shipping address on, hide our Shipping box
 		if(!empty($model->intShippingAddress) && count($model->objAddresses)>0)
+		{
 			Yii::app()->clientScript->registerScript('shipping',
 				'$(document).ready(function(){
 						$("#CustomerContactShippingAddress").hide();
 				    });');
 
-		//If we have a default shipping address on, hide our Shipping box
+			Yii::app()->clientScript->registerScript('shippingforceclick',
+				'$(document).ready(function(){
+					js:$("#btnCalculate").click();
+						    });');
+		}
+
+		//If we have a default billing address on, hide our Billing box
 		if(!empty($model->intBillingAddress) && count($model->objAddresses)>0)
 			Yii::app()->clientScript->registerScript('billingadd',
 				'$(document).ready(function(){
@@ -904,8 +914,9 @@ class CartController extends Controller
 			})',CClientScript::POS_READY);
 
 
-
-
+		//Clear out anything we don't to survive the round trip
+		$model->cardNumber =  null;
+		$model->cardCVV =  null;
 
 		$this->render('checkout',array('model'=>$model,'paymentForms'=>$paymentForms));
 	}
@@ -1376,8 +1387,11 @@ class CartController extends Controller
 						$objPromoCode->amount
 					)));
 
-				$arrReturn['cartitems'] = $this->renderPartial('/cart/_cartitems',array('model'=>Yii::app()->shoppingcart),true);
-				$arrTotals = $this->calculateTotalScenarios(Yii::app()->session['ship.modules.cache'],Yii::app()->session['ship.prices.cache']);
+				$arrTotals = $this->calculateTotalScenarios(
+					Yii::app()->session['ship.modules.cache'],
+					Yii::app()->session['ship.prices.cache']
+				);
+				Yii::app()->session['ship.cartscenarios.cache'] = $arrReturn['cartitems'] = $arrTotals['cartitems'];
 				Yii::app()->session['ship.scenarios.cache'] = $arrReturn['totals'] = $arrTotals['totals'];
 				$arrReturn['prices'] = $arrTotals['prices'];
 
@@ -1426,7 +1440,8 @@ class CartController extends Controller
 				{
 					echo CJSON::encode(array("result"=>"error",
 						"errormsg"=>Yii::t('checkout',
-							'Oops, cannot calculate shipping quite yet. Please complete shipping address information and click Calculate again.')));
+							'Oops, cannot calculate shipping quite yet. Please complete shipping address information and click Calculate again.')."\n".
+						_xls_convert_errors_display(_xls_convert_errors($arrErrors))));
 					Yii::log("Checkout Errors ".print_r($arrErrors,true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 					return;
 				}
@@ -1450,7 +1465,11 @@ class CartController extends Controller
 			//Calculate tax since that may change depending on shipping address
 			Yii::log("Attempting to match with a defined Destination to Country/State/Postal ".$CheckoutForm->shippingCountry."/".
 				$CheckoutForm->shippingState."/".$CheckoutForm->shippingPostal, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-			$objDestination = Destination::LoadMatching($CheckoutForm->shippingCountry, $CheckoutForm->shippingState, $CheckoutForm->shippingPostal);
+			$objDestination = Destination::LoadMatching(
+				$CheckoutForm->shippingCountry,
+				$CheckoutForm->shippingState,
+				$CheckoutForm->shippingPostal
+			);
 			if (!$objDestination) $objDestination = Destination::LoadDefault();
 			if (!$objDestination)
 			{
@@ -1459,14 +1478,17 @@ class CartController extends Controller
 				Yii::log($err,'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				return;
 			}
+
 			Yii::app()->shoppingcart->tax_code_id = $objDestination->taxcode;
 			Yii::app()->shoppingcart->UpdateCart();
+
 
 			//We actually contact each module and get shipping
 			Yii::log("Contacting each live shipping module", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			$strPrices = array();
 			$strPriority = array();
 			$strTotalScenarios = array();
+			$arrCartScenarios = array();
 			$arrProvider = array();
 			foreach(CHtml::listData(Modules::model()->findAllByAttributes(
 				array('active'=>1,'category'=>'shipping'),array('order'=>'sort_order')),'id','module') as $moduleKey=>$moduleValue)
@@ -1516,10 +1538,11 @@ class CartController extends Controller
 					$strPriority[$moduleKey] = ""; //Delivery speed options
 					$strPrices[$moduleKey] = ""; //Price of each shipping scenario
 					$strTotalScenarios[$moduleKey] = ""; //What the cart total would be given a particular shipping choice
+					$arrCartScenarios[$moduleKey] = ""; //What the cart item display would be given a particular shipping choice
 
 					foreach($arrShippingRates as $speedKey=>$arrSpeed)
 					{
-						if(_xls_get_conf('SHIPPING_TAXABLE'))
+						if(Yii::app()->params['SHIPPING_TAXABLE']=='1')
 						{
 							$objShipProduct = Product::LoadByCode(Yii::app()->getComponent($moduleValue)->setCheckoutForm($CheckoutForm)->LsProduct);
 							$taxes = Tax::CalculatePricesWithTax($arrSpeed['price'], Yii::app()->shoppingcart->tax_code_id, $objShipProduct->taxStatus->lsid);
@@ -1578,7 +1601,7 @@ class CartController extends Controller
 				'prices'=>$arrTotals['prices'],
 				'taxes'=>$arrTotals['taxes'],
 				'totals'=>$arrTotals['totals'],
-				'cartitems'=> $this->renderPartial('/cart/_cartitems',null,true),
+				'cartitems'=>$arrTotals['cartitems'],
 				'paymentmodules' => $model->GetPaymentModules('ajax'),
 			);
 
@@ -1591,6 +1614,7 @@ class CartController extends Controller
 			Yii::app()->session['ship.priorityRadio.cache'] = $strPriority;
 			Yii::app()->session['ship.prices.cache'] = $strPrices; //We purposely keep the unformatted version
 			Yii::app()->session['ship.scenarios.cache'] = $arrTotals['totals'];
+			Yii::app()->session['ship.cartscenarios.cache'] = $arrTotals['cartitems'];
 
 			if (empty($arrProvider)) {
 				$arrShippingResult = array(
@@ -1613,7 +1637,7 @@ class CartController extends Controller
 		$arrTaxes = array();
 		$savedTaxId = Yii::app()->shoppingcart->tax_code_id;
 
-		if (empty($arrPrices)) return array('prices'=>'','totals'=>''); //We have no shipping calculations yet
+		if (empty($arrPrices)) return array('prices'=>'','totals'=>'','cartitems'=>$this->renderPartial('/cart/_cartitems',null,true)); //We have no shipping calculations yet
 		//For each given shipping price, what would the cart total be
 		foreach ($arrPrices as $moduleKey=>$moduleValue)
 		{
@@ -1624,20 +1648,24 @@ class CartController extends Controller
 
 			Yii::app()->shoppingcart->UpdateCart();
 
+			$value = $this->renderPartial('/cart/_cartitems',null,true);
+			$value = str_replace("\n","",$value);
+			$arrCartItems[$moduleKey] = $value;
 
 			foreach ($moduleValue as $speedKey => $speedValue)
 			{
-
 				$arrTotalScenarios[$moduleKey][$speedKey] = _xls_currency(Yii::app()->shoppingcart->precalculateTotal($speedValue,0));
 				$arrPrices[$moduleKey][$speedKey] = _xls_currency($speedValue);
-				$arrTaxes[$moduleKey][$speedKey] = $this->renderPartial('/cart/_carttaxes',array('model'=>Yii::app()->shoppingcart),true);
+				$arrTaxes[$moduleKey][$speedKey] = $this->renderPartial('/cart/_carttaxes',
+					array('model'=>Yii::app()->shoppingcart),true);
 			}
+
 		}
 		//Then put back our tax to what it was before
 		Yii::app()->shoppingcart->tax_code_id = $savedTaxId;
 		Yii::app()->shoppingcart->UpdateCart();
 
-		return array('taxes'=>$arrTaxes,'prices'=>$arrPrices,'totals'=>$arrTotalScenarios);
+		return array('taxes'=>$arrTaxes,'prices'=>$arrPrices,'totals'=>$arrTotalScenarios,'cartitems'=>$arrCartItems);
 
 
 	}

@@ -147,132 +147,132 @@
 			</div>
 			<?php endif; ?>
 
-	<div class="row-fluid">
-		<fieldset class="span10">
-			<div id="CustomerContactShippingAddress">
+		<div class="row-fluid">
+			<fieldset class="span10">
+				<div id="CustomerContactShippingAddress">
 
-			        <legend><?php echo Yii::t('checkout','Shipping Address'); ?></legend>
+				        <legend><?php echo Yii::t('checkout','Shipping Address'); ?></legend>
 
 
-                        <div class="row-fluid">
-                            <div class="span6">
-						        <?php echo $form->labelEx($model,'shippingLabel'); ?>
-						        <?php echo $form->textField($model,'shippingLabel'); ?>
-						        <?php echo $form->error($model,'shippingLabel'); ?>
-                            </div>
+	                        <div class="row-fluid">
+	                            <div class="span6">
+							        <?php echo $form->labelEx($model,'shippingLabel'); ?>
+							        <?php echo $form->textField($model,'shippingLabel'); ?>
+							        <?php echo $form->error($model,'shippingLabel'); ?>
+	                            </div>
+							</div>
+
+							<div class="row-fluid">
+	                            <div class="span4">
+							        <?php echo $form->labelEx($model,'shippingFirstName'); ?>
+							        <?php echo $form->textField($model,'shippingFirstName'); ?>
+							        <?php echo $form->error($model,'shippingFirstName'); ?>
+	                            </div>
+	                            <div class="span4">
+							        <?php echo $form->labelEx($model,'shippingLastName'); ?>
+							        <?php echo $form->textField($model,'shippingLastName'); ?>
+							        <?php echo $form->error($model,'shippingLastName'); ?>
+	                            </div>
+	                        </div>
+
+	                        <div class="row-fluid">
+	                            <div class="span4">
+			                        <?php echo $form->labelEx($model,'shippingAddress1'); ?>
+			                        <?php echo $form->textField($model,'shippingAddress1'); ?>
+			                        <?php echo $form->error($model,'shippingAddress1'); ?>
+	                            </div>
+	                            <div class="span4">
+			                        <?php echo $form->labelEx($model,'shippingAddress2'); ?>
+			                        <?php echo $form->textField($model,'shippingAddress2'); ?>
+			                        <?php echo $form->error($model,'shippingAddress2'); ?>
+	                            </div>
+
+	                        </div>
+	                        <div class="row-fluid">
+	                            <div class="span4">
+							        <?php echo $form->labelEx($model,'shippingCity'); ?>
+							        <?php echo $form->textField($model,'shippingCity'); ?>
+							        <?php echo $form->error($model,'shippingCity'); ?>
+	                            </div>
+
+	                            <div class="span4">
+							        <?php echo $form->labelEx($model,'shippingCountry'); ?>
+							        <?php echo $form->dropDownList($model,'shippingCountry',$model->getCountries(),array(
+								        'ajax' => array(
+									        'type'=>'POST',
+									        'url'=>CController::createUrl('cart/getdestinationstates'),
+									        'success'=>'js:function(data){
+										        $("#' . CHtml::activeId( $model, 'shippingState') .'").html(data);
+										        $("#' . CHtml::activeId( $model, 'shippingProvider') .'").html("");
+			                                    $("#' . CHtml::activeId( $model, 'shippingPriority') .'").html(""); }',
+									        'data' => 'js:{"'.'country_id'.'": $("#'.CHtml::activeId($model,'shippingCountry').
+										        ' option:selected").val()}',
+								        ))); ?>
+							        <?php echo $form->error($model,'shippingCountry'); ?>
+	                            </div>
+
+	                            <div class="span2">
+							        <?php echo $form->labelEx($model,'shippingState'); ?>
+							        <?php echo $form->dropDownList($model,'shippingState',$model->getStates('shipping'),array(
+		                                'prompt' =>'--',
+		                                'ajax' => array(
+				                            'type'=>'POST',
+			                                'dataType'=>'json',
+				                            'url'=>CController::createUrl('cart/settax'),
+				                            'success'=>'js:function(data){ updateTax(data) }',
+				                            'data' => 'js:{"'.'state_id'.'": $("#'.CHtml::activeId($model,'shippingState').
+					                            ' option:selected").val(),
+				                                "'.'postal'.'": $("#'.CHtml::activeId($model,'shippingPostal').'").val()}',
+			                            ))); ?>
+							        <?php echo $form->error($model,'shippingState'); ?>
+	                            </div>
+	                            <div class="span2">
+							        <?php echo $form->labelEx($model,'shippingPostal'); ?>
+							        <?php echo $form->textField($model,'shippingPostal',array(
+			                            'ajax' => array(
+				                            'type'=>'POST',
+				                            'dataType'=>'json',
+				                            'url'=>CController::createUrl('cart/settax'),
+				                            'success'=>'js:function(data){ updateTax(data) }',
+				                            'data' => 'js:{"'.'state_id'.'": $("#'.CHtml::activeId($model,'shippingState').
+					                            ' option:selected").val(),
+					                            "'.'postal'.'": $("#'.CHtml::activeId($model,'shippingPostal').'").val()}',
+			                            ))); ?>
+							        <?php echo $form->error($model,'shippingPostal'); ?>
+	                            </div>
+	                        </div>
+
+					<div class="row-fluid">
+						<div class="span9">
+							<div class="rememberMe">
+								<?php echo $form->checkBox($model,'shippingResidential'); ?>
+								<?php echo $form->label($model,'shippingResidential'); ?>
+								<?php echo $form->error($model,'shippingResidential'); ?>
+							</div>
 						</div>
+					</div>
+				</div>
 
-						<div class="row-fluid">
-                            <div class="span4">
-						        <?php echo $form->labelEx($model,'shippingFirstName'); ?>
-						        <?php echo $form->textField($model,'shippingFirstName'); ?>
-						        <?php echo $form->error($model,'shippingFirstName'); ?>
-                            </div>
-                            <div class="span4">
-						        <?php echo $form->labelEx($model,'shippingLastName'); ?>
-						        <?php echo $form->textField($model,'shippingLastName'); ?>
-						        <?php echo $form->error($model,'shippingLastName'); ?>
-                            </div>
-                        </div>
 
-                        <div class="row-fluid">
-                            <div class="span4">
-		                        <?php echo $form->labelEx($model,'shippingAddress1'); ?>
-		                        <?php echo $form->textField($model,'shippingAddress1'); ?>
-		                        <?php echo $form->error($model,'shippingAddress1'); ?>
-                            </div>
-                            <div class="span4">
-		                        <?php echo $form->labelEx($model,'shippingAddress2'); ?>
-		                        <?php echo $form->textField($model,'shippingAddress2'); ?>
-		                        <?php echo $form->error($model,'shippingAddress2'); ?>
-                            </div>
 
-                        </div>
-                        <div class="row-fluid">
-                            <div class="span4">
-						        <?php echo $form->labelEx($model,'shippingCity'); ?>
-						        <?php echo $form->textField($model,'shippingCity'); ?>
-						        <?php echo $form->error($model,'shippingCity'); ?>
-                            </div>
 
-                            <div class="span4">
-						        <?php echo $form->labelEx($model,'shippingCountry'); ?>
-						        <?php echo $form->dropDownList($model,'shippingCountry',$model->getCountries(),array(
-							        'ajax' => array(
-								        'type'=>'POST',
-								        'url'=>CController::createUrl('cart/getdestinationstates'),
-								        'success'=>'js:function(data){
-									        $("#' . CHtml::activeId( $model, 'shippingState') .'").html(data);
-									        $("#' . CHtml::activeId( $model, 'shippingProvider') .'").html("");
-		                                    $("#' . CHtml::activeId( $model, 'shippingPriority') .'").html(""); }',
-								        'data' => 'js:{"'.'country_id'.'": $("#'.CHtml::activeId($model,'shippingCountry').
-									        ' option:selected").val()}',
-							        ))); ?>
-						        <?php echo $form->error($model,'shippingCountry'); ?>
-                            </div>
 
-                            <div class="span2">
-						        <?php echo $form->labelEx($model,'shippingState'); ?>
-						        <?php echo $form->dropDownList($model,'shippingState',$model->getStates('shipping'),array(
-	                                'prompt' =>'--',
-	                                'ajax' => array(
-			                            'type'=>'POST',
-		                                'dataType'=>'json',
-			                            'url'=>CController::createUrl('cart/settax'),
-			                            'success'=>'js:function(data){ updateTax(data) }',
-			                            'data' => 'js:{"'.'state_id'.'": $("#'.CHtml::activeId($model,'shippingState').
-				                            ' option:selected").val(),
-			                                "'.'postal'.'": $("#'.CHtml::activeId($model,'shippingPostal').'").val()}',
-		                            ))); ?>
-						        <?php echo $form->error($model,'shippingState'); ?>
-                            </div>
-                            <div class="span2">
-						        <?php echo $form->labelEx($model,'shippingPostal'); ?>
-						        <?php echo $form->textField($model,'shippingPostal',array(
-		                            'ajax' => array(
-			                            'type'=>'POST',
-			                            'dataType'=>'json',
-			                            'url'=>CController::createUrl('cart/settax'),
-			                            'success'=>'js:function(data){ updateTax(data) }',
-			                            'data' => 'js:{"'.'state_id'.'": $("#'.CHtml::activeId($model,'shippingState').
-				                            ' option:selected").val(),
-				                            "'.'postal'.'": $("#'.CHtml::activeId($model,'shippingPostal').'").val()}',
-		                            ))); ?>
-						        <?php echo $form->error($model,'shippingPostal'); ?>
-                            </div>
-                        </div>
-
+				<?php //We keep this outside the shipping address block because the rest may be hidden ?>
 				<div class="row-fluid">
 					<div class="span9">
 						<div class="rememberMe">
-							<?php echo $form->checkBox($model,'shippingResidential'); ?>
-							<?php echo $form->label($model,'shippingResidential'); ?>
-							<?php echo $form->error($model,'shippingResidential'); ?>
+							<?php echo $form->checkBox($model,'billingSameAsShipping',array(
+								'onclick'=>'js:jQuery($("#CustomerContactBillingAddress")).toggle()',
+								'disabled'=>Yii::app()->params['SHIP_SAME_BILLSHIP']
+							)); ?>
+							<?php echo $form->label($model,'billingSameAsShipping'); ?>
+							<?php echo $form->error($model,'billingSameAsShipping'); ?>
 						</div>
 					</div>
 				</div>
-			</div>
 
-
-
-
-
-			<?php //We keep this outside the shipping address block because the rest may be hidden ?>
-			<div class="row-fluid">
-				<div class="span9">
-					<div class="rememberMe">
-						<?php echo $form->checkBox($model,'billingSameAsShipping',array(
-							'onclick'=>'js:jQuery($("#CustomerContactBillingAddress")).toggle()',
-							'disabled'=>Yii::app()->params['SHIP_SAME_BILLSHIP']
-						)); ?>
-						<?php echo $form->label($model,'billingSameAsShipping'); ?>
-						<?php echo $form->error($model,'billingSameAsShipping'); ?>
-					</div>
-				</div>
-			</div>
-
-		</fieldset>
-
+			</fieldset>
+		</div>
 	</div>
 
 
@@ -407,8 +407,10 @@
 									$("#btnCalculate").click();
 									alert(data.errormsg);
 								} else if (data.action=="success") {
-									$("#' . CHtml::activeId($model,'promoCode') .'_em_").html(data.errormsg).show();
 									$("#cartItems").html(data.cartitems);
+									savedCartScenarios = data.cartitems;
+									$("#' . CHtml::activeId($model,'promoCode') .'_em_").html(data.errormsg).show();
+									alert(data.errormsg);
 									updateShippingAuto();
 								}
 			                }'),
@@ -465,10 +467,10 @@
 										savedTaxes = data.taxes;
 										savedTotalScenarios = data.totals;
 										savedShippingPriorities = data.priority;
+										savedCartScenarios = data.cartitems;
 										$("#' . CHtml::activeId( $model, 'shippingProvider') .'").html(data.provider);
 	                                    $("#' . CHtml::activeId( $model, 'shippingPriority') .'").html(data.priority);
 	                                    $("#' . CHtml::activeId( $model, 'paymentProvider') .'").html(data.paymentmodules);
-	                                    $("#cartItems").html(data.cartitems);
 										$("#shippingSpinner").hide();
 	                                    $("#shippingProvider_0").click();
 	                                    }',

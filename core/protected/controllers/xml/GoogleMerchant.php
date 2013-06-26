@@ -88,7 +88,7 @@ class GoogleMerchant extends CAction
 
 			echo chr(9).'<g:condition>new</g:condition>'.chr(13);
 
-			if($objProduct->IsAvailable)
+			if($objProduct->IsAddable)
 				echo chr(9).'<g:availability>in stock</g:availability>'.chr(13);
 			elseif ($intStockHandling==Product::InventoryAllowBackorders && $objProduct->Inventory<=0)
 				echo chr(9).'<g:availability>available for order</g:availability>'.chr(13);

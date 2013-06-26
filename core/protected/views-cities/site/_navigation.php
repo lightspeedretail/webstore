@@ -9,7 +9,8 @@
 	</div>
 
 	<div class="span7">
-		<?php $this->widget('zii.widgets.CMenu', array(
+		<?php if (count(CustomPage::model()->toptabs()->findAll()))
+			$this->widget('zii.widgets.CMenu', array(
 			'id'=>'menutabs',
 			'itemCssClass'=>'menutab menuheight menuunderline span'.round(12/count(CustomPage::model()->toptabs()->findAll())),
 			'items'=>CustomPage::model()->toptabs()->findAll()

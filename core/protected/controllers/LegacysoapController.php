@@ -778,8 +778,9 @@ class LegacySoapController extends Controller
 			if (!is_null($intCategory))
 			{
 				$objCategory = Category::model()->findByPk($intCategory);
-				ProductCategoryAssn::model()->deleteAll('product_id = :id1 AND category_id = :id2',
-					array('id1' => $objProduct->id,'id2' => $intCategory));
+				//Delete any prior categories from the table
+				ProductCategoryAssn::model()->deleteAllByAttributes(
+					array('product_id'=>$objProduct->id));
 				$objAssn = new ProductCategoryAssn();
 				$objAssn->product_id=$objProduct->id;
 				$objAssn->category_id=$intCategory;
@@ -1548,6 +1549,7 @@ class LegacySoapController extends Controller
 		$objDocument = Document::LoadByIdStr($strId);
 		if ($objDocument instanceof Document) {
 			$strSaveLink = $objDocument->linkid;
+			Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=0;')->execute();
 
 			foreach ($objDocument->documentItems as $item)
 				$item->delete();
@@ -1578,6 +1580,7 @@ class LegacySoapController extends Controller
 
 		$objDocument->order_type = CartType::quote;
 		$objDocument->fk_tax_code_id = $intTaxCode;
+		$objDocument->tax_inclusive = _xls_get_conf('TAX_INCLUSIVE_PRICING');
 
 
 		if (!$objDocument->save())
@@ -1635,10 +1638,15 @@ class LegacySoapController extends Controller
 		if (empty($strDescription))
 			$strDescription=$objProduct->title;
 
+		if(_xls_get_conf('TAX_INCLUSIVE_PRICING') == '1')
+			list($fltTaxedPrice, $arrTaxes) =
+				Tax::CalculatePricesWithTax($fltSell, $objDocument->fk_tax_code_id, $objProduct->tax_status_id);
+		else $fltTaxedPrice = $fltSell;
+
 		$retVal = $objDocument->AddSoapProduct($objDocument->id,
 			$objProduct,
 			$fltQty, $strDescription,
-			$fltSell, $fltDiscount, CartType::quote);
+			$fltTaxedPrice, $fltDiscount, CartType::quote);
 
 		if (!$retVal)
 			return self::UNKNOWN_ERROR;

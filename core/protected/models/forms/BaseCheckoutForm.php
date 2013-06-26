@@ -169,7 +169,7 @@ class BaseCheckoutForm extends CFormModel
 					array('{attribute}'=>$this->getAttributeLabel($attribute))));
 		elseif (!is_null($obj->zip_validate_preg) && !_xls_validate_zip($this->$attribute,$obj->zip_validate_preg))
 			$this->addError($attribute,
-				Yii::t('yii','{attribute} is invalid.',
+				Yii::t('yii','{attribute} format is incorrect for this country.',
 					array('{attribute}'=>$this->getAttributeLabel($attribute))));
 
 
@@ -654,5 +654,23 @@ class BaseCheckoutForm extends CFormModel
 		}
 
 		else return "''";
+	}
+	/** for cached shipping */
+	public function getSavedCartScenarios()
+	{
+		if (isset(Yii::app()->session['ship.cartscenarios.cache'])) {
+			$strReturn = "{";
+			$outercount=0;
+			foreach (Yii::app()->session['ship.cartscenarios.cache'] as $key => $value) {
+				if ($outercount++>0) $strReturn .= ",";
+				$value = str_replace("\t","",$value);
+				$strReturn .= $key.":'".$value."'";
+			}
+			$strReturn .= "}";
+			return $strReturn;
+		}
+
+		else return "''";
+
 	}
 }

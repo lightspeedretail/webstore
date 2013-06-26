@@ -1,0 +1,143 @@
+hr {
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#40f9f9f9', endColorstr='#40f9f9f9',GradientType=1 ); /* IE6-8 */
+}
+
+.navbar-inner {
+	filter: none;
+}
+
+.box-header {
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f4f4f4',GradientType=0 ); /* IE6-8 */
+}
+
+.dropdown-menu li > a:hover,
+.dropdown-menu li > a:focus,
+.dropdown-submenu:hover > a,
+.dropdown-menu .active > a,
+.dropdown-menu .active > a:hover {
+  	filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0077b3', GradientType=0); /* IE6-8 */
+}
+
+.quick-button,
+.quick-button-small {
+  	filter: progid:dximagetransform.microsoft.gradient(startColorstr='#fafafa', endColorstr='#efefef', GradientType=0); /* IE6-8 */
+}
+
+.btn-overlay,
+.btn3d:before {
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ebeae8', endColorstr='#ffffff',GradientType=0 ); /* IE6-8 */
+}
+
+.login-box {
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f5f5f5', endColorstr='#f5f5f5',GradientType=0 ); /* IE6-8 */
+}
+
+.sliderOverlay,
+.sliderVertical,
+.progressBarOverlay {
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ebeae8', endColorstr='#ffffff',GradientType=0 ); /* IE6-8 */
+}
+
+.slider,
+.progress,
+.progressSlim {
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#fafafa',GradientType=0 ); /* IE6-8 */
+}
+
+.sliderBlue .ui-slider-range, .progressBlue .ui-progressbar-value {
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#67c2ef', endColorstr='#2fabe9',GradientType=0 ); /* IE6-8 */
+}
+
+.sliderGreen .ui-slider-range, .progressGreen .ui-progressbar-value {
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#bdea74', endColorstr='#b6e370',GradientType=0 ); /* IE6-8 */
+}
+
+.sliderDarkGreen .ui-slider-range, .progressDarkGreen .ui-progressbar-value {
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#78cd51', endColorstr='#5aad34',GradientType=0 ); /* IE6-8 */
+}
+
+.sliderPink .ui-slider-range, .progressPink .ui-progressbar-value {
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e84c8a', endColorstr='#e21668',GradientType=0 ); /* IE6-8 */
+}
+
+.sliderOrange .ui-slider-range, .progressOrange .ui-progressbar-value {
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fa603d', endColorstr='#fa5833',GradientType=0 ); /* IE6-8 */
+}
+
+.sliderLightOrange .ui-slider-range, .progressLightOrange .ui-progressbar-value {
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fabb3d', endColorstr='#f4a506',GradientType=0 ); /* IE6-8 */
+}
+
+.sliderRed .ui-slider-range, .progressRed .ui-progressbar-value {
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff5454', endColorstr='#ff0000',GradientType=0 ); /* IE6-8 */
+}
+
+.sliderYellow .ui-slider-range, .progressYellow .ui-progressbar-value {
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eae874', endColorstr='#e3e270',GradientType=0 ); /* IE6-8 */
+}
+
+.navbar-inner a i {
+	margin-top: 4px;
+}
+
+.box-header h2 i {
+	margin-top: 1px;
+}
+
+.todo-actions i {
+	margin: 2px 5px 0px 5px;	
+}
+
+.message .header i {
+	margin-top: 3px;
+}
+
+#content {
+	padding: 20px;
+	margin-left: -2px;
+}
+
+hr {
+	height: 2px;
+	border: none;
+	background: #f9f9f9;
+}
+
+.dark {
+	right: -12px;	
+}
+
+#sidebar-left {
+	background: transparent;
+	margin: -1px 0px 0px 25px;
+	padding-top: 0px;
+}
+
+.sidebar-nav > ul{
+	margin: 0px 0px 0px -20px;
+}
+
+footer {
+	margin: 20px -20px 0px -20px;
+	padding: 10px 20px;
+	position: relative;
+	z-index: 2;
+}
+
+.hideInIE8 {
+	display: none;
+}
+
+.task .time .date {
+	font-size: 14px;
+	margin-bottom: 5px;	
+}
+
+.verticalChart .singleBar .bar .value span{
+	color: #3b3b41;
+}
+
+ul.users-list li a .status:before,
+ul.users-list li a .status:after {
+  background: transparent;
+}

@@ -131,7 +131,7 @@ class CustomPage extends BaseCustomPage
 	}
 	// Return the URL for this object
 	public function GetLink() {
-		if (substr(strip_tags($this->page),0,7)=="http://" || substr(strip_tags($this->page),0,8)=="https://")
+		if (substr(trim(strip_tags($this->page)),0,7)=="http://" || substr(trim(strip_tags($this->page)),0,8)=="https://")
 			return trim(strip_tags($this->page));
 
 		//Because of our special handling on the contact us form

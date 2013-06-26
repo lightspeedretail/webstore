@@ -97,7 +97,7 @@ class Tax extends BaseTax
 			if($i >= $taxtypes) $i = $taxtypes;
 		}
 
-		return array($fltSellTotalTaxed , $arrTaxAmount);
+		return array(round($fltSellTotalTaxed,2,PHP_ROUND_HALF_UP) , $arrTaxAmount);
 	}
 
 	/**

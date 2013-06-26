@@ -185,7 +185,7 @@ class Document extends BaseDocument
 		// Tax Inclusive && Don't want taxes
 		foreach ($this->documentItems as $objItem) {
 			// For quote to cart, we have to remove prices manually
-			if ($objItem->cart_type = CartType::quote && $objItem->tax_in) {
+			if ($objItem->cart_type == CartType::quote && $objItem->tax_in) {
 				$taxes = $objItem->product->CalculateTax(
 					TaxCode::GetDefault(), $objItem->Sell);
 

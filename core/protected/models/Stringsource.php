@@ -35,7 +35,7 @@ class Stringsource extends BaseStringsource
 		$criteria->addCondition('category = :cat');
 		if (!empty($this->string))
 		{
-			$criteria->addCondition('stringtranslates.translation = :string');
+			$criteria->addCondition('message = :string');
 			$criteria->params = array(':cat'=>$this->category,':string'=>$this->string);
 		}
 		else

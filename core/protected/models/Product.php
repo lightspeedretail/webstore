@@ -147,7 +147,7 @@ class Product extends BaseProduct
 			$strDesc = _xls_parse_language($this->description_long);
 		else $strDesc = $this->description_long;
 
-		if (_xls_get_conf('HTML_DESCRIPTION') == 0)
+		if($strDesc==strip_tags($strDesc,'<b><i><u><font><a>'))
 			return nl2br($strDesc);
 		else
 			return $strDesc;
@@ -176,13 +176,15 @@ class Product extends BaseProduct
 	/**
 	 * If we are in multilanguage mode, parse the description and display only the local language.
 	 * Otherwise, just display the raw field from the database
+	 * Disabled because creates display issues in several places, need to revisit in LS
 	 * @return string
 	 */
 	public function getTitle()
 	{
-		if(_xls_get_conf('LANG_MENU',0))
-			return _xls_parse_language($this->title);
-		else return $this->title;
+//		if(_xls_get_conf('LANG_MENU',0))
+//			return _xls_parse_language($this->title);
+//		else
+			return $this->title;
 	}
 
 	/**
@@ -197,19 +199,11 @@ class Product extends BaseProduct
 		foreach ($this->products as $objProduct) {
 			$strSize = $objProduct->product_size;
 
-			if ($strSize == '')
-				continue;
-
-//			if ($strColor && $objProduct->product_color != $strColor)
-//				continue;
-
-			if (in_array($strSize, $strOptionsArray))
-				continue;
-
-			if (!$objProduct->Displayable)
-				continue;
-
-			$strOptionsArray[$strSize] = $strSize;
+			if (!empty($strSize)  &&
+				!in_array($strSize, $strOptionsArray) &&
+				$objProduct->IsDisplayable
+			)
+				$strOptionsArray[$strSize] = $strSize;
 
 		}
 
@@ -231,21 +225,17 @@ class Product extends BaseProduct
 		foreach ($this->products as $objProduct) {
 			$strColor = $objProduct->product_color;
 
-			if ($strColor == '')
-				continue;
 
-			if ($strSize && $objProduct->product_size != $strSize)
-				continue;
+			if (!empty($strColor)  &&
+				($strSize==false || $objProduct->product_size == $strSize) &&
+				!in_array($strColor, $strOptionsArray) &&
+				$objProduct->IsDisplayable
 
-			if (in_array($strColor, $strOptionsArray))
-				continue;
-
-			if (!$objProduct->Displayable)
-				continue;
-
-			$strOptionsArray[$strColor] = $strColor;
+			)
+				$strOptionsArray[$strColor] = $strColor;
 
 		}
+
 		return $strOptionsArray;
 	}
 
@@ -350,22 +340,33 @@ class Product extends BaseProduct
 	}
 
 
-	protected function IsAvailable() {
-		if ($this->web && $this->HasInventory(true))
-			return true;
-		return false;
-	}
-
 	/**
-	 * Checks to see if product should be displayed to the user, based on Sell on Web checkbox and
-	 * if we show out of stock products
+	 * Should a product be displayed, not necessarily the same if it an actually be ordered
 	 * @return bool
 	 */
-	protected function getDisplayable() {
+	public function getIsDisplayable() {
 
-		if($this->IsAvailable)
+		if ($this->web && $this->HasInventory())
 			return true;
-		if ($this->web && _xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0)>Product::InventoryMakeDisappear)
+
+		if ($this->web && !$this->HasInventory() && Yii::app()->params['INVENTORY_OUT_ALLOW_ADD'] != Product::InventoryMakeDisappear)
+			 return true;
+
+		return false;
+	}
+	/**
+	 * Is a product addable to a cart
+	 * @return bool
+	 */
+	public function getIsAddable() {
+
+		if ($this->web && Yii::app()->params['INVENTORY_OUT_ALLOW_ADD'] == Product::InventoryAllowBackorders)
+			 return true;
+
+		if ($this->web && !$this->HasInventory(true) && Yii::app()->params['INVENTORY_OUT_ALLOW_ADD'] == Product::InventoryDisplayNotOrder)
+			 return false;
+
+		if ($this->web && $this->HasInventory(true))
 			return true;
 
 		return false;
@@ -488,7 +489,7 @@ class Product extends BaseProduct
 				"{rcrumbtrai}"=>implode(" ",array_reverse(_xls_get_crumbtrail('names')))
 		));
 
-
+		$strItem = strip_tags($strItem);
 		return $strItem;
 
 	}
@@ -508,12 +509,9 @@ class Product extends BaseProduct
 	 * @return bool
 	 */
 	public function HasInventory($bolExtended = false) {
-		if ($bolExtended)
-			if (!$this->inventoried)
-				return true;
-			else if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD' , 0)==Product::InventoryAllowBackorders)
-				return true;
-
+		//if($bolExtended)
+		if (!$this->inventoried) //non-inventoried items
+			return true;
 		if ($this->GetInventory() > 0)
 			return true;
 
@@ -1124,7 +1122,7 @@ class Product extends BaseProduct
 				else
 					$strState = '';
 				//$fltRate -- built above
-				$strTaxShip = _xls_get_conf('SHIPPING_TAXABLE','0') == '1' ? "y" : "n";
+				$strTaxShip = Yii::app()->params['SHIPPING_TAXABLE'] == '1' ? "y" : "n";
 				$arrGrid[] = array($strCountry,	$strState,$fltRate,$strTaxShip);
 
 			}
@@ -1144,22 +1142,6 @@ class Product extends BaseProduct
 	 */
 	public function getBreadcrumbs()
 	{
-//		$arrPath=array();
-//		$objCategory = Category::L
-//
-//		if(!is_null($objCategory->parent))
-//			do {
-//				if ($objCategory instanceof Category)
-//					$arrPath[$objCategory->label] = $objCategory->Link;
-//				$objCategory = $objCategory->parent0;
-//
-//			} while (!is_null($objCategory->parent));
-//
-//		if ($objCategory instanceof Category)
-//			$arrPath[$objCategory->label] = $objCategory->Link;
-//
-//		$arrPath = array_reverse($arrPath);
-//		return $arrPath;
 
 		$arrCrumbs = Category::getBreadcrumbByProductId($this->id);
 		$arrCrumbs[_xls_truncate($this->Title,45)] = $this->Link;
@@ -1289,9 +1271,6 @@ class Product extends BaseProduct
 
 			case 'IsIndependent':
 				return $this->IsIndependent();
-
-			case 'IsAvailable':
-				return $this->IsAvailable();
 
 			case 'Slug':
 				return $this->GetSlug();
