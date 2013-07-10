@@ -10,7 +10,7 @@ Note we use the is_null to put the blank entries on the bottom
 	'enableClientValidation'=>false,
 ));   ?>
     <div class="editinstructions">
-		<?php echo Yii::t('admin','Can you can define up to 10 tiers. Use two digit decimals to ensure your values don\'t leave gaps in-between rows. Start your first line defined for 0.00 and for the last amount (the high end), you can enter 999999 to catch any high cart values.'); ?>
+		<?php echo Yii::t('admin','You can define up to 10 tiers. Use two digit decimals to ensure your values don\'t leave gaps in-between rows. Start your first line defined for 0.00 and for the last amount (the high end), you can enter 999999 to catch any high cart values.'); ?>
     </div>
 
     <table>

@@ -423,7 +423,7 @@ class InstallController extends Controller
 			'beanstream_aim'        =>'beanstreamaim',
 			'beanstream_sim'        =>'beanstreamsim',
 			'cheque'                =>'cheque',
-			'eway_cvn_aus'          =>'eway',
+			'eway_cvn_aus'          =>'ewayaim',
 			'merchantware'          =>'merchantware',
 			'paypal_webpayments_pro'=>'paypalpro',
 			'paypal'                =>'paypal',
@@ -445,7 +445,7 @@ class InstallController extends Controller
 			'australiapost'     =>'australiapost',
 			'canadapost'        =>'canadapost',
 			'destination_table' =>'destinationshipping',
-			'fedex'             =>'wssfedex',
+			'fedex'             =>'fedex',
 			'flat_rate'         =>'flatrate',
 			'free_shipping'     =>'freeshipping',
 			'intershipper'      =>'intershipper',
@@ -657,6 +657,12 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 			_dbx("delete from xlsws_product_tags where product_id=".$result['product_id']." and tag_id=".$result['tag_id']);
 			_dbx("insert into xlsws_product_tags set product_id=".$result['product_id'].", tag_id=".$result['tag_id']);
 		}
+
+
+		//Remove orphaned wish list purchase records (unfortunately lost pre 3.0 but not much we can do except clean it up)
+		$results=Yii::app()->db->createCommand('select a.id as id from xlsws_wishlist_item as a left join xlsws_cart_item as b on a.cart_item_id=b.id where cart_item_id is not null AND cart_id is null')->queryAll();
+		foreach($results AS $result)
+			_dbx("update xlsws_wishlist_item set cart_item_id=null where id =".$result['id']);
 
 		return json_encode(array('result'=>"success",'makeline'=>15,'total'=>50));
 

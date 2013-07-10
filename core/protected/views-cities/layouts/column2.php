@@ -19,7 +19,7 @@
 				'danger'=>array('block'=>true, 'fade'=>true, 'closeText'=>'&times;'), // success, info, warning, error or danger
 			),
 			)); ?><!-- flash messages -->
-	    <div id="viewport row-fluid">
+		<div id="viewport" class="row-fluid">
 		    <?php echo $content; ?>
 	    </div>
 	</div>

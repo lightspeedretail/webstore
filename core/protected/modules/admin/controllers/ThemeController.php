@@ -107,17 +107,27 @@ class ThemeController extends AdminBaseController
 
 			$d = YiiBase::getPathOfAlias('webroot')."/themes";
 
+			$arrThemes = $this->getGalleryThemes();
+
 			$strTheme = $_POST['gallery'];
-			$data = $this->getFile("http://".$this->externalUrl."/themes/".$strTheme.".zip");
+
+			$path = $arrThemes[$strTheme]['installfile'];
+			$data = $this->getFile($path);
 			$f=file_put_contents($d."/".$strTheme.".zip", $data);
 
 			if ($f)
 			{
 				$blnExtract = $this->unzipFile($d,$strTheme.".zip");
-				Yii::app()->user->setFlash('success',Yii::t('admin','The {file} theme was downloaded and installed at {time}.',
-					array('{file}'=>"<strong>".$strTheme."</strong>",'{time}'=>date("d F, Y  h:i:sa"))));
-				unlink($d."/".$strTheme.".zip");
-				$this->redirect($this->createUrl("theme/manage"));
+				if($blnExtract)
+				{
+					Yii::app()->user->setFlash('success',Yii::t('admin','The {file} theme was downloaded and installed at {time}.',
+						array('{file}'=>"<strong>".$strTheme."</strong>",'{time}'=>date("d F, Y  h:i:sa"))));
+					unlink($d."/".$strTheme.".zip");
+					$this->redirect($this->createUrl("theme/manage"));
+				}
+				else Yii::app()->user->setFlash('error',Yii::t('admin','ERROR! Theme {file} was downloaded but extraction failed. {time}.',
+					array('{file}'=>$strTheme,'{time}'=>date("d F, Y  h:i:sa"))));
+
 			}
 			else Yii::app()->user->setFlash('error',Yii::t('admin','ERROR! Theme {file} was not downloaded. {time}.',
 				array('{file}'=>$strTheme,'{time}'=>date("d F, Y  h:i:sa"))));
@@ -139,7 +149,7 @@ class ThemeController extends AdminBaseController
 			$file = CUploadedFile::getInstanceByName('theme_file');
 			if ($file->type == "application/zip")
 			{
-				$path = str_replace("/protected","",Yii::app()->basePath); //Since we're inside admin panel, bump up one folder
+				$path = str_replace("/core/protected","",Yii::app()->basePath); //Since we're inside admin panel, bump up one folder
 				$retVal = $file->saveAs($path.'/themes/'.$file->name);
 				if ($retVal)
 				{
@@ -211,7 +221,7 @@ class ThemeController extends AdminBaseController
 
 	protected function unzipFile($path,$file)
 	{
-		$path = str_replace("/protected","/themes",Yii::app()->basePath);
+		$path = str_replace("/core/protected","/themes",Yii::app()->basePath);
 		require_once( YiiBase::getPathOfAlias('application.components'). '/zip.php');
 
 		extractZip($file,'',$path);
@@ -260,7 +270,7 @@ class ThemeController extends AdminBaseController
 			}
 			else {
 				//If we don't have old settings saved already, then we can do two things. First, we see
-				//if there is an Options.xml for defaults we create. If not, then we just leave the Config table
+				//if there is an config.xml for defaults we create. If not, then we just leave the Config table
 				//as is and use those settings, we'll save it next time.
 				$fnOptions = $this->getConfigFile($post['theme']);
 				if (file_exists($fnOptions)) {
@@ -270,11 +280,15 @@ class ThemeController extends AdminBaseController
 					$oXML = new SimpleXMLElement($strXml);
 
 					if($oXML->defaults) {
-						foreach ($oXML->defaults as $item)
+						foreach ($oXML->defaults->{'configuration'} as $item)
 						{
-							$objKey = Configuration::model()->findByAttributes(array('key_name'=>$item->key_name));
-							if ($objKey && $objKey->template_specific==1)
-								_xls_set_conf($item->key_name,$item->key_value);
+							$keyname = (string)$item->key_name;
+							$keyvalue = (string)$item->key_value;
+							$objKey = Configuration::model()->findByAttributes(array('key_name'=>$keyname));
+							if ($objKey) {
+								_xls_set_conf($keyname,$keyvalue);
+								Configuration::model()->updateByPk($objKey->id,array('template_specific'=>'1'));
+							}
 
 						}
 					}
@@ -288,7 +302,20 @@ class ThemeController extends AdminBaseController
 
 
 		if (isset($post['subtheme-'.$post['theme']]))
-			_xls_set_conf('CHILD_THEME',$post['subtheme-'.$post['theme']]);
+			$child = $post['subtheme-'.$post['theme']];
+		else
+		{
+			$child = "";
+			$arrOptions = $this->buildSubThemes($post['theme']);
+			if ($arrOptions)
+			{
+				$keys = array_keys($arrOptions);
+				$child = array_shift($keys);
+			}
+
+
+		}
+		_xls_set_conf('CHILD_THEME',$child);
 
 
 		Yii::app()->user->setFlash('success',Yii::t('admin','Theme set as "{theme}" at {time}.',
@@ -415,7 +442,7 @@ class ThemeController extends AdminBaseController
 	protected function getGalleryThemes()
 	{
 		$arr = array();
-		$strXml = $this->getFile("http://".$this->externalUrl."/themes/themes.xml");
+		$strXml = $this->getFile("http://updater.lightspeedretail.com/webstore/themes");
 		if (stripos($strXml,"404 Not Found")>0 || empty($strXml))
 			return $arr;
 
@@ -429,6 +456,7 @@ class ThemeController extends AdminBaseController
 			$arr[$filename]['img'] = CHtml::image($item->thumbnail, $item->name);
 			$arr[$filename]['name'] = $item->name;
 			$arr[$filename]['version'] = $item->version;
+			$arr[$filename]['installfile'] = $item->installfile;
 			$arr[$filename]['releasedate'] = strtotime($item->releasedate);
 			$arr[$filename]['description'] = $item->description;
 			$arr[$filename]['credit'] = $item->credit;

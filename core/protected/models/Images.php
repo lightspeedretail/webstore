@@ -417,41 +417,21 @@ class Images extends BaseImages
 	public static function CalculateNewSize($intWidth, $intHeight, $intNewWidth, $intNewHeight)
 	{
 
-		// Calculations for the new thumbnail size
-		if ($intNewHeight > $intNewWidth)
-			$strNewScale = 'y';
+		$rw = $intWidth / $intNewWidth; // width and height are maximum thumbnail's bounds
+		$rh = $intHeight / $intNewHeight;
+
+		if ($rw > $rh)
+		{
+			$newh = round($intHeight / $rw);
+			$neww = $intNewWidth;
+		}
 		else
-			$strNewScale = 'x';
-
-		// Calculations for the old thumbnail size
-		if ($intHeight > $intWidth)
-			$strScale = 'y';
-		else
-			$strScale = 'x';
-
-		if ($strScale == 'y')
-			$intRatio = $intWidth / $intHeight;
-		else
-			$intRatio = $intHeight / $intWidth;
-
-		// Ratios
-		$intRatioY = $intNewHeight / $intHeight;
-		$intRatioX = $intNewWidth / $intWidth;
-
-		// Recalculate sizes
-		if (($strNewScale == 'y') && ($strScale == 'y')) {
-			$intNewWidth = intval($intRatioY * $intWidth);
+		{
+			$neww = round($intWidth / $rh);
+			$newh = $intNewHeight;
 		}
-		else if (($strNewScale == 'x') && ($strScale == 'x')) {
-			$intNewHeight = intval($intRatioX * $intHeight);
-		}
-		else if (($strNewScale == 'y') && ($strScale == 'x')) {
-			$intNewHeight = intval($intRatioX * $intHeight);
-		}
-		else if (($strNewScale == 'x') && ($strScale == 'y')) {
-			$intNewWidth = intval($intRatioY * $intWidth);
-		}
-		return array($intNewWidth,$intNewHeight);
+		return array($neww,$newh);
+
 	}
 
 	/**

@@ -39,7 +39,7 @@ class tieredshippingAdminForm extends CFormModel
 	{
 		return array(
 			'title' => 'After making changes and clicking Save, you can  '.
-				CHtml::link('Editing Shipping Tiers','#',array('class'=>'settiers','id'=>get_class($this))) .' to define your ranges. You can '.CHtml::link('Set Product Restrictions','#',array('class'=>'basic','id'=>get_class($this))) .' for this module.',
+				CHtml::link('Edit Shipping Tiers','#',array('class'=>'settiers','id'=>get_class($this))) .' to define your ranges. You can '.CHtml::link('Set Product Restrictions','#',array('class'=>'basic','id'=>get_class($this))) .' for this module.',
 
 			'elements'=>array(
 				'label'=>array(

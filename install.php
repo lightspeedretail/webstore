@@ -1,6 +1,6 @@
 <?php
 set_time_limit(300);
-define('VERSION',"3.0.0");
+define('VERSION',"3.0.0.1");
 define('DBARRAY_NUM', MYSQL_NUM);define('DBARRAY_ASSOC', MYSQL_ASSOC);define('DBARRAY_BOTH', MYSQL_BOTH);if (!defined('DB_EXPLAIN')) { define('DB_EXPLAIN', false);}if (!defined('DB_QUERIES')) { define('DB_QUERIES', false);}
 
 
@@ -237,7 +237,8 @@ function displayNotAcceptable($checkenv)
 	displayHeader();
 
 	$warning_text = "<table class='table table-striped'>";
-	if ($_SERVER['REQUEST_URI'] ==  "/install.php?check") {
+	if (stripos($_SERVER['REQUEST_URI'],"install.php?check") !== false) {
+		?><h2>System Check</h2><?php
 		$warning_text .= "<tr><td colspan='2'><b>SYSTEM CHECK for " . _xls_version() . "</b></td></tr>";
 		$warning_text .= "<tr><td colspan='2'>The chart below shows the results of the system check and if upgrades have been performed.</td></td>";
 
@@ -727,7 +728,8 @@ function zipAndFolders()
 {
 
 	decompress("webstore.zip");
-
+	@unlink("webstore.zip");
+	
 	//////////////////////////////////////////////////////////////////
 	// Verify the cache folders exist and if not, create them
 	// These may fail if cache isn't yet writable, so we ignore errors
@@ -2664,7 +2666,7 @@ function initialConfigLoad($db)
 	$db->add_config_key("LISTING_IMAGE_WIDTH","Product Grid image width",180,"Product Listing Image Width. Comes in search or category listing page",29,1,"INT");
 	$db->add_config_key("LISTING_IMAGE_HEIGHT","Product Grid image height",190,"Product Listing Image Height. Comes in search or category listing page",29,2,"INT");
 	$db->add_config_key("DETAIL_IMAGE_WIDTH","Product Detail Image Width",256,"Product Detail Page Image Width. When the product is being viewed in the product detail page.",29,5,"INT");
-	$db->add_config_key("DETAIL_IMAGE_HEIGHT","Product Detail Image Width",256,"Product Detail Page Image Height. When the product is being viewed in the product detail page.",29,6,"INT");
+	$db->add_config_key("DETAIL_IMAGE_HEIGHT","Product Detail Image Height",256,"Product Detail Page Image Height. When the product is being viewed in the product detail page.",29,6,"INT");
 	$db->add_config_key("PRODUCT_SIZE_LABEL","Product Size Label","Size","Rename Size Option of LightSpeed to this",8,2,NULL);
 	$db->add_config_key("PRODUCT_COLOR_LABEL","Product Color Label","Color","Rename Color Option of LightSpeed to this",8,1,NULL);
 	$db->add_config_key("MINI_IMAGE_WIDTH","Shopping Cart image width",30,"Mini Cart Image Width. For images in the mini cart for every page.",29,3,"INT");
@@ -2741,7 +2743,7 @@ function initialConfigLoad($db)
 	$db->add_config_key("SEO_CATEGORY_TITLE","Category pages Title format","{name} : {storename}","Which elements appear in the title of a category page",23,1,"NULL");
 	$db->add_config_key("SEO_CUSTOMPAGE_TITLE","Custom pages Title format","{name} : {storename}","Which elements appear in the title of a custom page",23,2,"NULL");
 	$db->add_config_key("CATEGORY_IMAGE_WIDTH","Category Page Image Width",180,"if using a Category Page image",29,7,"INT");
-	$db->add_config_key("CATEGORY_IMAGE_HEIGHT","Category Page Image Width",180,"if using a Category Page image",29,8,"INT");
+	$db->add_config_key("CATEGORY_IMAGE_HEIGHT","Category Page Image Height",180,"if using a Category Page image",29,8,"INT");
 	$db->add_config_key("PREVIEW_IMAGE_WIDTH","Preview Thumbnail (Product Detail Page) Width",60,"Preview Thumbnail image",29,9,"INT");
 	$db->add_config_key("PREVIEW_IMAGE_HEIGHT","Preview Thumbnail (Product Detail Page) Height",60,"Preview Thumbnail image",29,10,"INT");
 	$db->add_config_key("SLIDER_IMAGE_WIDTH","Slider Image Width",90,"Slider on custom pages",29,11,"INT");
@@ -3919,6 +3921,8 @@ function parse_php_info()
 	$phpinfo['session']['session.use_cookies'] == "On" ? "pass" : "fail");
 //	$checked['session.use_only_cookies must be turned Off'] = (
 //	$phpinfo['session']['session.use_only_cookies'] == "Off" ? "pass" : "fail");
+	$checked['PDO Library'] = isset($phpinfo['PDO']) ? "pass" : "fail";
+	$checked['pdo_mysql Library'] = isset($phpinfo['pdo_mysql']) ? "pass" : "fail";
 	$checked['Zip Library'] = isset($phpinfo['zip']) ? "pass" : "fail";
 	$checked['Soap Library'] = ($phpinfo['soap']['Soap Client'] == "enabled" ? "pass" : "fail");
 	$checked['OpenSSL'] = ($phpinfo['openssl']['OpenSSL support'] == "enabled" ? "pass" : "fail");

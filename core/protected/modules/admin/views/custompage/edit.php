@@ -61,7 +61,7 @@
 
 	<div class="span11">
 	    <h4>Edit Page Content</h4>
-		<div class="tip">Click in the first tool on the toobar to switch to editing HTML directly. Note this editor can be used for HTML and CSS, but any scripting language like JavaScript will not be functional.</div>
+		<div class="tip">Click on the first tool on the toolbar to switch to editing HTML directly. Note this editor can be used for HTML and CSS, but any scripting language like JavaScript will not be functional.</div>
 		<?php
 		$this->widget('ImperaviRedactorWidget', array(
 			'model' => $model,
