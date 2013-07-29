@@ -409,11 +409,17 @@ class BaseCheckoutForm extends CFormModel
 		$retHtml = "";
 		foreach($objModules as $obj)
 		{
+			$CheckoutForm = clone $this;
+			$CheckoutForm->billingState = State::CodeById($CheckoutForm->billingState);
+			$CheckoutForm->billingCountry = Country::CodeById($CheckoutForm->billingCountry);
+			$CheckoutForm->shippingState = State::CodeById($CheckoutForm->shippingState);
+			$CheckoutForm->shippingCountry = Country::CodeById($CheckoutForm->shippingCountry);
+
 			$moduleValue = $obj->module;
 			$objModule = Yii::app()->getComponent($moduleValue);
 			if (!$objModule)
 				Yii::log("Error missing module ".$moduleValue, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-			elseif($objModule->setCheckoutForm($this)->Show)
+			elseif($objModule->setCheckoutForm($CheckoutForm)->Show)
 				$retHtml .= CHtml::tag('option',
 					array('value'=>$obj->id),CHtml::encode($objModule->Name),true);
 
@@ -658,7 +664,7 @@ class BaseCheckoutForm extends CFormModel
 	/** for cached shipping */
 	public function getSavedCartScenarios()
 	{
-		if (isset(Yii::app()->session['ship.cartscenarios.cache'])) {
+		if (isset(Yii::app()->session['ship.cartscenarios.cache']) && is_array(Yii::app()->session['ship.cartscenarios.cache'])) {
 			$strReturn = "{";
 			$outercount=0;
 			foreach (Yii::app()->session['ship.cartscenarios.cache'] as $key => $value) {

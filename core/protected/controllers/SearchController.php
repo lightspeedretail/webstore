@@ -73,6 +73,7 @@ class SearchController extends Controller
 
 		$strC = Yii::app()->getRequest()->getQuery('cat');
 		$strB = Yii::app()->getRequest()->getQuery('brand');
+		$strS = Yii::app()->getRequest()->getQuery('class_name');
 		$strInv='';
 
 		//If we haven't passed any criteria, we just query the database
@@ -82,40 +83,68 @@ class SearchController extends Controller
 		if (!empty($strC)) {
 
 			$objCategory = Category::LoadByRequestUrl($strC);
-			$criteria->join='LEFT JOIN xlsws_product_category_assn as ProductAssn ON ProductAssn.product_id=Product.id';
-			$intIdArray = array($objCategory->id);
-			$intIdArray = array_merge($intIdArray, $objCategory->GetBranchPath());
-			$criteria->addInCondition('category_id', $intIdArray);
+			if($objCategory)
+			{
+				$criteria->join='LEFT JOIN xlsws_product_category_assn as ProductAssn ON ProductAssn.product_id=Product.id';
+				$intIdArray = array($objCategory->id);
+				$intIdArray = array_merge($intIdArray, $objCategory->GetBranchPath());
+				$criteria->addInCondition('category_id', $intIdArray);
 
-			$this->pageTitle=$objCategory->PageTitle;
-			$this->pageDescription=$objCategory->PageDescription;
-			$this->pageImageUrl = $objCategory->CategoryImage;
-			$this->breadcrumbs = $objCategory->Breadcrumbs;
-			$this->pageHeader = $objCategory->label;
+				$this->pageTitle=$objCategory->PageTitle;
+				$this->pageDescription=$objCategory->PageDescription;
+				$this->pageImageUrl = $objCategory->CategoryImage;
+				$this->breadcrumbs = $objCategory->Breadcrumbs;
+				$this->pageHeader = $objCategory->label;
 
-			$this->subcategories = $objCategory->SubcategoryTree;
+				$this->subcategories = $objCategory->SubcategoryTree;
 
-			if ($objCategory->custom_page)
-				$this->custom_page_content = $objCategory->customPage->page;
+				if ($objCategory->custom_page)
+					$this->custom_page_content = $objCategory->customPage->page;
 
-			$this->CanonicalUrl = $this->createAbsoluteUrl($objCategory->Link);
+				$this->CanonicalUrl = $this->createAbsoluteUrl($objCategory->Link);
+			}
+
+
 
 		}
 
 		if (!empty($strB)) {
 
 			$objFamily = Family::LoadByRequestUrl($strB);
+			if($objFamily)
+			{
+				$criteria->addCondition('family_id = :id');
+				$criteria->params = array (':id'=>$objFamily->id);
 
-			$criteria->addCondition('family_id = :id');
-			$criteria->params = array (':id'=>$objFamily->id);
-
-			$this->pageTitle=$objFamily->PageTitle;
-			//$this->pageDescription=$objFamily->PageDescription;
-			//$this->breadcrumbs = $objCategory->Breadcrumbs;
-			$this->pageHeader = $objFamily->family;
+				$this->pageTitle=$objFamily->PageTitle;
+				//$this->pageDescription=$objFamily->PageDescription;
+				//$this->breadcrumbs = $objCategory->Breadcrumbs;
+				$this->pageHeader = $objFamily->family;
 
 
-			$this->CanonicalUrl = $this->createAbsoluteUrl($objFamily->Link);
+				$this->CanonicalUrl = $this->createAbsoluteUrl($objFamily->Link);
+			}
+
+
+		}
+
+		if (!empty($strS)) {
+
+			$objClasses = Classes::LoadByRequestUrl($strS);
+			if($objClasses)
+			{
+				$criteria->addCondition('class_id = :id');
+				$criteria->params = array (':id'=>$objClasses->id);
+
+				//$this->pageTitle=$objClasses->PageTitle;
+				//$this->pageDescription=$objFamily->PageDescription;
+				//$this->breadcrumbs = $objClasses->class_name;
+				$this->pageHeader = $objClasses->class_name;
+				$this->CanonicalUrl = $this->createAbsoluteUrl($objClasses->Link);
+
+
+			}
+
 
 		}
 

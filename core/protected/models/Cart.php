@@ -204,12 +204,21 @@ class Cart extends BaseCart
 				if(!$objDestination)
 					$objDestination = Destination::LoadDefault();
 
+				if(!$objDestination)
+					throw new CHttpException(500,'Web Store missing destination setup. Cannot continue.');
+
 				$this->tax_code_id = $objDestination->taxcode;
+
+				if(!isset($objDestination->taxcode0))
+					throw new CHttpException(500,'Web Store error, destination has invalid tax code. Cannot continue.');
 
 				if ($objDestination->taxcode0->IsNoTax() && Yii::app()->params['TAX_INCLUSIVE_PRICING'])
 					Yii::app()->user->setFlash('warning',Yii::t('global','Note: Because of your default shipping address, prices will be displayed without tax.'));
 
 
+			} else {
+				$objTax = TaxCode::GetDefault();
+				$this->tax_code_id = $objTax->lsid;
 			}
 		}
 
@@ -263,14 +272,9 @@ class Cart extends BaseCart
 
 		$arrItems = $this->cartItems;
 		foreach($arrItems as $objItem) {
-			$objProduct = Product::model()->findByPk($objItem->product_id);
-			$objProduct->inventory_reserved=$objProduct->CalculateReservedInventory();
-			//Since $objProduct->Inventory isn't the real inventory column, it's a calculation,
-			//just pass it to the Avail so we have it for queries elsewhere
-			$objProduct->inventory_avail=$objProduct->Inventory;
-			$objProduct->save();
+			$objItem->product->SetAvailableInventory();
 
-			$objEvent = new CEventProduct(get_class($this),'onUpdateInventory',$objProduct);
+			$objEvent = new CEventProduct(get_class($this),'onUpdateInventory',$objItem->product);
 			_xls_raise_events('CEventProduct',$objEvent);
 
 		}
@@ -355,7 +359,8 @@ class Cart extends BaseCart
 	 * Update Cart by removing discounts if the Cart is expired
 	 */
 	public function ResetDiscounts() {
-		foreach ($this->cartItems as $objItem) {
+		foreach ($this->cartItems as $obj) {
+			$objItem = CartItem::model()->findByPk($obj->id);
 			if ($objItem->Discounted) {
 				$objItem->discount = 0;
 				$objItem->sell_discount = 0;
@@ -443,10 +448,10 @@ class Cart extends BaseCart
 
 		if ($objPromoCode->threshold > $intOriginalSubTotal && $this->fk_promo_id != NULL) {
 			$this->fk_promo_id = NULL;
+			Yii::app()->user->setFlash('error',
+				Yii::t('cart','Promo Code {promocode} no longer applies to your cart and has been removed.',
+					array('{promocode}'=>"<strong>".$objPromoCode->code."</strong>")));
 			$this->ResetDiscounts();
-			CartMessages::CreateMessage($this->id,
-				Yii::t('cart','Promo Code {code} no longer applies to your cart and has been removed.',
-					array('{code}'=>$objPromoCode->Code)));
 			return;
 		}
 

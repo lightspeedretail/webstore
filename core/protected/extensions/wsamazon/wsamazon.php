@@ -5,7 +5,7 @@
  *
  */
 
-class wsamazon extends CApplicationComponent {
+class wsamazon extends ApplicationComponent {
 
 
 	public $category = "CEventProduct,CEventPhoto,CEventOrder";

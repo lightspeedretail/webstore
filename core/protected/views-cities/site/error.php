@@ -11,7 +11,7 @@ if (defined('YII_DEBUG') && YII_DEBUG) {
 	echo '<P></P><div class="error">NOTE: Comment out YII_DEBUG lines in index.php to hide these messages.</div>';
 }
 else {
-	if ($code=="404")
+	if ($code=="404" || $code=="500")
 	{
 		echo '<h2>'.Yii::t('global','Error').' '.$code.'</h2>';
 		echo '<div class="error">'.CHtml::encode($message).'</div>';

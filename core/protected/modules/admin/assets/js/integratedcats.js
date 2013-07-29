@@ -125,7 +125,10 @@ jQuery(function ($) {
                         $('#set-categories-dialog').dialog("close");
                         $('#'+thisid).html(item[1]);
                     }
-                        else alert(data);
+                        else {
+                            $("#alert-box").html(data);
+                            $("#alert-box").dialog("open");
+                    }
 				}, 'json');
 
 			return;

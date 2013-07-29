@@ -97,6 +97,7 @@ class Category extends BaseCategory
 						'text'=>CHtml::link($objItem->label,$objItem->Link),
 						'label' => $objItem->label,
 						'link' => $objItem->Link,
+						'url' => $objItem->Link,
 						'id' => $objItem->id,
 						'child_count' => $objItem->child_count,
 						'children' => $children
@@ -125,6 +126,7 @@ class Category extends BaseCategory
 			'text'=>$person['text'],
 			'label'=>$person['label'],
 			'link'=>$person['link'],
+			'url'=>$person['link'],
 			'id'=>$person['id'],
 			'child_count'=>$person['child_count'],
 			'hasChildren'=>isset($person['children']));
@@ -310,7 +312,7 @@ class Category extends BaseCategory
 
 		if ($objCategory)
 			return $objCategory[0]->GetTrail($strType);
-		else return;
+		else return array();
 
 	}
 
@@ -352,7 +354,8 @@ class Category extends BaseCategory
 					if ($objCategory instanceof Category)
 						array_push($arrPath , $strType=='names' ?
 							$objCategory->label : array( 'key' => $objCategory->id , 'tag' => 'c' ,
-								'name' => $objCategory->label , 'link' => $objCategory->Link));
+								'name' => $objCategory->label , 'url' => $objCategory->Link,
+								'link' => $objCategory->Link));
 
 					$objCategory = $objCategory->parent0;
 
@@ -361,7 +364,8 @@ class Category extends BaseCategory
 			if ($objCategory instanceof Category)
 				array_push($arrPath , $strType=='names' ?
 					$objCategory->label : array( 'key' => $objCategory->id , 'tag' => 'c' ,
-						'name' => $objCategory->label , 'link' => $objCategory->Link));
+						'name' => $objCategory->label , 'url' => $objCategory->Link,
+						'link' => $objCategory->Link));
 		}
 		catch (Exception $objExc) {
 			Yii::log('GetTrail failed, probably uploading categories out of order : ' . $objExc, 'error', 'application.'.__CLASS__.".".__FUNCTION__);

@@ -32,7 +32,10 @@ jQuery(function ($) {
             $.post(yii.urls.base + "/admin/ajax/UpdateRestrictions", $("#restrictions").serialize(), function(data){
                 if (data=='success')
                     window.location.reload(true);
-                else alert(data);
+                else {
+                    $("#alert-box").html(data);
+                    $("#alert-box").dialog("open");
+                }
             });
             //$('#setpromo-modal').dialog("close");
 

@@ -31,7 +31,10 @@ jQuery(function ($) {
             $.post(yii.urls.base + "/admin/shipping/tiers", $("#tier-grid").serialize(), function(data){
                 if (data=='success')
                     window.location.reload(true);
-                else alert(data);
+                else {
+                    $("#alert-box").html(data);
+                    $("#alert-box").dialog("open");
+                }
             });
 
             return;

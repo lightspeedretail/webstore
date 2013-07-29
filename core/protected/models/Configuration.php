@@ -386,6 +386,12 @@ return array(
 			case 'EMAIL_TEST':
 				return array(1=>'On',0=>'Off');
 
+			case 'AUTO_UPDATE_TRACK':
+				return array(0=>'Release Versions',1=>'Beta and Release Versions');
+
+			default:
+				return array(1=>'On',0=>'Off');
+
 		}
 
 

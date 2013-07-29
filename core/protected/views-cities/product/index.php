@@ -58,6 +58,7 @@
 		            <div class="row">
 			            <?php if (_xls_get_conf('ENABLE_WISH_LIST'))
 				            echo CHtml::tag('div',array(
+					            'id'=>'addToWishList',
 					            'class'=>'wishlist span5',
 					            'onClick'=>CHtml::ajax(array(
 						            'url'=>array('wishlist/add'),
@@ -81,6 +82,7 @@
 
 			            <?= CHtml::tag('div',array(
 				            'class'=>'addcart span5',
+				            'id'=>'addToCart',
 				            'onClick'=>CHtml::ajax(array(
 					            'url'=>array('cart/AddToCart'),
 					            //If we are viewing a matrix product, Add To Cart needs to pass selected options, otherwise just our model id
@@ -166,7 +168,7 @@
 							'Other items you may be interested in:'),
 						'emptyText'=>'',
 						'titleText' => '$data->Title',
-						'captionText' => '$data->Title."<br>"._xls_currency($data->sell)',
+						'captionText' => '$data->Title."<br>"._xls_currency($data->Price)',
 						'target' => 'do-not-delete-this',
 						//'wrap' => 'circular',
 						'visible' => true,

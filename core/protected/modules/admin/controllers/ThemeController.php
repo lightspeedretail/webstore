@@ -18,7 +18,7 @@ class ThemeController extends AdminBaseController
 	{
 		return array(
 			array('allow',
-				'actions'=>array('index','edit','gallery','header','manage','upload'),
+				'actions'=>array('index','edit','gallery','header','manage','upload','upgrade'),
 				'roles'=>array('admin'),
 			),
 		);
@@ -68,6 +68,12 @@ class ThemeController extends AdminBaseController
 
 		if (isset($_POST['theme']))
 		{
+			if (isset($_POST['btnUpgrade']) && $_POST['btnUpgrade']=="btnUpgrade")
+			{
+				$strTheme = $_POST['theme'];
+				$this->actionUpgrade($strTheme);
+				return;
+			}
 
 			if (isset($_POST['yt2']) && $_POST['yt2']=="btnClean")
 			{
@@ -104,34 +110,17 @@ class ThemeController extends AdminBaseController
 
 		if (isset($_POST['gallery']))
 		{
-
-			$d = YiiBase::getPathOfAlias('webroot')."/themes";
-
-			$arrThemes = $this->getGalleryThemes();
-
 			$strTheme = $_POST['gallery'];
-
-			$path = $arrThemes[$strTheme]['installfile'];
-			$data = $this->getFile($path);
-			$f=file_put_contents($d."/".$strTheme.".zip", $data);
-
-			if ($f)
+			$blnExtract = $this->downloadTheme($arrThemes,$strTheme);
+			if($blnExtract)
 			{
-				$blnExtract = $this->unzipFile($d,$strTheme.".zip");
-				if($blnExtract)
-				{
-					Yii::app()->user->setFlash('success',Yii::t('admin','The {file} theme was downloaded and installed at {time}.',
-						array('{file}'=>"<strong>".$strTheme."</strong>",'{time}'=>date("d F, Y  h:i:sa"))));
-					unlink($d."/".$strTheme.".zip");
-					$this->redirect($this->createUrl("theme/manage"));
-				}
-				else Yii::app()->user->setFlash('error',Yii::t('admin','ERROR! Theme {file} was downloaded but extraction failed. {time}.',
-					array('{file}'=>$strTheme,'{time}'=>date("d F, Y  h:i:sa"))));
-
+				Yii::app()->user->setFlash('success',Yii::t('admin','The {file} theme was downloaded and installed at {time}.',
+					array('{file}'=>"<strong>".$strTheme."</strong>",'{time}'=>date("d F, Y  h:i:sa"))));
+				unlink(YiiBase::getPathOfAlias('webroot')."/themes/".$strTheme.".zip");
+				$this->redirect($this->createUrl("theme/manage"));
 			}
-			else Yii::app()->user->setFlash('error',Yii::t('admin','ERROR! Theme {file} was not downloaded. {time}.',
+			else Yii::app()->user->setFlash('error',Yii::t('admin','ERROR! Theme {file} installation failed. {time}.',
 				array('{file}'=>$strTheme,'{time}'=>date("d F, Y  h:i:sa"))));
-
 
 		}
 
@@ -141,6 +130,62 @@ class ThemeController extends AdminBaseController
 
 		$this->render('gallery',array('arrThemes'=>$arrThemes));
 	}
+
+	protected function downloadTheme($arrThemes,$strTheme)
+	{
+		$d = YiiBase::getPathOfAlias('webroot')."/themes";
+
+		$path = $arrThemes[$strTheme]['installfile'];
+		$data = $this->getFile($path);
+		$f=file_put_contents($d."/".$strTheme.".zip", $data);
+
+		if ($f)
+		{
+			$blnExtract = $this->unzipFile($d,$strTheme.".zip");
+			return $blnExtract;
+
+		}
+		else return false;
+	}
+
+	/**
+	 * Download a new version of a template and trash the old one
+	 */
+	protected function actionUpgrade($strTheme)
+	{
+
+		/*
+		 * Steps for updating template
+
+			create trash folder if doesn't exist
+			rename old folder to trashtimestamp i.e. portland becomes 201307150916-trash-portland
+			move to /themes/trash
+			download new template and unzip
+
+			if we have modified old custom.css
+				copy /themes/trash/201307150916-trash-portland/css/custom.css to new /themes/portland/css/custom.css (since it's always blank)
+		 */
+
+		$d = YiiBase::getPathOfAlias('webroot')."/themes";
+		@mkdir($d."/trash");
+		$strTrash = $d."/trash/".date("YmdHis").$strTheme;
+		rcopy($d."/".$strTheme,$strTrash);
+		rrmdir($d."/".$strTheme);
+
+		//Now that the old version is in the trash, we can grab the new version normally
+		$arrThemes = $this->GalleryThemes;
+		$blnExtract = $this->downloadTheme($arrThemes,$strTheme);
+		if($blnExtract)
+		{
+			//New copy downloaded and extracted. Copy any custom.css
+			@copy ($strTrash."/css/custom.css", $d."/".$strTheme."/css/custom.css");
+			Yii::app()->user->setFlash('success',Yii::t('admin','The {file} theme was updated to the latest version at {time}. Any custom.css file changes were preserved.',
+				array('{file}'=>"<strong>".$strTheme."</strong>",'{time}'=>date("d F, Y  h:i:sa"))));
+			unlink(YiiBase::getPathOfAlias('webroot')."/themes/".$strTheme.".zip");
+			$this->redirect($this->createUrl("theme/manage"));
+		}
+	}
+
 
 	public function actionUpload()
 	{
@@ -272,7 +317,7 @@ class ThemeController extends AdminBaseController
 				//If we don't have old settings saved already, then we can do two things. First, we see
 				//if there is an config.xml for defaults we create. If not, then we just leave the Config table
 				//as is and use those settings, we'll save it next time.
-				$fnOptions = $this->getConfigFile($post['theme']);
+				$fnOptions = self::getConfigFile($post['theme']);
 				if (file_exists($fnOptions)) {
 					$strXml = file_get_contents($fnOptions);
 
@@ -345,7 +390,7 @@ class ThemeController extends AdminBaseController
 		recurse_copy("themes/$original","themes/$tcopy");
 		recurse_copy("core/protected/views","themes/$tcopy/views");
 		recurse_copy("themes/$original","themes/$tcopy");
-		$fnOptions = $this->getConfigFile($tcopy);
+		$fnOptions = self::getConfigFile($tcopy);
 		$arr = array();
 
 		if (file_exists($fnOptions)) {
@@ -412,7 +457,7 @@ class ThemeController extends AdminBaseController
 		$d = dir(YiiBase::getPathOfAlias('webroot')."/themes");
 		while (false!== ($filename = $d->read())) {
 			if ($filename[0] != ".") {
-				$fnOptions = $this->getConfigFile($filename);
+				$fnOptions = self::getConfigFile($filename);
 				if (file_exists($fnOptions)) {
 					$strXml = file_get_contents($fnOptions);
 					$oXML = new SimpleXMLElement($strXml);
@@ -481,7 +526,7 @@ class ThemeController extends AdminBaseController
 
 	protected function buildSubThemes($filename)
 	{
-		$fnOptions = $this->getConfigFile($filename);
+		$fnOptions = self::getConfigFile($filename);
 		$arr = array();
 
 		if (file_exists($fnOptions)) {
@@ -519,8 +564,20 @@ class ThemeController extends AdminBaseController
 
 	}
 
+	public static function getConfig($theme)
+	{
+		$fnOptions = YiiBase::getPathOfAlias('webroot')."/themes/".$theme."/config.xml";
 
-	protected function getConfigFile($filename)
+		if (file_exists($fnOptions))
+		{
+			$strXml = file_get_contents($fnOptions);
+			return new SimpleXMLElement($strXml);
+		} else return null;
+
+	}
+
+
+	protected static function getConfigFile($filename)
 	{
 		return YiiBase::getPathOfAlias('webroot')."/themes/".$filename."/config.xml";
 	}

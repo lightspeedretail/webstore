@@ -181,6 +181,11 @@ class WishlistController extends Controller
 		$model = new WishlistSearch();
 		$objWishlists = array();
 
+		$this->breadcrumbs = array(
+			Yii::t('global','My Wish Lists')=>$this->createUrl("/wishlist"),
+			Yii::t('global','Wish List Search')=>$this->createUrl("wishlist/search"),
+		);
+
 		// collect user input data
 		if(isset($_POST['WishlistSearch']))
 		{

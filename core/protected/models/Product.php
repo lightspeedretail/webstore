@@ -512,7 +512,7 @@ class Product extends BaseProduct
 		//if($bolExtended)
 		if (!$this->inventoried) //non-inventoried items
 			return true;
-		if ($this->GetInventory() > 0)
+		if ($this->getInventory() > 0)
 			return true;
 
 		return false;
@@ -523,12 +523,12 @@ class Product extends BaseProduct
 	 * This is INVENTORY_FIELD_TOTAL aware.
 	 * @return intenger
 	 */
-	protected function GetInventory() {
+	public function getInventory() {
 		$strField = $this->GetInventoryField();
 		$intInventory = $this->$strField;
 
 		if (_xls_get_conf('INVENTORY_RESERVED' , 0) == '1')
-			$intInventory -= $this->inventory_reserved;
+			$intInventory = $this->inventory_avail;
 
 		return ($intInventory < 0 ? 0 : $intInventory);
 
@@ -578,7 +578,7 @@ class Product extends BaseProduct
 			return '';
 		}
 
-		$intValue = $this->GetInventory();
+		$intValue = $this->getInventory();
 
 		if($intValue <= 0)
 			$strMessage = _xls_get_conf('INVENTORY_ZERO_NEG_TITLE', 'Please Call');
@@ -672,27 +672,10 @@ class Product extends BaseProduct
 	 */
 	public function getPriceField($taxInclusive = false) {
 
-//		if (_xls_get_conf('TAX_INCLUSIVE_PRICING')==0)
-//			$strField = "sell_web";
-//		else {
-//			if (Yii::app()->shoppingcart->IsTaxIn || $taxInclusive)
-//				$strField = "sell_web_tax_inclusive";
-//			else
-//				$strField = "sell_web";
-//		}
-
-
-//		if ($this->HasWebPrice($taxInclusive)) {
 			if ($taxInclusive)
 				$strField = "sell_web_tax_inclusive";
 			else
 				$strField = "sell_web";
-//		} else {
-//			if ($taxInclusive)
-//				$strField = "sell_tax_inclusive";
-//			else
-//				$strField = "sell";
-//		}
 
 		return $strField;
 
@@ -950,9 +933,15 @@ class Product extends BaseProduct
 	public function SetAvailableInventory() {
 
 		$this->inventory_reserved=$this->CalculateReservedInventory();
-		//Since $objProduct->Inventory isn't the real inventory column, it's a calculation,
-		//just pass it to the Avail so we have it for queries elsewhere
-		$this->inventory_avail=$this->Inventory;
+
+		$strField = $this->GetInventoryField();
+		$intInventory = $this->$strField;
+
+
+		if (_xls_get_conf('INVENTORY_RESERVED' , 0) == '1')
+		$intInventory -= $this->inventory_reserved;
+
+		$this->inventory_avail=$intInventory;
 		if (!$this->save())
 			return false;
 		else return true;
@@ -1104,7 +1093,7 @@ class Product extends BaseProduct
 		foreach ($objDestinations as $objDestination) {
 			//Because of differences in how Google defines zip code ranges, we can't convert our ranges
 			//to theirs. At this time we won't be able to support zip code ranges
-			if ($objDestination->country != '*' && $objDestination->Zipcode1 == '') {
+			if (!is_null($objDestination->country) && $objDestination->Zipcode1 == '') {
 
 				$objTaxCode = TaxCode::LoadByLS($objDestination->taxcode);
 				//print_r($objTaxCode);
@@ -1116,9 +1105,9 @@ class Product extends BaseProduct
 				}
 
 				//Our four elements
-				$strCountry = $objDestination->country;
-				if ($objDestination->state != '*')
-					$strState = $objDestination->state;
+				$strCountry = Country::CodeById($objDestination->country);
+				if (!is_null($objDestination->state))
+					$strState = State::CodeById($objDestination->state);
 				else
 					$strState = '';
 				//$fltRate -- built above
@@ -1360,8 +1349,6 @@ class Product extends BaseProduct
 				return _xls_get_conf('PRODUCT_SIZE_LABEL' , _sp('Size'));
 			case 'ColorLabel':
 				return _xls_get_conf('PRODUCT_COLOR_LABEL' , _sp('Color'));
-			case 'Inventory':
-				return $this->GetInventory();
 
 			case 'PageTitle':
 				return _xls_truncate($this->GetPageMeta('SEO_PRODUCT_TITLE'),70);

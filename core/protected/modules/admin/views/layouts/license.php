@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>Web Store 3.0 Installation</title>
-	<link rel="stylesheet" href="http://twitter.github.io/bootstrap/assets/css/bootstrap.css">
+	<link rel="stylesheet" href="http://cdn.lightspeedretail.com/bootstrap/css/bootstrap.css">
 	<?php $this->registerAsset('css/admin.css'); ?>
 	<style type="text/css">
 		.header-new {
@@ -22,7 +22,7 @@
 		body { padding-top: 0px;}
 	</style>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-	<script src="http://twitter.github.io/bootstrap/assets/js/bootstrap.js"></script>
+	<script src="http://cdn.lightspeedretail.com/bootstrap/js/bootstrap.js"></script>
 
 </head>
 

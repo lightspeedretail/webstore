@@ -54,6 +54,18 @@ function _xls_site_url($strUrlPath =  '') {
 	return _xls_site_dir($usessl) . '/' . $strUrlPath;
 }
 
+function _xls_theme_config($theme)
+{
+	$fnOptions = YiiBase::getPathOfAlias('webroot')."/themes/".$theme."/config.xml";
+
+	if (file_exists($fnOptions))
+	{
+		$strXml = file_get_contents($fnOptions);
+		return new SimpleXMLElement($strXml);
+	} else return null;
+
+}
+
 function _xls_regionalize($str)
 {
 	$c = Yii::app()->params['DEFAULT_COUNTRY'];
@@ -132,7 +144,13 @@ function _xls_get_events($strEventHandler)
 	$objModules = $dataProvider->getData();
 
 	foreach ($objModules as $module)
-		Yii::import('ext.'.$module->module.".".$module->module);
+	{
+		//See if the extension actually exists either in custom file or our core
+		if(file_exists(Yii::getPathOfAlias('custom.extensions.'.$module->module.".".$module->module).".php"))
+			Yii::import('custom.extensions.'.$module->module.".".$module->module);
+		elseif(file_exists(Yii::getPathOfAlias('ext.'.$module->module.".".$module->module).".php"))
+			Yii::import('ext.'.$module->module.".".$module->module);
+	}
 
 	return $objModules;
 }
@@ -177,7 +195,7 @@ function _xls_convert_errors_display($arrErrors)
 	$strReturn = "\n";
 	foreach ($arrErrors as $key=>$value)
 	{
-		$strReturn .= $key.": ".$value."\n";
+		$strReturn .= $value."\n";
 
 	}
 	return $strReturn;
@@ -1369,7 +1387,9 @@ function _xls_is_ipad() {
  */
 function _xls_is_iphone() {
 
-	if (strpos($_SERVER['HTTP_USER_AGENT'],'iPhone') || strpos($_SERVER['HTTP_USER_AGENT'],'iPod'))
+	if(isset($_SERVER['HTTP_USER_AGENT']) &&
+		strpos($_SERVER['HTTP_USER_AGENT'],'iPhone') ||
+		strpos($_SERVER['HTTP_USER_AGENT'],'iPod'))
 		return true;
 	else return false;
 }
@@ -1402,6 +1422,60 @@ function _xls_avail_languages()
 	}
 	return $data;
 
+}
+
+function _xls_check_version()
+{
+	$url = "http://updater.lightspeedretail.com";
+	//$url = "http://www.lsvercheck.site";
+
+
+	$storeurl = Yii::app()->createAbsoluteUrl("/");
+	$storeurl = str_replace("http://","",$storeurl);
+	$storeurl = str_replace("https://","",$storeurl);
+
+	$oXML = _xls_theme_config(Yii::app()->theme->name);
+
+	if(!is_null($oXML))
+	{
+		$strTheme = Yii::app()->theme->name;
+		$strThemeVersion = _xls_number_only((string)$oXML->version);
+		if(isset($oXML->noupdate) && $oXML->noupdate=='true' && $strTheme != "brooklyn")
+			$strThemeVersion="noupdate";
+
+	} else {
+		$strTheme = "unknown";
+		$strThemeVersion="noupdate";
+	}
+	$data['webstore'] = array(
+		'version'       => XLSWS_VERSIONBUILD,
+		'customer'      => $storeurl,
+		'type'          => (_xls_get_conf('LIGHTSPEED_HOSTING')==1 ? "hosted" : "self"),
+		'theme'         => $strTheme,
+		'themeversion'  => $strThemeVersion,
+		'schema'  => _xls_get_conf('DATABASE_SCHEMA_VERSION')
+
+	);
+	$json = json_encode($data);
+
+	$ch = curl_init($url);
+
+	curl_setopt($ch, CURLOPT_VERBOSE, 1);
+
+	curl_setopt($ch, CURLOPT_HEADER, false);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+	curl_setopt($ch, CURLOPT_HTTPHEADER,
+		array("Content-type: application/json"));
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+
+	$resp = curl_exec($ch);
+	curl_close($ch);
+	return $resp;
 }
 
 function _xls_parse_language($string)
@@ -1737,4 +1811,27 @@ function recurse_copy($src,$dst) {
 		}
 	}
 	closedir($dir);
+}
+function rrmdir($dir) {
+	if (is_dir($dir)) {
+		$files = scandir($dir);
+		foreach ($files as $file)
+			if ($file != "." && $file != "..") rrmdir("$dir/$file");
+		rmdir($dir);
+	}
+	else if (file_exists($dir)) unlink($dir);
+}
+
+// Function to Copy folders and files
+function rcopy($src, $dst) {
+	if (file_exists ( $dst ))
+		rrmdir ( $dst );
+	if (is_dir ( $src )) {
+		mkdir ( $dst );
+		$files = scandir ( $src );
+		foreach ( $files as $file )
+			if ($file != "." && $file != "..")
+				rcopy ( "$src/$file", "$dst/$file" );
+	} else if (file_exists ( $src ))
+		copy ( $src, $dst );
 }

@@ -41,7 +41,8 @@ class CustomerAddress extends BaseCustomerAddress
 			array('customer_id', 'length', 'max'=>20),
 			array('address_label, first_name, last_name, company, address1, address2, city', 'length', 'max'=>255),
 			array('state_id, country_id', 'length', 'max'=>11),
-			array('postal, phone', 'length', 'max'=>64),
+			array('postal', 'length', 'max'=>64),
+			array('phone', 'length','min'=>7, 'max'=>32),
 			array('postal','validatePostal'),
 			array('created,makeDefaultBilling,makeDefaultShipping', 'safe'),
 			// The following rule is used by search().
@@ -80,17 +81,18 @@ class CustomerAddress extends BaseCustomerAddress
 	public function validatePostal($attribute, $params)
 	{
 		$obj = Country::Load($this->country_id);
+		if ($obj instanceof Country)
+		{
+			if ($this->$attribute == '')
+				$this->addError($attribute,
+					Yii::t('yii','{attribute} cannot be blank.',
+						array('{attribute}'=>$this->getAttributeLabel($attribute))));
+			elseif (!is_null($obj->zip_validate_preg) && !_xls_validate_zip($this->$attribute,$obj->zip_validate_preg))
+				$this->addError($attribute,
+					Yii::t('yii','{attribute} format is incorrect for this country.',
+						array('{attribute}'=>$this->getAttributeLabel($attribute))));
 
-		if ($this->$attribute == '')
-			$this->addError($attribute,
-				Yii::t('yii','{attribute} cannot be blank.',
-					array('{attribute}'=>$this->getAttributeLabel($attribute))));
-		elseif (!is_null($obj->zip_validate_preg) && !_xls_validate_zip($this->$attribute,$obj->zip_validate_preg))
-			$this->addError($attribute,
-				Yii::t('yii','{attribute} format is incorrect for this country.',
-					array('{attribute}'=>$this->getAttributeLabel($attribute))));
-
-
+		}
 
 	}
 

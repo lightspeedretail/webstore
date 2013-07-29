@@ -120,6 +120,7 @@ class Controller extends CController
 		}
 
 		Yii::app()->shoppingcart->UpdateMissingProducts();
+		Yii::app()->shoppingcart->RevalidatePromoCode();
 
 		//Run other functions to create some data we always need
 		$this->buildGoogle();

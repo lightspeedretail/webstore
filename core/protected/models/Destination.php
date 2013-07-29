@@ -76,6 +76,10 @@ class Destination extends BaseDestination
 		$criteria->order = 'country,state';
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+
+			'pagination'=>array(
+        'pageSize'=>9999,
+			),
 		));
 	}
 

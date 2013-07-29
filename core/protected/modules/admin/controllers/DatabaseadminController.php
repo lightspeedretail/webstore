@@ -147,10 +147,9 @@ class DatabaseadminController extends AdminBaseController
 
 		$id = Yii::app()->getRequest()->getQuery('id');
 
-
-		$objCart = Cart::model()->findByPk($id);
-		$model = CartPayment::model()->findByPk($objCart->payment_id);
-
+		//
+		$model = CartPayment::model()->findByPk($id);
+		$objCart = Cart::model()->findByAttributes(array('payment_id'=>$id));
 		if (isset($_POST['Cart']) &&  isset($_POST['CartPayment']))
 		{
 
@@ -166,7 +165,6 @@ class DatabaseadminController extends AdminBaseController
 				echo "success";
 
 			} else echo implode(" ",_xls_convert_errors($objCart->getErrors() + $model->getErrors()));
-
 
 		} else echo $this->renderPartial("_pay",array('objCart'=>$objCart,'model'=>$model),true);
 
@@ -218,6 +216,8 @@ class DatabaseadminController extends AdminBaseController
 					Product::model()->updateAll(array('image_id'=>null),'id ='.$_POST['pk']);
 					Images::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
 					ProductCategoryAssn::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
+					WishlistItem::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
+					TaskQueue::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
 					Product::model()->deleteByPk($_POST['pk']);
 					echo "delete";
 				}

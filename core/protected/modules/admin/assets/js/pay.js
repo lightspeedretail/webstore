@@ -29,7 +29,7 @@ jQuery(function ($) {
         },
         send: function () {
 
-            $.post(yii.urls.base + $("#editpending").attr("action"), $("#editpending").serialize(), function(data){
+            $.post($("#editpending").attr("action"), $("#editpending").serialize(), function(data){
                 if (data=='success')
                     window.location.reload(true);
                 else {

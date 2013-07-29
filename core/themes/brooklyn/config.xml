@@ -4,6 +4,7 @@
     <thumbnail>brooklyn.png</thumbnail>
     <version>2.0.0</version>
     <description>Our default template, suitable for any type of business.</description>
+    <noupdate>true</noupdate>
     <credit>Designed by LightSpeed</credit>
     <subthemes>
         <subtheme>

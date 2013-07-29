@@ -66,14 +66,17 @@ class LoginForm extends CFormModel
 
 					case UserIdentity::ERROR_PASSWORD_INVALID:
 						$this->addError('password',Yii::t('global','Incorrect password.'));
+						Yii::log("Login denied: Incorrect password for ".$this->email." attempted login", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 						break;
 
 					case UserIdentity::ERROR_USERNAME_INVALID:
 						$this->addError('password',Yii::t('global','Unknown email address.'));
+						Yii::log("Login denied: Unknown email address ".$this->email." attempted login", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 						break;
 
 					default:
 						$this->addError('password',Yii::t('global','Incorrect username or password.'));
+						Yii::log("Login denied: Incorrect username or password for ".$this->email." attempted login", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				}
 
 
@@ -95,16 +98,20 @@ class LoginForm extends CFormModel
 		}
 		if($this->_identity->errorCode===UserIdentity::ERROR_NONE)
 		{
+			Yii::log("Login authentication passed ", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			$duration=$this->rememberMe ? 3600*24*30  : 0 ; // true = 30 days, false=until browser close
 			Yii::app()->user->login($this->_identity,$duration);
 
 			//Assign the user to the cart
+			Yii::log("Assigning customer id #".Yii::app()->user->id, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			Yii::app()->shoppingcart->assignCustomer(Yii::app()->user->id);
 
 			//Since we have successfully logged in, see if we have a cart in progress
+			Yii::log("Merging any prior cart", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			Yii::app()->shoppingcart->loginMerge();
 
 			//Verify prices haven't changed
+			Yii::log("Verifying prices", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			Yii::app()->shoppingcart->verifyPrices();
 			return true;
 		}

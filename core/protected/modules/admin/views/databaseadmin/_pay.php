@@ -4,6 +4,7 @@
 
 	<?php $form=$this->beginWidget('CActiveForm', array(
 	'enableAjaxValidation'=>true,
+	'action'=>$this->createUrl('databaseadmin/pay',array('id'=>$model->id)),
 	'id'=>'editpending',
 	)); ?>
 	<?php echo $form->hiddenField($objCart,'id'); ?>

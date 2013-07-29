@@ -328,6 +328,7 @@ class AdminBaseController extends CController
 				$class != "LoginController" &&
 				$class != "CustomerController" &&
 				$class != "LanguageController" &&
+				$class != "UpgradeController" &&
 				$class != "LicenseController"
 
 				) //Keep these showing up on top

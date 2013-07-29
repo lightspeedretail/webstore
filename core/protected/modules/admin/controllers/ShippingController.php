@@ -101,11 +101,9 @@ class ShippingController extends AdminBaseController
 	 */
 	public function scanShippers()
 	{
-
-		$files=array_merge(
-			glob(YiiBase::getPathOfAlias("ext.wsshipping").'/*', GLOB_ONLYDIR),
-			glob(YiiBase::getPathOfAlias("custom.extensions.shipping").'/*', GLOB_ONLYDIR)
-		);
+		$arrCustom = glob(YiiBase::getPathOfAlias("custom.extensions.shipping").'/*', GLOB_ONLYDIR);
+		if(!is_array($arrCustom)) $arrCustom = array();
+		$files=array_merge(glob(YiiBase::getPathOfAlias("ext.wsshipping").'/*', GLOB_ONLYDIR),$arrCustom);
 
 		foreach ($files as $file)
 		{

@@ -25,14 +25,14 @@ class CartItem extends BaseCartItem
 	}
 
 
-	protected function IsDiscounted() {
+	public function getDiscounted() {
 		if ($this->discount > 0)
 			return true;
 		return false;
 	}
 
 	public function GetPriceField() {
-		if ($this->IsDiscounted())
+		if ($this->getDiscounted())
 			return 'sell_discount';
 		return 'sell';
 
@@ -102,9 +102,6 @@ class CartItem extends BaseCartItem
 //				if(!$this->objProduct)
 //					$this->objProduct = Product::model()->findByPk($this->product_id);
 				return $this->product;
-
-			case 'Discounted':
-				return $this->IsDiscounted();
 
 			case 'Price':
 				return $this->GetPriceValue();

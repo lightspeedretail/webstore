@@ -1,19 +1,4 @@
 <?php $this->Widget('zii.widgets.jui.CJuiDialog',array(
-	'id'=>'alert-box',
-	'options'=>array(
-		'title'=>'Alert',
-		'autoOpen'=>false,
-		'modal'=>'true',
-		'width'=>'400',
-		'height'=>'150',
-		'scrolling'=>'no',
-		'resizable'=>false,
-		'position'=>'center',
-		'draggable'=>false,
-	),
-));
-?>
-<?php $this->Widget('zii.widgets.jui.CJuiDialog',array(
 	'id'=>'setpromo-modal',
 	'options'=>array(
 		'title'=>'View Wish Lists',

@@ -3,7 +3,13 @@
 
 		<h3><?php echo Yii::t('admin','Manage My Themes'); ?></h3>
 		<div class="editinstructions">
-			<?php echo Yii::t('admin','Choose the theme you wish to use. Change {color} options for the theme below the image. Click Set to switch to this theme. Your currently active theme is always listed first.',array('{color}'=>_xls_regionalize('color'))); ?>
+			<?php if (Yii::app()->getRequest()->getQuery('n'))
+				echo "<h4>".Yii::t('admin','Your current template has an update available. Click Upgrade Template below the icon to download the latest version.')."</h4> ";
+
+				echo Yii::t('admin','Choose the theme you wish to use by selecting the graphic and clicking Make Active to switch to the theme. Change {color} options for the currently active theme below the image and clicking Make Active. Your currently active theme is always listed first.',array('{color}'=>_xls_regionalize('color')));
+
+
+			?>
 		</div>
 		<div class="clearfix spaceafter"></div>
 		<div id="thememanage">
@@ -29,9 +35,17 @@
 									picked = "'.$key.'";
 									$("#img"+picked).addClass("selected")'),
 						$objTheme['img']);
-					echo CHtml::tag('div',array(
-							'class'=>'themeoptions',),
-						$objTheme['options']);
+
+				    if($key == Yii::app()->theme->name && Yii::app()->getRequest()->getQuery('n'))
+					    $this->widget('bootstrap.widgets.TbButton', array(
+						'buttonType'=>'submit',
+						'label'=>'Upgrade Template',
+						'type'=>'danger',
+						'size'=>'mini',
+						'htmlOptions'=>array('id'=>'btnUpgrade','name'=>'btnUpgrade','value'=>'btnUpgrade'),
+					)); else echo CHtml::tag('div',array(
+						    'class'=>'themeoptions',),
+					    $key == Yii::app()->theme->name ? $objTheme['options'] : "") ;
 					echo '</div>';
 				endforeach;
 			?>

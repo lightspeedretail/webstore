@@ -1,6 +1,6 @@
 <?php
 set_time_limit(300);
-define('VERSION',"3.0.0.1");
+define('VERSION',"3.0.1");
 define('DBARRAY_NUM', MYSQL_NUM);define('DBARRAY_ASSOC', MYSQL_ASSOC);define('DBARRAY_BOTH', MYSQL_BOTH);if (!defined('DB_EXPLAIN')) { define('DB_EXPLAIN', false);}if (!defined('DB_QUERIES')) { define('DB_QUERIES', false);}
 
 
@@ -13,7 +13,6 @@ if (version_compare(PHP_VERSION, '5.3.0') < 0) {
 define ('__SUBDIRECTORY__', preg_replace('/\/?\w+\.php$/', '', $_SERVER['PHP_SELF']));
 define ('__DOCROOT__', substr(dirname(__FILE__), 0, strlen(dirname(__FILE__)) - strlen(__SUBDIRECTORY__)));
 define ('__VIRTUAL_DIRECTORY__', '');
-
 
 //Installer can only run if the site hasn't been set up
 if(file_exists("config/main.php") && $_SERVER['REQUEST_URI'] != __SUBDIRECTORY__ . "/install.php?check")
@@ -49,14 +48,35 @@ switch ($step)
 
 function xls_check_file_signatures($complete = false)
 {
+	$url = "http://updater.lightspeedretail.com";
+	//$url = "http://www.lsvercheck.site";
+
+	$url .= "/webstore/hash";
+
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_VERBOSE, 1);
+
+	// Turn off the server and peer verification (TrustManager Concept).
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+	$strXml = curl_exec($ch);
+	curl_close($ch);
+	$oXML = new SimpleXMLElement($strXml);
+
+	$signatures = $oXML->signatures;
+	$versions = explode(",",$oXML->versions);
+
 	$checked = array();
 	$checked['<b>--File Signatures Check for ' . _xls_version() . '--</b>'] = "pass";
 
-	include("core/protected/modules/admin/signatures.php");
 
 	$fn = unserialize($signatures);
 	if (!isset($signatures)) {
-		$checked['Signature File in /includes'] = "fail";
+		$checked['Signature File in /core/protected/modules/admin'] = "fail";
 	}
 
 	foreach ($fn as $key => $value) {
@@ -243,7 +263,7 @@ function displayNotAcceptable($checkenv)
 		$warning_text .= "<tr><td colspan='2'>The chart below shows the results of the system check and if upgrades have been performed.</td></td>";
 
 		//For 2.1.x upgrade, have the upgrades been run?
-		if ($_SERVER['REQUEST_URI'] ==  "/install.php?check") {
+		if (stripos($_SERVER['REQUEST_URI'],"install.php?check") !== false) {
 			//$checkenv = array_merge($checkenv, xls_check_upgrades());
 			$checkenv = array_merge($checkenv, xls_check_file_signatures());
 		}
@@ -448,7 +468,7 @@ function displayHeader()
 	<head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Web Store 3.0 Installation</title>
-	    <link rel="stylesheet" href="http://twitter.github.io/bootstrap/assets/css/bootstrap.css">
+	    <link rel="stylesheet" href="http://cdn.lightspeedretail.com/bootstrap/css/bootstrap.css">
 	    <style type="text/css">
 	        .header-new {
 	            background: url("http://www.lightspeedretail.com/wp-content/themes/lightspeed/images/bg-header.jpg") repeat scroll 0 0 transparent;
@@ -466,7 +486,7 @@ function displayHeader()
 		    #stats { font-size: 0.7em; }
 	    </style>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-        <script src="http://twitter.github.io/bootstrap/assets/js/bootstrap.js"></script>
+        <script src="http://cdn.lightspeedretail.com/bootstrap/js/bootstrap.js"></script>
 	</head>
 
 	<body>
@@ -2484,6 +2504,7 @@ function migrateTwoFiveToThree()
 	ALTER TABLE `{newdbname}`.`xlsws_customer` CHANGE `mainephonetype` `mainphonetype` VARCHAR(8)  NULL  DEFAULT NULL;
 	ALTER TABLE `{newdbname}`.`xlsws_product` ADD `sell_web_tax_inclusive` FLOAT  NULL  DEFAULT NULL  AFTER `sell_web`;
 	UPDATE `{newdbname}`.`xlsws_product` set `sell_web_tax_inclusive`=`sell_web`;
+	UPDATE `{newdbname}`.`xlsws_product` set `sell_web_tax_inclusive`=`sell_tax_inclusive` where `sell_tax_inclusive`>0;
 	ALTER TABLE `{newdbname}`.`xlsws_cart_item` ADD `tax_in` TINYINT(2)  UNSIGNED  NULL  DEFAULT NULL  AFTER `serial_numbers`;
 	ALTER TABLE `{newdbname}`.`xlsws_document_item` ADD `tax_in` TINYINT(2)  UNSIGNED  NULL  DEFAULT NULL  AFTER `serial_numbers`;
 	ALTER TABLE `{newdbname}`.`xlsws_family` ADD `child_count` INT(11)  NOT NULL  DEFAULT '0'  AFTER `family`;
@@ -2775,7 +2796,7 @@ function initialDataLoad($db)
 	$sql[] = "insert into xlsws_country set id=224,code='US', region='NA', active=1, sort_order=1, country='United States', zip_validate_preg='/^([0-9]{5})(-[0-9]{4})?$/i'";
 
 	$sql[] = "insert into xlsws_country set id=1,code='AF', region='AS', active=1, sort_order=100, country='Afghanistan'";
-	$sql[] = "insert into xlsws_country set id=2,code='AL', region='EU', active=0, sort_order=10, country='Albania'";
+	$sql[] = "insert into xlsws_country set id=2,code='AL', region='EU', active=1, sort_order=10, country='Albania'";
 	$sql[] = "insert into xlsws_country set id=3,code='DZ', region='AF', active=1, sort_order=10, country='Algeria'";
 	$sql[] = "insert into xlsws_country set id=4,code='AS', region='AU', active=1, sort_order=10, country='American Samoa'";
 	$sql[] = "insert into xlsws_country set id=6,code='AO', region='AF', active=1, sort_order=10, country='Angola'";
@@ -3947,24 +3968,15 @@ function parse_php_info()
 
 	//Check folder permissions
 	 if (file_exists('images'))
-	$checked['/images folder must be writeable'] = (is_writable(__DOCROOT__ . __SUBDIRECTORY__ . '/images')
-		? "pass" : "fail");
+	$checked['/images folder must be writeable'] = (is_writable('images') ? "pass" : "fail");
 	 if (file_exists('assets'))
-	$checked['/assets folder must be writeable'] = (is_writable(
-		__DOCROOT__ . __SUBDIRECTORY__ . '/assets'
-	) ? "pass" : "fail");
+	$checked['/assets folder must be writeable'] = (is_writable('assets') ? "pass" : "fail");
 	 if (file_exists('runtime'))
-		 $checked['/runtime folder must be writeable'] = (is_writable(
-		__DOCROOT__ . __SUBDIRECTORY__ . '/runtime'
-	) ? "pass" : "fail");
+		 $checked['/runtime folder must be writeable'] = (is_writable('runtime') ? "pass" : "fail");
 	 if (file_exists('runtime/cache'))
-		 $checked['/runtime/cache folder must be writeable'] = (is_writable(
-		__DOCROOT__ . __SUBDIRECTORY__ . '/runtime/cache'
-	) ? "pass" : "fail");
+		 $checked['/runtime/cache folder must be writeable'] = (is_writable('runtime/cache') ? "pass" : "fail");
 	 if (file_exists('config'))
-	 $checked['/config folder must be writeable'] = (is_writable(
-		__DOCROOT__ . __SUBDIRECTORY__ . '/config'
-	) ? "pass" : "fail");
+	 $checked['/config folder must be writeable'] = (is_writable('config') ? "pass" : "fail");
 
 	//If any of our items fail, be helpful and show them where the php.ini is. Otherwise, we hide it since working servers shouldn't advertise this
 	if (in_array('fail',$checked))
@@ -4001,4 +4013,3 @@ function parse_php_info()
 	return $checked;
 }
 
-?>

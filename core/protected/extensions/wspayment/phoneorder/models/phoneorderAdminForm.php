@@ -3,6 +3,7 @@
 class phoneorderAdminForm extends CFormModel
 {
 	public $label;
+	public $customeralert = 'Please call us with your credit card details.';
 	public $restrictcountry;
 
 	/**
@@ -11,7 +12,7 @@ class phoneorderAdminForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('label,restrictcountry','required'),
+			array('label,customeralert,restrictcountry','required'),
 		);
 	}
 
@@ -24,6 +25,7 @@ class phoneorderAdminForm extends CFormModel
 	{
 		return array(
 			'label'=>'Label',
+			'customeralert'=>'Notice displayed to customer',
 			'restrictcountry'=>'Only allow this processor',
 		);
 	}
@@ -35,6 +37,10 @@ class phoneorderAdminForm extends CFormModel
 
 			'elements'=>array(
 				'label'=>array(
+					'type'=>'text',
+					'maxlength'=>64,
+				),
+				'customeralert'=>array(
 					'type'=>'text',
 					'maxlength'=>64,
 				),

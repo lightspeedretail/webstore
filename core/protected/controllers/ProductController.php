@@ -87,6 +87,11 @@ class ProductController extends Controller
 		$this->CanonicalUrl = $this->createAbsoluteUrl($model->Link);
 		$this->returnUrl = $this->CanonicalUrl;
 		$model->intQty=1;
+
+		//Raise any events first
+		$objEvent = new CEventProduct(get_class($this),'onActionProductView',$model);
+		_xls_raise_events('CEventProduct',$objEvent);
+
 		$this->render('index',array(
 			'model'=>$model,
 			'WishlistAddForm'=>$objWishlistAddForm,

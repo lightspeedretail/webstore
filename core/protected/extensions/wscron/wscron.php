@@ -14,6 +14,9 @@ class wscron extends CApplicationComponent {
 		Log::GarbageCollect();
 		Wishlist::GarbageCollect();
 
+		//Check for new version
+		_xls_check_version();
+
 		//Pending Emails
 		$this->sendQueueEmails();
 	}

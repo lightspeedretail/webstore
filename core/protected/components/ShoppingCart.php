@@ -397,6 +397,30 @@ class ShoppingCart extends CApplicationComponent
 
 
 	/**
+	 * Make sure our promo code still applies
+	 */
+	public function RevalidatePromoCode()
+	{
+		if ($this->model->fk_promo_id)
+		{
+			$objPromo = PromoCode::model()->findByPk($this->model->fk_promo_id);
+			$objPromo->validatePromocode('code',null);
+			$arrErrors = $objPromo->getErrors();
+			$errCount = count($arrErrors);
+			if ($errCount>0)
+			{
+				Yii::app()->user->setFlash('error',
+					Yii::t('cart','Promo Code {promocode} removed. {reason}',
+						array('{promocode}'=>"<strong>".$objPromo->code."</strong>",
+						'{reason}'=>_xls_convert_errors_display(_xls_convert_errors($arrErrors)))));
+				$this->model->fk_promo_id = NULL;
+				$this->model->ResetDiscounts();
+			}
+		}
+	}
+
+
+	/**
 	 * Disassociate the cart with the current session. Should be done after payment
 	 * is complete but before redirecting to receipt.
 	 */

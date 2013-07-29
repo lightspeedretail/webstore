@@ -6,13 +6,12 @@
 			<strong>Web Store version <?php echo $oXML->displayversion ?> is now available.</strong>
 			<p>
 				<?php if (_xls_get_conf('LIGHTSPEED_HOSTING',0)=="1"): ?>
-					Because your are a hosted customer, your Web Store will be updated for you. We are including this notice as a courtesy only.
+					Because you are a hosted customer, your Web Store will be updated for you. We are including this notice as a courtesy only.
 				<?php endif; ?>
 
 				<?php if (_xls_get_conf('LIGHTSPEED_HOSTING',0)=="0")
-					if(Yii::app()->user->fullname=="LightSpeed")
-						echo "You can download this update by going to our website and clicking Downloads.";
-					else echo "You can download this update directly from ".CHtml::link($oXML->downloadurl,$oXML->downloadurl).".";
+					echo "You can apply this update by clicking on <strong>".
+						CHtml::link('APPLY WEBSTORE UPDATE',$this->createUrl("upgrade/index",array('patch'=>$oXML->autopathfile)))."</strong>.";
 				?>
 
 			</p>

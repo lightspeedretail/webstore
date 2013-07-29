@@ -44,7 +44,7 @@ class MyaccountController extends Controller
 		$model = Customer::GetCurrent();
 
 		$this->breadcrumbs = array(
-			'My Account'=>$this->createUrl("/myaccount"),
+			Yii::t('global','My Account')=>$this->createUrl("/myaccount"),
 		);
 
 		$this->render('index',array('model'=>$model));
@@ -151,8 +151,8 @@ class MyaccountController extends Controller
 		}
 
 		$this->breadcrumbs = array(
-			'My Account'=>$this->createUrl("/myaccount"),
-			'Edit'=>$this->createUrl("myaccount/edit"),
+			Yii::t('global','My Account')=>$this->createUrl("/myaccount"),
+			Yii::t('global','Edit Account')=>$this->createUrl("myaccount/edit"),
 		);
 
 		$model->password = null; //don't bother sending password to form
@@ -165,6 +165,11 @@ class MyaccountController extends Controller
 
 		if (Yii::app()->user->isGuest)
 			$this->redirect($this->createUrl("/myaccount"));
+
+		$this->breadcrumbs = array(
+			Yii::t('global','My Account')=>$this->createUrl("/myaccount"),
+			Yii::t('global','Add an address')=>$this->createUrl("myaccount/address"),
+		);
 
 		$model = new CustomerAddress();
 		$model->country_id = _xls_get_conf('DEFAULT_COUNTRY',224);

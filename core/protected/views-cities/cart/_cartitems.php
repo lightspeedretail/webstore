@@ -70,7 +70,13 @@ if (!isset($model)) $model = Yii::app()->shoppingcart;
 			</div>
 		<?php endif; ?>
 
-
+	<?php if (isset($this->intEditMode) && $this->intEditMode): ?>
+		<div class="row-fluid">
+			<div class="span12 errorMessage">
+				<?php echo Yii::t('cart','Note: Change quantity to zero to remove an item from your cart.'); ?>
+			</div>
+		</div>
+	<?php endif; ?>
 </div>
 
 

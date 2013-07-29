@@ -102,7 +102,11 @@ class wsmailchimp extends CApplicationComponent {
 				$arrReturn = $this->api->listMemberInfo($intListId, $objCustomer->email);
 
 				Yii::log("listMemberInfo returned ".print_r($arrReturn,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-				if ($arrReturn['success'])
+				if ($arrReturn['success'] &&
+					isset($arrReturn['data'][0]['status']) &&
+					$arrReturn['data'][0]['status'] != "unsubscribed" &&
+					$arrReturn['data'][0]['status'] != "pending"
+				)
 					$retval = $this->api->listUpdateMember($intListId, $objCustomer->email,$merge_vars);
 				else
 					return $this->onAddCustomer($event); //just send this to the Add routine

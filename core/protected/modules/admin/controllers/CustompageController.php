@@ -72,7 +72,8 @@ class CustompageController extends AdminBaseController
 				else
 				{
 					Yii::app()->user->setFlash('success',Yii::t('admin','Custom page added on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
-					_rd($this->createUrl("custompage/edit",array('id'=>$model->id)));
+					$this->redirect($this->createUrl("custompage/edit",array('id'=>$model->id)));
+
 				}
 			}
 
@@ -89,7 +90,7 @@ class CustompageController extends AdminBaseController
 		if (!($model instanceof CustomPage))
 		{
 			Yii::app()->user->setFlash('error',"Invalid Custom Page");
-			_rd($this->createUrl("custompage/index"));
+			$this->redirect($this->createUrl("custompage/index"));
 
 		}
 		if(isset($_POST['CustomPage']))
@@ -102,7 +103,7 @@ class CustompageController extends AdminBaseController
 				{
 					$model->delete();
 					Yii::app()->user->setFlash('info',"Custom page has been deleted");
-					_rd($this->createUrl("custompage/index"));
+					$this->redirect($this->createUrl("custompage/index"));
 				}
 				else {
 					$model->request_url =  _xls_seo_url($model->title);

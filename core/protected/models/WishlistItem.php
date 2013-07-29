@@ -67,7 +67,9 @@ class WishlistItem extends BaseWishlistItem
 	public function getPurchaseStatusLabel()
 	{
 
-		if (is_null($this->cart_item_id) && !$this->product->IsAddable)
+		if (is_null($this->cart_item_id) && !$this->product->web)
+				return Yii::t('wishlist','Item no longer for sale');
+		elseif (is_null($this->cart_item_id) && (!$this->product->IsDisplayable || !$this->product->IsAddable))
 				return Yii::t('wishlist','Item Unavailable');
 		elseif (is_null($this->cart_item_id))
 				return Yii::t('wishlist','Not purchased');

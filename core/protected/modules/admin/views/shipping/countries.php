@@ -131,7 +131,7 @@
 				'headerHtmlOptions' => array('style' => 'width: 50px'),
 				'editable' => array(
 					'type' => 'select',
-					'url' => $this->createUrl('shipping/updateState'),
+					'url' => $this->createUrl('shipping/updatecountry'),
 					'source' => "{1: 'enabled',0: 'disabled'}",
 					'emptytext'=> 'disabled',
 					'placement' => 'left',

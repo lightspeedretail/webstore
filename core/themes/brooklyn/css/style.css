@@ -331,7 +331,7 @@ a:hover {  text-decoration: none;   }
 /***** Footy *****/
 #footer { clear: both;}
 #footer .addresshours { height: 70px; margin: 30px 0px 30px 0; padding-top: 30px; padding-bottom: 7px; line-height: 1.2em;}
-#footer .addresshours .indentl { margin-left: 40px; margin-right: -40px; text-transform: uppercase;}
+#footer .addresshours .indentl { margin-left: 40px; margin-right: -40px; text-transform: uppercase; text-align: left;}
 #footer .addresshours .indentr { margin-right: 20px; margin-left: -20px; text-transform: uppercase;}
 #footer .bottomtabs { text-transform: uppercase; text-align: center; font-size: 0.9em;  }
 #footer .bottomtabs a { font-size: 1.1em; font-weight: 400; }

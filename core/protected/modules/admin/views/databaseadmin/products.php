@@ -1,24 +1,9 @@
-<?php $this->Widget('zii.widgets.jui.CJuiDialog',array(
-	'id'=>'alert-box',
-	'options'=>array(
-		'title'=>'Alert',
-		'autoOpen'=>false,
-		'modal'=>'true',
-		'width'=>'400',
-		'height'=>'150',
-		'scrolling'=>'no',
-		'resizable'=>false,
-		'position'=>'center',
-		'draggable'=>false,
-	),
-));
-?>
 <div class="span9">
 
     <h3>Products</h3>
 	<div class="span8">
 	    <div class="editinstructions">
-			<?php echo Yii::t('admin','Please use extreme caution with this option, and contact technical support for assistance. Use this screen to make changes for products which are orphaned. You can also view pending orders including a product to determine issues with inventory levels.'); ?>
+			<?php echo Yii::t('admin','Please use extreme caution with this option, and contact technical support for assistance. Use this screen to make changes for products which are orphaned. You can also view pending orders including a product to determine issues with inventory levels. Note deleting a product will remove it from all wish lists.'); ?>
 	    </div>
     </div>
         <div class="clearfix search">

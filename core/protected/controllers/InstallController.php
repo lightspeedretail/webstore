@@ -75,10 +75,11 @@ class InstallController extends Controller
 	public function actionExportConfig()
 	{
 
+		if(isset($_GET['debug']))
+			Yii::log("Exporting Configuration", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+
 		Configuration::exportConfig();
 		Configuration::exportLogging();
-
-
 
 		echo json_encode(array('result'=>"success"));
 	}
@@ -90,11 +91,12 @@ class InstallController extends Controller
 	{
 
 		$this->online = _xls_number_only($_POST['online']);
-
+		if(isset($_GET['debug']))
+			Yii::log("InstallController on line ".$this->online, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		if ($this->online==1)                       $retval = $this->actionConvertStart();
-		if ($this->online==2) $retval = $this->actionConvertAddressBook();
-		if ($this->online==8)                      $retval = $this->actionConvertModules();
-		if ($this->online>=9 && $this->online<=13) $retval = $this->actionConvertGoogle();
+		if ($this->online==2)                       $retval = $this->actionConvertAddressBook();
+		if ($this->online==8)                       $retval = $this->actionConvertModules();
+		if ($this->online>=9 && $this->online<=13)  $retval = $this->actionConvertGoogle();
 		if ($this->online==14)                      $retval = $this->actionConvertKeywordsToTags();
 		if ($this->online==15)                      $retval = $this->actionConvertFamilies();
 		if ($this->online==16)                      $retval = $this->actionConvertClasses();
@@ -121,7 +123,8 @@ class InstallController extends Controller
 	 */
 	protected function actionConvertStart()
 	{
-
+		if(isset($_GET['debug']))
+			Yii::log("Exporting Configuration", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 
 		Configuration::exportConfig();
 		Configuration::exportLogging();

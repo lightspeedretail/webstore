@@ -32,7 +32,10 @@ jQuery(function ($) {
             $.post(yii.urls.base + "/admin/shipping/destinationrates", $("#destinations").serialize(), function(data){
                 if (data=='success')
                     window.location.reload(true);
-                else alert(data);
+                else {
+                    $("#alert-box").html(data);
+                    $("#alert-box").dialog("open");
+                }
             });
 
             return;

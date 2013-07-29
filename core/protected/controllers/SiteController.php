@@ -77,8 +77,8 @@ class SiteController extends Controller
 
 
 				//We leech off the grid file from search
-				if ( Yii::app()->theme && file_exists('webroot.themes.'.Yii::app()->theme->name.'.search.grid'))
-					$gridFile = 'webroot.themes.'.Yii::app()->theme->name.'.search.grid';
+				if (Yii::app()->theme && file_exists('themes/'.Yii::app()->theme->name.'/views/search/grid.php'))
+					$gridFile = 'webroot.themes.'.Yii::app()->theme->name.'.views.search.grid';
 				else $gridFile = "application.views.search.grid";
 
 				$this->render($gridFile,array(
@@ -159,7 +159,7 @@ class SiteController extends Controller
 		// collect user input data
 		if(isset($_POST['LoginForm']))
 		{
-
+			Yii::log("Attempting login", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			$model->attributes=$_POST['LoginForm'];
 			// validate user input and redirect to the previous page if valid
 			if($model->validate() && $model->login()) {
@@ -169,7 +169,7 @@ class SiteController extends Controller
 				$response_array['status'] = 'error';
 				$response_array['errormsg'] = _xls_convert_errors($model->getErrors());
 			}
-
+			Yii::log("Login results ".print_r($response_array,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			echo json_encode($response_array);
 		}
 

@@ -3,6 +3,7 @@
 class chequeAdminForm extends CFormModel
 {
 	public $label;
+	public $customeralert = 'Please note your order will be pending until the check has cleared.';
 	public $restrictcountry;
 
 	/**
@@ -11,7 +12,7 @@ class chequeAdminForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('label,restrictcountry','required'),
+			array('label,customeralert,restrictcountry','required'),
 		);
 	}
 
@@ -24,6 +25,7 @@ class chequeAdminForm extends CFormModel
 	{
 		return array(
 			'label'=>'Label',
+			'customeralert'=>'Notice displayed to customer',
 			'restrictcountry'=>'Only allow this processor',
 		);
 	}
@@ -37,6 +39,9 @@ class chequeAdminForm extends CFormModel
 				'label'=>array(
 					'type'=>'text',
 					'maxlength'=>64,
+				),
+				'customeralert'=>array(
+					'type'=>'text',
 				),
 				'restrictcountry'=>array(
 					'type'=>'dropdownlist',

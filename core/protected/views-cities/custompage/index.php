@@ -10,7 +10,7 @@
 			'imageUrl' => '$data->Link',
 			'emptyText'=>'',
 			'titleText' => '$data->Title',
-			'captionText' => '$data->Title."<br>"._xls_currency($data->sell)',
+			'captionText' => '$data->Title."<br>"._xls_currency($data->Price)',
 			'target' => 'do-not-delete-this',
 			//'wrap' => 'circular',
 			'visible' => true,

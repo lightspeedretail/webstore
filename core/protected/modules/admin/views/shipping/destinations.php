@@ -56,6 +56,7 @@
 	    'columns'=>array(
 		    array(
 			    'class' => 'editable.EditableColumn',
+			    'sortable'=>false,
 			    'id' => 'country',
 			    'name' => 'country',
 			    'headerHtmlOptions' => array('id'=>'$data->id','style' => 'width: 110px'),
@@ -74,7 +75,7 @@
 									else {
 										var pk = $(this).data("pk");
 										var country = newValue;
-										var state = $("a[rel=Destination_state][data-pk="+pk+"]");
+										var state = $("a[rel=user-grid_Destination_state][data-pk="+pk+"]");
 										var newurl = "'.$this->createUrl('shipping/destinationstates').'?a=1&country_id=" + country;
 										$.get(newurl,function(jsdata) {
 											response = $.parseJSON(jsdata);
@@ -91,6 +92,7 @@
 			    'class' => 'editable.EditableColumn',
 			    'name' => 'state',
 			    'headerHtmlOptions' => array('style' => 'width: 110px'),
+			    'sortable'=>false,
 			    'editable' => array(
 				    'url' => $this->createUrl('shipping/updateDestination'),
 				    'type' => 'select',
@@ -99,7 +101,7 @@
 				    'onInit' => 'js: function(e, params) {
 							if ($(this).data("value")>=0) {
 								var pk = $(this).data("pk");
-								var country = $("a[rel=Destination_country][data-pk="+pk+"]").editable("getValue").country;
+								var country = $("a[rel=user-grid_Destination_country][data-pk="+pk+"]").editable("getValue").country;
 								var newurl = "'.$this->createUrl('shipping/destinationstates').'?a=1&country_id=" + country;
 								$(this).editable("option", "source", newurl);
 							}}',
@@ -113,6 +115,7 @@
 		    ),
 		    array(
 			    'class' => 'editable.EditableColumn',
+			    'sortable'=>false,
 			    'name' => 'zipcode1',
 			    'headerHtmlOptions' => array('style' => 'width: 110px'),
 			    'editable' => array(
@@ -125,6 +128,7 @@
 		    ),
 		    array(
 			    'class' => 'editable.EditableColumn',
+			    'sortable'=>false,
 			    'name' => 'zipcode2',
 			    'headerHtmlOptions' => array('style' => 'width: 110px'),
 			    'editable' => array(
@@ -137,6 +141,7 @@
 		    ),
 		    array(
 			    'class' => 'editable.EditableColumn',
+			    'sortable'=>false,
 			    'name' => 'taxcode',
 			    'headerHtmlOptions' => array('style' => 'width: 110px'),
 			    'editable' => array(

@@ -1,4 +1,4 @@
-<div class="row-fluid">
+<div id="topbar" class="row-fluid">
 	<div class="span9">
 		<div id="headerimage">
 			<?php echo CHtml::link(CHtml::image(Yii::app()->baseUrl._xls_get_conf('HEADER_IMAGE')), Yii::app()->baseUrl."/"); ?>

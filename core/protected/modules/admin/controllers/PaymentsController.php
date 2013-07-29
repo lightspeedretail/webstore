@@ -71,12 +71,9 @@ class PaymentsController extends AdminBaseController
 
 	public function scanPayments()
 	{
-
-		$files=array_merge(
-			glob(YiiBase::getPathOfAlias("ext.wspayment").'/*', GLOB_ONLYDIR),
-			glob(YiiBase::getPathOfAlias("custom.extensions.payment").'/*', GLOB_ONLYDIR)
-		);
-
+		$arrCustom = glob(YiiBase::getPathOfAlias("custom.extensions.payment").'/*', GLOB_ONLYDIR);
+		if(!is_array($arrCustom)) $arrCustom = array();
+		$files=array_merge(glob(YiiBase::getPathOfAlias("ext.wspayment").'/*', GLOB_ONLYDIR),$arrCustom);
 
 		foreach ($files as $file)
 		{

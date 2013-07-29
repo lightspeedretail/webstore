@@ -113,7 +113,7 @@ h3 { margin-top: 2px; }
 .themeicon {  border: 8px solid #EEEEEE; width: 200px; height: 160px;}
 .themeicon.selected {  border: 8px solid #c6d0e5; }
 .themeicon label { padding: 0px; margin: 0px; width: 200px; height: 160px; text-align: left; }
-.themeoptions { font-size: 0.8em; }
+.themeoptions { font-size: 0.8em; min-height: 60px; }
 .themeoptions select { margin-left: 13px; margin-top: 8px; width: 180px; }
 .themeselect { display: none; }
 .themeinstaller {  margin-left: 13px; font-size: 0.8em; font-weight: 600; }
@@ -130,6 +130,7 @@ h3 { margin-top: 2px; }
 
 #btnCopy { display: hidden;}
 #btnClean { display: hidden;}
+#btnUpgrade { margin-left: 53px;}
 
 .hero-unit  legend { font-size: 0.7em; border: none; line-height: 18px; padding-bottom: 16px; }
 .maxhint { max-height: 20px; overflow: hidden; }

@@ -38,7 +38,59 @@ class Family extends BaseFamily
 		return _xls_site_url("/brand/".$this->request_url);
 	}
 
+	public static function GetTree() {
 
+		$criteria = new CDbCriteria();
+		$criteria->alias = 'Family';
+
+		$criteria->order = 'family';
+
+		$objRet = Family::model()->findAll($criteria);
+
+		return Family::getDataFormatted(Family::parseTree($objRet,0));
+
+	}
+
+	protected static function formatData($person) {
+		return array(
+			'text'=>$person['text'],
+			'label'=>$person['label'],
+			'link'=>$person['link'],
+			'url'=>$person['link'],
+			'id'=>$person['id'],
+			'child_count'=>$person['child_count'],
+			'hasChildren'=>0);
+	}
+
+	protected static function getDataFormatted($data) {
+		$personFormatted = array();
+		if (is_array($data))
+			foreach($data as $k=>$person) {
+				$personFormatted[$k] = Family::formatData($person);
+
+			}
+		return $personFormatted;
+	}
+
+	public static function parseTree($objRet, $root = 0)
+	{
+		$return = array();
+		# Traverse the tree and search for direct children of the root
+		foreach($objRet as $objItem) {
+			if ($objItem->child_count>0 || Yii::app()->params['DISPLAY_EMPTY_CATEGORY'])
+			$return[] = array(
+						'text'=>CHtml::link($objItem->family,$objItem->Link),
+						'label' => $objItem->family,
+						'link' => $objItem->Link,
+						'url' => $objItem->Link,
+						'id' => $objItem->id,
+						'child_count' => $objItem->child_count,
+						'children' => null
+					);
+
+		}
+		return empty($return) ? null : $return;
+	}
 	public static function ConvertSEO() {
 
 		$arrFamilies = Family::model()->findAll();

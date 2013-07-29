@@ -1,19 +1,4 @@
 <?php $this->Widget('zii.widgets.jui.CJuiDialog',array(
-	'id'=>'alert-box',
-	'options'=>array(
-		'title'=>'Alert',
-		'autoOpen'=>false,
-		'modal'=>'true',
-		'width'=>'400',
-		'height'=>'150',
-		'scrolling'=>'no',
-		'resizable'=>false,
-		'position'=>'center',
-		'draggable'=>false,
-	),
-));
-
-$this->Widget('zii.widgets.jui.CJuiDialog',array(
 	'id'=>'setpromo-modal',
 	'options'=>array(
 		'title'=>'Manually mark order as paid',
@@ -53,7 +38,7 @@ $this->Widget('zii.widgets.jui.CJuiDialog',array(
 			'name' => 'id_str',
 			'header'=>'Web Order #',
 			'type' => 'raw',
-			'value'=>'"<a href=\"#\" id=\"".$data->id."\" class=\"basic\">".$data->id_str."</a>"',
+			'value'=>'"<a href=\"#\" id=\"".$data->payment->id."\" class=\"basic\">".$data->id_str."</a>"',
 			'headerHtmlOptions' => array('style' => 'span1'),
 		),
 		array(

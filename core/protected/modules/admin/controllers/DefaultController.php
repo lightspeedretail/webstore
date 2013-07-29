@@ -120,14 +120,31 @@ class DefaultController extends AdminBaseController
 	{
 
 	
-		$oXML = $this->checkVersion();
+		$oXML = json_decode(_xls_check_version());
 
-		if (!empty($oXML) && $oXML->webstore->version>XLSWS_VERSIONBUILD)
-			$this->render("newversion",array('oXML'=>$oXML->webstore));
-		else
-			$this->render("index");
+		if (!empty($oXML))
+		{
+			if($oXML->webstore->version>XLSWS_VERSIONBUILD)
+			{
+				if(_xls_get_conf('AUTO_UPDATE','1')=='1' && $oXML->webstore->autopathfile)
+					$this->redirect($this->createUrl("upgrade/index",array('patch'=>$oXML->webstore->autopathfile)));
+				else
+					$this->render("newversion",array('oXML'=>$oXML->webstore));
+				return;
+			}
+			elseif(isset($oXML->webstore->schema) && $oXML->webstore->schema != "current")
+			{
+				$this->redirect($this->createUrl("upgrade/index")); //update without patch file
+			}
+			elseif(isset($oXML->webstore->themedisplayversion))
+			{
+				$this->render("newtemplate",array('oXML'=>$oXML->webstore));
+				return;
+			}
 
+		}
 
+		$this->render("index",array('inls'=>(Yii::app()->user->fullname=="LightSpeed" ? "1" : "0")));
 	}
 
 
@@ -168,45 +185,6 @@ class DefaultController extends AdminBaseController
 		$this->redirect(Yii::app()->createUrl('admin/default'));
 	}
 
-
-	protected function checkVersion()
-	{
-		//ToDo:replace with shipping URL
-		$url = "http://updater.lightspeedretail.com";
-
-
-		$storeurl = $this->createAbsoluteUrl("/");
-		$storeurl = str_replace("http://","",$storeurl);
-		$storeurl = str_replace("https://","",$storeurl);
-
-		$data['webstore'] = array(
-			'version'      => XLSWS_VERSIONBUILD,
-			'customer'    => $storeurl,
-			'type'       => (_xls_get_conf('LIGHTSPEED_HOSTING')==1 ? "hosted" : "self")
-		);
-		$json = json_encode($data);
-
-		$ch = curl_init($url);
-
-		curl_setopt($ch, CURLOPT_VERBOSE, 1);
-
-		curl_setopt($ch, CURLOPT_HEADER, false);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-		curl_setopt($ch, CURLOPT_HTTPHEADER,
-			array("Content-type: application/json"));
-		curl_setopt($ch, CURLOPT_POST, true);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-
-		$resp = curl_exec($ch);
-		curl_close($ch);
-		
-		$oXML= json_decode($resp);
-		return $oXML;
-	}
 
 	public function actionCategorymeta()
 	{

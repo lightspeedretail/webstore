@@ -56,6 +56,7 @@ class Customer extends BaseCustomer
 			array('email', 'required','on'=>'create,createfb,update'),
 			array('first_name,last_name', 'required','on'=>'create,createfb,update,updatepassword'),
 			array('mainphone', 'required','on'=>'create,update,updatepassword'),
+			array('mainphone', 'length','min'=>7, 'max'=>32),
 			array('password,password_repeat', 'required','on'=>'create,updatepassword'),
 
 			// email has to be a valid email address
