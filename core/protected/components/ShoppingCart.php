@@ -68,7 +68,7 @@ class ShoppingCart extends CApplicationComponent
 			} else {
 
 				$objCart = Cart::model()->findByPk($intCartId);
-				if (!$objCart) {
+				if (!$objCart || $objCart->cart_type  != CartType::cart) {
 					//something has happened to the database object
 					Yii::log("Could not find cart ".$intCartId.", creating new one.", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 					$objCart = Cart::InitializeCart();

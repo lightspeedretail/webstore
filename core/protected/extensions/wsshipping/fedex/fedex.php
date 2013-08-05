@@ -9,6 +9,8 @@ class fedex extends WsShipping
 	protected $defaultName = "FedEx";
 
 	public static $service_types = array(
+		'FEDEX_EXPRESS_SAVER'=>'FedEx Express Saver',
+		'FEDEX_2_DAY'=>'FedEx Two-Day Delivery',
 		'FIRST_OVERNIGHT'=>'FedEx First Overnight',
 		'STANDARD_OVERNIGHT'=>'FedEx Standard Overnight',
 		'PRIORITY_OVERNIGHT'=>'FedEx Priority Overnight',

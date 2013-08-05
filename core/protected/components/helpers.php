@@ -1451,6 +1451,7 @@ function _xls_check_version()
 		'version'       => XLSWS_VERSIONBUILD,
 		'customer'      => $storeurl,
 		'type'          => (_xls_get_conf('LIGHTSPEED_HOSTING')==1 ? "hosted" : "self"),
+		'track'         => (_xls_get_conf('AUTO_UPDATE_TRACK','0')==1 ? "beta" : "release"),
 		'theme'         => $strTheme,
 		'themeversion'  => $strThemeVersion,
 		'schema'  => _xls_get_conf('DATABASE_SCHEMA_VERSION')

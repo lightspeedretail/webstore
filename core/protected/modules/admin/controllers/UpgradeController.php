@@ -419,8 +419,9 @@ class UpgradeController extends CController
 		}
 		else
 		{
+			Yii::log("Upgrade.xml error No upgrade files can be found. Update failed.", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			echo json_encode(array('result'=> "No upgrade files can be found. Update failed.",'makeline'=>30,'tag'=>'Final cleanup','total'=>100));
-			die();
+			Yii::app()->end();
 		}
 
 

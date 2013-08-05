@@ -6,7 +6,6 @@
  */
 class WebUser extends CWebUser {
 
-
 	function beforeLogout()
 	{
 

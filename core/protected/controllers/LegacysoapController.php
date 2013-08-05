@@ -13,6 +13,9 @@ class LegacySoapController extends Controller
 {
 
 	public function init() {
+
+		if(Yii::app()->params['INSTALLED'] != '1') die(); //No soap when not installed (or partially installed)
+
 		//do nothing since we don't need a PHP session created for SOAP transactions
 		if(_xls_get_conf('DEBUG_LS_SOAP_CALL'))
 			_xls_log("SOAP DEBUG : " . print_r($GLOBALS['HTTP_RAW_POST_DATA'] , true));

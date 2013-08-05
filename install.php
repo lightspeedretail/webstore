@@ -1,6 +1,6 @@
 <?php
 set_time_limit(300);
-define('VERSION',"3.0.1");
+define('VERSION',"3.0.2");
 define('DBARRAY_NUM', MYSQL_NUM);define('DBARRAY_ASSOC', MYSQL_ASSOC);define('DBARRAY_BOTH', MYSQL_BOTH);if (!defined('DB_EXPLAIN')) { define('DB_EXPLAIN', false);}if (!defined('DB_QUERIES')) { define('DB_QUERIES', false);}
 
 
@@ -152,12 +152,30 @@ function makeSymbolicLink()
 		die("cannot create symbolic link 'views' to point to 'views-cities'");
 
 	$symfile =  "themes/brooklyn";
-	$strOriginal = "../core/themes/brooklyn";
 
-	@unlink($symfile);
-	$retVal = symlink($strOriginal, $symfile);
-	if (!$retVal)
-		die("cannot create symbolic link 'themes/brooklyn' to point to '../core/themes/brooklyn'");
+	if(is_link($symfile))
+		@unlink($symfile);
+	@mkdir("themes/brooklyn");
+	@mkdir("themes/brooklyn/css");
+	@mkdir("themes/brooklyn/views");
+	@mkdir("themes/brooklyn/views/site");
+	if (
+		@symlink("../../core/themes/brooklyn/brooklyn.png", "themes/brooklyn/brooklyn.png")  &&
+		@symlink("../../core/themes/brooklyn/config.xml", "themes/brooklyn/config.xml")  &&
+		@symlink("../../../core/themes/brooklyn/css/dark.css", "themes/brooklyn/css/dark.css")  &&
+		@symlink("../../../core/themes/brooklyn/css/light.css", "themes/brooklyn/css/light.css")  &&
+		@symlink("../../../core/themes/brooklyn/css/style.css", "themes/brooklyn/css/style.css")  &&
+		@symlink("../../../core/themes/brooklyn/css/images", "themes/brooklyn/css/images")  &&
+		@symlink("../../core/themes/brooklyn/README.txt", "themes/brooklyn/README.txt")
+	)
+	{
+		if (!file_exists("themes/brooklyn/css/custom.css"))
+			@copy("core/themes/brooklyn/css/custom.css","themes/brooklyn/css/custom.css");
+		if (!file_exists("themes/brooklyn/views/site/index.php"))
+			@copy("core/themes/brooklyn/views/site/index.php","themes/brooklyn/views/site/index.php");
+	}
+
+
 
 }
 function  _xls_version()
@@ -358,11 +376,10 @@ function displayFormTwo()
 					    var perc = Math.round((100*(online/obj.total)));
 					    perc = perc/2;
 					    document.getElementById('progressbar').style.width = perc + "%";
-					    if (obj.tag)
-						    document.getElementById('stats').innerHTML = obj.tag;
-					    else document.getElementById('stats').innerHTML = "";
+					    if (!obj.tag) obj.tag = "";
+						document.getElementById('stats').innerHTML = obj.tag;
 					    <?php if(isset($_GET['debug'])): ?>
-						    document.getElementById('stats').innerHTML = "Running line "+online + " of " + obj.total + " (" + perc + "%)";
+						    document.getElementById('stats').innerHTML = obj.tag + " Running line "+online + " of " + obj.total + " (" + perc + "%)";
 					    <?php endif; ?>
 					    if (online==obj.total) {
 						    clearInterval(pinttimer);
@@ -424,11 +441,10 @@ function displayFormTwo()
 					    online = obj.makeline;
 					    var perc = 50 + online;
 					    document.getElementById('progressbar').style.width = perc + "%";
-					    if (obj.tag)
+					    if (!obj.tag) obj.tag = "";
 					    document.getElementById('stats').innerHTML = obj.tag;
-					    else document.getElementById('stats').innerHTML = "";
 					    <?php if(isset($_GET['debug'])): ?>
-						document.getElementById('stats').innerHTML = "online "+online + " total "+obj.total + " perc " + perc;
+						document.getElementById('stats').innerHTML = obj.tag + " at " + " (" + perc + "%)";
 					    <?php endif; ?>
 					    if (online==obj.total) {
 						    clearInterval(pinttimer);

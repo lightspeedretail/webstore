@@ -33,10 +33,6 @@ class Family extends BaseFamily
 		return Family::model()->findByAttributes(array('family'=>$strName));
 
 	}
-	public function GetLink() {
-
-		return _xls_site_url("/brand/".$this->request_url);
-	}
 
 	public static function GetTree() {
 
@@ -153,10 +149,31 @@ class Family extends BaseFamily
 
 	}
 
+	public function setLabel($str)
+	{
+		$this->family = $str;
+	}
+	public function getLabel()
+	{
+		return $this->family;
+	}
+	public function getActive()
+	{
+		return 1;
+	}
+	public function getLink() {
+
+		return _xls_site_url("/brand/".$this->request_url);
+	}
+	public function getUrl()
+	{
+		return $this->getLink();
+	}
+
+
 	public function __get($strName) {
 		switch ($strName) {
-		case 'Link':
-			return $this->GetLink();
+
 		case 'RequestUrl':
 			return $this->request_url;
 		case 'PageTitle':

@@ -62,7 +62,7 @@ class Customer extends BaseCustomer
 			// email has to be a valid email address
 			array('email', 'email'),
 			array('email,email_repeat', 'safe'),
-			array('email', 'validateEmailUnique','on'=>'create,createfb,update'),
+			array('email', 'validateEmailUnique','on'=>'create,createfb'),
 			array('email_repeat', 'validateEmailRepeat','on'=>'create,createfb'),
 			// verifyCode needs to be entered correctly
 			//array('verifyCode', 'captcha', 'allowEmpty'=>!CCaptcha::checkRequirements()),

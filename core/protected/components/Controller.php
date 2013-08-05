@@ -56,12 +56,12 @@ class Controller extends CController
 	 */
 	public function init() {
 
-		if (Yii::app()->params['STORE_OFFLINE']>0)
+		if (Yii::app()->params['STORE_OFFLINE']>0 || Yii::app()->params['INSTALLED'] != '1')
 		{
 			if (isset($_GET['offline']))
 				Yii::app()->session['STORE_OFFLINE'] = _xls_number_only($_GET['offline']);
 
-			if (Yii::app()->session['STORE_OFFLINE'] != Yii::app()->params['STORE_OFFLINE'])
+			if (Yii::app()->session['STORE_OFFLINE'] != Yii::app()->params['STORE_OFFLINE'] || Yii::app()->params['INSTALLED'] != '1')
 			{
 				$this->render('/site/offline');
 				Yii::app()->end();

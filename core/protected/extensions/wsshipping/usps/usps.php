@@ -21,21 +21,44 @@ class usps extends WsShipping
 	protected $defaultName = "USPS";
 
 	public static $service_types = array(
-		'Express Mail' => 'Express Mail',
-	    'Express Mail Hold For Pickup' => 'Express Mail Hold For Pickup',
-	    'Express Mail SundayHoliday Delivery' =>  'Express Mail Sunday/Holiday Delivery',
-	    'Express Mail Flat Rate Boxes' =>   'Express Mail Flat Rate Boxes',
-	    'Express Mail Flat Rate Boxes Hold For Pickup' =>  'Express Mail Flat Rate Boxes Hold For Pickup',
-	    'Express Mail SundayHoliday Delivery Flat Rate Boxes' =>'Express Mail Sunday/Holiday Delivery Flat Rate Boxes',
-	    'Express Mail Flat Rate Envelope' => 'Express Mail Flat Rate Envelope' ,
-	    'Express Mail Flat Rate Envelope Hold For Pickup' =>     'Express Mail Flat Rate Envelope Hold For Pickup',
-	    'Express Mail SundayHoliday Delivery Flat Rate Envelope' =>  'Express Mail Sunday/Holiday Delivery Flat Rate Envelope',
-	    'Express Mail Legal Flat Rate Envelope' => 'Express Mail Legal Flat Rate Envelope',
-	    'Express Mail Legal Flat Rate Envelope Hold For Pickup' => 'Express Mail Legal Flat Rate Envelope Hold For Pickup',
-	    'Express Mail SundayHoliday Delivery Legal Flat Rate Envelope' =>   'Express Mail Sunday/Holiday Delivery Legal Flat Rate Envelope',
-	    'Express Mail Padded Flat Rate Envelope' => 'Express Mail Padded Flat Rate Envelope',
-	    'Express Mail Padded Flat Rate Envelope Hold For Pickup' => 'Express Mail Padded Flat Rate Envelope Hold For Pickup',
-	    'Express Mail SundayHoliday Delivery Padded Flat Rate Envelope' => 'Express Mail Sunday/Holiday Delivery Padded Flat Rate Envelope',
+
+		//These show up if you're sending a longer distance and it needs to be express
+		'Priority Mail Express 1-Day' => 'Priority Mail Express 1-Day',
+	    'Priority Mail Express 1-Day Hold For Pickup' => 'Priority Mail Express 1-Day Hold For Pickup',
+	    'Priority Mail Express 1-Day Flat Rate Boxes' => 'Priority Mail Express 1-Day Flat Rate Boxes',
+	    'Priority Mail Express 1-Day Flat Rate Boxes Hold For Pickup' => 'Priority Mail Express 1-Day Flat Rate Boxes Hold For Pickup',
+	    'Priority Mail Express 1-Day Flat Rate Envelope' =>  'Priority Mail Express 1-Day Flat Rate Envelope',
+	    'Priority Mail Express 1-Day Flat Rate Envelope Hold For Pickup' => 'Priority Mail Express 1-Day Flat Rate Envelope Hold For Pickup',
+	    'Priority Mail Express 1-Day Legal Flat Rate Envelope' =>   'Priority Mail Express 1-Day Legal Flat Rate Envelope',
+	    'Priority Mail Express 1-Day Legal Flat Rate Envelope Hold For Pickup' =>  'Priority Mail Express 1-Day Legal Flat Rate Envelope Hold For Pickup',
+	    'Priority Mail Express 1-Day Padded Flat Rate Envelope' => 'Priority Mail Express 1-Day Padded Flat Rate Envelope',
+	    'Priority Mail Express 1-Day Padded Flat Rate Envelope Hold For Pickup' =>  'Priority Mail Express 1-Day Padded Flat Rate Envelope Hold For Pickup',
+
+		//These show up if you're sending to your local area where you'd get 1 day anyway (i.e. NY to NY)
+		'Priority Mail 1-Day' =>  'Priority Mail 1-Day',
+		'Priority Mail 1-Day Large Flat Rate Box' => 'Priority Mail 1-Day Large Flat Rate Box',
+		'Priority Mail 1-Day Medium Flat Rate Box' => 'Priority Mail 1-Day Medium Flat Rate Box',
+		'Priority Mail 1-Day Small Flat Rate Box' => 'Priority Mail 1-Day Small Flat Rate Box',
+		'Priority Mail 1-Day Flat Rate Envelope' => 'Priority Mail 1-Day Flat Rate Envelope',
+		'Priority Mail 1-Day Legal Flat Rate Envelope' => 'Priority Mail 1-Day Legal Flat Rate Envelope',
+		'Priority Mail 1-Day Padded Flat Rate Envelope' => 'Priority Mail 1-Day Padded Flat Rate Envelope',
+		'Priority Mail 1-Day Gift Card Flat Rate Envelope' => 'Priority Mail 1-Day Gift Card Flat Rate Envelope',
+		'Priority Mail 1-Day Small Flat Rate Envelope' =>  'Priority Mail 1-Day Small Flat Rate Envelope',
+		'Priority Mail 1-Day Window Flat Rate Envelope' => 'Priority Mail 1-Day Window Flat Rate Envelope',
+
+		//These show up for slightly slower service when sending longer distance
+	    'Priority Mail 2-Day' =>  'Priority Mail 2-Day',
+	    'Priority Mail 2-Day Large Flat Rate Box' => 'Priority Mail 2-Day Large Flat Rate Box',
+	    'Priority Mail 2-Day Medium Flat Rate Box' => 'Priority Mail 2-Day Medium Flat Rate Box',
+	    'Priority Mail 2-Day Small Flat Rate Box' => 'Priority Mail 2-Day Small Flat Rate Box',
+	    'Priority Mail 2-Day Flat Rate Envelope' => 'Priority Mail 2-Day Flat Rate Envelope',
+	    'Priority Mail 2-Day Legal Flat Rate Envelope' => 'Priority Mail 2-Day Legal Flat Rate Envelope',
+	    'Priority Mail 2-Day Padded Flat Rate Envelope' => 'Priority Mail 2-Day Padded Flat Rate Envelope',
+	    'Priority Mail 2-Day Gift Card Flat Rate Envelope' => 'Priority Mail 2-Day Gift Card Flat Rate Envelope',
+	    'Priority Mail 2-Day Small Flat Rate Envelope' =>  'Priority Mail 2-Day Small Flat Rate Envelope',
+	    'Priority Mail 2-Day Window Flat Rate Envelope' => 'Priority Mail 2-Day Window Flat Rate Envelope',
+
+		//Standard delivery times
 	    'Priority Mail' =>  'Priority Mail',
 	    'Priority Mail Large Flat Rate Box' => 'Priority Mail Large Flat Rate Box',
 	    'Priority Mail Medium Flat Rate Box' =>  'Priority Mail Medium Flat Rate Box',
@@ -169,6 +192,7 @@ class usps extends WsShipping
 
 		}
 
+
 		return $arrServices;
 	}
 
@@ -263,6 +287,7 @@ class usps extends WsShipping
 	}
 
 	public function cleanMethodName($strName) {
+		$strName = str_replace('#8482', '', $strName);
 		$strName = html_entity_decode($strName);
 		$strName = strip_tags($strName);
 		$strName = str_replace('reg', '', $strName);
@@ -318,8 +343,7 @@ class usps extends WsShipping
 		}
 
 		$arrMethods = array_fill_keys($this->methods, '');
-
-
+		Yii::log("USPS All results. " . print_r($retval , true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 		if($showall)
 			return $retval;
 		else

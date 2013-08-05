@@ -112,8 +112,11 @@ class InstallController extends Controller
 		if ($this->online==48)                      $retval = $this->actionCalculateInventory();
 		if ($this->online==49)                      $retval = $this->actionUpdateConfiguration();
 
+		if(isset($_GET['debug']))
+			if(isset($retval['tag']))
+				$retval['tag'] .= " online ".$this->online; else $retval['tag'] = " online ".$this->online;
 
-		echo $retval;
+		echo json_encode($retval);
 
 
 	}
@@ -129,7 +132,7 @@ class InstallController extends Controller
 		Configuration::exportConfig();
 		Configuration::exportLogging();
 
-		return json_encode(array('result'=>"success",'makeline'=>2,'tag'=>'Converting cart addresses','total'=>50));
+		return array('result'=>"success",'makeline'=>2,'tag'=>'Converting cart addresses','total'=>50);
 
 	}
 
@@ -399,7 +402,7 @@ class InstallController extends Controller
 		else
 			$remain=2;
 
-		return json_encode(array('result'=>"success",'makeline'=>$remain,'total'=>50,'tag'=>'Converting cart addresses, '.$results2.' remaining'));
+		return array('result'=>"success",'makeline'=>$remain,'total'=>50,'tag'=>'Converting cart addresses, '.$results2.' remaining');
 
 
 	}
@@ -529,7 +532,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 
 
-		return json_encode(array('result'=>"success",'makeline'=>9,'tag'=>'Installing Google categories (group 1 of 6)','total'=>50));
+		return array('result'=>"success",'makeline'=>9,'tag'=>'Installing Google categories (group 1 of 6)','total'=>50);
 
 	}
 
@@ -613,7 +616,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		}
 		_dbx('SET FOREIGN_KEY_CHECKS=1');
 
-		return json_encode(array('result'=>"success",'makeline'=>($this->online+1),'tag'=>'Installing Google categories (group '.($this->online-7)." of 6)",'total'=>50));
+		return array('result'=>"success",'makeline'=>($this->online+1),'tag'=>'Installing Google categories (group '.($this->online-7)." of 6)",'total'=>50);
 
 	}
 
@@ -667,7 +670,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		foreach($results AS $result)
 			_dbx("update xlsws_wishlist_item set cart_item_id=null where id =".$result['id']);
 
-		return json_encode(array('result'=>"success",'makeline'=>15,'total'=>50));
+		return array('result'=>"success",'makeline'=>15,'total'=>50);
 
 	}
 
@@ -689,7 +692,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		foreach ($objFamilies as $obj)
 			$obj->UpdateChildCount();
 
-		return json_encode(array('result'=>"success",'makeline'=>16,'total'=>50));
+		return array('result'=>"success",'makeline'=>16,'total'=>50);
 	}
 
 	/**
@@ -706,7 +709,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 		Classes::ConvertSEO();
 
-		return json_encode(array('result'=>"success",'makeline'=>18,'total'=>50));
+		return array('result'=>"success",'makeline'=>18,'total'=>50);
 	}
 
 
@@ -756,7 +759,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		_dbx("ALTER TABLE `xlsws_country` DROP `code_a3`;");
 		_dbx("update `xlsws_shipping_tiers` set `class_name`='tieredshipping';");
 
-		return json_encode(array('result'=>"success",'makeline'=>19,'tag'=>'Applying database schema changes','total'=>50));
+		return array('result'=>"success",'makeline'=>19,'tag'=>'Applying database schema changes','total'=>50);
 	}
 
 	/**
@@ -784,7 +787,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 
 
-		return json_encode(array('result'=>"success",'makeline'=>20,'tag'=>'Creating SEO-friendly URLs','total'=>50));
+		return array('result'=>"success",'makeline'=>20,'tag'=>'Creating SEO-friendly URLs','total'=>50);
 
 	}
 	/**
@@ -808,7 +811,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 
 
-		return json_encode(array('result'=>"success",'makeline'=>21,'tag'=>'Creating SEO-friendly URLs','total'=>50));
+		return array('result'=>"success",'makeline'=>21,'tag'=>'Creating SEO-friendly URLs','total'=>50);
 
 	}
 	/**
@@ -834,7 +837,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 
 
-		return json_encode(array('result'=>"success",'makeline'=>25,'tag'=>'Creating SEO-friendly URLs','total'=>50));
+		return array('result'=>"success",'makeline'=>25,'tag'=>'Creating SEO-friendly URLs','total'=>50);
 
 	}
 
@@ -850,12 +853,12 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 		$matches=Yii::app()->db->createCommand('SELECT count(*) FROM '.Product::model()->tableName().' WHERE request_url IS NULL AND title is not null')->queryScalar();
 		if ($matches>0)
-			return json_encode(array('result'=>"success",'makeline'=>25,'tag'=>'Creating SEO-friendly URLs '.$matches.' remaining','total'=>50));
+			return array('result'=>"success",'makeline'=>25,'tag'=>'Creating SEO-friendly URLs '.$matches.' remaining','total'=>50);
 		else
 		{
 			//Getting ready for photo convert, drop any orphaned images with blobs
 			_dbx("delete a from xlsws_images as a left join xlsws_product as b on a.id=b.image_id where image_path is null and a.id=a.parent and b.id is null;");
-			echo json_encode(array('result'=>"success",'makeline'=>32,'tag'=>'Installing Amazon categories (group 1 of 14)','total'=>50));
+			return array('result'=>"success",'makeline'=>32,'tag'=>'Installing Amazon categories (group 1 of 14)','total'=>50);
 
 		}
 
@@ -924,9 +927,9 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		$this->online++;
 
 		if ($this->online-31 == 14)
-			return json_encode(array('result'=>"success",'makeline'=>$this->online,'tag'=>'Removing unused database fields 1', 'total'=>50));
+			return array('result'=>"success",'makeline'=>$this->online,'tag'=>'Removing unused database fields 1', 'total'=>50);
 			else
-				return json_encode(array('result'=>"success",'makeline'=>$this->online,'tag'=>'Installing Amazon categories (group '.($this->online-31)." of 14)", 'total'=>50));
+				return array('result'=>"success",'makeline'=>$this->online,'tag'=>'Installing Amazon categories (group '.($this->online-31)." of 14)", 'total'=>50);
 	}
 
 
@@ -969,7 +972,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 
 
-		return json_encode(array('result'=>"success",'makeline'=>46,'tag'=>'Removing unused database fields 2','total'=>50));
+		return array('result'=>"success",'makeline'=>46,'tag'=>'Removing unused database fields 2','total'=>50);
 
 	}
 
@@ -1005,7 +1008,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 
 
-		return json_encode(array('result'=>"success",'makeline'=>47,'tag'=>'Removing unused database fields 3','total'=>50));
+		return array('result'=>"success",'makeline'=>47,'tag'=>'Removing unused database fields 3','total'=>50);
 
 	}
 
@@ -1017,27 +1020,26 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 	 */
 	protected function actionDropProductFields()
 	{
+		$elements = array('family','class_name','web_keyword1','web_keyword2','web_keyword3','meta_desc','meta_keyword');
+		foreach ($elements as $element)
+		{
+			$res = Yii::app()->db->createCommand("SHOW COLUMNS FROM xlsws_product WHERE Field='".$element."'")->execute();
+			if($res)
+			{
+				Yii::app()->db->createCommand("ALTER TABLE `xlsws_product` DROP `".$element."`")->execute();
+				return array('result'=>"success",'makeline'=>47,'tag'=>'Removed unused database field '.$element,'total'=>50);
 
-		$sqlstrings = "ALTER TABLE `xlsws_product` DROP `family`;
-		ALTER TABLE `xlsws_product` DROP `class_name`;
-		ALTER TABLE `xlsws_product` DROP `web_keyword1`;
-		ALTER TABLE `xlsws_product` DROP `web_keyword2`;
-		ALTER TABLE `xlsws_product` DROP `web_keyword3`;
-		ALTER TABLE `xlsws_product` DROP `meta_desc`;
-		ALTER TABLE `xlsws_product` DROP `meta_keyword`;
-		ALTER TABLE `xlsws_wishlist_item` DROP `registry_status`;
-
-		ALTER TABLE `xlsws_wishlist_item` ADD CONSTRAINT `xlsws_wishlist_item_ibfk_1` FOREIGN KEY (`registry_id`) REFERENCES `xlsws_wishlist` (`id`);";
-
-		$arrSql = explode(";",$sqlstrings);
-
-		foreach ($arrSql as $strSql)
-			if (!empty($strSql))
-				Yii::app()->db->createCommand($strSql)->execute();
+			}
+		}
 
 
+		//If we're done a droppin', move on...
+		Yii::app()->db->createCommand(
+			"ALTER TABLE `xlsws_wishlist_item` DROP `registry_status`;")->execute();
+		Yii::app()->db->createCommand(
+			"ALTER TABLE `xlsws_wishlist_item` ADD CONSTRAINT `xlsws_wishlist_item_ibfk_1` FOREIGN KEY (`registry_id`) REFERENCES `xlsws_wishlist` (`id`);")->execute();
 
-		return json_encode(array('result'=>"success",'makeline'=>48,'tag'=>'Calculating available inventory','total'=>50));
+		return array('result'=>"success",'makeline'=>48,'tag'=>'Calculating available inventory','total'=>50);
 
 	}
 
@@ -1050,10 +1052,10 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		$matches = Product::RecalculateInventory();
 
 		if ($matches>0)
-			return json_encode(array('result'=>"success",'makeline'=>48,'tag'=>'Calculating available inventory '.$matches.' products remaining','total'=>50));
+			return array('result'=>"success",'makeline'=>48,'tag'=>'Calculating available inventory '.$matches.' products remaining','total'=>50);
 		else
 		{
-			return json_encode(array('result'=>"success",'makeline'=>49,'tag'=>'Final cleanup','total'=>50));
+			return array('result'=>"success",'makeline'=>49,'tag'=>'Final cleanup','total'=>50);
 
 		}
 
@@ -1166,7 +1168,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 		_dbx("INSERT INTO `xlsws_modules` (`active`, `module`, `category`, `version`, `name`, `sort_order`,	`configuration`, `modified`, `created`)
 				VALUES (1, 'wsamazon', 'CEventProduct,CEventPhoto,CEventOrder', 1, 'Amazon MWS', 2, NULL, '2013-04-04 11:34:38', NULL);");
-		return json_encode(array('result'=>"success",'makeline'=>50,'total'=>50));
+		return array('result'=>"success",'makeline'=>50,'total'=>50);
 
 	}
 

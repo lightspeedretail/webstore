@@ -542,6 +542,27 @@ class Category extends BaseCategory
 
 	}
 
+	/**
+	 * For current category, return families within the category
+	 * ToDo: This really needs to use a Search class instead, and
+	 * this will not pick up families in subcategories
+	 * Consider this "version 1"
+	 * @return array
+	 */
+	public function getFamilies()
+	{
+		$objCommand = Yii::app()->db->createCommand();
+		$objCommand->select('t4.*,t4.family as label');
+		$objCommand->leftJoin('xlsws_product_category_assn t2', 't1.id=t2.product_id');
+		$objCommand->leftJoin('xlsws_category t3', 't2.category_id=t3.id');
+		$objCommand->leftJoin('xlsws_family t4', 't1.family_id=t4.id');
+		$objCommand->where('t2.category_id=:categoryid and family is not null');
+		$objCommand->from('xlsws_product t1');
+		$objCommand->group('t4.id');
+		$objCommand->order('t4.family');
+		$objCommand->bindValue('categoryid',$this->id, PDO::PARAM_STR);
+		return Family::model()->populateRecords($objCommand->QueryAll(),false);
+	}
 
 	/**
 	 * Since Validate tests to make sure certain fields have values, populate requirements here such as the modified timestamp

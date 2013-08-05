@@ -238,7 +238,7 @@ class wsamazon extends ApplicationComponent {
 				<MessageID>1</MessageID>
 				<Inventory>
 					<SKU>'.$objProduct->code.'</SKU>
-					<Quantity>'.$objProduct->Inventory.'</Quantity>
+					<Quantity>'.round($objProduct->Inventory,0,PHP_ROUND_HALF_DOWN).'</Quantity>
 					<FulfillmentLatency>1</FulfillmentLatency>
 				</Inventory>
 			</Message>
@@ -572,6 +572,7 @@ class wsamazon extends ApplicationComponent {
 
 				foreach ($orderItemList as $orderItem) {
 
+					Yii::log("Amazon ".$cartId." item found ".print_r($orderItem,true) , 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 					$strCode = $orderItem->getSellerSKU();
 					$intQty = $orderItem->getQuantityOrdered();
 
