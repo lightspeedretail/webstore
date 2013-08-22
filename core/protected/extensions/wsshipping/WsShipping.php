@@ -160,17 +160,23 @@ class WsShipping extends WsExtension
 				$arrRestrictions = $this->config['offerservices'];
 			else
 				$arrRestrictions = array($this->config['offerservices']);
+
+			$arrRestrictions = $shipClass::expandRestrictions($arrRestrictions);
 		}
 		else
 			$arrRestrictions = null;
 
-
 		asort($ret,SORT_NUMERIC);
 
-		foreach($ret as $desc=>$returnval) {
+		if (isset($shipClass::$service_types)) //phpstorm flags this as an error but it's fine
+		{
 
-			if (isset($shipClass::$service_types))
-				$serviceTypes = $shipClass::$service_types; //phpstorm flags this as an error but it's fine
+			$serviceTypes = $shipClass::getServiceTypes($shipClass);
+		}
+
+		foreach($ret as $desc=>$returnval)
+		{
+
 			$arrReturn['price']=floatval($returnval)+ floatval($this->config['markup']);
 			$arrReturn['level']=$desc;
 			if (isset($serviceTypes[$desc]))
@@ -231,5 +237,16 @@ class WsShipping extends WsExtension
 			return $this->config['product'];
 		else return "SHIPPING";
 
+	}
+
+	public static function getServiceTypes($class_name)
+	{
+
+		return $class_name::$service_types;
+	}
+
+	public static function expandRestrictions($arrRestrictions)
+	{
+		return $arrRestrictions;
 	}
 }

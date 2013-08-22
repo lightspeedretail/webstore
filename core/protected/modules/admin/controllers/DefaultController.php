@@ -37,7 +37,7 @@ class DefaultController extends AdminBaseController
 	{
 		return array(
 			array('allow',
-				'actions'=>array('edit','index','sidebar','categorymeta','updatecategory'),
+				'actions'=>array('edit','index','sidebar','categorymeta','updatecategory','releasenotes'),
 				'roles'=>array('admin'),
 			),
 			array('allow',
@@ -208,5 +208,15 @@ class DefaultController extends AdminBaseController
 
 
 	}
+
+	public function actionReleasenotes()
+	{
+		$oXML = json_decode(_xls_check_version(true));
+
+//print_r($oXML);die();
+		$this->render("releasenotes", array('oXML'=>$oXML->webstore));
+
+	}
+
 
 }

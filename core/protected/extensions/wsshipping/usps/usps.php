@@ -22,80 +22,84 @@ class usps extends WsShipping
 
 	public static $service_types = array(
 
-		//These show up if you're sending a longer distance and it needs to be express
-		'Priority Mail Express 1-Day' => 'Priority Mail Express 1-Day',
-	    'Priority Mail Express 1-Day Hold For Pickup' => 'Priority Mail Express 1-Day Hold For Pickup',
-	    'Priority Mail Express 1-Day Flat Rate Boxes' => 'Priority Mail Express 1-Day Flat Rate Boxes',
-	    'Priority Mail Express 1-Day Flat Rate Boxes Hold For Pickup' => 'Priority Mail Express 1-Day Flat Rate Boxes Hold For Pickup',
-	    'Priority Mail Express 1-Day Flat Rate Envelope' =>  'Priority Mail Express 1-Day Flat Rate Envelope',
-	    'Priority Mail Express 1-Day Flat Rate Envelope Hold For Pickup' => 'Priority Mail Express 1-Day Flat Rate Envelope Hold For Pickup',
-	    'Priority Mail Express 1-Day Legal Flat Rate Envelope' =>   'Priority Mail Express 1-Day Legal Flat Rate Envelope',
-	    'Priority Mail Express 1-Day Legal Flat Rate Envelope Hold For Pickup' =>  'Priority Mail Express 1-Day Legal Flat Rate Envelope Hold For Pickup',
-	    'Priority Mail Express 1-Day Padded Flat Rate Envelope' => 'Priority Mail Express 1-Day Padded Flat Rate Envelope',
-	    'Priority Mail Express 1-Day Padded Flat Rate Envelope Hold For Pickup' =>  'Priority Mail Express 1-Day Padded Flat Rate Envelope Hold For Pickup',
+		'First-Class Mail Large Envelope',
+		'First-Class Mail Letter',
+		'First-Class Mail Parcel',
+		//'First-Class Mail Postcards',
+		'Priority Mail{0}',
+		//'Priority Mail Express{0} Hold For Pickup',
+        'Priority Mail Express{0}',
+		'Standard Post',
+		'Media Mail',
+		'Library Mail'=>'Library Mail',
+		'Priority Mail Express{0} Flat Rate Envelope',
+		'First-Class Mail Large Postcards',
+		'Priority Mail{0} Flat Rate Envelope',
+		'Priority Mail{0} Medium Flat Rate Box',
+		'Priority Mail{0} Large Flat Rate Box',
+		'Priority Mail Express{0} Sunday/Holiday Delivery',
+		'Priority Mail Express{0} Sunday/Holiday Delivery Flat Rate Envelope',
+		//'Priority Mail Express{0} Flat Rate Envelope Hold For Pickup',
+		'Priority Mail{0} Small Flat Rate Box',
+		'Priority Mail{0} Padded Flat Rate Envelope',
+		'Priority Mail Express{0} Legal Flat Rate Envelope',
+		//'Priority Mail Express{0} Legal Flat Rate Envelope Hold For Pickup',
+		'Priority Mail Express{0} Sunday/Holiday Delivery Legal Flat Rate Envelope',
+		//'Priority Mail{0} Hold For Pickup',
+		//'Priority Mail{0} Large Flat Rate Box Hold For Pickup',
+		//'Priority Mail{0} Medium Flat Rate Box Hold For Pickup',
+		//'Priority Mail{0} Small Flat Rate Box Hold For Pickup',
+		//'Priority Mail{0} Flat Rate Envelope Hold For Pickup',
+  		'Priority Mail{0} Gift Card Flat Rate Envelope',
+		//'Priority Mail{0} Gift Card Flat Rate Envelope Hold For Pickup',
+		'Priority Mail{0} Window Flat Rate Envelope',
+		//'Priority Mail{0} Window Flat Rate Envelope Hold For Pickup',
+        'Priority Mail{0} Small Flat Rate Envelope',
+		//'Priority Mail{0} Small Flat Rate Envelope Hold For Pickup',
+        'Priority Mail{0} Legal Flat Rate Envelope',
+		//'Priority Mail{0} Legal Flat Rate Envelope Hold For Pickup',
+		//'Priority Mail{0} Padded Flat Rate Envelope Hold For Pickup',
+		'Priority Mail{0} Regional Rate Box A',
+		//'Priority Mail{0} Regional Rate Box A Hold For Pickup',
+		'Priority Mail{0} Regional Rate Box B',
+		//'Priority Mail{0} Regional Rate Box B Hold For Pickup',
+		//'First-Class Package Service Hold For Pickup',
+		'Priority Mail Express{0} Flat Rate Boxes',
+		//'Priority Mail Express{0} Flat Rate Boxes Hold For Pickup',
+		'Priority Mail Express{0} Sunday/Holiday Delivery Flat Rate Boxes',
+		'Priority Mail{0} Regional Rate Box C',
+		//'Priority Mail{0} Regional Rate Box C Hold For Pickup',
+		'First-Class Package Service',
+		'Priority Mail Express{0} Padded Flat Rate Envelope',
+		//'Priority Mail Express{0} Padded Flat Rate Envelope Hold For Pickup',
+		'Priority Mail Express{0} Sunday/Holiday Delivery Padded Flat Rate Envelope',
 
-		//These show up if you're sending to your local area where you'd get 1 day anyway (i.e. NY to NY)
-		'Priority Mail 1-Day' =>  'Priority Mail 1-Day',
-		'Priority Mail 1-Day Large Flat Rate Box' => 'Priority Mail 1-Day Large Flat Rate Box',
-		'Priority Mail 1-Day Medium Flat Rate Box' => 'Priority Mail 1-Day Medium Flat Rate Box',
-		'Priority Mail 1-Day Small Flat Rate Box' => 'Priority Mail 1-Day Small Flat Rate Box',
-		'Priority Mail 1-Day Flat Rate Envelope' => 'Priority Mail 1-Day Flat Rate Envelope',
-		'Priority Mail 1-Day Legal Flat Rate Envelope' => 'Priority Mail 1-Day Legal Flat Rate Envelope',
-		'Priority Mail 1-Day Padded Flat Rate Envelope' => 'Priority Mail 1-Day Padded Flat Rate Envelope',
-		'Priority Mail 1-Day Gift Card Flat Rate Envelope' => 'Priority Mail 1-Day Gift Card Flat Rate Envelope',
-		'Priority Mail 1-Day Small Flat Rate Envelope' =>  'Priority Mail 1-Day Small Flat Rate Envelope',
-		'Priority Mail 1-Day Window Flat Rate Envelope' => 'Priority Mail 1-Day Window Flat Rate Envelope',
-
-		//These show up for slightly slower service when sending longer distance
-	    'Priority Mail 2-Day' =>  'Priority Mail 2-Day',
-	    'Priority Mail 2-Day Large Flat Rate Box' => 'Priority Mail 2-Day Large Flat Rate Box',
-	    'Priority Mail 2-Day Medium Flat Rate Box' => 'Priority Mail 2-Day Medium Flat Rate Box',
-	    'Priority Mail 2-Day Small Flat Rate Box' => 'Priority Mail 2-Day Small Flat Rate Box',
-	    'Priority Mail 2-Day Flat Rate Envelope' => 'Priority Mail 2-Day Flat Rate Envelope',
-	    'Priority Mail 2-Day Legal Flat Rate Envelope' => 'Priority Mail 2-Day Legal Flat Rate Envelope',
-	    'Priority Mail 2-Day Padded Flat Rate Envelope' => 'Priority Mail 2-Day Padded Flat Rate Envelope',
-	    'Priority Mail 2-Day Gift Card Flat Rate Envelope' => 'Priority Mail 2-Day Gift Card Flat Rate Envelope',
-	    'Priority Mail 2-Day Small Flat Rate Envelope' =>  'Priority Mail 2-Day Small Flat Rate Envelope',
-	    'Priority Mail 2-Day Window Flat Rate Envelope' => 'Priority Mail 2-Day Window Flat Rate Envelope',
-
-		//Standard delivery times
-	    'Priority Mail' =>  'Priority Mail',
-	    'Priority Mail Large Flat Rate Box' => 'Priority Mail Large Flat Rate Box',
-	    'Priority Mail Medium Flat Rate Box' =>  'Priority Mail Medium Flat Rate Box',
-	    'Priority Mail Small Flat Rate Box' => 'Priority Mail Small Flat Rate Box',
-	    'Priority Mail Flat Rate Envelope' => 'Priority Mail Flat Rate Envelope',
-	    'Priority Mail Legal Flat Rate Envelope' =>   'Priority Mail Legal Flat Rate Envelope',
-	    'Priority Mail Padded Flat Rate Envelope' => 'Priority Mail Padded Flat Rate Envelope',
-	    'Priority Mail Gift Card Flat Rate Envelope' =>  'Priority Mail Gift Card Flat Rate Envelope',
-	    'Priority Mail Small Flat Rate Envelope' => 'Priority Mail Small Flat Rate Envelope',
-	    'Priority Mail Window Flat Rate Envelope' => 'Priority Mail Window Flat Rate Envelope',
-	    'Standard Post' => 'Standard Post',
-	    'Media Mail' => 'Media Mail',
-	    'Library Mail' => 'Library Mail',
-		
-		'Global Express Guaranteed GXG' => 'Global Express Guaranteed GXG' ,
-	    'Global Express Guaranteed Non-Document Rectangular' => 'Global Express Guaranteed Non-Document Rectangular',
-	    'Global Express Guaranteed Non-Document Non-Rectangular' => 'Global Express Guaranteed Non-Document Non-Rectangular',
-	    'USPS GXGtrade Envelopes' => 'USPS GXG Envelopes',
-	    'Express Mail International' => 'Express Mail International',
-	    'Express Mail International Flat Rate Boxes' => 'Express Mail International Flat Rate Boxes',
-	    'Express Mail International Flat Rate Envelope' => 'Express Mail International Flat Rate Envelope',
-	    'Express Mail International Legal Flat Rate Envelope' => 'Express Mail International Legal Flat Rate Envelope',
-	    'Express Mail International Padded Flat Rate Envelope' => 'Express Mail International Padded Flat Rate Envelope',
-	    'Priority Mail International' => 'Priority Mail International',
-	    'Priority Mail International Large Flat Rate Box' => 'Priority Mail International Large Flat Rate Box',
-	    'Priority Mail International Medium Flat Rate Box' => 'Priority Mail International Medium Flat Rate Box',
-	    'Priority Mail International Small Flat Rate Box' => 'Priority Mail International Small Flat Rate Box',
-	    'Priority Mail International DVD Flat Rate priced box' => 'Priority Mail International DVD Flat Rate priced box',
-	    'Priority Mail International Large Video Flat Rate priced box' => 'Priority Mail International Large Video Flat Rate priced box',
-	    'Priority Mail International Flat Rate Envelope' => 'Priority Mail International Flat Rate Envelope',
-	    'Priority Mail International Legal Flat Rate Envelope' =>  'Priority Mail International Legal Flat Rate Envelope' ,
-	    'Priority Mail International Padded Flat Rate Envelope' => 'Priority Mail International Padded Flat Rate Envelope',
-	    'Priority Mail International Gift Card Flat Rate Envelope' => 'Priority Mail International Gift Card Flat Rate Envelope',
-	    'Priority Mail International Small Flat Rate Envelope' => 'Priority Mail International Small Flat Rate Envelope',
-	    'Priority Mail International Window Flat Rate Envelope' => 'Priority Mail International Window Flat Rate Envelope' ,
-	    'First-Class Package International Servicetrade' => 'First-Class Package International Service',
-	    'First-Class Mail International Large Envelope' => 'First-Class Mail International Large Envelope'
+		'Priority Mail Express International',
+		'Priority Mail International',
+		'Global Express Guaranteed (GXG)',
+		'Global Express Guaranteed Document',
+		'Global Express Guaranteed Non-Document Rectangular',
+		'Global Express Guaranteed Non-Document Non-Rectangular',
+		'Priority Mail International Flat Rate Envelope',
+		'Priority Mail International Medium Flat Rate Box',
+		'Priority Mail Express International Flat Rate Envelope',
+		'Priority Mail International Large Flat Rate Box',
+		'USPS GXG Envelopes',
+		'First-Class Mail International Letter',
+		'First-Class Mail International Large Envelope',
+		'First-Class Package International Service',
+		'Priority Mail International Small Flat Rate Box',
+		'Priority Mail Express International Legal Flat Rate Envelope',
+		'Priority Mail International Gift Card Flat Rate Envelope',
+		'Priority Mail International Window Flat Rate Envelope',
+		'Priority Mail International Small Flat Rate Envelope',
+		'First-Class Mail International Postcard',
+		'Priority Mail International Legal Flat Rate Envelope',
+		'Priority Mail International Padded Flat Rate Envelope',
+		'Priority Mail International DVD Flat Rate priced box',
+		'Priority Mail International Large Video Flat Rate priced box',
+		'Priority Mail Express International Flat Rate Boxes',
+		'Priority Mail Express International Padded Flat Rate Envelope'
 	);
 
 	/**
@@ -108,23 +112,38 @@ class usps extends WsShipping
 
 		if(!isset($this->config['offerservices'])) return false;
 
-		if (!is_null($this->CheckoutForm)) {
-			$arrReturn = $this->total(null,
-				$this->objCart,
-				$this->CheckoutForm['shippingCountry'],
-				$this->CheckoutForm['shippingPostal'],
-				$this->CheckoutForm['shippingState'],
-				$this->CheckoutForm['shippingCity'],
-				$this->CheckoutForm['shippingAddress2'],
-				$this->CheckoutForm['shippingAddress1'],
-				'',
-				$this->CheckoutForm['shippingLastName'],
-				$this->CheckoutForm['shippingFirstName']
-			);
+		$weight = $this->objCart->Weight;
+		if(_xls_get_conf('WEIGHT_UNIT' , 'lb') != 'lb')
+			$weight = $weight * 2.2;   // one KG is 2.2 pounds
 
-			if ($arrReturn===false) return array();
-			return $arrReturn;
-		} else  return array();
+		//USPS wants a full country name
+		$countryObj = Country::LoadByCode($this->CheckoutForm->shippingCountry);
+		if($countryObj)
+			$country = $countryObj->country;
+		else
+			$country = "US";
+
+		if (empty($country)) $country = "US";
+
+		if(empty($this->config['username']) || empty($this->config['originpostcode']))
+			return false;
+
+		$this->init_vars(
+			$this->config['username'],
+			$this->config['originpostcode'],
+			$this->CheckoutForm->shippingPostal,
+			$country,
+			$this->config['markup']);
+		$this->addItem(intval($weight) , round(($weight - intval($weight)) *16  , 0) , $this->objCart->total);
+
+		$rates = $this->getRate();
+
+		if(($rates === FALSE) || (count($rates) == 0 )) {
+			Yii::log("USPS: Could not get rates. " . print_r($this , true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			return false;
+		}
+
+		return $this->convertRetToDisplay($rates);
 	}
 
 
@@ -150,17 +169,17 @@ class usps extends WsShipping
 	 * @return array
 	 */
 	public function total($fields, $cart, $country = '', $zipcode = '', $state = '',
-	                      $city = '', $address2 = '', $address1 = '', $company = '', $lname = '', $fname = '') {
+	   $city = '', $address2 = '', $address1 = '', $company = '', $lname = '', $fname = '') {
 
-		$config = $this->config;
-
-		$weight = $cart->Weight;
+//		$config = $this->config;
+//
+//		$weight = $cart->Weight;
 
 		if(_xls_get_conf('WEIGHT_UNIT' , 'lb') != 'lb')
-			$weight = $weight * 2.2;   // one KG is 2.2 pounds
+			$weight = $this->objCart->Weight * 2.2;   // one KG is 2.2 pounds
 
 		//USPS wants a full country name
-		$countryObj = Country::LoadByCode($country);
+		$countryObj = Country::LoadByCode($this->CheckoutForm->shippingCountry);
 		if($countryObj)
 			$country = $countryObj->country;
 		else
@@ -168,11 +187,16 @@ class usps extends WsShipping
 
 		if (empty($country)) $country = "US";
 
-		if(empty($config['username']) || empty($config['originpostcode']))
+		if(empty($this->config['username']) || empty($this->config['originpostcode']))
 			return false;
 
-		$this->init_vars($config['username'] , $config['originpostcode'] , $zipcode , $country , $config['markup']);
-		$this->addItem(intval($weight) , round(($weight - intval($weight)) *16  , 0) , $cart->Total);
+		$this->init_vars(
+			$this->config['username'],
+			$this->config['originpostcode'],
+			$this->CheckoutForm->shippingPostal,
+			$country,
+			$this->config['markup']);
+		$this->addItem(intval($weight) , round(($weight - intval($weight)) *16  , 0) , $this->objCart->total);
 
 		$rates = $this->getRate();
 
@@ -181,19 +205,21 @@ class usps extends WsShipping
 			return false;
 		}
 
-		asort($rates);
-		$arrServices = array();
-		foreach($rates as $desc=>$returnval) {
-			$arrReturn['price']=floatval($returnval);
-			$arrReturn['level']=$desc;
-			$arrReturn['label'] = $desc;
+		return $this->convertRetToDisplay($rates);
 
-			$arrServices[] = $arrReturn;
-
-		}
-
-
-		return $arrServices;
+//		asort($rates);
+//		$arrServices = array();
+//		foreach($rates as $desc=>$returnval) {
+//			$arrReturn['price']=floatval($returnval);
+//			$arrReturn['level']=$desc;
+//			$arrReturn['label'] = $desc;
+//
+//			$arrServices[] = $arrReturn;
+//
+//		}
+//
+//
+//		return $arrServices;
 	}
 
 	/**
@@ -342,12 +368,9 @@ class usps extends WsShipping
 			}
 		}
 
-		$arrMethods = array_fill_keys($this->methods, '');
-		Yii::log("USPS All results. " . print_r($retval , true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-		if($showall)
-			return $retval;
-		else
-			return array_intersect_key($retval, $arrMethods);
+		return $retval;
+
+
 	}
 
 	/**
@@ -425,4 +448,46 @@ class usps extends WsShipping
 		curl_close($c);
 		return $page;
 	}
+
+
+	public static function getServiceTypes($class_name,$process_days=true)
+	{
+		if($process_days)
+		{
+			$arr = array();
+
+			foreach(self::$service_types as $value)
+			{
+				if(stripos($value,"{0}") !== false)
+				{
+					for($x=1; $x<=5; $x++)
+						$arr[] = Yii::t('usps',$value,array('{0}'=>$x."-Day"));
+				} else $arr[] = $value;
+			}
+
+			return array_combine($arr,$arr);
+		}
+
+		else
+			return array_combine(self::$service_types,self::$service_types);
+
+	}
+
+	public static function expandRestrictions($arrRestrictions)
+	{
+
+		$arr = array();
+
+		foreach($arrRestrictions as $key=>$value)
+		{
+			if(stripos($value,"{0}") !== false)
+			{
+				for($x=1; $x<=5; $x++)
+					$arr[] = Yii::t('usps',$value,array('{0}'=>" ".$x."-Day"));
+			} else $arr[] = $value;
+		}
+
+		return $arr;
+	}
+
 }

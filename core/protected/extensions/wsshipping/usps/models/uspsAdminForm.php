@@ -63,7 +63,7 @@ class uspsAdminForm extends CFormModel
 				),
 				'offerservices'=>array(
 					'type'=>'checkboxlist',
-					'items'=>usps::$service_types,
+					'items'=>usps::getServiceTypes('usps',false),
 					'separator'=>'',
 					'template'=>'<div class="offerservices">{input} {label}</div>',
 					'label'=>'Offer these services<br><a onclick="selectall()">Select All</a><br><a onclick="selectnone()">Select None</a><br>'

@@ -116,11 +116,14 @@ class UpgradeController extends CController
 			$strPathToCreate = $path_parts['dirname'];
 
 
-			if (($v->action == 'replace' || $v->action == 'delete') && $v->status == 'critical' && file_exists($strUpgradeFileName)) {
-				if (!isset($v->ignore)) {
+			if (($v->action == 'replace' || $v->action == 'delete') && $v->status == 'critical' && file_exists($strUpgradeFileName))
+			{
+				if (!isset($v->ignore))
+				{
 					$blnError = 1;
 					foreach($v->original_hash as $hash)
-						if (md5_file($v->filename) == $hash) {
+						if (md5_file($v->filename) == $hash)
+						{
 							if (isset($_GET['check'])) echo $v->filename." matched on hash ".$hash."<br>";
 							$blnError=0;
 						} //If one of our hashes matches, clear errorflag
@@ -131,19 +134,16 @@ class UpgradeController extends CController
 				}
 
 				//Even if we ignore changed files, we still have to be able to write critical files
-				if ($v->action == 'replace' && file_exists($v->filename) && !is_writable($v->filename)) {
+				if ($v->action == 'replace' && file_exists($v->filename) && !is_writable($v->filename))
+				{
 					$blnError = 1;
-					$arrErrors[] = $v->filename . " (" . $v->status
-						. ") doesn't have permission to write, cannot be upgraded";
+					$arrErrors[] = $v->filename." (".$v->status.") doesn't have permission to write, cannot be upgraded";
 				}
-				if ($v->action == 'replace' && !file_exists($v->filename) && file_exists($strPathToCreate) && !is_writable($strPathToCreate)) {
+				if ($v->action == 'replace' && !file_exists($v->filename) && file_exists($strPathToCreate) && !is_writable($strPathToCreate))
+				{
 					$blnError = 1;
-					$arrErrors[] = $v->filename . " (" . $v->status
-						. ") doesn't have permission to write, cannot be upgraded";
+					$arrErrors[] = $v->filename." (".$v->status. ") doesn't have permission to write, cannot be upgraded";
 				}
-
-
-
 			}
 
 
@@ -222,7 +222,7 @@ class UpgradeController extends CController
 						foreach($v->original_hash as $hash)
 						{
 							if (md5_file($strOrigFileName) == $hash) $blnReplace = true;
-							if (md5_file($strOrigFileName) != $hash && $v->status == 'critical' && isset($v->ignore)) $blnReplace = true;
+							if ((md5_file($strOrigFileName) != $hash && $v->status == 'critical') || isset($v->ignore)) $blnReplace = true;
 						}
 					}
 
@@ -283,14 +283,19 @@ class UpgradeController extends CController
 
 	}
 
-	public function actionDatabaseUpgrade($online = 50)
+	public function actionDatabaseInstall()
+	{
+		$this->actionDatabaseUpgrade(44,50,'Applying latest database changes...');
+	}
+
+	public function actionDatabaseUpgrade($online = 50, $total=100, $tag='')
 	{
 
 		$oXML = $this->checkForDatabaseUpdates();
 
 		if ($oXML->schema == "current")
 		{
-			echo json_encode(array('result'=>"success",'makeline'=>100,'tag'=>'','total'=>100));
+			echo json_encode(array('result'=>"success",'makeline'=>$total,'tag'=>$tag,'total'=>$total));
 			return;
 		}
 
@@ -324,9 +329,14 @@ class UpgradeController extends CController
 
 		if ($oXML->schema == "current")
 		{
-			echo json_encode(array('result'=>"success",'makeline'=>100,'tag'=>'','total'=>100));
+			echo json_encode(array('result'=>"success",'makeline'=>$total,'tag'=>$tag,'total'=>$total));
 			return;
-		} else echo json_encode(array('result'=>"success",'makeline'=>($online+5),'tag'=>'','total'=>100));
+		} else {
+			$tag .= " ".$oXML->schema;
+			$makeline = ($online+5);
+			if ($makeline>=$total) $makeline -= 5; //keep it from artificially ending
+			echo json_encode(array('result'=>"success",'makeline'=>$makeline,'tag'=>$tag,'total'=>$total));
+		}
 
 	}
 

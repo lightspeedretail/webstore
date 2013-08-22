@@ -48,6 +48,7 @@ class SystemController extends AdminBaseController
 					array('label'=>'Erase abandoned carts &gt; '.intval(_xls_get_conf('CART_LIFE' , 30)).' days', 'url'=>array('system/erasecarts')),
 				array('label'=>'System Log', 'linkOptions'=>array('class'=>'nav-header')),
 					array('label'=>'View Log', 'url'=>array('system/log')),
+					array('label'=>'Latest Release Notes', 'url'=>array('default/releasenotes')),
 
 		);
 

@@ -107,17 +107,19 @@ class InstallController extends Controller
 		if ($this->online==25)                      $retval = $this->actionConvertProductSEO();
 		if ($this->online>=32 && $this->online<=44) $retval = $this->actionImportAmazon();
 		if ($this->online==45)                      $retval = $this->actionDropcustomerfields();
-		if ($this->online==46)                      $retval = $this->actionDropMoreCartfields();
-		if ($this->online==47)                      $retval = $this->actionDropProductFields();
-		if ($this->online==48)                      $retval = $this->actionCalculateInventory();
-		if ($this->online==49)                      $retval = $this->actionUpdateConfiguration();
+		if ($this->online==46)                      $retval = $this->actionDropProductFields();
+		if ($this->online==47)                      $retval = $this->actionCalculateInventory();
+		if ($this->online==48)                      $retval = $this->actionUpdateConfiguration();
+		if ($this->online==49)                      $retval = $this->actionApplyLatestChanges();
 
-		if(isset($_GET['debug']))
-			if(isset($retval['tag']))
-				$retval['tag'] .= " online ".$this->online; else $retval['tag'] = " online ".$this->online;
+		if($retval != null)
+		{
+			if(isset($_GET['debug']))
+				if(isset($retval['tag']))
+					$retval['tag'] .= " online ".$this->online; else $retval['tag'] = " online ".$this->online;
 
-		echo json_encode($retval);
-
+			echo json_encode($retval);
+		}
 
 	}
 
@@ -131,6 +133,11 @@ class InstallController extends Controller
 
 		Configuration::exportConfig();
 		Configuration::exportLogging();
+
+		//And download brooklyn as a default
+		$filename = Yii::getPathOfAlias('webroot.themes').DIRECTORY_SEPARATOR.'brooklyn';
+		if(!file_exists($filename))
+			downloadBrooklyn();
 
 		return array('result'=>"success",'makeline'=>2,'tag'=>'Converting cart addresses','total'=>50);
 
@@ -977,49 +984,27 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 	}
 
 
-	/**
-	 * 46 Drop fields no longer needed
-	 */
-	protected function actionDropMoreCartfields()
-	{
-
-		$sqlstrings = "ALTER TABLE `xlsws_cart` DROP `full_name`;
-		ALTER TABLE `xlsws_cart` DROP `phone`;
-		ALTER TABLE `xlsws_cart` DROP `shipping_method`;
-		ALTER TABLE `xlsws_cart` DROP `shipping_module`;
-		ALTER TABLE `xlsws_cart` DROP `shipping_data`;
-		ALTER TABLE `xlsws_cart` DROP `shipping_cost`;
-		ALTER TABLE `xlsws_cart` DROP `shipping_sell`;
-		ALTER TABLE `xlsws_cart` DROP `payment_method`;
-		ALTER TABLE `xlsws_cart` DROP `payment_module`;
-		ALTER TABLE `xlsws_cart` DROP `payment_data`;
-		ALTER TABLE `xlsws_cart` DROP `payment_amount`;
-		ALTER TABLE `xlsws_cart` DROP `datetime_posted`;
-		ALTER TABLE `xlsws_cart` DROP `tracking_number`;
-		ALTER TABLE `xlsws_cart` DROP `email`;
-		ALTER TABLE `xlsws_cart` DROP `cost_total`;
-		ALTER TABLE `xlsws_cart` DROP `sell_total`;";
-
-		$arrSql = explode(";",$sqlstrings);
-
-		foreach ($arrSql as $strSql)
-			if (!empty($strSql))
-				Yii::app()->db->createCommand($strSql)->execute();
-
-
-
-		return array('result'=>"success",'makeline'=>47,'tag'=>'Removing unused database fields 3','total'=>50);
-
-	}
-
-
 
 	/**
-	 * 47 Drop product fields
+	 * 46 Drop product fields
 	 * @return string
 	 */
 	protected function actionDropProductFields()
 	{
+		$elements = array('full_name','phone','shipping_method','shipping_module','shipping_data',
+			'shipping_cost','shipping_sell','payment_method','payment_module','payment_data','payment_amount',
+			'datetime_posted','tracking_number','email','cost_total','sell_total');
+		foreach ($elements as $element)
+		{
+			$res = Yii::app()->db->createCommand("SHOW COLUMNS FROM xlsws_cart WHERE Field='".$element."'")->execute();
+			if($res)
+			{
+				Yii::app()->db->createCommand("ALTER TABLE `xlsws_cart` DROP `".$element."`")->execute();
+				return array('result'=>"success",'makeline'=>46,'tag'=>'Removed unused database field '.$element,'total'=>50);
+
+			}
+		}
+
 		$elements = array('family','class_name','web_keyword1','web_keyword2','web_keyword3','meta_desc','meta_keyword');
 		foreach ($elements as $element)
 		{
@@ -1027,7 +1012,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 			if($res)
 			{
 				Yii::app()->db->createCommand("ALTER TABLE `xlsws_product` DROP `".$element."`")->execute();
-				return array('result'=>"success",'makeline'=>47,'tag'=>'Removed unused database field '.$element,'total'=>50);
+				return array('result'=>"success",'makeline'=>46,'tag'=>'Removed unused database field '.$element,'total'=>50);
 
 			}
 		}
@@ -1039,12 +1024,12 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		Yii::app()->db->createCommand(
 			"ALTER TABLE `xlsws_wishlist_item` ADD CONSTRAINT `xlsws_wishlist_item_ibfk_1` FOREIGN KEY (`registry_id`) REFERENCES `xlsws_wishlist` (`id`);")->execute();
 
-		return array('result'=>"success",'makeline'=>48,'tag'=>'Calculating available inventory','total'=>50);
+		return array('result'=>"success",'makeline'=>47,'tag'=>'Calculating available inventory','total'=>50);
 
 	}
 
 	/**
-	 * 48 Create request_urls and export any photos (from pre 2.5 installs)
+	 * 47 Create request_urls and export any photos (from pre 2.5 installs)
 	 */
 	public function actionCalculateInventory()
 	{
@@ -1052,10 +1037,10 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		$matches = Product::RecalculateInventory();
 
 		if ($matches>0)
-			return array('result'=>"success",'makeline'=>48,'tag'=>'Calculating available inventory '.$matches.' products remaining','total'=>50);
+			return array('result'=>"success",'makeline'=>47,'tag'=>'Calculating available inventory '.$matches.' products remaining','total'=>50);
 		else
 		{
-			return array('result'=>"success",'makeline'=>49,'tag'=>'Final cleanup','total'=>50);
+			return array('result'=>"success",'makeline'=>48,'tag'=>'Final cleanup','total'=>50);
 
 		}
 
@@ -1066,53 +1051,11 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 
 
 	/**
-	 * 49 Cleanup details, config options that have changed, NULL where we had 0's, etc.
+	 * 48 Cleanup details, config options that have changed, NULL where we had 0's, etc.
 	 * @return string
 	 */
 	protected function actionUpdateConfiguration()
 	{
-
-
-		//Amazon changes
-		_dbx("update xlsws_category_amazon set product_type='AutoAccessory' where name1 like '%Automotive%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='Beauty' where name1 like '%Beauty%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='Beauty' where name1 like '%Beauty%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='CameraPhoto' where name0 like '%camera & photo%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='CE' where name1 like '%Electronics%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='Computers' where name2 like '%Computers & Accessories%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='FoodAndBeverages' where name1 like '%Grocery & Gourmet Food%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='Health' where name1 like '%Health & Personal Care%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='Home' where name1 like '%Home & Kitchen%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='Jewelry' where name1 like '%Jewelry%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='Jewelry' where name1 like '%Jewelry%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='MusicalInstruments' where name1 like '%Musical Instruments%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='Office' where name1 like '%Office%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='PetSupplies' where name1 like '%Pet Supplies%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='Shoes' where name1 like '%Shoes%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='Sports' where name1='Sports & Outdoors' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='SWVG' where name1='Software' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='SWVG' where name1='Video Games' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='TiresAndWheels' where name2 like '%Tires & Wheels%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='Tools' where name1 like '%Tools & Home Improvement%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='Toys' where name1 like '%Toys & Games%' and product_type is null;");
-		_dbx("update xlsws_category_amazon set product_type='ToysBaby' where name2 like '%Baby & Toddler Toys%';");
-
-
-		_dbx("update xlsws_customer as a set default_billing_id=(select id from xlsws_customer_address as b where customer_id=a.id  order by b.id desc limit 1)");
-		
-		_dbx("update xlsws_customer as a set default_shipping_id=(select id from xlsws_customer_address as b where customer_id=a.id  order by b.id desc limit 1)");
-
-
-
-		_dbx("update xlsws_wishlist_item set cart_item_id=null where cart_item_id=0;");
-		_dbx("update xlsws_wishlist_item set purchased_by=null where purchased_by=0;");
-		_dbx("update xlsws_wishlist set visibility=".Wishlist::PERSONALLIST);
-		_dbx("ALTER TABLE `xlsws_wishlist` DROP `registry_password`;");
-		_dbx("update xlsws_promo_code set valid_from=null where valid_from='0000-00-00';");
-		_dbx("update xlsws_promo_code set valid_until=null where valid_until='0000-00-00';");
-		_dbx("delete from xlsws_configuration where `key_name`='PHONE_TYPES';");
-
-
 		//Migrate our header image to the new folder
 		$objConfig = Configuration::LoadByKey('HEADER_IMAGE');
 		$objConfig->key_value = str_replace("/photos/","/images/header/",$objConfig->key_value);
@@ -1130,45 +1073,22 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		$objConfig->key_value = str_replace("WebKeyword3","title",$objConfig->key_value);
 		$objConfig->save();
 
+		//What we're gonna do right here is go back.... way back...
+		_xls_set_conf('DATABASE_SCHEMA_VERSION',0);
+		return array('result'=>"success",'makeline'=>49,'tag'=>'Final cleanup','total'=>50);
+	}
+
+	protected function actionApplyLatestChanges()
+	{
+		//Now the live changes from Web Store world headquarters take over
+		$myModule = Yii::app()->getModule('admin');
+
+		Yii::app()->runController($myModule->id . '/upgrade/databaseinstall');
+
+		//We don't even have to return our own JSON status because the actionDatabaseUpgrade() does that for us.
+		return null;
 
 
-		_dbx("update xlsws_configuration set configuration_type_id=15,sort_order=2 where key_name='LANGUAGES'");
-		_dbx("update xlsws_configuration set sort_order=sort_order+8 where configuration_type_id=19");
-		_dbx("update xlsws_configuration set `key_name`='THEME',title='Site Theme',options='THEME',
-			configuration_type_id=0,sort_order=2,param=0 where `key_name`='DEFAULT_TEMPLATE'");
-		_dbx("update xlsws_configuration set `key_name`='CHILD_THEME',title='Theme {color} scheme',
-			options='CHILD_THEME',sort_order=3,param=0,configuration_type_id=0 where `key_name`='DEFAULT_TEMPLATE_THEME'");
-		_dbx("INSERT INTO `xlsws_configuration`
-			(`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `options`, `template_specific`, `param`, `required`)
-			VALUES ('Template Viewset', 'VIEWSET', 'cities', 'The master design set for themes.', 0, 1, 'VIEWSET', 0, 0, 1)");
-		_dbx("INSERT INTO `xlsws_configuration`
-			(`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `options`, `template_specific`, `param`, `required`)
-			VALUES ('Enable Language Menu', 'LANG_MENU', '0', 'Show language switch menu on website.', 15, 1, 'BOOL', 0, 0, 1)");
-		_dbx("INSERT INTO `xlsws_configuration`
-			(`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `options`, `template_specific`, `param`, `required`)
-			VALUES ('Add missing translations while navigating', 'LANG_MISSING', '0', 'For creating new translations. Do NOT leave this option on, it will slow your server down.', 15, 3, 'BOOL', 0, 0, 1)");
-
-		_dbx("delete from xlsws_configuration where key_name='MODERATE_REGISTRATION'");
-		_dbx("INSERT INTO `xlsws_configuration`
-			(`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `options`, `template_specific`, `param`, `required`)
-			VALUES ('Moderate Customer Registration', 'MODERATE_REGISTRATION', '0',
-			 'If enabled, customer registrations will need to be moderated before they are approved.', 0, 1, 'BOOL', 0, 0, 1)");
-
-		_dbx("INSERT INTO `xlsws_configuration`
-			(`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `options`, `template_specific`, `param`, `required`)
-			VALUES ('Language Options', 'LANG_OPTIONS', 'en:English,fr:français',
-			 '', 0,0, NULL, 0, 0, 1)");
-
-		_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`='0' where `key_name`='CURRENCY_FORMAT'");
-		_dbx("UPDATE `xlsws_configuration` SET `title`='Require account creation',`key_name`='REQUIRE_ACCOUNT',options='BOOL' where `key_name`='ALLOW_GUEST_CHECKOUT'");
-		_dbx("UPDATE `xlsws_configuration` SET `configuration_type_id`='0' where `key_name`='LOCALE'");
-		_dbx("UPDATE `xlsws_configuration` SET `title`='Default Locale (Language) Code' where `key_name`='LANG_CODE'");
-		_dbx("UPDATE `xlsws_configuration` SET `key_value`='300' where `key_name`='DATABASE_SCHEMA_VERSION'");
-		_dbx("UPDATE `xlsws_customer` SET `pricing_level`=1 where pricing_level is null");
-
-		_dbx("INSERT INTO `xlsws_modules` (`active`, `module`, `category`, `version`, `name`, `sort_order`,	`configuration`, `modified`, `created`)
-				VALUES (1, 'wsamazon', 'CEventProduct,CEventPhoto,CEventOrder', 1, 'Amazon MWS', 2, NULL, '2013-04-04 11:34:38', NULL);");
-		return array('result'=>"success",'makeline'=>50,'total'=>50);
 
 	}
 

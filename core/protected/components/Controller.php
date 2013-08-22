@@ -70,17 +70,25 @@ class Controller extends CController
 
 		$this->logoutUrl = $this->createUrl("site/logout");
 
+		$filename = Yii::getPathOfAlias('webroot.themes').DIRECTORY_SEPARATOR.'brooklyn';
+		if(!file_exists($filename))
+		{
+			if(!downloadBrooklyn())
+				die("missing Brooklyn");
+			else
+				$this->redirect("/");
+		}
 		if(!Yii::app()->theme)
 		{
 			if(_xls_get_conf('theme'))
 			{
-				$symfile =  "themes/brooklyn";
-				$strOriginal = "../core/themes/brooklyn";
+				//We can't find our theme for some reason, switch back to brookyn
+				_xls_set_conf('theme','brooklyn');
+				_xls_set_conf('CHILD_THEME','light');
+				Yii::log("Couldn't find our theme, switched back to Brooklyn for emergency",
+					'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				$this->redirect("/");
 
-				@unlink($symfile);
-				$retVal = symlink($strOriginal, $symfile);
-				if (!$retVal)
-					die("cannot create symbolic link 'themes/brooklyn' to point to '../core/themes/brooklyn'");
 			} else
 				die("you have no theme set");
 		}

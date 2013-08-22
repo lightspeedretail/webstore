@@ -1,7 +1,7 @@
 <div id="sharingtools">
     <div id="pinterest">
     <a href="http://pinterest.com/pin/create/button/?url=<?= $this->getCanonicalUrl(); ?>&media=<?=
-		_xls_site_url($product->SmallImage,true); ?>&description=<?= urlencode($product->Title); ?>"
+    $product->SmallImageAbsolute; ?>&description=<?= urlencode($product->Title); ?>"
            class="pin-it-button" count-layout="none"><img border="0" src="//assets.pinterest.com/images/PinExt.png"
            title="Pin It"/></a></div>
     <div class="g-plusone" data-size="medium" data-annotation="none" data-width="50"></div>

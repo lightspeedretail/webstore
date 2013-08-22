@@ -1,6 +1,5 @@
 <?php
 set_time_limit(300);
-define('VERSION',"3.0.2");
 define('DBARRAY_NUM', MYSQL_NUM);define('DBARRAY_ASSOC', MYSQL_ASSOC);define('DBARRAY_BOTH', MYSQL_BOTH);if (!defined('DB_EXPLAIN')) { define('DB_EXPLAIN', false);}if (!defined('DB_QUERIES')) { define('DB_QUERIES', false);}
 
 
@@ -36,7 +35,7 @@ switch ($step)
 	$checkenv = xls_check_server_environment();
 	if ((in_array("fail", $checkenv) && $_SERVER['REQUEST_URI'] != __SUBDIRECTORY__ . "/install.php?ignore")
 		|| $_SERVER['REQUEST_URI'] == __SUBDIRECTORY__ . "/install.php?check"
-	) { 
+	) {
 		displayNotAcceptable($checkenv);
 	} else {
 
@@ -53,6 +52,8 @@ function xls_check_file_signatures($complete = false)
 
 	$url .= "/webstore/hash";
 
+	$json = json_encode(array('version'=>XLSWS_VERSION));
+
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_VERBOSE, 1);
@@ -62,6 +63,11 @@ function xls_check_file_signatures($complete = false)
 	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
 
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_HTTPHEADER,
+		array("Content-type: application/json"));
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+
 
 	$strXml = curl_exec($ch);
 	curl_close($ch);
@@ -140,47 +146,16 @@ Sitemap: http://www.example.com/store/sitemap.xml
 
 
 }
-function makeSymbolicLink()
-{
 
-	$symfile = "core/protected/views";
-	$strOriginal =  "views-cities";
-
-	@unlink($symfile);
-	$retVal = symlink($strOriginal, $symfile);
-	if (!$retVal)
-		die("cannot create symbolic link 'views' to point to 'views-cities'");
-
-	$symfile =  "themes/brooklyn";
-
-	if(is_link($symfile))
-		@unlink($symfile);
-	@mkdir("themes/brooklyn");
-	@mkdir("themes/brooklyn/css");
-	@mkdir("themes/brooklyn/views");
-	@mkdir("themes/brooklyn/views/site");
-	if (
-		@symlink("../../core/themes/brooklyn/brooklyn.png", "themes/brooklyn/brooklyn.png")  &&
-		@symlink("../../core/themes/brooklyn/config.xml", "themes/brooklyn/config.xml")  &&
-		@symlink("../../../core/themes/brooklyn/css/dark.css", "themes/brooklyn/css/dark.css")  &&
-		@symlink("../../../core/themes/brooklyn/css/light.css", "themes/brooklyn/css/light.css")  &&
-		@symlink("../../../core/themes/brooklyn/css/style.css", "themes/brooklyn/css/style.css")  &&
-		@symlink("../../../core/themes/brooklyn/css/images", "themes/brooklyn/css/images")  &&
-		@symlink("../../core/themes/brooklyn/README.txt", "themes/brooklyn/README.txt")
-	)
-	{
-		if (!file_exists("themes/brooklyn/css/custom.css"))
-			@copy("core/themes/brooklyn/css/custom.css","themes/brooklyn/css/custom.css");
-		if (!file_exists("themes/brooklyn/views/site/index.php"))
-			@copy("core/themes/brooklyn/views/site/index.php","themes/brooklyn/views/site/index.php");
-	}
-
-
-
-}
 function  _xls_version()
 {
-	return VERSION;
+	if(file_exists("core/protected/config/wsver.php"))
+	{
+		include_once("core/protected/config/wsver.php");
+
+		return XLSWS_VERSION;
+	}
+	else return 3;
 }
 
 function displayForm()
@@ -214,58 +189,58 @@ function displayForm()
 
 
 
-        <h2>Welcome!</h2>
-        <div class="hero-unit">
-	        <p>This process will install Web Store 3.0, optionally importing your old 2.x information. This initial page will set up the database for you, and then you will be redirected for additional setup steps. We've made install as simple as possible to get you going on your new eCommerce store!</p>
-	        <p><strong>Warning: Do not close this browser window until your setup has completed. Doing so will cause an incomplete install and you will have to begin again.</strong></p>
-	     </div>
+	<h2>Welcome!</h2>
+	<div class="hero-unit">
+		<p>This process will install the latest Web Store, optionally importing your old 2.x information. This initial page will set up the database for you, and then you will be redirected for additional setup steps. We've made install as simple as possible to get you going on your new eCommerce store!</p>
+		<p><strong>Warning: Do not close this browser window until your setup has completed. Doing so will cause an incomplete install and you will have to begin again.</strong></p>
+	</div>
 
-        <h2>Install</h2>
-        <label>Enter your database connection information below. <strong>Note: This database must already exist and be blank.</strong></label>
+	<h2>Install</h2>
+	<label>Enter your database connection information below. <strong>Note: This database must already exist and be blank.</strong></label>
 
-        <!-- Search form with input field and button -->
-        <form id="installform" action="install.php<?php if(isset($_GET['debug'])) echo "?debug"; ?>" method="POST" class="well form-search">
-	        <table class="table table-striped">
-		        <tr>
-			        <td nowrap>MySQL Database Host (Server name or IP):</td>
-					<td><input id="dbhost" name="dbhost" value="<?php echo $dbhost; ?>" type="text" class="input-medium"></td>
-		        </tr>
-		        <tr>
-			        <td nowrap>MySQL Port:</td>
-					<td><input id="dbport" name="dbport" value="<?php echo $dbport; ?>" type="text" class="input-medium"></td>
-		        </tr>
-		        <tr>
-			        <td nowrap>MySQL Username:</td>
-					<td><input id="dbusername" name="dbusername" value="<?php echo $dbusername; ?>" type="text" class="input-medium"></td>
-		        </tr>
-		        <tr>
-			        <td nowrap>MySQL Password:</td>
-					<td><input id="dbpass" name="dbpass" value="<?php echo $dbpass; ?>" type="password" class="input-medium"></td>
-		        </tr>
-		        <tr>
-			        <td nowrap>Database Name:</td>
-					<td><input id="dbname" name="dbname" value="<?php echo $dbname; ?>" type="text" class="input-medium"></td>
+	<!-- Search form with input field and button -->
+	<form id="installform" action="install.php?<?php if(isset($_GET['debug'])) echo "&debug";if(isset($_GET['qa'])) echo "&qa"; ?>" method="POST" class="well form-search">
+		<table class="table table-striped">
+			<tr>
+				<td nowrap>MySQL Database Host (Server name or IP):</td>
+				<td><input id="dbhost" name="dbhost" value="<?php echo $dbhost; ?>" type="text" class="input-medium"></td>
+			</tr>
+			<tr>
+				<td nowrap>MySQL Port:</td>
+				<td><input id="dbport" name="dbport" value="<?php echo $dbport; ?>" type="text" class="input-medium"></td>
+			</tr>
+			<tr>
+				<td nowrap>MySQL Username:</td>
+				<td><input id="dbusername" name="dbusername" value="<?php echo $dbusername; ?>" type="text" class="input-medium"></td>
+			</tr>
+			<tr>
+				<td nowrap>MySQL Password:</td>
+				<td><input id="dbpass" name="dbpass" value="<?php echo $dbpass; ?>" type="password" class="input-medium"></td>
+			</tr>
+			<tr>
+				<td nowrap>Database Name:</td>
+				<td><input id="dbname" name="dbname" value="<?php echo $dbname; ?>" type="text" class="input-medium"></td>
 
-		        </tr>
-            </table>
+			</tr>
+		</table>
 
-	        <input type="hidden" name="step" value="2">
-            <p><strong>If you are upgrading, enter your old database name here. Because this installer copies your database, you cannot use the same database name if upgrading. If your original database was named "webstore" and you wish to keep that name, you will need to rename your existing database to something like "webstoreold" first, and then create a new blank "webstore" database.</strong></p>
+		<input type="hidden" name="step" value="2">
+		<p><strong>If you are upgrading, enter your old database name here. Because this installer copies your database, you cannot use the same database name if upgrading. If your original database was named "webstore" and you wish to keep that name, you will need to rename your existing database to something like "webstoreold" first, and then create a new blank "webstore" database.</strong></p>
 
-            <table class="table table-striped">
-		        <tr>
-			        <td nowrap>Web Store 2.x Database Name:</td>
-					<td><input name="dboldname" value="" type="text" class="input-medium"></td>
-		        </tr>
-            </table>
+		<table class="table table-striped">
+			<tr>
+				<td nowrap>Web Store 2.x Database Name:</td>
+				<td><input name="dboldname" value="" type="text" class="input-medium"></td>
+			</tr>
+		</table>
 
-            <button type="submit" class="btn btn-primary pull-right">Install</button>
-	        <P>&nbsp;</P>
-        </form>
+		<button type="submit" class="btn btn-primary pull-right">Install</button>
+		<P>&nbsp;</P>
+	</form>
 
-    </div>
+	</div>
 
-<?php
+	<?php
 	displayFooter();
 }
 
@@ -301,7 +276,7 @@ function displayNotAcceptable($checkenv)
 	foreach ($checkenv as $key => $value) {
 		$warning_text
 			.= "<tr><td>$key</td><td>" . (($value == "pass" || $value == $curver) ? "$value"
-			: "<font color='#cc0000'><b>$value</b></font>") . "</td>";
+				: "<font color='#cc0000'><b>$value</b></font>") . "</td>";
 	}
 
 
@@ -312,7 +287,7 @@ function displayNotAcceptable($checkenv)
 
 
 	<div>
-	<?php echo $warning_text; ?>
+		<?php echo $warning_text; ?>
 	</div>
 	<p>&nbsp;</p>
 	<?php
@@ -333,141 +308,142 @@ function displayFormTwo()
 	else {  $headerstring= "Installing..."; $quip = "This shouldn't take too long."; }
 
 	if (!isset($_POST['dboldname'])) $_POST['dboldname'] = "";
-?>
+	?>
 
 	<h2><?php echo $headerstring; ?></h2>
 	<div class="hero-unit">
 
-	    <p id="quip"><?php echo $quip; ?></p>
+		<p id="quip"><?php echo $quip; ?></p>
 
-	    <div class="progress progress-striped active">
-	        <div class="bar" id="progressbar" style="width: 0%;"></div>
-	    </div>
+		<div class="progress progress-striped active">
+			<div class="bar" id="progressbar" style="width: 0%;"></div>
+		</div>
 		<div id="stats"></div>
 	</div>
 
 
 	<script language="javascript">
-	    var prunning=0;
-	    var pinttimer=0;
-	    var online=1;
-	    var total = 0;
+		var prunning=0;
+		var pinttimer=0;
+		var online=1;
+		var total = 0;
 
-	    function startInstall(key) {
-	        document.getElementById('progressbar').style.width = "0%";
-	        pinttimer=self.setInterval(function(){runInstall(key)},50);
-	        runInstall(key);
-	    }
-	    function runInstall(key)
-	    {
-		    if (prunning==1) return;
-		    prunning=1;
-		    var postvar = "sqlline="+ online +
-			    "&dbname=" + "<?php echo $_POST['dbname'] ?>" +
-			    "&dboldname=" + "<?php echo $_POST['dboldname'] ?>";
+		function startInstall(key) {
+			document.getElementById('progressbar').style.width = "1%";
+			pinttimer=self.setInterval(function(){runInstall(key)},50);
+			runInstall(key);
+		}
+		function runInstall(key)
+		{
+			if (prunning==1) return;
+			prunning=1;
+			var postvar = "sqlline="+ online +
+				"&dbname=" + "<?php echo $_POST['dbname'] ?>" +
+				"&dboldname=" + "<?php echo $_POST['dboldname'] ?><?php if(isset($_GET['qa'])) echo "&qa=1"?><?php if(isset($_GET['debug'])) echo "&debug=1"?>";
 
 
-		    $.post("install.php", postvar, function(data){
-			    if (data[0]=="{")
-			    {
-				    obj = JSON.parse(data);
-				    if (obj.result=='success')
-				    {
-					    var perc = Math.round((100*(online/obj.total)));
-					    perc = perc/2;
-					    document.getElementById('progressbar').style.width = perc + "%";
-					    if (!obj.tag) obj.tag = "";
+			$.post("install.php", postvar, function(data){
+				if (data[0]=="{")
+				{
+					obj = JSON.parse(data);
+					if (obj.result=='success')
+					{
+						var perc = Math.round((100*(online/obj.total)));
+						perc = perc/2;
+						if(perc<1) perc=1;
+						document.getElementById('progressbar').style.width = perc + "%";
+						if (!obj.tag) obj.tag = "";
 						document.getElementById('stats').innerHTML = obj.tag;
-					    <?php if(isset($_GET['debug'])): ?>
-						    document.getElementById('stats').innerHTML = obj.tag + " Running line "+online + " of " + obj.total + " (" + perc + "%)";
-					    <?php endif; ?>
-					    if (online==obj.total) {
-						    clearInterval(pinttimer);
-						    prunning=0;
-						    var exporturl = window.location.href.replace("/install.php", "/install/exportconfig");
-						    $.post(exporturl, "", function(data){  if (data[0]!="{") alert(data); });
-						    online = 1;
-						    pinttimer=self.setInterval(function(){runUpgrade(key)},50);
-					    }else {
-						    prunning=0;
-						    online = online + 1;
-					    }
+						<?php if(isset($_GET['debug'])): ?>
+						document.getElementById('stats').innerHTML = obj.tag + " Running line "+online + " of " + obj.total + " (" + perc + "%)";
+						<?php endif; ?>
+						if (online==obj.total) {
+							clearInterval(pinttimer);
+							prunning=0;
+							var exporturl = window.location.href.replace("/install.php", "/install/exportconfig");
+							$.post(exporturl, "", function(data){  if (data[0]!="{") alert(data); });
+							online = 1;
+							pinttimer=self.setInterval(function(){runUpgrade(key)},50);
+						}else {
+							prunning=0;
+							online = online + 1;
+						}
 
-				    }
-			    }
-			    else {
-				    clearInterval(pinttimer);
+					}
+				}
+				else {
+					clearInterval(pinttimer);
 
-				    if(data.indexOf("Table 'xlsws_customer' already exists")>0)
-					    data = "Helpful information: This appears to be an error caused by installing into a database that is not blank. Web Store 3 requires a blank database to install.\n\n" + data;
+					if(data.indexOf("Table 'xlsws_customer' already exists")>0)
+						data = "Helpful information: This appears to be an error caused by installing into a database that is not blank. Web Store 3 requires a blank database to install.\n\n" + data;
 
-				    data = "An error has occured. If this does not appear to be an issue you can easily remedy based on the information below, please contact Web Store technical support for additional assistance.\n\n" + data;
-				    document.getElementById('progressbar').style.width = 0;
-				    document.getElementById('stats').innerHTML = "";
-				    document.getElementById('quip').innerHTML = "Error, install halted.";
-				    alert(data);
-			    }
-		    });
+					data = "An error has occured. If this does not appear to be an issue you can easily remedy based on the information below, please contact Web Store technical support for additional assistance.\n\n" + data;
+					document.getElementById('progressbar').style.width = 0;
+					document.getElementById('stats').innerHTML = "";
+					document.getElementById('quip').innerHTML = "Error, install halted.";
+					alert(data);
+				}
+			});
 
-	    }
+		}
 
-	    function runUpgrade(key)
-	    {
+		function runUpgrade(key)
+		{
 
-		    if (prunning>2400)
-		    {
-			    clearInterval(pinttimer);
-			    prunning=0;
-			    alert("The install process has become unresponsive. This may indicate a problem with the database. Please contact technical support for additional information. Error information may be available in the xlsws_log table of your database for troubleshooting purposes.");
-			    document.getElementById('progressbar').style.width = 0;
-			    document.getElementById('stats').innerHTML = "Check xlsws_log for error information.";
-			    document.getElementById('quip').innerHTML = "Error, install halted.";
+			if (prunning>2400)
+			{
+				clearInterval(pinttimer);
+				prunning=0;
+				alert("The install process has become unresponsive. This may indicate a problem with the database. Please contact technical support for additional information. Error information may be available in the xlsws_log table of your database for troubleshooting purposes.");
+				document.getElementById('progressbar').style.width = 0;
+				document.getElementById('stats').innerHTML = "Check xlsws_log for error information.";
+				document.getElementById('quip').innerHTML = "Error, install halted.";
 
-		    }
-		    if (prunning>0) { prunning++; return; }
-		    prunning=1;
-		    var postvar = "online="+ online + "&total=" + total +
-			    "&dbname=" + "<?php echo $_POST['dbname'] ?>" +
-			    "&dboldname=" + "<?php echo $_POST['dboldname'] ?>";
+			}
+			if (prunning>0) { prunning++; return; }
+			prunning=1;
+			var postvar = "online="+ online + "&total=" + total +
+				"&dbname=" + "<?php echo $_POST['dbname'] ?>" +
+				"&dboldname=" + "<?php echo $_POST['dboldname'] ?>";
 
-		    var exporturl = window.location.href.replace("/install.php", "/install/upgrade");
-		    $.post(exporturl, postvar, function(data){
-		    if (data[0]=="{")
-			    {
-				    obj = JSON.parse(data);
-				    if (obj.result=='success')
-				    {
-					    total = obj.total;
-					    online = obj.makeline;
-					    var perc = 50 + online;
-					    document.getElementById('progressbar').style.width = perc + "%";
-					    if (!obj.tag) obj.tag = "";
-					    document.getElementById('stats').innerHTML = obj.tag;
-					    <?php if(isset($_GET['debug'])): ?>
+			var exporturl = window.location.href.replace("/install.php", "/install/upgrade");
+			$.post(exporturl, postvar, function(data){
+				if (data[0]=="{")
+				{
+					obj = JSON.parse(data);
+					if (obj.result=='success')
+					{
+						total = obj.total;
+						online = obj.makeline;
+						var perc = 50 + online;
+						document.getElementById('progressbar').style.width = perc + "%";
+						if (!obj.tag) obj.tag = "";
+						document.getElementById('stats').innerHTML = obj.tag;
+						<?php if(isset($_GET['debug'])): ?>
 						document.getElementById('stats').innerHTML = obj.tag + " at " + " (" + perc + "%)";
-					    <?php endif; ?>
-					    if (online==obj.total) {
-						    clearInterval(pinttimer);
-						    window.location.href = window.location.href.replace("/install.php", "/admin/license");
-					    }else {
-						    prunning=0;
-					    }
+						<?php endif; ?>
+						if (online==obj.total) {
+							clearInterval(pinttimer);
+							window.location.href = window.location.href.replace("/install.php", "/admin/license");
+						}else {
+							prunning=0;
+						}
 
-				    }
-				    else {
-					    clearInterval(pinttimer);
-					    alert(obj.result);
-				    }
-			    }
-			    else {
-				    clearInterval(pinttimer);
-				    alert(data);
-			    }
-		    });
+					}
+					else {
+						clearInterval(pinttimer);
+						alert(obj.result);
+					}
+				}
+				else {
+					clearInterval(pinttimer);
+					alert(data);
+				}
+			});
 
-	    }
+		}
 
-	    startInstall();
+		startInstall();
 
 	</script>
 
@@ -482,40 +458,40 @@ function displayHeader()
 	<!DOCTYPE html>
 	<html xmlns="http://www.w3.org/1999/html" lang="en-US">
 	<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Web Store 3.0 Installation</title>
-	    <link rel="stylesheet" href="http://cdn.lightspeedretail.com/bootstrap/css/bootstrap.css">
-	    <style type="text/css">
-	        .header-new {
-	            background: url("http://www.lightspeedretail.com/wp-content/themes/lightspeed/images/bg-header.jpg") repeat scroll 0 0 transparent;
-	            height: 80px;
-	            position: relative;
-	            width: 100%;
-	            z-index: 999;
-	        }
-	        .header-inner {margin: 0 auto; width: 960px; }
-	        .header-new .logo { float: left; padding: 24px 0 0 10px; }
-	        .header-new .welcome { float: left; padding: 30px 20px 20px 10px; margin-left: 470px; font-size: 28px; }
-	        .table { width: 700px; margin: 0 auto; }
-	        .hero-unit { padding: 20px; }
-	        .hero-unit p { font-size: 0.9em; }
-		    #stats { font-size: 0.7em; }
-	    </style>
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-        <script src="http://cdn.lightspeedretail.com/bootstrap/js/bootstrap.js"></script>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Web Store Installation</title>
+		<link rel="stylesheet" href="http://cdn.lightspeedretail.com/bootstrap/css/bootstrap.css">
+		<style type="text/css">
+			.header-new {
+				background: url("http://www.lightspeedretail.com/wp-content/themes/lightspeed/images/bg-header.jpg") repeat scroll 0 0 transparent;
+				height: 80px;
+				position: relative;
+				width: 100%;
+				z-index: 999;
+			}
+			.header-inner {margin: 0 auto; width: 960px; }
+			.header-new .logo { float: left; padding: 24px 0 0 10px; }
+			.header-new .welcome { float: left; padding: 30px 20px 20px 10px; margin-left: 470px; font-size: 28px; }
+			.table { width: 700px; margin: 0 auto; }
+			.hero-unit { padding: 20px; }
+			.hero-unit p { font-size: 0.9em; }
+			#stats { font-size: 0.7em; }
+		</style>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+		<script src="http://cdn.lightspeedretail.com/bootstrap/js/bootstrap.js"></script>
 	</head>
 
 	<body>
 
-    <div class="header-new">
-        <div class="header-inner">
-            <div class="logo"><img src="http://www.lightspeedretail.com/wp-content/themes/lightspeed/images/logo-mini.png"></div>
-        </div>
-        <div class="welcome">Web Store 3.0 Installation</div>
-    </div>
-    <div class="container">
+	<div class="header-new">
+		<div class="header-inner">
+			<div class="logo"><img src="http://www.lightspeedretail.com/wp-content/themes/lightspeed/images/logo-mini.png"></div>
+		</div>
+		<div class="welcome">Web Store Installation</div>
+	</div>
+	<div class="container">
 
-	<?php
+<?php
 }
 
 function displayFooter()
@@ -523,20 +499,20 @@ function displayFooter()
 	?>
 	<script>
 		$('#installform').submit(validate);
-	    function validate(){
-		    var dbhost = $('#dbhost').val();
-		    if (!$.trim(dbhost)) {alert('Database Host is required!'); return false; }
-		    var dbusername = $('#dbusername').val();
-		    if (!$.trim(dbusername)) {alert('Database Username is required!'); return false; }
-		    var dbpass = $('#dbpass').val();
-		    if (!$.trim(dbpass)) {alert('Database Password is required!'); return false; }
-		    var dbname = $('#dbname').val();
-		    if (!$.trim(dbname)) {alert('Database name is required!'); return false; }
-	    }
+		function validate(){
+			var dbhost = $('#dbhost').val();
+			if (!$.trim(dbhost)) {alert('Database Host is required!'); return false; }
+			var dbusername = $('#dbusername').val();
+			if (!$.trim(dbusername)) {alert('Database Username is required!'); return false; }
+			var dbpass = $('#dbpass').val();
+			if (!$.trim(dbpass)) {alert('Database Password is required!'); return false; }
+			var dbname = $('#dbname').val();
+			if (!$.trim(dbname)) {alert('Database name is required!'); return false; }
+		}
 	</script>
 	</body>
 	</html>
-	<?php
+<?php
 }
 
 
@@ -760,12 +736,87 @@ class DB_Class {
 
 }
 
-function zipAndFolders()
+function getFile($url)
 {
 
-	decompress("webstore.zip");
-	@unlink("webstore.zip");
-	
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_VERBOSE, 1);
+
+	// Turn off the server and peer verification (TrustManager Concept).
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+	curl_setopt($ch, CURLOPT_PROGRESSFUNCTION, 'progressCallback');
+	curl_setopt($ch, CURLOPT_NOPROGRESS, false); // needed to make progress function work
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+	$resp = curl_exec($ch);
+	curl_close($ch);
+	return $resp;
+
+
+}
+
+
+function progressCallback( $download_size, $downloaded_size, $upload_size, $uploaded_size )
+
+{
+
+	static $previousProgress = 0;
+
+	if ( $download_size == 0 )
+
+		$progress = 0;
+
+	else
+
+		$progress = round( $downloaded_size * 100 / $download_size );
+
+	if ( $progress > $previousProgress)
+
+	{
+
+		$previousProgress = $progress;
+
+		$fp = fopen( 'progress.txt', 'w' );
+
+		fputs( $fp, "$progress\n" );
+
+		fclose( $fp );
+
+	}
+
+}
+
+function zipAndFolders()
+{
+	if(isset($_POST['debug'])) error_log(__FUNCTION__,3,"error.txt");
+	//if we've already downloaded and extracted, don't do it twice
+	if (!file_exists('core'))
+	{
+		$dest = (isset($_POST['qa']) ? "qa" : "latestwebstore");
+		$cdn = (isset($_POST['qa']) ? "webstore-qa" : "webstore-full");
+		$jLatest= getFile("http://updater.lightspeedretail.com/site/".$dest);
+		$result = json_decode($jLatest);
+		$strWebstoreInstall = "http://cdn.lightspeedretail.com/webstore/".$cdn."/".$result->latest->filename;
+		if(isset($_POST['debug'])) error_log("downloading $strWebstoreInstall",3,"error.txt");
+		$data = getFile($strWebstoreInstall);
+		if (stripos($data,"404 - Not Found")>0 || empty($data))
+			echo("ERROR downloading ".$result->latest->filename." from LightSpeed");
+		if(isset($_POST['debug'])) error_log("writing to to".$result->latest->filename,3,"error.txt");
+		$f=file_put_contents($result->latest->filename, $data);
+		if(isset($_POST['debug'])) error_log("wrote to".$result->latest->filename,3,"error.txt");
+		if ($f)
+		{
+			if(isset($_POST['debug'])) error_log("decompressing ".$result->latest->filename,3,"error.txt");
+			decompress($result->latest->filename);
+			if(isset($_POST['debug'])) error_log("removing ".$result->latest->filename,3,"error.txt");
+			if(!isset($_POST['debug'])) @unlink($result->latest->filename);
+			if(!isset($_POST['debug'])) @unlink("progress.txt");
+		}
+		else echo("ERROR downloading ".$result->latest->filename." from LightSpeed");
+	}
+
 	//////////////////////////////////////////////////////////////////
 	// Verify the cache folders exist and if not, create them
 	// These may fail if cache isn't yet writable, so we ignore errors
@@ -783,6 +834,21 @@ function zipAndFolders()
 		@mkdir('themes');
 	}
 }
+
+
+
+function makeSymbolicLink()
+{
+
+	$symfile = "core/protected/views";
+	$strOriginal =  "views-cities";
+
+	@unlink($symfile);
+	$retVal = symlink($strOriginal, $symfile);
+	if (!$retVal)
+		die("cannot create symbolic link 'views' to point to 'views-cities'");
+}
+
 /**
  * This is actually a copy of our zip.php from Web store from Florian
  * This violates our DRY principle but we need everything in the installer
@@ -906,16 +972,23 @@ function runInstall($db,$sqlline = 0)
 		case 1:
 
 			return json_encode(array('result'=>"success",
-				'tag'=>'Extracting installation files...','line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
+				'tag'=>'Downloading and extracting installation files...','line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
 			break;
 
 		case 2:
 			zipAndFolders();
+			makeSymbolicLink();
+			$tag = "Applying pre-3.0 changes. Line #".$sqlline;
+			break;
+
+		case 3:
 			if ($upgrade) $db->changedb('old');
 			if ($upgrade) if ($db->schemaNumber<217) up217($db);
+			if ($upgrade) $db->changedb('old');
+			if ($upgrade) if ($db->schemaNumber==217) up250($db,$sqlline);
 			$tag = "Applying pre-3.0 changes. Line #".$sqlline;
-			
-		case 3:
+			break;
+
 		case 4:
 		case 5:
 		case 6:
@@ -972,7 +1045,6 @@ function runInstall($db,$sqlline = 0)
 			if ($sqlline==$total)
 			{
 				makeHtaccess();
-				makeSymbolicLink();
 				installMainConfig();
 				$tag = "Halfway there, stand by...";
 			}
@@ -982,7 +1054,7 @@ function runInstall($db,$sqlline = 0)
 
 	if (isset($tag))
 		return json_encode(array('result'=>"success",'line'=>$sqlline,'tag'=>$tag,'total'=>$total,'upgrade'=>$upgrade));
-		else return json_encode(array('result'=>"success",'line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
+	else return json_encode(array('result'=>"success",'line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
 
 }
 
@@ -1254,7 +1326,7 @@ function initialCreateTables($db)
 	  (
 	     `rowid`             BIGINT(20) NOT NULL auto_increment,
 	     `code`              CHAR(2) NOT NULL,
-	     `code_a3`           CHAR(3) NOT NULL,
+	     `code_a3`           CHAR(3),
 	     `region`            CHAR(2) NOT NULL,
 	     `avail`             CHAR(1) NOT NULL DEFAULT 'Y',
 	     `sort_order`        INT(11) DEFAULT '10',
@@ -3417,9 +3489,9 @@ function up217($db)
 	$db->query("ALTER TABLE xlsws_product MODIFY COLUMN family varchar (255)");
 
 	$db->add_config_key('DATABASE_SCHEMA_VERSION' ,'Database Schema Version',
-			'217',  'Used for tracking schema changes',  '',  '',  NULL);
+		'217',  'Used for tracking schema changes',  '',  '',  NULL);
 	$db->query("UPDATE `xlsws_configuration` SET `value`='217' where `key`='DATABASE_SCHEMA_VERSION'");
-	
+
 }
 
 function up250($db,$sqlline)
@@ -3437,32 +3509,32 @@ function up250($db,$sqlline)
 
 		$db->add_config_key('FEATURED_KEYWORD' ,
 			'Featured Keyword', 'featured',
-					'If this keyword is one of your product keywords, the product will be featured on the Web Store homepage.',
-					8, 6, NULL,0);
+			'If this keyword is one of your product keywords, the product will be featured on the Web Store homepage.',
+			8, 6, NULL,0);
 
 		$db->add_config_key('LIGHTSPEED_HOSTING' ,
 			'LightSpeed Hosting',
-					'0', 'Flag which indicates site is hosted by LightSpeed', 0, 0, 'BOOL',0);
+			'0', 'Flag which indicates site is hosted by LightSpeed', 0, 0, 'BOOL',0);
 
 		//Add debug keys
 		$db->add_config_key('DEBUG_PAYMENTS' , 'Debug Payment Methods', '',
-					'If selected, WS logs all activity for credit card processing and other payment methods.',
-					1, 18, 'BOOL',0);
+			'If selected, WS logs all activity for credit card processing and other payment methods.',
+			1, 18, 'BOOL',0);
 		$db->add_config_key('DEBUG_SHIPPING' ,'Debug Shipping Methods', '',
-					'If selected, WS logs all activity for shipping processing.',
-					1, 19,  'BOOL',0);
+			'If selected, WS logs all activity for shipping processing.',
+			1, 19,  'BOOL',0);
 		$db->add_config_key('DEBUG_RESET' ,
 			'Reset Without Flush', '',
-					'If selected, WS will not perform a flush on content tables when doing a Reset Store Products.',
-					1, 20,  'BOOL',0);
+			'If selected, WS will not perform a flush on content tables when doing a Reset Store Products.',
+			1, 20,  'BOOL',0);
 		$db->add_config_key('DEBUG_DISABLE_AJAX' ,
 			'Disable Ajax Paging', '0',
-					'If selected, WS will not page using AJAX but will use regular URLs.',
-					1, 21,  'BOOL',0);
+			'If selected, WS will not page using AJAX but will use regular URLs.',
+			1, 21,  'BOOL',0);
 		$db->add_config_key('LOG_ROTATE_DAYS' ,'Log Rotate Days',
-					 '30', 'How many days System Log should be retained.', 1, 30,  'INT',0);
+			'30', 'How many days System Log should be retained.', 1, 30,  'INT',0);
 		$db->add_config_key('UPLOADER_TIMESTAMP' , 'Last timestamp uploader ran',
-					'0', 'Internal', 0, 0,  'NULL',0);
+			'0', 'Internal', 0, 0,  'NULL',0);
 
 		//Families menu labeling
 		$db->query("UPDATE `xlsws_configuration` SET `title`='Show Families on Product Menu?',`configuration_type_id`=19,`sort_order`=3,
@@ -3470,7 +3542,7 @@ function up250($db,$sqlline)
 
 		$db->add_config_key('ENABLE_FAMILIES_MENU_LABEL' ,
 			'Show Families Menu label',
-					'By Manufacturer', '', 19, 4,  NULL,0);
+			'By Manufacturer', '', 19, 4,  NULL,0);
 	}
 
 	if ($sqlline==3)
@@ -3493,12 +3565,12 @@ function up250($db,$sqlline)
 					where `key`='DEFAULT_TEMPLATE'");
 		$db->add_config_key('DEFAULT_TEMPLATE_THEME' ,
 			'Template theme', '',
-					'If supported, changeable colo(u)rs for template files.',
-					0, 2,  'DEFAULT_TEMPLATE_THEME',1);
+			'If supported, changeable colo(u)rs for template files.',
+			0, 2,  'DEFAULT_TEMPLATE_THEME',1);
 		$db->add_config_key('ENABLE_SLASHED_PRICES' ,
 			'Enabled Slashed \"Original\" Prices', '',
-					'If selected, will display original price slashed out and Web Price as a Sale Price.',
-					19, 3,  'ENABLE_SLASHED_PRICES',0);
+			'If selected, will display original price slashed out and Web Price as a Sale Price.',
+			19, 3,  'ENABLE_SLASHED_PRICES',0);
 
 
 		//Fix some sequencing problems for Product options
@@ -3537,45 +3609,45 @@ function up250($db,$sqlline)
 		//ReCaptcha Keys
 		$db->add_config_key('RECAPTCHA_PUBLIC_KEY' ,
 			'ReCaptcha Public Key',
-					'', 'Sign up for an account at http://www.google.com/recaptcha', 18, 2,  NULL,0);
+			'', 'Sign up for an account at http://www.google.com/recaptcha', 18, 2,  NULL,0);
 		$db->add_config_key('RECAPTCHA_PRIVATE_KEY' ,
 			'ReCaptcha Private Key',
-					'', 'Sign up for an account at http://www.google.com/recaptcha', 18, 3,  NULL,0);
+			'', 'Sign up for an account at http://www.google.com/recaptcha', 18, 3,  NULL,0);
 
 		$db->add_config_key('CAPTCHA_STYLE' ,
 			'Captcha Style',
-					'0', 'Sign up for an account at http://www.google.com/recaptcha', 18, 1,  'CAPTCHA_STYLE',0);
+			'0', 'Sign up for an account at http://www.google.com/recaptcha', 18, 1,  'CAPTCHA_STYLE',0);
 
 		$db->add_config_key('CAPTCHA_CHECKOUT' ,
 			'Use Captcha on Checkout',
-					'1', '', 18, 6,  'CAPTCHA_CHECKOUT',0);
+			'1', '', 18, 6,  'CAPTCHA_CHECKOUT',0);
 		$db->add_config_key('CAPTCHA_CONTACTUS' ,
 			'Use Captcha on Contact Us',
-					'1', '', 18, 7,  'CAPTCHA_CONTACTUS',0);
+			'1', '', 18, 7,  'CAPTCHA_CONTACTUS',0);
 		$db->add_config_key('CAPTCHA_REGISTRATION' ,
 			'Use Captcha on Registration',
-					'1', '', 18, 8,  'CAPTCHA_REGISTRATION',0);
+			'1', '', 18, 8,  'CAPTCHA_REGISTRATION',0);
 		$db->add_config_key('CAPTCHA_THEME' ,
 			'ReCaptcha Theme',
-					'white', '', 18, 4,  'CAPTCHA_THEME',1);
+			'white', '', 18, 4,  'CAPTCHA_THEME',1);
 
 
 		//Email options
 		$db->add_config_key('EMAIL_SMTP_AUTH_PLAIN' ,
 			'Force AUTH PLAIN Authentication',
-					 '0', 'Force plain text password in rare circumstances', 5, 9,  'BOOL',0);
+			'0', 'Force plain text password in rare circumstances', 5, 9,  'BOOL',0);
 		$db->add_config_key('EMAIL_SEND_CUSTOMER' ,
 			'Send Receipts to Customers',
-					'1', 'Option whether to email order receipts to customers', 24, 1,  'BOOL',0);
+			'1', 'Option whether to email order receipts to customers', 24, 1,  'BOOL',0);
 		$db->add_config_key('EMAIL_SEND_STORE' ,
 			'Send Order Alerts to Store',
-					'1', 'Option to send Store Owner email when order is placed', 24, 2,  'BOOL',0);
+			'1', 'Option to send Store Owner email when order is placed', 24, 2,  'BOOL',0);
 		$db->add_config_key('EMAIL_SUBJECT_CUSTOMER' ,
 			'Customer Email Subject Line',
-					'%storename% Order Notification %orderid%', 'Configure Email Subject line with variables for Customer Email', 24, 10,  NULL,0);
+			'%storename% Order Notification %orderid%', 'Configure Email Subject line with variables for Customer Email', 24, 10,  NULL,0);
 		$db->add_config_key('EMAIL_SUBJECT_OWNER' ,
 			'Owner Email Subject Line',
-					'%storename% Order Notification %orderid%', 'Configure Email Subject line with variables for Owner email', 24, 11,  NULL,0);
+			'%storename% Order Notification %orderid%', 'Configure Email Subject line with variables for Owner email', 24, 11,  NULL,0);
 
 
 
@@ -3615,7 +3687,7 @@ function up250($db,$sqlline)
 					where `key`='INVENTORY_FIELD_TOTAL'");
 		$db->add_config_key('INVENTORY_RESERVED' ,
 			'Deduct Pending Orders from Available Inventory',
-					'1', 'This option will calculate Qty Available minus Pending Orders. Turning on Upload Orders in LightSpeed Tools->eCommerce->Documents is required to make this feature work properly.', 11, 4,  'BOOL',0);
+			'1', 'This option will calculate Qty Available minus Pending Orders. Turning on Upload Orders in LightSpeed Tools->eCommerce->Documents is required to make this feature work properly.', 11, 4,  'BOOL',0);
 		$db->add_column('xlsws_product' , 'inventory_reserved' ,
 			"ALTER TABLE xlsws_product ADD COLUMN inventory_reserved float NOT NULL DEFAULT 0 AFTER inventory_total;");
 	}
@@ -3639,7 +3711,7 @@ function up250($db,$sqlline)
 					`options`='MATRIX_PRICE',`value`=3,`helper_text`='How should system treat child products when different child products have different prices.' where `key`='MATRIX_PRICE'");
 		$db->add_config_key('PRICE_REQUIRE_LOGIN' ,
 			'Require login to view prices',
-					'0', 'System will not display prices to anyone not logged in.', 3, 3,  'BOOL',0);
+			'0', 'System will not display prices to anyone not logged in.', 3, 3,  'BOOL',0);
 		//Fix some sequencing problems for options
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=4 where `key`='LANGUAGES'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=5 where `key`='MIN_PASSWORD_LEN'");
@@ -3674,57 +3746,57 @@ function up250($db,$sqlline)
 	{
 		$db->add_config_key('SHOW_TEMPLATE_CODE' ,
 			'Show Product Code on Product Details',
-					'1', 'Determines if the Product Code should be visible', 19, 20,  'BOOL',0);
+			'1', 'Determines if the Product Code should be visible', 19, 20,  'BOOL',0);
 		$db->add_config_key('SHOW_SHARING' ,
 			'Show Sharing Buttons on Product Details',
-					'1', 'Show Sharing buttons such as Facebook and Pinterest', 19, 21,  'BOOL',0);
+			'1', 'Show Sharing buttons such as Facebook and Pinterest', 19, 21,  'BOOL',0);
 
 		$db->add_config_key('SEO_URL_CODES' ,
 			'Use Product Codes in Product URLs',
-					'0', 'If your Product Codes are important (such as model numbers), this will include them when making SEO formatted URLs. If you generate your own Product Codes that are only internal, you can leave this off.', 21, 1,  'BOOL',0);
+			'0', 'If your Product Codes are important (such as model numbers), this will include them when making SEO formatted URLs. If you generate your own Product Codes that are only internal, you can leave this off.', 21, 1,  'BOOL',0);
 		$db->add_config_key('GOOGLE_ANALYTICS' ,
 			'Google Analytics Code (format: UA-00000000-0)',
-					'', 'Google Analytics code for tracking', 20, 1,  'NULL',0);
+			'', 'Google Analytics code for tracking', 20, 1,  'NULL',0);
 		$db->add_config_key('GOOGLE_MPN' ,
 			'Product Codes are Manufacturer Part Numbers in Google Shopping', '0',
-						'If your Product Codes are Manufacturer Part Numbers, turn this on to apply this to Google Shopping feed.',
-						20, 4,  'BOOL', 0);
+			'If your Product Codes are Manufacturer Part Numbers, turn this on to apply this to Google Shopping feed.',
+			20, 4,  'BOOL', 0);
 		$db->add_config_key('GOOGLE_ADWORDS' ,
 			'Google AdWords ID (format: 000000000)',
-					'', 'Google AdWords Conversion ID (found in line \'var google_conversion_id\' when viewing code from Google AdWords setup)', 20, 2,  'NULL',0);
+			'', 'Google AdWords Conversion ID (found in line \'var google_conversion_id\' when viewing code from Google AdWords setup)', 20, 2,  'NULL',0);
 		$db->add_config_key('GOOGLE_VERIFY' ,
 			'Google Site Verify ID (format: _PRasdu8f9a8F9A..etc)',
-					'', 'Google Verify Code (found in google-site-verification meta header)', 20, 3,  'NULL',0);
+			'', 'Google Verify Code (found in google-site-verification meta header)', 20, 3,  'NULL',0);
 
 
 
 		$db->add_config_key('STORE_TAGLINE' ,
 			'Store Tagline',
-					'Amazing products available to order online!', 'Slogan which follows your store name on the Title bar', 2, 4,  'NULL',0);
+			'Amazing products available to order online!', 'Slogan which follows your store name on the Title bar', 2, 4,  'NULL',0);
 		$db->add_config_key('STORE_ADDRESS1' ,
 			'Store Address',
-					'123 Main St.', 'Address line 1', 2, 5,  'NULL',0);
+			'123 Main St.', 'Address line 1', 2, 5,  'NULL',0);
 		$db->add_config_key('STORE_ADDRESS2' ,
 			'Store City, State, Postal',
-					 'Anytown, NY 12345', 'Address line 2', 2, 6,  'NULL',0);
+			'Anytown, NY 12345', 'Address line 2', 2, 6,  'NULL',0);
 		$db->add_config_key('STORE_HOURS' ,
 			'Store Operating Hours',
-					'MON - SAT: 9AM-9PM', 'Store hours.', 2, 7,  'NULL',0);
+			'MON - SAT: 9AM-9PM', 'Store hours.', 2, 7,  'NULL',0);
 
 
 		//URL and Description Formatting
 		$db->add_config_key('SEO_PRODUCT_TITLE' ,
 			'Product Title format',
-					'%description% : %storename%', 'Which elements appear in the Title', 22, 2,  'NULL',0);
+			'%description% : %storename%', 'Which elements appear in the Title', 22, 2,  'NULL',0);
 		$db->add_config_key('SEO_PRODUCT_DESCRIPTION' ,
 			'Product Meta Description format',
-					'%longdescription%', 'Which elements appear in the Meta Description', 22, 3,  'NULL',0);
+			'%longdescription%', 'Which elements appear in the Meta Description', 22, 3,  'NULL',0);
 		$db->add_config_key('SEO_CATEGORY_TITLE' ,
 			'Category pages Title format',
-					'%name% : %storename%', 'Which elements appear in the title of a category page', 23, 1,  'NULL',0);
+			'%name% : %storename%', 'Which elements appear in the title of a category page', 23, 1,  'NULL',0);
 		$db->add_config_key('SEO_CUSTOMPAGE_TITLE' ,
 			'Custom pages Title format',
-					'%name% : %storename%', 'Which elements appear in the title of a custom page', 23, 2,  'NULL',0);
+			'%name% : %storename%', 'Which elements appear in the title of a custom page', 23, 2,  'NULL',0);
 
 		//Copy our category table since we will use this to handle uploads and SEO activities
 		$db->add_table('xlsws_category_addl' , "CREATE TABLE `xlsws_category_addl` (
@@ -3759,32 +3831,32 @@ function up250($db,$sqlline)
 
 		$db->add_config_key('CATEGORY_IMAGE_WIDTH' ,
 			'Category Page Image Width',
-					'180', 'if using a Category Page image', 29, 7,  'INT',1);
+			'180', 'if using a Category Page image', 29, 7,  'INT',1);
 		$db->add_config_key('CATEGORY_IMAGE_HEIGHT' ,
 			'Category Page Image Height',
-					'180', 'if using a Category Page image', 29, 8,  'INT',1);
+			'180', 'if using a Category Page image', 29, 8,  'INT',1);
 		$db->add_config_key('PREVIEW_IMAGE_WIDTH' ,
 			'Preview Thumbnail (Product Detail Page) Width',
-					'30', 'Preview Thumbnail image', 29, 9,  'INT',1);
+			'30', 'Preview Thumbnail image', 29, 9,  'INT',1);
 		$db->add_config_key('PREVIEW_IMAGE_HEIGHT' ,
 			'Preview Thumbnail (Product Detail Page) Height',
-					'30', 'Preview Thumbnail image', 29, 10,  'INT',1);
+			'30', 'Preview Thumbnail image', 29, 10,  'INT',1);
 		$db->add_config_key('SLIDER_IMAGE_WIDTH' ,
 			'Slider Image Width',
-					'90', 'Slider on custom pages', 29, 11,  'INT',1);
+			'90', 'Slider on custom pages', 29, 11,  'INT',1);
 		$db->add_config_key('SLIDER_IMAGE_HEIGHT' ,
 			'Slider Image Height',
-					'90', 'Slider on custom pages', 29, 12,  'INT',1);
+			'90', 'Slider on custom pages', 29, 12,  'INT',1);
 		$db->add_config_key('IMAGE_FORMAT' ,
 			'Image Format',
-					'jpg', 'Use .jpg or .png format for images. JPG files are smaller but slightly lower quality. PNG is higher quality and supports transparency, but has a larger file size.', 17, 18,  'IMAGE_FORMAT',0);
+			'jpg', 'Use .jpg or .png format for images. JPG files are smaller but slightly lower quality. PNG is higher quality and supports transparency, but has a larger file size.', 17, 18,  'IMAGE_FORMAT',0);
 
 		$db->query("UPDATE `xlsws_configuration` SET `configuration_type_id`=17, `sort_order`=15
 					where `key`='PRODUCT_ENLARGE_SHOW_LIGHTBOX'");
 
 		$db->add_config_key('ENABLE_CATEGORY_IMAGE' ,
 			'Display Image on Category Page (when set)',
-					'0', 'Requires a defined Category image under SEO settings', 0, 13,  'BOOL',1);
+			'0', 'Requires a defined Category image under SEO settings', 0, 13,  'BOOL',1);
 		$db->query("update `xlsws_configuration` set template_specific=1,`configuration_type_id`=29 where `key` like '%_IMAGE_WIDTH'");
 		$db->query("update `xlsws_configuration` set template_specific=1,`configuration_type_id`=29 where `key` like '%_IMAGE_HEIGHT'");
 		$db->query("update `xlsws_configuration` set template_specific=1 where `key` = 'DEFAULT_TEMPLATE_THEME'");
@@ -3810,7 +3882,7 @@ function up250($db,$sqlline)
 
 
 
-	//Cart flash messages table
+		//Cart flash messages table
 		$db->add_table('xlsws_cart_messages' , "CREATE TABLE `xlsws_cart_messages` (
 				  `rowid` int(11) unsigned NOT NULL AUTO_INCREMENT,
 				  `cart_id` bigint(20) DEFAULT NULL,
@@ -3825,7 +3897,7 @@ function up250($db,$sqlline)
 		//Shipping options
 		$db->add_config_key('SHIP_SAME_BILLSHIP' ,
 			'Require Billing and Shipping Address to Match',
-					'0', 'Locks the Shipping and Billing are same checkbox to not allow separate shipping address.', 25, 2,  'BOOL',0);
+			'0', 'Locks the Shipping and Billing are same checkbox to not allow separate shipping address.', 25, 2,  'BOOL',0);
 		$db->query("UPDATE `xlsws_configuration` SET `configuration_type_id`=25, `sort_order`=1
 					where `key`='SHIP_RESTRICT_DESTINATION'");
 		if ($db->add_column('xlsws_shipping_tiers' , 'class_name' ,
@@ -3924,7 +3996,7 @@ function parse_php_info()
 	return $phpinfo;
 }
 
- function xls_check_server_environment()
+function xls_check_server_environment()
 {
 	$phpinfo = parse_php_info();
 	//We check all the elements we need for a successful install and pass back the report
@@ -3977,29 +4049,28 @@ function parse_php_info()
 		$checked['short_open_tag in Php.ini must be turned On'] = ($phpinfo['Core']['short_open_tag'] == "On" ? "pass" : "fail");
 	}
 
-
-
-
+	if (version_compare(PHP_VERSION, '5.4.0', '>'))
+		$checked['Default timezone'] = ($phpinfo['date']['date.timezone'] == "no value" ? "fail" : "pass");
 
 
 	//Check folder permissions
-	 if (file_exists('images'))
-	$checked['/images folder must be writeable'] = (is_writable('images') ? "pass" : "fail");
-	 if (file_exists('assets'))
-	$checked['/assets folder must be writeable'] = (is_writable('assets') ? "pass" : "fail");
-	 if (file_exists('runtime'))
-		 $checked['/runtime folder must be writeable'] = (is_writable('runtime') ? "pass" : "fail");
-	 if (file_exists('runtime/cache'))
-		 $checked['/runtime/cache folder must be writeable'] = (is_writable('runtime/cache') ? "pass" : "fail");
-	 if (file_exists('config'))
-	 $checked['/config folder must be writeable'] = (is_writable('config') ? "pass" : "fail");
+	if (file_exists('images'))
+		$checked['/images folder must be writeable'] = (is_writable('images') ? "pass" : "fail");
+	if (file_exists('assets'))
+		$checked['/assets folder must be writeable'] = (is_writable('assets') ? "pass" : "fail");
+	if (file_exists('runtime'))
+		$checked['/runtime folder must be writeable'] = (is_writable('runtime') ? "pass" : "fail");
+	if (file_exists('runtime/cache'))
+		$checked['/runtime/cache folder must be writeable'] = (is_writable('runtime/cache') ? "pass" : "fail");
+	if (file_exists('config'))
+		$checked['/config folder must be writeable'] = (is_writable('config') ? "pass" : "fail");
 
 	//If any of our items fail, be helpful and show them where the php.ini is. Otherwise, we hide it since working servers shouldn't advertise this
 	if (in_array('fail',$checked))
 		$checked = array_merge(array('<b>php.ini file is at</b> '.$phpinfo['phpinfotemp']['Loaded Configuration File']=>"pass"),$checked);
 	return $checked;
 }
- function xls_check_upgrades()
+function xls_check_upgrades()
 {
 	$checked = array();
 	$strFolder =str_replace("/install.php","",$_SERVER['SCRIPT_NAME']);

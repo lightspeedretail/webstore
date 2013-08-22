@@ -225,7 +225,9 @@ class BaseCheckoutForm extends CFormModel
 					{
 						Yii::import('ext.validators.ECCValidator');
 						$cc = new ECCValidator();
-						$cc->format = array(ECCValidator::MASTERCARD, ECCValidator::VISA);
+						$cardType = str_replace(" ","_",strtoupper($this->cardType));
+
+						$cc->format = array(constant('ECCValidator::'.$cardType));
 
 						if(!$cc->validateNumber($this->cardNumber))
 							$this->addError($this->cardNumber,

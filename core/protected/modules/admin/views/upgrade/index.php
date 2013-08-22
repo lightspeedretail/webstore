@@ -93,7 +93,7 @@
 
 						if (online==obj.total) {
 							clearInterval(pinttimer);
-							window.location.href = window.location.href.replace("upgrade/index", "");
+							window.location.href = window.location.href.replace("upgrade/index", "default/releasenotes");
 						}else {
 							prunning=0;
 						}

@@ -20,7 +20,7 @@ class UserIdentity extends CUserIdentity
 	 */
 	public function authenticate()
 	{
-		error_log("here 2");
+
 		$user = Customer::model()->findByAttributes(array('email' => $this->username,'record_type'=>Customer::REGISTERED));
 		if (!($user instanceof Customer) || $user->email !== $this->username) {
 			$this->errorCode = self::ERROR_USERNAME_INVALID;
@@ -35,7 +35,7 @@ class UserIdentity extends CUserIdentity
 			else
 				$this->errorCode = self::ERROR_PASSWORD_INVALID;
 
-		} else {error_log("here 3");
+		} else {
 			$this->errorCode = self::ERROR_NONE;
 			$this->_id = $user->id;
 			$this->setState('fullname', $user->first_name.' '.$user->last_name);
@@ -47,10 +47,10 @@ class UserIdentity extends CUserIdentity
 				$this->setState('role', 'admin');
 			else
 				$this->setState('role', 'user');
-			error_log("here 4 ".$user->password." ".$this->password." ".$this->hash($this->password));
+
 			//If we used an md5 password from old webstore, let's re-encrypt it with the new format
 			if 	($user->password == $this->hash($this->password))
-			{error_log("here 5");
+			{
 				Yii::log("Note, user's old MD5 password upgraded ".$user->fullname, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				$user->password = _xls_encrypt($this->password);
 			}

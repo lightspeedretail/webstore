@@ -434,8 +434,9 @@ class Product extends BaseProduct
 	 * @param string $type :: Image size constant
 	 * @return string
 	 */
-	protected function GetImageLink($type = ImagesType::normal) {
-		return Images::GetLink($this->image_id, $type);
+	protected function GetImageLink($type = ImagesType::normal,$absolute=false)
+	{
+		return Images::GetLink($this->image_id, $type,$absolute);
 	}
 
 	/**
@@ -469,6 +470,18 @@ class Product extends BaseProduct
 
 	}
 
+	public function getAbsoluteLink() {
+		if ($this->IsChild)
+			//if ($prod = Product::model()->findByPk($this->parent))
+				return $this->parent0->getAbsolutelink();
+
+		//return _xls_site_url($this->request_url."/".XLSURL::KEY_PRODUCT."/".$this->id);
+		//return Yii::app()->createUrl('/product',array('id'=>$this->id));
+
+		return Yii::app()->createAbsoluteUrl('product/view',array('id'=>$this->id,'name'=>$this->request_url));
+
+	}
+
 	protected function GetPageMeta($strConf = 'SEO_PRODUCT_TITLE') {
 
 		if (isset($this->family)) $family = $this->family->family; else $family="";
@@ -486,7 +499,7 @@ class Product extends BaseProduct
 				"{family}"=>$family,
 				"{class}"=>$classname,
 				"{crumbtrail}"=>implode(" ",_xls_get_crumbtrail('names')),
-				"{rcrumbtrai}"=>implode(" ",array_reverse(_xls_get_crumbtrail('names')))
+				"{rcrumbtrail}"=>implode(" ",array_reverse(_xls_get_crumbtrail('names')))
 		));
 
 		$strItem = strip_tags($strItem);
@@ -1300,8 +1313,14 @@ class Product extends BaseProduct
 			case 'ListingImage':
 				return $this->GetImageLink(ImagesType::listing);
 
+			case 'ListingImageAbsolute':
+				return $this->GetImageLink(ImagesType::listing,true);
+
 			case 'MiniImage':
 				return $this->GetImageLink(ImagesType::mini);
+
+			case 'MiniImageAbsolute':
+				return $this->GetImageLink(ImagesType::mini,true);
 
 			case 'MiniImageTag':
 				return CHtml::image(Images::GetLink($this->image_id,ImagesType::mini));
@@ -1309,11 +1328,17 @@ class Product extends BaseProduct
 			case 'PreviewImage':
 				return $this->GetImageLink(ImagesType::preview);
 
+			case 'PreviewImageAbsolute':
+				return $this->GetImageLink(ImagesType::preview,true);
+
 			case 'PreviewImageTag':
 				return CHtml::image(Images::GetLink($this->image_id,ImagesType::preview));
 
 			case 'SliderImage':
 				return $this->GetImageLink(ImagesType::slider);
+
+			case 'SliderImageAbsolute':
+				return $this->GetImageLink(ImagesType::slider,true);
 
 			case 'SliderImageTag':
 				return CHtml::image(Images::GetLink($this->image_id,ImagesType::slider));
@@ -1321,11 +1346,17 @@ class Product extends BaseProduct
 			case 'CategoryImage':
 				return $this->GetImageLink(ImagesType::category);
 
+			case 'CategoryImageAbsolute':
+				return $this->GetImageLink(ImagesType::category,true);
+
 			case 'CategoryImageTag':
 				return CHtml::image(Images::GetLink($this->image_id,ImagesType::category));
 
 			case 'PDetailImage':
 				return $this->GetImageLink(ImagesType::pdetail);
+
+			case 'PDetailImageAbsolute':
+				return $this->GetImageLink(ImagesType::pdetail,true);
 
 			case 'PDetailImageTag':
 				return CHtml::image(Images::GetLink($this->image_id,ImagesType::pdetail));
@@ -1333,11 +1364,17 @@ class Product extends BaseProduct
 			case 'SmallImage':
 				return $this->GetImageLink(ImagesType::small);
 
+			case 'SmallImageAbsolute':
+				return $this->GetImageLink(ImagesType::small,true);
+
 			case 'SmallImageTag':
 				return CHtml::image(Images::GetLink($this->image_id,ImagesType::small));
 
 			case 'Image':
 				return $this->GetImageLink(ImagesType::normal);
+
+			case 'ImageAbsolute':
+				return $this->GetImageLink(ImagesType::normal,true);
 
 			case 'ImageTag':
 				return CHtml::image(Images::GetLink($this->image_id,ImagesType::normal));

@@ -72,7 +72,7 @@ class ProductController extends Controller
 
 		//Set breadcrumbs
 		$this->breadcrumbs = $model->Breadcrumbs;
-		$this->pageImageUrl = _xls_site_url($model->SmallImage,true);
+		$this->pageImageUrl = $model->SmallImageAbsolute;
 
 
 		$objWishlistAddForm = new WishlistAddForm();
@@ -84,7 +84,7 @@ class ProductController extends Controller
 
 		$this->setPageTitle($model->PageTitle);
 		$this->pageDescription = $model->PageDescription;
-		$this->CanonicalUrl = $this->createAbsoluteUrl($model->Link);
+		$this->CanonicalUrl = $model->AbsoluteLink;
 		$this->returnUrl = $this->CanonicalUrl;
 		$model->intQty=1;
 

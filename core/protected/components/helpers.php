@@ -66,6 +66,63 @@ function _xls_theme_config($theme)
 
 }
 
+
+/**
+ * Get a file from our CDN network.
+ * @param $url
+ * @return bool|mixed
+ */
+function getFile($url)
+{
+	if(stripos($url,".lightspeedretail.com")>0)
+	{
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_VERBOSE, 1);
+
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+		$resp = curl_exec($ch);
+		curl_close($ch);
+		return $resp;
+	} else return false;
+
+
+}
+
+
+/**
+ * Download the Brooklyn template. We call this during install and also on the off chance that Brooklyn suddenly
+ * goes missing.
+ */
+function downloadBrooklyn()
+{
+	$jLatest= getFile("http://updater.lightspeedretail.com/site/latestbrooklyn");
+	$result = json_decode($jLatest);
+	$strWebstoreInstall = "http://cdn.lightspeedretail.com/webstore/themes/".$result->latest->filename;
+
+	$data = getFile($strWebstoreInstall);
+	if (stripos($data,"404 - Not Found")>0 || empty($data)){
+		Yii::log("ERROR downloading themes/brooklyn.zip from LightSpeed", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		return false;
+	}
+
+	$f=file_put_contents("themes/brooklyn.zip", $data);
+	if ($f)
+	{
+		require_once( YiiBase::getPathOfAlias('application.components'). '/zip.php');
+		extractZip("brooklyn.zip",'',YiiBase::getPathOfAlias('webroot.themes'));
+		@unlink("themes/brooklyn.zip");
+	}
+	else {
+		Yii::log("ERROR downloading themes/brooklyn.zip from LightSpeed", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		return false;
+	}
+	return true;
+}
 function _xls_regionalize($str)
 {
 	$c = Yii::app()->params['DEFAULT_COUNTRY'];
@@ -1424,8 +1481,10 @@ function _xls_avail_languages()
 
 }
 
-function _xls_check_version()
+function _xls_check_version($releasenotes = false)
 {
+	if(!Yii::app()->theme) return false;
+
 	$url = "http://updater.lightspeedretail.com";
 	//$url = "http://www.lsvercheck.site";
 
@@ -1447,12 +1506,14 @@ function _xls_check_version()
 		$strTheme = "unknown";
 		$strThemeVersion="noupdate";
 	}
+
 	$data['webstore'] = array(
 		'version'       => XLSWS_VERSIONBUILD,
 		'customer'      => $storeurl,
 		'type'          => (_xls_get_conf('LIGHTSPEED_HOSTING')==1 ? "hosted" : "self"),
 		'track'         => (_xls_get_conf('AUTO_UPDATE_TRACK','0')==1 ? "beta" : "release"),
 		'theme'         => $strTheme,
+		'releasenotes'  => $releasenotes,
 		'themeversion'  => $strThemeVersion,
 		'schema'  => _xls_get_conf('DATABASE_SCHEMA_VERSION')
 
