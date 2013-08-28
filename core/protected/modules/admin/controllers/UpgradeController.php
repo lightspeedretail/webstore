@@ -359,7 +359,7 @@ class UpgradeController extends CController
 
 		$ch = curl_init($url);
 
-		curl_setopt($ch, CURLOPT_VERBOSE, 1);
+		curl_setopt($ch, CURLOPT_VERBOSE, 0);
 
 		curl_setopt($ch, CURLOPT_HEADER, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -384,7 +384,7 @@ class UpgradeController extends CController
 		$url = "http://cdn.lightspeedretail.com/webstore/webstore-incremental/".$url;
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_VERBOSE, 1);
+		curl_setopt($ch, CURLOPT_VERBOSE, 0);
 
 		// Turn off the server and peer verification (TrustManager Concept).
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);

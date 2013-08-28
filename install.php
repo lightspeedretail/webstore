@@ -7,44 +7,206 @@ if (version_compare(PHP_VERSION, '5.3.0') < 0) {
 	die('WebStore requires at least PHP version of 5.3 (5.4 is preferable). Sorry cannot continue installation.');
 }
 
-//////////////////////////////////////////////////////////////////
-// Set up initial pathing so install can continue
+
 define ('__SUBDIRECTORY__', preg_replace('/\/?\w+\.php$/', '', $_SERVER['PHP_SELF']));
 define ('__DOCROOT__', substr(dirname(__FILE__), 0, strlen(dirname(__FILE__)) - strlen(__SUBDIRECTORY__)));
 define ('__VIRTUAL_DIRECTORY__', '');
 
 //Installer can only run if the site hasn't been set up
-if(file_exists("config/main.php") && $_SERVER['REQUEST_URI'] != __SUBDIRECTORY__ . "/install.php?check")
+if(file_exists("config/main.php") && isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'] != __SUBDIRECTORY__ . "/install.php?check")
 {
 	header("Location: index.php");
 	exit;
 }
 
-
-
-
-$step = 1;
-if (isset($_POST['step']))
-	$step = preg_replace('/[^0-9]/', '', $_POST['step']);
-if (isset($_POST['sqlline'])) { $db = createDbConnection(); echo runInstall($db,preg_replace('/[^0-9]/', '', $_POST['sqlline'])); exit(); }
-switch ($step)
+if(isset($_POST['getpg']))
 {
-	case 2:displayFormTwo(); break;
-	case 3:displayForm(); break;
-	case 1: default:
-	$checkenv = xls_check_server_environment();
-	if ((in_array("fail", $checkenv) && $_SERVER['REQUEST_URI'] != __SUBDIRECTORY__ . "/install.php?ignore")
-		|| $_SERVER['REQUEST_URI'] == __SUBDIRECTORY__ . "/install.php?check"
-	) {
-		displayNotAcceptable($checkenv);
-	} else {
-
-		displayForm();
+	if(file_exists("progress.txt"))
+	{
+		$c = file_get_contents("progress.txt");
+		if(empty($c)) $c=1;
+		echo json_encode(array('result'=>"success",'progress'=>$c));
 	}
-	break;
-
+	else echo json_encode(array('result'=>"success",'progress'=>1));
+	return;
 }
 
+if(isset($argv)) $arg = arguments($argv); else $arg=array();
+if(count($arg))
+{
+	//We're running this install from the command line
+	//usage: php install.php --dbhost=localhost --dbuser=root
+	//   --dbpass=mypass --dbname=webstore --url=store.example.com
+	//   --oldbname=webstorebak (optional)
+	//WARNING: This method of install does not run the environment check
+	//We cannot guarantee all libraries are installed
+	//(This is because command line php may differ from Apache server php)
+
+	if(isset($arg['help'])) showCommandLine();
+	if(file_exists("config/main.php")) die("\nENTER 1 OR 2 FOR INSTRUCTIONS (ENTER 2 TO PAGE)\n\nENTER SEED NUMBER
+INITIALIZING...\n\nYOU MUST DESTROY 17 KINGONS IN 30 STARDATES WITH 3 STARBASES\n\n-=--=--=--=--=--=--=--=-\n
+    *\n                         STARDATE  2100\n                *     *  CONDITION GREEN\n            <*>          QUADRANT  5,2\n    *                    SECTOR    5,4\n                         ENERGY    3000\n                         SHIELDS   0\n                   *     PHOTON TORPEDOES 10\n-=--=--=--=--=--=--=--=-\nCOMMAND\n\nHey, ensign Wesley, Web Store is already installed!\n\n");
+	if(isset($arg['dbupdate']) && $arg['dbupdate']==1)
+	{
+		//This is command line for applying any database updates
+		echo "\n**Applying latest database changes**\n\n";
+		runYii('www.example.com','/install.php',49);
+		die();
+	}
+
+	$arrRequired = array('dbhost','dbuser','dbpass','dbname','url');
+	foreach($arrRequired as $item)
+		if(!isset($arg[$item]))
+			showCommandLine();
+
+	echo "\n**Installing Web Store**\n\n";
+
+	if(isset($arg['dboldname']))
+		$_POST['dboldname']=$arg['dboldname'];
+
+	downloadLatest();
+	zipAndFolders();
+	writeDB($arg['dbhost'],$arg['dbuser'],$arg['dbpass'],$arg['dbname']);
+
+	$arg=modifyArgs($arg);
+
+
+
+
+	$db = createDbConnection();
+	$sqlline = 1;
+	$endline = 99999999;
+	$tag="";
+	$saveperc=0;
+	while($sqlline<=$endline)
+	{
+		$retVal = runInstall($db,$sqlline);
+		$j = json_decode($retVal);
+
+		if($j->result=="success")
+		{
+			$sqlline = $j->line+1;
+			$endline = $j->total;
+			if(isset($j->tag) && $tag != $j->tag)
+			{
+				echo $j->tag."\n";
+				$tag=$j->tag;
+			}
+			$perc = round($sqlline/$endline*50,0);
+			if ($perc != $saveperc)
+			{
+				$saveperc = $perc;
+				echo $perc."%\n";
+			}
+
+		} else {
+			echo $j->result;
+			die();
+		}
+	}
+
+	if(isset($arg['hosted']))
+		$db->query("update xlsws_configuration set key_value=1 where key_name='LIGHTSPEED_HOSTING'");
+
+	echo "\nLaunching Yii bootstrap\n";
+	runYii($arg['url'],$_SERVER['SCRIPT_NAME']);
+
+}
+else {
+	//We're running this install from the browser
+
+	//////////////////////////////////////////////////////////////////
+	// Set up initial pathing so install can continue
+
+	$step = 1;
+	if (isset($_POST['step']))
+		$step = preg_replace('/[^0-9]/', '', $_POST['step']);
+	if (isset($_POST['sqlline'])) { $db = createDbConnection(); echo runInstall($db,preg_replace('/[^0-9]/', '', $_POST['sqlline'])); exit(); }
+	switch ($step)
+	{
+		case 2:displayFormTwo(); break;
+		case 3:displayForm(); break;
+		case 1: default:
+		$checkenv = xls_check_server_environment();
+		if ((in_array("fail", $checkenv) && $_SERVER['REQUEST_URI'] != __SUBDIRECTORY__ . "/install.php?ignore")
+			|| $_SERVER['REQUEST_URI'] == __SUBDIRECTORY__ . "/install.php?check"
+		) {
+			displayNotAcceptable($checkenv);
+		} else {
+
+			displayForm();
+		}
+		break;
+
+	}
+}
+
+function showCommandLine()
+{
+	die("\n*error halting*\n\nusage: php install.php --dbhost=localhost --dbuser=root --dbpass=mypass --dbname=webstore --url=store.example.com --dboldname=webstorebak (optional) --hosted=1 (optional)\n\n");
+}
+function runYii($url,$scriptname,$sqlline=1)
+{
+	//This is the halfway point, we have to switch to the Yii framework now, so let's bootstrap it
+	$yii=dirname(__FILE__).'/core/framework/yii.php';
+	$config=dirname(__FILE__).'/config/main.php';
+	require_once($yii);
+	$objYii = Yii::createWebApplication($config);
+
+	Configuration::exportConfig();
+	Configuration::exportLogging();
+
+	//Since we're in this same instance, reread the variables we just wrote
+	//Because we've updated the config, rerun
+	Yii::app()->theme='brooklyn';
+	Yii::app()->language='en';
+	$objConfig = Configuration::model()->findAllByAttributes(array('param'=>'1'),array('order'=>'key_name'));
+	foreach ($objConfig as $oConfig)
+		Yii::app()->params[$oConfig->key_name]=str_replace('\'','\\\'',$oConfig->key_value);
+	Yii::app()->params['OFFLINE']=0;
+	Yii::app()->params['INSTALLED']=1;
+
+
+	$_SERVER=array(
+		'REQUEST_URI'=>'/index.php',
+		'SERVER_NAME'=>$url,
+		'SCRIPT_NAME'=>$scriptname,
+		'PHP_SELF'=>$scriptname,
+		'HTTP_USER_AGENT'=>'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/536.30.1 (KHTML, like Gecko)',
+		'HTTP_HOST'=>$url,
+		'QUERY_STRING'=>'',
+
+	);
+	$_SESSION['DUMMY']="nothing"; //force creation of session just in case
+
+
+	do
+	{
+		$_POST['online']=$sqlline;
+		ob_start();
+		$objYii->runController("install/upgrade");
+		$retVal = ob_get_contents();
+
+		$j = json_decode($retVal);
+
+		if(isset($j->result) && $j->result=="success")
+		{
+			ob_clean();
+			$sqlline = $j->makeline;
+			$endline = $j->total;
+			if(isset($j->tag))
+				echo $j->tag." ";
+			echo (50+$sqlline)."%\n";
+		} else die();
+
+		ob_end_flush();
+
+	} while ($sqlline<50);
+
+	if($url!= "www.example.com") //IOW only command line db updates
+		echo "\n** finished **\n\nCustomer needs to go to http://".$url."/admin/license to complete installation.\n\n";
+
+}
 function xls_check_file_signatures($complete = false)
 {
 	$url = "http://updater.lightspeedretail.com";
@@ -52,11 +214,11 @@ function xls_check_file_signatures($complete = false)
 
 	$url .= "/webstore/hash";
 
-	$json = json_encode(array('version'=>XLSWS_VERSION));
+	$json = json_encode(array('version'=> _ws_version()));
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
-	curl_setopt($ch, CURLOPT_VERBOSE, 1);
+	curl_setopt($ch, CURLOPT_VERBOSE, 0);
 
 	// Turn off the server and peer verification (TrustManager Concept).
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
@@ -77,7 +239,7 @@ function xls_check_file_signatures($complete = false)
 	$versions = explode(",",$oXML->versions);
 
 	$checked = array();
-	$checked['<b>--File Signatures Check for ' . _xls_version() . '--</b>'] = "pass";
+	$checked['<b>--File Signatures Check for ' . _ws_version() . '--</b>'] = "pass";
 
 
 	$fn = unserialize($signatures);
@@ -94,7 +256,7 @@ function xls_check_file_signatures($complete = false)
 			$hashfile = md5_file($key);
 			if (!in_array($hashfile, $hashes)) {
 				$checked[$key] = "modified";
-			} elseif (_xls_version() != $versions[array_search($hashfile, $hashes)] || $complete) {
+			} elseif (_ws_version() != $versions[array_search($hashfile, $hashes)] || $complete) {
 				$checked[$key] = $versions[array_search($hashfile, $hashes)];
 			}
 		}
@@ -147,7 +309,7 @@ Sitemap: http://www.example.com/store/sitemap.xml
 
 }
 
-function  _xls_version()
+function  _ws_version()
 {
 	if(file_exists("core/protected/config/wsver.php"))
 	{
@@ -163,14 +325,14 @@ function displayForm()
 	displayHeader();
 	$dbhost = "localhost";
 	$dbport = "3306";
-	$dbusername = ini_get('mysql.default_user');
+	$dbuser = ini_get('mysql.default_user');
 	$dbpass = "";
 	$dbname = "";
 
 	if (file_exists("config/wsdb.php"))
 	{
 		$arrSql = require("config/wsdb.php");
-		if(isset($arrSql['username'])) $dbusername = $arrSql['username'];
+		if(isset($arrSql['username'])) $dbuser = $arrSql['username'];
 		if(isset($arrSql['password'])) $dbpass = $arrSql['password'];
 		if(isset($arrSql['connectionString']))
 		{
@@ -211,7 +373,7 @@ function displayForm()
 			</tr>
 			<tr>
 				<td nowrap>MySQL Username:</td>
-				<td><input id="dbusername" name="dbusername" value="<?php echo $dbusername; ?>" type="text" class="input-medium"></td>
+				<td><input id="dbuser" name="dbuser" value="<?php echo $dbuser; ?>" type="text" class="input-medium"></td>
 			</tr>
 			<tr>
 				<td nowrap>MySQL Password:</td>
@@ -252,7 +414,7 @@ function displayNotAcceptable($checkenv)
 	$warning_text = "<table class='table table-striped'>";
 	if (stripos($_SERVER['REQUEST_URI'],"install.php?check") !== false) {
 		?><h2>System Check</h2><?php
-		$warning_text .= "<tr><td colspan='2'><b>SYSTEM CHECK for " . _xls_version() . "</b></td></tr>";
+		$warning_text .= "<tr><td colspan='2'><b>SYSTEM CHECK for " . _ws_version() . "</b></td></tr>";
 		$warning_text .= "<tr><td colspan='2'>The chart below shows the results of the system check and if upgrades have been performed.</td></td>";
 
 		//For 2.1.x upgrade, have the upgrades been run?
@@ -272,7 +434,7 @@ function displayNotAcceptable($checkenv)
 		$warning_text .= "<tr><td colspan='2'>There are issues with your PHP environment which need to be fixed before you can install WebStore. Please check the chart below for required changes to your PHP installation which must be changed, and subdirectories which you need to make writeable. (Making php.ini changes on a web hosting service will vary by company. Please consult their technical support for exact instructions.)</td></td>";
 	}
 	$warning_text .= "<tr><td colspan='2'><hr></td></tr>";
-	$curver = _xls_version();
+	$curver = _ws_version();
 	foreach ($checkenv as $key => $value) {
 		$warning_text
 			.= "<tr><td>$key</td><td>" . (($value == "pass" || $value == $curver) ? "$value"
@@ -295,7 +457,7 @@ function displayNotAcceptable($checkenv)
 }
 function displayFormTwo()
 {
-	writeDB();
+	writeDB($_POST['dbhost'],$_POST['dbuser'],$_POST['dbpass'],$_POST['dbname']);
 
 
 
@@ -335,7 +497,26 @@ function displayFormTwo()
 		}
 		function runInstall(key)
 		{
-			if (prunning==1) return;
+			if (prunning==1)
+			{
+				if(online==2)
+				{
+					var postvar = "getpg=1";
+
+					$.post("install.php", postvar, function(data)
+					{
+						if (data[0]=="{")
+						{
+							obj = JSON.parse(data);
+							if (obj.result=='success' && obj.progress>1) {
+								document.getElementById('progressbar').style.width = obj.progress + "%";
+								document.getElementById('progressbar').style.backgroundColor = "#AA0000";
+							}
+						}
+					});
+				}
+				return;
+			}
 			prunning=1;
 			var postvar = "sqlline="+ online +
 				"&dbname=" + "<?php echo $_POST['dbname'] ?>" +
@@ -352,6 +533,7 @@ function displayFormTwo()
 						perc = perc/2;
 						if(perc<1) perc=1;
 						document.getElementById('progressbar').style.width = perc + "%";
+						document.getElementById('progressbar').style.backgroundColor = "#149BDF";
 						if (!obj.tag) obj.tag = "";
 						document.getElementById('stats').innerHTML = obj.tag;
 						<?php if(isset($_GET['debug'])): ?>
@@ -502,8 +684,8 @@ function displayFooter()
 		function validate(){
 			var dbhost = $('#dbhost').val();
 			if (!$.trim(dbhost)) {alert('Database Host is required!'); return false; }
-			var dbusername = $('#dbusername').val();
-			if (!$.trim(dbusername)) {alert('Database Username is required!'); return false; }
+			var dbuser = $('#dbuser').val();
+			if (!$.trim(dbuser)) {alert('Database Username is required!'); return false; }
 			var dbpass = $('#dbpass').val();
 			if (!$.trim(dbpass)) {alert('Database Password is required!'); return false; }
 			var dbname = $('#dbname').val();
@@ -516,24 +698,18 @@ function displayFooter()
 }
 
 
-function writeDB()
+function writeDB($dbhost,$dbuser,$dbpass,$dbname)
 {
-
-	$servername = isset($_POST['dbhost']) ? $_POST['dbhost'] : "";
-	$dbusername  = isset($_POST['dbusername']) ? $_POST['dbusername'] : "";
-	$dbpassword = isset($_POST['dbpass']) ? $_POST['dbpass'] : "";
-	$dbname = isset($_POST['dbname']) ? $_POST['dbname'] : "";
-
-	if (strlen($servername)==0 || strlen($dbusername)==0 || strlen($dbname)==0 || strlen($dbpassword)==0)
+	if (strlen($dbhost)==0 || strlen($dbuser)==0 || strlen($dbname)==0 || strlen($dbpass)==0)
 		return json_encode(array('result'=>"Database connection info missing."));
 
 	$strtoexport = "<?php
 
 return array(
-			'connectionString' => 'mysql:host=".$servername.";dbname=".$dbname."',
+			'connectionString' => 'mysql:host=".$dbhost.";dbname=".$dbname."',
 			'emulatePrepare' => true,
-			'username' => '".$dbusername."',
-			'password' => '".$dbpassword."',
+			'username' => '".$dbuser."',
+			'password' => '".$dbpass."',
 			'charset' => 'utf8',
 			'tablePrefix'=>'xlsws_',
 			'schemaCachingDuration'=>30,
@@ -567,8 +743,8 @@ class DB_Class {
 	var $newdb;
 	var $schemaNumber = 0;
 
-	public function __construct($servername, $dbusername, $dbpassword, $dbname) {
-		$this->db = new mysqli($servername, $dbusername, $dbpassword);
+	public function __construct($servername, $dbuser, $dbpassword, $dbname) {
+		$this->db = new mysqli($servername, $dbuser, $dbpassword);
 		if (!$this->db)
 		{ echo ("Unable to connect to Database Server. Invalid server, username or password."); die(); }
 		$this->newdb = $dbname;
@@ -736,18 +912,21 @@ class DB_Class {
 
 }
 
-function getFile($url)
+function downloadFile($url)
 {
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
-	curl_setopt($ch, CURLOPT_VERBOSE, 1);
+	curl_setopt($ch, CURLOPT_VERBOSE, 0);
 
 	// Turn off the server and peer verification (TrustManager Concept).
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
 	curl_setopt($ch, CURLOPT_PROGRESSFUNCTION, 'progressCallback');
-	curl_setopt($ch, CURLOPT_NOPROGRESS, false); // needed to make progress function work
+	if(stripos($url,".zip") !== false)
+		curl_setopt($ch, CURLOPT_NOPROGRESS, false); // needed to make progress function work
+	else
+		curl_setopt($ch, CURLOPT_NOPROGRESS, true); // needed to make progress function work
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
 	$resp = curl_exec($ch);
@@ -758,63 +937,56 @@ function getFile($url)
 }
 
 
-function progressCallback( $download_size, $downloaded_size, $upload_size, $uploaded_size )
-
+function progressCallback( $download_size, $downloaded, $upload_size, $uploaded_size )
 {
-
-	static $previousProgress = 0;
-
-	if ( $download_size == 0 )
-
-		$progress = 0;
-
+	if ($download_size == 0)
+		$progress = 1;
 	else
+		$progress = round( ($downloaded / $download_size  * 100 ),0);
 
-		$progress = round( $downloaded_size * 100 / $download_size );
+	file_put_contents("progress.txt",$progress);
 
-	if ( $progress > $previousProgress)
+}
 
+function downloadLatest()
+{
+	if(isset($_POST['debug'])) error_log(__FUNCTION__,3,"error.txt");
+	//if we've already downloaded and extracted, don't do it twice
+	if (!file_exists('core') && !file_exists('webstore.zip'))
 	{
+		$dest = (isset($_POST['qa']) ? "qa" : "latestwebstore");
+		$cdn = (isset($_POST['qa']) ? "webstore-qa" : "webstore-full");
+		$jLatest= downloadFile("http://updater.lightspeedretail.com/site/".$dest);
+		$result = json_decode($jLatest);
+		$strWebstoreInstall = "http://cdn.lightspeedretail.com/webstore/".$cdn."/".$result->latest->filename;
+		if(isset($_POST['debug'])) error_log("downloading $strWebstoreInstall",3,"error.txt");
+		$data = downloadFile($strWebstoreInstall);
+		if (stripos($data,"404 - Not Found")>0 || empty($data))
+			echo("ERROR downloading ".$result->latest->filename." from LightSpeed");
+		if(isset($_POST['debug'])) error_log("writing to to".$result->latest->filename,3,"error.txt");
+		$f=file_put_contents("webstore.zip", $data);
+		if(isset($_POST['debug'])) error_log("wrote to".$result->latest->filename,3,"error.txt");
+		if ($f)
+		{
 
-		$previousProgress = $progress;
-
-		$fp = fopen( 'progress.txt', 'w' );
-
-		fputs( $fp, "$progress\n" );
-
-		fclose( $fp );
-
+			if(!isset($_POST['debug'])) @unlink("progress.txt");
+		}
+		else {
+			echo("ERROR downloading ".$result->latest->filename." from LightSpeed");
+		}
 	}
-
 }
 
 function zipAndFolders()
 {
 	if(isset($_POST['debug'])) error_log(__FUNCTION__,3,"error.txt");
 	//if we've already downloaded and extracted, don't do it twice
-	if (!file_exists('core'))
+	if (!file_exists('core') && file_exists("webstore.zip"))
 	{
-		$dest = (isset($_POST['qa']) ? "qa" : "latestwebstore");
-		$cdn = (isset($_POST['qa']) ? "webstore-qa" : "webstore-full");
-		$jLatest= getFile("http://updater.lightspeedretail.com/site/".$dest);
-		$result = json_decode($jLatest);
-		$strWebstoreInstall = "http://cdn.lightspeedretail.com/webstore/".$cdn."/".$result->latest->filename;
-		if(isset($_POST['debug'])) error_log("downloading $strWebstoreInstall",3,"error.txt");
-		$data = getFile($strWebstoreInstall);
-		if (stripos($data,"404 - Not Found")>0 || empty($data))
-			echo("ERROR downloading ".$result->latest->filename." from LightSpeed");
-		if(isset($_POST['debug'])) error_log("writing to to".$result->latest->filename,3,"error.txt");
-		$f=file_put_contents($result->latest->filename, $data);
-		if(isset($_POST['debug'])) error_log("wrote to".$result->latest->filename,3,"error.txt");
-		if ($f)
-		{
-			if(isset($_POST['debug'])) error_log("decompressing ".$result->latest->filename,3,"error.txt");
-			decompress($result->latest->filename);
-			if(isset($_POST['debug'])) error_log("removing ".$result->latest->filename,3,"error.txt");
-			if(!isset($_POST['debug'])) @unlink($result->latest->filename);
-			if(!isset($_POST['debug'])) @unlink("progress.txt");
-		}
-		else echo("ERROR downloading ".$result->latest->filename." from LightSpeed");
+		if(isset($_POST['debug'])) error_log("decompressing webstore.zip",3,"error.txt");
+		decompress("webstore.zip");
+		if(isset($_POST['debug'])) error_log("removing webstore.zip",3,"error.txt");
+		if(!isset($_POST['debug'])) @unlink("webstore.zip");
 	}
 
 	//////////////////////////////////////////////////////////////////
@@ -860,9 +1032,7 @@ function makeSymbolicLink()
 function decompress($zipFile = '', $dirFromZip = '', $zipDir=null)
 {
 
-	define(DIRECTORY_SEPARATOR, '/');
-
-	if (is_null($zipDir)) $zipDir = getcwd() . DIRECTORY_SEPARATOR; else $zipDir .=  DIRECTORY_SEPARATOR;
+	if (is_null($zipDir)) $zipDir = getcwd() . '/'; else $zipDir .=  '/';
 	$zip = zip_open($zipDir.$zipFile);
 
 	if (is_resource($zip))
@@ -919,7 +1089,7 @@ function createDbConnection()
 	//Since we have our db information already saved in the Yii file, read it back here
 	$dbinfo = require(dirname(__FILE__).'/config/wsdb.php');
 
-	$dbusername = $dbinfo['username'];
+	$dbuser = $dbinfo['username'];
 	$dbpassword = $dbinfo['password'];
 
 
@@ -934,11 +1104,11 @@ function createDbConnection()
 
 	$dboldname = isset($_POST['dboldname']) ? $_POST['dboldname'] : "";
 
-	if (strlen($servername)==0 || strlen($dbusername)==0 || strlen($dbname)==0 || strlen($dbpassword)==0)
+	if (strlen($servername)==0 || strlen($dbuser)==0 || strlen($dbname)==0 || strlen($dbpassword)==0)
 		return json_encode(array('result'=>"Database connection info missing."));
 
 
-	$db = new DB_Class($servername, $dbusername, $dbpassword, $dbname);
+	$db = new DB_Class($servername, $dbuser, $dbpassword, $dbname);
 
 	$db->olddb = $dboldname;
 	$db->newdb = $dbname;
@@ -971,17 +1141,29 @@ function runInstall($db,$sqlline = 0)
 
 		case 1:
 
+			$dest = (isset($_POST['qa']) ? "qa" : "latestwebstore");
+			$cdn = (isset($_POST['qa']) ? "webstore-qa" : "webstore-full");
+			$jLatest= downloadFile("http://updater.lightspeedretail.com/site/".$dest);
+			$result = json_decode($jLatest);
 			return json_encode(array('result'=>"success",
-				'tag'=>'Downloading and extracting installation files...','line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
+				'tag'=>'Downloading Web Store program file '.$result->latest->filename.'...','line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
 			break;
 
 		case 2:
-			zipAndFolders();
-			makeSymbolicLink();
-			$tag = "Applying pre-3.0 changes. Line #".$sqlline;
+			downloadLatest();
+			return json_encode(array('result'=>"success",
+				'tag'=>'Extracting Web Store files...','line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
 			break;
 
 		case 3:
+			zipAndFolders();
+			makeSymbolicLink();
+			$tag = "Applying pre-3.0 changes. Line #".$sqlline;
+			return json_encode(array('result'=>"success",
+				'tag'=>$tag,'line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
+			break;
+
+		case 4:
 			if ($upgrade) $db->changedb('old');
 			if ($upgrade) if ($db->schemaNumber<217) up217($db);
 			if ($upgrade) $db->changedb('old');
@@ -989,29 +1171,29 @@ function runInstall($db,$sqlline = 0)
 			$tag = "Applying pre-3.0 changes. Line #".$sqlline;
 			break;
 
-		case 4:
 		case 5:
 		case 6:
 		case 7:
 		case 8:
 		case 9:
 		case 10:
+		case 11:
 			if ($upgrade) $db->changedb('old');
 			if ($upgrade) if ($db->schemaNumber==217) up250($db,$sqlline);
 			$tag = "Applying pre-3.0 changes. Line #".$sqlline;
 			break;
-		case 11:
+		case 12:
 			if ($upgrade) $db->changedb('old');
 			if ($upgrade) if ($db->schemaNumber==250) up251($db);
 			$tag = "Applying pre-3.0 changes. Line #".$sqlline;
 			break;
-		case 12:
+		case 13:
 			if ($upgrade) $db->changedb('old');
 			if ($upgrade) if ($db->schemaNumber==251) up252($db);
 			$tag = "Creating new tables. Line #".$sqlline;
 			break;
 
-		case 13:
+		case 14:
 			$db->changedb('new');
 			initialCreateTables($db); //Create all tables at once
 			if (!$upgrade)
@@ -1021,7 +1203,7 @@ function runInstall($db,$sqlline = 0)
 		default:
 			$db->changedb('new');
 
-			$sqlStringtoRun = trim($arrSql[$sqlline-14],"\n\r\t");
+			$sqlStringtoRun = trim($arrSql[$sqlline-15],"\n\r\t");
 			$sqlStringtoRun = str_replace("{newdbname}",$db->newdb,$sqlStringtoRun);
 
 
@@ -1046,7 +1228,7 @@ function runInstall($db,$sqlline = 0)
 			{
 				makeHtaccess();
 				installMainConfig();
-				$tag = "Halfway there, stand by...";
+				$tag = "Downloading Brooklyn template (this is the halfway mark, isn't this exciting?!)...";
 			}
 
 	}
@@ -1862,33 +2044,33 @@ function initialMigrateTables()
 function migrateTwoFiveToThree()
 {
 
-	return "alter table {newdbname}.xlsws_cart CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_cart_item CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_cart_messages CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_category CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_category CHANGE `parent` `parent` INT(11) unsigned NULL;
-	alter table {newdbname}.xlsws_category_addl CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_configuration CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_country CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_credit_card CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_custom_page CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_customer CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_destination CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_family CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_gift_registry CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_gift_registry_items CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_modules CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_product CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_product_qty_pricing CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_product_related CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_promo_code CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_shipping_tiers CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_sro CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_sro_repair CHANGE `rowid` `id`  BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_sro_repair CHANGE `sro_id` `sro_id`  BIGINT(20) unsigned NOT NULL;
-	alter table {newdbname}.xlsws_state CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_tax CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
-	alter table {newdbname}.xlsws_tax_code CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
+	return "alter table `{newdbname}`.xlsws_cart CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_cart_item CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_cart_messages CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_category CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_category CHANGE `parent` `parent` INT(11) unsigned NULL;
+	alter table `{newdbname}`.xlsws_category_addl CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_configuration CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_country CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_credit_card CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_custom_page CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_customer CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_destination CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_family CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_gift_registry CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_gift_registry_items CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_modules CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_product CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_product_qty_pricing CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_product_related CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_promo_code CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_shipping_tiers CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_sro CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_sro_repair CHANGE `rowid` `id`  BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_sro_repair CHANGE `sro_id` `sro_id`  BIGINT(20) unsigned NOT NULL;
+	alter table `{newdbname}`.xlsws_state CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_tax CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
+	alter table `{newdbname}`.xlsws_tax_code CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
 	alter table `{newdbname}`.xlsws_tax_status CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
 
 	ALTER TABLE `{newdbname}`.`xlsws_cart` CHANGE `name` `full_name` VARCHAR(255)  NULL  DEFAULT NULL;
@@ -2507,7 +2689,7 @@ function migrateTwoFiveToThree()
 	ALTER TABLE `{newdbname}`.`xlsws_customer` ADD FOREIGN KEY (`default_shipping_id`) REFERENCES `xlsws_customer_address` (`id`);
 	ALTER TABLE `{newdbname}`.`xlsws_customer` ADD `last_login` TIMESTAMP  NULL  AFTER `modified`;
 
-	use {newdbname};
+	use `{newdbname}`;
 
 	CREATE TABLE `{newdbname}`.`xlsws_email_queue` (
 	  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -3496,8 +3678,9 @@ function up217($db)
 
 function up250($db,$sqlline)
 {
-	if ($sqlline==2)
+	if ($sqlline==4)
 	{
+
 		$db->add_column('xlsws_configuration' , 'template_specific',
 			"ALTER TABLE xlsws_configuration ADD COLUMN `template_specific` tinyint (1) NULL DEFAULT 0 AFTER `options`");
 
@@ -3506,6 +3689,10 @@ function up250($db,$sqlline)
 
 		$db->query("ALTER TABLE `xlsws_cart` CHANGE `printed_notes` `printed_notes` TEXT  NULL");
 
+		$db->add_config_key('DEBUG_LS_SOAP_CALL' ,
+			'Debug SOAP Calls', '0',
+			'Turn on soap debugging.',
+			1, 17, 'BOOL',0);
 
 		$db->add_config_key('FEATURED_KEYWORD' ,
 			'Featured Keyword', 'featured',
@@ -3545,7 +3732,7 @@ function up250($db,$sqlline)
 			'By Manufacturer', '', 19, 4,  NULL,0);
 	}
 
-	if ($sqlline==3)
+	if ($sqlline==5)
 	{
 		//Promo code table changes
 		if ($db->add_column('xlsws_promo_code' , 'enabled' ,
@@ -3680,7 +3867,7 @@ function up250($db,$sqlline)
 		$db->query("UPDATE `xlsws_configuration` SET `title`='New customers can purchase', `options`='ALLOW_GUEST_CHECKOUT', `helper_text`='Force customers to sign up with an account before shopping? Note this some customers will abandon a forced-signup process. Customer cards are created in LightSpeed based on all orders, not dependent on customer registrations.' where `key`='ALLOW_GUEST_CHECKOUT'");
 	}
 
-	if ($sqlline==4)
+	if ($sqlline==6)
 	{
 		//Inventory handling changes
 		$db->query("UPDATE `xlsws_configuration` SET `title`='Inventory should include Virtual Warehouses'
@@ -3692,7 +3879,7 @@ function up250($db,$sqlline)
 			"ALTER TABLE xlsws_product ADD COLUMN inventory_reserved float NOT NULL DEFAULT 0 AFTER inventory_total;");
 	}
 
-	if ($sqlline==5)
+	if ($sqlline==7)
 	{
 		$db->add_column('xlsws_product' , 'inventory_avail' ,
 			"ALTER TABLE xlsws_product ADD COLUMN inventory_avail float NOT NULL DEFAULT 0 AFTER inventory_reserved;");
@@ -3700,7 +3887,7 @@ function up250($db,$sqlline)
 		$db->query("UPDATE xlsws_product SET inventory_avail=0");
 	}
 
-	if ($sqlline==6)
+	if ($sqlline==8)
 	{
 		$db->query("UPDATE `xlsws_configuration` SET `title`='When a product is Out of Stock',
 					`options`='INVENTORY_OUT_ALLOW_ADD',`helper_text`='How should system treat products currently out of stock. Note: Turn OFF the checkbox for -Only Upload Products with Available Inventory- in Tools->eCommerce.' where `key`='INVENTORY_OUT_ALLOW_ADD'");
@@ -3720,7 +3907,7 @@ function up250($db,$sqlline)
 					`options`='SSL_NO_NEED_FORWARD',`helper_text`='Change when SSL secure mode is used.' where `key`='SSL_NO_NEED_FORWARD'");
 	}
 
-	if ($sqlline==7)
+	if ($sqlline==9)
 	{
 		//SEO Changes
 		$db->add_column('xlsws_category' , 'request_url' ,
@@ -3732,7 +3919,7 @@ function up250($db,$sqlline)
 		$db->add_column('xlsws_family' , 'request_url' ,
 			"ALTER TABLE xlsws_family ADD COLUMN `request_url` varchar (255) AFTER `family`");
 	}
-	if ($sqlline==8)
+	if ($sqlline==10)
 	{
 		$db->add_index('xlsws_family','request_url');
 		$db->add_index('xlsws_category','request_url');
@@ -3742,7 +3929,7 @@ function up250($db,$sqlline)
 		$db->add_index('xlsws_images','image_path');
 	}
 
-	if ($sqlline==9)
+	if ($sqlline==11)
 	{
 		$db->add_config_key('SHOW_TEMPLATE_CODE' ,
 			'Show Product Code on Product Details',
@@ -4100,3 +4287,62 @@ function xls_check_upgrades()
 	return $checked;
 }
 
+function arguments ( $args )
+{
+	$out = array();
+	$last_arg = null;
+	for($i = 1, $il = sizeof($args); $i < $il; $i++) {
+		if( (bool)preg_match("/^--(.+)/", $args[$i], $match) ) {
+			$parts = explode("=", $match[1]);
+			$key = preg_replace("/[^a-z0-9]+/", "", $parts[0]);
+			if(isset($parts[1])) {
+				$out[$key] = $parts[1];
+			}
+			else {
+				$out[$key] = true;
+			}
+			$last_arg = $key;
+		}
+		else if( (bool)preg_match("/^-([a-zA-Z0-9]+)/", $args[$i], $match) ) {
+			for( $j = 0, $jl = strlen($match[1]); $j < $jl; $j++ ) {
+				$key = $match[1]{$j};
+				$out[$key] = true;
+			}
+			$last_arg = $key;
+		}
+		else if($last_arg !== null) {
+			$out[$last_arg] = $args[$i];
+		}
+	}
+	return $out;
+}
+
+function modifyArgs($arg)
+{
+	if(isset($arg['url']))
+	{
+		$url = str_replace("http://","",$arg['url']);
+		$url = str_replace("https://","",$url);
+		if($url[strlen($url)-1]=="/")
+			$url = substr($url,0,-1);
+		$arg['url'] = $url;
+
+		if(stripos($url,"/")===false)
+		{
+			$_SERVER['SERVER_NAME'] = $arg['url'];
+			$_SERVER['SCRIPT_NAME']=$_SERVER['PHP_SELF']="/install.php";
+		} else
+		{
+			$marker = stripos($arg['url'],"/");
+			$path=substr($arg['url'],$marker);
+			$arg['url'] = substr($arg['url'],0,$marker);
+
+			$_SERVER['SERVER_NAME'] = $arg['url'];
+			$_SERVER['SCRIPT_NAME']=$_SERVER['PHP_SELF']=$path."/install.php";
+
+		}
+
+
+	}
+	return $arg;
+}

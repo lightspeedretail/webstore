@@ -78,7 +78,7 @@ function getFile($url)
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_VERBOSE, 1);
+		curl_setopt($ch, CURLOPT_VERBOSE, 0);
 
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -1435,7 +1435,9 @@ function _xls_is_idevice() {
  */
 function _xls_is_ipad() {
 
+	if(isset($_SERVER['HTTP_USER_AGENT']))
 	return (bool) strpos($_SERVER['HTTP_USER_AGENT'],'iPad');
+	else return false;
 }
 
 /**
@@ -1522,7 +1524,7 @@ function _xls_check_version($releasenotes = false)
 
 	$ch = curl_init($url);
 
-	curl_setopt($ch, CURLOPT_VERBOSE, 1);
+	curl_setopt($ch, CURLOPT_VERBOSE, 0);
 
 	curl_setopt($ch, CURLOPT_HEADER, false);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

@@ -967,13 +967,22 @@ class Product extends BaseProduct
 
 		$dbC = Yii::app()->db->createCommand();
 		$dbC->setFetchMode(PDO::FETCH_OBJ);//fetch each row as Object
-
+		Yii::app()->db->schema->getTable('xlsws_product', true);
 		$dbC->select()->from('xlsws_product')->where('web=1 AND '.$strField.'>0 AND inventory_reserved=0 AND inventory_avail=0 AND master_model=0')->order('id')->limit(200);
+
 
 		foreach ($dbC->queryAll() as $objItem) {
 
 			$objProduct = Product::model()->findByPk($objItem->id);
-			$objProduct->SetAvailableInventory();
+
+			try {
+				Yii::app()->db->schema->refresh();
+
+				$objProduct->SetAvailableInventory();
+			}
+			catch (Exception $objExc) {
+
+			}
 		}
 
 		$matches=Yii::app()->db->createCommand("SELECT count(*) as thecount FROM ".Product::model()->tableName()."
@@ -1042,7 +1051,7 @@ class Product extends BaseProduct
 		$blnParent = false;
 		if ($this->IsChild()) {
 			$blnParent = true;
-			$objProduct = $this->FkProductMaster;
+			$objProduct = $this->GetMaster();
 		}
 
 		if (!$objProduct)

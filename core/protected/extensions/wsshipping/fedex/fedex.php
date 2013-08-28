@@ -16,7 +16,8 @@ class fedex extends WsShipping
 		'PRIORITY_OVERNIGHT'=>'FedEx Priority Overnight',
 		'INTERNATIONAL_PRIORITY'=>'International Priority',
 		'INTERNATIONAL_ECONOMY'=>'International Economy',
-		'FEDEX_GROUND'=>'FedEx Ground'
+		'FEDEX_GROUND'=>'FedEx Ground',
+		'GROUND_HOME_DELIVERY'=>'FedEx Ground Home Delivery'
 	);
 
 
