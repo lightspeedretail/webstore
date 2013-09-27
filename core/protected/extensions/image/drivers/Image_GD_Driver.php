@@ -347,34 +347,16 @@ class Image_GD_Driver extends Image_Driver {
 	 */
 	protected function imagecreatetransparent($width, $height)
 	{
-		if (self::$blank_png === NULL)
-		{
-			// Decode the blank PNG if it has not been done already
-			self::$blank_png = imagecreatefromstring(base64_decode
-			(
-				'iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29'.
-				'mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADqSURBVHjaYvz//z/DYAYAAcTEMMgBQAANegcCBN'.
-				'CgdyBAAA16BwIE0KB3IEAADXoHAgTQoHcgQAANegcCBNCgdyBAAA16BwIE0KB3IEAADXoHAgTQoHcgQ'.
-				'AANegcCBNCgdyBAAA16BwIE0KB3IEAADXoHAgTQoHcgQAANegcCBNCgdyBAAA16BwIE0KB3IEAADXoH'.
-				'AgTQoHcgQAANegcCBNCgdyBAAA16BwIE0KB3IEAADXoHAgTQoHcgQAANegcCBNCgdyBAAA16BwIE0KB'.
-				'3IEAADXoHAgTQoHcgQAANegcCBNCgdyBAgAEAMpcDTTQWJVEAAAAASUVORK5CYII='
-			));
-
-			// Set the blank PNG width and height
-			self::$blank_png_width = imagesx(self::$blank_png);
-			self::$blank_png_height = imagesy(self::$blank_png);
-		}
-
-		$img = imagecreatetruecolor($width, $height);
-
-		// Resize the blank image
-		imagecopyresized($img, self::$blank_png, 0, 0, 0, 0, $width, $height, self::$blank_png_width, self::$blank_png_height);
-
-		// Prevent the alpha from being lost
-		imagealphablending($img, FALSE);
-		imagesavealpha($img, TRUE);
-
-		return $img;
+		$image_resized = imagecreatetruecolor( $width, $height );
+		// Turn off transparency blending (temporarily)
+		imagealphablending($image_resized, false);
+		// Create a new transparent color for image
+		$color = imagecolorallocatealpha($image_resized, 0, 0, 0, 127);
+		// Completely fill the background of the new image with allocated color.
+		imagefill($image_resized, 0, 0, $color);
+		// Restore transparency blending
+		imagesavealpha($image_resized, true);
+		return $image_resized;
 	}
 
 } // End Image GD Driver
