@@ -110,14 +110,16 @@ class AdminBaseController extends CController
 					if ($item->options=="PASSWORD") $item->key_value=_xls_encrypt($item->key_value);
 					if (!$item->save())
 						Yii::app()->user->setFlash('error',print_r($item->getErrors(),true));
-					else
+					else {
+						Yii::app()->user->setFlash('success',Yii::t('admin','Configuration updated on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
 						$item->postConfigurationChange();
+					}
 
 					if($item->key_name=='EMAIL_TEST' && $item->key_value==1)
 						$this->sendEmailTest();
 
 				}
-				Yii::app()->user->setFlash('success',Yii::t('admin','Configuration updated on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
+
 
 
 

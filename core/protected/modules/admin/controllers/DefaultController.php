@@ -164,7 +164,7 @@ class DefaultController extends AdminBaseController
 					if (!$model->save())
 						Yii::app()->user->setFlash('error',print_r($model->getErrors(),true));
 
-					Yii::app()->user->setFlash('success',Yii::t('admin','Configuration updated on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
+					else Yii::app()->user->setFlash('success',Yii::t('admin','Configuration updated on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
 
 				} else Yii::app()->user->setFlash('error',print_r($model->getErrors(),true));
 			}

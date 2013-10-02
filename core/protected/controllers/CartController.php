@@ -438,7 +438,7 @@ class CartController extends Controller
 		if(_xls_get_conf('LIGHTSPEED_HOSTING','0') == '1' && _xls_get_conf('LIGHTSPEED_HOSTING_SHARED_SSL','0') == '1')
 			$this->verifySharedSSL();
 
-		$this->pageTitle=Yii::app()->name . ' - Checkout';
+		$this->pageTitle=_xls_get_conf('STORE_NAME') . ' : Checkout';
 		//Set breadcrumbs
 		$this->breadcrumbs = array(
 			Yii::t('global','Edit Cart')=>array('/cart'),
@@ -904,7 +904,7 @@ class CartController extends Controller
 
 					Yii::app()->clientScript->registerScript('payment',
 						'$(document).ready(function(){
-							changePayment(\''.$objPaymentModule->id.'\')
+							changePayment(\''.$model->paymentProvider.'\')
 						    });');
 				}
 			} else $model->paymentProvider=null;

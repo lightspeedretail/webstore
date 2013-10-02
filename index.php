@@ -6,7 +6,7 @@ $config=dirname(__FILE__).'/config/main.php';
 
 if(!file_exists($config))
 {
-	header("Location: install.php");
+	die("Web Store is not installed");
 	exit;
 }
 

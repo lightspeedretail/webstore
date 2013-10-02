@@ -14,26 +14,6 @@ class SiteController extends Controller
 {
 	public $layout='//layouts/column2';
 
-
-	/**
-	 * Declares class-based actions.
-	 */
-	public function actions()
-	{
-		return array(
-			// captcha action renders the CAPTCHA image displayed on the contact page
-			'captcha'=>array(
-				'class'=>'CCaptchaAction',
-				'backColor'=>0xFFFFFF,
-			),
-			// page action renders "static" pages stored under 'protected/views/site/pages'
-			// They can be accessed via: index.php?r=site/page&view=FileName
-			'page'=>array(
-				'class'=>'CViewAction',
-			),
-		);
-	}
-
 	/**
 	 * This is the default 'index' action that is invoked
 	 * when an action is not explicitly requested by users.
@@ -49,46 +29,7 @@ class SiteController extends Controller
 				break;
 
 			case "*products":
-
-				$criteria = new CDbCriteria();
-
-				if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD') == Product::InventoryMakeDisappear)
-					$criteria->addCondition('current=1 AND web=1 AND parent IS NULL AND inventory_avail>0');
-				else
-					$criteria->condition = 'current=1 AND web=1 AND parent IS NULL';
-
-				if (Product::HasFeatured())
-					$criteria->addCondition('featured=1');
-				$criteria->order = _xls_get_sort_order();
-
-				$item_count = Product::model()->count($criteria);
-
-				$pages = new CPagination($item_count);
-				$pages->setPageSize(Yii::app()->params['listPerPage']);
-				$pages->applyLimit($criteria);
-
-				$model = Product::model()->findAll($criteria);
-
-				$model = $this->createBookends($model);
-
-				$this->pageTitle=_xls_get_formatted_page_title(
-					null,_xls_get_conf('SEO_HOMEPAGE_TITLE','{storename} : {storetagline}')
-				);
-
-
-				//We leech off the grid file from search
-				if (Yii::app()->theme && file_exists('themes/'.Yii::app()->theme->name.'/views/search/grid.php'))
-					$gridFile = 'webroot.themes.'.Yii::app()->theme->name.'.views.search.grid';
-				else $gridFile = "application.views.search.grid";
-
-				$this->render($gridFile,array(
-					'model'=> $model, // must be the same as $item_count
-					'item_count'=>$item_count,
-					'page_size'=>Yii::app()->params['listPerPage'],
-					'items_count'=>$item_count,
-					'pages'=>$pages,
-				));
-
+				$this->forward("search/browse");
 				break;
 
 			default:
@@ -135,7 +76,10 @@ class SiteController extends Controller
 	 */
 	public function actionError()
 	{
-		$this->layout='//layouts/errorlayout';
+		$strPath = Yii::app()->getViewPath();
+		if(substr($strPath,-5)=="views")
+			Yii::app()->setViewPath(Yii::getPathOfAlias('application')."/views-cities");
+		$this->layout='//layouts/errorlaout';
 	    if($error=Yii::app()->errorHandler->error)
 	    {
 	    	if(Yii::app()->request->isAjaxRequest)

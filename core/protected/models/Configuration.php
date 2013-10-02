@@ -74,26 +74,55 @@ class Configuration extends BaseConfiguration
 		if ($objLangCode instanceof Configuration)
 			$lang = $objLangCode->key_value; else $lang = "en";
 
-		$fp = fopen(YiiBase::getPathOfAlias('config')."/wsconfig.php","w");
-
-		fwrite($fp,"<?php
-return
-	array(
-		'theme'=>'".$theme."',
-		'language'=>'".$lang."',
-		'params'=>array(
-");
+		//Create temporary file
+		$randName = _xls_seo_url(_xls_truncate(md5(date("YmdHis")),10,'')).".php";
 
 
-		foreach ($objConfig as $oConfig)
-			fwrite($fp,"\t\t'".$oConfig->key_name."'=>'".str_replace('\'','\\\'',$oConfig->key_value)."',".chr(13));
+		$strConfigArray =
+			"return array(\n".
+			"\t\t'theme'=>'".$theme."',\n".
+			"\t\t'language'=>'".$lang."',\n".
+			"\t\t'params'=>array(\n";
 
 
-		fwrite($fp,"		),
-);");
-		fclose($fp);
+		foreach ($objConfig as $oConfig) {
+			$keyvalue = str_replace('"','\"',$oConfig->key_value);
+			$strConfigArray .= "\t\t\t'".$oConfig->key_name."'=>\"".$keyvalue."\",\n";
+		}
 
-		return true;
+		$strConfigArray .= "));";
+
+		$success = false;
+		$x = null;
+		try {
+			@$x = eval($strConfigArray);
+			if(is_array($x)) $success=true;
+		} catch (Exception $objExc) {
+			//our config wasn't successful
+			Yii::log('generating wsconfig array failed '.$strConfigArray, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			$success = false;
+		}
+
+		if($success){
+			$str = "<?php"."\n".$strConfigArray;
+			//Yii::log('config being defined as '.YiiBase::getPathOfAlias('config'), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+			$result = file_put_contents(YiiBase::getPathOfAlias('config')."/".$randName,$str);
+			if($result === false) {
+				Yii::log('error file_put_contents to '.YiiBase::getPathOfAlias('config')."/".$randName, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				return false;
+			}
+
+			if(file_exists(YiiBase::getPathOfAlias('config')."/wsconfig.php"))
+				unlink(YiiBase::getPathOfAlias('config')."/wsconfig.php");
+
+			rename(YiiBase::getPathOfAlias('config')."/".$randName,YiiBase::getPathOfAlias('config')."/wsconfig.php");
+
+			return true;
+		} else {
+			Yii::log('error writing wsconfig.php', 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			return false;
+		}
+
 	}
 
 	public static function exportLogging()
@@ -468,9 +497,18 @@ return array(
 		return parent::beforeValidate();
 	}
 
+	protected function beforeSave()
+	{
+		if ($this->key_name=="STORE_TAGLINE")
+			$this->key_value = str_replace('"',"",$this->key_value);
+
+		return parent::beforeSave();
+	}
+
 	protected function afterSave()
 	{
-		Configuration::exportConfig();
+		$retVal = Configuration::exportConfig();
+		if(!$retVal) return $retVal;
 		if ($this->key_name=="DEBUG_LOGGING")
 			Configuration::exportLogging();
 

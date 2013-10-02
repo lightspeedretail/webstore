@@ -68,13 +68,19 @@ class ShoppingCart extends CApplicationComponent
 			} else {
 
 				$objCart = Cart::model()->findByPk($intCartId);
-				if (!$objCart || $objCart->cart_type  != CartType::cart) {
+				if (!($objCart instanceof Cart))
+				{
 					//something has happened to the database object
 					Yii::log("Could not find cart ".$intCartId.", creating new one.", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 					$objCart = Cart::InitializeCart();
 					Yii::app()->user->setState('cartid',$objCart->id);
 				}
-
+				elseif($objCart->cart_type != CartType::cart && $objCart->cart_type != CartType::awaitpayment)
+				{
+					Yii::log("Found cart ".$intCartId." but ".$objCart->cart_type." is not editable type, so generate a new one", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+					$objCart = Cart::InitializeCart();
+					Yii::app()->user->setState('cartid',$objCart->id);
+				}
 
 			}
 			$this->_model = $objCart;
@@ -141,6 +147,8 @@ class ShoppingCart extends CApplicationComponent
 					$objProduct = Product::model()->findbyPk($objItem->product_id);
 					//we strip any discount from another cart usu. promo code
 					$retVal = $this->model->AddProduct($objProduct, $objItem->qty, $objItem->cart_type, $objItem->wishlist_item, $objItem->description,$objItem->sell,0);
+					if($objItem->wishlist_item>0)
+						WishlistItem::model()->updateByPk($objItem->wishlist_item,array('cart_item_id'=>$retVal));
 
 					if(is_null($objCartToMerge)) $objItem->delete();
 				}
@@ -488,7 +496,7 @@ class ShoppingCart extends CApplicationComponent
 
 		if($this->model->id>0)
 		{
-			if($this->model->taxCode->IsNoTax()) return false;
+			if(is_object($this->model->taxCode) && $this->model->taxCode->IsNoTax()) return false;
 			if (Yii::app()->params['TAX_INCLUSIVE_PRICING']) return true;
 
 			return false;

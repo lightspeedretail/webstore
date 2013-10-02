@@ -1509,12 +1509,19 @@ function _xls_check_version($releasenotes = false)
 		$strThemeVersion="noupdate";
 	}
 
+	if(isset($_SERVER['SERVER_SOFTWARE']))
+		$serversoftware=$_SERVER['SERVER_SOFTWARE'];
+	else
+		$serversoftware="";
+
 	$data['webstore'] = array(
 		'version'       => XLSWS_VERSIONBUILD,
 		'customer'      => $storeurl,
 		'type'          => (_xls_get_conf('LIGHTSPEED_HOSTING')==1 ? "hosted" : "self"),
 		'track'         => (_xls_get_conf('AUTO_UPDATE_TRACK','0')==1 ? "beta" : "release"),
+		'autoupdate'    => (_xls_get_conf('AUTO_UPDATE','1')==1 ? "1" : "0"),
 		'theme'         => $strTheme,
+		'serversoftware'=> $serversoftware,
 		'releasenotes'  => $releasenotes,
 		'themeversion'  => $strThemeVersion,
 		'schema'  => _xls_get_conf('DATABASE_SCHEMA_VERSION')

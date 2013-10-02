@@ -72,6 +72,7 @@
 				'width'=> '500',
 				'height'=> '400',
 				'autoresize'=>false,
+				'convertDivs'=>false,
 			),
 		));
 	?>

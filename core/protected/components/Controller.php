@@ -49,24 +49,16 @@ class Controller extends CController
 	public $gridProductsRows;
     public $custom_page_content;
 
+
 	/**
 	 * Load anything we need globally, such as items we're going to use in our main.php template.
 	 * If you create init() in any other controller, you need to run parent::init() too or this
 	 * will be skipped.
 	 */
-	public function init() {
+	public function init()
+	{
 
-		if (Yii::app()->params['STORE_OFFLINE']>0 || Yii::app()->params['INSTALLED'] != '1')
-		{
-			if (isset($_GET['offline']))
-				Yii::app()->session['STORE_OFFLINE'] = _xls_number_only($_GET['offline']);
-
-			if (Yii::app()->session['STORE_OFFLINE'] != Yii::app()->params['STORE_OFFLINE'] || Yii::app()->params['INSTALLED'] != '1')
-			{
-				$this->render('/site/offline');
-				Yii::app()->end();
-			}
-		}
+		Yii::app()->setViewPath(Yii::getPathOfAlias('application')."/views-cities");
 
 		$this->logoutUrl = $this->createUrl("site/logout");
 
@@ -93,6 +85,26 @@ class Controller extends CController
 				die("you have no theme set");
 		}
 
+
+		if (Yii::app()->params['STORE_OFFLINE']>0 || Yii::app()->params['INSTALLED'] != '1')
+		{
+			if (isset($_GET['offline']))
+				Yii::app()->session['STORE_OFFLINE'] = _xls_number_only($_GET['offline']);
+
+			if (Yii::app()->session['STORE_OFFLINE'] != Yii::app()->params['STORE_OFFLINE'] || Yii::app()->params['INSTALLED'] != '1')
+			{
+				$this->render('/site/offline');
+				Yii::app()->end();
+			}
+		}
+
+		$this->logoutUrl = $this->createUrl("site/logout");
+
+		$strViewset = "cities";
+		if(!empty($strViewset)) Yii::app()->setViewPath(Yii::getPathOfAlias('application')."/views-".$strViewset);
+
+
+
 		if ( Yii::app()->theme && file_exists('webroot.themes.'.Yii::app()->theme->name.'.layouts.column2'))
 			$this->layout='webroot.themes.'.Yii::app()->theme->name.'.layouts.column2';
 
@@ -108,13 +120,14 @@ class Controller extends CController
 		$this->getUserLanguage();
 
 		$this->pageTitle =
-			Yii::app()->name =  _xls_get_conf('STORE_NAME', 'LightSpeed Web Store');
+			Yii::app()->name =  _xls_get_conf('STORE_NAME', 'LightSpeed Web Store')." : ".
+			_xls_get_conf('STORE_TAGLINE');
 		$this->pageCanonicalUrl = $this->getCanonicalUrl();
 		$this->pageDescription = _xls_get_conf('STORE_TAGLINE');
 		$this->pageImageUrl ='';
 
 		$this->pageHeaderImage = CHtml::link(CHtml::image(Yii::app()->baseUrl._xls_get_conf('HEADER_IMAGE')), array('site/index'));
-		Yii::app()->clientScript->registerMetaTag("LightSpeed Web Store ".XLSWS_VERSION,'generator');
+
 
 
 		try {
@@ -141,6 +154,8 @@ class Controller extends CController
 		if(_xls_facebook_login())
 			$this->getFacebookLogin();
 
+		Yii::app()->clientScript->registerMetaTag(
+			"LightSpeed Web Store ".XLSWS_VERSION,'generator',null,array(),'generator');
 	}
 
 	/**
@@ -327,3 +342,4 @@ class Controller extends CController
 	}
 
 }
+

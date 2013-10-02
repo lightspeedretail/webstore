@@ -29,7 +29,7 @@ class moneris extends WsPayment
 
 		$type='purchase';
 		$cust_id='';
-		$order_id=$this->objCart->id_str;
+		$order_id=$this->objCart->id_str.date("YmdHis");
 		$amount=number_format(round($this->objCart->total,2),2, '.', '');
 		$pan=_xls_number_only($this->CheckoutForm->cardNumber);
 		$expiry_date=$this->CheckoutForm->cardExpiryMonth.substr($this->CheckoutForm->cardExpiryYear,2,2);
@@ -114,7 +114,7 @@ class moneris extends WsPayment
 
 		/***************************** HTTPS Post Object *****************************/
 
-		$mpgHttpPost  =new mpgHttpsPost($store_id,$api_token,$mpgRequest);
+		$mpgHttpPost  =new mpgHttpsPost($store_id,$api_token,$mpgRequest,$this->config);
 
 		/******************************* Response ************************************/
 

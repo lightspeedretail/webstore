@@ -43,9 +43,6 @@ if(count($arg))
 	//(This is because command line php may differ from Apache server php)
 
 	if(isset($arg['help'])) showCommandLine();
-	if(file_exists("config/main.php")) die("\nENTER 1 OR 2 FOR INSTRUCTIONS (ENTER 2 TO PAGE)\n\nENTER SEED NUMBER
-INITIALIZING...\n\nYOU MUST DESTROY 17 KINGONS IN 30 STARDATES WITH 3 STARBASES\n\n-=--=--=--=--=--=--=--=-\n
-    *\n                         STARDATE  2100\n                *     *  CONDITION GREEN\n            <*>          QUADRANT  5,2\n    *                    SECTOR    5,4\n                         ENERGY    3000\n                         SHIELDS   0\n                   *     PHOTON TORPEDOES 10\n-=--=--=--=--=--=--=--=-\nCOMMAND\n\nHey, ensign Wesley, Web Store is already installed!\n\n");
 	if(isset($arg['dbupdate']) && $arg['dbupdate']==1)
 	{
 		//This is command line for applying any database updates
@@ -53,6 +50,10 @@ INITIALIZING...\n\nYOU MUST DESTROY 17 KINGONS IN 30 STARDATES WITH 3 STARBASES\
 		runYii('www.example.com','/install.php',49);
 		die();
 	}
+	if(file_exists("config/main.php")) die("\nENTER 1 OR 2 FOR INSTRUCTIONS (ENTER 2 TO PAGE)\n\nENTER SEED NUMBER
+INITIALIZING...\n\nYOU MUST DESTROY 17 KINGONS IN 30 STARDATES WITH 3 STARBASES\n\n-=--=--=--=--=--=--=--=-\n
+    *\n                         STARDATE  2100\n                *     *  CONDITION GREEN\n            <*>          QUADRANT  5,2\n    *                    SECTOR    5,4\n                         ENERGY    3000\n                         SHIELDS   0\n                   *     PHOTON TORPEDOES 10\n-=--=--=--=--=--=--=--=-\nCOMMAND\n\nHey, ensign Wesley, Web Store is already installed!\n\n");
+
 
 	$arrRequired = array('dbhost','dbuser','dbpass','dbname','url');
 	foreach($arrRequired as $item)
@@ -1008,19 +1009,6 @@ function zipAndFolders()
 }
 
 
-
-function makeSymbolicLink()
-{
-
-	$symfile = "core/protected/views";
-	$strOriginal =  "views-cities";
-
-	@unlink($symfile);
-	$retVal = symlink($strOriginal, $symfile);
-	if (!$retVal)
-		die("cannot create symbolic link 'views' to point to 'views-cities'");
-}
-
 /**
  * This is actually a copy of our zip.php from Web store from Florian
  * This violates our DRY principle but we need everything in the installer
@@ -1157,7 +1145,6 @@ function runInstall($db,$sqlline = 0)
 
 		case 3:
 			zipAndFolders();
-			makeSymbolicLink();
 			$tag = "Applying pre-3.0 changes. Line #".$sqlline;
 			return json_encode(array('result'=>"success",
 				'tag'=>$tag,'line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));

@@ -18,7 +18,7 @@ class InstallController extends Controller
 	protected $online;
 	
 	public function init() {
-
+		Yii::app()->setViewPath(Yii::getPathOfAlias('application')."/views-cities");
 		set_time_limit(300);
 		//We override init() to keep our system from trying to autoload stuff we haven't finished converting yet
 	}

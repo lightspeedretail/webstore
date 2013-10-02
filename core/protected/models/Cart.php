@@ -102,7 +102,9 @@ class Cart extends BaseCart
 			$objCart->datetime_cre = new CDbExpression('NOW()');;
 			$objCart->datetime_due = new CDbExpression('now() + INTERVAL '._xls_get_conf('CART_LIFE', 7).' DAY');
 			$objCart->ResetTaxIncFlag();
-			$objCart->save();
+			if(!$objCart->save())
+				Yii::log("Error initializing cart ".print_r($objCart->getErrors(),true),
+					'error', 'application.'.__CLASS__.".".__FUNCTION__);
 
 			return $objCart;
 
@@ -317,6 +319,8 @@ class Cart extends BaseCart
 	public function UpdateItemQuantity($objItem, $intQuantity) {
 
 		if ($intQuantity <= 0) {
+			if($objItem->wishlist_item>0)
+				WishlistItem::model()->updateByPk($objItem->wishlist_item,array('cart_item_id'=>null));
 			$objItem->delete();
 			return true;
 		}
@@ -856,14 +860,14 @@ class Cart extends BaseCart
 	 * @return
 	 */
 	public function ResetTaxIncFlag(){
-		$this->tax_inclusive = false;
+		$this->tax_inclusive = 0;
 
 		if (_xls_get_conf('TAX_INCLUSIVE_PRICING', '0') == 1) {
 			$objTaxCode = TaxCode::GetDefault();
 			if ($objTaxCode instanceof TaxCode)
 			{
 				$this->tax_code_id = $objTaxCode->lsid;
-				$this->tax_inclusive = true;
+				$this->tax_inclusive = 1;
 			}
 		}
 	}

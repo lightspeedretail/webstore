@@ -468,9 +468,11 @@
 										savedTotalScenarios = data.totals;
 										savedShippingPriorities = data.priority;
 										savedCartScenarios = data.cartitems;
+										savedPickedModule = $("#' . CHtml::activeId( $model, 'paymentProvider') .'").val();
 										$("#' . CHtml::activeId( $model, 'shippingProvider') .'").html(data.provider);
 	                                    $("#' . CHtml::activeId( $model, 'shippingPriority') .'").html(data.priority);
 	                                    $("#' . CHtml::activeId( $model, 'paymentProvider') .'").html(data.paymentmodules);
+	                                    $("#' . CHtml::activeId( $model, 'paymentProvider') .'").val(savedPickedModule);
 										$("#shippingSpinner").hide();
 	                                    $("#shippingProvider_0").click();
 	                                    }',

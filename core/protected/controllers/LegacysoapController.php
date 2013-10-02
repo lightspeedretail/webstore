@@ -13,7 +13,7 @@ class LegacySoapController extends Controller
 {
 
 	public function init() {
-
+		Yii::app()->setViewPath(Yii::getPathOfAlias('application')."/views-cities");
 		if(Yii::app()->params['INSTALLED'] != '1') die(); //No soap when not installed (or partially installed)
 
 		//do nothing since we don't need a PHP session created for SOAP transactions

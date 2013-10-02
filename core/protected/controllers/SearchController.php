@@ -150,13 +150,14 @@ class SearchController extends Controller
 
 
 		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD') == Product::InventoryMakeDisappear)
-			$criteria->addCondition('inventory_avail>0');
+			$criteria->addCondition('(inventory_avail>0 OR inventoried=0)');
 
 		if (!_xls_get_conf('CHILD_SEARCH') || empty($strQ))
 			$criteria->addCondition('Product.parent IS NULL');
 
 
 		$criteria->addCondition('web=1');
+		$criteria->addCondition('current=1');
 		$criteria->order = 'Product.'._xls_get_sort_order();
 
 
@@ -288,7 +289,7 @@ class SearchController extends Controller
 		$arrBind = array(':query'=>$strQ);
 
 		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD') == Product::InventoryMakeDisappear)
-			$strInv .= " AND inventory_avail>0 ";
+			$strInv .= " AND (inventory_avail>0 OR inventoried=0) ";
 
 		if (!_xls_get_conf('CHILD_SEARCH'))
 			$strInv .= " AND parent IS NULL ";
@@ -358,7 +359,7 @@ class SearchController extends Controller
 		$objCommand->leftJoin('xlsws_product_tags t2', 't2.product_id = t.id');
 		$objCommand->leftJoin('xlsws_tags t3', 't2.tag_id = t3.id');
 		$objCommand->from('xlsws_product t');
-		$objCommand->where('(' . $strWhere . ') ' . $strInv . '	AND web=1');
+		$objCommand->where('(' . $strWhere . ') ' . $strInv . '	AND web=1 AND current=1');
 
 		//If we have passed a category, append it to the search here
 		if(isset($formModel['cat'])  && $formModel['cat']>0)
@@ -369,7 +370,7 @@ class SearchController extends Controller
 			$intIdArray = array_merge($intIdArray, $objCategory->GetBranchPath());
 			unset($arrBind[':cat']);
 			$objCommand->leftJoin('xlsws_product_category_assn t4', 't4.product_id = t.id');
-			$objCommand->where(array('AND', '(' . $strWhere . ') ' . $strInv . ' AND web=1', array('in', 'category_id', $intIdArray)));
+			$objCommand->where(array('AND', '(' . $strWhere . ') ' . $strInv . ' AND web=1 AND current=1', array('in', 'category_id', $intIdArray)));
 		}
 
 
@@ -379,7 +380,7 @@ class SearchController extends Controller
 		{
 			if ($intLimit==-1) {
 				//This means we're just running a count, so we don't need all aspects of this query
-				$objCommand->select(' count(t.id) ');
+				$objCommand->select(' count(DISTINCT t.id) ');
 				$objCommand->group(null);
 				$objCommand->order(null);
 			}

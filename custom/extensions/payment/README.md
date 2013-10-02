@@ -1,0 +1,1 @@
+This directory is for custom extensions. If you want to use third party extensions for your Web Store customization, such as ones you have downloaded from http://www.yiiframework.com/extension/, you can place them here. Web Store has been set up to look both here and the Web Store program folder.

@@ -68,7 +68,7 @@ class monerisAdminForm extends CFormModel
 				'live'=>array(
 					'type'=>'dropdownlist',
 					'items'=>array('live'=>'Live','test'=>'Sandbox'),
-					'title'=>"To use (TEST MODE) in your regular account, leave this as Live and instead set Test Mode in your Authorize.net account settings on their site. Sandbox should only be used with Authorize.net Sandbox testing servers.",
+					'title'=>"To use TEST MODE set to Sandbox.",
 					'hint'=>"Hover over field for instructions",
 				),
 				'restrictcountry'=>array(
