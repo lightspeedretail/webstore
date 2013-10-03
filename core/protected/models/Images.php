@@ -258,7 +258,10 @@ class Images extends BaseImages
 	public function SaveImageData($strName, $blbImage) {
 
 			$this->DeleteImage();
-
+			
+			imagealphablending($blbImage, false);
+			imagesavealpha($blbImage, TRUE);
+			
 			$strPath = Images::GetImagePath($strName);
 			$arrPath = mb_pathinfo($strPath);
 
