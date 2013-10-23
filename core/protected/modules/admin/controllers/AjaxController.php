@@ -63,6 +63,12 @@ class AjaxController extends AdminBaseController
 			$objPromoCode->save();
 		}
 
+		if (!$objPromoCode->code)
+		{
+			$objPromoCode->code = $moduleid . ":";
+			$objPromoCode->save();
+		}
+
 		//Prepopulate if we have them
 		$model->id=$objPromoCode->id;
 		$model->promocode = Yii::app()->getComponent($moduleid)->AdminName;

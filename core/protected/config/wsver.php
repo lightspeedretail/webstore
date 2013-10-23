@@ -1,5 +1,5 @@
 <?php
 
-define('XLSWS_VERSION', '3.0.5');
-define('XLSWS_VERSIONBUILD', 3050);
-define('XLSWS_BUILDDATE', '2013-10-02 12:18:39');
+define('XLSWS_VERSION', '3.0.6');
+define('XLSWS_VERSIONBUILD', 3060);
+define('XLSWS_BUILDDATE', '2013-10-22 11:28:35');

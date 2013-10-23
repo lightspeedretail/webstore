@@ -830,26 +830,63 @@ function _xls_mail_name($name , $adde) {
 function _xls_send_email($id, $hideJson = false)
 {
 
-	$headers = array(
-		'MIME-Version: 1.0',
-		'Content-type: text/html; charset=utf8'
-	);
-
 	$objMail = EmailQueue::model()->findByPk($id);
 	if ($objMail instanceof EmailQueue) {
 
-		Yii::import("ext.KEmail.KEmail");
-		$orderEmail = _xls_get_conf('ORDER_FROM','');
 
-		$blnResult = Yii::app()->email->send(
-			empty($orderEmail) ? _xls_get_conf('EMAIL_FROM') : $orderEmail,
-			$objMail->to,
-			$objMail->subject,
-			$objMail->htmlbody,
-			$headers);
+		$orderEmail = _xls_get_conf('ORDER_FROM','');
+		$from = empty($orderEmail) ? _xls_get_conf('EMAIL_FROM') : $orderEmail;
+
+		Yii::app()->setComponent('Smtpmail',null);
+		$mail=Yii::app()->Smtpmail;
+		//$mail->CharSet="utf-8";
+		$mail->Debugoutput="error_log";
+		$mail->IsSMTP();
+		$mail->Username = Yii::app()->params['EMAIL_SMTP_USERNAME'];
+		$mail->Password = _xls_decrypt(Yii::app()->params['EMAIL_SMTP_PASSWORD']);
+		$mail->Mailer = 'smtp';
+		$mail->Port = Yii::app()->params['EMAIL_SMTP_PORT'];
+
+		$SMTPSecure = "";
+		if(Yii::app()->params['EMAIL_SMTP_SECURITY_MODE']=='0')
+		{
+			if (Yii::app()->params['EMAIL_SMTP_PORT']=="465") $SMTPSecure = "ssl";
+			if (Yii::app()->params['EMAIL_SMTP_PORT']=="587") $SMTPSecure = "tls";
+		}
+
+		if(_xls_get_conf('EMAIL_SMTP_SECURITY_MODE')=='1') $SMTPSecure = "";
+		if(_xls_get_conf('EMAIL_SMTP_SECURITY_MODE')=='2') $SMTPSecure = "ssl";
+		if(_xls_get_conf('EMAIL_SMTP_SECURITY_MODE')=='3') $SMTPSecure = "tls";
+
+		$mail->SMTPAuth =  true;
+		$mail->AuthType = "LOGIN";
+		if(_xls_get_conf('EMAIL_SMTP_AUTH_PLAIN','0')=='1')
+			$mail->AuthType = "PLAIN";
+		if(empty(Yii::app()->params['EMAIL_SMTP_PASSWORD']))
+		{
+			Yii::log("Password for SMTP blank, turning off SMTP Authentication", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+			$mail->SMTPAuth =  false;
+			$mail->Username = '';
+			$mail->Password = '';
+		}
+		$mail->SMTPDebug=1;
+		$mail->SMTPSecure = $SMTPSecure;
+		$mail->Host = Yii::app()->params['EMAIL_SMTP_SERVER'];
+
+		$mail->SetFrom($from, Yii::app()->params['STORE_NAME']);
+		$mail->Subject = $objMail->subject;
+		$mail->MsgHTML($objMail->htmlbody);
+		$mail->AddAddress($objMail->to);
+		if(!empty(Yii::app()->params['EMAIL_BCC']))
+			if($objMail->to != Yii::app()->params['EMAIL_BCC'])
+				$mail->AddCC(Yii::app()->params['EMAIL_BCC']);
+
+		Yii::log("Contents of mail ".print_r($mail,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+		$blnResult = $mail->Send();
 
 		if($blnResult)
 		{
+			Yii::log("Sent email to ".$objMail->to." successfully.", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			$objMail->delete();
 			if (!$hideJson) echo json_encode("success");
 		}
@@ -857,7 +894,8 @@ function _xls_send_email($id, $hideJson = false)
 		{
 			$objMail->sent_attempts += 1;
 			$objMail->save();
-			Yii::log("Sending email failed ID ".$id, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			Yii::log("Sending email failed ID ".$id." ".$objMail->to." ".
+				print_r($mail->ErrorInfo,true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			if (!$hideJson) echo json_encode("failure");
 		}
 	}

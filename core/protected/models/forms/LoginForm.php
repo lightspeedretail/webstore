@@ -171,4 +171,17 @@ class LoginForm extends CFormModel
 
 
 	}
+
+    /**
+     * Since Validate tests to make sure certain fields have values, populate requirements here such as the modified timestamp
+     * @return boolean from parent
+     */
+
+    protected function beforeValidate() {
+
+        $this->email = strtolower($this->email);
+
+        return parent::beforeValidate();
+    }
+
 }

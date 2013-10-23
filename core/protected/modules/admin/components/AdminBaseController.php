@@ -60,9 +60,9 @@ class AdminBaseController extends CController
 		if (!isset($this->menuItems))
 			$this->menuItems = array(
 				array('label'=>'$this->menuItems not defined')
-				);
-			else
-				$this->setMenuHighlight();
+			);
+		else
+			$this->setMenuHighlight();
 
 
 
@@ -76,7 +76,7 @@ class AdminBaseController extends CController
 
 		if (_xls_get_conf('STORE_OFFLINE')>1)
 			Yii::app()->user->setFlash('warning',Yii::t('admin','Your store is currently set offline for maintenance -- you can access it via the url {url}',
-			array('{url}'=>Yii::app()->createAbsoluteUrl('site/index',array('offline'=>_xls_get_conf('STORE_OFFLINE'))))));
+				array('{url}'=>Yii::app()->createAbsoluteUrl('site/index',array('offline'=>_xls_get_conf('STORE_OFFLINE'))))));
 
 		return parent::beforeAction($action);
 
@@ -305,8 +305,8 @@ class AdminBaseController extends CController
 
 			$this->render('admin.views.default.moduleedit',
 				array(  'objModule'=>$objModule,
-						'model'=>$model,
-						'form'=>new CForm($formDefinition,$model)
+					'model'=>$model,
+					'form'=>new CForm($formDefinition,$model)
 				));
 		}
 		else
@@ -333,8 +333,8 @@ class AdminBaseController extends CController
 				$class != "UpgradeController" &&
 				$class != "LicenseController"
 
-				) //Keep these showing up on top
-				$arrReturn[] = $class;
+			) //Keep these showing up on top
+			$arrReturn[] = $class;
 		}
 
 
@@ -465,6 +465,55 @@ SETUP;
 					$this->editSectionName = strip_tags($this->menuItems[$key]['label']);
 				}
 		}
+	}
+
+	public function scanModules($type)
+	{
+		$arrCustom = array();
+		if(file_exists(YiiBase::getPathOfAlias("custom.extensions.".$type)))
+			$arrCustom = glob(realpath(YiiBase::getPathOfAlias("custom.extensions.".$type)).'/*', GLOB_ONLYDIR);
+		if(!is_array($arrCustom)) $arrCustom = array();
+		$files=array_merge(glob(realpath(YiiBase::getPathOfAlias("ext.ws".$type)).'/*', GLOB_ONLYDIR),$arrCustom);
+
+		foreach ($files as $file)
+		{
+
+			$moduleName = mb_pathinfo($file,PATHINFO_BASENAME);
+
+			//Check if module is already in database
+			$objModule = Modules::LoadByName($moduleName);
+			if(!($objModule instanceof Modules))
+			{
+				//The module doesn't exist, attempt to install it
+				try {
+
+					$objModule = new Modules();
+					$objModule->active=0;
+					$objModule->module = $moduleName;
+					$objModule->category = $type;
+					$objModule->configuration = Yii::app()->getComponent($moduleName)->getDefaultConfiguration();
+					if (!$objModule->save())
+						Yii::log("Found widget $moduleName could not install ".
+						print_r($objModule->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+
+				}
+				catch (Exception $e) {
+					Yii::log("Found widget $moduleName could not install ".$e, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				}
+
+			}
+
+			$objModule->version = Yii::app()->getComponent($moduleName)->version;
+			$objModule->name = Yii::app()->getComponent($moduleName)->AdminNameNormal;
+			$objModule->save();
+
+
+
+
+		}
+
+
+
 	}
 
 }

@@ -179,14 +179,18 @@ class WsExtension extends CComponent
 	}
 
 
-	/**
-	 * This should be overridden in our WsPayment and WSShipping classes. Get the AdminForm from the models folder under our shipping/payment module.
-	 * In the payment/shipping class, we actually create an instance of the form model and pass it back. We should never actually get a null because
-	 * that would mean the model file is missing.
-	 * @return null
-	 */
+
 	public function getAdminModel()
 	{
+
+		$className = $this->getAdminModelName();
+		$reflector = new ReflectionClass(get_class($this));
+		$classPath = $reflector->getFileName();
+		$adminFile = str_replace(get_class($this).".php","models/".$className,$classPath.".php");
+
+		if(file_exists($adminFile))
+			return new $className;
+		else
 			return null;
 
 	}

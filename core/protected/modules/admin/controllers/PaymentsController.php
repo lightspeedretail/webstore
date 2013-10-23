@@ -19,7 +19,7 @@ class PaymentsController extends AdminBaseController
 	public function beforeAction($action)
 	{
 
-		$this->scanPayments();
+		$this->scanModules('payment');
 
 		$arrModules =  Modules::model()->findAllByAttributes(array('category'=>'payment'),array('order'=>'module')); //Get active and inactive
 
@@ -71,9 +71,13 @@ class PaymentsController extends AdminBaseController
 
 	public function scanPayments()
 	{
-		$arrCustom = glob(YiiBase::getPathOfAlias("custom.extensions.payment").'/*', GLOB_ONLYDIR);
+		$arrCustom = array();
+		if(file_exists(YiiBase::getPathOfAlias("custom.extensions.payment")))
+			$arrCustom = glob(realpath(YiiBase::getPathOfAlias("custom.extensions.payment")).'/*', GLOB_ONLYDIR);
 		if(!is_array($arrCustom)) $arrCustom = array();
-		$files=array_merge(glob(YiiBase::getPathOfAlias("ext.wspayment").'/*', GLOB_ONLYDIR),$arrCustom);
+		$files=array_merge(glob(realpath(YiiBase::getPathOfAlias("ext.wspayment")).'/*', GLOB_ONLYDIR),$arrCustom);
+
+
 
 		foreach ($files as $file)
 		{
@@ -100,11 +104,11 @@ class PaymentsController extends AdminBaseController
 					Yii::log("Found widget $moduleName could not install ".$e, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				}
 
-			} else  {
-				$objModule->version = Yii::app()->getComponent($moduleName)->version;
-				$objModule->name = Yii::app()->getComponent($moduleName)->AdminNameNormal;
-				$objModule->save();
 			}
+			$objModule->version = Yii::app()->getComponent($moduleName)->version;
+			$objModule->name = Yii::app()->getComponent($moduleName)->AdminNameNormal;
+			$objModule->save();
+
 		}
 
 

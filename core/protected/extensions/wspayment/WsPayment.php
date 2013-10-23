@@ -29,6 +29,7 @@ class WsPayment extends WsExtension
 		parent::init();
 		// import the module-level models and components
 		Yii::import('application.extensions.wspayment.'.get_class($this).'.models.*');
+		Yii::import('custom.extensions.payment.'.get_class($this).'.models.*');
 	}
 
 	/**
@@ -66,19 +67,6 @@ class WsPayment extends WsExtension
 			return $this;
 		}
 		else throw new CException('SubForm not passed to module');
-	}
-
-	public function getAdminModel()
-	{
-
-		$className = $this->getAdminModelName();
-		$filename = Yii::getPathOfAlias('ext.wspayment').DIRECTORY_SEPARATOR.get_class($this).DIRECTORY_SEPARATOR."models".DIRECTORY_SEPARATOR.$className.'.php';
-
-		if(file_exists($filename))
-			return new $className;
-		else
-			return null;
-
 	}
 
 	public function getDefaultConfiguration()

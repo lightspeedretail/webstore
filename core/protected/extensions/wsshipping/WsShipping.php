@@ -47,6 +47,7 @@ class WsShipping extends WsExtension
 		parent::init();
 		// import the module-level models and components
 		Yii::import('application.extensions.wsshipping.'.get_class($this).'.models.*');
+		Yii::import('custom.extensions.shipping.'.get_class($this).'.models.*');
 	}
 
 	/**
@@ -195,20 +196,6 @@ class WsShipping extends WsExtension
 	public function getIsStorePickup()
 	{
 		return $this->storePickup;
-	}
-
-
-	public function getAdminModel()
-	{
-
-		$className = $this->getAdminModelName();
-		$filename = Yii::getPathOfAlias('ext.wsshipping').DIRECTORY_SEPARATOR.get_class($this).DIRECTORY_SEPARATOR."models".DIRECTORY_SEPARATOR.$className.'.php';
-
-		if(file_exists($filename))
-			return new $className;
-		else
-			return null;
-
 	}
 
 	public function reportShippingFailure()

@@ -17,8 +17,6 @@ class LegacySoapController extends Controller
 		if(Yii::app()->params['INSTALLED'] != '1') die(); //No soap when not installed (or partially installed)
 
 		//do nothing since we don't need a PHP session created for SOAP transactions
-		if(_xls_get_conf('DEBUG_LS_SOAP_CALL'))
-			_xls_log("SOAP DEBUG : " . print_r($GLOBALS['HTTP_RAW_POST_DATA'] , true));
 
 	}
 
@@ -35,8 +33,13 @@ class LegacySoapController extends Controller
 		//error_log($_SERVER['HTTP_SOAPACTION']);
 
 		//$_SERVER['HTTP_SOAPACTION']="http://10.80.0.169/ws_version";
-		$soapAction = str_replace("http://10.80.0.169/","",$_SERVER['HTTP_SOAPACTION']);
-		$soapAction = str_replace('"','',$soapAction);
+		$_SERVER['HTTP_SOAPACTION'] = str_replace("\"","",$_SERVER['HTTP_SOAPACTION']);
+		$output_array = explode("/",$_SERVER['HTTP_SOAPACTION']);
+
+		$soapAction = is_array($output_array) ? $output_array[count($output_array)-1] : $output_array;
+
+		if(_xls_get_conf('DEBUG_LS_SOAP_CALL'))
+			Yii::log(print_r($GLOBALS['HTTP_RAW_POST_DATA'] , true), CLogger::LEVEL_ERROR,"soap.".$soapAction);
 
 		//error_log("attempting ".$soapAction);
 		$postdata = file_get_contents("php://input");
@@ -44,7 +47,7 @@ class LegacySoapController extends Controller
 
 		$xml = simplexml_load_string($postdata);
 		//Yii::log($postdata, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-		$xml->registerXPathNamespace('envoy', 'http://10.80.0.169/'.$soapAction);
+		$xml->registerXPathNamespace('envoy', "http://10.80.0.169/".$soapAction);
 		//error_log(print_r($xml,true));
 		$arrArguments=array();
 		foreach ($xml->xpath('//envoy:'.$soapAction) as $item)
@@ -410,7 +413,7 @@ class LegacySoapController extends Controller
 		}
 
 		if (!($objProduct instanceof Product)) {
-			Yii::log('Did not receive image data for ' . $intRowid, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			Yii::log('Product Id does not exist ' . $intRowid, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return false;
 		}
 
@@ -774,7 +777,8 @@ class LegacySoapController extends Controller
 		// Save category
 		$strCategoryPath = trim($strCategoryPath);
 
-		if($strCategoryPath && ($strCategoryPath != "Default")) {
+		if($strCategoryPath && ($strCategoryPath != "Default"))
+		{
 			$arrCategories = explode("\t", $strCategoryPath);
 			$intCategory = Category::GetIdByTrail($arrCategories);
 
@@ -791,7 +795,8 @@ class LegacySoapController extends Controller
 				$objCategory->UpdateChildCount();
 			}
 
-		}
+		} else ProductCategoryAssn::model()->deleteAllByAttributes(
+			array('product_id'=>$objProduct->id));
 
 		Product::ConvertSEO($intRowid); //Build request_url
 
@@ -2208,8 +2213,15 @@ class LegacySoapController extends Controller
 			$strReturn .= "ShippingMethod:".base64encode($objCart->shipping->shipping_method).chr(13);
 			$strReturn .= "ShippingModule:".base64encode($objCart->shipping->shipping_module).chr(13);
 			$strReturn .= "ShippingData:".base64encode($objCart->shipping->shipping_data).chr(13);
-			$strReturn .= "ShippingCost:".base64encode($objCart->shipping->shipping_cost).chr(13);
-			$strReturn .= "ShippingSell:".base64encode($objCart->shipping->shipping_sell).chr(13);
+
+			$shippingCost = $objCart->shipping->shipping_cost;
+			$shippingSell = $objCart->shipping->shipping_sell;
+
+			if(empty($shippingCost)) $shippingCost='0';
+			if(empty($shippingSell)) $shippingSell='0';
+
+			$strReturn .= "ShippingCost:".base64encode($shippingCost).chr(13);
+			$strReturn .= "ShippingSell:".base64encode($shippingSell).chr(13);
 			$strReturn .= "PaymentMethod:".base64encode($objCart->payment->payment_method).chr(13);
 			$strReturn .= "PaymentModule:".base64encode($objCart->payment->payment_module).chr(13);
 			$strReturn .= "PaymentData:".base64encode($objCart->payment->payment_data).chr(13);

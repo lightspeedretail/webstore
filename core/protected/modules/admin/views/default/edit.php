@@ -16,6 +16,10 @@
 			                    echo CHtml::activeTextField($item,"[$i]key_value",array('title'=>$item->helper_text));
 			                    break;
 
+                            case "EMAIL":
+                                echo CHtml::activeEmailField($item,"[$i]key_value",array('title'=>$item->helper_text,'pattern'=> '^[a-zA-Z0-9!#$%&\'*+\\/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&\'*+\\/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$'));
+                                break;
+
 		                    case "PASSWORD":
 			                    echo CHtml::activePasswordField($item,"[$i]key_value",array('title'=>$item->helper_text));
 			                    break;

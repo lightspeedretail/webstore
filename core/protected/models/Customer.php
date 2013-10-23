@@ -294,6 +294,10 @@ class Customer extends BaseCustomer
 		if (empty($this->currency))
 			$this->currency = _xls_get_conf('CURRENCY_DEFAULT','USD');
 
+        $this->email = strtolower($this->email);
+        $this->email_repeat = strtolower($this->email_repeat);
+
+
 		return parent::beforeValidate();
 	}
 

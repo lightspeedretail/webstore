@@ -92,7 +92,7 @@ class wsphoto extends CApplicationComponent {
 			if ($intType>0) //exclude original size
 			{
 				list($intWidth, $intHeight) = ImagesType::GetSize($intType);
-				$this->createThumb($objImage,$intWidth,$intHeight);
+				$this->createThumb($objImage,$intWidth,$intHeight,$intType);
 			}
 
 		}
@@ -106,7 +106,7 @@ class wsphoto extends CApplicationComponent {
 	 * @param $intNewWidth
 	 * @param $intNewHeight
 	 */
-	protected function createThumb($objImage,$intNewWidth,$intNewHeight)
+	protected function createThumb($objImage,$intNewWidth,$intNewHeight,$type)
 	{
 
 		//Get our original file from LightSpeed

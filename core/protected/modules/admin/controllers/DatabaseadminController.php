@@ -216,6 +216,11 @@ class DatabaseadminController extends AdminBaseController
 					Product::model()->updateAll(array('image_id'=>null),'id ='.$_POST['pk']);
 					Images::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
 					ProductCategoryAssn::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
+                    ProductRelated::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
+                    ProductRelated::model()->deleteAllByAttributes(array('related_id'=>$_POST['pk']));
+                    ProductTags::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
+                    ProductQtyPricing::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
+                    ProductText::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
 					WishlistItem::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
 					TaskQueue::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
 					Product::model()->deleteByPk($_POST['pk']);

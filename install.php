@@ -1,5 +1,6 @@
 <?php
 set_time_limit(300);
+
 define('DBARRAY_NUM', MYSQL_NUM);define('DBARRAY_ASSOC', MYSQL_ASSOC);define('DBARRAY_BOTH', MYSQL_BOTH);if (!defined('DB_EXPLAIN')) { define('DB_EXPLAIN', false);}if (!defined('DB_QUERIES')) { define('DB_QUERIES', false);}
 
 
@@ -122,7 +123,12 @@ else {
 	$step = 1;
 	if (isset($_POST['step']))
 		$step = preg_replace('/[^0-9]/', '', $_POST['step']);
-	if (isset($_POST['sqlline'])) { $db = createDbConnection(); echo runInstall($db,preg_replace('/[^0-9]/', '', $_POST['sqlline'])); exit(); }
+	if (isset($_POST['sqlline']))
+	{
+		$db = createDbConnection();
+		echo runInstall($db,preg_replace('/[^0-9]/', '', $_POST['sqlline']));
+		exit();
+	}
 	switch ($step)
 	{
 		case 2:displayFormTwo(); break;
@@ -362,7 +368,7 @@ function displayForm()
 	<label>Enter your database connection information below. <strong>Note: This database must already exist and be blank.</strong></label>
 
 	<!-- Search form with input field and button -->
-	<form id="installform" action="install.php?<?php if(isset($_GET['debug'])) echo "&debug";if(isset($_GET['qa'])) echo "&qa"; ?>" method="POST" class="well form-search">
+	<form id="installform" action="install.php?<?php if(isset($_GET['debug'])) echo "&debug";if(isset($_GET['qa'])) echo "&qa=".$_GET['qa']; ?>" method="POST" class="well form-search">
 		<table class="table table-striped">
 			<tr>
 				<td nowrap>MySQL Database Host (Server name or IP):</td>
@@ -481,6 +487,9 @@ function displayFormTwo()
 		<div class="progress progress-striped active">
 			<div class="bar" id="progressbar" style="width: 0%;"></div>
 		</div>
+		<div id="waitbar">
+
+		</div>
 		<div id="stats"></div>
 	</div>
 
@@ -490,6 +499,7 @@ function displayFormTwo()
 		var pinttimer=0;
 		var online=1;
 		var total = 0;
+		var delay=50;
 
 		function startInstall(key) {
 			document.getElementById('progressbar').style.width = "1%";
@@ -498,6 +508,7 @@ function displayFormTwo()
 		}
 		function runInstall(key)
 		{
+
 			if (prunning==1)
 			{
 				if(online==2)
@@ -521,10 +532,22 @@ function displayFormTwo()
 			prunning=1;
 			var postvar = "sqlline="+ online +
 				"&dbname=" + "<?php echo $_POST['dbname'] ?>" +
-				"&dboldname=" + "<?php echo $_POST['dboldname'] ?><?php if(isset($_GET['qa'])) echo "&qa=1"?><?php if(isset($_GET['debug'])) echo "&debug=1"?>";
+				"&dboldname=" + "<?php echo $_POST['dboldname'] ?><?php if(isset($_GET['qa'])) echo "&qa=".$_GET['qa']?><?php if(isset($_GET['debug'])) echo "&debug=1"?>";
 
-
-			$.post("install.php", postvar, function(data){
+			//document.getElementById('waitbar').innerHTML = 'about to post '+postvar;
+			$.ajax({
+				url: "install.php",
+				type:'POST',data:postvar,
+				error: function(jqXHR, textStatus, errorThrown){
+					delay=delay+1000;
+					document.getElementById('quip').innerHTML = "Server appears to be throttling connections, setting delay to "+((delay-50)/1000)+ " seconds";
+					clearInterval(pinttimer);
+					pinttimer=self.setInterval(function(){runInstall(key)},delay);
+					prunning=0;
+				}
+			}).done(
+				function(data){
+					//document.getElementById('waitbar').innerHTML = "got back "+data;
 				if (data[0]=="{")
 				{
 					obj = JSON.parse(data);
@@ -534,6 +557,8 @@ function displayFormTwo()
 						perc = perc/2;
 						if(perc<1) perc=1;
 						document.getElementById('progressbar').style.width = perc + "%";
+
+
 						document.getElementById('progressbar').style.backgroundColor = "#149BDF";
 						if (!obj.tag) obj.tag = "";
 						document.getElementById('stats').innerHTML = obj.tag;
@@ -546,10 +571,18 @@ function displayFormTwo()
 							var exporturl = window.location.href.replace("/install.php", "/install/exportconfig");
 							$.post(exporturl, "", function(data){  if (data[0]!="{") alert(data); });
 							online = 1;
-							pinttimer=self.setInterval(function(){runUpgrade(key)},50);
+							pinttimer=self.setInterval(function(){runUpgrade(key)},delay);
 						}else {
 							prunning=0;
 							online = online + 1;
+							if (delay>1050)
+							{
+								delay=delay-1000;
+								document.getElementById('quip').innerHTML =
+									"Server appears to be throttling connections, setting delay to "+((delay-50)/1000)+ " seconds";
+								clearInterval(pinttimer);
+								pinttimer=self.setInterval(function(){runInstall(key)},delay);
+							}
 						}
 
 					}
@@ -566,6 +599,7 @@ function displayFormTwo()
 					document.getElementById('quip').innerHTML = "Error, install halted.";
 					alert(data);
 				}
+				//document.getElementById('waitbar').innerHTML = "end of function";
 			});
 
 		}
@@ -590,7 +624,17 @@ function displayFormTwo()
 				"&dboldname=" + "<?php echo $_POST['dboldname'] ?>";
 
 			var exporturl = window.location.href.replace("/install.php", "/install/upgrade");
-			$.post(exporturl, postvar, function(data){
+			$.ajax({
+				url: exporturl,
+				type:'POST',data:postvar,
+				error: function(jqXHR, textStatus, errorThrown){
+					delay=delay+1000;
+					document.getElementById('quip').innerHTML = "Server appears to be throttling connections, setting delay to "+((delay-50)/1000)+ "seconds";
+					clearInterval(pinttimer);
+					pinttimer=self.setInterval(function(){runUpgrade(key)},delay);
+					prunning=0;
+				}
+			}).done(function(data){
 				if (data[0]=="{")
 				{
 					obj = JSON.parse(data);
@@ -660,7 +704,7 @@ function displayHeader()
 			.hero-unit p { font-size: 0.9em; }
 			#stats { font-size: 0.7em; }
 		</style>
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+		<script src="http://cdn.lightspeedretail.com/bootstrap/js/jquery.min.js"></script>
 		<script src="http://cdn.lightspeedretail.com/bootstrap/js/bootstrap.js"></script>
 	</head>
 
@@ -747,7 +791,8 @@ class DB_Class {
 	public function __construct($servername, $dbuser, $dbpassword, $dbname) {
 		$this->db = new mysqli($servername, $dbuser, $dbpassword);
 		if (!$this->db)
-		{ echo ("Unable to connect to Database Server. Invalid server, username or password."); die(); }
+		{ error_log("Unable to connect to Database Server. Invalid server, username or password.",3,"errorlog.txt");
+			echo("Unable to connect to Database Server. Invalid server, username or password."); die(); }
 		$this->newdb = $dbname;
 
 	}
@@ -758,7 +803,8 @@ class DB_Class {
 		{
 			$blnSuccess =$this->db->select_db($this->olddb);
 			if (!$blnSuccess)
-			{ echo ("Cannot find or use \"".$this->olddb."\" database to upgrade."); die(); }
+			{ error_log("Cannot find or use \"".$this->olddb."\" database to upgrade.",3,"errorlog.txt");
+				echo ("Cannot find or use \"".$this->olddb."\" database to upgrade."); die(); }
 
 
 			$this->getSchema();
@@ -767,7 +813,8 @@ class DB_Class {
 		{
 			$blnSuccess =$this->db->select_db($this->newdb);
 			if (!$blnSuccess)
-			{ echo ("Cannot find or use \"".$this->newdb."\" database. Make sure it has been created and is blank."); die(); }
+			{ error_log("Cannot find or use \"".$this->newdb."\" database. Make sure it has been created and is blank",3,"errorlog.txt");
+				echo ("Cannot find or use \"".$this->newdb."\" database. Make sure it has been created and is blank."); die(); }
 			$this->getSchema();
 		}
 
@@ -955,7 +1002,7 @@ function downloadLatest()
 	//if we've already downloaded and extracted, don't do it twice
 	if (!file_exists('core') && !file_exists('webstore.zip'))
 	{
-		$dest = (isset($_POST['qa']) ? "qa" : "latestwebstore");
+		$dest = (isset($_POST['qa']) ? "qa/".$_POST['qa'] : "latestwebstore");
 		$cdn = (isset($_POST['qa']) ? "webstore-qa" : "webstore-full");
 		$jLatest= downloadFile("http://updater.lightspeedretail.com/site/".$dest);
 		$result = json_decode($jLatest);
@@ -1121,6 +1168,7 @@ function runInstall($db,$sqlline = 0)
 		$sqlstrings = initialMigrateTables().migrateTwoFiveToThree();
 	else
 		$sqlstrings = migrateTwoFiveToThree();
+
 	$arrSql = explode(";",$sqlstrings);
 	$total = count($arrSql)+13;
 
@@ -1129,7 +1177,7 @@ function runInstall($db,$sqlline = 0)
 
 		case 1:
 
-			$dest = (isset($_POST['qa']) ? "qa" : "latestwebstore");
+			$dest = (isset($_POST['qa']) ? "qa/".$_POST['qa'] : "latestwebstore");
 			$cdn = (isset($_POST['qa']) ? "webstore-qa" : "webstore-full");
 			$jLatest= downloadFile("http://updater.lightspeedretail.com/site/".$dest);
 			$result = json_decode($jLatest);
@@ -1222,9 +1270,10 @@ function runInstall($db,$sqlline = 0)
 
 
 	if (isset($tag))
-		return json_encode(array('result'=>"success",'line'=>$sqlline,'tag'=>$tag,'total'=>$total,'upgrade'=>$upgrade));
-	else return json_encode(array('result'=>"success",'line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
+		$retVal =  json_encode(array('result'=>"success",'line'=>$sqlline,'tag'=>$tag,'total'=>$total,'upgrade'=>$upgrade));
+	else $retVal =   json_encode(array('result'=>"success",'line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
 
+	return $retVal;
 }
 
 function installMainConfig()
@@ -2080,19 +2129,15 @@ function migrateTwoFiveToThree()
 	ALTER TABLE `{newdbname}`.`xlsws_customer` CHANGE `user` `lightspeed_user` VARCHAR(32)  NULL  DEFAULT NULL;
 	ALTER TABLE `{newdbname}`.`xlsws_customer` ADD `facebook` BIGINT(20) unsigned NULL  DEFAULT NULL  AFTER `lightspeed_user`;
 	ALTER TABLE `{newdbname}`.`xlsws_destination` CHANGE `name` `label` VARCHAR(32)  NULL  DEFAULT NULL;
-
-
-	ALTER TABLE `{newdbname}`.`xlsws_modules` CHANGE `type` `category` VARCHAR(255)  NOT NULL  DEFAULT '';
-	ALTER TABLE `{newdbname}`.`xlsws_modules` CHANGE `file` `module` VARCHAR(64)  NOT NULL  DEFAULT '';
-	ALTER TABLE `{newdbname}`.`xlsws_product` CHANGE `description` `description_long` MEDIUMTEXT  NULL;
 	ALTER TABLE `{newdbname}`.`xlsws_product` CHANGE `name` `title` VARCHAR(255)  NOT NULL  DEFAULT '';
+	ALTER TABLE `{newdbname}`.`xlsws_modules` CHANGE `type` `category` VARCHAR(255)  NOT NULL  DEFAULT '';
+	ALTER TABLE `{newdbname}`.`xlsws_product` CHANGE `description` `description_long` MEDIUMTEXT  NULL;
+	ALTER TABLE `{newdbname}`.`xlsws_modules` CHANGE `file` `module` VARCHAR(64)  NOT NULL  DEFAULT '';
 	ALTER TABLE `{newdbname}`.`xlsws_product` CHANGE `fk_product_master_id` `parent` BIGINT(20) unsigned NULL;
 	ALTER TABLE `{newdbname}`.`xlsws_product` CHANGE `image_id` `image_id` BIGINT(20) unsigned NULL;
 	ALTER TABLE `{newdbname}`.`xlsws_promo_code` CHANGE `except` `exception` TINYINT(1)  NOT NULL  DEFAULT '0';
 	ALTER TABLE `{newdbname}`.`xlsws_tax` CHANGE `max` `max_tax` DOUBLE  NULL  DEFAULT '0';
-
 	ALTER TABLE `{newdbname}`.`xlsws_state` ADD `country_id` INT  UNSIGNED  NULL  DEFAULT NULL  AFTER `id`;
-
 	DROP TABLE IF EXISTS `{newdbname}`.`xlsws_log`;
 
 	create table `{newdbname}`.`xlsws_log`

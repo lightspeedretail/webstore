@@ -111,7 +111,7 @@ class BaseCheckoutForm extends CFormModel
 				'validatePostal','on'=>'CalculateShipping,formSubmitGuest,formSubmitCreatingAccount,formSubmitExistingAccount'),
 
 			array('acceptTerms,shippingProvider,shippingPriority,paymentProvider','required',
-				'on'=>'formSubmit,formSubmitCreatingAccount,formSubmitExistingAccount'),
+				'on'=>'formSubmit,formSubmitGuest,formSubmitCreatingAccount,formSubmitExistingAccount'),
 
 			array('cardNumber,cardExpiryMonth, cardExpiryYear,cardType,cardCVV,cardNameOnCard','validateCard',
 				'on'=>'formSubmitGuest,formSubmitCreatingAccount,formSubmitExistingAccount'),
@@ -128,7 +128,7 @@ class BaseCheckoutForm extends CFormModel
 
 			array('acceptTerms','required', 'requiredValue'=>1,
 				'message'=>Yii::t('global','You must accept Terms and Conditions'),
-				'on'=>'formSubmit,formSubmitCreatingAccount,formSubmitExistingAccount'),
+				'on'=>'formSubmit,formSubmitGuest,formSubmitCreatingAccount,formSubmitExistingAccount'),
 
 			array('createPassword', 'length', 'max'=>255),
 			array('createPassword', 'compare', 'on'=>'formSubmitCreatingAccount'),
@@ -157,7 +157,7 @@ class BaseCheckoutForm extends CFormModel
 	public function validatePostal($attribute, $params)
 	{
 		if($attribute=='shippingPostal' && $this->shippingCountry==0) return;
-		if($attribute=='billingPostal' && ($this->billingCountry==0 || $this->billingSameAsShipping==1)) return;
+		if($attribute=='billingPostal' && ($this->billingCountry==0 || $this->intBillingAddress>0 || $this->billingSameAsShipping==1)) return;
 
 
 		if($attribute=='shippingPostal') $obj = Country::Load($this->shippingCountry);
@@ -171,9 +171,6 @@ class BaseCheckoutForm extends CFormModel
 			$this->addError($attribute,
 				Yii::t('yii','{attribute} format is incorrect for this country.',
 					array('{attribute}'=>$this->getAttributeLabel($attribute))));
-
-
-
 	}
 
 	/**
@@ -221,17 +218,16 @@ class BaseCheckoutForm extends CFormModel
 			switch ($attribute)
 			{
 				case 'cardNumber':
-					if ($this->cardNumber != '')
+					if ($this->cardNumber != '' && !is_null($this->cardType))
 					{
 						Yii::import('ext.validators.ECCValidator');
 						$cc = new ECCValidator();
-						$cardType = str_replace(" ","_",strtoupper($this->cardType));
 
-						$cc->format = array(constant('ECCValidator::'.$cardType));
+						$cc->format = array(constant('ECCValidator::'.$this->cardType));
 
 						if(!$cc->validateNumber($this->cardNumber))
-							$this->addError($this->cardNumber,
-								Yii::t('yii','Invalid Card Number',
+							$this->addError($attribute,
+								Yii::t('yii','Invalid Card Number or Type mismatch',
 									array('{attribute}'=>$this->getAttributeLabel($attribute)))
 							);
 					}
@@ -460,7 +456,7 @@ class BaseCheckoutForm extends CFormModel
 	 */
 	public function getCardTypes() {
 
-		return CHtml::listData(CreditCard::model()->findAllByAttributes(array('enabled'=>1),array('order'=>'sort_order,label')), 'label', 'label');
+		return CHtml::listData(CreditCard::model()->findAllByAttributes(array('enabled'=>1),array('order'=>'sort_order,label')), 'validfunc', 'label');
 
 	}
 
@@ -672,7 +668,7 @@ class BaseCheckoutForm extends CFormModel
 			foreach (Yii::app()->session['ship.cartscenarios.cache'] as $key => $value) {
 				if ($outercount++>0) $strReturn .= ",";
 				$value = str_replace("\t","",$value);
-				$strReturn .= $key.":'".$value."'";
+				$strReturn .= $key.":'".addslashes($value)."'";
 			}
 			$strReturn .= "}";
 			return $strReturn;

@@ -35,7 +35,7 @@
     <div class="pull-right">
 	<?php
 	echo CHtml::ajaxButton(Yii::t('admin','Create New Country'),
-		array('shipping/newtier'),
+		'#',
 		array(
 			'type'=>"POST",
 			'dataType'=>'json',

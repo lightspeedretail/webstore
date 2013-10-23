@@ -23,7 +23,7 @@ class ShippingController extends AdminBaseController
 	public function beforeAction($action)
 	{
 
-		$this->scanShippers();
+		$this->scanModules('shipping');
 
 		$arrModules =  Modules::model()->findAllByAttributes(array('category'=>'shipping'),array('order'=>'module')); //Get active and inactive
 
@@ -99,52 +99,7 @@ class ShippingController extends AdminBaseController
 	/**
 	 * Compare actual files in shipping extensions folders with our Modules table, add anything missing
 	 */
-	public function scanShippers()
-	{
-		$arrCustom = glob(YiiBase::getPathOfAlias("custom.extensions.shipping").'/*', GLOB_ONLYDIR);
-		if(!is_array($arrCustom)) $arrCustom = array();
-		$files=array_merge(glob(YiiBase::getPathOfAlias("ext.wsshipping").'/*', GLOB_ONLYDIR),$arrCustom);
 
-		foreach ($files as $file)
-		{
-
-			$moduleName = mb_pathinfo($file,PATHINFO_BASENAME);
-
-			//Check if module is already in database
-			$objModule = Modules::LoadByName($moduleName);
-			if(!($objModule instanceof Modules))
-			{
-				//The module doesn't exist, attempt to install it
-				try {
-
-					$objModule = new Modules();
-					$objModule->active=0;
-					$objModule->module = $moduleName;
-					$objModule->category = 'shipping';
-					$objModule->configuration = Yii::app()->getComponent($moduleName)->getDefaultConfiguration();
-					if (!$objModule->save())
-						Yii::log("Found widget $moduleName could not install ".print_r($objModule->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-
-				}
-				catch (Exception $e) {
-					Yii::log("Found widget $moduleName could not install ".$e, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-				}
-
-			}
-			else
-			{
-				$objModule->version = Yii::app()->getComponent($moduleName)->version;
-				$objModule->name = Yii::app()->getComponent($moduleName)->AdminNameNormal;
-				$objModule->save();
-
-
-
-			}
-		}
-
-
-
-	}
 
 
 	public function actionIndex()
@@ -385,10 +340,10 @@ class ShippingController extends AdminBaseController
 
 				if($obj->save())
 					echo "success";
-				else echo print_r($obj->getErrors,true);
+				else echo _xls_convert_errors_display(_xls_convert_errors($obj->getErrors()));
 			}
 			else
-				echo print_r($obj->getErrors,true);
+				echo _xls_convert_errors_display(_xls_convert_errors($obj->getErrors()));
 
 		}
 	}

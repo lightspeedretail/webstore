@@ -128,7 +128,7 @@ class Configuration extends BaseConfiguration
 	public static function exportLogging()
 	{
 		$objConfig = Configuration::model()->findAllByAttributes(array('param'=>'1'),array('order'=>'key_name'));
-
+		$DEBUG_TOOLBAR=0;
 		//Write out logging
 		foreach ($objConfig as $oConfig)
 			if ($oConfig->key_name=="DEBUG_LOGGING")
@@ -136,14 +136,39 @@ class Configuration extends BaseConfiguration
 				{
 					case 'error';   $level = "error";   $logLevel = "error,warning"; break;
 					case 'info';    $level = "info";    $logLevel = "error,warning,info";break;
+					case 'info2';    $level = "info";   $DEBUG_TOOLBAR=1; $logLevel = "error,warning,info";break;
 					case 'trace';   $level = "trace";   $logLevel = "error,warning,info,trace";break;
 
 				}
 
-
+		if(!('YII_DEBUG')) $DEBUG_TOOLBAR=0;
 		$fp2 = fopen(YiiBase::getPathOfAlias('config')."/wslogging.php","w");
 
-		fwrite($fp2,"<?php
+		if($DEBUG_TOOLBAR==1)
+			fwrite($fp2,"<?php
+
+return array(
+	'class'=>'CLogRouter',
+	'routes'=>array(
+		array(
+			'class'=>'CFileLogRoute',
+			'levels'=>'error, warning',
+		),
+		array(
+			'class'=>'ext.yii-debug-toolbar.YiiDebugToolbarRoute',
+			'levels'=>'error,warning,info',
+		),
+		array(
+			'class'=>'CDbLogRoute',
+			'levels'=>'".$logLevel."',
+			'logTableName'=>'xlsws_log',
+			'connectionID'=>'db',
+		),
+	),
+);
+
+");
+			else fwrite($fp2,"<?php
 
 return array(
 	'class'=>'CLogRouter',
@@ -171,28 +196,12 @@ return array(
 
 	public static function exportEmail()
 	{
-		$objConfig = Configuration::model()->findAllByAttributes(array('param'=>'1'),array('order'=>'key_name'));
-
 		$fp2 = fopen(YiiBase::getPathOfAlias('config')."/wsemail.php","w");
 		if(!$fp2) die("error writing wsemail");
 
-		$ssl = "false";
-		if(_xls_get_conf('EMAIL_SMTP_SECURITY_MODE')==0)
-			if (_xls_get_conf('EMAIL_SMTP_PORT')=="465") $ssl = "true";
-
-		if(_xls_get_conf('EMAIL_SMTP_SECURITY_MODE')==1) $ssl = "false";
-		if(_xls_get_conf('EMAIL_SMTP_SECURITY_MODE')==2) $ssl = "true";
-
 		fwrite($fp2,"<?php
 
-return array(
-			'class'=>'KEmail',
-			'host_name'=>'"._xls_get_conf('EMAIL_SMTP_SERVER')."',
-			'host_port'=>'"._xls_get_conf('EMAIL_SMTP_PORT')."',
-			'user'=>'"._xls_get_conf('EMAIL_SMTP_USERNAME')."',
-			'password'=>'"._xls_decrypt(_xls_get_conf('EMAIL_SMTP_PASSWORD'))."',
-			'ssl'=>".$ssl.",
-			);
+return array(); //no longer used
 ");
 		fclose($fp2);
 
@@ -337,7 +346,7 @@ return array(
 				return array(0 => _sp("Off") , 1 => _sp("Bottom of Products Menu") , 2 => _sp("Top of Products Menu"));
 
 			case 'EMAIL_SMTP_SECURITY_MODE':
-				return array(0 => _sp("Autodetect") , 1 => _sp("Force No Security") , 2 => _sp("Force SSL"));
+				return array(0 => _sp("Autodetect") , 1 => _sp("Force No Security") , 2 => _sp("Force SSL"),3 => _sp("Force TLS"));
 
 			case 'STORE_IMAGE_LOCATION':
 				return array('DB'=>'Database' , 'FS' => 'File System');
@@ -361,7 +370,11 @@ return array(
 				return array('jpg' => "JPG" , 'png' => "PNG");
 
 			case 'LOGGING':
-				return array('error' => "Error Logging" , 'info' => "Troubleshooting Logging",'trace'=>'Ludicrous Logging');
+				if(YII_DEBUG)
+					return array('error' => "Error Logging" , 'info' => "Troubleshooting Logging",
+						'info2' => "TShoot log and toolbar",'trace'=>'Ludicrous Logging');
+					else
+						return array('error' => "Error Logging" , 'info' => "Troubleshooting Logging",'trace'=>'Ludicrous Logging');
 
 
 			case 'INVENTORY_OUT_ALLOW_ADD':
@@ -417,6 +430,9 @@ return array(
 
 			case 'AUTO_UPDATE_TRACK':
 				return array(0=>'Release Versions',1=>'Beta and Release Versions');
+
+			case 'IMAGE_ZOOM':
+				return array('flyout'=>'Flyout','inside'=>'Inside');
 
 			default:
 				return array(1=>'On',0=>'Off');
@@ -492,7 +508,6 @@ return array(
 
 		if (empty($this->helper_text))
 			$this->helper_text = ' ';
-
 
 		return parent::beforeValidate();
 	}

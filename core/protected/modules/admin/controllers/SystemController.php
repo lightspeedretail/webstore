@@ -177,25 +177,22 @@ class SystemController extends AdminBaseController
 	public function sendEmailTest()
 	{
 
-		$headers = array(
-			'MIME-Version: 1.0',
-			'Content-type: text/html; charset=utf8'
-		);
 
-		Yii::import("ext.KEmail.KEmail");
+		$objEmail = new EmailQueue();
+		$objEmail->subject = "Test email from "._xls_get_conf('STORE_NAME');
 		$orderEmail = _xls_get_conf('ORDER_FROM','');
-
-		$blnResult = Yii::app()->email->send(
-			empty($orderEmail) ? _xls_get_conf('EMAIL_FROM') : $orderEmail,
-			_xls_get_conf('EMAIL_FROM'),
-			"Test email from "._xls_get_conf('STORE_NAME'),
-			"<h1>You have successfully received your test email.</h1>",
-			$headers);
+		$objEmail->to = empty($orderEmail) ? _xls_get_conf('EMAIL_FROM') : $orderEmail;
+		$objEmail->htmlbody = "<h1>You have successfully received your test email.</h1>";
+		$objEmail->save();
+		$blnResult = _xls_send_email($objEmail->id,true);
 
 		if ($blnResult)
 			Yii::app()->user->setFlash('warning','Test Email Successfully Sent');
 		else
+		{
 			Yii::app()->user->setFlash('error','ERROR -- YOUR TEST EMAIL ATTEMPT FAILED');
+			$objEmail->delete();
+		}
 
 	}
 

@@ -339,8 +339,20 @@ class Cart extends BaseCart
 				return Yii::t('cart','Your chosen quantity is not available for ordering. Please come back and order later.');
 		}
 
-		$objItem->qty = $intQuantity;
+
+        // qty discount?
+//        $arrtmp = ProductQtyPricing::model()->findAllByAttributes(array('product_id'=>$objItem->product_id,
+//                                                                            'pricing_level'=>1));
+//        $tmpprice = 0;
+//
+//        foreach ($arrtmp as $tmp)
+//            $tmpprice = ($intQuantity>=$tmp->qty ? $tmp->price : $tmpprice);
+//
+//        $objItem->discount = ($tmpprice>0 ? $objItem->sell_base - $tmpprice : 0);
+
+        $objItem->qty = $intQuantity;
 		$objItem->save();
+
 		$this->UpdateCart();
 		return $objItem;
 	}
@@ -730,7 +742,6 @@ class Cart extends BaseCart
 		$this->UpdatePromoCode();
 		$this->UpdateCountAndSubtotal();
 
-
 		$this->UpdateTaxInclusive();
 		$this->UpdateTaxExclusive();
 		$this->UpdateTaxShipping();
@@ -836,7 +847,7 @@ class Cart extends BaseCart
 		}
 
 		$objItem->qty = ($objItem->qty ? $objItem->qty : 0);
-		$objItem->sell_total = $objItem->sell_base*$objItem->qty;
+        $objItem->sell_total = $objItem->sell_base*$objItem->qty;
 		if (!$objItem->save())
 			print_r($objItem->getErrors());
 
@@ -854,8 +865,7 @@ class Cart extends BaseCart
 		return $objItem->id;
 	}
 
-
-	/**
+  	/**
 	 * Checks if current taxcode should be tax inclusive or not..
 	 * @return
 	 */
@@ -1054,7 +1064,6 @@ class Cart extends BaseCart
 
 		$this->refresh();
 	}
-
 
 	public function UpdateWishList()
 	{

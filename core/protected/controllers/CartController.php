@@ -113,7 +113,6 @@ class CartController extends Controller
 
 		}
 
-
 		$this->intEditMode = 1;
 		Yii::app()->shoppingcart->Recalculate();
 		$arrReturn['action'] = 'success';
@@ -1242,7 +1241,6 @@ class CartController extends Controller
 			$CheckoutForm->contactLastName = $objCustomer->last_name;
 			$CheckoutForm->contactPhone = $objCustomer->mainphone;
 			$CheckoutForm->contactEmail = $objCustomer->email;
-
 		}
 
 		return $CheckoutForm;
@@ -1472,10 +1470,12 @@ class CartController extends Controller
 		{
 			//We run the items through the model for verification
 			$model->attributes=$_POST['CheckoutForm'];
-			if(Yii::app()->params['SHIP_SAME_BILLSHIP']) $model->billingSameAsShipping=1;
+            if(Yii::app()->params['SHIP_SAME_BILLSHIP']) $model->billingSameAsShipping=1;
+
 			$model->scenario = 'CalculateShipping';
 			//Copy address book to field if necessary
-			$model = $this->FillFieldsFromPreselect($model);
+            $model = $this->FillFieldsFromPreselect($model);
+
 			if(!$model->validate()) {
 				$arrErrors = $model->getErrors();
 				if (count($arrErrors)>0)

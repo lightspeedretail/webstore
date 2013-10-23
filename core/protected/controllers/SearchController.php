@@ -155,6 +155,11 @@ class SearchController extends Controller
 		if (!_xls_get_conf('CHILD_SEARCH') || empty($strQ))
 			$criteria->addCondition('Product.parent IS NULL');
 
+		if (Product::HasFeatured() && empty($strS) && empty($strB) && empty($strC))
+		{
+			$criteria->addCondition('featured=1');
+			$this->pageHeader = 'Featured Products';
+		}
 
 		$criteria->addCondition('web=1');
 		$criteria->addCondition('current=1');

@@ -240,6 +240,54 @@ class Product extends BaseProduct
 	}
 
 
+	/*
+	 * returns product photos in an array
+	*/
+	public function getProductPhotos($absolute=false)
+	{
+		$objImages = Images::model()->findAll(array(
+			'condition'=>'product_id=:id AND `parent`=`id` order by `index`',
+			'params'=>array(':id'=>$this->id),
+		));
+		$arrImages = array();
+
+		foreach ($objImages as $obj)
+		{
+			$a = array();
+			$a['image']=Images::GetLink($obj->id,ImagesType::pdetail,$absolute);
+			$a['image_thumb']=Images::GetLink($obj->id,ImagesType::preview,$absolute);
+			$a['image_alt']=$this->Title;
+			$a['image_desc']='';
+			$a['image_large']=Images::GetLink($obj->id,ImagesType::normal,$absolute);
+			$webroot = Yii::getPathOfAlias('webroot');
+			if (strlen(Yii::app()->baseUrl)>2)
+				$webroot = substr($webroot,0,-(strlen(Yii::app()->baseUrl)));
+			list($wt, $ht, $type, $attr) = getimagesize($webroot.$a['image']);
+			if($obj->width<=$wt && $obj->height<=$ht)
+				$a['image_large']=$a['image'];
+
+			$arrImages[] = $a;
+
+		}
+
+		//This will force the no-product image
+		if(count($objImages)==0)
+		{
+			$a = array();
+			$a['image']=Images::GetImageFallbackPath($absolute);
+			$a['image_large']=Images::GetImageFallbackPath();
+			$a['image_thumb']=Images::GetImageFallbackPath();
+			$a['image_alt']=$this->Title;
+			$a['image_desc']='';
+			$arrImages[] = $a;
+		}
+
+
+		return $arrImages;
+
+	}
+
+
 	public function getImages()
 	{
 		$objImages = Images::model()->findAll(array(

@@ -47,7 +47,6 @@ return CMap::mergeArray(
 			'application.components.*',
 			'application.components.wscontrollers.*',
 			'application.helpers.*',
-			'application.extensions.KEmail.KEmail',
 			'application.extensions.wsborderlookup.Wsborderlookup',
 			'application.extensions.wsshipping.WsShipping',
 			'application.extensions.wspayment.WsPayment',
@@ -193,8 +192,6 @@ return CMap::mergeArray(
 					'cookieMode' => 'only',
 					'timeout' => 3600
 				),
-				//Email handling
-				'email'=>require(dirname(__FILE__).'/wsemail.php'),
 
 				//Facebook integration
 				'facebook'=>require(dirname(__FILE__).'/wsfacebook.php'),

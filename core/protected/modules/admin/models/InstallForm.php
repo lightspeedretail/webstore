@@ -42,6 +42,7 @@ class InstallForm extends CFormModel
 			array('STORE_NAME,EMAIL_FROM,STORE_ADDRESS1,STORE_ADDRESS2,STORE_HOURS,STORE_PHONE','required', 'on'=>'page3'),
 			array('EMAIL_SMTP_SERVER,EMAIL_SMTP_PORT,EMAIL_SMTP_USERNAME,EMAIL_SMTP_PASSWORD,EMAIL_SMTP_SECURITY_MODE','required', 'on'=>'page4'),
 			array('STORE_NAME,EMAIL_FROM,STORE_ADDRESS1,STORE_ADDRESS2,STORE_HOURS,STORE_PHONE,LSKEY,encryptionKey,encryptionSalt,TIMEZONE','safe'),
+            array('EMAIL_FROM','email'),
 			array('page','safe'),
 		);
 	}
@@ -97,7 +98,7 @@ class InstallForm extends CFormModel
 					'maxlength'=>64,
 				),
 				'EMAIL_FROM'=>array(
-					'type'=>'text',
+					'type'=>'email',
 					'maxlength'=>64,
 				),
 

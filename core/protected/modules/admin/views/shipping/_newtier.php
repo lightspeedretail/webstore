@@ -29,7 +29,7 @@
 <div class="row">
     <div class="pull-right" >
 	    <?php echo CHtml::ajaxSubmitButton(Yii::t('global','Save'),
-		    array('shipping/newtier'),
+		    '#',
 		    array(
 			    'type'=>"POST",
 			    'success'=>'js:function(data) {
