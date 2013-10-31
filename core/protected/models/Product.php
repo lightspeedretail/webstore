@@ -305,7 +305,6 @@ class Product extends BaseProduct
 			$a['image_thumb']=str_replace($urlToRemove,"",Images::GetLink($obj->id,ImagesType::preview,true));
 			$a['image_alt']=$this->Title;
 			$a['image_desc']='';
-			if (count($objImages)<=1) return $a;
 			$arrImages[] = $a;
 
 		}
@@ -314,11 +313,11 @@ class Product extends BaseProduct
 		if(count($objImages)==0)
 		{
 			$a = array();
-			$a['image']=str_replace($urlToRemove,"",Images::GetImageFallbackPath());
-			$a['image_large']=str_replace($urlToRemove,"",Images::GetImageFallbackPath());
-			$a['image_thumb']=str_replace($urlToRemove,"",Images::GetImageFallbackPath());
-			$a['image_alt']=$this->Title;
-			$a['image_desc']='';
+			$a[0]['image']=str_replace($urlToRemove,"",Images::GetImageFallbackPath());
+			$a[0]['image_large']=str_replace($urlToRemove,"",Images::GetImageFallbackPath());
+			$a[0]['image_thumb']=str_replace($urlToRemove,"",Images::GetImageFallbackPath());
+			$a[0]['image_alt']=$this->Title;
+			$a[0]['image_desc']='';
 			return $a;
 		}
 
