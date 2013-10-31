@@ -18,12 +18,18 @@ function searchForComponents()
 		$arr[basename($moduleDirectory)] = array('class'=>'ext.wsshipping.'.basename($moduleDirectory).'.'.basename($moduleDirectory));
 
 	//Load any custom payment components
-	foreach (glob(dirname(__FILE__).'/../../../custom/extensions/payment/*', GLOB_ONLYDIR) as $moduleDirectory)
-		$arr[basename($moduleDirectory)] = array('class'=>'custom.extensions.payment.'.basename($moduleDirectory).'.'.basename($moduleDirectory));
+	$path = realpath(dirname(__FILE__).'/../../../custom/extensions/payment');
+	$arrCustom = glob($path.'/*', GLOB_ONLYDIR);
+	if($arrCustom !== false && !empty($arrCustom))
+		foreach ($arrCustom as $moduleDirectory)
+			$arr[basename($moduleDirectory)] = array('class'=>'custom.extensions.payment.'.basename($moduleDirectory).'.'.basename($moduleDirectory));
 
 	//Load any custom shipping components
-	foreach (glob(dirname(__FILE__).'/../../../custom/extensions/shipping/*', GLOB_ONLYDIR) as $moduleDirectory)
-		$arr[basename($moduleDirectory)] = array('class'=>'custom.extensions.shipping.'.basename($moduleDirectory).'.'.basename($moduleDirectory));
+	$path = realpath(dirname(__FILE__).'/../../../custom/extensions/shipping');
+	$arrCustom = glob($path.'/*', GLOB_ONLYDIR);
+	if($arrCustom !== false && !empty($arrCustom))
+		foreach ($arrCustom as $moduleDirectory)
+			$arr[basename($moduleDirectory)] = array('class'=>'custom.extensions.shipping.'.basename($moduleDirectory).'.'.basename($moduleDirectory));
 
 	$arr['Smtpmail'] = array('class'=>'application.extensions.smtpmail.PHPMailer');
 

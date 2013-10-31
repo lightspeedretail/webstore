@@ -126,6 +126,7 @@ h3 { margin-top: 2px; }
 #thememanage .theme {
    margin-left: 0px;
 }
+.langedit { margin-bottom: -1px; }
 
 
 #btnCopy { display: hidden;}

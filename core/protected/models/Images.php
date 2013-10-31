@@ -257,31 +257,61 @@ class Images extends BaseImages
 	/* Save blob to file */
 	public function SaveImageData($strName, $blbImage) {
 
-			$this->DeleteImage();
+		$this->DeleteImage();
 
-			$strPath = Images::GetImagePath($strName);
-			$arrPath = mb_pathinfo($strPath);
+		$strPath = Images::GetImagePath($strName);
+		$arrPath = mb_pathinfo($strPath);
 
-			$strFolder = $arrPath['dirname'];
-			$strSaveFunc = 'imagepng';
+		$strFolder = $arrPath['dirname'];
+		$strSaveFunc = 'imagepng';
 
-			if ($arrPath['extension'] == 'jpg')
-				$strSaveFunc = 'imagejpeg';
+		if ($arrPath['extension'] == 'jpg')
+			$strSaveFunc = 'imagejpeg';
 
-			if ($arrPath['extension'] == 'gif')
-				$strSaveFunc = 'imagegif';
+		if ($arrPath['extension'] == 'gif')
+			$strSaveFunc = 'imagegif';
 
-			if ($this->SaveImageFolder($strFolder) && $strSaveFunc($blbImage, $strPath))
+		if ($strSaveFunc=="imagepng")
+		{
+			//Set transparency
+			$retVal = $this->check_transparent($blbImage);
+			if($retVal)
 			{
-				$this->image_path = $strName;
-				return true;
+				imagealphablending($blbImage, false);
+				imagesavealpha($blbImage, true);
 			}
-			else {
-				Yii::log("Failed to save file $strName", 'image', __FUNCTION__);
-				return false;
-			}
+		}
+
+		if ($this->SaveImageFolder($strFolder) && $strSaveFunc($blbImage, $strPath))
+		{
+			$this->image_path = $strName;
+			return true;
+		}
+		else {
+			Yii::log("Failed to save file $strName", 'image', __FUNCTION__);
+			return false;
+		}
 
 
+	}
+
+	protected function check_transparent($im) {
+
+		$width = imagesx($im); // Get the width of the image
+		$height = imagesy($im); // Get the height of the image
+
+		// We run the image pixel by pixel and as soon as we find a transparent pixel we stop and return true.
+		for($i = 0; $i < $width; $i++) {
+			for($j = 0; $j < $height; $j++) {
+				$rgba = imagecolorat($im, $i, $j);
+				if(($rgba & 0x7F000000) >> 24) {
+					return true;
+				}
+			}
+		}
+
+		// If we don't find any pixel the function will return false.
+		return false;
 	}
 
 	/* If we do not have an image, pass back our default Not Found graphic URL

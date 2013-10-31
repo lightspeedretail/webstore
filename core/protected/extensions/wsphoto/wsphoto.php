@@ -119,11 +119,18 @@ class wsphoto extends CApplicationComponent {
 
 
 		$image = Yii::app()->image->load($strOriginalFileWithPath);
-		$image->resize($intNewWidth,$intNewHeight)
-			->quality(_xls_get_conf('IMAGE_QUALITY','75'))
-			->sharpen(_xls_get_conf('IMAGE_SHARPEN','20'));
 
+        $quality = _xls_get_conf('IMAGE_QUALITY', '75');
+        $sharpness = _xls_get_conf('IMAGE_SHARPEN', '20');
 
+        if($sharpness != 0){
+            $image->resize($intNewWidth,$intNewHeight)
+                ->quality($quality)
+                ->sharpen($sharpness);
+        } else {
+            $image->resize($intNewWidth,$intNewHeight)
+                ->quality($quality);
+        }
 
 		if (Images::IsWritablePath($strNewThumbnail)) //Double-check folder permissions
 		{

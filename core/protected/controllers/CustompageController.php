@@ -43,6 +43,10 @@ class CustompageController extends Controller
 		if (!($model instanceof CustomPage))
 			_xls_404();
 
+		//If we are in multilanguage mode, parse the description and display only the local language.
+		if(_xls_get_conf('LANG_MENU',0))
+			$model->page = _xls_parse_language($model->page);
+
 		$this->pageTitle=$model->PageTitle;
 		$this->pageDescription=$model->meta_description;
 		$this->pageImageUrl = '';
@@ -52,8 +56,6 @@ class CustompageController extends Controller
 
 		$this->CanonicalUrl = $model->CanonicalUrl;
 		$this->render('index',array('model'=>$model,'objCustomPage'=>$model));
-
-
 
 	}
 
@@ -70,6 +72,10 @@ class CustompageController extends Controller
 		$this->breadcrumbs = array(
 			$model->title=>$model->RequestUrl,
 		);
+
+		//If we are in multilanguage mode, parse the description and display only the local language.
+		if(_xls_get_conf('LANG_MENU',0))
+			$model->page = _xls_parse_language($model->page);
 
 		$ContactForm=new ContactForm;
 		if(isset($_POST['ContactForm']))

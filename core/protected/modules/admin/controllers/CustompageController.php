@@ -93,9 +93,28 @@ class CustompageController extends AdminBaseController
 			$this->redirect($this->createUrl("custompage/index"));
 
 		}
+
+		if (_xls_get_conf('LANG_MENU'))
+		{
+			$langs = _xls_comma_to_array(_xls_get_conf('LANGUAGES'));
+			$def = _xls_get_conf('LANG_CODE');
+
+			Yii::log('POST: ' . print_r($_POST,true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+
+			if(isset($_POST['content-'.$def]))
+				$_POST['CustomPage']['page']='<'.$def.'>'.$_POST['content-'.$def].'</'.$def.'>';
+
+			foreach ($langs as $i=>$v)
+				if(isset($_POST['content-'.substr($v,0,2)]))
+				{
+					$_POST['CustomPage']['page'].='<'.substr($v,0,2).'>'.$_POST['content-'.substr($v,0,2)].'</'.substr($v,0,2).'>';
+				}
+
+
+		}
+
 		if(isset($_POST['CustomPage']))
 		{
-
 			$model->attributes = $_POST['CustomPage'];
 			if ($model->validate())
 			{

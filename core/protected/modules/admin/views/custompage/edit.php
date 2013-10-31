@@ -59,27 +59,60 @@
 
 	</div>
 
+
 	<div class="span11">
 	    <h4>Edit Page Content</h4>
 		<div class="tip">Click on the first tool on the toolbar to switch to editing HTML directly. Note this editor can be used for HTML and CSS, but any scripting language like JavaScript will not be functional.</div>
-		<?php
-		$this->widget('ImperaviRedactorWidget', array(
-			'model' => $model,
-			'attribute' => 'page',
-			'htmlOptions'=>array('style'=>"height: 400px; padding-bottom: 20px;"),
-			'options' => array(
-				'lang' => 'en',
-				'width'=> '500',
-				'height'=> '400',
-				'autoresize'=>false,
-				'convertDivs'=>false,
-			),
-		));
-	?>
-	</div>
+		<p></p>
 
 
-	<div class="row">
+		<?php if (_xls_get_conf('LANG_MENU'))
+			$langs = _xls_comma_to_array(_xls_get_conf('LANG_OPTIONS'));
+		else $langs=array("en:English");
+		?>
+		<div class="tabbable">
+			<ul class="nav nav-tabs langedit">
+				<?php if(count($langs)>1)
+						foreach($langs as $lang)
+						{
+							$langa = explode(":",$lang);
+							echo '<li '.($langa[0]=='en' ? 'class="active"' : '').
+								'><a href="#'.$langa[0].'" data-toggle="tab">'.$langa[1].'</a></li>';
+						}
+				?>
+			</ul>
+
+			<div class="tab-content">
+				<?php
+				$origLang = Yii::app()->language;
+				foreach($langs as $lang)
+				{
+					$langa = explode(":",$lang);
+					Yii::app()->language = 	$langa[0];
+					echo '<div class="tab-pane'.($langa[0]=='en' ? ' active' : '').'" id="'.$langa[0].'">';
+					$this->widget('ImperaviRedactorWidget', array(
+						'name' => (count($langs)>1 ? 'content-'.$langa[0] : 'CustomPage[page]'),
+						'value'=>  (count($langs)>1 ? _xls_parse_language($model->page) : $model->page),
+						'attribute' => 'page',
+						'htmlOptions'=>array('style'=>"height: 400px; padding-bottom: 20px;"),
+						'options' => array(
+							'width'=> '500',
+							'height'=> '400',
+							'autoresize'=>false,
+							'convertDivs'=>false,
+							'linebreaks'=>true,
+						),
+					));
+					echo '</div>';
+				}
+				Yii::app()->language = $origLang;
+			?>
+			</div>
+		</div>
+	</div> <!-- /tabbable -->
+
+
+		<div class="row">
 		<div class="span11">
             <div class="row">
 	            <P></P>
