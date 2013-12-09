@@ -155,11 +155,16 @@ class SearchController extends Controller
 		if (!_xls_get_conf('CHILD_SEARCH') || empty($strQ))
 			$criteria->addCondition('Product.parent IS NULL');
 
-		if (Product::HasFeatured() && empty($strS) && empty($strB) && empty($strC))
+		if (Product::HasFeatured() && empty($strS) && empty($strB) && empty($strC) && !isset($_GET['all']))
 		{
 			$criteria->addCondition('featured=1');
 			$this->pageHeader = 'Featured Products';
+		} elseif (isset($_GET['all']))
+		{
+			$this->pageHeader = 'Browse Products';
 		}
+
+		$pageSize = isset($_GET['all']) ? 99999 : Yii::app()->params['listPerPage'];
 
 		$criteria->addCondition('web=1');
 		$criteria->addCondition('current=1');
@@ -169,7 +174,7 @@ class SearchController extends Controller
 		$numberOfRecords = Product::model()->count($criteria);
 
 		$pages = new CPagination($numberOfRecords);
-		$pages->setPageSize(Yii::app()->params['listPerPage']);
+		$pages->setPageSize($pageSize);
 		$pages->applyLimit($criteria);  // the trick is here!
 
 		$model = Product::model()->findAll($criteria);
