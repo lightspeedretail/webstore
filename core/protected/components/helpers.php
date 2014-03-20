@@ -1525,27 +1525,17 @@ function _xls_check_version($releasenotes = false)
 {
 	if(!Yii::app()->theme) return false;
 
-	$url = "http://updater.lightspeedretail.com";
-	//$url = "http://www.lsvercheck.site";
+	$url = "http://"._xls_get_conf('LIGHTSPEED_UPDATER','updater.lightspeedretail.com');
 
+	Yii::log("Checking Version (and reporting stats) to $url", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 	$storeurl = Yii::app()->createAbsoluteUrl("/");
 	$storeurl = str_replace("http://","",$storeurl);
 	$storeurl = str_replace("https://","",$storeurl);
 
-	$oXML = _xls_theme_config(Yii::app()->theme->name);
-
-	if(!is_null($oXML))
-	{
-		$strTheme = Yii::app()->theme->name;
-		$strThemeVersion = _xls_number_only((string)$oXML->version);
-		if(isset($oXML->noupdate) && $oXML->noupdate=='true' && $strTheme != "brooklyn")
-			$strThemeVersion="noupdate";
-
-	} else {
-		$strTheme = "unknown";
-		$strThemeVersion="noupdate";
-	}
+	$strTheme = Yii::app()->theme->name;
+	$strThemeVersion =
+		(Yii::app()->theme->info->noupdate ? "noupdate" : Yii::app()->theme->info->version);
 
 	if(isset($_SERVER['SERVER_SOFTWARE']))
 		$serversoftware=$_SERVER['SERVER_SOFTWARE'];
@@ -1562,9 +1552,15 @@ function _xls_check_version($releasenotes = false)
 		'serversoftware'=> $serversoftware,
 		'releasenotes'  => $releasenotes,
 		'themeversion'  => $strThemeVersion,
-		'schema'  => _xls_get_conf('DATABASE_SCHEMA_VERSION')
+		'schema'  => _xls_get_conf('DATABASE_SCHEMA_VERSION'),
+		'cid'  => _xls_get_conf('LIGHTSPEED_CID'),
+		'phpversion'  => PHP_VERSION,
+		'themefiles' => _xls_theme_report()
+
 
 	);
+
+	Yii::log("sending to stats ".print_r($data,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 	$json = json_encode($data);
 
 	$ch = curl_init($url);
@@ -1585,6 +1581,56 @@ function _xls_check_version($releasenotes = false)
 	$resp = curl_exec($ch);
 	curl_close($ch);
 	return $resp;
+}
+
+//In order to evaluate view layer changes impact, we need to know
+//what files have changed in a customer theme. (This is useful for
+//judging risk during the development process)
+//We simply take an md5 hash of each file in the theme and compare
+//it to the hash of our original shipping file. Contents of the file
+//are not sent.
+function _xls_theme_report()
+{
+	$retVal = getThemeFiles(YiiBase::getPathOfAlias('webroot.themes').'/'.Yii::app()->theme->name);
+	return serialize($retVal);
+}
+
+function getThemeFiles($dir) {
+
+	$files = array();
+	if ($handle = @opendir($dir)) {
+		while (false !== ($file = readdir($handle))) {
+			if ($file != "." && $file != "..") {
+				if(is_dir($dir.'/'.$file)) {
+					$dir2 = $dir.'/'.$file;
+					$files[] = getThemeFiles($dir2);
+				}
+				else {
+					//We only care about php and css files
+					if(substr($file,-4)==".php" || substr($file,-4)==".css" )
+						$files[] = str_replace(YiiBase::getPathOfAlias('webroot.themes').'/'.Yii::app()->theme->name."/","",$dir).
+							'/'.$file.",".md5_file($dir.'/'.$file);
+				}
+			}
+		}
+		closedir($handle);
+	}
+
+	return array_flat($files);
+}
+
+function array_flat($array) {
+	$tmp=array();
+	foreach($array as $a) {
+		if(is_array($a)) {
+			$tmp = array_merge($tmp, array_flat($a));
+		}
+		else {
+			$tmp[] = $a;
+		}
+	}
+
+	return $tmp;
 }
 
 function _xls_parse_language($string)

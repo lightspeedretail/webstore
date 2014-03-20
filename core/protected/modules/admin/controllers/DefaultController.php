@@ -211,9 +211,8 @@ class DefaultController extends AdminBaseController
 
 	public function actionReleasenotes()
 	{
-		$oXML = json_decode(_xls_check_version(true));
 
-//print_r($oXML);die();
+		$oXML = json_decode(_xls_check_version(true));
 		$this->render("releasenotes", array('oXML'=>$oXML->webstore));
 
 	}

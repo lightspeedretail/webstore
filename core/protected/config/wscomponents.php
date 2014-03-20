@@ -24,6 +24,8 @@ function searchForComponents()
 		foreach ($arrCustom as $moduleDirectory)
 			$arr[basename($moduleDirectory)] = array('class'=>'custom.extensions.payment.'.basename($moduleDirectory).'.'.basename($moduleDirectory));
 
+	$arr['wstheme'] = array('class'=>'ext.wstheme.WsTheme');
+	$arr['themeManager']=array('themeClass'=>'Theme');
 	//Load any custom shipping components
 	$path = realpath(dirname(__FILE__).'/../../../custom/extensions/shipping');
 	$arrCustom = glob($path.'/*', GLOB_ONLYDIR);
