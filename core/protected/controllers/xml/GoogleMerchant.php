@@ -79,12 +79,14 @@ class GoogleMerchant extends CAction
 				echo chr(9).'<g:product_type><![CDATA['.implode(" &gt; ",$arrTrail).']]></g:product_type>'.chr(13);
 			echo chr(9).'<link>'.$objProduct->AbsoluteUrl.'</link>'.chr(13);
 
-			if($objProduct->image_id)
-				echo chr(9).'<g:image_link>'._xls_site_url($objProduct->Image,true).'</g:image_link>'.chr(13);
-
-			foreach ($objProduct->images as $objImage)
-				if ($objImage->parent==$objImage->id && $objImage->index>0)
-					echo chr(9).'<g:additional_image_link>'._xls_site_url($objImage->image_path).'</g:additional_image_link>'.chr(13);
+			if($objProduct->image_id) {
+				$arrProductImages = $objProduct->getProductPhotos(true);
+				if($arrProductImages) {
+					echo chr(9).'<g:image_link>'.$arrProductImages[0]['image'].'</g:image_link>'.chr(13);
+					for ($index = 1; $index < count($arrProductImages); $index++)
+						echo chr(9).'<g:additional_image_link>'.$arrProductImages[$index]['image'].'</g:additional_image_link>'.chr(13);
+				}
+			}
 
 			echo chr(9).'<g:condition>new</g:condition>'.chr(13);
 
@@ -107,8 +109,8 @@ class GoogleMerchant extends CAction
 				echo chr(9).'<g:age_group>'.$arrGoogle['Age'].'</g:age_group>'.chr(13);
 			}
 
-			echo chr(9).'<g:color>'.$objProduct->product_color.'</g:color>'.chr(13);
-			echo chr(9).'<g:size>'.$objProduct->product_size.'</g:size>'.chr(13);
+			echo chr(9).'<g:color><![CDATA['.$objProduct->product_color.']]></g:color>'.chr(13);
+			echo chr(9).'<g:size><![CDATA['.$objProduct->product_size.']]></g:size>'.chr(13);
 
 			if ($objProduct->parent>0)
 				echo chr(9).'<item_group_id>'.$objProduct->parent.'</item_group_id>'.chr(13);

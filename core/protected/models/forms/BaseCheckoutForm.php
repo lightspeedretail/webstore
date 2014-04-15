@@ -118,6 +118,7 @@ class BaseCheckoutForm extends CFormModel
 
 			array('cardCVV', 'length', 'max'=>4,'on'=>'formSubmit,formSubmitCreatingAccount,formSubmitExistingAccount'),
 
+			array('contactPhone', 'length','min'=>7, 'max'=>32),
 
 			// email has to be a valid email address
 			array('contactEmail', 'email'),
@@ -217,6 +218,23 @@ class BaseCheckoutForm extends CFormModel
 		{
 			switch ($attribute)
 			{
+				case 'cardCVV':
+					if ($this->cardCVV != '' && !is_null($this->cardType))
+					{
+						Yii::import('ext.validators.ECCValidator');
+						$cc = new ECCValidator();
+
+						$cc->format = array(constant('ECCValidator::'.$this->cardType));
+
+						if (!$cc->validateCVV($this->cardCVV))
+							$this->addError($attribute,
+								Yii::t('yii','Invalid CVV or type mismatch',
+									array('{attribute}'=>$this->getAttributeLabel($attribute)))
+							);
+
+					}
+					//we purposely don't have a break here so it drops to the next check when blank
+
 				case 'cardNumber':
 					if ($this->cardNumber != '' && !is_null($this->cardType))
 					{
@@ -624,7 +642,7 @@ class BaseCheckoutForm extends CFormModel
 			$outercount=0;
 			foreach (Yii::app()->session['ship.priorityRadio.cache'] as $key => $value) {
 				if ($outercount++>0) $strReturn .= ",";
-				$strReturn .= $key.":'".$value."'";
+				$strReturn .= $key.":'"._xls_jssafe_name($value)."'";
 			}
 			$strReturn .= "}";
 			return $strReturn;

@@ -14,7 +14,7 @@
 			<div id="submitSpinner" class="span3" style="display:none">
 				<?php echo CHtml::image(Yii::app()->getBaseUrl(true).'/images/wait_animated.gif')?>
 			</div>
-			<div class="span3 pull-right">
+			<div class="span5 pull-right">
 				<?php echo CHtml::Button (
 					Yii::t('facebook',_xls_get_conf('FACEBOOK_WALL_PUBLISH')),
 					array(

@@ -43,7 +43,7 @@ abstract class BaseTaxCode extends CActiveRecord
 			array('list_order', 'numerical', 'integerOnly'=>true),
 			array('tax1_rate, tax2_rate, tax3_rate, tax4_rate, tax5_rate', 'numerical'),
 			array('lsid', 'length', 'max'=>11),
-			array('code', 'length', 'max'=>32),
+			array('code', 'length', 'max'=>255),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, lsid, code, list_order, tax1_rate, tax2_rate, tax3_rate, tax4_rate, tax5_rate', 'safe', 'on'=>'search'),

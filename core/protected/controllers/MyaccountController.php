@@ -23,18 +23,20 @@ class MyaccountController extends Controller
 	public function beforeAction($action)
 	{
 
-		if ($action->Id=="edit" && _xls_get_conf('ENABLE_SSL')==1)
-		{
-			if(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on') {
-				$this->redirect(Yii::app()->createAbsoluteUrl('myaccount/'.$action->Id,array(),'https'));
-				Yii::app()->end();
-			}
-		}
+//		if (_xls_get_conf('ENABLE_SSL')==1)
+//		{
+//			if(Yii::app()->isCommonSSL)
+//				$this->verifyCommonSSL();
+//
+//			if(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on') {
+//				$this->redirect(Yii::app()->createAbsoluteUrl('myaccount/'.$action->Id,array(),'https'));
+//				Yii::app()->end();
+//			}
+//		}
 
 		return parent::beforeAction($action);
 
 	}
-
 	public function actionIndex()
 	{
 
@@ -113,32 +115,7 @@ class MyaccountController extends Controller
 					if (Yii::app()->user->isGuest)
 					{
 
-						if(_xls_get_conf('MODERATE_REGISTRATION')==1)
-						{
-
-							$this->triggerEmailCampaign($model,'onAddCustomer');
-							Yii::app()->user->setFlash('success',
-								Yii::t('customer','Your account has been created but must be approved before you can log in. You will receive confirmation when you have been approved.'));
-						} else {
-						//We've successfully created the account, so just log in
-							$loginModel=new LoginForm;
-							$loginModel->email=$model->email;
-							$loginModel->password=$strPassword;
-							// validate user input and redirect to the previous page if valid
-							if($loginModel->validate() && $loginModel->login()) {
-								Yii::app()->user->setFlash('success',
-									Yii::t('customer','Your account has been created and you have been logged in automatically.'));
-								$this->triggerEmailCampaign($model,'onAddCustomer');
-								$this->redirect($this->createUrl("/site"));
-							}
-							else
-								Yii::log("Error logging in our newly created user ".print_r($loginModel->getErrors(),true),
-									'error', 'application.'.__CLASS__.".".__FUNCTION__);
-								Yii::app()->user->setFlash('error',
-									Yii::t('customer','Your account has been created but we had an error logging you in.'));
-						}
-
-						$this->redirect($this->createUrl("/site"));
+						$this->createAndLogin($model,$strPassword);
 					}
 					else
 						$this->triggerEmailCampaign($model,'onUpdateCustomer');
@@ -224,6 +201,68 @@ class MyaccountController extends Controller
 
 	}
 
+	/**
+	 * Create a new account from Registration and then login
+	 * @param $model
+	 * @param $strPassword
+	 */
+	protected function createAndLogin($model,$strPassword)
+	{
+		if(Yii::app()->params['MODERATE_REGISTRATION']==1)
+		{
+
+			$this->triggerEmailCampaign($model,'onAddCustomer');
+			Yii::app()->user->setFlash('success',
+				Yii::t('customer','Your account has been created but must be approved before you can log in. You will receive confirmation when you have been approved.'));
+			$this->triggerEmailCampaign($model,'onAddCustomer');
+			$this->redirect($this->createUrl("/site"));
+		}
+
+		//We've successfully created the account, so just log in
+		$loginModel=new LoginForm;
+		$loginModel->email=$model->email;
+		$loginModel->password=$strPassword;
+		// validate user input and redirect to the previous page if valid
+		if($loginModel->validate() && $loginModel->login())
+		{
+			Yii::app()->user->setFlash('success',
+				Yii::t('customer','Your account has been created and you have been logged in automatically.'));
+		}
+		else
+		{
+			Yii::log("Error logging in our newly created user ".print_r($loginModel->getErrors(),true),
+				'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			Yii::app()->user->setFlash('error',
+				Yii::t('customer','Your account has been created but we had an error logging you in.'));
+		}
+
+		$this->triggerEmailCampaign($model,'onAddCustomer');
+
+		//Common SSL mode means we need to pass back to the original URL and log in again automatically
+		if(Yii::app()->isCommonSSL)
+		{
+			$strIdentity = Yii::app()->user->id.",".Yii::app()->shoppingcart->id.",site,index";
+			Yii::log("Log in ".$strIdentity, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+			$redirString = _xls_encrypt($strIdentity);
+
+			$url = Yii::app()->controller->createAbsoluteUrl(
+				'commonssl/login',array('link'=>$redirString));
+
+			$url = str_replace(
+				"https://".Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL'],
+				"http://".Yii::app()->params['LIGHTSPEED_HOSTING_CUSTOM_URL'],
+				$url);
+
+		}
+		else
+		{
+			$url = $this->createUrl("/site");
+
+		}
+
+		//No matter what happens, we always go home.
+		$this->redirect($url);
+	}
 
 	protected function triggerEmailCampaign($objCustomer,$strTrigger)
 	{

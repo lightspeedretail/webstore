@@ -17,8 +17,14 @@
 		<hr>
 			<div class="row-fluid editinstructions">
 				<?php if(Yii::app()->user->fullname=="LightSpeed")
-					echo "<p><strong>".Yii::t('admin','NOTE: You are currently logged into Admin Panel from LightSpeed. This mode does not support direct file uploading. You will need to log into Admin Panel externally at {url} using a webstore account with Admin privileges to upload a file. The Choose File button will appear non-responsive. You can still switch to an already uploaded header image.',array('{url}'=>$this->createAbsoluteUrl("/admin")))."</strong></p>"; ?>
-				<?php echo Yii::t('admin','To upload a new header image to add to your collection, choose the file with the selector. Upload a .png or .jpg header file (Recommended max size: 750x125px):'); ?>
+					 ?>
+				<?php  if(Yii::app()->user->fullname=="LightSpeed")
+					echo "<p><strong>".Yii::t('admin','To upload a new header image to add to your collection, drag and drop a file on top of the Choose File button, then click Upload. NOTE: You can also log into Admin Panel externally at {url} to use the Choose File button normally.',array('{url}'=>$this->createAbsoluteUrl("/admin")))."</strong></p>";
+				else
+					echo Yii::t('admin','To upload a new header image to add to your collection, click Choose File and select your file, then click Upload.');
+
+				echo " Upload a .png or .jpg header file (Recommended max size: 750x125px):";
+				?>
 			</div>
 			<?php echo CHtml::fileField('header_image', '', array('id'=>'header_image','onchange'=>'js:$("#btnUpload").html("Upload");')); ?>
 

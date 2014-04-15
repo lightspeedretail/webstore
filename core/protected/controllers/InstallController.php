@@ -18,7 +18,15 @@ class InstallController extends Controller
 	protected $online;
 	
 	public function init() {
+		Controller::initParams();
 		Yii::app()->setViewPath(Yii::getPathOfAlias('application')."/views-cities");
+		Yii::app()->setComponent('bootstrap',array(
+			'class'=>'ext.bootstrap.components.Bootstrap',
+			'responsiveCss'=>true,
+		));
+		Yii::setPathOfAlias('bootstrap', dirname(__FILE__).DIRECTORY_SEPARATOR.'../extensions/bootstrap');
+		Yii::app()->bootstrap->init();
+
 		set_time_limit(300);
 		//We override init() to keep our system from trying to autoload stuff we haven't finished converting yet
 	}
@@ -35,7 +43,6 @@ class InstallController extends Controller
 	{
 
 		if (strlen(_xls_get_conf('LSKEY'))>0 &&
-			$action->id != "exportconfig" &&
 			$action->id != "upgrade" &&
 			$action->id != "fixlink" &&
 			$action->id != "migratephotos")
@@ -67,21 +74,6 @@ class InstallController extends Controller
 		$strOriginal = YiiBase::getPathOfAlias('application.views')."-".strtolower("cities");
 		@unlink($symfile);
 		symlink($strOriginal, $symfile);
-	}
-
-	/**
-	 * Export the initial configuration
-	 */
-	public function actionExportConfig()
-	{
-
-		if(isset($_GET['debug']))
-			Yii::log("Exporting Configuration", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-
-		Configuration::exportConfig();
-		Configuration::exportLogging();
-
-		echo json_encode(array('result'=>"success"));
 	}
 
 	/**
@@ -131,13 +123,10 @@ class InstallController extends Controller
 		if(isset($_GET['debug']))
 			Yii::log("Exporting Configuration", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 
-		Configuration::exportConfig();
-		Configuration::exportLogging();
-
 		//And download brooklyn as a default
-		$filename = Yii::getPathOfAlias('webroot.themes').DIRECTORY_SEPARATOR.'brooklyn';
+		$filename = Yii::getPathOfAlias('webroot.themes').DIRECTORY_SEPARATOR.DEFAULT_THEME;
 		if(!file_exists($filename))
-			downloadBrooklyn();
+			downloadTheme(DEFAULT_THEME);
 
 		return array('result'=>"success",'makeline'=>2,'tag'=>'Converting cart addresses','total'=>50);
 
@@ -731,25 +720,45 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		//Ship to buyer
 		//Keep in store
 
+		//find and remove any destinations with an erroneous taxcode
+		$sql = 'SELECT `id` FROM `xlsws_destination` WHERE `taxcode` NOT IN (SELECT xlsws_tax_code.lsid FROM xlsws_tax_code);';
+		$array = Yii::app()->db->createCommand($sql)->queryAll();
+		foreach ($array as $a)
+		{
+			Yii::log('Destination id '.$a['id'].'deleted due to erroneous tax code', 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			_dbx('DELETE FROM `xlsws_destination` WHERE `id`='.$a['id'].';');
+		}
+
+
 		$objDestinations = Destination::model()->findAll();
 		foreach ($objDestinations as $objDestination)
 		{
 			if ($objDestination->country=="*") $objDestination->country=null;
-			else {
-				$objC = Country::LoadByCode($objDestination->country);
-				$objDestination->country=$objC->id;
-			}
-
-			if ($objDestination->state=="*") $objDestination->state=null;
 			else
 			{
-				$objS = State::LoadByCode($objDestination->state,$objDestination->country);
-				$objDestination->state=$objS->id;
+				if (!is_numeric($objDestination->country))
+				{
+					$objC = Country::LoadByCode($objDestination->country);
+					$objDestination->country=$objC->id;
+				}
+			}
+
+			if ($objDestination->state=="*" || $objDestination->state==null) $objDestination->state=null;
+			else
+			{
+				if (!is_numeric($objDestination->state))
+				{
+					$objS = State::LoadByCode($objDestination->state,$objDestination->country);
+					$objDestination->state=$objS->id;
+				}
 			}
 
 			if (!$objDestination->save())
 				return print_r($objDestination->getErrors());
+
 		}
+
+
 
 		//Need to map destinations to IDs before doing this
 		_dbx("update `xlsws_destination` set country=null where country=0;");

@@ -32,6 +32,16 @@ class CartPayment extends BaseCartPayment
 		),parent::rules());
 	}
 
+
+	public function markCompleted()
+	{
+		if($this->payment_amount>0 && is_null($this->payment_status))
+		{
+			$this->payment_status = OrderStatus::Completed;
+			$this->save();
+		}
+	}
+
 	public function __get($strName) {
 		switch ($strName) {
 			case 'payment_name':

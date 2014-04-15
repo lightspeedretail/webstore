@@ -92,15 +92,17 @@ class Category extends BaseCategory
 				//unset($objItem);
 				# Append the child into result array and parse its children
 					$children = self::parseTree($objRet, $objItem->id);
-					if ($objItem->child_count>0 || is_array($children) || Yii::app()->params['DISPLAY_EMPTY_CATEGORY'])
+					if (Yii::app()->params['DISPLAY_EMPTY_CATEGORY'] || is_array($children) || $objItem->hasVisibleProducts )
 						$return[] = array(
 						'text'=>CHtml::link($objItem->label,$objItem->Link),
 						'label' => $objItem->label,
 						'link' => $objItem->Link,
+						'request_url' => $objItem->request_url,
 						'url' => $objItem->Link,
 						'id' => $objItem->id,
 						'child_count' => $objItem->child_count,
-						'children' => $children
+						'children' => $children,
+						'items' => $children
 					);
 			}
 		}
@@ -109,23 +111,32 @@ class Category extends BaseCategory
 
 
 
-	public function GetSubcategoryTree() {
+	public function getSubcategoryTree($menuTree = null)
+	{
 
-		$criteria = new CDbCriteria();
-		$criteria->alias = 'Category';
-		$criteria->condition = 'parent='.$this->id;
+		if(is_null($menuTree))
+			return null;
 
-		$criteria->order = 'menu_position';
+		if(!is_null($this->parent) && isset($menuTree[$this->parent0->request_url]['items']))
+			$menuTree = $menuTree[$this->parent0->request_url]['items'];
 
-		return Category::model()->findAll($criteria);
+		$compareArray = array($this->request_url=>'');
+		$subcatArray = array_intersect_key($menuTree,$compareArray);
+
+		if(isset($subcatArray[$this->request_url]['items']))
+			return $subcatArray[$this->request_url]['items'];
+		else
+			return null;
 
 	}
+
 
 	protected static function formatData($person) {
 		return array(
 			'text'=>$person['text'],
 			'label'=>$person['label'],
 			'link'=>$person['link'],
+			'request_url'=>$person['request_url'],
 			'url'=>$person['link'],
 			'id'=>$person['id'],
 			'child_count'=>$person['child_count'],
@@ -136,11 +147,13 @@ class Category extends BaseCategory
 		$personFormatted = array();
 		if (is_array($data))
 			foreach($data as $k=>$person) {
-				$personFormatted[$k] = Category::formatData($person);
+				$str = $person['request_url'];
+				$personFormatted[$str] = Category::formatData($person);
 				$parents = null;
 				if (isset($person['children'])) {
 					$parents = Category::getDataFormatted($person['children']);
-					$personFormatted[$k]['children'] = $parents;
+					$personFormatted[$str]['children'] = $parents;
+					$personFormatted[$str]['items'] = $parents;
 				}
 			}
 		return $personFormatted;
@@ -216,16 +229,34 @@ class Category extends BaseCategory
 	}
 
 
+	public function getHasVisibleProducts() {
+		if ($this->child_count == 0)
+			return false;
+
+		foreach($this->xlswsProducts as $product)
+			if($product->IsDisplayable)
+				return true;
+
+		return false;
+	}
+
 	protected function HasProducts() {
 		if ($this->child_count > 0)
 			return true;
 		return false;
 	}
 
-	protected function HasChildOrProduct() {
-		if ($this->HasChildren() || $this->HasProducts() || _xls_get_conf('DISPLAY_EMPTY_CATEGORY', '1')=='1')
+	public function getHasChildOrProduct() {
+		if ($this->HasChildren || $this->HasProducts() || Yii::app()->params['DISPLAY_EMPTY_CATEGORY'])
 			return true;
 		return false;
+	}
+
+
+	public function getHasChildren()
+	{
+		if ($this->categories) return true;
+		else return false;
 	}
 
 	protected function IsPrimary() {
@@ -434,25 +465,30 @@ class Category extends BaseCategory
 	}
 
 
-	public function UpdateChildCount(){
+	public function UpdateChildCount()
+	{
+
+
 
 		$criteria = new CDbCriteria();
 		$criteria->alias = 'Product';
 		$criteria->join='LEFT JOIN xlsws_product_category_assn as ProductAssn ON ProductAssn.product_id=Product.id';
 
-
+		//This count shows if there are products in the category (including ones that are temporarily hidden
+		//due to hiding out of stock)
 		$criteria->condition = 'category_id = :id AND web=1
 			AND (current=1 OR (current=0 AND inventoried=1 AND inventory_avail>0))
 			AND (
 				(master_model=1) OR
 				(master_model=0 AND parent IS NULL)
-			)';
-		$criteria->params = array (':id'=>$this->id);
-
+			)';		$criteria->params = array (':id'=>$this->id);
 
 		$intCount = Product::model()->count($criteria);
+		Yii::log("Calculating child count for ".$this->label." and got ".$intCount, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 		$this->child_count = $intCount;
-		$this->save();
+		if (!$this->save())
+			Yii::log("Error saving category ".$this->label." ". print_r($this->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+
 
 
 		if(!$this->IsPrimary() && $this->ParentObject)
@@ -564,6 +600,7 @@ class Category extends BaseCategory
 		return Family::model()->populateRecords($objCommand->QueryAll(),false);
 	}
 
+
 	/**
 	 * Since Validate tests to make sure certain fields have values, populate requirements here such as the modified timestamp
 	 * @return boolean from parent
@@ -592,15 +629,9 @@ class Category extends BaseCategory
 				return Yii::app()->createAbsoluteUrl('search/browse', array('cat' => $this->request_url));
 			//return _xls_site_dir(false).'/'.$this->GetLink();
 
-			case 'HasChildren':
-				if ($this->categories) return true;
-				else return false;
 
 			case 'HasProducts':
 				return $this->HasProducts();
-
-			case 'HasChildOrProduct':
-				return $this->HasChildOrProduct();
 
 			case 'ParentObject':
 				return $this->getParent();

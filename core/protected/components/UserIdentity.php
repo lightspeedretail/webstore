@@ -21,7 +21,8 @@ class UserIdentity extends CUserIdentity
 	public function authenticate()
 	{
 
-		$user = Customer::model()->findByAttributes(array('email' => $this->username,'record_type'=>Customer::REGISTERED));
+		$user = $this->getCustomerRecord();
+
 		if (!($user instanceof Customer) || $user->email !== $this->username) {
 			$this->errorCode = self::ERROR_USERNAME_INVALID;
 		} elseif ($user->allow_login != Customer::NORMAL_USER && $user->allow_login != Customer::ADMIN_USER) {
@@ -36,29 +37,8 @@ class UserIdentity extends CUserIdentity
 				$this->errorCode = self::ERROR_PASSWORD_INVALID;
 
 		} else {
-			$this->errorCode = self::ERROR_NONE;
-			$this->_id = $user->id;
-			$this->setState('fullname', $user->first_name.' '.$user->last_name);
-			$this->setState('firstname', $user->first_name);
-			$this->setState('profilephoto',Yii::app()->theme->baseUrl."/css/images/loginhead.png");
-			$user->last_login = new CDbExpression('NOW()');
 
-			if ($user->allow_login == Customer::ADMIN_USER)
-				$this->setState('role', 'admin');
-			else
-				$this->setState('role', 'user');
-
-			//If we used an md5 password from old webstore, let's re-encrypt it with the new format
-			if 	($user->password == $this->hash($this->password))
-			{
-				Yii::log("Note, user's old MD5 password upgraded ".$user->fullname, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-				$user->password = _xls_encrypt($this->password);
-			}
-			$user->setScenario('update');
-			if (!$user->save())
-			{
-				Yii::log("ERROR Saving user record ".print_r($user->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-			}
+			$this->successfullyLogin($user);
 
 		}
 		return !$this->errorCode;
@@ -86,4 +66,35 @@ class UserIdentity extends CUserIdentity
 
 	}
 
+	protected function getCustomerRecord()
+	{
+		return Customer::model()->findByAttributes(array('email' => $this->username,'record_type'=>Customer::REGISTERED));
+	}
+
+	protected function successfullyLogin($user)
+	{
+		$this->errorCode = self::ERROR_NONE;
+		$this->_id = $user->id;
+		$this->setState('fullname', $user->first_name.' '.$user->last_name);
+		$this->setState('firstname', $user->first_name);
+		$this->setState('profilephoto',Yii::app()->theme->baseUrl."/css/images/loginhead.png");
+		$user->last_login = new CDbExpression('NOW()');
+
+		if ($user->allow_login == Customer::ADMIN_USER)
+			$this->setState('role', 'admin');
+		else
+			$this->setState('role', 'user');
+
+		//If we used an md5 password from old webstore, let's re-encrypt it with the new format
+		if 	($user->password == $this->hash($this->password))
+		{
+			Yii::log("Note, user's old MD5 password upgraded ".$user->fullname, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			$user->password = _xls_encrypt($this->password);
+		}
+		$user->setScenario('update');
+		if (!$user->save())
+		{
+			Yii::log("ERROR Saving user record ".print_r($user->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		}
+	}
 }

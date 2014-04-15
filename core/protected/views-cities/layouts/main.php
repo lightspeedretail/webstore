@@ -23,7 +23,5 @@
 
 		<?php echo $this->sharingFooter; ?>
 
-		<?php echo $this->loginDialog; ?>
-
 	</body>
 </html>

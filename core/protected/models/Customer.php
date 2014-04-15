@@ -44,12 +44,12 @@ class Customer extends BaseCustomer
 		// will receive user inputs.
 		return array(
 			array('created, modified', 'required'),
-			array('newsletter_subscribe, allow_login', 'numerical', 'integerOnly'=>true),
+			array('newsletter_subscribe', 'numerical', 'integerOnly'=>true),
 			array('first_name, last_name', 'length', 'max'=>64),
-			array('company, email, password, temp_password', 'length', 'max'=>255),
+			array('company, email, password', 'length', 'max'=>255),
 			array('currency', 'length', 'max'=>3),
 			array('preferred_language, mainphonetype', 'length', 'max'=>8),
-			array('mainphone, lightspeed_user', 'length', 'max'=>32),
+			array('mainphone', 'length', 'max'=>32),
 			array('last_login', 'safe'),
 
 
@@ -157,6 +157,9 @@ class Customer extends BaseCustomer
 		$obj->allow_login = Customer::NORMAL_USER;
 		if (!$obj->save())
 			Yii::log("Error creating user ".print_r($obj->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		else
+			Yii::log("Created user from checkout ".$obj->first_name." ".$obj->last_name." ".$obj->id,
+				'info', 'application.'.__CLASS__.".".__FUNCTION__);
 		return $obj;
 	}
 
@@ -173,11 +176,12 @@ class Customer extends BaseCustomer
 	{
 
 		$objCustomer = Customer::model()->findByPk($id);
+		$objCustomer->default_billing_id = null;
+		$objCustomer->default_shipping_id = null;
+		$objCustomer->save();
 		foreach ($objCustomer->customerAddresses as $objAddress)
 			$objAddress->delete();
 		$objCustomer->delete();
-
-
 
 	}
 

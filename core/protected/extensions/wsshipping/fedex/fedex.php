@@ -241,7 +241,7 @@ class fedex extends WsShipping
 						foreach ($rateReply->RatedShipmentDetails as $choice) {
 							if ($choice->ShipmentRateDetail->RateType == $config['ratetype'])
 								$ret[ $rateReply->ServiceType] = $choice->ShipmentRateDetail->TotalNetCharge->Amount;
-							else if ($rateReply->ServiceType == "FEDEX_GROUND")
+							else if ($rateReply->ServiceType == "FEDEX_GROUND" || $rateReply->ServiceType == "GROUND_HOME_DELIVERY")
 								$ret[ $rateReply->ServiceType] = $rateReply->RatedShipmentDetails[1]->ShipmentRateDetail->TotalNetCharge->Amount;
 						}
 					}

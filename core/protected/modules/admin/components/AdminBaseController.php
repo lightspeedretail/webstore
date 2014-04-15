@@ -15,6 +15,24 @@ class AdminBaseController extends CController
 
 	public $debug = YII_DEBUG;
 
+	/**
+	 * These keys do not apply to Cloud, so remove them from any edit screens. They will
+	 * be returned as features are added to Clou.
+	 * @var array
+	 */
+	public $hideCloudKeys = array('TAX_INCLUSIVE_PRICING');
+
+	/**
+	 * These keys do not apply to Multitenant mode, so remove them from any edit screens.
+	 * @var array
+	 */
+	public $hideMTKeys = array();
+
+	/**
+	 * These keys do not apply to Hosting mode, so remove them from any edit screens.
+	 * @var array
+	 */
+	public $hideHostedKeys = array('AUTO_UPDATE','AUTO_UPDATE_TRACK','ENABLE_SSL');
 
 	public function filters()
 	{
@@ -50,12 +68,55 @@ class AdminBaseController extends CController
 		);
 	}
 
-	public function beforeAction($action)
+	public function verifySSL()
 	{
 
+		if ($this->getId() != "license" && Yii::app()->params['INSTALLED']==0)
+		{
+			$url = Yii::app()->createAbsoluteUrl("admin/license",array(),'http');
+			$url = str_replace("https:","http:",$url);
+			$this->redirect($url,true);
+		}
+
+		if ($this->getId() != "license" && Yii::app()->params['ENABLE_SSL'] && !Yii::app()->user->getState('internal', false))
+			if(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on')
+			{
+
+				$route = "admin/".$this->getId()."/".$this->getAction()->getId();
+				$url = Yii::app()->createAbsoluteUrl($route,array(),'https');
+				$this->redirect($url,true);
+			}
+
+	}
+
+	public function validateEmail($obj)
+	{
+		$objV = new CEmailValidator();
+		if (!empty($obj->key_value))
+			return $objV->validateValue($obj->key_value);
+		return true;
+	}
+
+	public function beforeAction($action)
+	{
+		$this->verifySSL();
 
 		$arrControllerList = $this->getControllerList();
 		$this->moduleList = $this->convertControllersToMenu($arrControllerList);
+
+        array_push($this->moduleList, array(
+            'label'=>'Go to Public Site',
+            'url'=>Yii::app()->createAbsoluteUrl("/",array(),'http'),
+            'itemOptions'=>array('class'=>'visible-xs')));
+
+		if(!Yii::app()->user->isGuest && !Yii::app()->user->getState('internal', false))
+			array_push($this->moduleList, array(
+            'label'=>'Logout ('.Yii::app()->user->firstname.')',
+            'url'=>array('default/logout'),
+            'itemOptions'=>array('class'=>'visible-xs')));
+
+        // remove the blank ajax button
+        array_shift($this->moduleList);
 
 		if (!isset($this->menuItems))
 			$this->menuItems = array(
@@ -65,19 +126,35 @@ class AdminBaseController extends CController
 			$this->setMenuHighlight();
 
 
+		$baseUrl = str_replace("/admin","/",Yii::app()->createAbsoluteUrl("admin"));
 
 		Yii::app()->clientScript->registerScript('helpers', '
           yii = {
               urls: {
-               base: '.CJSON::encode(Yii::app()->createAbsoluteUrl("/")).'
+               base: '.CJSON::encode($baseUrl).'
               }
           };
       ',CClientScript::POS_HEAD);
 
-		if (_xls_get_conf('STORE_OFFLINE')>1)
+
+		$this->registerAsset("js/bootbox.min.js");
+
+		if (Yii::app()->params['STORE_OFFLINE'] != '0')
 			Yii::app()->user->setFlash('warning',Yii::t('admin','Your store is currently set offline for maintenance -- you can access it via the url {url}',
 				array('{url}'=>Yii::app()->createAbsoluteUrl('site/index',array('offline'=>_xls_get_conf('STORE_OFFLINE'))))));
 
+
+		if(isset($action->id) && $action->id=="edit")
+		{
+			//Remove some options that aren't applicable in Cloud right now
+			if(Yii::app()->params['LIGHTSPEED_CLOUD']>0)
+			{
+				_dbx("update xlsws_configuration set key_value=0,configuration_type_id=0,sort_order=0 where key_name='SHIPPING_TAXABLE'");
+				_dbx("update xlsws_configuration set key_value=0,configuration_type_id=0,sort_order=0 where key_name='INVENTORY_FIELD_TOTAL'");
+
+			}
+		}
+		
 		return parent::beforeAction($action);
 
 	}
@@ -88,6 +165,10 @@ class AdminBaseController extends CController
 
 		$model = Configuration::model()->findAllByAttributes(array('configuration_type_id'=>$id),array('order'=>'sort_order'));
 
+		if($this->IsCloud) $model = $this->sanitizeEditModule($model,'Cloud');
+		if($this->IsMT) $model = $this->sanitizeEditModule($model,'MT');
+		if($this->isHosted) $model = $this->sanitizeEditModule($model,'Hosted');
+
 		if(isset($_POST['Configuration']))
 		{
 			$valid=true;
@@ -95,11 +176,20 @@ class AdminBaseController extends CController
 			{
 				if(isset($_POST['Configuration'][$i]))
 					$item->attributes=$_POST['Configuration'][$i];
-				$valid=$item->validate() && $valid;
+
+				if ($item->options=="EMAIL")
+					$valid = $this->validateEmail($item) && $valid;
+				else
+					$valid=$item->validate() && $valid;
 				if (!$valid)
 				{
-					$err = $item->getErrors();
-					Yii::app()->user->setFlash('error',$item->title." -- ".print_r($err['key_value'][0],true));
+					if ($item->options=="EMAIL")
+						Yii::app()->user->setFlash('error',$item->title." is not a valid email address");
+					else {
+						$err = $item->getErrors();
+						Yii::app()->user->setFlash('error',$item->title." -- ".print_r($err['key_value'][0],true));
+					}
+
 					break;
 				}
 			}
@@ -153,7 +243,12 @@ class AdminBaseController extends CController
 	public function actionModule()
 	{
 		$id = Yii::app()->getRequest()->getQuery('id');
+
+		if(Yii::app()->controller->id=="theme" && Yii::app()->controller->action->id == "module")
+			$id = "wstheme";
+
 		$objComponent = Yii::app()->getComponent($id);
+
 		if (!$objComponent)
 			throw new CHttpException(404,'The requested page does not exist.');
 
@@ -165,17 +260,23 @@ class AdminBaseController extends CController
 			//Get form elements (Admin panel configuration) and add our layout formatting so the form looks nice within Admin Panel
 			$this->editSectionInstructions = $this->getInstructions(get_class($this))."<p>".$this->editSectionInstructions;
 
-			$objModule = Modules::LoadByName($id);
+			$adminModelName = Yii::app()->getComponent($id)->getAdminModelName();
 
-			if(isset($_POST[Yii::app()->getComponent($id)->getAdminModelName()]))
+			$objModule = ($id == "wstheme" ? Modules::LoadByName(Yii::app()->theme->name) : Modules::LoadByName($id));
+
+			if($id == "wstheme") $objModule->active=1;
+			if(isset($_POST[$adminModelName]))
 			{
-				$model->attributes = $_POST[Yii::app()->getComponent($id)->getAdminModelName()];
+				$config = $objModule->GetConfigValues();
+				$new_config = array_replace_recursive($config, $_POST[$adminModelName]);
+				$model->attributes = $new_config;
+
 				$this->registerOnOff($objModule->id,'Modules_active',_xls_number_only($_POST['Modules']['active']));
 				if ($model->validate())
 				{
 
 					$objModule->active = _xls_number_only($_POST['Modules']['active']);
-					$objModule->configuration = serialize($model->attributes);
+					$objModule->SaveConfigValues($new_config);
 
 					if (!$objModule->save())
 						Yii::app()->user->setFlash('error',print_r($objModule->getErrors(),true));
@@ -188,11 +289,6 @@ class AdminBaseController extends CController
 						//If we happen to be updating a module that includes a promo code, we need to throw that to our restrictions
 						if (isset($model->promocode))
 							Yii::app()->getComponent($id)->syncPromoCode();
-//						&& !empty($model->promocode))
-//							$strPromoCode = $model->promocode;
-//						else $strPromoCode = $id.":";
-//						$formDefinition = $model->getAdminForm();
-//						PromoCode::model()->updateAll(array('code'=>$strPromoCode),'module=:module',array(':module'=>$id));
 
 						$this->updateMenuAfterEdit($id);
 
@@ -212,7 +308,7 @@ class AdminBaseController extends CController
 			{
 				//Load current attributes
 				$this->registerOnOff($objModule->id,'Modules_active',$objModule->active);
-				$model->attributes = Yii::app()->getComponent($id)->getConfigValues();
+				$model->attributes = $objModule->getConfigValues();
 
 			}
 
@@ -231,7 +327,7 @@ class AdminBaseController extends CController
 			$this->render('admin.views.default.moduleedit', array('objModule'=>$objModule,'model'=>$model,'form'=>new CForm($formDefinition,$model)));
 		}
 		else
-			$this->render('admin.views.default.noconfig'); //If null it means the AdminForm model file is missing
+			$this->render('admin.views.default.noconfig',array('id'=>$id)); //If null it means the AdminForm model file is missing
 
 	}
 
@@ -331,9 +427,11 @@ class AdminBaseController extends CController
 				$class != "CustomerController" &&
 				$class != "LanguageController" &&
 				$class != "UpgradeController" &&
-				$class != "LicenseController"
+				$class != "GalleryController" &&
+				$class != "LicenseController" &&
+				$class != "DatabaseadminController"
 
-			) //Keep these showing up on top
+			) //Keep these from showing up on top
 			$arrReturn[] = $class;
 		}
 
@@ -355,13 +453,50 @@ class AdminBaseController extends CController
 			$arrItem['zclass']=$val;
 			$arrMenu[] = $arrItem;
 		}
-		asort($arrMenu); //we sort on the label
+		asort($arrMenu); //we sort on the order
+
+        $arrMenu = $this->arrangeControllers($arrMenu);
 
 		foreach ($arrMenu as $key=>$val)
 			if (get_class($this)==$val['zclass']) { $arrMenu[$key]['active']=true; break; }
 
+        // Highlight the System tab when a user accesses the DB controller
+        // No other tabs will be active so we don't need to check for another active tab
+        if ($this->controllerName == 'Db')
+            foreach ($arrMenu as $key=>$value)
+                if ($value['label']=='System')
+                    $arrMenu[$key]['active'] = true;
+
+
+
 		return $arrMenu;
 	}
+
+
+    /**
+     * we want these eight controllers to show up in this specific order in the admin panel.
+     * any other controllers will appear at the end in alphabetical order.
+     */
+
+    protected function arrangeControllers($arrMenu)
+    {
+        $arrOrder = array('Ajax','Default','Theme','Payments','Shipping','Custompage','Integration','System');
+
+        $arrSorted = array();
+        $i=0;
+        foreach ($arrOrder as $module)
+            foreach ($arrMenu as $key=>$item)
+            {
+                if ($module.'Controller' == $item['zclass'])
+                {
+                    $arrSorted[$i++] = $item;
+                    unset($arrMenu[$key]);
+                    break;
+                }
+            }
+
+        return array_merge($arrSorted,$arrMenu);
+    }
 
 	protected function setMenuHighlight()
 	{
@@ -467,18 +602,55 @@ SETUP;
 		}
 	}
 
-	public function scanModules($type)
+
+	public function scanModules($moduletype = "payment")
 	{
-		$arrCustom = array();
-		if(file_exists(YiiBase::getPathOfAlias("custom.extensions.".$type)))
-			$arrCustom = glob(realpath(YiiBase::getPathOfAlias("custom.extensions.".$type)).'/*', GLOB_ONLYDIR);
-		if(!is_array($arrCustom)) $arrCustom = array();
-		$files=array_merge(glob(realpath(YiiBase::getPathOfAlias("ext.ws".$type)).'/*', GLOB_ONLYDIR),$arrCustom);
+		if($moduletype=="theme")
+		{
+			$files = glob(YiiBase::getPathOfAlias("webroot.themes").'/*', GLOB_ONLYDIR);
+			foreach($files as $key=>$file)
+				if(stripos($file,"/themes/trash")>0 || stripos($file,"/themes/_customcss")>0)
+					unset($files[$key]);
+
+		}
+		else
+		{
+			$arrCustom = array();
+			if(file_exists(YiiBase::getPathOfAlias("custom.extensions.".$moduletype)))
+				$arrCustom = glob(realpath(YiiBase::getPathOfAlias("custom.extensions.".$moduletype)).'/*', GLOB_ONLYDIR);
+			if(!is_array($arrCustom)) $arrCustom = array();
+			$files=array_merge(glob(realpath(YiiBase::getPathOfAlias("ext.ws".$moduletype)).'/*', GLOB_ONLYDIR),$arrCustom);
+
+		}
 
 		foreach ($files as $file)
 		{
 
 			$moduleName = mb_pathinfo($file,PATHINFO_BASENAME);
+			$version=0;
+			$name = $moduleName;
+
+			if($moduletype=="theme")
+			{
+				$model = Yii::app()->getComponent('wstheme')->getAdminModel($moduleName);
+				$configuration = "";
+				if($model)
+				{
+					$version = $model->version;
+					$name = $model->name;
+					$configuration = $model->getDefaultConfiguration();
+				}
+
+
+			} else {
+				try {
+				$version =  Yii::app()->getComponent($moduleName)->Version;
+				$name = Yii::app()->getComponent($moduleName)->AdminNameNormal;
+				$configuration = Yii::app()->getComponent($moduleName)->getDefaultConfiguration();
+				}catch (Exception $e) {
+					Yii::log("$moduleName component can't be read ".$e, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				}
+			}
 
 			//Check if module is already in database
 			$objModule = Modules::LoadByName($moduleName);
@@ -490,30 +662,76 @@ SETUP;
 					$objModule = new Modules();
 					$objModule->active=0;
 					$objModule->module = $moduleName;
-					$objModule->category = $type;
-					$objModule->configuration = Yii::app()->getComponent($moduleName)->getDefaultConfiguration();
+					$objModule->category = $moduletype;
+
+
+
+					$objModule->version = $version;
+					$objModule->name =  $name;
+					$objModule->configuration = $configuration;
 					if (!$objModule->save())
-						Yii::log("Found widget $moduleName could not install ".
-						print_r($objModule->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+						Yii::log("Found widget $moduleName could not install ".print_r($objModule->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 
 				}
 				catch (Exception $e) {
-					Yii::log("Found widget $moduleName could not install ".$e, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+					Yii::log("Found $moduletype widget $moduleName could not install ".$e, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				}
 
 			}
-
-			$objModule->version = Yii::app()->getComponent($moduleName)->version;
-			$objModule->name = Yii::app()->getComponent($moduleName)->AdminNameNormal;
+			$objModule->version = $version;
+			$objModule->name = $name;
 			$objModule->save();
-
-
-
 
 		}
 
-
-
 	}
 
+	/**
+	 * Boolean if this store is a Cloud store
+	 * @return bool
+	 */
+	public function getIsCloud()
+	{
+		if(Yii::app()->params['LIGHTSPEED_CLOUD']>0)
+			return true;
+		return false;
+	}
+
+	/**
+	 * Boolen if this store is a Multitenant Store (could be Cloud or Pro)
+	 * @return bool
+	 */
+	public function getIsMT()
+	{
+		if(Yii::app()->params['LIGHTSPEED_MT']>0)
+			return true;
+		return false;
+	}
+
+	/**
+	 * Boolen if this store is a Hosted store
+	 * @return bool
+	 */
+	public function getIsHosted()
+	{
+		if(Yii::app()->params['LIGHTSPEED_HOSTING']>0)
+			return true;
+		return false;
+	}
+
+	protected function sanitizeEditModule($model,$keyType)
+	{
+
+		$keys = "hide".$keyType."Keys";
+		$keyArray = $this->$keys;
+
+		foreach($model as $key=>$value)
+		{
+			if(in_array($value->key_name,$keyArray))
+				unset($model[$key]);
+		}
+
+
+		return $model;
+	}
 }

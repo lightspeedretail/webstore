@@ -3,64 +3,58 @@
 // uncomment the following to define a path alias
 // Yii::setPathOfAlias('local','path/to/local-folder');
 
-require_once( dirname(__FILE__) . '/../core/protected/components/helpers.php');
+require_once(dirname(__FILE__) . '/../core/protected/components/helpers.php');
 //Web Store version
-require_once( dirname(__FILE__) . '/../core/protected/config/wsver.php');
+require_once(dirname(__FILE__) . '/../core/protected/config/wsver.php');
 // Define default values
 define('XLS_TRUNCATE_PUNCTUATIONS', ".!?:;,-");
 define('XLS_TRUNCATE_SPACE', " ");
 define('ADVANCED_SEARCH_DEFAULT_OPERATOR', 'and');
 
+
 //Create alias for custom includes
 Yii::setPathOfAlias("config",dirname(__FILE__)."/../config");
-Yii::setPathOfAlias("custom",dirname(__FILE__)."/../custom");
+Yii::setPathOfAlias("custom",realpath(dirname(__FILE__)."/../custom"));
 Yii::setPathOfAlias('editable', dirname(__FILE__).DIRECTORY_SEPARATOR.'../core/protected/extensions/x-editable');
 Yii::setPathOfAlias('ext', dirname(__FILE__).DIRECTORY_SEPARATOR.'../core/protected/extensions');
 Yii::setPathOfAlias('extensions', dirname(__FILE__).DIRECTORY_SEPARATOR.'../core/protected/extensions');
 
-if (file_exists(dirname(__FILE__).'/wsconfig.php'))
-	$wsconfig = require(dirname(__FILE__).'/wsconfig.php');
-else $wsconfig = array();
-
 // This is the main Web application configuration. Any writable
 // CWebApplication properties can be configured here.
-return CMap::mergeArray(
-	array(
-		'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'../core/protected',
-		'runtimePath' => dirname(__FILE__).DIRECTORY_SEPARATOR.'../runtime',
-		'name'=>'Web Store',
-		//'theme'=>'brooklyn', //pulled from wsconfig
-		//'language' => 'en', //pulled from wsconfig
-		'sourceLanguage' => 'en',
+return array(
+	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'../core/protected',
+	'runtimePath' => dirname(__FILE__).DIRECTORY_SEPARATOR.'../runtime',
+	'name'=>'Web Store',
+	'sourceLanguage' => 'en',
 
-		// preloading 'log' component
-		'preload'=>array(
-			'log',
-			'bootstrap',
+	// preloading 'log' component
+	'preload'=>(XLSWS_VERSION<'3.1.0' ?
+			array('log','bootstrap') : array('log')
 		),
 
-		// autoloading model and component classes
-		'import'=>array(
-			'application.models.*',
-			'application.models.base.*',
-			'application.models.forms.*',
-			'application.components.*',
-			'application.components.wscontrollers.*',
-			'application.helpers.*',
-			'application.extensions.wsborderlookup.Wsborderlookup',
-			'application.extensions.wsshipping.WsShipping',
-			'application.extensions.wspayment.WsPayment',
-			'application.extensions.MissingMessages.MissingMessages',
-			'custom.extensions.*',
-			'custom.helpers.*',
-			'custom.models.*',
-			'custom.xml.*',
-			'editable.*' //easy include of editable classes
-		),
+	// autoloading model and component classes
+	'import'=>array(
+		'application.models.*',
+		'application.models.base.*',
+		'application.models.forms.*',
+		'application.components.*',
+		'application.components.wscontrollers.*',
+		'application.helpers.*',
+		'application.extensions.wsborderlookup.Wsborderlookup',
+		'application.extensions.wsshipping.WsShipping',
+		'application.extensions.wspayment.WsPayment',
+		'application.extensions.MissingMessages.MissingMessages',
+		'application.extensions.s3.*',
+		'custom.extensions.*',
+		'custom.helpers.*',
+		'custom.models.*',
+		'custom.xml.*',
+		'editable.*' //easy include of editable classes
+	),
 
 
-		'modules' =>
-		array_merge(require(dirname(__FILE__).'/../core/protected/config/wsmodules.php'), //dynamically load all modules in /modules
+	'modules' =>
+		array_merge(require(dirname(__FILE__) . '/../core/protected/config/wsmodules.php'), //dynamically load all modules in /modules
 			array(
 				// uncomment the following to enable the Gii tool
 //	        'gii' => array(
@@ -74,19 +68,20 @@ return CMap::mergeArray(
 //	        ),
 			)
 		),
-		//sample of how you would add a custom controller in custom/controllers and map it for use
+	//sample of how you would add a custom controller in custom/controllers and map it for use
 //	'controllerMap'=>array(
-//		'test'=>array(
-//			'class'=>'custom.controllers.TestController',
+//		'product'=>array(
+//			'class'=>'custom.controllers.MyProductController',
 //		),
 //	),
-		// application components
-		'components'=>
-		array_merge(require(dirname(__FILE__).'/../core/protected/config/wscomponents.php'), //dynamically load all modules in /modules
+	// application components
+	'components'=>
+		array_merge(require(dirname(__FILE__) . '/../core/protected/config/wscomponents.php'), //dynamically load all modules in /modules
 			array(
 //		'request' => array(
 //			'baseUrl' => '',
 //		),
+
 				'user'=>array(
 					// enable cookie-based authentication
 					'allowAutoLogin'=>true,
@@ -120,10 +115,10 @@ return CMap::mergeArray(
 					'class'=>'ShoppingCart',
 				),
 				//Twitter bootstrap
-				'bootstrap'=>array(
-					'class'=>'ext.bootstrap.components.Bootstrap',
-					'responsiveCss'=>true,
-				),
+				'bootstrap'=>XLSWS_VERSION<'3.1.0' ? array(
+						'class'=>'ext.bootstrap.components.Bootstrap',
+						'responsiveCss'=>true,
+					) : array(),
 
 				'urlManager'=>array(
 					'urlFormat'=>'path',
@@ -134,8 +129,10 @@ return CMap::mergeArray(
 						'/xls_admin.php/<controller:\w+>/<action:\w+>'=>array('admin/<controller>/<action>', 'caseSensitive'=>false,'parsingOnly'=>true),
 						'admin/<controller:\w+>/<action:\w+>'=>'admin/<controller>/<action>',
 						'xls_image_upload.php/<type:\w+>/<id:\w+>/<key:\w+>/<position:\w+>' => 'legacysoap/image', //soap
+						'soap/image/<type:\w+>/<id:\w+>/<key:\w+>/<position:\w+>/imageid/<imageid:\w+>' => 'soap/image', //soap
 						'brand/<brand:(.*)>' => 'search/browse', //display product
 						'<name:(.*)>/dp/<id:[0-9]+>' => 'product/view', //display product
+						'<id:(.*)>/pg'=>array('custompage/index', 'caseSensitive'=>false,'parsingOnly'=>true), //Custom Page
 						'<feed:[\w\d\-_\.()]+>.xml' => 'xml/<feed>', //xml feeds
 						'wishlist/<action:\w+>/<code:[\w\d\-_\.()]+>' => 'wishlist/<action>',
 						'cart/receipt/<getuid:[\w\d\-_\.()]+>' => 'cart/receipt',
@@ -143,8 +140,16 @@ return CMap::mergeArray(
 						'cart/quote/<code:[\w\d\-_\.()]+>' => 'cart/quote',
 						'sro/view/<code:[\w\d\-_\.()]+>' => 'sro/view',
 
-						//Backwards compatibility, to be removed eventually
-						'order-track/pg'=>array('cart/receipt', 'caseSensitive'=>false,'parsingOnly'=>true),
+						// moneris simple integration requires a hardcoded cancel URL
+						// any other methods that require something similar we can add a cart/cancel rule like this one
+						'cart/cancel/<order_id:\WO-[0-9]+>&<cancelTXN:(.*)>'=>'cart/cancel',
+
+						// REST patterns
+						array('api/list', 'pattern'=>'api/<model:\w+>', 'verb'=>'GET'),
+						array('api/view', 'pattern'=>'api/<model:\w+>/<id:\d+>', 'verb'=>'GET'),
+						array('api/update', 'pattern'=>'api/<model:\w+>/<id:\d+>', 'verb'=>'PUT'),
+						array('api/delete', 'pattern'=>'api/<model:\w+>/<id:\d+>', 'verb'=>'DELETE'),
+						array('api/create', 'pattern'=>'api/<model:\w+>', 'verb'=>'POST'),
 
 						'gii/<controller:\w+>/<action:\w+>'=>'gii/<controller>/<action>',
 						'wsborderlookup/<controller:\w+>/<action:\w+>'=>'wsborderlookup/<controller>/<action>',
@@ -171,6 +176,13 @@ return CMap::mergeArray(
 //			'class'=>'system.caching.CFileCache',
 //		),
 
+//				'cache'=>array(
+//					'class'=>'system.caching.CMemCache',
+//					'servers'=>array(
+//						array('host'=>'localhost', 'port'=>11211),
+//					),
+//				),
+
 				'cronJobs'=>array(
 					'class'=>'application.extensions.wscron.wscron'
 				),
@@ -193,9 +205,6 @@ return CMap::mergeArray(
 					'timeout' => 3600
 				),
 
-				//Facebook integration
-				'facebook'=>require(dirname(__FILE__).'/wsfacebook.php'),
-
 				//X-editable config
 				'editable' => array(
 					'class'     => 'editable.EditableConfig',
@@ -209,12 +218,11 @@ return CMap::mergeArray(
 
 		),
 
-		// application-level parameters that can be accessed
-		// using Yii::app()->params['paramName']
-		'params'=>array(
-			// this is used in contact page
-			'listPerPage'=>6,
-			'mainfile'=>'yes',
-		),
+	// application-level parameters that can be accessed
+	// using Yii::app()->params['paramName']
+	'params'=>array(
+		// this is used in contact page
+		'mainfile'=>'yes',
+	),
 
-	),$wsconfig);
+);

@@ -43,7 +43,6 @@ class CartItem extends BaseCartItem
 		return $this->$strPriceField;
 	}
 
-
 	/**
 	 * Since Validate tests to make sure certain fields have values, populate requirements here such as the modified timestamp
 	 * @return boolean from parent
@@ -73,6 +72,7 @@ class CartItem extends BaseCartItem
 	 */
 	protected function beforeSave() {
 		if ($this->discount>0) {
+			$this->discount = round($this->discount,2,PHP_ROUND_HALF_DOWN);
 			$this->sell_discount = $this->sell - $this->discount;
 			$this->sell_total = $this->sell_discount*$this->qty;
 		}
@@ -85,7 +85,7 @@ class CartItem extends BaseCartItem
 		return parent::beforeValidate();
 	}
 
-	/** If we had any valiation errors in saving, log them
+	/** If we had any validation errors in saving, log them
 	 * @return boolean from parent
 	 */
 	protected function afterValidate() {

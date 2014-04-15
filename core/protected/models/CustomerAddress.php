@@ -68,6 +68,7 @@ class CustomerAddress extends BaseCustomerAddress
 				'address2'=>'Address Line 2 (Apt/Unit)',
 				'makeDefaultBilling'=>'Default billing address',
 				'makeDefaultShipping'=>'Default shipping address',
+				'postal'=>'Postal / Zip Code',
 
 
 

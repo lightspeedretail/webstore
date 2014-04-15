@@ -25,7 +25,7 @@ class wscron extends CApplicationComponent {
 	public function sendQueueEmails()
 	{
 
-		$objMails = EmailQueue::model()->findAll("`sent_attempts` < 20 and `to` IS NOT NULL LIMIT 10");
+		$objMails = EmailQueue::model()->findAll("`sent_attempts` < 20 and `sent_attempts` > 0  and `to` IS NOT NULL LIMIT 10");
 
 		foreach ($objMails as $objMail)
 		{

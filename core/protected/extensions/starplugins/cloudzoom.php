@@ -18,6 +18,7 @@ class cloudzoom extends CWidget
 	public $zoomPosition = 3;
 	public $zoomFlyOut=true;
 	public $zoomOffsetX=0;
+	public $zoomOffsetY=0;
 
 	public $css_target='targetarea';
 	public $css_thumbs = "thumbs";
@@ -85,22 +86,22 @@ BINDING;
 
 
 		$html='<div class="'.$this->css_target.'">';
-		$html.='<img id="zoomPrimary" class="'.$this->zoomClass.'" src="'.$this->images[0]['image'].'"
-				data-cloudzoom="zoomImage: \''.$this->images[0]['image_large'].'\',
-				zoomSizeMode:\''.$this->zoomSizeMode.'\',
-				zoomOffsetX: '.$this->zoomOffsetX.',
-				zoomPosition: \''.$this->zoomPosition.'\',
-				zoomFlyOut: '.$this->zoomFlyOut.'
-				"/>';
 
+		$options = array(
+			'encode'=>false,
+			'class'=>$this->zoomClass,
+			'id'=>'zoomPrimary',
+			'data-cloudzoom'=>'zoomImage: \''.$this->images[0]['image_large'].'\',
+				zoomSizeMode: \''.$this->zoomSizeMode.'\',
+				zoomOffsetX: '.$this->zoomOffsetX.',
+				zoomOffsetY: '.$this->zoomOffsetY.',
+				zoomPosition: \''.$this->zoomPosition.'\',
+				zoomFlyOut: '.$this->zoomFlyOut);
+		$html .= CHtml::image($this->images[0]['image'],$this->images[0]['image_alt'],$options);
 		$html .= "</div>";
 
 		if(count($this->images)>1)
-		{
 			$html .= $this->buildAdditionalImages();
-		}
-
-
 
 		return $html;
 
@@ -109,15 +110,21 @@ BINDING;
 
 	public function buildAdditionalImages()
 	{
-		$html='<div class="'.$this->css_thumbs.'">';
+		$html = '<div class="'.$this->css_thumbs.'">';
 		foreach($this->images as $image)
 		{
-			$html .= '<a href="#" class="cloudzoom-gallery"
-    data-cloudzoom =
-	    "useZoom: \'#zoomPrimary\', image: \''.$image['image'].'\', zoomImage: \''.$image['image_large'].'\'"
-				>'.CHtml::image($image['image_thumb'],$image['image_alt']).'</a>';
+			
+			$options = array(
+				'encode'=>false,
+				'class'=>'cloudzoom-gallery',
+				'data-cloudzoom'=>'useZoom: \'#zoomPrimary\',
+					image: \''.$image['image'].'\',zoomImage: \''.$image['image_large'].'\''
+			);
+			$html .= CHtml::link(CHtml::image($image['image_thumb'],$image['image_alt']),'#',$options);
+
 		}
 		$html .= "</div>";
+
 		return $html;
 
 	}

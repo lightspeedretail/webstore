@@ -14,6 +14,7 @@
  * @property string $configuration
  * @property string $modified
  * @property string $created
+ * @property integer $mt_compatible
  *
  * @package application.models.base
  * @name BaseModules
@@ -40,10 +41,10 @@ abstract class BaseModules extends CActiveRecord
 			array('active, version, sort_order', 'numerical', 'integerOnly'=>true),
 			array('module', 'length', 'max'=>64),
 			array('category, name', 'length', 'max'=>255),
-			array('configuration, created', 'safe'),
+			array('configuration, created, mt_compatible', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, active, module, category, version, name, sort_order, configuration, modified, created', 'safe', 'on'=>'search'),
+			array('id, active, module, category, version, name, sort_order, configuration, modified, created, mt_compatible', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -74,6 +75,7 @@ abstract class BaseModules extends CActiveRecord
 			'configuration' => 'Configuration',
 			'modified' => 'Modified',
 			'created' => 'Created',
+			'mt_compatible' => 'Multi-tenant Compatible',
 		);
 	}
 
@@ -98,6 +100,7 @@ abstract class BaseModules extends CActiveRecord
 		$criteria->compare('configuration',$this->configuration,true);
 		$criteria->compare('modified',$this->modified,true);
 		$criteria->compare('created',$this->created,true);
+		$criteria->compare('mt_compatible',$this->mt_compatible,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

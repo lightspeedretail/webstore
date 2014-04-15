@@ -52,6 +52,7 @@ class Family extends BaseFamily
 			'text'=>$person['text'],
 			'label'=>$person['label'],
 			'link'=>$person['link'],
+			'request_url'=>$person['request_url'],
 			'url'=>$person['link'],
 			'id'=>$person['id'],
 			'child_count'=>$person['child_count'],
@@ -62,7 +63,15 @@ class Family extends BaseFamily
 		$personFormatted = array();
 		if (is_array($data))
 			foreach($data as $k=>$person) {
-				$personFormatted[$k] = Family::formatData($person);
+
+				$str = _xls_seo_name(strtolower($person['label'].'fam'));
+				$personFormatted[$str] = Family::formatData($person);
+				$parents = null;
+				if (isset($person['children'])) {
+					$parents = Family::getDataFormatted($person['children']);
+					$personFormatted[$str]['children'] = $parents;
+					$personFormatted[$str]['items'] = $parents;
+				}
 
 			}
 		return $personFormatted;
@@ -78,10 +87,12 @@ class Family extends BaseFamily
 						'text'=>CHtml::link($objItem->family,$objItem->Link),
 						'label' => $objItem->family,
 						'link' => $objItem->Link,
+						'request_url' => $objItem->request_url,
 						'url' => $objItem->Link,
 						'id' => $objItem->id,
 						'child_count' => $objItem->child_count,
-						'children' => null
+						'children' => null,
+						'items' => null
 					);
 
 		}
@@ -163,7 +174,8 @@ class Family extends BaseFamily
 	}
 	public function getLink() {
 
-		return _xls_site_url("/brand/".$this->request_url);
+		return Yii::app()->createAbsoluteUrl("/brand/".$this->request_url);
+
 	}
 	public function getUrl()
 	{

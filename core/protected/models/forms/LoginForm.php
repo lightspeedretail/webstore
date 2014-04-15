@@ -10,6 +10,7 @@ class LoginForm extends CFormModel
 	public $email;
 	public $password;
 	public $rememberMe  = true;
+	public $sharedLogin = false;
 
 	private $_identity;
 
@@ -96,23 +97,15 @@ class LoginForm extends CFormModel
 			$this->_identity=new UserIdentity($this->email,$this->password);
 			$this->_identity->authenticate();
 		}
+
 		if($this->_identity->errorCode===UserIdentity::ERROR_NONE)
 		{
 			Yii::log("Login authentication passed ", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			$duration=$this->rememberMe ? 3600*24*30  : 0 ; // true = 30 days, false=until browser close
 			Yii::app()->user->login($this->_identity,$duration);
 
-			//Assign the user to the cart
-			Yii::log("Assigning customer id #".Yii::app()->user->id, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-			Yii::app()->shoppingcart->assignCustomer(Yii::app()->user->id);
+			//afterLogin() in WebUser class will restore prior cart if necessary
 
-			//Since we have successfully logged in, see if we have a cart in progress
-			Yii::log("Merging any prior cart", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-			Yii::app()->shoppingcart->loginMerge();
-
-			//Verify prices haven't changed
-			Yii::log("Verifying prices", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-			Yii::app()->shoppingcart->verifyPrices();
 			return true;
 		}
 		else

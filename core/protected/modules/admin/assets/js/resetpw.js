@@ -15,6 +15,7 @@ jQuery(function ($) {
 
                     $('#buttonSavePCR').bind('click', function() {
                         resetpw.send();
+                        $('#buttonSavePCR').attr("disabled",true);
                       return false;
                     });
 

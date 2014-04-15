@@ -21,6 +21,8 @@ class InstallForm extends CFormModel
 	public $TIMEZONE;
 	public $encryptionKey;
 	public $encryptionSalt;
+	public $loginemail;
+	public $loginpassword;
 
 	public $EMAIL_SMTP_SERVER;
 	public $EMAIL_SMTP_PORT;
@@ -37,12 +39,22 @@ class InstallForm extends CFormModel
 	{
 		return array(
 			//array('label,login,trans_key,live,ccv,restrictcountry,ls_payment_method','required'),
-			array('iagree','required', 'requiredValue'=>1,'message'=>'You must accept Terms and Conditions', 'on'=>'page1'),
+			array('iagree','required', 'requiredValue'=>1,'message'=>'You must accept Terms and Conditions',
+				'on'=>'page1,page1-mt,page1-cld'),
+
 			array('LSKEY,encryptionKey,encryptionSalt,TIMEZONE','required', 'on'=>'page2'),
-			array('STORE_NAME,EMAIL_FROM,STORE_ADDRESS1,STORE_ADDRESS2,STORE_HOURS,STORE_PHONE','required', 'on'=>'page3'),
-			array('EMAIL_SMTP_SERVER,EMAIL_SMTP_PORT,EMAIL_SMTP_USERNAME,EMAIL_SMTP_PASSWORD,EMAIL_SMTP_SECURITY_MODE','required', 'on'=>'page4'),
+			array('TIMEZONE,loginemail,loginpassword','required', 'on'=>'page2-cld'),
+			array('LSKEY,TIMEZONE,','required', 'on'=>'page2-mt'),
+			array('loginemail,loginpassword','safe', 'on'=>'page2'),
+
+			array('loginpassword','checkForemail'),
+
+			array('STORE_NAME,EMAIL_FROM,STORE_ADDRESS1,STORE_ADDRESS2,STORE_HOURS,STORE_PHONE','required',
+				'on'=>'page3,page3-mt,page3-cld'),
+			array('EMAIL_SMTP_SERVER,EMAIL_SMTP_PORT,EMAIL_SMTP_USERNAME,EMAIL_SMTP_PASSWORD,EMAIL_SMTP_SECURITY_MODE',
+				'required', 'on'=>'page4,page4-mt,page4-cld'),
 			array('STORE_NAME,EMAIL_FROM,STORE_ADDRESS1,STORE_ADDRESS2,STORE_HOURS,STORE_PHONE,LSKEY,encryptionKey,encryptionSalt,TIMEZONE','safe'),
-            array('EMAIL_FROM','email'),
+            array('EMAIL_FROM,loginemail','email'),
 			array('page','safe'),
 		);
 	}
@@ -67,8 +79,17 @@ class InstallForm extends CFormModel
 			'TIMEZONE'=>'Server timezone',
 			'encryptionKey'=>'Encryption Key 1',
 			'encryptionSalt'=>'Encryption Key 2',
+			'loginemail'=>'External Admin Login Email',
+			'loginpassword'=>'External Admin Login Password',
 
 		);
+	}
+
+	public function checkForemail($lpass,$params)
+	{
+		if (!empty($this->loginemail))
+			if (empty($this->loginpassword))
+				$this->addError($lpass,'Password cannot be blank if Email is entered');
 	}
 
 	public function getPage1()
@@ -100,6 +121,7 @@ class InstallForm extends CFormModel
 				'EMAIL_FROM'=>array(
 					'type'=>'email',
 					'maxlength'=>64,
+					'pattern'=> '^[a-zA-Z0-9!#$%&\'*+\\/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&\'*+\\/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$'
 				),
 
 				'STORE_ADDRESS1'=>array(
@@ -133,13 +155,15 @@ class InstallForm extends CFormModel
 	public function getPage2()
 	{
 		return array(
-			'title'=>'Enter a store password and verify the server timezone. The encryption keys are used to encrypt all passwords, you can generally accept the randomly generated ones below. <b>Type in your store password even if this is an upgrade. Your new store password will be reset to what is entered here.</b>',
-
+			'title'=>_xls_get_conf('LIGHTSPEED_CLOUD',0)>0 ? '<p>Please verify the server timezone.</p><p>You must also enter an email address and password which will be granted admin access when logging into <strong>'.Yii::app()->createAbsoluteUrl('admin').'</strong> in any web browser. If this email already exists in Web Store, the password will be updated and admin access granted.</p></b>'
+				: (_xls_get_conf('LIGHTSPEED_MT',0)>0 ? '<p>Enter a store password and verify the server timezone. <strong>You must type in your store password even if this is an upgrade. Your new store password will be reset to what is entered here.</strong></p><p>You can enter an email address and password which will be granted admin access when logging into <strong>'.Yii::app()->createAbsoluteUrl('admin').'</strong> in any web browser. If this email already exists in Web Store, the password will be updated and admin access granted.</p></b>'
+					: '<p>Enter a store password and verify the server timezone. The encryption keys are used to encrypt all passwords, you can generally accept the randomly generated ones below. <strong>Type in your store password even if this is an upgrade. Your new store password will be reset to what is entered here.</strong></p><p>You can enter an email address and password which will be granted admin access when logging into <strong>'.Yii::app()->createAbsoluteUrl('admin').'</strong> in any web browser. If this email already exists in Web Store, the password will be updated and admin access granted.</p></b>'),
 
 			'elements'=>array(
 				'LSKEY'=>array(
 					'type'=>'password',
 					'maxlength'=>64,
+					'visible'=>_xls_get_conf('LIGHTSPEED_CLOUD',0)>0 ? false : true,
 				),
 				'TIMEZONE'=>array(
 					'type'=>'dropdownlist',
@@ -148,9 +172,22 @@ class InstallForm extends CFormModel
 				'encryptionKey'=>array(
 					'type'=>'text',
 					'maxlength'=>64,
+					'visible'=>_xls_get_conf('LIGHTSPEED_CLOUD',0)>0 || _xls_get_conf('LIGHTSPEED_MT',0)>0 ? false : true,
 				),
 				'encryptionSalt'=>array(
 					'type'=>'text',
+					'maxlength'=>64,
+					'size'=>60,
+					'visible'=>_xls_get_conf('LIGHTSPEED_CLOUD',0)>0 || _xls_get_conf('LIGHTSPEED_MT',0)>0 ? false : true,
+				),
+				'loginemail'=>array(
+					'type'=>'email',
+					'maxlength'=>64,
+					'size'=>60,
+					'pattern'=> '^[a-zA-Z0-9!#$%&\'*+\\/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&\'*+\\/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$'
+				),
+				'loginpassword'=>array(
+					'type'=>'password',
 					'maxlength'=>64,
 					'size'=>60,
 				),
@@ -165,10 +202,10 @@ class InstallForm extends CFormModel
 	public function getPage4()
 	{
 		return array(
-			'title'=>'Finally, enter your email server settings. These are generally identical to LightSpeed\'s setup in Tools->Setup->Advanced->Email. Click for standard settings for: <a href=\'javascript:setupMail("smtp");\'>Standard SMTP</a>, <a href=\'javascript:setupMail("gmail");\'>Gmail</a>, <a href=\'javascript:setupMail("godaddy");\'>Godaddy</a>',
+            'title'=> Yii::t('admin','Finally, enter your email server settings. {LightSpeed} Click for standard settings for: <a href=\'javascript:setupMail("smtp");\'>Standard SMTP</a>, <a href=\'javascript:setupMail("gmail");\'>Gmail</a>, <a href=\'javascript:setupMail("godaddy");\'>Godaddy</a>',
+                        array('{LightSpeed}'=>_xls_get_conf('LIGHTSPEED_CLOUD',0)>0 ? '' : "These are generally identical to LightSpeed's setup in Tools->Setup->Advanced->Email." )),
 
-
-			'elements'=>array(
+            'elements'=>array(
 				'EMAIL_SMTP_SERVER'=>array(
 					'type'=>'text',
 					'maxlength'=>64,
@@ -260,9 +297,32 @@ class InstallForm extends CFormModel
 
 
 			case 2:
-				_xls_set_conf('LSKEY',strtolower(md5($this->LSKEY)));
+				if (!_xls_get_conf('LIGHTSPEED_CLOUD',0)>0)
+					_xls_set_conf('LSKEY',strtolower(md5($this->LSKEY)));
 				_xls_set_conf('TIMEZONE',$this->TIMEZONE);
 				Configuration::exportKeys($this->encryptionKey,$this->encryptionSalt);
+
+				//Now that we have encryption keys written, save the account if we have it
+				if(!empty($this->loginemail) && !empty($this->loginpassword))
+				{
+					$objCustomer = Customer::LoadByEmail($this->loginemail);
+					if(!($objCustomer instanceof Customer))
+					{
+						$objCustomer = new Customer();
+						$objCustomer->first_name = "Admin";
+						$objCustomer->last_name = "User";
+						$objCustomer->record_type=1;
+						$objCustomer->pricing_level=1;
+						$objCustomer->preferred_language="en";
+						$objCustomer->currency="USD";
+						$objCustomer->email=$this->loginemail;
+						$objCustomer->mainphone=_xls_get_conf('STORE_PHONE');
+
+					}
+					$objCustomer->password=_xls_encrypt($this->loginpassword);
+					$objCustomer->allow_login=2;
+					$objCustomer->save();
+				}
 			break;
 
 			case 3:
@@ -285,12 +345,9 @@ class InstallForm extends CFormModel
 				_xls_set_conf('EMAIL_SMTP_USERNAME',$this->EMAIL_SMTP_USERNAME);
 				_xls_set_conf('EMAIL_SMTP_PASSWORD',_xls_encrypt($this->EMAIL_SMTP_PASSWORD));
 				_xls_set_conf('EMAIL_SMTP_SECURITY_MODE',$this->EMAIL_SMTP_SECURITY_MODE);
-				Configuration::exportLogging();
 				break;
 
 		}
-
-		Configuration::exportConfig();
 
 
 	}

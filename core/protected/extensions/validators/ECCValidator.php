@@ -60,6 +60,16 @@ class ECCValidator extends CValidator{
 		self::LASER=>'/^(?:6304|6706|6771|6709)\\d{12}(\\d{2,3})?$/',
 		self::ALL=>'/^(5[1-5][0-9]{14}|4[0-9]{12}([0-9]{3})?|3[47][0-9]{13}|3(0[0-5]|[68][0-9])[0-9]{11}|(6011\d{12}|65\d{14})|(3[0-9]{4}|2131|1800)[0-9]{11}|2(?:014|149)\\d{11}|8699[0-9]{11}|(6334[5-9][0-9]|6767[0-9]{2})\\d{10}(\\d{2,3})?|(?:5020|6\\d{3})\\d{12}|56(10\\d\\d|022[1-5])\\d{10}|(?:49(03(0[2-9]|3[5-9])|11(0[1-2]|7[4-9]|8[1-2])|36[0-9]{2})\\d{10}(\\d{2,3})?)|(?:564182\\d{10}(\\d{2,3})?)|(6(3(33[0-4][0-9])|759[0-9]{2})\\d{10}(\\d{2,3})?)|(?:417500|4026\\d{2}|4917\\d{2}|4913\\d{2}|4508\\d{2}|4844\\d{2})\\d{10}|(?:417500|4026\\d{2}|4917\\d{2}|4913\\d{2}|4508\\d{2}|4844\\d{2})\\d{10})$/'
 	);
+
+	/**
+	 * @var array holds regex patterns to check for valid CVV number
+	 * added by Kevin Ottley, LightSpeed Retail (7-MAR-2014)
+	 */
+	protected $cvvpatterns = array(
+		self::AMERICAN_EXPRESS=>'/^[0-9]{4}$/',
+		self::ALL=>'/^[0-9]{3}$/'
+	);
+
 	/**
 	 * 
 	 * @var string set with selected Credit Card type to check -ie ECCValidator::MAESTRO
@@ -126,6 +136,28 @@ class ECCValidator extends CValidator{
 		
 		return !empty( $creditCardHolder ) && eregi('^[A-Z ]+$', $creditCardHolder);
 	}
+
+	/**
+	 *
+	 * Validates Credit Card CVV number
+	 * @param integer $creditCardCVV
+	 * created for use with LightSpeed Web Store (7-MAR-2014)
+	 */
+	public function validateCVV($creditCardCVV){
+
+		if (is_scalar($creditCardCVV)) $creditCardCVV = intval($creditCardCVV);
+
+		// grab the value out of the array
+		if(is_array($this->format))
+			$this->format = array_shift($this->format);
+
+		if (!array_key_exists($this->format, $this->cvvpatterns))
+			$this->format = self::ALL;
+
+		return preg_match($this->cvvpatterns[$this->format],$creditCardCVV);
+
+	}
+
 	/**
 	 * 
 	 * Validates holder, number, and dates of Credit Card numbers
@@ -134,10 +166,11 @@ class ECCValidator extends CValidator{
 	 * @param string $creditCardNumber
 	 * @param integer $creditCardExpiredMonth
 	 * @param integer $creditCardExpiredYear
+	 * updated for use with LightSpeed Web Store (7-MAR-2014)
 	 */
-	public function validateAll($creditCardHolder, $creditCardNumber, $creditCardExpiredMonth, $creditCardExpiredYear){
+	public function validateAll($creditCardHolder, $creditCardNumber, $creditCardExpiredMonth, $creditCardExpiredYear, $creditCardCVV){
 		
-		return $this->validateName($creditCardHolder) && $this->validateNumber($creditCardNumber) && $this->validateDate($creditCardExpiredMonth, $creditCardExpiredYear);
+		return $this->validateName($creditCardHolder) && $this->validateNumber($creditCardNumber) && $this->validateDate($creditCardExpiredMonth, $creditCardExpiredYear) && $this->validateCVV($creditCardCVV);
 		
 	}
 	/**

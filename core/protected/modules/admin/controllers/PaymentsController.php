@@ -28,10 +28,11 @@ class PaymentsController extends AdminBaseController
 		foreach ($arrModules as $module)
 			try {
 				if (Yii::app()->getComponent($module->module))
-					if (Yii::app()->getComponent($module->module)->advancedMode)
-						$menuSidebara[] = array('label'=>Yii::app()->getComponent($module->module)->AdminName, 'url'=>array('payments/module', 'id'=>$module->module));
-					else
-						$menuSidebar[] = array('label'=>Yii::app()->getComponent($module->module)->AdminName, 'url'=>array('payments/module', 'id'=>$module->module));
+					if (Yii::app()->getComponent($module->module)->cloudCompatible || _xls_get_conf('LIGHTSPEED_CLOUD')==0)
+						if (Yii::app()->getComponent($module->module)->advancedMode)
+							$menuSidebara[] = array('label'=>Yii::app()->getComponent($module->module)->AdminName, 'url'=>array('payments/module', 'id'=>$module->module));
+						else
+							$menuSidebar[] = array('label'=>Yii::app()->getComponent($module->module)->AdminName, 'url'=>array('payments/module', 'id'=>$module->module));
 			}
 			catch (Exception $e) {
 				Yii::log("Missing widget ".$e, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
@@ -43,7 +44,7 @@ class PaymentsController extends AdminBaseController
 				),
 			$menuSidebar,
 			array(
-				array('label'=>'Advanced Integration Modules', 'linkOptions'=>array('class'=>'nav-header'))
+				array('label'=>'Advanced Integration Modules', 'linkOptions'=>array('class'=>'nav-header'), 'visible'=>count($menuSidebara)>0)
 			),
 			$menuSidebara,
 			array(
@@ -66,55 +67,6 @@ class PaymentsController extends AdminBaseController
 		}
 
 		return parent::beforeAction($action);
-	}
-
-
-	public function scanPayments()
-	{
-		$arrCustom = array();
-		if(file_exists(YiiBase::getPathOfAlias("custom.extensions.payment")))
-			$arrCustom = glob(realpath(YiiBase::getPathOfAlias("custom.extensions.payment")).'/*', GLOB_ONLYDIR);
-		if(!is_array($arrCustom)) $arrCustom = array();
-		$files=array_merge(glob(realpath(YiiBase::getPathOfAlias("ext.wspayment")).'/*', GLOB_ONLYDIR),$arrCustom);
-
-
-
-		foreach ($files as $file)
-		{
-
-			$moduleName = mb_pathinfo($file,PATHINFO_BASENAME);
-
-			//Check if module is already in database
-			$objModule = Modules::LoadByName($moduleName);
-			if(!($objModule instanceof Modules))
-			{
-				//The module doesn't exist, attempt to install it
-				try {
-
-					$objModule = new Modules();
-					$objModule->active=0;
-					$objModule->module = $moduleName;
-					$objModule->category = 'payment';
-					$objModule->configuration = Yii::app()->getComponent($moduleName)->getDefaultConfiguration();
-					if (!$objModule->save())
-						Yii::log("Found widget $moduleName could not install ".print_r($objModule->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-
-				}
-				catch (Exception $e) {
-					Yii::log("Found widget $moduleName could not install ".$e, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-				}
-
-			}
-			$objModule->version = Yii::app()->getComponent($moduleName)->version;
-			$objModule->name = Yii::app()->getComponent($moduleName)->AdminNameNormal;
-			$objModule->save();
-
-		}
-
-
-
-
-
 	}
 
 

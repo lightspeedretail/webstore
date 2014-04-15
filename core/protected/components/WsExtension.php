@@ -9,6 +9,7 @@ class WsExtension extends CComponent
 	const SHIPPING = 'shipping';
 	const PAYMENT = 'payment';
 	const SIDEBAR = 'sidebar';
+	const THEME = 'theme';
 
 	/**
 	 * shipping or billing extension
@@ -21,10 +22,10 @@ class WsExtension extends CComponent
 	 */
 	protected $strModuleName = "Web Store Module";
 	/**
-	 * Extension version number
-	 * @var float
+	 * Extension version number (note whole numbers only)
+	 * @var int
 	 */
-	protected $Version = 1.0;
+	protected $version = 1;
 	/**
 	 * For billing extensions, does it redirect offsite (Simple Integration a la Paypal)
 	 * @var bool
@@ -253,7 +254,7 @@ class WsExtension extends CComponent
 
 		$objModule = Modules::model()->findByAttributes(array('module'=>$strClass));
 		if ($objModule instanceof Modules) {
-
+			Yii::log("Writing config " . print_r($arr,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			try{
 				$objModule->configuration = serialize($arr);
 				$objModule->save();
@@ -272,7 +273,7 @@ class WsExtension extends CComponent
 
 	public function getVersion()
 	{
-		return $this->Version;
+		return $this->version;
 	}
 	public function getAdminNameNormal()
 	{

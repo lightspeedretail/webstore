@@ -7,7 +7,7 @@ class worldpaysim extends WsPayment
 	protected $version = 1.0;
 	protected $uses_jumper = true;
 	protected $apiVersion = 1;
-
+	public $cloudCompatible = true;
 
 	/**
 	 * Run the payment process
@@ -25,8 +25,9 @@ class worldpaysim extends WsPayment
 		
 		if($this->config['live'] == 'test')
 			$str .= _xls_make_hidden('testMode',  '100');
-		$str .= _xls_make_hidden('address',   ($this->CheckoutForm->billingAddress2 != '' ?
-			$this->CheckoutForm->billingAddress1 . " " . $this->CheckoutForm->billingAddress2 : $this->CheckoutForm->billingAddress1));
+		$str .= _xls_make_hidden('address1',   $this->CheckoutForm->billingAddress1);
+		$str .= _xls_make_hidden('address2',   $this->CheckoutForm->billingAddress2);
+		$str .= _xls_make_hidden('town',   $this->CheckoutForm->billingCity);
 		$str .= _xls_make_hidden('region',   $this->CheckoutForm->billingState);
 		$str .= _xls_make_hidden('postcode',   $this->CheckoutForm->billingPostal);
 		$str .= _xls_make_hidden('country',   $this->CheckoutForm->billingCountry);
@@ -38,7 +39,7 @@ class worldpaysim extends WsPayment
 		$str .= _xls_make_hidden('cartId',  $this->objCart->id_str);
 		$str .= _xls_make_hidden('desc',  _xls_get_conf( 'STORE_NAME'  , "Online") . " Order");
 		$str .= _xls_make_hidden('M_cartlink',   Yii::app()->controller->createAbsoluteUrl('cart/restore', array('getuid'=>$this->objCart->linkid)));
-		$str .= _xls_make_hidden('MC_callback',   Yii::app()->controller->createAbsoluteUrl('/cart/payment/'.$this->modulename));
+		$str .= _xls_make_hidden('MC_callback',   Yii::app()->controller->createAbsoluteUrl('cart/payment', array('id'=>$this->modulename)));
 
 		$str .= _xls_make_hidden('amount',  round($this->objCart->total , 2));
 
@@ -62,6 +63,8 @@ class worldpaysim extends WsPayment
 	public function gateway_response_process()
 	{
 
+        Yii::log(get_class($this) . " Transaction ".print_r($_GET,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+
 		$instId = Yii::app()->getRequest()->getQuery('instId');
 		$transId = Yii::app()->getRequest()->getQuery('transId');
 		$cartId = Yii::app()->getRequest()->getQuery('cartId');
@@ -71,7 +74,7 @@ class worldpaysim extends WsPayment
 
 		if(empty($transId)) {
 			// failed order
-			Yii::log("Failed: ".print_r($_POST,true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			Yii::log("Failed: ".print_r($_GET,true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return false;
 		}
 
@@ -91,7 +94,7 @@ class worldpaysim extends WsPayment
 		}
 		else
 		{
-			Yii::log("Declined: ".$messageText, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			Yii::log("Declined Reason: ".strtoupper($messageText), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			$retArray = array(
 				'order_id' => $cartId,
 				'amount' => 0,

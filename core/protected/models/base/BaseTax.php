@@ -35,7 +35,7 @@ abstract class BaseTax extends CActiveRecord
 			array('compounded', 'numerical', 'integerOnly'=>true),
 			array('max_tax', 'numerical'),
 			array('lsid', 'length', 'max'=>11),
-			array('tax', 'length', 'max'=>32),
+			array('tax', 'length', 'max'=>255),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, lsid, tax, max_tax, compounded', 'safe', 'on'=>'search'),

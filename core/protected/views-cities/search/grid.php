@@ -9,12 +9,13 @@
 	    <h1><?php echo $this->pageHeader; ?></h1>
 
 	    <div class="subcategories">
-			<?php  if(isset($this->subcategories) && (count($this->subcategories) > 0)): ?>
-
-			<?php echo _sp("Subcategories"); ?>:
-			<?php foreach ($this->subcategories as $item)
-					echo CHtml::link(trim($item['label']), $item['link']); ?>
-			<?php endif; ?>
+			<?php
+			if(isset($this->subcategories) && (count($this->subcategories) > 0)) {
+				echo _sp("Subcategories").':';
+				foreach ($this->subcategories as $item)
+					echo CHtml::link(trim($item['label']), $item['link']);
+			}
+			?>
 	    </div>
 
 		<?php if(isset($this->custom_page_content)): ?>
@@ -45,7 +46,7 @@
 					CHtml::tag('div',array(
 				    'class'=>'product_cell_graphic',
 				    'onClick'=>'js:window.location.href="'.$objProduct->Link.'"'),
-			        CHtml::link(CHtml::image($objProduct->ListingImage), $objProduct->Link)).
+			        CHtml::link(CHtml::image($objProduct->ListingImage,$objProduct->Title), $objProduct->Link)).
 
 					CHtml::tag('div',array(
 					    'class'=>'product_cell_label',

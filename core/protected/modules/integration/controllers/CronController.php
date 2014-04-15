@@ -10,6 +10,7 @@ class CronController extends CController
 
 	public function init()
 	{
+		Controller::initParams();
 		//do nothing so we don't create a cart
 	}
 
@@ -48,16 +49,24 @@ class CronController extends CController
 					'controller'=>$objModule->module,
 					'action'=>$objType->action)
 				);
+				Yii::log("Found TaskQueue item ".$objTask->controller." ".$objTask->action,
+					'info', 'application.'.__CLASS__.".".__FUNCTION__);
 				$actionName = "OnAction".ucfirst($objTask->action);
 
 				$objEvent = new CEventTaskQueue(get_class($this),$objTask->data_id,$objTask->product_id);
-
+				Yii::log("Cron action ".$actionName." on object ".
+					print_r($objEvent,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 				//Run the action and get a true/false if it was successful
 				$retVal = $component->$actionName($objEvent);
 
 				if($retVal)
+				{
+					Yii::log("Successfully processed by Amazon, so deleting task", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 					$objTask->delete(); //Successfully ran, so delete entry
+				}
 				else {
+					Yii::log("Still waiting on Amazon, will check again next time",
+						'info', 'application.'.__CLASS__.".".__FUNCTION__);
 					$objTask->modified = new CDbExpression('NOW()');
 					$objTask->save();
 				}
@@ -66,6 +75,15 @@ class CronController extends CController
 
 
 		}
+
+		//Create a Download Orders event to force any other subsystems to check for new orders
+		if(date("i") % 10 == 0) //every 10 minute increment
+		{
+			$objEvent = new CEventOrder('CronController','onDownloadOrders');
+			_xls_raise_events('CEventOrder',$objEvent);
+
+		}
+
 
 
 	}

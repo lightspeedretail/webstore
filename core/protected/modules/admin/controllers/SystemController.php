@@ -24,7 +24,7 @@ class SystemController extends AdminBaseController
 	{
 		return array(
 			array('allow',
-				'actions'=>array('index','edit','erasecarts','log','purge'),
+				'actions'=>array('index','edit','erasecarts','resynccloud','log','purge','info'),
 				'roles'=>array('admin'),
 			),
 		);
@@ -42,13 +42,23 @@ class SystemController extends AdminBaseController
 					array('label'=>'System Configuration', 'url'=>array('system/edit', 'id'=>self::SYSTEM_CONFIGURATION)),
 					array('label'=>'Event Processors', 'url'=>array('system/edit', 'id'=>self::PROCESSORS)),
 					array('label'=>'Email Servers', 'url'=>array('system/edit', 'id'=>self::EMAIL_SERVERS)),
-					array('label'=>'Security', 'url'=>array('system/edit', 'id'=>self::SECURITY)),
+					array('label'=>'Security', 'url'=>array('system/edit', 'id'=>self::SECURITY),
+						'visible'=>!(Yii::app()->params['LIGHTSPEED_MT']>0)),
 				array('label'=>'Tasks', 'linkOptions'=>array('class'=>'nav-header')),
 					array('label'=>'Purge Deleted Categories/Families', 'url'=>array('system/purge')),
-					array('label'=>'Erase abandoned carts &gt; '.intval(_xls_get_conf('CART_LIFE' , 30)).' days', 'url'=>array('system/erasecarts')),
+					array('label'=>'Erase abandoned carts &gt; '.intval(_xls_get_conf('CART_LIFE' , 30)).' days',
+						'url'=>array('system/erasecarts')
+					),
+					array('label'=>'Resync Cloud Account',
+						'url'=>array('system/resynccloud'),
+						'visible'=>Yii::app()->params['LIGHTSPEED_CLOUD']>0
+					),
+                array('label'=>'Database', 'linkOptions'=>array('class'=>'nav-header')),
+                    array('label'=>'Database Admin', 'url'=>array('/admin/databaseadmin')),
 				array('label'=>'System Log', 'linkOptions'=>array('class'=>'nav-header')),
 					array('label'=>'View Log', 'url'=>array('system/log')),
-					array('label'=>'Latest Release Notes', 'url'=>array('default/releasenotes')),
+				array('label'=>'About', 'linkOptions'=>array('class'=>'nav-header')),
+					array('label'=>'System Information', 'url'=>array('system/info')),
 
 		);
 
@@ -62,6 +72,10 @@ class SystemController extends AdminBaseController
 		$this->render("index");
 	}
 
+	public function actionInfo()
+	{
+		$this->render("info");
+	}
 
 
 	/**
@@ -103,13 +117,55 @@ class SystemController extends AdminBaseController
 
 	public function actionPurge()
 	{
+
+        $check = CategoryAddl::model()->findAll();
+
+        if (!empty($check))
+        {
+            $sql = "SELECT id FROM xlsws_category WHERE id NOT IN (SELECT id FROM `xlsws_category_addl`);";
+
+            $emptycats = Yii::app()->db->createCommand($sql)->queryAll();
+
+            foreach ($emptycats as $id)
+            {
+                $sqldelete = "DELETE FROM xlsws_product_category_assn WHERE category_id = ".$id['id'].";";
+                try {
+                    Yii::app()->db->createCommand($sqldelete)->execute();
+                    $obj = Category::model()->findByPk($id);
+                    $obj->UpdateChildCount();
+                }
+                catch (Exception $e)
+                {
+                    Yii::app()->user->setFlash('error',Yii::t('admin','Could not purge categories. Product associations could not be removed.'));
+                }
+
+            }
+        }
+
+        unset($check);
+
+        $sql3 = "DELETE xlsws_category_integration.* FROM xlsws_category_integration
+                LEFT JOIN xlsws_category_addl ON xlsws_category_addl.id = xlsws_category_integration.category_id
+                WHERE xlsws_category_addl.id IS NULL";
+
 		$sql1 = "DELETE xlsws_category.* FROM xlsws_category
 				LEFT JOIN xlsws_category_addl ON xlsws_category_addl.id = xlsws_category.id
 				WHERE xlsws_category_addl.id IS NULL";
 
 		$sql2 ="DELETE xlsws_family.* from xlsws_family left join xlsws_product on xlsws_family.id=xlsws_product.family_id where xlsws_product.id is null";
-		$success=0;
+		$success=$check=0;
 
+        try {
+            Yii::app()->db->createCommand($sql3)->execute();
+            $check=1;
+
+        }
+        catch (Exception $e)
+        {
+            Yii::app()->user->setFlash('error',Yii::t('admin','Could not purge categories. Error encountered unassigning Amazon/Google integrations.'));
+        }
+
+        if ($check)
 		try {
 			Yii::app()->db->createCommand($sql1)->execute();
 			$success=1;
@@ -193,6 +249,20 @@ class SystemController extends AdminBaseController
 			Yii::app()->user->setFlash('error','ERROR -- YOUR TEST EMAIL ATTEMPT FAILED');
 			$objEmail->delete();
 		}
+
+	}
+
+
+	public function actionResynccloud()
+	{
+
+		$objComponent=Yii::createComponent('ext.wscloud.wscloud');
+		$sync = Yii::app()->getRequest()->getPost('buttonResync');
+
+		if($sync)
+			$objComponent->Resynccloud();
+
+		$this->render("resync",array('sync'=>$sync));
 
 	}
 

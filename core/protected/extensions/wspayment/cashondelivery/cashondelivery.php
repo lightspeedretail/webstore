@@ -4,8 +4,8 @@ class cashondelivery extends WsPayment
 {
 
 	protected $defaultName = "Cash on Delivery";
-	protected $version = "1.0";
-
+	protected $version = 1;
+	public $cloudCompatible = false;
 
 	/**
 	 * The run() function is called from Web Store to run the process.

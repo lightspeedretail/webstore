@@ -62,155 +62,9 @@ class Configuration extends BaseConfiguration
 
 	}
 
-
-	public static function exportConfig()
-	{
-		$objConfig = Configuration::model()->findAllByAttributes(array('param'=>'1'),array('order'=>'key_name'));
-
-		$objTheme = Configuration::model()->find('key_name=?', array('THEME'));
-		if ($objTheme instanceof Configuration)
-			$theme = $objTheme->key_value; else $theme = "brooklyn";
-		$objLangCode = Configuration::model()->find('key_name=?', array('LANG_CODE'));
-		if ($objLangCode instanceof Configuration)
-			$lang = $objLangCode->key_value; else $lang = "en";
-
-		//Create temporary file
-		$randName = _xls_seo_url(_xls_truncate(md5(date("YmdHis")),10,'')).".php";
-
-
-		$strConfigArray =
-			"return array(\n".
-			"\t\t'theme'=>'".$theme."',\n".
-			"\t\t'language'=>'".$lang."',\n".
-			"\t\t'params'=>array(\n";
-
-
-		foreach ($objConfig as $oConfig) {
-			$keyvalue = str_replace('"','\"',$oConfig->key_value);
-			$strConfigArray .= "\t\t\t'".$oConfig->key_name."'=>\"".$keyvalue."\",\n";
-		}
-
-		$strConfigArray .= "));";
-
-		$success = false;
-		$x = null;
-		try {
-			@$x = eval($strConfigArray);
-			if(is_array($x)) $success=true;
-		} catch (Exception $objExc) {
-			//our config wasn't successful
-			Yii::log('generating wsconfig array failed '.$strConfigArray, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-			$success = false;
-		}
-
-		if($success){
-			$str = "<?php"."\n".$strConfigArray;
-			//Yii::log('config being defined as '.YiiBase::getPathOfAlias('config'), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-			$result = file_put_contents(YiiBase::getPathOfAlias('config')."/".$randName,$str);
-			if($result === false) {
-				Yii::log('error file_put_contents to '.YiiBase::getPathOfAlias('config')."/".$randName, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-				return false;
-			}
-
-			if(file_exists(YiiBase::getPathOfAlias('config')."/wsconfig.php"))
-				unlink(YiiBase::getPathOfAlias('config')."/wsconfig.php");
-
-			rename(YiiBase::getPathOfAlias('config')."/".$randName,YiiBase::getPathOfAlias('config')."/wsconfig.php");
-
-			return true;
-		} else {
-			Yii::log('error writing wsconfig.php', 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-			return false;
-		}
-
-	}
-
-	public static function exportLogging()
-	{
-		$objConfig = Configuration::model()->findAllByAttributes(array('param'=>'1'),array('order'=>'key_name'));
-		$DEBUG_TOOLBAR=0;
-		//Write out logging
-		foreach ($objConfig as $oConfig)
-			if ($oConfig->key_name=="DEBUG_LOGGING")
-				switch ($oConfig->key_value)
-				{
-					case 'error';   $level = "error";   $logLevel = "error,warning"; break;
-					case 'info';    $level = "info";    $logLevel = "error,warning,info";break;
-					case 'info2';    $level = "info";   $DEBUG_TOOLBAR=1; $logLevel = "error,warning,info";break;
-					case 'trace';   $level = "trace";   $logLevel = "error,warning,info,trace";break;
-
-				}
-
-		if(!('YII_DEBUG')) $DEBUG_TOOLBAR=0;
-		$fp2 = fopen(YiiBase::getPathOfAlias('config')."/wslogging.php","w");
-
-		if($DEBUG_TOOLBAR==1)
-			fwrite($fp2,"<?php
-
-return array(
-	'class'=>'CLogRouter',
-	'routes'=>array(
-		array(
-			'class'=>'CFileLogRoute',
-			'levels'=>'error, warning',
-		),
-		array(
-			'class'=>'ext.yii-debug-toolbar.YiiDebugToolbarRoute',
-			'levels'=>'error,warning,info',
-		),
-		array(
-			'class'=>'CDbLogRoute',
-			'levels'=>'".$logLevel."',
-			'logTableName'=>'xlsws_log',
-			'connectionID'=>'db',
-		),
-	),
-);
-
-");
-			else fwrite($fp2,"<?php
-
-return array(
-	'class'=>'CLogRouter',
-	'routes'=>array(
-		array(
-			'class'=>'CFileLogRoute',
-			'levels'=>'error, warning',
-		),
-		array(
-			'class'=>'CDbLogRoute',
-			'levels'=>'".$logLevel."',
-			'logTableName'=>'xlsws_log',
-			'connectionID'=>'db',
-		),
-	),
-);
-
-");
-		fclose($fp2);
-
-		
-		return true;
-	}
-
-
-	public static function exportEmail()
-	{
-		$fp2 = fopen(YiiBase::getPathOfAlias('config')."/wsemail.php","w");
-		if(!$fp2) die("error writing wsemail");
-
-		fwrite($fp2,"<?php
-
-return array(); //no longer used
-");
-		fclose($fp2);
-
-
-		return true;
-	}
-
 	public static function exportKeys($key,$salt)
 	{
+		if(_xls_get_conf('LIGHTSPEED_CLOUD',0)>0 || _xls_get_conf('LIGHTSPEED_MT',0)>0) return true; //cloud mode doesn't use this
 
 		$fp2 = fopen(YiiBase::getPathOfAlias('config')."/wskeys.php","w");
 
@@ -225,37 +79,6 @@ return array(
 
 
 		return true;
-	}
-
-	public function exportFacebook()
-	{
-		$objAppID = self::LoadByKey('FACEBOOK_APPID');
-		$objSecret = self::LoadByKey('FACEBOOK_SECRET');
-
-		$configtext = file_get_contents(YiiBase::getPathOfAlias('application')."/config/_wsfacebook.php");
-		$fp2 = fopen(YiiBase::getPathOfAlias('config')."/wsfacebook.php","w");
-
-		$configtext = str_replace("FACEBOOK_APPID",$objAppID->key_value,$configtext);
-		$configtext = str_replace("FACEBOOK_SECRET",$objSecret->key_value,$configtext);
-
-		fwrite($fp2,$configtext);
-		fclose($fp2);
-	}
-
-
-	public function updateViewsetSymLink($viewset)
-	{
-		$symfile = YiiBase::getPathOfAlias('application')."/views";
-		$strOriginal = YiiBase::getPathOfAlias('application.views')."-".strtolower($viewset);
-		$current="";
-		if(file_exists($symfile))
-			$current = readlink($symfile);
-		if ($current != $strOriginal)
-		{
-			@unlink($symfile);
-			symlink($strOriginal, $symfile);
-		}
-
 	}
 
 	public static function getAdminDropdownOptions($strId)
@@ -343,7 +166,9 @@ return array(
 				);
 
 			case 'ENABLE_FAMILIES':
-				return array(0 => _sp("Off") , 1 => _sp("Bottom of Products Menu") , 2 => _sp("Top of Products Menu"));
+				return array(0 => _sp("Off") , 1 => _sp("Bottom of Products Menu") , 2 => _sp("Top of Products Menu"),
+					3 => _sp("Blended into Products Menu")
+				);
 
 			case 'EMAIL_SMTP_SECURITY_MODE':
 				return array(0 => _sp("Autodetect") , 1 => _sp("Force No Security") , 2 => _sp("Force SSL"),3 => _sp("Force TLS"));
@@ -370,11 +195,7 @@ return array(
 				return array('jpg' => "JPG" , 'png' => "PNG");
 
 			case 'LOGGING':
-				if(YII_DEBUG)
-					return array('error' => "Error Logging" , 'info' => "Troubleshooting Logging",
-						'info2' => "TShoot log and toolbar",'trace'=>'Ludicrous Logging');
-					else
-						return array('error' => "Error Logging" , 'info' => "Troubleshooting Logging",'trace'=>'Ludicrous Logging');
+				return array('error' => "Error Logging" , 'info' => "Troubleshooting Logging",'trace'=>'Ludicrous Logging');
 
 
 			case 'INVENTORY_OUT_ALLOW_ADD':
@@ -400,10 +221,20 @@ return array(
 				return array(1 =>1,2 => 2,3 => 3,4=>4,6=>6);
 
 			case 'HOME_PAGE':
-				$arr = array(
-					'*products' => _sp("Product grid"),
-					//'*categories' => _sp("Category grid"),
-					'*index' => _sp("site/index.php"));
+				$arr = array('*products' => _sp("Product grid"));
+				if (Yii::app()->params['LIGHTSPEED_MT'] == '1')
+				{
+					if (Yii::app()->theme->info->showCustomIndexOption)
+						$arr['*index'] = _sp(Yii::app()->theme->info->name." home page");
+				}
+				else
+				{
+					if (Yii::app()->theme->info->showCustomIndexOption)
+						$arr['*index'] = _sp(Yii::app()->theme->info->name." home page");
+					else
+						$arr['*index'] = _sp("site/index.php");
+				}
+
 				foreach (CustomPage::model()->findAll(array('order'=>'title')) as $item)
 				{
 					$arr[$item->page_key] = $item->title;
@@ -509,6 +340,7 @@ return array(
 		if (empty($this->helper_text))
 			$this->helper_text = ' ';
 
+
 		return parent::beforeValidate();
 	}
 
@@ -522,25 +354,12 @@ return array(
 
 	protected function afterSave()
 	{
-		$retVal = Configuration::exportConfig();
-		if(!$retVal) return $retVal;
-		if ($this->key_name=="DEBUG_LOGGING")
-			Configuration::exportLogging();
-
-		if (substr($this->key_name,0,10)=="EMAIL_SMTP")
-			Configuration::exportEmail();
 
 		if ($this->key_name=="FEATURED_KEYWORD")
 			Product::SetFeaturedByKeyword($this->key_value);
 
 		if ($this->key_name=="LANGUAGES")
 			$this->updateLanguages($this->key_value);
-
-		if ($this->key_name=="VIEWSET")
-			$this->updateViewsetSymLink($this->key_value);
-
-		if (substr($this->key_name,0,8)=="FACEBOOK")
-			$this->exportFacebook();
 
 		if ($this->key_name=="SEO_URL_CATEGORIES")
 		{

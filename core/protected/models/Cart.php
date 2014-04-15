@@ -21,7 +21,8 @@ class Cart extends BaseCart
 	public $blnStorePickup = false;
 
 	// String representation of the object
-	public function __toString() {
+	public function __toString()
+	{
 		return sprintf('Cart Object %s',  $this->id);
 	}
 
@@ -29,9 +30,9 @@ class Cart extends BaseCart
 	public function scopes()
 	{
 		return array(
-			'complete'=>array(
-				'condition'=>'cart_type='.CartType::order,
-				'order'=>'id_str DESC',
+			'complete' => array(
+				'condition' => 'cart_type='.CartType::order,
+				'order' => 'id_str DESC',
 			),
 		);
 	}
@@ -220,7 +221,8 @@ class Cart extends BaseCart
 
 			} else {
 				$objTax = TaxCode::GetDefault();
-				$this->tax_code_id = $objTax->lsid;
+				if($objTax instanceof TaxCode)
+					$this->tax_code_id = $objTax->lsid;
 			}
 		}
 
@@ -275,6 +277,9 @@ class Cart extends BaseCart
 		$arrItems = $this->cartItems;
 		foreach($arrItems as $objItem) {
 			$objItem->product->SetAvailableInventory();
+
+			foreach($objItem->product->xlswsCategories as $objCategory)
+				$objCategory->UpdateChildCount();
 
 			$objEvent = new CEventProduct(get_class($this),'onUpdateInventory',$objItem->product);
 			_xls_raise_events('CEventProduct',$objEvent);
@@ -341,14 +346,13 @@ class Cart extends BaseCart
 
 
         // qty discount?
-//        $arrtmp = ProductQtyPricing::model()->findAllByAttributes(array('product_id'=>$objItem->product_id,
-//                                                                            'pricing_level'=>1));
-//        $tmpprice = 0;
-//
-//        foreach ($arrtmp as $tmp)
-//            $tmpprice = ($intQuantity>=$tmp->qty ? $tmp->price : $tmpprice);
-//
-//        $objItem->discount = ($tmpprice>0 ? $objItem->sell_base - $tmpprice : 0);
+        $arrtmp = ProductQtyPricing::model()->findAllByAttributes(array('product_id'=>$objItem->product_id, 'pricing_level'=>1));
+        $tmpprice = 0;
+
+        foreach ($arrtmp as $tmp)
+            $tmpprice = ($intQuantity>=$tmp->qty ? $tmp->price : $tmpprice);
+
+        $objItem->discount = ($tmpprice>0 ? $objItem->sell_base - $tmpprice : 0);
 
         $objItem->qty = $intQuantity;
 		$objItem->save();
@@ -634,11 +638,20 @@ class Cart extends BaseCart
 	 * Update Cart by setting taxes for Shipping if applicable
 	 */
 	public function UpdateTaxShipping() {
-		if(Yii::app()->params['SHIPPING_TAXABLE'] != '1')
-			return;
 
 		if (!isset($this->shipping->shipping_sell))
 			return;
+
+		if(Yii::app()->params['SHIPPING_TAXABLE'] != '1')
+		{
+			$this->shipping->shipping_sell_taxed = $this->shipping->shipping_sell;
+			$this->shipping->shipping_taxable = 0;
+			$this->shipping->save();
+			return;
+		}
+
+		$this->shipping->shipping_taxable = 1;
+		$this->shipping->save();
 
 		$objNoTax = TaxCode::GetNoTaxCode();
 		$intNoTax = 999;
@@ -675,14 +688,25 @@ class Cart extends BaseCart
 		$this->tax4 += $taxes[4];
 		$this->tax5 += $taxes[5];
 
-		//
-		// Legacy behavior assumes that the ShippingSell price does
-		// not already contain taxes and that they must be added.
-		//
-		if (Yii::app()->params['TAX_INCLUSIVE_PRICING'] == '1' && $this->tax_code_id != $intNoTax) {
-			$this->shipping->shipping_sell += array_sum($taxes);
-		}
 
+		if ($this->tax_code_id != $intNoTax)
+			$this->shipping->shipping_sell_taxed = $this->shipping->shipping_sell + round(array_sum($taxes),2);
+		else
+			$this->shipping->shipping_sell_taxed = $this->shipping->shipping_sell;
+
+		/*
+		 * Legacy behavior assumes that the ShippingSell price does
+		 * not already contain taxes and that they must be added.
+		 * Cloud mode also expects taxes to already be included.
+		 */
+
+		if ( Yii::app()->params['TAX_INCLUSIVE_PRICING'] == '1' && $this->tax_code_id != $intNoTax)
+			$this->shipping->shipping_sell += round(array_sum($taxes),2);
+
+
+
+		$this->shipping->shipping_taxable = 1;
+		$this->shipping->save();
 
 	}
 
@@ -1032,7 +1056,8 @@ class Cart extends BaseCart
 		try {
 
 			$arrCarts=Cart::model()->findAll(array(
-				'condition'=>'customer_id=:id AND cart_type=:type AND item_count > 0 '. ($intBelowCart>0 ? 'AND id<:currentcart' : 'AND id>:currentcart'),
+				'condition'=>'customer_id=:id AND cart_type=:type AND item_count > 0 '.
+					($intBelowCart>0 ? 'AND id<:currentcart' : 'AND id>:currentcart'),
 				'params'=>array(':id'=>$intCustomerId, ':type'=>CartType::cart, ':currentcart'=>$intBelowCart),
 				'order'=>'id DESC',
 				'limit'=>1,
@@ -1268,7 +1293,7 @@ class Cart extends BaseCart
 
 			case 'shipping_sell':
 				if (isset($this->shipping->shipping_sell))
-					return $this->shipping->shipping_sell;
+					return $this->shipping->getShippingSell();
 				else
 					return 0;
 
@@ -1284,5 +1309,26 @@ class Cart extends BaseCart
 			return 0;
 
 		return ($objA->sell_base < $objB->sell_base) ? +1 : -1;
+	}
+
+	/**
+	 * Return an array of pending orders containing 'id_str' and 'datetime_cre' fields.
+	 *
+	 * @return array pending orders
+	 */
+	public static function getPendingOrders()
+	{
+		$criteria = new CDbCriteria();
+		$criteria->select = 'id_str,datetime_cre';
+		$criteria->condition = 'cart_type = :cart_type AND downloaded = :downloaded';
+		$criteria->params = array('cart_type' => CartType::order, 'downloaded' => 0);
+		$pendingOrders = Cart::model()->findAll($criteria);
+
+		$returnOrders = array();
+
+		foreach ($pendingOrders as $order)
+			array_push($returnOrders, array('id_str' => $order['id_str'], 'datetime_cre' => $order['datetime_cre']));
+
+		return $returnOrders;
 	}
 }

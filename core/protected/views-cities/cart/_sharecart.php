@@ -8,9 +8,6 @@
 ));
 	echo $form->hiddenField($model,'code');
 	?>
-    <div class="row shortrow">
-		<?= Yii::t('wishlist','Share via email'); ?>
-    </div>
 
 <?php if(Yii::app()->user->isGuest): ?>
     <div class="row midrow">

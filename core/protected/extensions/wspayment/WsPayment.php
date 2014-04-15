@@ -5,7 +5,7 @@ class WsPayment extends WsExtension
 {
 	public $advancedMode = false;
 	public $subformModel;
-
+	public $cloudCompatible = false;
 	/**
 	 * The run() function is called from Web Store to actually do the process. It returns an array of the service
 	 * levels and prices available to the customer (as keys and values in the array, respectively).

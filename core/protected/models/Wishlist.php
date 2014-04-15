@@ -71,6 +71,7 @@ class Wishlist extends BaseWishlist
 			array('registry_name,visibility,ship_option,after_purchase', 'required'),
 			array('visibility', 'numerical', 'integerOnly'=>true),
 			array('registry_name, ship_option, gift_code', 'length', 'max'=>100),
+			array('registry_name,registry_description,event_date','filter','filter'=>array($obj=new CHtmlPurifier(),'purify')),
 			array('customer_id', 'length', 'max'=>20),
 			array('registry_description,event_date,deleteMe', 'safe'),
 		);
@@ -230,9 +231,10 @@ class Wishlist extends BaseWishlist
 				if (!is_null($item->wishlist_item))
 				{
 					$cartCustomerId  = is_null($objCart->customer_id) ? 0 : $objCart->customer_id;
-					$wishCustomerId = $item->wishlistItem->registry->customer_id;
 
-					if ($cartCustomerId != $wishCustomerId) //Wish list item was purchased by a visitor
+					//Wish list item was purchased by a visitor
+					if (isset($item->wishlistItem->registry) &&
+						$cartCustomerId != $item->wishlistItem->registry->customer_id)
 					{
 						if (date('YmdHis', strtotime($item->datetime_mod) < $cutoffDate))
 						{

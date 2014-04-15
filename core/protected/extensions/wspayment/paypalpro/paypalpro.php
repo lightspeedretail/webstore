@@ -21,7 +21,7 @@ class paypalpro extends WsPayment
 
 		$strCardType = $this->CheckoutForm->cardType;
 
-		if ($strCardType=="American Express") $strCardType="Amex";
+		if ($strCardType=="AMERICAN_EXPRESS") $strCardType="Amex";
 
 //ITEMAMT=2&SHIPPINGAMT=15.62&AMT=2&TAXAMT=0
 

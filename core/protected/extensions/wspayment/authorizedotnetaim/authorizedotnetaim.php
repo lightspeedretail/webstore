@@ -59,6 +59,7 @@ class authorizedotnetaim extends WsPayment
 			"x_ship_to_country"		=> $this->CheckoutForm->shippingCountry,
 
 			"x_invoice_num"			=> $this->objCart->id_str,
+			"x_solution_id"			=> 'A1000010',
 			"x_cust_id"				=> $this->objCart->customer_id,
 			"x_freight"				=> $this->objCart->shipping_sell,
 		);
@@ -87,7 +88,7 @@ class authorizedotnetaim extends WsPayment
 			Yii::log(get_class($this) . " receiving ".$resp, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		}
 
-		$resp_vals = _xls_delim_to_array($resp , self::x_delim_char);
+		$resp_vals = explode(self::x_delim_char,$resp);
 		$resp_vals = array_values($resp_vals);
 
 		if($resp_vals[0] != '1' ) {

@@ -9,6 +9,7 @@
  */
 class Images extends BaseImages
 {
+	public $strImageName;
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return Images the static model class
@@ -45,40 +46,76 @@ class Images extends BaseImages
 	creation dynamically and return the resulting URL. If the original graphic
 	doesn't exist, it will point to a "missing graphic" URL.
 	*/
-	public static function GetLink($id, $intType = ImagesType::normal, $AbsoluteUrl = false) {
+	public static function GetLink($id, $intType = ImagesType::normal, $AbsoluteUrl = false)
+	{
+		$objImage = Images::model()->findByPk($id);
+		if(Yii::app()->params['LIGHTSPEED_MT']=='1')
+			return self::getCloudLink($objImage, $intType);
+		else
+			return self::getLocalLink($objImage, $intType, $AbsoluteUrl);
 
-		//See if image exists for chosen size
-		$objImage = Images::LoadByRowidSize($id, $intType);
-		//If exists, return URL based on stored path
-		if ($objImage && $objImage->ImageFileExists())
-			return Images::GetImageUri($objImage->image_path,$AbsoluteUrl);
+	}
 
-
+	public static function getCloudLink($objImage, $intType)
+	{
 		list($intWidth, $intHeight) = ImagesType::GetSize($intType);
-
-		//Does original size image exist?
-		$objParentImage = Images::LoadByParent($id);
-		if ($objParentImage && $objParentImage->ImageFileExists()) {
-
-			$objProduct = Product::model()->findByPk($objParentImage->product_id);
-			$blbImage = imagecreatefrompng(Images::GetImagePath($objParentImage->image_path));
-			$objEvent = new CEventPhoto('Images','onUploadPhoto',$blbImage,$objProduct,$objParentImage->index);
-			_xls_raise_events('CEventPhoto',$objEvent);
-
-			$objImage = Images::LoadByRowidSize($id, $intType);
-			if ($objImage && $objImage->ImageFileExists())
-				return Images::GetImageUri($objImage->image_path,$AbsoluteUrl);
+		if (!is_null($objImage) && isset($objImage->imagesClouds) && isset($objImage->imagesClouds[0]))
+		{
+			$objComponent=Yii::createComponent('ext.wscloud.wscloud');
+			if ($intWidth==0)
+				$intWidth = $intHeight=max($objImage->width,$objImage->height);
+			return $objComponent->getCloudImage($objImage->imagesClouds[0],$intWidth, $intHeight);
 		}
-
-		//If we haven't returned by this point, we don't have any image, so show default missing
-		if ($intWidth==0) $intWidth = 100;
-		if ($intHeight==0) $intHeight = 100;
-		$objParentImage = Images::ShowFallback($intWidth, $intHeight);
-		$thumb = $objParentImage->CreateThumb($intWidth, $intHeight);
-		if ($thumb) return Images::GetImageUri($thumb->image_path,$AbsoluteUrl);
-		else return self::GetImageFallbackPath($AbsoluteUrl);
+		else
+			return
+				"http://res.cloudinary.com/lightspeed-retail/image/upload/c_fit,h_".
+				$intHeight.",w_".$intWidth."/v1389476545/no_product.png";
 
 
+
+	}
+
+	public static function getLocalLink($objImage, $intType = ImagesType::normal, $AbsoluteUrl = false)
+	{
+		list($intWidth, $intHeight) = ImagesType::GetSize($intType);
+		if (!is_null($objImage))
+		{
+			//See if image exists for chosen size
+			$objImageThumbnail = Images::LoadByRowidSize($objImage->id, $intType);
+			//If exists, return URL based on stored path
+			if ($objImageThumbnail && $objImageThumbnail->ImageFileExists())
+				return Images::GetImageUri($objImageThumbnail->image_path,$AbsoluteUrl);
+
+			//If we are to this point, we don't have the size of thumbnail we need, so can we create it on the fly
+			//from the parent image
+			$objParentImage = Images::LoadByParent($objImage->id);
+			if ($objParentImage && $objParentImage->ImageFileExists())
+			{
+
+				$objProduct = Product::model()->findByPk($objParentImage->product_id);
+				$strPath = $objParentImage->image_path;
+				if (!empty($strPath))
+				{
+					//We have a parent image
+					//Kick our thumbnail creation back to the processor
+					$blbImage = imagecreatefrompng(Images::GetImagePath($strPath));
+					$objEvent = new CEventPhoto('Images','onUploadPhoto',$blbImage,$objProduct,$objParentImage->index);
+					_xls_raise_events('CEventPhoto',$objEvent);
+
+					//At this point, the new size has been created, so look it up again just like above
+					//This time we should find it
+					//See if image exists for chosen size
+					$objImageThumbnail = Images::LoadByRowidSize($objImage->id, $intType);
+					//If exists, return URL based on stored path
+					if ($objImageThumbnail && $objImageThumbnail->ImageFileExists())
+						return Images::GetImageUri($objImageThumbnail->image_path,$AbsoluteUrl);
+				}
+
+			}
+		}
+		return
+			"http://res.cloudinary.com/lightspeed-retail/image/upload/c_fit,h_".
+			$intHeight.",w_".$intWidth."/v1389476545/no_product.png";
 
 	}
 
@@ -110,7 +147,7 @@ class Images extends BaseImages
 
 
 		$strImageName = Images::GetImageName(mb_substr($objProduct->request_url,0,60,'utf8'),0, 0, $intSequence);
-		if (Images::ExistsForOtherProduct($strImageName,$objProduct->id))
+		if ($objProduct->id>0 && Images::ExistsForOtherProduct($strImageName,$objProduct->id))
 			$strImageName = Images::GetImageName(mb_substr($objProduct->request_url,0,60,'utf8')."-r".$objProduct->id,0, 0, $intSequence);
 
 		return $strImageName;
@@ -161,20 +198,23 @@ class Images extends BaseImages
 	/* Helper function to get full drive path to passed Image file.
 	*/
 	public static function GetImagePath($strFile) {
-		return Yii::getPathOfAlias('webroot') . "/images/${strFile}";
+		if(Yii::app()->params['LIGHTSPEED_MT']>0 && substr($strFile,0,2)=="//")
+		return "http:${strFile}";
+		else return realpath(Yii::getPathOfAlias('webroot')) . "/images/${strFile}";
 	}
 	/* Return full drive path to No Image graphic.
 	*/
 	public static function GetImageFallbackPath($AbsoluteUrl = false) {
-		if ($AbsoluteUrl)
-			return Yii::app()->createAbsoluteUrl('/images/no_product.png');
-			else
-				return 'no_product.png';
+		return
+			"http://res.cloudinary.com/lightspeed-retail/image/upload/c_fit,h_190,w_190/v1389476545/no_product.png";
+
+
 	}
 
 	/* Helper function to get full URL to passed Image file.
 	*/
 	public static function GetImageUri($strFile,$AbsoluteUrl = false) {
+		if(stripos($strFile,'//') !== false) return $strFile; //already URL
 		if ($AbsoluteUrl)
 			return Yii::app()->createAbsoluteUrl("/images/".$strFile);
 		else return Yii::app()->createUrl("images/".$strFile);
@@ -220,7 +260,7 @@ class Images extends BaseImages
 
 	/* Test if actual .jpg/.png file exists on drive */
 	public function ImageFileExists() {
-		if ($this->image_path &&
+		if ($this->image_path && (stripos($this->image_path,'//') !==false) ||
 			file_exists(Images::GetImagePath($this->image_path)))
 			return true;
 		return false;
@@ -282,20 +322,23 @@ class Images extends BaseImages
 			}
 		}
 
+
 		if ($this->SaveImageFolder($strFolder) && $strSaveFunc($blbImage, $strPath))
 		{
 			$this->image_path = $strName;
 			return true;
 		}
-		else {
-			Yii::log("Failed to save file $strName", 'image', __FUNCTION__);
-			return false;
-		}
+
+
+
+		Yii::log("Failed to save file $strName", 'image', __FUNCTION__);
+		return false;
+
 
 
 	}
 
-	protected function check_transparent($im) {
+	public static function check_transparent($im) {
 
 		$width = imagesx($im); // Get the width of the image
 		$height = imagesy($im); // Get the height of the image
@@ -313,32 +356,6 @@ class Images extends BaseImages
 		// If we don't find any pixel the function will return false.
 		return false;
 	}
-
-	/* If we do not have an image, pass back our default Not Found graphic URL
-	*/
-	public static function ShowFallback($intWidth = null, $intHeight = null) {
-//		if (is_null($intWidth) || is_null($intHeight)) {
-//			$intWidth = 100;
-//			$intHeight = 100;
-//		}
-//
-//		$image = Yii::app()->image->load(Yii::getPathOfAlias('webroot') . "/images/no_product.png");
-//		$image->resize($intWidth, $intHeight)->quality(_xls_get_conf('IMAGE_QUALITY','75'))->sharpen(_xls_get_conf('IMAGE_SHARPEN','20'));
-//
-//		header('Content-Type: image/png');
-//		imagepng($image, NULL, 100);
-//		exit();
-
-
-		$objImage = new Images();
-		$objImage->image_path = self::GetImageFallbackPath();
-		$objImage->width = 100;
-		$objImage->height = 100;
-
-		//print_r($objImage);die();
-		return $objImage;
-	}
-
 
 	/**
 	 * ToDo: need to update and make photo processors use a more condensed version of this
@@ -468,22 +485,19 @@ class Images extends BaseImages
 	 * ORM level methods
 	 */
 	public function DeleteImage() {
-		if ($this->ImageFileExists())
-			unlink($this->GetPath());
+		if ($this->image_path && file_exists(Images::GetImagePath($this->image_path)))
+			@unlink($this->GetPath());
+
+
+		$objEvent = new CEventPhoto('Images','onDeletePhoto',null,null,null);
+
+		if(isset($this->ImagesCloud) && isset($this->ImagesCloud[0]))
+			$objEvent->cloudinary_public_id = $this->ImagesCloud[0]->cloudinary_public_id;
+
+		$objEvent->s3_path = $this->image_path;
+		_xls_raise_events('CEventPhoto',$objEvent);
 	}
 
-	public function Delete() {
-		if (!$this->id)
-			return;
-
-		if ($this->IsPrimary())
-			foreach (Images::model()->findAllByAttributes(array('parent' => $this->id)) as $objImage)
-				if (!$objImage->IsPrimary())
-					$objImage->Delete();
-
-		$this->DeleteImage();
-		parent::Delete();
-	}
 
 	public static function LoadByRowidSize($id, $intSize) {
 		if ($intSize == ImagesType::normal)
@@ -532,6 +546,24 @@ class Images extends BaseImages
 				'parent' => $intParent
 			)
 		);
+	}
+
+	/**
+	 * Before a delete of an Image record, take appropriate action
+	 * @return bool
+	 */
+	public function beforeDelete()
+	{
+
+		//In case this delete is pointed to by a product, get rid of that first
+		Product::model()->updateAll(array('image_id'=>null),'image_id ='.$this->id);
+		if ($this->IsPrimary())
+			foreach (Images::model()->findAllByAttributes(array('parent' => $this->id)) as $objImage)
+				if (!$objImage->IsPrimary())
+					$objImage->delete();
+
+		$this->DeleteImage();
+		return parent::beforeDelete();
 	}
 
 	/**

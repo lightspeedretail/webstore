@@ -2,13 +2,14 @@
 
 class IntegrationController extends AdminBaseController
 {
-	public $controllerName = "Integration";
+	public $controllerName = "Integrations";
 
 	//Codes for this controller
 	const AMAZON = 29;
 	const FACEBOOK = 26;
 	const GOOGLE = 20;
 	const MAILCHIMP = 30;
+	const SOCIAL = 31;
 
 
 	public function actions()
@@ -49,6 +50,8 @@ class IntegrationController extends AdminBaseController
 
 		$this->menuItems = array_merge(
 			array(
+				array('label'=>'Social Accounts', 'linkOptions'=>array('class'=>'nav-header')),
+					array('label'=>'Edit Public Accounts', 'url'=>array('integration/edit', 'id'=>self::SOCIAL)),
 				array('label'=>'Amazon', 'linkOptions'=>array('class'=>'nav-header')),
 					array('label'=>'Amazon MWS Settings', 'url'=>array('integration/integration', 'id'=>'wsamazon')),
 					array('label'=>'Match Amazon Categories to WS', 'url'=>array('integration/amazonmatch')),
@@ -58,7 +61,7 @@ class IntegrationController extends AdminBaseController
 				$menuSidebar,
 			array(
 				array('label'=>'Facebook', 'linkOptions'=>array('class'=>'nav-header')),
-					array('label'=>'Facebook Settings', 'url'=>array('integration/edit', 'id'=>self::FACEBOOK)),
+					array('label'=>'Facebook Connect', 'url'=>array('integration/edit', 'id'=>self::FACEBOOK)),
 				array('label'=>'Google', 'linkOptions'=>array('class'=>'nav-header')),
 					array('label'=>'Google Settings', 'url'=>array('integration/edit', 'id'=>self::GOOGLE)),
 					array('label'=>'Match Google Categories to WS', 'url'=>array('integration/googlematch')),
@@ -78,6 +81,9 @@ class IntegrationController extends AdminBaseController
 
 		switch($id)
 		{
+			case self::SOCIAL:
+				return "<P>Enter URLs to your public social media accounts, which are used by some themes to direct customers to Like/Follow your business accounts.</p>";
+
 			case self::FACEBOOK:
 				return "<P>To properly set up Facebook functionality, you need to register your site as an \"app\" at https://developers.facebook.com/apps and get an ID. Please consult our documentation for specifics.</p>";
 

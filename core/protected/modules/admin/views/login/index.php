@@ -7,8 +7,6 @@ $this->pageTitle=Yii::app()->name . ' - Login';
 
 ?>
 
-<h3>Admin Panel Login</h3>
-
 <div class="form">
 	<?php $form=$this->beginWidget('CActiveForm', array(
 		'id'=>'login-form',
@@ -30,9 +28,9 @@ $this->pageTitle=Yii::app()->name . ' - Login';
 		<div class="span4"><?php echo $form->error($model,'password'); ?></div>
 	</div>
 
-	<div class="row buttons pull-right">
-		<div class="span6">
-			<?php echo CHtml::submitButton('Login'); ?>
+	<div class="row buttons">
+		<div class="span3">
+			<?php echo CHtml::submitButton('Login',array('id'=>'admin-login')); ?>
 		</div>
 	</div>
 

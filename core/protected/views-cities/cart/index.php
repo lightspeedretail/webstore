@@ -26,9 +26,7 @@
  */
 
 $form = $this->beginWidget('CActiveForm', array(
-	'id'=>'ShoppingCart',
-	'action'=>array('cart/updatecart'),
-
+	'id'=>'ShoppingCart'
 ));
 
 
@@ -55,29 +53,14 @@ $form = $this->beginWidget('CActiveForm', array(
 		),array('confirm'=>Yii::t('cart',"Are you sure you want to erase your cart items?"))); ?>
     </div>
 
-    <div class="span2">
-		<?php echo CHtml::htmlButton(
-		Yii::t('cart', 'Email Cart'),
-	    array(
-		    'onClick'=>'js:jQuery($("#CartShare")).dialog("open");return false;')
-        ); ?>
-    </div>
+    
 
-	<?= CHtml::tag('div',array(
-		'id'=>'shoppingcartcontinue',
-		'class'=>'span4 checkoutlink',
-		'onClick'=>'js:window.location.href="'. $this->returnUrl.'"'),
-	Yii::t('cart','Continue Shopping'));
-	?>
+	
 
-    <div class="span1">
-		&nbsp;
-    </div>
-
-    <div class="span2">
+    <div class="span2 offset1">
 		<?php echo CHtml::ajaxButton(
 		Yii::t('cart', 'Update Cart'),
-		array('cart/updatecart'),
+		array('/cart'),
 		array('data'=>'js:$("#ShoppingCart").serialize()',
 			'type'=>'POST',
 			'dataType'=>'json',
@@ -90,7 +73,20 @@ $form = $this->beginWidget('CActiveForm', array(
 		)); ?>
     </div>
 
+
+	<div class="span3 offset1">
+		<?php echo CHtml::htmlButton(
+		Yii::t('cart', 'Share Cart'),
+	    array(
+		    'onClick'=>'js:jQuery($("#CartShare")).dialog("open");return false;')
+        ); ?>
+    </div>
+    
+    
+
+
 </div>
+
 
 <?php $this->endWidget();
 

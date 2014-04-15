@@ -42,7 +42,7 @@ class Tax extends BaseTax
 
 		$fltSellTotalTaxed = $fltSellTotal;
 		$arrTaxAmount = array(1=>0 , 2=>0 , 3=>0 , 4=> 0 , 5=>0);
-
+		$arrTaxRates = array(1=>0 , 2=>0 , 3=>0 , 4=> 0 , 5=>0);
 
 		if($intTaxCodeId instanceof TaxCode )
 			$objTaxCode = $intTaxCodeId;
@@ -53,7 +53,7 @@ class Tax extends BaseTax
 			if(!is_null($intTaxCodeId)) //Ignore null at this stage
 				Yii::log("Unknown tax code passed: $intTaxCodeId", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 
-			return array($fltSellTotalTaxed , $arrTaxAmount);
+			return array($fltSellTotalTaxed , $arrTaxAmount, $arrTaxRates);
 		}
 
 		if($intTaxStatusId instanceof TaxStatus)
@@ -62,6 +62,10 @@ class Tax extends BaseTax
 			$objTaxStatus = TaxStatus::model()->findByAttributes(array('lsid'=>$intTaxStatusId));
 		else
 			$objTaxStatus = false;
+
+		//For LS Cloud integration, see if we can find the default Tax Status
+		if($objTaxStatus === false && Yii::app()->params['LIGHTSPEED_CLOUD']>0)
+			$objTaxStatus = TaxStatus::getCloudDefault();
 
 		if(!$objTaxes)
 			$objTaxes = Tax::model()->findAll();
@@ -90,6 +94,7 @@ class Tax extends BaseTax
 				$fltTaxAmount = $objTax->max_tax;
 
 			$arrTaxAmount[$i+1] = $fltTaxAmount;
+			$arrTaxRates[$i+1] = $objTaxCode->$strRate;
 
 			$fltSellTotalTaxed = $fltSellTotalTaxed + $fltTaxAmount;
 
@@ -97,7 +102,7 @@ class Tax extends BaseTax
 			if($i >= $taxtypes) $i = $taxtypes;
 		}
 
-		return array(round($fltSellTotalTaxed,2,PHP_ROUND_HALF_UP) , $arrTaxAmount);
+		return array(round($fltSellTotalTaxed,2,PHP_ROUND_HALF_UP) , $arrTaxAmount, $arrTaxRates);
 	}
 
 	/**

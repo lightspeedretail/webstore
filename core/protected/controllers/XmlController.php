@@ -15,6 +15,7 @@ class XmlController extends Controller
 
 	public function init()
 	{
+		Controller::initParams();
 		//We avoid loading our init since it's not necessary for an XML feed
 	}
 
@@ -32,13 +33,18 @@ class XmlController extends Controller
 	public function actions()
 	{
 		//Dynamically read our built-in xml actions
-		$arr = array();
-		foreach (glob(dirname(__FILE__).'/../controllers/xml/*') as $action) {
+		$arrController = glob(dirname(__FILE__).'/../controllers/xml/*');
+        if (!is_array($arrController)) $arrController = array();
+
+		foreach ($arrController as $action) {
 			$cname = basename($action,'.php');
 			$arr[strtolower($cname)] = 'application.controllers.xml.'.basename($action,'.php');
 		}
 		//Dynamically read our custom xml actions
-		foreach (glob(dirname(__FILE__).'/../../custom/xml/*') as $action) {
+        $arrCustom = glob(dirname(__FILE__).'/../../custom/xml/*');
+        if (!is_array($arrCustom)) $arrCustom = array();
+
+        foreach ($arrCustom as $action) {
 			$cname = basename($action,'.php');
 			$arr[strtolower($cname)] = 'custom.xml.'.basename($action,'.php');
 		}

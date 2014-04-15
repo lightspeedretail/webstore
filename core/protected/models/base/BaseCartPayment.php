@@ -9,6 +9,7 @@
  * @property string $payment_module
  * @property string $payment_data
  * @property double $payment_amount
+ * @property string $payment_status
  * @property string $datetime_posted
  * @property string $promocode
  *
@@ -39,10 +40,11 @@ abstract class BaseCartPayment extends CActiveRecord
 			array('payment_amount', 'numerical'),
 			array('payment_method, payment_data, promocode', 'length', 'max'=>255),
 			array('payment_module', 'length', 'max'=>64),
+			array('payment_status', 'length', 'max'=>100),
 			array('datetime_posted', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, payment_method, payment_module, payment_data, payment_amount, datetime_posted, promocode', 'safe', 'on'=>'search'),
+			array('id, payment_method, payment_module, payment_data, payment_amount, payment_status, datetime_posted, promocode', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -69,6 +71,7 @@ abstract class BaseCartPayment extends CActiveRecord
 			'payment_module' => 'Payment Module',
 			'payment_data' => 'Payment Data',
 			'payment_amount' => 'Payment Amount',
+			'payment_status' => 'Payment Status',
 			'datetime_posted' => 'Datetime Posted',
 			'promocode' => 'Promocode',
 		);
@@ -90,6 +93,7 @@ abstract class BaseCartPayment extends CActiveRecord
 		$criteria->compare('payment_module',$this->payment_module,true);
 		$criteria->compare('payment_data',$this->payment_data,true);
 		$criteria->compare('payment_amount',$this->payment_amount);
+		$criteria->compare('payment_status',$this->payment_status,true);
 		$criteria->compare('datetime_posted',$this->datetime_posted,true);
 		$criteria->compare('promocode',$this->promocode,true);
 

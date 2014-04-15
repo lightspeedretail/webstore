@@ -1,19 +1,17 @@
 <div id="topbar" class="row-fluid">
 	<div class="span9">
 		<div id="headerimage">
-			<?php echo CHtml::link(CHtml::image(Yii::app()->baseUrl._xls_get_conf('HEADER_IMAGE')), Yii::app()->baseUrl."/"); ?>
+			<?php echo CHtml::link(CHtml::image($this->pageHeaderImage),$this->createUrl("site/index")); ?>
 		</div>
 	</div>
 	<div class="span3">
 		<div id="login">
 			<?php if(Yii::app()->user->isGuest): ?>
-				<?php echo CHtml::ajaxLink(Yii::t('global','Login'),array('site/login'),
-					array('onClick'=>'js:jQuery($("#LoginForm")).dialog("open")'),
-					array('id'=>'btnLogin')); ?>
+				<?php echo CHtml::link(Yii::t('global', 'Login'), array("site/login")); ?>
 				&nbsp;/&nbsp;
-				<a href="<?= _xls_site_url('myaccount/edit'); ?>"><?php echo Yii::t('global', 'Register'); ?></a>
+				<?php echo CHtml::link(Yii::t('global', 'Register'), $this->createAbsoluteUrl('/myaccount')); ?>
 			<?php else: ?>
-				<?php echo CHtml::link(CHtml::image(Yii::app()->user->profilephoto).Yii::app()->user->firstname, array('/myaccount')); ?>
+				<?php echo CHtml::link(CHtml::image(Yii::app()->user->profilephoto).Yii::app()->user->firstname, $this->createAbsoluteUrl('/myaccount')); ?>
 				&nbsp;&nbsp;/&nbsp;&nbsp;<?php echo CHtml::link(Yii::t('global', 'Logout'), array("site/logout")); ?>
 				<?php endif; ?>
 		</div>

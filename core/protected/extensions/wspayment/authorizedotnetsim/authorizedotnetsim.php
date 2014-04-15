@@ -7,6 +7,7 @@ class authorizedotnetsim extends WsPayment
 	protected $version = 1.0;
 	protected $uses_jumper = true;
 	protected $apiVersion = 1;
+	public $cloudCompatible = true;
 
 	const x_delim_char = "|";
 
@@ -63,18 +64,31 @@ class authorizedotnetsim extends WsPayment
 		$str .= _xls_make_hidden('x_description',  _xls_get_conf( 'STORE_NAME'  , "Online") . " Order");
 
 		$str .= _xls_make_hidden('x_login',   $auth_net_login_id);
+		$str .= _xls_make_hidden('x_solution_id', 'A1000010');
 		$str .= _xls_make_hidden('x_type',   'AUTH_CAPTURE');
 		$str .= _xls_make_hidden('x_currency_code',   $this->objCart->currency);  //trying to get currency code to submit
 		$str .= _xls_make_hidden('x_amount',  round($this->objCart->Total,2));
 		$str .= _xls_make_hidden('x_show_form',   'PAYMENT_FORM');
 
 
-		$str .= _xls_make_hidden('x_relay_url', Yii::app()->controller->createAbsoluteUrl('/cart/payment/'.$this->modulename));
+		$str .= _xls_make_hidden('x_relay_url',
+			Yii::app()->controller->createAbsoluteUrl('cart/payment',array(),'http').'/'.$this->modulename);
 		$str .= _xls_make_hidden('x_relay_response',   'TRUE');
-		$str .= _xls_make_hidden('x_cancel_url',   Yii::app()->controller->createAbsoluteUrl('cart/restore', array('getuid'=>$this->objCart->linkid)));
-		$str .= _xls_make_hidden('x_header_html_payment_form', str_replace("\"","'",
-			CHtml::image(Yii::app()->controller->createAbsoluteUrl(_xls_get_conf('HEADER_IMAGE')),_xls_get_conf('STORE_NAME'),array('style'=>'max-width:580px'))
-		));
+		$str .= _xls_make_hidden('x_cancel_url',
+			Yii::app()->controller->createAbsoluteUrl('cart/restore', array('getuid'=>$this->objCart->linkid),'http'));
+
+		if(Yii::app()->params['LIGHTSPEED_MT']>0)
+			$str .= _xls_make_hidden('x_header_html_payment_form', str_replace("\"","'",
+				CHtml::image("https:".Yii::app()->params['HEADER_IMAGE'],
+					Yii::app()->params['STORE_NAME'],
+					array('style'=>'max-width:580px'))
+			));
+		else
+			$str .= _xls_make_hidden('x_header_html_payment_form', str_replace("\"","'",
+				CHtml::image(Yii::app()->controller->createAbsoluteUrl(Yii::app()->params['HEADER_IMAGE'],array(),'https'),
+					Yii::app()->params['STORE_NAME'],
+					array('style'=>'max-width:580px'))
+			));
 
 		//if($this->config['live'] == 'test')
 			//$str .= _xls_make_hidden('x_test_request',   'TRUE');
@@ -154,8 +168,8 @@ class authorizedotnetsim extends WsPayment
 	 */
 	public function gateway_response_process() {
 
-		if(_xls_get_conf('DEBUG_PAYMENTS' , false)=="1")
-			Yii::log(get_class($this) . "  Transaction ".print_r($_POST,true), CLogger::LEVEL_ERROR, get_class($this));
+		Yii::log("Response Transaction ".print_r($_POST,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+
 
 		$x_response_code = Yii::app()->getRequest()->getPost('x_response_code');
 		$x_invoice_num = Yii::app()->getRequest()->getPost('x_invoice_num');
@@ -180,7 +194,7 @@ class authorizedotnetsim extends WsPayment
 				return false;
 			}
 		}
-
+		
 		$objCart = Cart::LoadByIdStr($x_invoice_num);
 		$url = Yii::app()->createAbsoluteUrl('cart/receipt',array('getuid'=>$objCart->linkid));
 
@@ -191,6 +205,7 @@ class authorizedotnetsim extends WsPayment
 			'data' => !empty($x_trans_id) ? $x_trans_id : '',
 			'output' => "<html><head><meta http-equiv=\"refresh\" content=\"0;url=$url\"></head><body><a href=\"$url\">" .
 				Yii::t('global','Redirecting to your receipt')."...</a></body></html>"
+
 		);
 
 	}

@@ -10,6 +10,8 @@
  * @property string $shipping_data
  * @property double $shipping_cost
  * @property double $shipping_sell
+ * @property double $shipping_sell_taxed
+ * @property integer $shipping_taxable
  * @property string $tracking_number
  *
  * The followings are the available model relations:
@@ -36,12 +38,13 @@ abstract class BaseCartShipping extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('shipping_cost, shipping_sell', 'numerical'),
+			array('shipping_taxable', 'numerical', 'integerOnly'=>true),
+			array('shipping_cost, shipping_sell, shipping_sell_taxed', 'numerical'),
 			array('shipping_method, shipping_data, tracking_number', 'length', 'max'=>255),
 			array('shipping_module', 'length', 'max'=>64),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, shipping_method, shipping_module, shipping_data, shipping_cost, shipping_sell, tracking_number', 'safe', 'on'=>'search'),
+			array('id, shipping_method, shipping_module, shipping_data, shipping_cost, shipping_sell, shipping_sell_taxed, shipping_taxable, tracking_number', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -69,6 +72,8 @@ abstract class BaseCartShipping extends CActiveRecord
 			'shipping_data' => 'Shipping Data',
 			'shipping_cost' => 'Shipping Cost',
 			'shipping_sell' => 'Shipping Sell',
+			'shipping_sell_taxed' => 'Shipping Sell Taxed',
+			'shipping_taxable' => 'Shipping Taxable',
 			'tracking_number' => 'Tracking Number',
 		);
 	}
@@ -90,6 +95,8 @@ abstract class BaseCartShipping extends CActiveRecord
 		$criteria->compare('shipping_data',$this->shipping_data,true);
 		$criteria->compare('shipping_cost',$this->shipping_cost);
 		$criteria->compare('shipping_sell',$this->shipping_sell);
+		$criteria->compare('shipping_sell_taxed',$this->shipping_sell_taxed);
+		$criteria->compare('shipping_taxable',$this->shipping_taxable);
 		$criteria->compare('tracking_number',$this->tracking_number,true);
 
 		return new CActiveDataProvider($this, array(

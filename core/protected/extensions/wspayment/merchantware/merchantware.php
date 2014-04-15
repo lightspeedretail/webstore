@@ -7,7 +7,7 @@ class merchantware extends WsPayment
 	protected $uses_credit_card = true;
 	protected $apiVersion = 1;
 	public $advancedMode=true;
-
+	public $cloudCompatible=true;
 
 	const x_delim_char = "|";
 	private $paid_amount;
@@ -99,10 +99,12 @@ class merchantware extends WsPayment
 
 			if ($response_status=="DECLINED,DUPLICATE;1110;duplicate transaction")
 			{
-				$response_status = "APPROVED";
+
 				$code = (string)$oXML->soapBody->IssueKeyedSaleResponse->IssueKeyedSaleResult->ExtData;
 				$arrResponse = explode(";",$code);
 				$response_authorization_code = str_replace("Original AuthCode=","",$arrResponse[1]);
+				Yii::log("MerchantWare flagging this as duplicate: ".
+					$arrResponse[0].': '.$arrResponse[1], 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			}
 		}
 
@@ -122,6 +124,7 @@ class merchantware extends WsPayment
 			$arrReturn['success']=true;
 			$arrReturn['amount_paid']=  $this->objCart->total;
 			$arrReturn['result']=$response_authorization_code;
+			Yii::log("Approved: ".$response_status, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 		}
 

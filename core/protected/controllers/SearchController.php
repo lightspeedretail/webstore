@@ -33,6 +33,8 @@ class SearchController extends Controller
 	public function actionIndex()
 	{
 
+
+
 		$model = new AdvancedSearchForm();
 
 		if (isset($_POST['AdvancedSearchForm']))
@@ -74,6 +76,7 @@ class SearchController extends Controller
 		$strC = Yii::app()->getRequest()->getQuery('cat');
 		$strB = Yii::app()->getRequest()->getQuery('brand');
 		$strS = Yii::app()->getRequest()->getQuery('class_name');
+
 		$strInv='';
 
 		//If we haven't passed any criteria, we just query the database
@@ -96,7 +99,7 @@ class SearchController extends Controller
 				$this->breadcrumbs = $objCategory->Breadcrumbs;
 				$this->pageHeader = $objCategory->label;
 
-				$this->subcategories = $objCategory->SubcategoryTree;
+				$this->subcategories = $objCategory->getSubcategoryTree($this->MenuTree);
 
 				if ($objCategory->custom_page)
 					$this->custom_page_content = $objCategory->customPage->page;
@@ -122,7 +125,7 @@ class SearchController extends Controller
 				$this->pageHeader = $objFamily->family;
 
 
-				$this->CanonicalUrl = $this->createAbsoluteUrl($objFamily->Link);
+				$this->CanonicalUrl = $objFamily->Link;
 			}
 
 
@@ -169,7 +172,7 @@ class SearchController extends Controller
 		$numberOfRecords = Product::model()->count($criteria);
 
 		$pages = new CPagination($numberOfRecords);
-		$pages->setPageSize(Yii::app()->params['listPerPage']);
+		$pages->setPageSize(Yii::app()->params['PRODUCTS_PER_PAGE']);
 		$pages->applyLimit($criteria);  // the trick is here!
 
 		$model = Product::model()->findAll($criteria);
@@ -178,10 +181,16 @@ class SearchController extends Controller
 		$this->returnUrl = $this->CanonicalUrl;
 		$this->pageImageUrl = "";
 
+        if ($strB=='*')
+        {
+            $families = Family::model()->findAll(array('order'=>'family'));
+            $this->render('brands',array('model'=>$families));
+        }
+        else
 		$this->render('grid',array(
 		'model'=> $model,
 		'item_count'=>$numberOfRecords,
-		'page_size'=>Yii::app()->params['listPerPage'],
+		'page_size'=>Yii::app()->params['PRODUCTS_PER_PAGE'],
 		'items_count'=>$numberOfRecords,
 		'pages'=>$pages,
 		));
@@ -215,7 +224,7 @@ class SearchController extends Controller
 		$objCommand = $this->BuildCommand($formModel,-1); //passing -1 as the limit triggers a count(*) query
 		$numberOfRecords = $objCommand->queryScalar();
 		$pages=new CPagination(intval($numberOfRecords));
-		$pages->pageSize = Yii::app()->params['listPerPage'];
+		$pages->pageSize = Yii::app()->params['PRODUCTS_PER_PAGE'];
 
 		$objCommand = $this->BuildCommand($formModel,$pages->pageSize, $pages->currentPage*$pages->pageSize);
 		$rows = $objCommand->QueryAll();
@@ -225,11 +234,27 @@ class SearchController extends Controller
 
 		if (empty($this->strBreadcrumbCat))
 			$this->breadcrumbs = array(
-			Yii::t('global','Searching for "{terms}"',array('{terms}'=>$strQ))=>'',
-		);
+				Yii::t('global','Searching for "{terms}"',array('{terms}'=>$strQ))=>'',
+			);
 		else $this->breadcrumbs = array(
 			Yii::t('global','Searching for "{terms}" in category "{category}"',array('{terms}'=>$strQ,'{category}'=>$this->strBreadcrumbCat))=>'',
 		);
+
+		if(isset($_GET['cpc']))
+		{
+			//We have been sent over Custom Page Content
+			$objCustomPage = CustomPage::model()->findByPk($_GET['cpc']);
+			if($objCustomPage)
+			{
+				$this->pageTitle=$objCustomPage->PageTitle;
+				$this->pageDescription=$objCustomPage->meta_description;
+				$this->pageImageUrl = '';
+				$this->breadcrumbs = array($objCustomPage->title=>$objCustomPage->RequestUrl);
+				$this->custom_page_content = $objCustomPage->page;
+				$this->pageHeader = $objCustomPage->title;
+			}
+		}
+
 		$this->CanonicalUrl = $this->createAbsoluteUrl('/search/results',$formModel->attributes,'',"&amp;");
 
 
@@ -242,7 +267,7 @@ class SearchController extends Controller
 		$this->render('grid',array(
 				'model'=> $model,
 				'item_count'=>$numberOfRecords,
-				'page_size'=>Yii::app()->params['listPerPage'],
+				'page_size'=>Yii::app()->params['PRODUCTS_PER_PAGE'],
 				'items_count'=>$numberOfRecords,
 				'pages'=>$pages,
 		));
@@ -310,6 +335,7 @@ class SearchController extends Controller
 					case 'endprice':        $strInv .= " AND sell_web <= :endprice ";   break;
 					case 'product_size':    $strInv .= " AND product_size = :product_size "; break;
 					case 'product_color':   $strInv .= " AND product_color = :product_color "; break;
+					case 'tag':             $strInv .= " AND tag = :tag "; break;
 				}
 			}
 

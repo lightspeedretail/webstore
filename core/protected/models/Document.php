@@ -64,6 +64,9 @@ class Document extends BaseDocument
 		if ($objProduct->id)
 			$objItem->product_id = $objProduct->id;
 
+		if(empty($strDescription))
+			$strDescription = $objProduct->title;
+
 		$objItem->cart_type = $mixCartType;
 		$objItem->description = $strDescription;
 		$objItem->gift_registry_item = $intGiftItemId;

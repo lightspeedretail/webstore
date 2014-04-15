@@ -16,7 +16,9 @@ class LoginController extends AdminBaseController
 
 	public function beforeAction($action)
 	{
-		return true;
+		$this->verifySSL();
+
+		return parent::beforeAction($action);
 
 	}
 	public function actionIndex()

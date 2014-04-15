@@ -1,0 +1,1 @@
+This directory used by Web Store when editing CSS directly from Admin Panel, to override default CSS files for a given theme.

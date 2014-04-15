@@ -3,8 +3,7 @@
 class ThemeController extends AdminBaseController
 {
 	public $controllerName = "Themes";
-	public $externalUrl = "gallery.lightspeedwebstore.com";
-
+	public $currentTheme;
 	const THEME_PHOTOS = 29;
 
 	public function actions()
@@ -18,7 +17,8 @@ class ThemeController extends AdminBaseController
 	{
 		return array(
 			array('allow',
-				'actions'=>array('index','edit','gallery','header','manage','upload','upgrade'),
+				'actions'=>array('index','edit','gallery','image','header',
+					'editcss','favicon','manage','upload','upgrade','module'),
 				'roles'=>array('admin'),
 			),
 		);
@@ -27,19 +27,51 @@ class ThemeController extends AdminBaseController
 	public function beforeAction($action)
 	{
 
+		$this->scanModules('theme');
+
+		if(Yii::app()->theme)
+		{
+			$this->currentTheme = Yii::app()->theme->name;
+			if(Theme::hasAdminForm($this->currentTheme))
+			{
+				$model = Yii::app()->getComponent('wstheme')->getAdminModel($this->currentTheme);
+				$this->currentTheme = $model->name;
+			}
+		}
+		else
+			$this->currentTheme = "unknown";
 
 		$this->menuItems =
 			array(
-				array('label'=>'Manage My Themes', 'url'=>array('theme/manage')),
-				array('label'=>'Set Photo Sizes for '.ucfirst(Yii::app()->theme->name), 'url'=>array('theme/edit','id'=>self::THEME_PHOTOS)),
-				array('label'=>'View Theme Gallery', 'url'=>array('theme/gallery')),
-				array('label'=>'Upload Theme .Zip', 'url'=>array('theme/upload')),
-				array('label'=>'Set Header Image', 'url'=>array('theme/header'))
+				array('label'=>'Manage My Themes',
+					'url'=>array('theme/manage')
+				),
+				array('label'=>'Configure '.ucfirst($this->currentTheme),
+					'url'=>array('theme/module')
+				),
+				array('label'=>'Edit CSS for '.ucfirst($this->currentTheme),
+					'url'=>array('theme/editcss')
+				),
+				array('label'=>'View Theme Gallery',
+					'url'=>array('theme/gallery'),
+					'visible'=>!(Yii::app()->params['LIGHTSPEED_MT']>0)
+				),
+				array('label'=>'Upload Theme .Zip',
+					'url'=>array('theme/upload'),
+					'visible'=>!(Yii::app()->params['LIGHTSPEED_MT']>0)
+				),
+				array('label'=>'My Header/Image Gallery',
+					'url'=>array('theme/image','id'=>1),
+				),
+				array('label'=>'Upload FavIcon',
+					'url'=>array('theme/favicon'),
+					'visible'=>!(Yii::app()->params['LIGHTSPEED_MT']>0)
+				)
 
 
 			);
 
-		//run parent init() after setting menu so highlighting works
+		//run parent beforeAction() after setting menu so highlighting works
 		return parent::beforeAction($action);
 
 	}
@@ -49,7 +81,6 @@ class ThemeController extends AdminBaseController
 	{
 		switch($id)
 		{
-
 			case self::THEME_PHOTOS:
 				return "Note that these settings are used as photos are uploaded from LightSpeed. These sizes are saved for each theme.";
 		}
@@ -68,13 +99,6 @@ class ThemeController extends AdminBaseController
 
 		if (isset($_POST['theme']))
 		{
-			if (isset($_POST['btnUpgrade']) && $_POST['btnUpgrade']=="btnUpgrade")
-			{
-				$strTheme = $_POST['theme'];
-				$this->actionUpgrade($strTheme);
-				return;
-			}
-
 			if (isset($_POST['yt2']) && $_POST['yt2']=="btnClean")
 			{
 				$arrThemes = $this->changeTheme($_POST);
@@ -85,7 +109,7 @@ class ThemeController extends AdminBaseController
 			if (isset($_POST['yt1']) && $_POST['yt1']=="btnCopy")
 			{
 				$arrThemes = $this->changeTheme($_POST);
-				$arrThemes = $this->copyTheme($_POST);
+				$arrThemes = $this->copyThemeForCustomization($_POST);
 
 			}
 
@@ -94,13 +118,157 @@ class ThemeController extends AdminBaseController
 				$arrThemes = $this->changeTheme($_POST);
 			}
 
+			if (isset($_POST['task']) && $_POST['task']=="btnTrash")
+			{
+
+				if($_POST['theme']==Yii::app()->theme->name)
+				{
+					$strTheme =Yii::app()->theme->name;
+					Yii::app()->user->setFlash('error',Yii::t('admin','ERROR! You cannot trash your currently active theme.'));
+				}
+				else
+				{
+					$mixResult = $this->trashTheme($_POST['theme']);
+					if ($mixResult===false)
+					{
+						Yii::app()->user->setFlash('error',
+							Yii::t('admin','The {file} theme can not be moved to trash.',
+								array('{file}'=>"<strong>".$_POST['theme']."</strong>"
+								)));
+						$this->redirect($this->createUrl("theme/manage"));
+					}
+					$objModule = Modules::model()->findByAttributes(array('module'=>$_POST['theme'],'category'=>'theme'));
+					if($objModule) $objModule->delete();
+					$arrThemes = $this->getInstalledThemes();
+					Yii::app()->user->setFlash('info',Yii::t('admin','Theme {theme} has been moved to /trash on server.',array('{theme}'=>$_POST['theme'])));
+				}
+
+			}
+
 		}
 
+		if(isset(Yii::app()->theme))
+			$strTheme = Yii::app()->theme->name;
+		else $strTheme='';
+
 		Yii::app()->clientScript->registerScript('picking', '
-			var picked = "'.Yii::app()->theme->name.'";
+			var picked = "'.$strTheme.'";
 		',CClientScript::POS_BEGIN);
 
-		$this->render('manage',array('arrThemes'=>$arrThemes));
+		$this->render('manage',array('arrThemes'=>$arrThemes,'currentTheme'=>$strTheme));
+	}
+
+	public function actionEditcss()
+	{
+
+		Yii::import('ext.imperavi-redactor-widget.ImperaviRedactorWidget');
+
+		$this->editSectionInstructions = "<p>The css files below are part of your currently chosen theme. <b>The order of the tabs reflects the hierarchy of the files.</b> For example, custom.css is first because it's loaded last. Any items here will override any other files. The right-most tabs form the foundation of the theme. <b>Simple customizations can be made by simply adding to custom.css (you can copy from other files as a guide).</b> You may also edit other files which will then be used instead of the default. You can restore the default of any file by choosing the appropriate button.</p><p>As much as possible, we recommend restricting your changes to custom.css so theme upgrades work properly, if you wish to receive theme updates. You are free, however, to edit what you like.</p>";
+
+		$customCss = Yii::app()->theme->config->customcss;
+
+		$d = dir(YiiBase::getPathOfAlias('webroot')."/themes/".Yii::app()->theme->name."/css");
+		while (false!== ($filename = $d->read()))
+			if ($filename[0] != "." && substr($filename,-4)==".css")
+			{
+				$arr = array();
+				$arr['filename'] = $filename;
+				$parts = mb_pathinfo($filename);
+				$arr['tab'] = $parts['filename'];
+				$arr['path']=$d->path."/".$filename;
+
+				//Are we using custom or regular
+				if(!empty($customCss) && in_array($arr['tab'],$customCss))
+					$arr['usecustom']=1;
+				else $arr['usecustom']=0;
+
+
+				//See if we have a custom one already, if not, copy the original
+				$cssUrl = _xls_custom_css_folder(true). "_customcss/".Yii::app()->theme->name."/".$arr['tab'].".css";
+				$contents = @file_get_contents($cssUrl);
+				if(empty($contents))
+				{
+					$arr['usecustom']=0;
+					$contents = file_get_contents($arr['path']);
+				}
+				$contents = str_replace("\n", "<br>\n", $contents);
+
+				$arr['contents']=$contents;
+
+				$files[$arr['tab']]=$arr;
+			}
+		$files = $this->setCssOrder($files);
+
+		//We do our submit test way down here after we've loaded up the array
+		if (isset($_POST) && !empty($_POST))
+		{
+			$customCss=array();
+			$objComponent=Yii::createComponent('ext.wscloud.wscloud');
+			foreach($files as $file)
+			{
+
+				$arr = $file;
+				$originalFile = @file_get_contents($arr['path']);
+				$originalFile = str_replace("\n", "<br>\n", $originalFile);
+
+				$customFile = $_POST['content-'.$arr['tab']];
+				$customFile = html_entity_decode($customFile);
+				$file['usecustom'] = $_POST['radio'.$arr['tab']];
+
+
+				$cssFile="_customcss/".Yii::app()->theme->name."/".$arr['tab'].".css";
+
+				if(isset($_POST['check'.$arr['tab']]))
+				{
+					$restoreCheck = $_POST['check'.$arr['tab']];
+					if($restoreCheck=="on")
+					{
+						//We're removing any customization. That's easy.
+						$customFile=$originalFile;
+						$file['usecustom']=0;
+						if(Yii::app()->params['LIGHTSPEED_MT']=="1")
+							$objComponent->RemoveImageFromS3(new Images(),_xls_custom_css_folder(true).$cssFile);
+						else
+							@unlink(_xls_custom_css_folder(true).$cssFile);
+
+
+					}
+
+				}
+
+				if($originalFile==$customFile)
+					$file['usecustom']=0;
+				else
+				{
+					$file['contents']=trim(strip_tags($customFile));
+					if($file['usecustom']==1)
+						$customCss[]=$file['tab'];
+
+					if(Yii::app()->params['LIGHTSPEED_MT']=="1")
+					{
+						$d = YiiBase::getPathOfAlias('webroot')."/runtime/cloudimages/".
+							_xls_get_conf('LIGHTSPEED_HOSTING_LIGHTSPEED_URL');
+						@mkdir($d,0777,true);
+						$tmpOriginal = tempnam($d,"css");
+						file_put_contents($tmpOriginal,$file['contents']);
+						$objComponent->SaveToS3("themes/".$cssFile,$tmpOriginal);
+					}
+					else
+					{
+						@mkdir(_xls_custom_css_folder(true)."_customcss/".Yii::app()->theme->name,0777,true);
+						file_put_contents(_xls_custom_css_folder(true).$cssFile,$file['contents']);
+					}
+
+				}
+			}
+
+			Yii::app()->theme->config->customcss = $customCss;
+			Yii::app()->user->setFlash('success',Yii::t('admin','CSS files saved'));
+			$this->redirect($this->createUrl("theme/editcss"));
+		}
+
+		$this->render('editcss',array('files'=>$files));
+
 	}
 
 	public function actionGallery()
@@ -108,30 +276,58 @@ class ThemeController extends AdminBaseController
 		//Get list
 		$arrThemes = $this->GalleryThemes;
 
-		if (isset($_POST['gallery']))
+		if (isset($_POST) && !empty($_POST))
 		{
-			$strTheme = $_POST['gallery'];
-			$blnExtract = $this->downloadTheme($arrThemes,$strTheme);
-			if($blnExtract)
+			foreach ($_POST as $key => $value)
 			{
-				Yii::app()->user->setFlash('success',Yii::t('admin','The {file} theme was downloaded and installed at {time}.',
-					array('{file}'=>"<strong>".$strTheme."</strong>",'{time}'=>date("d F, Y  h:i:sa"))));
-				unlink(YiiBase::getPathOfAlias('webroot')."/themes/".$strTheme.".zip");
-				$this->redirect($this->createUrl("theme/manage"));
+				$strTheme = $key;
+				if ($value == "update")
+				{
+					$this->actionUpgrade($strTheme);
+				}
+				if ($value == "install")
+				{
+					$blnExtract = $this->downloadTheme($arrThemes, $strTheme);
+					if ($blnExtract)
+					{
+						Yii::app()->user->setFlash(
+							'success',
+							Yii::t(
+								'admin',
+								'The {file} theme was downloaded and installed at {time}.',
+								array('{file}' => "<strong>" . $arrThemes[$strTheme]['name']->{0} . "</strong>", '{time}' => date("d F, Y  h:i:sa"))
+							)
+						);
+						unlink(YiiBase::getPathOfAlias('webroot') . "/themes/" . $strTheme . ".zip");
+						$this->redirect($this->createUrl("theme/manage"));
+					}
+					else
+					{
+						Yii::app()->user->setFlash(
+							'error',
+							Yii::t(
+								'admin',
+								'ERROR! Theme {file} installation failed. {time}.',
+								array('{file}' => $strTheme, '{time}' => date("d F, Y  h:i:sa"))
+							)
+						);
+					}
+				}
 			}
-			else Yii::app()->user->setFlash('error',Yii::t('admin','ERROR! Theme {file} installation failed. {time}.',
-				array('{file}'=>$strTheme,'{time}'=>date("d F, Y  h:i:sa"))));
-
 		}
 
-		Yii::app()->clientScript->registerScript('picking', '
-			var picked = "'.Yii::app()->theme->name.'";
-		',CClientScript::POS_BEGIN);
+		Yii::app()->clientScript->registerScript(
+			'picking',
+			'
+			var picked = "'.$this->currentTheme.'";
+		',
+			CClientScript::POS_BEGIN
+		);
 
-		$this->render('gallery',array('arrThemes'=>$arrThemes));
+		$this->render('gallery',array('arrThemes'=>$arrThemes,'currentTheme'=>$this->currentTheme));
 	}
 
-	protected function downloadTheme($arrThemes,$strTheme)
+	protected function downloadTheme($arrThemes, $strTheme)
 	{
 		$d = YiiBase::getPathOfAlias('webroot')."/themes";
 
@@ -166,26 +362,116 @@ class ThemeController extends AdminBaseController
 				copy /themes/trash/201307150916-trash-portland/css/custom.css to new /themes/portland/css/custom.css (since it's always blank)
 		 */
 
-		$d = YiiBase::getPathOfAlias('webroot')."/themes";
-		@mkdir($d."/trash");
-		$strTrash = $d."/trash/".date("YmdHis").$strTheme;
-		rcopy($d."/".$strTheme,$strTrash);
-		rrmdir($d."/".$strTheme);
+		$arrThemes = $this->GalleryThemes;
+		$realName=$arrThemes[$strTheme]['title'];
+
+		//Make a copy of our current theme first
+		$strCopyName = $this->copyTheme($realName);
+		$mixResult = $this->trashTheme($realName);
+
+		if ($mixResult===false)
+		{
+			Yii::app()->user->setFlash(
+				'error',
+				Yii::t(
+					'admin',
+					'The {file} theme could not be updated because the old copy could not be deleted.',
+					array('{file}' => "<strong>" . $arrThemes[$strTheme]['name'] . "</strong>"
+					)
+				)
+			);
+			$this->redirect($this->createUrl("theme/gallery"));
+		}
 
 		//Now that the old version is in the trash, we can grab the new version normally
 		$arrThemes = $this->GalleryThemes;
 		$blnExtract = $this->downloadTheme($arrThemes,$strTheme);
 		if($blnExtract)
 		{
-			//New copy downloaded and extracted. Copy any custom.css
-			@copy ($strTrash."/css/custom.css", $d."/".$strTheme."/css/custom.css");
-			Yii::app()->user->setFlash('success',Yii::t('admin','The {file} theme was updated to the latest version at {time}. Any custom.css file changes were preserved.',
-				array('{file}'=>"<strong>".$strTheme."</strong>",'{time}'=>date("d F, Y  h:i:sa"))));
+			//New copy downloaded and extracted. Copy any custom.css and site/index.php
+			$d = YiiBase::getPathOfAlias('webroot')."/themes";
+
+			$strCssPath = _xls_custom_css_folder(true)."_customcss/".$realName;
+			@mkdir($strCssPath,0777,true);
+
+			//We only want to copy custom.css to the new custom folder if one doesn't already exist there
+			if(!file_exists($strCssPath."/css/custom.css"))
+				@copy($mixResult."/css/custom.css", $strCssPath."/css/custom.css");
+
+			@copy($mixResult."/views/site/index.php", $d."/".$realName."/views/site/index.php");
+			Yii::app()->user->setFlash(
+				'success',
+				Yii::t(
+					'admin',
+					'The {file} theme was updated to the latest version at {time}. Any custom.css and site/index.php file changes were preserved. The old theme was renamed to {oldfile} and is still in your gallery. You may move it to the trash if no longer needed.',
+					array('{file}' => "<strong>" . $arrThemes[$strTheme]['name'] . "</strong>",
+						'{time}' => date("d F, Y  h:i:sa"),
+						'{oldfile}' => $strCopyName
+					)
+				)
+			);
 			unlink(YiiBase::getPathOfAlias('webroot')."/themes/".$strTheme.".zip");
-			$this->redirect($this->createUrl("theme/manage"));
+
+			$objCurrentSettings = Modules::model()->findByAttributes(array(
+				'module'=>$realName,
+				'category'=>'theme'));
+
+			if ($objCurrentSettings)
+			{
+				$objCurrentSettings->version =$arrThemes[$strTheme]['version'];
+				$objCurrentSettings->save();
+			}
+
+			$this->redirect($this->createUrl("theme/gallery"));
 		}
 	}
 
+
+	protected function trashTheme($strName)
+	{
+		$symbolic_link=false;
+
+		$d = YiiBase::getPathOfAlias('webroot')."/themes";
+		@mkdir($d."/trash");
+		$strTrash = $d."/trash/".date("YmdHis").$strName;
+
+		//If this is a symbolic link, we have to handle this differently
+		if(is_link($d."/".$strName))
+			$symbolic_link=true;
+
+		if($symbolic_link)
+		{
+			$oldpath = readlink($d."/".$strName);
+			symlink($oldpath,$strTrash);
+			unlink($d."/".$strName);
+
+		} else {
+
+			if(!is_writable($d."/".$strName))
+				return false;
+			rcopy($d."/".$strName,$strTrash);
+			rrmdir($d."/".$strName);
+		}
+		return $strTrash;
+	}
+
+	protected function copyTheme($strOriginalThemeFolder)
+	{
+
+		list($strCopyThemeFolder,
+			$strPrettyThemeCopyName) = $this->generateThemeCopyNames($strOriginalThemeFolder);
+
+		$d = YiiBase::getPathOfAlias('webroot')."/themes";
+
+		//If this is a symbolic link, we have to handle this differently
+		if(is_link($d."/".$strOriginalThemeFolder))
+			return false; //can't rename a symlink'd theme
+
+		rcopy($d."/".$strOriginalThemeFolder,$d."/".$strCopyThemeFolder);
+		$this->renameAdminForm($strOriginalThemeFolder,$strCopyThemeFolder,$strPrettyThemeCopyName);
+
+		return $strCopyThemeFolder;
+	}
 
 	public function actionUpload()
 	{
@@ -212,56 +498,61 @@ class ThemeController extends AdminBaseController
 		$this->render('upload');
 	}
 
-	public function actionHeader()
+	/**
+	 * Manage user uploaded images
+	 */
+	public function actionImage()
 	{
 
-		//Get list
-		$arrHeaderImages = $this->getHeaderFiles();
+		$id = Yii::app()->getRequest()->getQuery('id');
+
+		$this->render('image',array('gallery'=>Gallery::LoadGallery($id)));
+	}
+
+	public function actionFavicon()
+	{
 
 		if (isset($_POST['yt0']))
 		{
 
 
-			$file = CUploadedFile::getInstanceByName('header_image');
+			$file = CUploadedFile::getInstanceByName('icon_image');
 			if ($file)
 			{
 
-					if ($file->type == "image/jpg" || $file->type == "image/png" || $file->type == "image/jpeg")
+					if ($file->type == "image/jpg" || $file->type == "image/png" || $file->type == "image/jpeg" || $file->type == "image/gif" ||
+						$file->type == 'image/vnd.microsoft.icon' || $file->type == "image/x-icon")
 					{
-						$path = str_replace("/core/protected","/images/header/",Yii::app()->basePath);
-						$retVal = $file->saveAs($path.$file->name);
+						$path = str_replace("/core/protected","/images/",Yii::app()->basePath);
+						$retVal = $file->saveAs($path."favicon.ico");
+						$path2 = str_replace("/images/","/",$path);
+
 						if ($retVal)
 						{
-							_xls_set_conf('HEADER_IMAGE',"/images/header/".$file->name);
+							copy($path."favicon.ico",$path2."favicon.ico");//save in root too, just because of stupid crawlers
 							Yii::app()->user->setFlash('success',Yii::t('admin','File {file} uploaded and chosen at {time}.',
-								array('{file}'=>"<strong>".$file->name."</strong>",'{time}'=>date("d F, Y  h:i:sa"))));
+								array('{file}'=>"<strong>favicon.ico</strong>",'{time}'=>date("d F, Y  h:i:sa"))));
 						}
 						else
 							Yii::app()->user->setFlash('error',Yii::t('admin','ERROR! File {file} was not saved. {time}.',
 								array('{file}'=>$file->name,'{time}'=>date("d F, Y  h:i:sa"))));
 					}
-					else Yii::app()->user->setFlash('error',Yii::t('admin','ERROR! Only png or jpg files can be uploaded through this method. {time}.',
+					else Yii::app()->user->setFlash('error',Yii::t('admin','ERROR! Only icon files can be uploaded through this method. {time}.',
 						array('{file}'=>$file->name,'{time}'=>date("d F, Y  h:i:sa"))));
-				$arrHeaderImages = $this->getHeaderFiles();
-			} elseif (isset($_POST['headerimage']))
-			{
-				_xls_set_conf('HEADER_IMAGE',$_POST['headerimage']);
-				Yii::app()->user->setFlash('success',Yii::t('admin','Header image updated at {time}.',
-					array('{time}'=>date("d F, Y  h:i:sa"))));
 
 			}
 		}
-		$this->render('header',array('arrHeaderImages'=>$arrHeaderImages));
+		$this->render('favicon');
 	}
 
-	protected function getHeaderFiles()
+	protected function getImageFiles($type = 'header')
 	{
-		$arrHeaderImages = array();
-		$d = dir(YiiBase::getPathOfAlias('webroot')."/images/header");
+		$arrImages = array();
+		$d = dir(YiiBase::getPathOfAlias('webroot')."/images/".$type);
 		while (false!== ($filename = $d->read()))
-			if ($filename[0] != ".") $arrHeaderImages["/images/header/".$filename] = CHtml::image(Yii::app()->request->baseUrl."/images/header/".$filename);
+			if ($filename[0] != ".") $arrImages["/images/".$type."/".$filename] = CHtml::image(Yii::app()->request->baseUrl."/images/".$type."/".$filename);
 		$d->close();
-		return $arrHeaderImages;
+		return $arrImages;
 	}
 
 	protected function unzipFile($path,$file)
@@ -280,65 +571,76 @@ class ThemeController extends AdminBaseController
 		{
 			//we're going to swap out template information
 
-			$objCurrentSettings = Modules::model()->findByAttributes(array(
-				'module'=>_xls_get_conf('THEME'),
-				'category'=>'theme'));
+			//Get (or create) Module entry for this theme.
+			//If outgoing theme does not have an Admin Form,
+			if(!Theme::hasAdminForm(_xls_get_conf('THEME')))
+			{
+				$objCurrentSettings = Modules::model()->findByAttributes(array(
+					'module'=>_xls_get_conf('THEME'),
+					'category'=>'theme'));
 
-			if (!$objCurrentSettings)
-				$objCurrentSettings = new Modules;
+				if (!$objCurrentSettings) {
+					$objCurrentSettings = new Modules;
+					$objCurrentSettings->active = 1;
+				}
 
-			$objCurrentSettings->module = _xls_get_conf('THEME');
-			$objCurrentSettings->category = 'theme';
+				$objCurrentSettings->module = _xls_get_conf('THEME');
+				$objCurrentSettings->category = 'theme';
 
-			$arrDimensions = array();
-			//We can't use the ORM because template_specific doesn't exist there (due to upgrade problems)
-			$arrItems = Configuration::model()->findAllByAttributes(array('template_specific'=>1));
-			foreach ($arrItems as $objConf) {
-				$arrDimensions[$objConf->key_name] = $objConf->key_value;
+				$arrDimensions = array();
+				$arrItems = Configuration::model()->findAllByAttributes(array('template_specific'=>1));
+				foreach ($arrItems as $objConf)
+					$arrDimensions[$objConf->key_name] = $objConf->key_value;
 
+
+				$objCurrentSettings->configuration = serialize($arrDimensions);
+				if (!$objCurrentSettings->save())
+					Yii::log("Error on switching old theme ".print_r($objCurrentSettings->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+
+				unset($objCurrentSettings);
 
 			}
-			$objCurrentSettings->configuration = serialize($arrDimensions);
-			$objCurrentSettings->active = 0;
-			$objCurrentSettings->save();
+
 
 			//Now that we've saved the current settings, see if there are new ones to load
-			$objNewSettings = Modules::model()->findByAttributes(array(
+			$objCurrentSettings = Modules::model()->findByAttributes(array(
 				'module'=>$post['theme'],
 				'category'=>'theme'));
-			if ($objNewSettings) {
+
+			list($themeDefaults,$themeVersion) = $this->loadDefaults($post['theme']);
+			$themeVersion = round($themeVersion,PHP_ROUND_HALF_DOWN);
+
+			if ($objCurrentSettings)
+			{
 				//We found settings, load them
-
-				$arrDimensions = unserialize($objNewSettings->configuration);
-				foreach($arrDimensions as $key=>$val)
-					_xls_set_conf($key,$val);
-			}
-			else {
-				//If we don't have old settings saved already, then we can do two things. First, we see
-				//if there is an config.xml for defaults we create. If not, then we just leave the Config table
-				//as is and use those settings, we'll save it next time.
-				$fnOptions = self::getConfigFile($post['theme']);
-				if (file_exists($fnOptions)) {
-					$strXml = file_get_contents($fnOptions);
-
-					// Parse xml for response values
-					$oXML = new SimpleXMLElement($strXml);
-
-					if($oXML->defaults) {
-						foreach ($oXML->defaults->{'configuration'} as $item)
-						{
-							$keyname = (string)$item->key_name;
-							$keyvalue = (string)$item->key_value;
-							$objKey = Configuration::model()->findByAttributes(array('key_name'=>$keyname));
-							if ($objKey) {
-								_xls_set_conf($keyname,$keyvalue);
-								Configuration::model()->updateByPk($objKey->id,array('template_specific'=>'1'));
-							}
-
-						}
-					}
+				$arrDimensions = unserialize($objCurrentSettings->configuration);
+				if(is_array($arrDimensions))
+				{
+					foreach($arrDimensions as $key=>$val)
+						_xls_set_conf($key,$val);
 				}
+
+				//Make sure our version number is up to date
+				$objCurrentSettings->version = $themeVersion;
+				if (!$objCurrentSettings->save())
+					Yii::log("Error on switching themes ".print_r($objCurrentSettings->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			}
+			else
+			{
+				//Create entry in our modules table
+				$objCurrentSettings = new Modules;
+				$objCurrentSettings->module = $post['theme'];
+				$objCurrentSettings->category = 'theme';
+				$objCurrentSettings->configuration = serialize($themeDefaults);
+				$objCurrentSettings->version = $themeVersion;
+				$objCurrentSettings->active = 1; //we use this for autochecking
+				if (!$objCurrentSettings->save())
+					Yii::log("Error on new module entry when switching themes ".
+						print_r($objCurrentSettings->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+
+			}
+
+
 		}
 
 
@@ -367,47 +669,89 @@ class ThemeController extends AdminBaseController
 			array('{theme}'=>ucfirst(Yii::app()->theme->name),'{time}'=>date("d F, Y  h:i:sa"))));
 		$arrThemes = $this->getInstalledThemes();
 		$this->beforeAction('manage');
-
+		_xls_check_version(); //to report new active theme
 		return $arrThemes;
 	}
 
-	protected function copyTheme($post)
+	protected function loadDefaults($strTheme)
+	{
+		$arrKeys = array();
+
+		$objComponent = Yii::app()->getComponent('wstheme');
+		$model = $objComponent->getAdminModel($strTheme);
+		if($model) {
+			$formname = $strTheme."AdminForm";
+			$arrKeys = get_class_vars($formname);
+			$form = new $formname;
+			$themeVersion = $form->version;
+		}
+		else
+		{
+
+			//If we don't have a CForm definition, we have to go old school
+			//(that means look for config.xml for backwards compatibility)
+			$fnOptions = self::getConfigFile($strTheme);
+			if (file_exists($fnOptions))
+			{
+				$strXml = file_get_contents($fnOptions);
+
+				// Parse xml for response values
+				$oXML = new SimpleXMLElement($strXml);
+
+				if($oXML->defaults) {
+					foreach ($oXML->defaults->{'configuration'} as $item)
+					{
+						$keyname = (string)$item->key_name;
+						$keyvalue = (string)$item->key_value;
+
+						$arrKeys[$keyname] = $keyvalue;
+					}
+				}
+				$themeVersion = $oXML->version;
+			}
+		}
+
+		//Now we have an array of keys no matter which method
+		foreach($arrKeys as $keyname=>$keyvalue)
+		{
+			$objKey = Configuration::model()->findByAttributes(array('key_name'=>$keyname));
+			if ($objKey) {
+				_xls_set_conf($keyname,$keyvalue);
+				Configuration::model()->updateByPk($objKey->id,array('template_specific'=>'1'));
+			}
+		}
+		return array($arrKeys,$themeVersion);
+	}
+
+
+	/**
+	 * Make a copy of a theme and also copy core files into theme folder, in preparation for customization work
+	 * @param $post
+	 * @return array
+	 */
+	protected function copyThemeForCustomization($post)
 	{
 
 		//To create a complete copy, we need to copy our viewset first, and then the theme in use over it so we get it all
 		//Later on, the cleanup will strip out anything unused
-		$original = Yii::app()->theme->name;
-		$tcopy = $original."-copy";
+		$strOriginalThemeFolder = Yii::app()->theme->name;
+		list($strCopyThemeFolder,
+			$strPrettyThemeCopyName) = $this->generateThemeCopyNames($strOriginalThemeFolder);
 
-		if(file_exists("themes/$tcopy"))
-		{Yii::app()->user->setFlash('error',Yii::t('admin','Theme {theme} already exists, cannot create new copy',
-			array('{theme}'=>ucfirst($tcopy),'{time}'=>date("d F, Y  h:i:sa"))));
+		//For editing purposes, make a copy of the core theme files
+		$this->copyCoreThemeFiles($strOriginalThemeFolder,$strCopyThemeFolder);
 
-			return $this->changeTheme($post);
-		}
+		//Copy Admin Panel file and rework name
+		$this->renameAdminForm($strOriginalThemeFolder,$strCopyThemeFolder,$strPrettyThemeCopyName);
 
+		$this->getInstalledThemes();
 
-		recurse_copy("themes/$original","themes/$tcopy");
-		recurse_copy("core/protected/views","themes/$tcopy/views");
-		recurse_copy("themes/$original","themes/$tcopy");
-		$fnOptions = self::getConfigFile($tcopy);
-		$arr = array();
-
-		if (file_exists($fnOptions)) {
-			$strXml = file_get_contents($fnOptions);
-			$oXML = new SimpleXMLElement($strXml);
-			$strXml = str_replace("<name>".$oXML->name."</name>","<name>".$oXML->name."-copy</name>",$strXml);
-			file_put_contents($fnOptions,$strXml);
-		}
-
-
-		$arrThemes = $this->getInstalledThemes();
 		$this->beforeAction('manage');
 
-		$post['theme'] = $tcopy;
+		$post['theme'] = $strCopyThemeFolder;
 
-		Yii::app()->user->setFlash('warning',Yii::t('admin','Copy {theme} created!',
-			array('{theme}'=>ucfirst($tcopy),'{time}'=>date("d F, Y  h:i:sa"))));
+		Yii::app()->user->setFlash('warning',Yii::t('admin','{theme} created!',
+			array('{theme}'=>$strPrettyThemeCopyName,'{time}'=>date("d F, Y  h:i:sa"))));
 
 		return $this->changeTheme($post);
 
@@ -420,76 +764,229 @@ class ThemeController extends AdminBaseController
 		//Compare files in core views with files in our theme, and remove any theme files that match
 		//to let the master files bleed through
 		$original = Yii::app()->theme->name;
+		$arrConfig = $this->loadConfiguration($original);
 
-		if (stripos($original,"-copy")===false)
+		if (isset($arrConfig['parent']) && !is_null($arrConfig['parent']))
 		{
-			Yii::app()->user->setFlash('error',Yii::t('admin','Clean can only be applied to a copy of a theme. {theme} was not modified.',
-				array('{theme}'=>ucfirst($original),'{time}'=>date("d F, Y  h:i:sa"))));
-			return $this->changeTheme($post);
 
-		}
+			$viewset = Yii::app()->theme->info->viewset;
+			if(empty($viewset)) $viewset="cities";
+			$viewset = "/views-".$viewset;
+			$path = Yii::getPathOfAlias('application').$viewset;
 
-		$fileArray = $this->getFilesFromDir("core/protected/views");
-		$ct=0;
-		foreach($fileArray as $filename)
-		{
-			if ($filename != "core/protected/views/site/index.php")
+			$fileArray = $this->getFilesFromDir($path);
+			$ct=0;
+			foreach($fileArray as $filename)
 			{
-				$localthemefile = str_replace("core/protected/","themes/$original/",$filename);
-				if(file_exists($localthemefile) && md5_file($filename)==md5_file($localthemefile))
+				if (stripos($filename,"/site/index.php") === false)
 				{
-					unlink($localthemefile);
-					$ct++;
+					$localthemefile = str_replace("core/protected".$viewset,"themes/$original/views",$filename);
+					if(file_exists($localthemefile) && md5_file($filename)==md5_file($localthemefile))
+					{
+						unlink($localthemefile);
+						$ct++;
+					}
 				}
 			}
+			$path = YiiBase::getPathOfAlias('webroot')."/themes/".$original."/views";
+			RemoveEmptySubFolders($path);
+
+			Yii::app()->user->setFlash('warning',Yii::t('admin','{fcount} files were unmodified from the original and have been cleared out of {theme}',
+				array('{fcount}'=>$ct,'{theme}'=>ucfirst($original),'{time}'=>date("d F, Y  h:i:sa"))));
+
+			return $this->changeTheme($post);
 		}
+		else
+		{
+			{
+				Yii::app()->user->setFlash('error',Yii::t('admin','Clean can only be applied to a copy of a theme. {theme} was not modified.',
+					array('{theme}'=>ucfirst($original),'{time}'=>date("d F, Y  h:i:sa"))));
+				return $this->changeTheme($post);
 
-		Yii::app()->user->setFlash('warning',Yii::t('admin','{fcount} files were unmodified from the original and have been cleared out of {theme}',
-			array('{fcount}'=>$ct,'{theme}'=>ucfirst($original),'{time}'=>date("d F, Y  h:i:sa"))));
-
-		return $this->changeTheme($post);
-
+			}
+		}
 	}
 
 	protected function getInstalledThemes()
 	{
 		$arr = array();
-		$d = dir(YiiBase::getPathOfAlias('webroot')."/themes");
-		while (false!== ($filename = $d->read())) {
-			if ($filename[0] != ".") {
-				$fnOptions = self::getConfigFile($filename);
-				if (file_exists($fnOptions)) {
-					$strXml = file_get_contents($fnOptions);
-					$oXML = new SimpleXMLElement($strXml);
-					$arr[$filename]['name'] = $oXML->name;
-					$arr[$filename]['version'] = $oXML->version;
-					$arr[$filename]['img'] = $this->buildThemeChooser($oXML);
-					$arr[$filename]['options'] =  CHtml::dropDownList("subtheme-".strtolower($oXML->name),_xls_get_conf('CHILD_THEME'),$this->buildSubThemes($filename));
-				}
-			}
+		$strThemePath = YiiBase::getPathOfAlias('webroot')."/themes";
+		$d = dir($strThemePath);
+		while (false !== ($filename = $d->read()))
+		{
+			if (is_dir($strThemePath."/".$filename) && $filename[0] != "." && $filename != "trash" && $filename != "_customcss")
+				$arr[$filename] = $this->loadConfiguration($filename);
+
 		}
 		$d->close();
 
-		$strTheme = Yii::app()->theme->name;
+		if(isset(Yii::app()->theme))
+			$strTheme = Yii::app()->theme->name;
+		else $strTheme='';
 
 		if (isset($arr[$strTheme]))
 		{
 			$hold[$strTheme] = $arr[$strTheme];
 			unset($arr[$strTheme]);
+			ksort($arr);
 			$newarray = $hold + $arr;
 			$arr = $newarray;
 
 		}
 
+		if(Yii::app()->params['LIGHTSPEED_MT'])
+			foreach ($arr as $key=>$objTheme)
+			{
+				$objModule = Modules::LoadByName($key);
+//				if (!$objModule->mt_compatible)
+//					unset($arr[$key]);
+			}
+
 		return $arr;
 	}
 
+	protected function generateThemeCopyNames($strOriginalThemeFolder)
+	{
+
+		$strCopyThemeFolder = $strOriginalThemeFolder."copy";
+		$strPrettyThemeCopyName = ucfirst($strOriginalThemeFolder)." Copy";
+
+		$i=""; //Don't use number unless we have to
+		while(file_exists("themes/".$strCopyThemeFolder.$i))
+			$i++;
+		$strCopyThemeFolder .= $i;
+
+		return array($strCopyThemeFolder,$strPrettyThemeCopyName);
+
+	}
+	protected function copyCoreThemeFiles($strOriginalThemeFolder,$strCopyThemeFolder)
+	{
+		$viewset = Yii::app()->theme->info->viewset;
+		if(empty($viewset)) $viewset="cities";
+		$viewset = "/views-".$viewset;
+		$path = Yii::getPathOfAlias('application').$viewset;
+		recurse_copy("themes/$strOriginalThemeFolder","themes/$strCopyThemeFolder");
+		recurse_copy($path,"themes/$strCopyThemeFolder/views");
+		recurse_copy("themes/$strOriginalThemeFolder","themes/$strCopyThemeFolder");
+	}
+
+	protected function renameAdminForm($strOriginalThemeFolder,$strCopyThemeFolder,$strPrettyThemeCopyName)
+	{
+		if(Theme::hasAdminForm($strOriginalThemeFolder))
+		{
+
+			$strXml = file_get_contents("themes/$strCopyThemeFolder/models/{$strOriginalThemeFolder}AdminForm.php");
+			$strXml = preg_replace('/class (.*)AdminForm extends/', 'class '.$strCopyThemeFolder."AdminForm extends", $strXml);
+			$strXml = preg_replace('/\$name = \"(.*)\";/', '$name = "'.$strPrettyThemeCopyName.'";', $strXml);
+
+			$strXmlnew = preg_replace('/\$useCustomFolderForCustomcss = true;/', '$useCustomFolderForCustomcss = false;', $strXml);
+			//this setting wasn't found in our file, so we need to add it
+			if($strXmlnew==$strXml)
+				$strXml = preg_replace('/protected \$parent/', 'protected $useCustomFolderForCustomcss = false;
+	protected $parent', $strXml);
+			else
+				$strXml = $strXmlnew;
+
+			$strXml = preg_replace('/\$parent;/', '$parent = "'.$strOriginalThemeFolder.'";', $strXml);
+
+			file_put_contents("themes/$strCopyThemeFolder/models/".$strCopyThemeFolder."AdminForm.php",$strXml);
+			unlink("themes/$strCopyThemeFolder/models/".$strOriginalThemeFolder."AdminForm.php");
+
+		} else {
+
+			$fnOptions = self::getConfigFile($strCopyThemeFolder);
+
+			if (file_exists($fnOptions)) {
+				$strXml = file_get_contents($fnOptions);
+				$oXML = new SimpleXMLElement($strXml);
+				$strXml = str_replace("<name>{$oXML->name}</name>","<name>$strCopyThemeFolder</name>",$strXml);
+				file_put_contents($fnOptions,$strXml);
+			}
+
+		}
+	}
+
+	protected function loadConfiguration($strThemeName)
+	{
+		//New style, Admin Form
+		if(Theme::hasAdminForm($strThemeName))
+		{
+			$model = Yii::app()->getComponent('wstheme')->getAdminModel($strThemeName);
+
+			return array('name'=>$model->name,
+				'version'=>'v'.$model->version,
+				'beta'=>($model->beta ? ' beta' : ''),
+				'img'=> CHtml::image(Yii::app()->createUrl("themes/".$strThemeName."/".$model->thumbnail),$model->name),
+				'parent'=> $model->parent,
+				'options'=>CHtml::link(Yii::t('global','Click to configure'),   "module")
+			);
+		}
+		else
+		{
+			$arr = $this->loadConfigXML($strThemeName);
+			$arr['beta'] = false; //old XML doesn't support this field
+			return $arr;//Old style, xml
+		}
+
+
+	}
+
+
+
+
+
+
+	/*
+	 * Backwards compatibility if AdminForm does not exist
+	 */
+	protected function loadConfigXML($strThemeName)
+	{
+		$arr = array('name'=>ucfirst($strThemeName),'version'=>'','img'=>CHtml::image(Yii::app()->createUrl('images/no_product.png'),"missing"),'options'=>'');
+		$fnOptions = self::getConfigFile($strThemeName);
+		if (file_exists($fnOptions)) {
+
+			$strXml = file_get_contents($fnOptions);
+			$oXML = new SimpleXMLElement($strXml);
+			$imagepath =  CHtml::image(Yii::app()->createUrl("themes/".strtolower($oXML->name)."/".$oXML->thumbnail),$oXML->name);
+
+			$arr['name'] = $oXML->name;
+			if(substr( $oXML->name,-4)=="copy")
+				$arr['parent'] = "yes";
+			else $arr['parent'] = null;
+			$arr['version'] = 'v'.$oXML->version;
+			$arr['img'] = $imagepath;
+			$arr['options'] =
+				CHtml::dropDownList(
+					"subtheme-".strtolower($oXML->name),
+					_xls_get_conf('CHILD_THEME'),
+					$this->buildSubThemes($strThemeName)
+				);
+		}
+		return $arr;
+
+	}
+
+
+
 	protected function getGalleryThemes()
 	{
+
+		$postVar = "";
+		$objCurrentSettings = Modules::model()->findAllByAttributes(array(
+			'category'=>'theme'));
+		foreach($objCurrentSettings as $item)
+			$postVar[] = array($item->module,$item->version);
+
+
 		$arr = array();
-		$strXml = $this->getFile("http://updater.lightspeedretail.com/webstore/themes");
-		if (stripos($strXml,"404 Not Found")>0 || empty($strXml))
+		$strXml = $this->getFile("http://"._xls_get_conf('LIGHTSPEED_UPDATER','updater.lightspeedretail.com').
+			"/webstore/themes",array('version'=>XLSWS_VERSIONBUILD,'themes'=>$postVar));
+
+		if (stripos($strXml,"404 Not Found")>0 || stripos($strXml,"An internal error")>0 || empty($strXml))
+		{
+			Yii::log("Connect failed to updater", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return $arr;
+		}
 
 		$oXML = new SimpleXMLElement($strXml);
 
@@ -499,6 +996,7 @@ class ThemeController extends AdminBaseController
 			$filename = mb_pathinfo($item->installfile,PATHINFO_BASENAME);
 			$filename = str_replace(".zip","",$filename);
 			$arr[$filename]['img'] = CHtml::image($item->thumbnail, $item->name);
+			$arr[$filename]['title'] = strtolower($item->name);
 			$arr[$filename]['name'] = $item->name;
 			$arr[$filename]['version'] = $item->version;
 			$arr[$filename]['installfile'] = $item->installfile;
@@ -507,6 +1005,7 @@ class ThemeController extends AdminBaseController
 			$arr[$filename]['credit'] = $item->credit;
 			$arr[$filename]['md5'] = $item->md5;
 			$arr[$filename]['options'] = "";
+			$arr[$filename]['newver'] = $item->newver;
 		}
 		return $arr;
 
@@ -544,18 +1043,28 @@ class ThemeController extends AdminBaseController
 
 	}
 
-	protected function getFile($url)
+	protected function getFile($url,$postVars = null)
 	{
 
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_VERBOSE, 0);
+		curl_setopt($ch, CURLOPT_VERBOSE, 1);
 
 		// Turn off the server and peer verification (TrustManager Concept).
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
 
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+		if(!is_null($postVars))
+		{
+			$json = json_encode($postVars);
+			curl_setopt($ch, CURLOPT_HTTPHEADER,
+				array("Content-type: application/json"));
+			curl_setopt($ch, CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+
+		}
 
 		$resp = curl_exec($ch);
 		curl_close($ch);
@@ -617,6 +1126,50 @@ class ThemeController extends AdminBaseController
 		}
 
 		return $tmp;
+	}
+
+
+	protected function setCssOrder($files)
+	{
+
+
+		/*
+		 * We need to order these from bottom to top. We only care about base, style and custom,
+		 * everything else is sandwiched in the middle
+		 * base.css
+	     * custom.css
+	     * dark.css
+	     * light.css
+	     * style.css
+		*/
+
+		$newFiles = array();
+		$baseFile=null; $customFile=null; $styleFile=null;
+		foreach($files as $key=>$file)
+		{
+			if($file['filename']=="base.css") { $baseFile=$file; }
+			if($file['filename']=="style.css") { $styleFile=$file; }
+			if($file['filename']=="custom.css") { $customFile=$file; }
+		}
+		unset($files['custom']);
+		unset($files['base']);
+		unset($files['style']);
+
+		if(!is_null($baseFile)) $newFiles[] = $baseFile;
+		if(!is_null($styleFile)) $newFiles[] = $styleFile;
+		$newFiles += $files;
+		if(!is_null($customFile)) $newFiles[] = $customFile;
+		else
+			$newFiles[] = array(
+				'filename'=>'custom.css',
+				'tab'=>'custom',
+				'path'=>'',
+				'usecustom'=>1,
+				'contents'=> Yii::t('css','/* Custom.css, use to override any element */')
+			);
+
+		$newFiles = array_reverse($newFiles,true);
+		return $newFiles;
 	}
 
 }

@@ -10,8 +10,6 @@
 
 <h1><?= Yii::t('global','Checkout') ?></h1>
 
-<p class="note"><?= Yii::t('global','Fields with {*} are required.',array('{*}'=>'<span class="required">*</span>')) ?></p>
-
 <?php if(Yii::app()->user->isGuest): ?>
     <div id="customercontact">
 	    <div id="CustomerContactBillingInfo">
@@ -163,12 +161,12 @@
 							</div>
 
 							<div class="row-fluid">
-	                            <div class="span4">
+	                            <div id="shippingFirstName" class="span4">
 							        <?php echo $form->labelEx($model,'shippingFirstName'); ?>
 							        <?php echo $form->textField($model,'shippingFirstName'); ?>
 							        <?php echo $form->error($model,'shippingFirstName'); ?>
 	                            </div>
-	                            <div class="span4">
+	                            <div id="shippingLastName" class="span4">
 							        <?php echo $form->labelEx($model,'shippingLastName'); ?>
 							        <?php echo $form->textField($model,'shippingLastName'); ?>
 							        <?php echo $form->error($model,'shippingLastName'); ?>
@@ -176,12 +174,12 @@
 	                        </div>
 
 	                        <div class="row-fluid">
-	                            <div class="span4">
+	                            <div id="shippingAddress1" class="span4">
 			                        <?php echo $form->labelEx($model,'shippingAddress1'); ?>
 			                        <?php echo $form->textField($model,'shippingAddress1'); ?>
 			                        <?php echo $form->error($model,'shippingAddress1'); ?>
 	                            </div>
-	                            <div class="span4">
+	                            <div id="shippingAddress2" class="span4">
 			                        <?php echo $form->labelEx($model,'shippingAddress2'); ?>
 			                        <?php echo $form->textField($model,'shippingAddress2'); ?>
 			                        <?php echo $form->error($model,'shippingAddress2'); ?>
@@ -189,13 +187,13 @@
 
 	                        </div>
 	                        <div class="row-fluid">
-	                            <div class="span4">
+	                            <div id="shippingCity" class="span4">
 							        <?php echo $form->labelEx($model,'shippingCity'); ?>
 							        <?php echo $form->textField($model,'shippingCity'); ?>
 							        <?php echo $form->error($model,'shippingCity'); ?>
 	                            </div>
 
-	                            <div class="span4">
+	                            <div id="shippingCountry" class="span4">
 							        <?php echo $form->labelEx($model,'shippingCountry'); ?>
 							        <?php echo $form->dropDownList($model,'shippingCountry',$model->getCountries(),array(
 								        'ajax' => array(
@@ -211,7 +209,7 @@
 							        <?php echo $form->error($model,'shippingCountry'); ?>
 	                            </div>
 
-	                            <div class="span2">
+	                            <div id="shippingState" class="span2">
 							        <?php echo $form->labelEx($model,'shippingState'); ?>
 							        <?php echo $form->dropDownList($model,'shippingState',$model->getStates('shipping'),array(
 		                                'prompt' =>'--',
@@ -226,7 +224,7 @@
 			                            ))); ?>
 							        <?php echo $form->error($model,'shippingState'); ?>
 	                            </div>
-	                            <div class="span2">
+	                            <div id="shippingPostal" class="span2">
 							        <?php echo $form->labelEx($model,'shippingPostal'); ?>
 							        <?php echo $form->textField($model,'shippingPostal',array(
 			                            'ajax' => array(
@@ -320,26 +318,26 @@
 		            </div>
 
 	                <div class="row-fluid">
-	                      <div class="span4">
-			                    <?php echo $form->labelEx($model,'billingAddress1'); ?>
-			                    <?php echo $form->textField($model,'billingAddress1'); ?>
-			                    <?php echo $form->error($model,'billingAddress1'); ?>
-	                        </div>
-	                        <div class="span4">
-			                    <?php echo $form->labelEx($model,'billingAddress2'); ?>
-			                    <?php echo $form->textField($model,'billingAddress2'); ?>
-			                    <?php echo $form->error($model,'billingAddress2'); ?>
-	                        </div>
+		                <div id="billingAddress1" class="span4">
+			                <?php echo $form->labelEx($model,'billingAddress1'); ?>
+			                <?php echo $form->textField($model,'billingAddress1'); ?>
+			                <?php echo $form->error($model,'billingAddress1'); ?>
+		                </div>
+		                <div id="billingAddress2" class="span4">
+			                <?php echo $form->labelEx($model,'billingAddress2'); ?>
+			                <?php echo $form->textField($model,'billingAddress2'); ?>
+			                <?php echo $form->error($model,'billingAddress2'); ?>
+		                </div>
 	                </div>
 
 	                <div class="row-fluid">
-	                    <div class="span4">
+	                    <div id="billingCity" class="span4">
 				            <?php echo $form->labelEx($model,'billingCity'); ?>
 				            <?php echo $form->textField($model,'billingCity'); ?>
 				            <?php echo $form->error($model,'billingCity'); ?>
 	                    </div>
 
-	                    <div class="span4">
+	                    <div id="billingCountry" class="span4">
 				            <?php echo $form->labelEx($model,'billingCountry'); ?>
 				            <?php echo $form->dropDownList($model,'billingCountry',$model->getCountries(),array(
 				            'ajax' => array(
@@ -351,13 +349,13 @@
 				            <?php echo $form->error($model,'billingCountry'); ?>
 	                    </div>
 
-	                    <div class="span2">
+	                    <div id="billingState" class="span2">
 				            <?php echo $form->labelEx($model,'billingState'); ?>
 				            <?php echo $form->dropDownList($model,'billingState',
 				            $model->getStates('billing'),array('prompt' =>'--')); ?>
 				            <?php echo $form->error($model,'billingState'); ?>
 	                    </div>
-	                    <div class="span2">
+	                    <div id="billingPostal" class="span2">
 				            <?php echo $form->labelEx($model,'billingPostal'); ?>
 				            <?php echo $form->textField($model,'billingPostal'); ?>
 				            <?php echo $form->error($model,'billingPostal'); ?>
@@ -517,7 +515,7 @@
 			<?php /* The credit card form renders hidden and will display if a payment module needs it */ ?>
             <div id="CreditCardForm" style="display: none" class="span10">
                 <div class="row-fluid">
-                    <div class="span6">
+                    <div class="span6 card-type">
 						<?php echo $form->labelEx($model,'cardType'); ?>
 						<?php echo $form->dropDownList($model,'cardType',$model->getCardTypes()); ?>
 						<?php echo $form->error($model,'cardType'); ?>
@@ -525,29 +523,33 @@
                 </div>
 
                 <div class="row-fluid">
-                    <div class="span5">
+                    <div id="cardNumber" class="span5">
 						<?php echo $form->labelEx($model,'cardNumber'); ?>
 						<?php echo $form->textField($model,'cardNumber',array('autocomplete'=>'off')); ?>
 						<?php echo $form->error($model,'cardNumber'); ?>
                     </div>
-                    <div class="span2">
+
+                    <div id="cardCVV" class="span2">
 						<?php echo $form->labelEx($model,'cardCVV'); ?>
 						<?php echo $form->textField($model,'cardCVV',array('autocomplete'=>'off')); ?>
 						<?php echo $form->error($model,'cardCVV'); ?>
                     </div>
-                    <div class="span2">
+
+                    <div id="cardExpiryMonth" class="span2">
 						<?php echo $form->labelEx($model,'cardExpiryMonth'); ?>
 						<?php echo $form->dropDownList($model,'cardExpiryMonth',$model->getCardMonths(),array('prompt'=>'--')); ?>
 						<?php echo $form->error($model,'cardExpiryMonth'); ?>
                     </div>
-                    <div class="span2">
+
+                    <div id="cardExpiryYear" class="span2">
 						<?php echo $form->labelEx($model,'cardExpiryYear'); ?>
 						<?php echo $form->dropDownList($model,'cardExpiryYear',$model->getCardYears(),array('prompt'=>'--')); ?>
 						<?php echo $form->error($model,'cardExpiryYear'); ?>
                     </div>
                 </div>
+
                 <div class="row-fluid">
-                    <div class="span6">
+                    <div id="cardNameOnCard" class="span6">
 						<?php echo $form->labelEx($model,'cardNameOnCard'); ?>
 						<?php echo $form->textField($model,'cardNameOnCard'); ?>
 						<?php echo $form->error($model,'cardNameOnCard'); ?>
@@ -575,8 +577,9 @@
 		        <div class="span9">
 					<?php echo $form->checkBox($model,'acceptTerms'); ?>
 			        <?php echo Yii::t('checkout',
-				        'I hereby agree to the Terms and Conditions of shopping with {storename}',
-				        array('{storename}'=>_xls_get_conf('STORE_NAME'))) ?>
+				        'I hereby agree to the {terms} of shopping with {storename}',
+				        array('{storename}'=>_xls_get_conf('STORE_NAME'),
+				                '{terms}'=>CHtml::link(Yii::t('global','Terms and Conditions'),$this->createUrl('/terms-and-conditions')))) ?>
 					<?php echo $form->error($model,'acceptTerms'); ?>
 		        </div>
 	        </div>

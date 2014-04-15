@@ -1,7 +1,7 @@
 <?php
 
 //Default photo processor
-class wsphoto extends CApplicationComponent {
+class wsphoto extends ApplicationComponent {
 
 
 	public $category = "CEventPhoto";
@@ -68,6 +68,7 @@ class wsphoto extends CApplicationComponent {
 				return false;
 			}
 		}
+
 
 		$this->createThumbnails($objProduct,$objImage);
 
@@ -142,34 +143,7 @@ class wsphoto extends CApplicationComponent {
 				$strLoadFunc = "imagecreatefrompng";
 			}
 
-			$hexbg = _xls_get_conf('IMAGE_BACKGROUND');
-			if(!empty($hexbg))
-			{
-				//Place image on colored background to better position images within theme
-				$image->save($strTempThumbnailWithPath,false);
-
-				$src = $strLoadFunc($strTempThumbnailWithPath);
-				//We've saved the resize, so let's load it and resave it centered
-				$dst_file = $strNewThumbnailWithPath;
-				$dst = imagecreatetruecolor($intNewWidth, $intNewHeight);
-
-				$rgb = hex2rgb($hexbg);
-				$colorFill = imagecolorallocate($dst, $rgb[0],$rgb[1],$rgb[2]);
-				imagefill($dst, 0, 0, $colorFill);
-				if (_xls_get_conf('IMAGE_FORMAT','jpg') == 'png')
-					imagecolortransparent($dst, $colorFill);
-				$arrOrigSize = getimagesize($strOriginalFileWithPath);
-				$arrSize = Images::CalculateNewSize($arrOrigSize[0],$arrOrigSize[1], $intNewWidth,$intNewHeight);
-				$intStartX = $intNewWidth/2 - ($arrSize[0]/2);
-
-				imagecopymerge($dst, $src, $intStartX, 0, 0, 0, $arrSize[0], $arrSize[1], 100);
-
-				$strSaveFunc($dst, $dst_file);
-				@unlink($strTempThumbnailWithPath);
-
-			}
-			else
-				$image->save($strNewThumbnailWithPath); //just save normally with no special effects
+			$image->save($strNewThumbnailWithPath); //just save normally with no special effects
 
 
 			//See if we have a thumbnail record in our Images table, create or update
@@ -186,7 +160,7 @@ class wsphoto extends CApplicationComponent {
 			if (!($objThumbImage instanceof Images))
 			{
 				$objThumbImage = new Images();
-				Images::model()->deleteAllByAttributes(array('width'=>$intNewHeight,'height'=>$intNewHeight,'parent'=>$objImage->id)); //sanity check to prevent SQL UNIQUE errors
+				Images::model()->deleteAllByAttributes(array('width'=>$intNewWidth,'height'=>$intNewHeight,'parent'=>$objImage->id)); //sanity check to prevent SQL UNIQUE errors
 			}
 
 			$objThumbImage->image_path = $strNewThumbnail;

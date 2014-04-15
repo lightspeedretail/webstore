@@ -4,29 +4,29 @@
 		<h3><?php echo Yii::t('admin','Manage My Themes'); ?></h3>
 		<div class="editinstructions">
 			<?php if (Yii::app()->getRequest()->getQuery('n'))
-				echo "<h4>".Yii::t('admin','Your current template has an update available. Click Upgrade Template below the icon to download the latest version.')."</h4> ";
+				echo "<h4>".Yii::t('admin','Your current theme has an update available. Click Upgrade Theme below the icon to download the latest version.')."</h4> ";
 
-				echo Yii::t('admin','Choose the theme you wish to use by selecting the graphic and clicking Make Active to switch to the theme. Change {color} options for the currently active theme below the image and clicking Make Active. Your currently active theme is always listed first.',array('{color}'=>_xls_regionalize('color')));
+				echo Yii::t('admin','Choose the theme you wish to use by selecting the graphic and clicking Make Active to switch to the theme. Change options for the currently active theme below the image. Your currently active theme is always listed first.',array('{color}'=>_xls_regionalize('color')));
 
 
 			?>
 		</div>
 		<div class="clearfix spaceafter"></div>
 		<div id="thememanage">
-			<?php echo CHtml::beginForm('manage', 'post'); ?>
+			<?php echo CHtml::beginForm('manage', 'post',array('id'=>'manage')); ?>
 
 
 			<?php
-
+				echo CHtml::hiddenField('task','',array('id'=>'task'));
 
 				foreach($arrThemes as $key=>$objTheme):
-					echo '<div class="span4 theme"><div class="themetitle">'.$objTheme['name'].'</div><div class="themeversion"> v'.$objTheme['version'].'</div><div class="clearfix"></div><div class="themeselect" >';
+					echo '<div class="span4 theme"><div class="themetitle">'.$objTheme['name'].'</div><div class="themeversion">'.$objTheme['version'].$objTheme['beta'].'</div><div class="clearfix"></div><div class="themeselect" >';
 					echo CHtml::radioButton('theme',
-						($key == Yii::app()->theme->name ?  true : false),
+						($key == $currentTheme ?  true : false),
 						array('id'=>$key,'value'=>$key));
 					echo '</div>';
 					echo CHtml::tag('div',array(
-							'class'=>'themeicon '.($key == Yii::app()->theme->name ?  "selected" : ""),
+							'class'=>'themeicon '.($key == $currentTheme ?  "selected" : ""),
 							'id'=>'img'.$key,
 							'onClick'=>'js:
 									$("#"+picked).attr("checked", false);
@@ -36,16 +36,16 @@
 									$("#img"+picked).addClass("selected")'),
 						$objTheme['img']);
 
-				    if($key == Yii::app()->theme->name && Yii::app()->getRequest()->getQuery('n'))
+				    if($key == $currentTheme && Yii::app()->getRequest()->getQuery('n'))
 					    $this->widget('bootstrap.widgets.TbButton', array(
 						'buttonType'=>'submit',
-						'label'=>'Upgrade Template',
+						'label'=>'Upgrade Theme',
 						'type'=>'danger',
 						'size'=>'mini',
 						'htmlOptions'=>array('id'=>'btnUpgrade','name'=>'btnUpgrade','value'=>'btnUpgrade'),
 					)); else echo CHtml::tag('div',array(
 						    'class'=>'themeoptions',),
-					    $key == Yii::app()->theme->name ? $objTheme['options'] : "") ;
+					    $key == $currentTheme ? $objTheme['options'] : "") ;
 					echo '</div>';
 				endforeach;
 			?>
@@ -67,6 +67,7 @@
 			)); ?>
 		</p>
 
+	<?php if (!_xls_get_conf('LIGHTSPEED_MT',0)>0): ?>
 	<p>
 		<div>
 			<?php $this->widget('bootstrap.widgets.TbButton', array(
@@ -83,8 +84,26 @@
 				'size'=>'mini',
 				'htmlOptions'=>array('id'=>'btnClean','value'=>'btnClean'),
 			)); ?>
+			<?php $this->widget('bootstrap.widgets.TbButton', array(
+				//'buttonType'=>'submit',
+				'label'=>'Move to trash',
+				'type'=>'inverse',
+				'size'=>'mini',
+				'htmlOptions'=>array(
+					'id'=>'btnTrash',
+					'name'=>'btnTrash',
+					'value'=>'btnTrash',
+					'onclick'=>'js:bootbox.confirm("Move theme to trash?",function(confirmed){if(confirmed)
+					{
+						$("#task").val("btnTrash");
+						$("#manage").submit();
+					}})'
+				),
+			)); ?>
 		</div>
 	</p>
+
+	<?php endif; ?>
 
 		<?php echo CHtml::endForm(); ?>
 

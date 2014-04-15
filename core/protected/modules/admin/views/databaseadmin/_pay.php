@@ -8,7 +8,7 @@
 	'id'=>'editpending',
 	)); ?>
 	<?php echo $form->hiddenField($objCart,'id'); ?>
-    <div class="row">
+    <div class="row-fluid">
 		<div class="span3">
 			<label>Paid Status</label>
 		</div>
@@ -17,7 +17,7 @@
 		</div>
     </div>
 
-	<div class="row">
+	<div class="row-fluid">
 		<div class="span3">
 			<?php echo $form->labelEx($model,'payment_module'); ?>
 		</div>
@@ -28,7 +28,7 @@
 		</div>
     </div>
 
-    <div class="row">
+    <div class="row-fluid">
         <div class="span3">
 			<?php echo $form->labelEx($model,'payment_data'); ?>
         </div>
@@ -37,7 +37,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row-fluid">
         <div class="span3">
 			<?php echo $form->labelEx($model,'payment_amount'); ?>
         </div>
@@ -48,7 +48,7 @@
 
 
 </div>
-   <div class="row pagination-centered">
+   <div class="row-fluid pagination-centered">
     <?php $this->widget('bootstrap.widgets.TbButton', array(
 	    'htmlOptions'=>array('id'=>'buttonSavePCR'),
 	    'label'=>'Save',

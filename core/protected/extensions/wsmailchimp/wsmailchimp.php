@@ -1,7 +1,7 @@
 <?php
 
 
-class wsmailchimp extends CApplicationComponent {
+class wsmailchimp extends ApplicationComponent {
 
 
 	public $category = "CEventCustomer";

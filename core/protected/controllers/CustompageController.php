@@ -43,10 +43,6 @@ class CustompageController extends Controller
 		if (!($model instanceof CustomPage))
 			_xls_404();
 
-		//If we are in multilanguage mode, parse the description and display only the local language.
-		if(_xls_get_conf('LANG_MENU',0))
-			$model->page = _xls_parse_language($model->page);
-
 		$this->pageTitle=$model->PageTitle;
 		$this->pageDescription=$model->meta_description;
 		$this->pageImageUrl = '';
@@ -55,7 +51,18 @@ class CustompageController extends Controller
 		);
 
 		$this->CanonicalUrl = $model->CanonicalUrl;
-		$this->render('index',array('model'=>$model,'objCustomPage'=>$model));
+		$this->layout = "//layouts/column".$model->column_template;
+		if (!empty($model->product_tag) && $model->product_display==2)
+		{
+			$_GET['tag']=$model->product_tag;
+			$_GET['cpc']=$model->id;
+			$this->forward("search/results");
+
+		}
+		else
+			$this->render('index',array('model'=>$model,'objCustomPage'=>$model));
+
+
 
 	}
 
@@ -66,16 +73,18 @@ class CustompageController extends Controller
 	public function actionContact()
 	{
 
-		$model = CustomPage::LoadByRequestUrl("contact-us");
+		$model = CustomPage::LoadByRequestUrl('contact-us');
 		$this->pageTitle=$model->PageTitle;
 		$this->pageDescription=$model->meta_description;
 		$this->breadcrumbs = array(
 			$model->title=>$model->RequestUrl,
 		);
 
-		//If we are in multilanguage mode, parse the description and display only the local language.
-		if(_xls_get_conf('LANG_MENU',0))
-			$model->page = _xls_parse_language($model->page);
+        $pageValues =  _xls_parse_language_serialized($model->page);
+        //If we are in multilanguage mode, parse the description and display only the local language.
+        $model->page =$pageValues[Yii::app()->language];
+
+		$this->layout = "//layouts/column".$model->column_template;
 
 		$ContactForm=new ContactForm;
 		if(isset($_POST['ContactForm']))

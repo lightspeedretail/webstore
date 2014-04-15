@@ -11,7 +11,7 @@
 
 				<?php if (_xls_get_conf('LIGHTSPEED_HOSTING',0)=="0")
 					echo "You can apply this update by clicking on <strong>".
-						CHtml::link('APPLY WEBSTORE UPDATE',$this->createUrl("upgrade/index",array('patch'=>$oXML->autopathfile)))."</strong>.";
+						CHtml::link('APPLY WEBSTORE UPDATE',$this->createAbsoluteUrl("upgrade/index",array('patch'=>$oXML->autopathfile),'http'))."</strong>.";
 				?>
 
 			</p>

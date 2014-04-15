@@ -50,5 +50,19 @@ class TaxStatus extends BaseTaxStatus
 		return TaxStatus::model()->findByAttributes(array('lsid'=>$intId));
 	}
 
+	public static function getCloudDefault()
+	{
+		$objStatus = TaxStatus::model()->findByAttributes(array(
+			'status'=>'Default',
+			'tax1_status'=>'0',
+			'tax2_status'=>'1',
+			'tax3_status'=>'1',
+			'tax4_status'=>'1',
+			'tax5_status'=>'1'
+		));
+		if(is_null($objStatus))
+			return false;
+		else return $objStatus;
+	}
 
 }

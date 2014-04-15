@@ -31,6 +31,7 @@ class LicenseController extends AdminBaseController
 		$model = new InstallForm();
 		$getpage = "getPage" . $model->page;
 		$model->scenario = "page1";
+		$model->setScenario($this->cloudMtScenario($model->getScenario()));
 		$formDefinition = $model->$getpage();
 
 		if(isset($_POST['InstallForm']))
@@ -38,6 +39,10 @@ class LicenseController extends AdminBaseController
 			$model->scenario = "page".$_POST['InstallForm']['page'];
 			if (isset($_POST['buttonSkip']) && $_POST['InstallForm']['page']==4)
 				$model->scenario = "page-skip".$_POST['InstallForm']['page'];
+
+			$model->setScenario($this->cloudMtScenario($model->getScenario()));
+
+
 			$model->attributes = $_POST['InstallForm'];
 
 			if ($model->validate())
@@ -66,11 +71,19 @@ class LicenseController extends AdminBaseController
 
 				}
 
-				$model->scenario = "page".$model->page;
+
+				if (_xls_get_conf('LIGHTSPEED_CLOUD',0)>0 && $model->page==2)
+					$model->scenario = "page".$model->page."-cld";
+				else
+					if (_xls_get_conf('LIGHTSPEED_CLOUD',0)==0 && _xls_get_conf('LIGHTSPEED_MT',0)>0 && $model->page==2)
+						$model->scenario = "page".$model->page."-mt";
+					else $model->scenario = "page".$model->page;
+
 				$model->attributes = $model->readFromSession($model->page);
 
 
-			}
+			} else Yii::log("Install Wizard ".$model->scenario." error ".print_r($model->getErrors(),true),
+				'error', 'application.'.__CLASS__.".".__FUNCTION__);
 
 			//Possibly after submit, refetch these items
 
@@ -92,6 +105,15 @@ class LicenseController extends AdminBaseController
 	}
 
 
+	protected function cloudMtScenario($scenario)
+	{
+		if(Yii::app()->params['LIGHTSPEED_CLOUD']>0)
+			$scenario .= "-cld";
+		elseif(Yii::app()->params['LIGHTSPEED_MT']>0)
+			$scenario .= "-mt";
+
+		return $scenario;
+	}
 
 	public function actionEnd()
 	{

@@ -6,8 +6,6 @@
  * The followings are the available columns in table '{{credit_card}}':
  * @property string $id
  * @property string $label
- * @property string $numeric_length
- * @property string $prefix
  * @property integer $sort_order
  * @property integer $enabled
  * @property string $validfunc
@@ -34,14 +32,12 @@ abstract class BaseCreditCard extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('prefix, enabled, modified', 'required'),
+			array('enabled, modified', 'required'),
 			array('sort_order, enabled', 'numerical', 'integerOnly'=>true),
 			array('label, validfunc', 'length', 'max'=>32),
-			array('numeric_length', 'length', 'max'=>16),
-			array('prefix', 'length', 'max'=>64),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, label, numeric_length, prefix, sort_order, enabled, validfunc, modified', 'safe', 'on'=>'search'),
+			array('id, label, sort_order, enabled, validfunc, modified', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -64,8 +60,6 @@ abstract class BaseCreditCard extends CActiveRecord
 		return array(
 			'id' => 'ID',
 			'label' => 'Label',
-			'numeric_length' => 'Numeric Length',
-			'prefix' => 'Prefix',
 			'sort_order' => 'Sort Order',
 			'enabled' => 'Enabled',
 			'validfunc' => 'Validfunc',
@@ -86,8 +80,6 @@ abstract class BaseCreditCard extends CActiveRecord
 
 		$criteria->compare('id',$this->id,true);
 		$criteria->compare('label',$this->label,true);
-		$criteria->compare('numeric_length',$this->numeric_length,true);
-		$criteria->compare('prefix',$this->prefix,true);
 		$criteria->compare('sort_order',$this->sort_order);
 		$criteria->compare('enabled',$this->enabled);
 		$criteria->compare('validfunc',$this->validfunc,true);

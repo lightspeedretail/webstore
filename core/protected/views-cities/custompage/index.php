@@ -9,6 +9,7 @@
 			'thumbUrl' => '$data->SliderImage',
 			'imageUrl' => '$data->Link',
 			'emptyText'=>'',
+			'altText' => '$data->Title',
 			'titleText' => '$data->Title',
 			'captionText' => '$data->Title."<br>"._xls_currency($data->Price)',
 			'target' => 'do-not-delete-this',

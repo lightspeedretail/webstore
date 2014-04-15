@@ -15,6 +15,8 @@
  * @property string $created
  * @property string $product_tag
  * @property integer $tab_position
+ * @property integer $column_template
+ * @property integer $product_display
  *
  * The followings are the available model relations:
  * @property Category[] $categories
@@ -41,14 +43,14 @@ abstract class BaseCustomPage extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('title, modified', 'required'),
-			array('tab_position', 'numerical', 'integerOnly'=>true),
+			array('tab_position, column_template, product_display', 'numerical', 'integerOnly'=>true),
 			array('page_key', 'length', 'max'=>32),
 			array('title', 'length', 'max'=>64),
 			array('request_url, meta_keywords, meta_description, product_tag', 'length', 'max'=>255),
 			array('page, created', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, page_key, title, page, request_url, meta_keywords, meta_description, modified, created, product_tag, tab_position', 'safe', 'on'=>'search'),
+			array('id, page_key, title, page, request_url, meta_keywords, meta_description, modified, created, product_tag, tab_position, column_template, product_display', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -81,6 +83,8 @@ abstract class BaseCustomPage extends CActiveRecord
 			'created' => 'Created',
 			'product_tag' => 'Product Tag',
 			'tab_position' => 'Tab Position',
+			'column_template' => 'Column Template',
+			'product_display' => 'Product Display',
 		);
 	}
 
@@ -106,6 +110,8 @@ abstract class BaseCustomPage extends CActiveRecord
 		$criteria->compare('created',$this->created,true);
 		$criteria->compare('product_tag',$this->product_tag,true);
 		$criteria->compare('tab_position',$this->tab_position);
+		$criteria->compare('column_template',$this->column_template);
+		$criteria->compare('product_display',$this->product_display);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

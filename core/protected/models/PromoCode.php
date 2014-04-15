@@ -144,14 +144,15 @@ class PromoCode extends BasePromoCode
 
 
 		//Minimum price threshold
-
-
 		if (!is_null($objPromoCode->threshold))
-			if ($objPromoCode->Threshold > Yii::app()->shoppingcart->subtotal) {
+		{
+			if ($objPromoCode->Threshold > Yii::app()->shoppingcart->originalSubTotal)
+			{
 				$this->addError($attribute,Yii::t('global','{label} only valid when your purchases total at least {amount}.',
 					array('{label}'=>$strLabel,'{amount}'=>_xls_currency($objPromoCode->threshold))));
 				return;
 			}
+		}
 
 		//If this is for shipping, we need to make sure all items in the cart qualify
 		if ($objPromoCode->Shipping) {
@@ -285,7 +286,7 @@ class PromoCode extends BasePromoCode
 
 		}
 
-		if (_xls_array_search_begin(strtolower($objItem->code), $arrCode))
+		if (_xls_array_search_restrict_begin(strtolower($objItem->code), $arrCode))
 			$boolReturn = true;
 
 		//We normally return true if it's a match. If this code uses Except, then the logic is reversed

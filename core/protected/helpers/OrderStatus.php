@@ -11,5 +11,6 @@ class OrderStatus
 	const Requested = 'Requested';
 	const Downloaded = 'Downloaded';
 	const Processed = 'Processed';
+	const Completed = 'Completed';
 
 }

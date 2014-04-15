@@ -3,7 +3,7 @@
 class freeshipping extends WsShipping
 {
 	protected $defaultName = "Free Shipping";
-	protected $version = "1.0";
+	protected $version = 1;
 	public $freeShipping = true;
 
 

@@ -14,6 +14,30 @@ class SiteController extends Controller
 {
 	public $layout='//layouts/column2';
 
+//	public function beforeAction($action)
+//	{
+//
+//		if ($action->Id=="login" && _xls_get_conf('ENABLE_SSL')==1)
+//		{
+//			if(Yii::app()->params['LIGHTSPEED_HOSTING_COMMON_SSL'])
+//				$this->verifyCommonSSL();
+//
+//			if(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on') {
+//				$this->redirect(Yii::app()->createAbsoluteUrl('site/'.$action->Id,array(),'https'));
+//				Yii::app()->end();
+//			}
+//		} else if(
+//			$action->Id != "login" &&
+//			$action->Id != "forgotpassword" &&
+//			$action->Id != "sendemail" &&
+//			Yii::app()->params['LIGHTSPEED_HOSTING_COMMON_SSL']
+//		)
+//			$this->verifyNoSharedSSL();
+//
+//		return parent::beforeAction($action);
+//
+//	}
+
 	/**
 	 * This is the default 'index' action that is invoked
 	 * when an action is not explicitly requested by users.
@@ -25,7 +49,16 @@ class SiteController extends Controller
 		switch ($homePage)
 		{
 			case "*index":
-				$this->render("/site/index");
+				if (Yii::app()->params['LIGHTSPEED_MT'] == '1')
+				{
+					if (Yii::app()->theme->info->showCustomIndexOption)
+						$this->render("/site/index");
+					else
+						$this->forward("search/browse");
+				}
+				else
+					$this->render("/site/index");
+
 				break;
 
 			case "*products":
@@ -79,9 +112,17 @@ class SiteController extends Controller
 		$strPath = Yii::app()->getViewPath();
 		if(substr($strPath,-5)=="views")
 			Yii::app()->setViewPath(Yii::getPathOfAlias('application')."/views-cities");
-		$this->layout='//layouts/errorlaout';
+		$this->layout='//layouts/errorlayout';
+
 	    if($error=Yii::app()->errorHandler->error)
 	    {
+		    if(stripos( Yii::app()->request->userAgent,"curl/") !== false)
+		    {
+			    echo $error['code']." ".$error['type']." ".$error['message']."\n";
+			    echo $error['trace'];
+			    die();
+		    }
+
 	    	if(Yii::app()->request->isAjaxRequest)
 	    		echo $error['message'];
 	    	else
@@ -96,6 +137,12 @@ class SiteController extends Controller
 	 */
 	public function actionLogin()
 	{
+		if(!Yii::app()->user->isGuest && Yii::app()->isCommonSSL)
+			Yii::app()->user->logout();
+
+		if(!Yii::app()->user->isGuest)
+			$this->redirect($this->createAbsoluteUrl("/site"));
+
 		$model=new LoginForm();
 
 		$response_array = array();
@@ -107,15 +154,41 @@ class SiteController extends Controller
 			$model->attributes=$_POST['LoginForm'];
 			// validate user input and redirect to the previous page if valid
 			if($model->validate() && $model->login()) {
-				$response_array['status'] = 'success';
+
+				//If we're doing this as a shared login, redirect
+				if(Yii::app()->isCommonSSL)
+				{
+					Yii::log("Common login redirecting", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+					//We logged in under the common URL but we don't stay here, so pass our login back
+
+					$strTimestamp = date("YmdHis");
+					$intCart = Yii::app()->shoppingcart->id;
+					$strIdentity = Yii::app()->user->id.",".$intCart.",".$strTimestamp;
+
+					Yii::log("Going to Shared URL with info: ".$strIdentity, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+					$redirString = _xls_encrypt($strIdentity);
+
+					$url = Yii::app()->createAbsoluteUrl("commonssl/login",array('link'=>$redirString),'http');
+					$strCustomUrl = Yii::app()->params['LIGHTSPEED_HOSTING_CUSTOM_URL'];
+					$strLightSpeedUrl = Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL'];
+					$url = str_replace(
+						$strLightSpeedUrl,
+						$strCustomUrl,
+						$url);
+
+					Yii::app()->getRequest()->redirect($url,true);
+
+				} else
+					$this->redirect($this->createAbsoluteUrl("site/index",array(),'http'));
 			}
-			else {
-				$response_array['status'] = 'error';
-				$response_array['errormsg'] = _xls_convert_errors($model->getErrors());
-			}
-			Yii::log("Login results ".print_r($response_array,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-			echo json_encode($response_array);
+
+
 		}
+
+		if(Yii::app()->request->isAjaxRequest)
+			echo json_encode($response_array);
+		else
+			$this->render('login', array('model'=>$model));
 
 	}
 
@@ -127,7 +200,20 @@ class SiteController extends Controller
 		Yii::app()->user->logout();
 		if(_xls_facebook_login())
 			Yii::app()->facebook->destroySession();
-		$this->redirect(Yii::app()->homeUrl);
+		if(Yii::app()->isCommonSSL)
+		{
+			$url = Yii::app()->createUrl("site/logout");
+			$url = str_replace(
+				"https://".Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL'],
+				"http://".Yii::app()->params['LIGHTSPEED_HOSTING_CUSTOM_URL'],
+				$url);
+		}
+		else
+		{
+			$url = $this->createAbsoluteUrl("site/index",array(),'http');
+		}
+
+		$this->redirect($url);
 	}
 
 	/**
@@ -149,7 +235,7 @@ class SiteController extends Controller
 		$item_count = Category::model()->count($criteria);
 
 		$pages = new CPagination($item_count);
-		$pages->setPageSize(Yii::app()->params['listPerPage']);
+		$pages->setPageSize(Yii::app()->params['PRODUCTS_PER_PAGE']);
 		$pages->applyLimit($criteria);  // the trick is here!
 
 		$model = Category::model()->findAll($criteria);
@@ -160,7 +246,7 @@ class SiteController extends Controller
 		$this->render('category',array(
 				'arrmodel'=> $arrModel, // must be the same as $item_count
 				'item_count'=>$item_count,
-				'page_size'=>Yii::app()->params['listPerPage'],
+				'page_size'=>Yii::app()->params['PRODUCTS_PER_PAGE'],
 				'items_count'=>$item_count,
 				'pages'=>$pages,
 			));
@@ -173,9 +259,17 @@ class SiteController extends Controller
 	
 		if(isset($_POST['LoginForm']))
 		{
-
+			Yii::log(print_r($_POST['LoginForm'],true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			$model->attributes=$_POST['LoginForm'];
 
+			if(empty($model->email))
+			{
+				$response_array = array(
+					'status'=>"failure",
+					'message'=> Yii::t('global','Please enter your email before clicking this link.'));
+				echo json_encode($response_array);
+				Yii::app()->end();
+			}
 
 			$objCustomer = Customer::model()->findByAttributes(array('record_type'=>Customer::REGISTERED,'email'=>$model->email));
 			if($objCustomer instanceof Customer)
@@ -232,6 +326,26 @@ class SiteController extends Controller
 
 		_xls_send_email($id);
 
+	}
+
+
+	/**
+	 * Since many third party templates have site/contact as a default tab, redirect to our own
+	 */
+	public function actionContact()
+	{
+		$this->redirect("/custompage/contact");
+	}
+
+	public function actionRobots()
+	{
+		echo <<<EOF
+User-agent: *
+Disallow:
+
+Sitemap: http://{$_SERVER['HTTP_HOST']}/store/sitemap.xml
+EOF;
+		Yii::app()->end();
 	}
 
 

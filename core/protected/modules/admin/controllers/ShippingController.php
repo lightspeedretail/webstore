@@ -96,12 +96,6 @@ class ShippingController extends AdminBaseController
 	}
 
 
-	/**
-	 * Compare actual files in shipping extensions folders with our Modules table, add anything missing
-	 */
-
-
-
 	public function actionIndex()
 	{
 		$this->render("index");

@@ -17,9 +17,9 @@
  * @property string $modified
  *
  * The followings are the available model relations:
- * @property CustomPage $customPage
  * @property Category $parent0
  * @property Category[] $categories
+ * @property CustomPage $customPage
  * @property CategoryIntegration[] $categoryIntegrations
  * @property Product[] $xlswsProducts
  *
@@ -46,7 +46,7 @@ abstract class BaseCategory extends CActiveRecord
 		return array(
 			array('menu_position, modified', 'required'),
 			array('menu_position, child_count', 'numerical', 'integerOnly'=>true),
-			array('label', 'length', 'max'=>64),
+			array('label', 'length', 'max'=>1023),
 			array('parent, custom_page', 'length', 'max'=>11),
 			array('request_url, meta_description', 'length', 'max'=>255),
 			array('image_id', 'length', 'max'=>20),
@@ -65,9 +65,9 @@ abstract class BaseCategory extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'customPage' => array(self::BELONGS_TO, 'CustomPage', 'custom_page'),
 			'parent0' => array(self::BELONGS_TO, 'Category', 'parent'),
 			'categories' => array(self::HAS_MANY, 'Category', 'parent'),
+			'customPage' => array(self::BELONGS_TO, 'CustomPage', 'custom_page'),
 			'categoryIntegrations' => array(self::HAS_MANY, 'CategoryIntegration', 'category_id'),
 			'xlswsProducts' => array(self::MANY_MANY, 'Product', '{{product_category_assn}}(category_id, product_id)'),
 		);

@@ -30,6 +30,7 @@ class DatabaseadminController extends AdminBaseController
 
 		$this->menuItems =
 			array(
+                    array('label'=>'&larr; Back to System Menu', 'url'=>array('/admin/system')),
 				array('label'=>'Customers', 'linkOptions'=>array('class'=>'nav-header')),
 					array('label'=>'Edit Customers', 'url'=>array('databaseadmin/customers')),
 				array('label'=>'Orders', 'linkOptions'=>array('class'=>'nav-header')),
@@ -155,6 +156,24 @@ class DatabaseadminController extends AdminBaseController
 
 			$objCart->attributes = $_POST['Cart'];
 			$model->attributes = $_POST['CartPayment'];
+
+			switch($objCart->cart_type)
+			{
+				case CartType::order:
+					$objCart->status = OrderStatus::AwaitingProcessing;
+					$model->payment_status = OrderStatus::Completed;
+					$model->datetime_posted = new CDbExpression('NOW()');
+					break;
+
+				case CartType::awaitpayment:
+					$objCart->status = OrderStatus::AwaitingPayment;
+					$model->payment_status = NULL;
+					$model->datetime_posted = NULL;
+					break;
+
+			}
+
+
 			$objCart->setScenario('manual');
 			$model->setScenario('manual');
 
@@ -162,6 +181,8 @@ class DatabaseadminController extends AdminBaseController
 			{
 				$objCart->save();
 				$model->save();
+				$objEvent = new CEventOrder('CartController','onCreateOrder',$objCart->id_str);
+				_xls_raise_events('CEventOrder',$objEvent);
 				echo "success";
 
 			} else echo implode(" ",_xls_convert_errors($objCart->getErrors() + $model->getErrors()));
@@ -194,6 +215,16 @@ class DatabaseadminController extends AdminBaseController
 		$value = Yii::app()->getRequest()->getPost('value');
 
 		Cart::model()->updateByPk($pk,array($name=>$value));
+
+		if($name=="downloaded" && $value==0)
+		{
+			$objCart = Cart::model()->findByPk($pk);
+			$objEvent = new CEventOrder('CartController','onCreateOrder',$objCart->id_str);
+			_xls_raise_events('CEventOrder',$objEvent);
+
+		}
+
+
 		echo "success";
 
 
@@ -208,11 +239,11 @@ class DatabaseadminController extends AdminBaseController
 		{
 			if ($_POST['name']=='code' && $_POST['value']=="")
 			{
-				$m1 = CartItem::model()->findAllByAttributes(array('product_id'=>$_POST['pk']));
-				$m2 = DocumentItem::model()->findAllByAttributes(array('product_id'=>$_POST['pk']));
-				if (count($m1)+count($m2)>0)
+				$items = CartItem::model()->findAll("product_id=".$_POST['pk']." AND (cart_type=".CartType::order." OR cart_type=".CartType::awaitpayment.")");
+				if ($items) {
 					echo "You cannot delete a product that has been used on an order";
-				else {
+				} else {
+					_dbx("set foreign_key_checks=0;");
 					Product::model()->updateAll(array('image_id'=>null),'id ='.$_POST['pk']);
 					Images::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
 					ProductCategoryAssn::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
@@ -224,8 +255,10 @@ class DatabaseadminController extends AdminBaseController
 					WishlistItem::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
 					TaskQueue::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
 					Product::model()->deleteByPk($_POST['pk']);
+					_dbx("set foreign_key_checks=1;");
 					echo "delete";
 				}
+
 			} else echo Yii::t('admin','You cannot change a product code here. Delete the code to remove it manually from the Web Store database');
 
 		} else {
@@ -339,11 +372,16 @@ class DatabaseadminController extends AdminBaseController
 			{
 				Yii::app()->user->setFlash('success',Yii::t('admin','Password updated and sent for {user} at {time}.',array('{user}'=>$model->fullname,'{time}'=>date("d F, Y  h:i:sa"))));
 				$retVal = "success";
-				if( ($theme=Yii::app()->getTheme()) !==null &&
-					file_exists(YiiBase::getPathOfAlias('webroot').'/themes/'.$theme->name.'/mail/_forgotpassword.php'))
-					$path = 'webroot.themes.'.$theme->name.'.mail._forgotpassword';
-				else
-					$path = 'application.views.mail._forgotpassword';
+
+                $theme = Yii::app()->getTheme();
+
+                if (file_exists(YiiBase::getPathOfAlias('webroot').'/themes/'.$theme->name.'/mail/_forgotpassword.php'))
+                    $path = 'webroot.themes.'.$theme->name.'.mail._forgotpassword';
+                else
+                    if ($theme->info->viewset)
+                        $path = 'application.views-'.$theme->info->viewset.'.mail._forgotpassword';
+                    else
+                        $path = 'application.views-cities.mail._forgotpassword';
 
 				$strHtmlBody =$this->renderPartial($path,array('model'=>$model), true);
 				$strSubject = Yii::t('global','Password reminder');

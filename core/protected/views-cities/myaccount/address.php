@@ -72,7 +72,7 @@
 
         <div class="row-fluid">
             <div class="span5">
-				<?php echo $form->labelEx($model,'country_id'); ?>
+	            <?php echo $form->labelEx($model,'country_id'); ?>
 				<?php echo $form->dropDownList($model,'country_id',$checkout->getCountries(),array(
 				'ajax' => array(
 					'type'=>'POST',
@@ -85,13 +85,13 @@
         </div>
 
         <div class="row-fluid">
-            <div class="span2">
+            <div id="state_id" class="span5">
 				<?php echo $form->labelEx($model,'state_id'); ?>
 				<?php echo $form->dropDownList($model,'state_id',
 					$checkout->getStates('myaccount',$model->country_id),array('prompt' =>'--')); ?>
 				<?php echo $form->error($model,'state_id'); ?>
             </div>
-            <div class="span3">
+            <div id="postal" class="span5">
 				<?php echo $form->labelEx($model,'postal'); ?>
 				<?php echo $form->textField($model,'postal'); ?>
 				<?php echo $form->error($model,'postal'); ?>

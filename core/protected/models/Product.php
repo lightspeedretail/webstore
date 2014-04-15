@@ -199,7 +199,7 @@ class Product extends BaseProduct
 		foreach ($this->products as $objProduct) {
 			$strSize = $objProduct->product_size;
 
-			if (!empty($strSize)  &&
+			if (($strSize === "0" || !empty($strSize))  &&
 				!in_array($strSize, $strOptionsArray) &&
 				$objProduct->IsDisplayable
 			)
@@ -226,7 +226,7 @@ class Product extends BaseProduct
 			$strColor = $objProduct->product_color;
 
 
-			if (!empty($strColor)  &&
+			if (($strColor === "0" || !empty($strColor))  &&
 				($strSize==false || $objProduct->product_size == $strSize) &&
 				!in_array($strColor, $strOptionsArray) &&
 				$objProduct->IsDisplayable
@@ -259,10 +259,7 @@ class Product extends BaseProduct
 			$a['image_alt']=$this->Title;
 			$a['image_desc']='';
 			$a['image_large']=Images::GetLink($obj->id,ImagesType::normal,$absolute);
-			$webroot = Yii::getPathOfAlias('webroot');
-			if (strlen(Yii::app()->baseUrl)>2)
-				$webroot = substr($webroot,0,-(strlen(Yii::app()->baseUrl)));
-			list($wt, $ht, $type, $attr) = getimagesize($webroot.$a['image']);
+			list($wt, $ht) = ImagesType::GetSize(ImagesType::pdetail);
 			if($obj->width<=$wt && $obj->height<=$ht)
 				$a['image_large']=$a['image'];
 
@@ -352,6 +349,15 @@ class Product extends BaseProduct
 	}
 
 
+	public function hasTag($tagMatch)
+	{
+		foreach($this->productTags as $tag)
+			if(strtolower($tag->tag->tag)==strtolower($tagMatch))
+				return true;
+
+		return false;
+
+	}
 
 
 	/**
@@ -506,16 +512,16 @@ class Product extends BaseProduct
 	 * Gets the URL for this Product
 	 * @return string
 	 */
-	protected function GetLink() {
+	public function getUrl() {
 		if ($this->IsChild)
-			//if ($prod = Product::model()->findByPk($this->parent))
-				return $this->parent0->Link;
-
-		//return _xls_site_url($this->request_url."/".XLSURL::KEY_PRODUCT."/".$this->id);
-		//return Yii::app()->createUrl('/product',array('id'=>$this->id));
+				return $this->parent0->Url;
 
 		return Yii::app()->createUrl('product/view',array('id'=>$this->id,'name'=>$this->request_url));
+	}
 
+	public function getLink()
+	{
+		return $this->getUrl();
 	}
 
 	public function getAbsoluteLink() {
@@ -921,9 +927,10 @@ class Product extends BaseProduct
 			$criteria = new CDbCriteria();
 
 			if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) == Product::InventoryMakeDisappear)
-				$criteria->condition = 'web=1 AND parent=id AND (inventory_avail>0 OR inventoried=0)';
+				$criteria->condition = 'web=1 AND parent=:id AND (inventory_avail>0 OR inventoried=0)';
 			else
-				$criteria->condition = 'web=1 AND parent=id';
+				$criteria->condition = 'web=1 AND parent=:id';
+			$criteria->params = array (':id'=>$this->id);
 
 			$criteria->order = $strField;
 
@@ -946,7 +953,7 @@ class Product extends BaseProduct
 
 				case Product::MASTER_PRICE:
 				default:
-					return ($this->$strField > $this->getPriceValue($intQuantity, $taxInclusive)) ? $this->$strField : "";;
+					return ($this->$strField > $this->getPriceValue($intQuantity, $taxInclusive)) ? $this->$strField : "";
 
 
 			}
@@ -991,21 +998,27 @@ class Product extends BaseProduct
 
 	}
 
-	public function SetAvailableInventory() {
+	public function SetAvailableInventory()
+	{
 
-		$this->inventory_reserved=$this->CalculateReservedInventory();
+		Yii::log("Recalculating inventory on ".$this->code, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+
+		$fltReserved = $this->CalculateReservedInventory();
+
+		$this->inventory_reserved = $fltReserved;
 
 		$strField = $this->GetInventoryField();
 		$intInventory = $this->$strField;
 
+		$this->inventory_avail=($intInventory-$fltReserved);
 
-		if (_xls_get_conf('INVENTORY_RESERVED' , 0) == '1')
-		$intInventory -= $this->inventory_reserved;
-
-		$this->inventory_avail=$intInventory;
 		if (!$this->save())
+		{
+			Yii::log("Error saving product ".$this->code." ". print_r($this->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return false;
-		else return true;
+		}
+
+		return true;
 	}
 
 	public static function RecalculateInventory() {
@@ -1358,7 +1371,7 @@ class Product extends BaseProduct
 
 			case 'Url':
 			case 'Link':
-				return $this->GetLink();
+				return $this->getUrl();
 
 			case 'SEOName':
 				return $this->GetSEOName();

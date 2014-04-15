@@ -46,9 +46,12 @@ if(count($arg))
 	if(isset($arg['help'])) showCommandLine();
 	if(isset($arg['dbupdate']) && $arg['dbupdate']==1)
 	{
+		if(empty($arg['url']))
+			die("dbupdate requires url key as well, such as --url=store.example.com\n\n");
+
 		//This is command line for applying any database updates
 		echo "\n**Applying latest database changes**\n\n";
-		runYii('www.example.com','/install.php',49);
+		runYii($arg['url'],'/install.php',49);
 		die();
 	}
 	if(file_exists("config/main.php")) die("\nENTER 1 OR 2 FOR INSTRUCTIONS (ENTER 2 TO PAGE)\n\nENTER SEED NUMBER
@@ -66,11 +69,11 @@ INITIALIZING...\n\nYOU MUST DESTROY 17 KINGONS IN 30 STARDATES WITH 3 STARBASES\
 	if(isset($arg['dboldname']))
 		$_POST['dboldname']=$arg['dboldname'];
 
+	$arg=modifyArgs($arg);
 	downloadLatest();
 	zipAndFolders();
 	writeDB($arg['dbhost'],$arg['dbuser'],$arg['dbpass'],$arg['dbname']);
 
-	$arg=modifyArgs($arg);
 
 
 
@@ -111,7 +114,7 @@ INITIALIZING...\n\nYOU MUST DESTROY 17 KINGONS IN 30 STARDATES WITH 3 STARBASES\
 		$db->query("update xlsws_configuration set key_value=1 where key_name='LIGHTSPEED_HOSTING'");
 
 	echo "\nLaunching Yii bootstrap\n";
-	runYii($arg['url'],$_SERVER['SCRIPT_NAME']);
+	runYii($arg['url'],$arg['scriptname']);
 
 }
 else {
@@ -154,14 +157,24 @@ function showCommandLine()
 }
 function runYii($url,$scriptname,$sqlline=1)
 {
+	global $arg;
+	$_SERVER=array(
+		'REQUEST_URI'=>'/index.php',
+		'SERVER_NAME'=>$url,
+		'SCRIPT_FILENAME'=>realpath(dirname(__FILE__)."/".$scriptname),
+		'SCRIPT_NAME'=>$scriptname,
+		'PHP_SELF'=>$scriptname,
+		'HTTP_USER_AGENT'=>'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/536.30.1 (KHTML, like Gecko)',
+		'HTTP_HOST'=>$url,
+		'QUERY_STRING'=>'',
+
+	);
+	$_SESSION['DUMMY']="nothing"; //force creation of session just in case
 	//This is the halfway point, we have to switch to the Yii framework now, so let's bootstrap it
 	$yii=dirname(__FILE__).'/core/framework/yii.php';
 	$config=dirname(__FILE__).'/config/main.php';
 	require_once($yii);
 	$objYii = Yii::createWebApplication($config);
-
-	Configuration::exportConfig();
-	Configuration::exportLogging();
 
 	//Since we're in this same instance, reread the variables we just wrote
 	//Because we've updated the config, rerun
@@ -174,17 +187,6 @@ function runYii($url,$scriptname,$sqlline=1)
 	Yii::app()->params['INSTALLED']=1;
 
 
-	$_SERVER=array(
-		'REQUEST_URI'=>'/index.php',
-		'SERVER_NAME'=>$url,
-		'SCRIPT_NAME'=>$scriptname,
-		'PHP_SELF'=>$scriptname,
-		'HTTP_USER_AGENT'=>'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/536.30.1 (KHTML, like Gecko)',
-		'HTTP_HOST'=>$url,
-		'QUERY_STRING'=>'',
-
-	);
-	$_SESSION['DUMMY']="nothing"; //force creation of session just in case
 
 
 	do
@@ -210,7 +212,7 @@ function runYii($url,$scriptname,$sqlline=1)
 
 	} while ($sqlline<50);
 
-	if($url!= "www.example.com") //IOW only command line db updates
+	if(!isset($arg['dbupdate'])) //IOW only command line db updates
 		echo "\n** finished **\n\nCustomer needs to go to http://".$url."/admin/license to complete installation.\n\n";
 
 }
@@ -568,8 +570,6 @@ function displayFormTwo()
 						if (online==obj.total) {
 							clearInterval(pinttimer);
 							prunning=0;
-							var exporturl = window.location.href.replace("/install.php", "/install/exportconfig");
-							$.post(exporturl, "", function(data){  if (data[0]!="{") alert(data); });
 							online = 1;
 							pinttimer=self.setInterval(function(){runUpgrade(key)},delay);
 						}else {
@@ -1263,7 +1263,7 @@ function runInstall($db,$sqlline = 0)
 			{
 				makeHtaccess();
 				installMainConfig();
-				$tag = "Downloading Brooklyn template (this is the halfway mark, isn't this exciting?!)...";
+				$tag = "Downloading default template (this is the halfway mark, isn't this exciting?!)...";
 			}
 
 	}
@@ -2146,8 +2146,8 @@ function migrateTwoFiveToThree()
 		level    VARCHAR(128),
 		category VARCHAR(128),
 		logtime  INTEGER,
-		message  TEXT,
-		created TIMESTAMP,
+		message  LONGTEXT,
+		created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		KEY `createdidx` (`created`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -2894,7 +2894,7 @@ function migrateTwoFiveToThree()
 	update xlsws_configuration set `key_value`='description_short' where `key_name`='PRODUCT_SORT_FIELD' AND `key_value`='DescriptionShort';
 	update xlsws_configuration set `key_value`='' where `key_name`='LSKEY';
 	update xlsws_configuration set `options`='PASSWORD' where `key_name`='EMAIL_SMTP_PASSWORD';
-	update xlsws_configuration set `key_value`='brooklyn' where `key_name`='DEFAULT_TEMPLATE';
+	update xlsws_configuration set `key_value`='brookyn' where `key_name`='DEFAULT_TEMPLATE';
 	update xlsws_configuration set `title`='Non-inventoried Item Display Message' where `key_name`='INVENTORY_NON_TITLE';
 
 	INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`) VALUES ('Photo Processor', 'CEventPhoto', 'wsphoto', 'Component that handles photos', '28', '1', CURRENT_TIMESTAMP, NULL, 'CEventPhoto', '0', '1');
@@ -2935,7 +2935,6 @@ UPDATE xlsws_configuration set key_value='Hurry, only {qty} left in stock!' wher
 UPDATE xlsws_configuration set key_value='{qty} Available' where key_name='INVENTORY_AVAILABLE';
 DELETE FROM xlsws_configuration where key_name='INVENTORY_DISPLAY_LEVEL';
 UPDATE xlsws_configuration set title='Display Inventory on Product Details' where key_name='INVENTORY_DISPLAY';
-UPDATE xlsws_configuration set title='Authorized IPs For LightSpeed uploading (USE WITH CAUTION)',helper_text='List of IP Addresses (comma separated) which are allowed to upload products and download orders. NOTE: DO NOT USE THIS OPTION IF YOU DO NOT HAVE A STATIC IP ADDRESS' where key_name='LSAUTH_IPS';
 DELETE FROM `xlsws_configuration` where `key_name`='DEFAULT_EXPIRY_GIFT_REGISTRY';
 UPDATE xlsws_configuration set title='Product {color} Label',helper_text='Rename {color} Option of LightSpeed to this' where key_name='PRODUCT_COLOR_LABEL';
 UPDATE xlsws_configuration set title='Image Background {color} Fill',helper_text='Optional image background {color} (#HEX)' where key_name='IMAGE_BACKGROUND';
@@ -2958,16 +2957,15 @@ DELETE FROM `xlsws_configuration` where `key_name`='HTML_DESCRIPTION';
 function initialConfigLoad($db)
 {
 
-	$db->add_config_key("LSAUTH_IPS","Authorized IPs For LightSpeed uploading (USE WITH CAUTION)","","List of IP Addresses (comma separated) which are allowed to upload products and download orders. NOTE: DO NOT USE THIS OPTION IF YOU DO NOT HAVE A STATIC IP ADDRESS",16,4,"");
 	$db->add_config_key("DISABLE_CART","Disable Cart","","If selected, products will only be shown but not sold",4,4,"BOOL");
 	$db->add_config_key("LANG_CODE","Default Language","en"," ",15,1,NULL);
 	$db->add_config_key("CURRENCY_DEFAULT","Default Currency","USD"," ",15,7,NULL);
 	$db->add_config_key("LANGUAGES","Languages","fr","",3,4,NULL);
 	$db->add_config_key("EMAIL_SMTP_SERVER","SMTP Server","","SMTP Server to send emails",5,11,NULL);
 	$db->add_config_key("MIN_PASSWORD_LEN","Minimum Password Length",6,"Minimum password length",3,5,"INT");
-	$db->add_config_key("EMAIL_FROM","Store Email","","From which address emails will be sent",2,3,NULL);
+	$db->add_config_key("EMAIL_FROM","Store Email","","From which address emails will be sent",2,3,"EMAIL");
 	$db->add_config_key("STORE_NAME","Store Name","LightSpeed Web Store","",2,1,NULL);
-	$db->add_config_key("EMAIL_BCC","BCC Address","","Enter an email address here if you would like to get BCCed on all emails sent by the webstore.",5,2,NULL);
+	$db->add_config_key("EMAIL_BCC","BCC Address","","Enter an email address here if you would like to get BCCed on all emails sent by the webstore.",5,2,"EMAIL");
 	$db->add_config_key("EMAIL_SIGNATURE","Email Signature","Thank you, {storename}","Email signature for all outgoing emails",24,10,NULL);
 	$db->add_config_key("ENABLE_WISH_LIST","Enable Wish List",1,"",7,1,"BOOL");
 	$db->add_config_key("ENABLE_SRO","Display My Repairs (SROs) under My Account",0,"If your store uses SROs for repairs and uploads them to Web Store, turn this option on to allow customers to view pending repairs.",6,4,"BOOL");
@@ -2975,7 +2973,7 @@ function initialConfigLoad($db)
 	$db->add_config_key("ENABLE_FAMILIES","Show Families on Product Menu?",1,"",19,5,"ENABLE_FAMILIES");
 	$db->add_config_key("PRODUCTS_PER_PAGE","Products Per Page",12,"Number of products per page to display in product listing or search",8,3,"INT");
 	$db->add_config_key("PRODUCT_SORT_FIELD","Products Sorting","-modified","By which field products will sorted in result",8,4,"PRODUCT_SORT");
-	$db->add_config_key("ORDER_FROM","Order From","","Order email address from which order notification is sent. This email address also gets the notification of the order",5,1,NULL);
+	$db->add_config_key("ORDER_FROM","Order From","","Order email address from which order notification is sent. This email address also gets the notification of the order",5,1,"EMAIL");
 	$db->add_config_key("ALLOW_GUEST_CHECKOUT","New customers can purchase",1,"Force customers to sign up with an account before shopping? Note this some customers will abandon a forced-signup process. Customer cards are created in LightSpeed based on all orders, not dependent on customer registrations.",3,2,"ALLOW_GUEST_CHECKOUT");
 	$db->add_config_key("INVENTORY_LOW_THRESHOLD","Low Inventory Threshold",3,"If inventory of a product is below this quantity, Low inventory threshold title will be displayed in place of inventory value.",11,8,"INT");
 	$db->add_config_key("INVENTORY_AVAILABLE","Available Inventory Message","{qty} Available","This text will be shown when product is available for shipping. This value will only be shown if you choose Display Inventory Level in place of actual inventory value",11,6,NULL);
@@ -3097,7 +3095,7 @@ function initialDataLoad($db)
 	$sql[] = "insert into xlsws_country set id=13,code='AU', region='AU', active=1, sort_order=4, country='Australia', zip_validate_preg='/\\\d{4}/'";
 	$sql[] = "insert into xlsws_country set id=224,code='US', region='NA', active=1, sort_order=1, country='United States', zip_validate_preg='/^([0-9]{5})(-[0-9]{4})?$/i'";
 
-	$sql[] = "insert into xlsws_country set id=1,code='AF', region='AS', active=1, sort_order=100, country='Afghanistan'";
+	$sql[] = "insert into xlsws_country set id=1,code='AF', region='AS', active=1, sort_order=10, country='Afghanistan'";
 	$sql[] = "insert into xlsws_country set id=2,code='AL', region='EU', active=1, sort_order=10, country='Albania'";
 	$sql[] = "insert into xlsws_country set id=3,code='DZ', region='AF', active=1, sort_order=10, country='Algeria'";
 	$sql[] = "insert into xlsws_country set id=4,code='AS', region='AU', active=1, sort_order=10, country='American Samoa'";
@@ -3625,14 +3623,14 @@ function initialDataLoad($db)
 	$sql[] = "insert into xlsws_credit_card set id=12, label='Visa Electron', numeric_length='16', prefix='41750049174913', sort_order=0, enabled=0, modified='".date("Y-m-d H:i:s")."' ";
 
 
-	$sql[] = "insert into xlsws_custom_page set id=1, page_key='top', title='Top Products', page='<p>Page coming soon...</p>', request_url='top-products', tab_position=12, modified='".date("Y-m-d H:i:s")."' ";
-	$sql[] = "insert into xlsws_custom_page set id=2, page_key='new', title='New Products', page='<p>Page coming soon...</p>', request_url='new-products', tab_position=11, modified='".date("Y-m-d H:i:s")."' ";
-	$sql[] = "insert into xlsws_custom_page set id=3, page_key='promo', title='Promotions', page='<p>Page coming soon...</p>', request_url='promotions', tab_position=13, modified='".date("Y-m-d H:i:s")."' ";
-	$sql[] = "insert into xlsws_custom_page set id=4, page_key='about', title='About Us', page='<p>Page coming soon...</p>', request_url='about-us', tab_position=21, modified='".date("Y-m-d H:i:s")."' ";
-	$sql[] = "insert into xlsws_custom_page set id=5, page_key='privacy', title='Privacy Policy', page='<p>Page coming soon...</p>', request_url='privacy-policy', tab_position=23, modified='".date("Y-m-d H:i:s")."' ";
-	$sql[] = "insert into xlsws_custom_page set id=6, page_key='tc', title='Terms and Conditions', page='<p>Page coming soon...</p>', request_url='terms-and-conditions', tab_position=22, modified='".date("Y-m-d H:i:s")."' ";
-	$sql[] = "insert into xlsws_custom_page set id=7, page_key='contactus', title='Contact Us', page='If you have business inquiries or other questions, please fill out the following form to contact us. Thank you.', request_url='contact-us', tab_position=13, modified='".date("Y-m-d H:i:s")."' ";
-	$sql[] = "insert into xlsws_custom_page set id=8, page_key='Welcome', title='Welcome', page='<p>Page coming soon...</p>', request_url='welcome', tab_position=0, modified='".date("Y-m-d H:i:s")."' ";
+	$sql[] = "insert into xlsws_custom_page set id=1, page_key='top', title='Top Products', page='a:1:{s:2:\"en\";s:26:\"<p>Page coming soon...</p>\";}', request_url='top-products', tab_position=12, modified='".date("Y-m-d H:i:s")."' ";
+	$sql[] = "insert into xlsws_custom_page set id=2, page_key='new', title='New Products', page='a:1:{s:2:\"en\";s:26:\"<p>Page coming soon...</p>\";}', request_url='new-products', tab_position=11, modified='".date("Y-m-d H:i:s")."' ";
+	$sql[] = "insert into xlsws_custom_page set id=3, page_key='promo', title='Promotions', page='a:1:{s:2:\"en\";s:26:\"<p>Page coming soon...</p>\";}', request_url='promotions', tab_position=13, modified='".date("Y-m-d H:i:s")."' ";
+	$sql[] = "insert into xlsws_custom_page set id=4, page_key='about', title='About Us', page='a:1:{s:2:\"en\";s:26:\"<p>Page coming soon...</p>\";}', request_url='about-us', tab_position=21, modified='".date("Y-m-d H:i:s")."' ";
+	$sql[] = "insert into xlsws_custom_page set id=5, page_key='privacy', title='Privacy Policy', page='a:1:{s:2:\"en\";s:26:\"<p>Page coming soon...</p>\";}', request_url='privacy-policy', tab_position=23, modified='".date("Y-m-d H:i:s")."' ";
+	$sql[] = "insert into xlsws_custom_page set id=6, page_key='tc', title='Terms and Conditions', page='a:1:{s:2:\"en\";s:26:\"<p>Page coming soon...</p>\";}', request_url='terms-and-conditions', tab_position=22, modified='".date("Y-m-d H:i:s")."' ";
+	$sql[] = "insert into xlsws_custom_page set id=7, page_key='contactus', title='Contact Us', page='a:1:{s:2:\"en\";s:118:\"<p>If you have business inquiries or other questions, please fill out the following form to contact us. Thank you.</p>\";}', request_url='contact-us', tab_position=13, modified='".date("Y-m-d H:i:s")."' ";
+	$sql[] = "insert into xlsws_custom_page set id=8, page_key='Welcome', title='Welcome', page='a:1:{s:2:\"en\";s:26:\"<p>Page coming soon...</p>\";}', request_url='welcome', tab_position=0, modified='".date("Y-m-d H:i:s")."' ";
 
 
 	$sql[] = "INSERT INTO `xlsws_modules` set active=1,module='wsborderlookup', category='sidebar', sort_order=2";
@@ -4268,7 +4266,7 @@ function xls_check_server_environment()
 		$checked['short_open_tag in Php.ini must be turned On'] = ($phpinfo['Core']['short_open_tag'] == "On" ? "pass" : "fail");
 	}
 
-	if (version_compare(PHP_VERSION, '5.4.0', '>'))
+	if (version_compare(PHP_VERSION, '5.3.27', '>='))
 		$checked['Default timezone'] = ($phpinfo['date']['date.timezone'] == "no value" ? "fail" : "pass");
 
 
@@ -4311,8 +4309,6 @@ function xls_check_upgrades()
 	$result == "DEFAULT_TEMPLATE_THEME" ? "pass" : "fail");
 	//Have new 2.5 templates been added
 
-	$checked['2.5 Templates added'] = file_exists("templates/brooklyn/index.tpl.php") ? "pass"
-		: "fail";
 
 	$checked['<b>Note: Specific template code changes are not checked.</b>'] = "pass";
 
@@ -4351,6 +4347,10 @@ function arguments ( $args )
 
 function modifyArgs($arg)
 {
+	global $_SERVER;
+	global $_POST;
+	global $_GET;
+
 	if(isset($arg['url']))
 	{
 		$url = str_replace("http://","",$arg['url']);
@@ -4362,19 +4362,27 @@ function modifyArgs($arg)
 		if(stripos($url,"/")===false)
 		{
 			$_SERVER['SERVER_NAME'] = $arg['url'];
-			$_SERVER['SCRIPT_NAME']=$_SERVER['PHP_SELF']="/install.php";
-		} else
+			$arg['scriptname'] = $_SERVER['SCRIPT_NAME']=$_SERVER['PHP_SELF']="/install.php";
+		}
+		else
 		{
+
 			$marker = stripos($arg['url'],"/");
 			$path=substr($arg['url'],$marker);
 			$arg['url'] = substr($arg['url'],0,$marker);
 
 			$_SERVER['SERVER_NAME'] = $arg['url'];
-			$_SERVER['SCRIPT_NAME']=$_SERVER['PHP_SELF']=$path."/install.php";
+			$arg['scriptname'] = $_SERVER['SCRIPT_NAME']=$_SERVER['PHP_SELF']=$path."/install.php";
 
 		}
 
 
+	}
+
+	if(isset($arg['qa']))
+	{
+		$_POST['qa']=$arg['qa'];
+		$_GET['qa']=$arg['qa'];
 	}
 	return $arg;
 }

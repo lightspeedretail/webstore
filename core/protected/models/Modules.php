@@ -46,7 +46,10 @@ class Modules extends BaseModules
 
 	public function GetConfigValues() {
 		try{
+
 			$arr = unserialize($this->configuration);
+			if($arr===false) $arr = array(); //If not a valid serialized string, return blank array
+
 		}catch(Exception $e){
 			Yii::log("Could not unserialize " . $this->configuration . " . Error : " . $e, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return array();

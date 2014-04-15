@@ -46,6 +46,13 @@ class State extends BaseState
 		return State::model()->find('code=:code_id AND country_id=:c_id',	array(':code_id'=>$strCode,':c_id'=>$intCountryId));
 	}
 
+	public static function IdByCode($strCode,$intCountry) {
+		$objState =  State::LoadByCode($strCode,$intCountry);
+		if ($objState instanceof State)
+			return $objState->id;
+		else return "";
+	}
+
 	/**
 	 * Load a state by row id, return Code (state abbreviation)
 	 * @param $intId

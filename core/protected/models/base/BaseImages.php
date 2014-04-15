@@ -16,6 +16,7 @@
  *
  * The followings are the available model relations:
  * @property Product $product
+ * @property ImagesCloud[] $imagesClouds
  * @property Product[] $products
  *
  * @package application.models.base
@@ -58,6 +59,7 @@ abstract class BaseImages extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'product' => array(self::BELONGS_TO, 'Product', 'product_id'),
+			'imagesClouds' => array(self::HAS_MANY, 'ImagesCloud', 'image_id'),
 			'products' => array(self::HAS_MANY, 'Product', 'image_id'),
 		);
 	}

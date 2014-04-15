@@ -35,7 +35,7 @@ class WishlistAddForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'gift_code'=> Yii::t('wishlist','Add to what list'),
+			'gift_code'=> Yii::t('wishlist','Choose the Wish List'),
 
 		);
 	}

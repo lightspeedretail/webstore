@@ -303,10 +303,22 @@ class UpgradeController extends CController
 
 		switch($oXML->changetype)
 		{
+			case 'run_task':
+
+				$this->runTask($oXML->schema);
+				break;
+
 			case 'add_column':
 				$elements = explode(".",$oXML->elementname);
 				$res = Yii::app()->db->createCommand("SHOW COLUMNS FROM ".$elements[0]." WHERE Field='".$elements[1]."'")->execute();
 				if(!$res)
+					Yii::app()->db->createCommand($oXML->sqlstatement)->execute();
+				break;
+
+			case 'drop_column':
+				$elements = explode(".",$oXML->elementname);
+				$res = Yii::app()->db->createCommand("SHOW COLUMNS FROM ".$elements[0]." WHERE Field='".$elements[1]."'")->execute();
+				if($res)
 					Yii::app()->db->createCommand($oXML->sqlstatement)->execute();
 				break;
 
@@ -342,8 +354,7 @@ class UpgradeController extends CController
 
 	protected function checkForDatabaseUpdates()
 	{
-		$url = "http://updater.lightspeedretail.com/webstore";
-		//$url = "http://www.lsvercheck.site/webstore";
+		$url = "http://"._xls_get_conf('LIGHTSPEED_UPDATER','updater.lightspeedretail.com')."/webstore";
 
 		$storeurl = $this->createAbsoluteUrl("/");
 		$storeurl = str_replace("http://","",$storeurl);
@@ -355,6 +366,14 @@ class UpgradeController extends CController
 			'customer'    => $storeurl,
 			'type'       => (_xls_get_conf('LIGHTSPEED_HOSTING')==1 ? "hosted" : "self")
 		);
+		if(Yii::app()->params['LIGHTSPEED_MT']=='1')
+		{
+			//Since we could have two urls on multitenant, just grab the original one
+			$data['customer']=Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL'];
+			$data['type']="mt-pro";
+			if(Yii::app()->params['LIGHTSPEED_CLOUD']>0) $data['type']="mt-cloud";
+
+		}
 		$json = json_encode($data);
 
 		$ch = curl_init($url);
@@ -441,5 +460,111 @@ class UpgradeController extends CController
 
 	}
 
+
+	/**
+	 * Triggers to perform upgrade tasks using a special key from the db upgrade routine
+	 * If we have to move files or remove something specifically during an upgrade
+	 * @param $id
+	 */
+	protected function runTask($id)
+	{
+		Yii::log("Running upgrade task $id.", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		switch($id)
+		{
+			case 416:
+				//Place any header images in our new gallery library
+				Gallery::LoadGallery(1);
+				$d = dir(YiiBase::getPathOfAlias('webroot')."/images/header");
+				while (false!== ($filename = $d->read()))
+					if ($filename[0] != ".")
+					{
+						$model = new GalleryPhoto();
+						$model->gallery_id = 1;
+						$model->file_name = $filename;
+						$model->name = '';
+						$model->description = '';
+						$model->save();
+						$arrImages["/images/header/".$filename] =
+							CHtml::image(Yii::app()->request->baseUrl."/images/header/".$filename);
+
+						$src = YiiBase::getPathOfAlias('webroot')."/images/header/".$filename;
+
+						$fileinfo = mb_pathinfo($filename);
+
+						$model->thumb_ext = $fileinfo['extension'];
+						$model->save();
+
+						$imageFile = new CUploadedFile($filename,
+							$src,
+							"image/".$fileinfo['extension'],
+							getimagesize($src),
+							null
+						);
+
+						if(Yii::app()->params['LIGHTSPEED_MT']=='1')
+							$model->setS3Image($imageFile);
+						else
+							$model->setImage($imageFile);
+
+					}
+
+				break;
+
+
+			case 417:
+				//Remove wsconfig.php reference from /config/main.php
+
+				if(Yii::app()->params['LIGHTSPEED_MT']==1) return;	//only applies to single tenant
+				$maincontents = file_get_contents(YiiBase::getPathOfAlias('webroot')."/config/main.php");
+
+				$maincontents=str_replace('if (file_exists(dirname(__FILE__).\'/wsconfig.php\'))
+	$wsconfig = require(dirname(__FILE__).\'/wsconfig.php\');
+else $wsconfig = array();','$wsconfig = array();',$maincontents);
+
+				//We actually catch this in two places, the second will make the first irrelevant anyway
+				$maincontents = str_replace('),$wsconfig);','),array());',$maincontents);
+
+				file_put_contents(YiiBase::getPathOfAlias('webroot')."/config/main.php",$maincontents);
+				break;
+
+			case 423:
+				// add cart/cancel url rule for sim payment methods (ex. moneris) that require hardcoded cancel urls
+
+				$maincontents = file_get_contents(YiiBase::getPathOfAlias('webroot')."/config/main.php");
+
+				// check to see if the entry is already there and write it if it isn't
+				$position = strpos($maincontents,'cart/cancel');
+				if (!$position)
+				{
+					$comments = "\r\r\t\t\t\t\t\t// moneris simple integration requires a hardcoded cancel URL\r\t\t\t\t\t\t// any other methods that require something similar we can add a cart/cancel rule like this one\r\t\t\t\t\t\t";
+
+					$pos = strpos($maincontents,"sro/view',")+strlen("sro/view',");
+					$maincontents = substr_replace($maincontents, $comments."'cart/cancel/<order_id:\WO-[0-9]+>&<cancelTXN:(.*)>'=>'cart/cancel',\t\t\t\t\t\t",$pos,0);
+					file_put_contents(YiiBase::getPathOfAlias('webroot')."/config/main.php",$maincontents);
+
+				}
+
+				break;
+
+			case 427:
+				// Add URL mapping for custom pages
+
+				// If the store's on multi-tenant server, do nothing
+				if(Yii::app()->params['LIGHTSPEED_MT']>0) return;
+
+				$main_config = file_get_contents(YiiBase::getPathOfAlias('webroot')."/config/main.php");
+				$search_string = "'<id:(.*)>/pg'";
+
+				// Check if the entry already exists. If not, add the mapping.
+				if (strpos($main_config, $search_string) ===false) {
+					$position = strpos($main_config, "'<feed:[\w\d\-_\.()]+>.xml' => 'xml/<feed>', //xml feeds");
+					$custompage_mapping = "'<id:(.*)>/pg'=>array('custompage/index', 'caseSensitive'=>false,'parsingOnly'=>true), //Custom Page\r\t\t\t\t\t\t";
+					$main_config = substr_replace($main_config, $custompage_mapping, $position, 0);
+					file_put_contents(YiiBase::getPathOfAlias('webroot')."/config/main.php",$main_config);
+				}
+
+				break;
+		}
+	}
 
 }

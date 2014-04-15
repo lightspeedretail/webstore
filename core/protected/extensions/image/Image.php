@@ -71,11 +71,11 @@ class Image {
 		($check === NULL) and $check = function_exists('getimagesize');
 
 		if ($check === FALSE)
-			throw new CException('image getimagesize missing');
+			throw new CException('image getimagesize missing: '.$image);
 
 		// Check to make sure the image exists
 		if ( ! is_file($image))
-			throw new CException('image file not found');
+			throw new CException('image file not found: '.$image);
 
 		// Disable error reporting, to prevent PHP warnings
 		$ER = error_reporting(0);
@@ -88,11 +88,11 @@ class Image {
 
 		// Make sure that the image is readable and valid
 		if ( ! is_array($image_info) OR count($image_info) < 3)
-			throw new CException('image file unreadable');
+			throw new CException('image file unreadable: '.$image);
 
 		// Check to make sure the image type is allowed
 		if ( ! isset(Image::$allowed_types[$image_info[2]]))
-			throw new CException('image type not allowed');
+			throw new CException('image type not allowed: '.$image);
 
 		// Image has been validated, load it
 		$this->image = array

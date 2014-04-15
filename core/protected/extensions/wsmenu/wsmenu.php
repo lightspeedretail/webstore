@@ -8,104 +8,102 @@ Yii::import('zii.widgets.CMenu');
 class WsMenu extends CMenu {
 
 
+	/**
+	 * @var bool
+	 */
 	public $activateItemsOuter = true;
+	/**
+	 * @var array
+	 */
 	public $categories = array();
 
+	/**
+	 * @var string
+	 */
 	public $menuheader = "Products";
+	/**
+	 * Whether to show arrow graphic
+	 * @var bool
+	 */
 	public $showarrow = true;
+	/**
+	 * Enable click to show menu when using iDevices
+	 * @var bool
+	 */
 	public $ipadhack = true;
+	/**
+	 * DIV id
+	 * @var string
+	 */
 	public $id = "nav_products";
+	/**
+	 * DIV id
+	 * @var string
+	 */
+	public $cmenuid = "menutree";
+	/**
+	 * Since Products occupies one of the tabs, the CSS class that we need to use
+	 * @var string
+	 */
 	public $CssClass="menutab";
+	/**
+	 * CSS Class to use for Menu Header
+	 * @var string
+	 */
+	public $menuheaderCssClass="nav_menuheader";
 
 
 	/**
-	 * Renders the menu items.
-	 * @param array $items menu items. Each menu item will be an array with at least two elements: 'label' and 'active'.
-	 * It may have three other optional elements: 'items', 'linkOptions' and 'itemOptions'.
+	 * Renders the dropdown menu
+	 * Use CMenu within a dropdown wrapper with an optional arrow
 	 */
 	public function run()
 	{
+		if($this->activateItemsOuter)
+			$this->renderMenuInWrapper();
+		else
+			$this->renderCMenu();
 
 
-
-		$this->renderProductsDropdown();
 
 	}
 
-
-	protected function renderProductsDropdown()
+	public function renderMenuInWrapper()
 	{
-
-		if(_xls_is_idevice()) {
-        echo '<script>
-            function showdropdown()	{
-                $("#nav_products li ul").style.left = "auto";
-                $("#nav_products li ul ul").style.left = "-999em";
-            }
-        </script>';
+		if(_xls_is_idevice() && $this->ipadhack) {
+			echo '<script>
+			function showdropdown()	{
+				$("#'.$this->id.' li ul").style.left = "auto";
+				$("#'.$this->id.' li ul ul").style.left = "-999em";
+			}
+		</script>';
 		}
 
-		echo '<div id="'.$this->id.'" class="'.$this->CssClass.'" '.(($this->ipadhack && _xls_is_idevice()) ? 'onClick="showdropdown();"' : '').'>
-			<ul>
-				<li class="nav_menuheader">'. Yii::t('tabs',$this->menuheader);
-				if ($this->showarrow)
-					echo CHtml::image(Yii::app()->theme->baseUrl.'/css/images/arrow-down.png','',array('class'=>'arrow'));
-				echo '<ul class="dropspace">';
+		echo '<div id="'.$this->id.'" class="'.$this->CssClass.'" '.
+			(($this->ipadhack && _xls_is_idevice()) ? 'onClick="showdropdown();"' : '').'>';
 
-						if(_xls_get_conf('ENABLE_FAMILIES', 0)==2)
-							$this->renderFamilies();
-						 foreach($this->categories as $category) {
-							echo '<li><a href="'.$category['link'].'">'.Yii::t('category',$category['label']);
-							 if(!_xls_is_idevice()) self::renderChildren($category); else echo "</a>";
-							 echo '</li>';
-							 }
-						if(_xls_get_conf('ENABLE_FAMILIES', 0)==1)
-							$this->renderFamilies();
-		echo '
-					</ul>
-				</li>
+		echo '<ul>
+					<li class="'.$this->menuheaderCssClass.'">'. Yii::t('tabs',$this->menuheader);
+
+		//If we show arrow graphic
+		if ($this->showarrow)
+			echo CHtml::image(Yii::app()->theme->baseUrl.'/css/images/arrow-down.png','',array('class'=>'arrow'));
+
+		$this->renderCMenu();
+
+		echo '</li>
 			</ul>
 		</div>';
-
 	}
 
-	protected function renderChildren($arrCategory) {
 
-		if(!$arrCategory['hasChildren']) {
-			echo "</a>";
-			return;
-		}
-		$arrChildren = $arrCategory['children'];
-		echo "<img src=\"" .  Yii::app()->theme->baseUrl  . "/css/images/arrow-right.gif\" class=\"arrow\" alt='' /></a><ul>\n";
-		foreach($arrChildren as $arrChild) {
-			echo '<li><a href="'.$arrChild['link'].'">'.Yii::t('category',$arrChild['label']);
-			self::renderChildren($arrChild);
-			echo '</li>';
-		}
-
-		echo "</ul>\n";
-	}
-
-	protected function renderFamilies()
+	public function renderCMenu()
 	{
-
-
-		$strLabel=_xls_get_conf('ENABLE_FAMILIES_MENU_LABEL' , 'By Manufacturer');
-		echo '<li class="producttabs"><a href="#">'.$strLabel;
-		echo "<img src=\"" .  Yii::app()->theme->baseUrl  . "/css/images/arrow-right.gif\" class=\"arrow\" alt='' /></a>";
-		echo '<ul>';
-		if (_xls_get_conf('DISPLAY_EMPTY_CATEGORY')==1)
-			$families= Family::model()->findAll('child_count>=0 order by family');
-		else
-			$families= Family::model()->findAll('child_count>0 order by family');
-		foreach($families as $family) {
-			echo '<li><a href="'.$family->Link.'">'.$family->family.'</a></li>';
-		}
-		echo '</ul></li>';
-
+		//Just use Yii functionality, way simpler than our own
+		$this->widget( 'zii.widgets.CMenu', array(
+			'items' => $this->categories,
+			'id'=>$this->cmenuid
+		));
 	}
 
 }
-
-
-?>

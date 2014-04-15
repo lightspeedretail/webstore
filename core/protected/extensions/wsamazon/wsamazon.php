@@ -29,6 +29,8 @@ class wsamazon extends ApplicationComponent {
 	protected $MarketplaceID;
 	protected $MWS_ACCESS_KEY_ID;
 	protected $MWS_SECRET_ACCESS_KEY;
+	protected $amazon_check_time = "-2 hours";
+	protected $amazon_tag;
 	protected $APPLICATION_NAME;
 	protected $APPLICATION_VERSION = "0.0.1";
 	protected $service;
@@ -42,6 +44,12 @@ class wsamazon extends ApplicationComponent {
 
 		$this->MerchantID = $this->objModule->getConfig('AMAZON_MERCHANT_ID');
 		$this->MarketplaceID = $this->objModule->getConfig('AMAZON_MARKETPLACE_ID');
+		$amazon_check_time = $this->objModule->getConfig('amazon_check_time');
+		if(!empty($amazon_check_time))
+			$this->amazon_check_time = $this->objModule->getConfig('amazon_check_time');
+		$amazon_tag = $this->objModule->getConfig('amazon_tag');
+		if(!empty($amazon_tag))
+			$this->amazon_tag = $amazon_tag;
 		$this->MWS_ACCESS_KEY_ID = $this->objModule->getConfig('AMAZON_MWS_ACCESS_KEY_ID');
 		$this->MWS_SECRET_ACCESS_KEY = $this->objModule->getConfig('AMAZON_MWS_SECRET_ACCESS_KEY');
 		$this->APPLICATION_NAME = _xls_get_conf('STORENAME')." MyCompany_AmazonMWS";
@@ -94,8 +102,18 @@ class wsamazon extends ApplicationComponent {
 	public function onSaveProduct($event)
 	{
 
+		$this->init();
+
+		if(!empty($this->amazon_tag))
+			Yii::log("Filtering by tag ".$this->amazon_tag, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+
+
 		$objProduct = $event->objProduct;
-		if (!empty($objProduct->upc) && $objProduct->web && (count($objProduct->xlswsCategories)>0))
+		if (!empty($objProduct->upc) &&
+			$objProduct->web &&
+			(count($objProduct->xlswsCategories)>0) &&
+			(empty($this->amazon_tag) || $objProduct->hasTag($this->amazon_tag))
+		)
 			TaskQueue::CreateEvent('integration',get_class($this),'UploadProduct',null,$objProduct->id);
 	}
 
@@ -106,8 +124,17 @@ class wsamazon extends ApplicationComponent {
 	 */
 	public function onUpdateInventory($event)
 	{
+		$this->init();
+
+		if(!empty($this->amazon_tag))
+			Yii::log("Filtering by tag ".$this->amazon_tag, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+
 		$objProduct = $event->objProduct;
-		if (!empty($objProduct->upc) && $objProduct->web && (count($objProduct->xlswsCategories)>0))
+		if (!empty($objProduct->upc) &&
+			$objProduct->web &&
+			(count($objProduct->xlswsCategories)>0) &&
+			(empty($this->amazon_tag) || $objProduct->hasTag($this->amazon_tag))
+		)
 			TaskQueue::CreateEvent('integration',get_class($this),'UploadInventory',null,$objProduct->id);
 	}
 
@@ -158,7 +185,7 @@ class wsamazon extends ApplicationComponent {
 
 			if ($submission_id)
 			{
-				TaskQueue::CreateEvent('integration',get_class($this),'verifyproductupload',$submission_id,$product_id);
+				TaskQueue::CreateEvent('integration',get_class($this),'VerifyProductUpload',$submission_id,$product_id);
 				return true;
 			}
 
@@ -182,7 +209,7 @@ class wsamazon extends ApplicationComponent {
 			$submission_id =  $this->submitFeed('_POST_PRODUCT_PRICING_DATA_',$feed);
 			if ($submission_id)
 			{
-				TaskQueue::CreateEvent('integration',get_class($this),'verifyproductupdate',$submission_id,$product_id);
+				TaskQueue::CreateEvent('integration',get_class($this),'VerifyProductUpdate',$submission_id,$product_id);
 				return true;
 			}
 
@@ -194,7 +221,7 @@ class wsamazon extends ApplicationComponent {
 
 	public function OnActionUploadPhoto($event)
 	{
-		$data_id = $event->data_id;
+
 		$product_id = $event->product_id;
 
 		$objProduct = Product::model()->findByPk($product_id);
@@ -207,12 +234,12 @@ class wsamazon extends ApplicationComponent {
 			{
 				$submission_id =  $this->submitFeed('_POST_PRODUCT_IMAGE_DATA_',$feed);
 				if ($submission_id)
-				{
-					TaskQueue::CreateEvent('integration',get_class($this),'verifyproductupdate',$submission_id,$product_id);
-					return true;
-				}
+					TaskQueue::CreateEvent('integration',get_class($this),'VerifyProductUpdate',$submission_id,$product_id);
+				else return false;
 			}
-			return false;
+
+			//We return true if we are successful on a submit, but also if our product has no image so we don't attempt upload
+			return true;
 
 		}
 
@@ -248,7 +275,7 @@ class wsamazon extends ApplicationComponent {
 
 			if ($submission_id)
 			{
-				TaskQueue::CreateEvent('integration',get_class($this),'verifyproductupdate',$submission_id,$product_id);
+				TaskQueue::CreateEvent('integration',get_class($this),'VerifyProductUpdate',$submission_id,$product_id);
 				return true;
 			}
 			return false;
@@ -265,6 +292,8 @@ class wsamazon extends ApplicationComponent {
 		switch ($this->getFeedSubmissionResult($data_id))
 		{
 			case self::SUCCESS:
+				Yii::log("Product uploaded successfully to Amazon ".$product_id, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+
 				TaskQueue::CreateEvent('integration',get_class($this),'uploadprice',null,$product_id);
 				TaskQueue::CreateEvent('integration',get_class($this),'uploadinventory',null,$product_id);
 
@@ -301,6 +330,9 @@ class wsamazon extends ApplicationComponent {
 		switch ($this->getFeedSubmissionResult($data_id))
 		{
 			case self::SUCCESS:
+				Yii::log("Product ".$event->product_id." successfully updated on to Amazon ".$product_id,
+					'info', 'application.'.__CLASS__.".".__FUNCTION__);
+
 			case self::ERROR: //true on error because want to stop further activity, we've already logged it
 				return true;
 
@@ -314,11 +346,12 @@ class wsamazon extends ApplicationComponent {
 
 	public function OnActionListOrders($event)
 	{
-		$data_id = $event->data_id;
-		$product_id = $event->product_id;
 
-		$checkTime = date("Y-m-d H:i:s",strtotime("-2 hours"));
-		$checkDate = date("Y-m-d",strtotime("-2 hours"));
+
+		$checkTime = date("Y-m-d H:i:s",strtotime($this->amazon_check_time));
+		$checkDate = date("Y-m-d",strtotime($this->amazon_check_time));
+
+		Yii::log("Checking for new orders since ".$checkTime, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 		$request = new MarketplaceWebServiceOrders_Model_ListOrdersRequest();
 		$request->setSellerId($this->MerchantID);
@@ -361,27 +394,35 @@ class wsamazon extends ApplicationComponent {
 					if ($order->isSetAmazonOrderId())
 					{
 
-						Yii::log("Found Amazon Order ".$order->getAmazonOrderId() , 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+						$strOrderId = $order->getAmazonOrderId();
+						Yii::log("Found Amazon Order ".$strOrderId ,
+							'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
-						$objCart = Cart::LoadByIdStr($order->getAmazonOrderId());
+						$objCart = Cart::LoadByIdStr($strOrderId);
 						if (!($objCart instanceof Cart))
 						{
 							//We ignore orders we've already downloaded
 							$objCart = new Cart();
 
-							$objCart->id_str = $order->getAmazonOrderId();
+							$objCart->id_str = $strOrderId;
 							$objCart->origin = 'amazon';
-							$objCart->cart_type = CartType::cart; //We mark this as just a cart, not an order, because we download the items next
+
+							//We mark this as just a cart, not an order, because we download the items next
+							$objCart->cart_type = CartType::cart;
 
 							$objOrderTotal = $order->getOrderTotal();
+							Yii::log("Order total information ".print_r($objOrderTotal,true),
+								'info', 'application.'.__CLASS__.".".__FUNCTION__);
+
 							$objCart->total = $objOrderTotal->getAmount();
 							$objCart->currency =$objOrderTotal->getCurrencyCode();
 							$objCart->status = OrderStatus::Requested;
 							$objCart->datetime_cre = $order->getPurchaseDate();
 							$objCart->modified = $order->getLastUpdateDate();
 
-							if (!$objCart->save())
-								print_r($objCart->getErrors());
+							if(!$objCart->save())
+								Yii::log("Error saving cart ".print_r($objCart->getErrors(),true),
+									'error', 'application.'.__CLASS__.".".__FUNCTION__);;
 
 							//Since email from is Anonymous, we probably will have to create a shell record
 							$objCustomer = Customer::LoadByEmail($order->getBuyerEmail());
@@ -399,7 +440,9 @@ class wsamazon extends ApplicationComponent {
 
 							}
 							$objCart->customer_id = $objCustomer->id;
-							$objCart->save();
+							if(!$objCart->save())
+								Yii::log("Error saving cart ".print_r($objCart->getErrors(),true),
+									'error', 'application.'.__CLASS__.".".__FUNCTION__);;
 
 
 							if ($order->isSetShippingAddress()) {
@@ -432,13 +475,27 @@ class wsamazon extends ApplicationComponent {
 								$objCustomer->default_billing_id = $objCustAddress->id;
 								$objCustomer->default_shipping_id = $objCustAddress->id;
 								$objCustomer->save();
+
 								$objCart->shipaddress_id = $objCustAddress->id;
 								$objCart->billaddress_id = $objCustAddress->id; //Amazon doesn't provide billing data, just dupe
-								$objCart->save();
+								if(!$objCart->save())
+									Yii::log("Error saving cart ".print_r($objCart->getErrors(),true),
+										'error', 'application.'.__CLASS__.".".__FUNCTION__);
 
-								$objDestination = Destination::LoadMatching($objState->country_code, $objState->code, $shippingAddress->getPostalCode());
+								Yii::log("Looking for destination ".$objState->country_code." ".
+									$objState->code." ".$shippingAddress->getPostalCode(),
+									'info', 'application.'.__CLASS__.".".__FUNCTION__);
+
+								$objDestination = Destination::LoadMatching(
+									$objState->country_code,
+									$objState->code,
+									$shippingAddress->getPostalCode());
 								if (!$objDestination)
+								{
+									Yii::log("Did not find destination, using default in Web Store ",
+										'info', 'application.'.__CLASS__.".".__FUNCTION__);
 									$objDestination = Destination::LoadDefault();
+								}
 
 								$objCart->tax_code_id = $objDestination->taxcode;
 								$objCart->UpdateCart();
@@ -455,8 +512,9 @@ class wsamazon extends ApplicationComponent {
 								else {
 									//create
 									$objShipping = new CartShipping;
-									if (!$objShipping->save())
-										print_r($objShipping->getErrors());
+									if(!$objShipping->save())
+										Yii::log("Error saving shipping info for cart ".print_r($objShipping->getErrors(),true),
+											'error', 'application.'.__CLASS__.".".__FUNCTION__);;
 								}
 
 								if ($order->isSetShipmentServiceLevelCategory())
@@ -470,7 +528,9 @@ class wsamazon extends ApplicationComponent {
 								$objShipping->save();
 
 								$objCart->shipping_id = $objShipping->id;
-								$objCart->save(); //save cart so far
+								if(!$objCart->save())
+									Yii::log("Error saving cart ".print_r($objCart->getErrors(),true),
+										'error', 'application.'.__CLASS__.".".__FUNCTION__);
 							}
 
 
@@ -481,12 +541,15 @@ class wsamazon extends ApplicationComponent {
 							$objP->payment_data='Amazon';
 							$objP->payment_amount=$objOrderTotal->getAmount();
 							$objP->datetime_posted=$order->getPurchaseDate();
-							if (!$objP->save())
-								print_r($objP->getErrors());
+							if(!$objP->save())
+								Yii::log("Error saving payment ".print_r($objP->getErrors(),true),
+									'error', 'application.'.__CLASS__.".".__FUNCTION__);;
 
 
 							$objCart->payment_id = $objP->id;
-							$objCart->save(); //save cart so far
+							if(!$objCart->save())
+								Yii::log("Error saving cart ".print_r($objCart->getErrors(),true),
+									'error', 'application.'.__CLASS__.".".__FUNCTION__);
 
 
 
@@ -532,6 +595,7 @@ class wsamazon extends ApplicationComponent {
 
 	public function onActionListOrderDetails($event)
 	{
+		Yii::log("Running event ".print_r($event,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 		$data_id = $event->data_id;
 		$arrData = explode(",",$data_id);
@@ -572,14 +636,21 @@ class wsamazon extends ApplicationComponent {
 
 				foreach ($orderItemList as $orderItem) {
 
-					Yii::log("Amazon ".$cartId." item found ".print_r($orderItem,true) , 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 					$strCode = $orderItem->getSellerSKU();
+					Yii::log("Amazon ".$cartId." item on order ".$strCode, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+					Yii::log("Order item information ".print_r($orderItem,true),
+						'info', 'application.'.__CLASS__.".".__FUNCTION__);
 					$intQty = $orderItem->getQuantityOrdered();
 
 					$objPrice = $orderItem->getItemPrice();
 					$fltPrice = $objPrice->getAmount();
 					$strCurrency = $objPrice->getCurrencyCode();
 
+					//Amazon provides price as total for line item, but our AddToCart expects per item
+					//so we divide
+					if($intQty>1)
+						$fltPrice = ($fltPrice/$intQty);
+					
 					if ($orderItem->isSetShippingPrice()) {
 						$objShippingPrice = $orderItem->getShippingPrice();
 						if ($objShippingPrice->isSetAmount())
@@ -594,13 +665,26 @@ class wsamazon extends ApplicationComponent {
 					} else $fltDiscount=0;
 
 					$objProduct = Product::LoadByCode($strCode);
-					$objCart->AddProduct($objProduct, $intQty, CartType::order, null, $orderItem->getTitle(),$fltPrice,$fltDiscount);
+					if(is_null($objProduct))
+					{
+						$objCart->printed_notes .= "ERROR MISSING PRODUCT - ".
+							"Attempted to download a product from Amazon ".$strCode." that doesn't exist in Web Store\n";
+						Yii::log("Attempted to download a product from Amazon ".$strCode." that doesn't exist in Web Store",
+							'error', 'application.'.__CLASS__.".".__FUNCTION__);
+					}
+					else
+						$objCart->AddProduct($objProduct, $intQty, CartType::order, null, $orderItem->getTitle(),
+							$fltPrice,$fltDiscount);
 
 					$objCart->currency = $strCurrency;
-					$objCart->save();
+					if(!$objCart->save())
+						Yii::log("Error saving cart ".print_r($objCart->getErrors(),true),
+							'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				}
 				$objCart->cart_type = CartType::order;
-				$objCart->save();
+				if(!$objCart->save())
+					Yii::log("Error saving cart ".print_r($objCart->getErrors(),true),
+						'error', 'application.'.__CLASS__.".".__FUNCTION__);
 
 				$objShipping = $objCart->shipping;
 				$objShipping->shipping_cost=$shippingCost;
@@ -610,6 +694,9 @@ class wsamazon extends ApplicationComponent {
 
 				$objCart->RecalculateInventoryOnCartItems();
 
+				//A new order has been created, so run signal
+				$objEvent = new CEventOrder('wsamazon','onCreateOrder',$objCart->id_str);
+				_xls_raise_events('CEventOrder',$objEvent);
 			}
 
 
@@ -631,7 +718,8 @@ class wsamazon extends ApplicationComponent {
 			Yii::log("Error Type: " . $ex->getErrorType(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			Yii::log("Request ID: " . $ex->getRequestId(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			Yii::log("XML: " . $ex->getXML(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-			Yii::log("ResponseHeaderMetadata: " . $ex->getResponseHeaderMetadata(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			Yii::log("ResponseHeaderMetadata: " . $ex->getResponseHeaderMetadata(),
+				'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::ERROR;
 
 		}
@@ -739,7 +827,8 @@ class wsamazon extends ApplicationComponent {
 			Yii::log("Error Type: " . $ex->getErrorType(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			Yii::log("Request ID: " . $ex->getRequestId(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			Yii::log("XML: " . $ex->getXML(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-			Yii::log("ResponseHeaderMetadata: " . $ex->getResponseHeaderMetadata(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			Yii::log("ResponseHeaderMetadata: " . $ex->getResponseHeaderMetadata(),
+				'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			self::ERROR;
 		}
 
@@ -758,6 +847,7 @@ class wsamazon extends ApplicationComponent {
 			case 'ES':
 			case 'FR':
 			case 'IN':
+			case 'GB':
 			case 'UK': return "https://mws-eu.amazonservices.com";
 
 			case 'CA': return "https://mws.amazonservices.ca";
@@ -773,8 +863,11 @@ class wsamazon extends ApplicationComponent {
 
 	public function getUploadProductFeed($objProduct)
 	{
-
-		return '<?xml version="1.0" encoding="utf-8"?>
+			if(strlen($objProduct->category->integration->amazon->item_type_keyword))
+				$itemType = '<ItemType>'.$objProduct->category->integration->amazon->item_type_keyword.'</ItemType>';
+			else
+				$itemType = '';
+		$strFeed = '<?xml version="1.0" encoding="utf-8"?>
 			<AmazonEnvelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xsi:noNamespaceSchemaLocation="amzn-envelope.xsd">
 				<Header>
@@ -795,17 +888,21 @@ class wsamazon extends ApplicationComponent {
 							<Brand><![CDATA['.$objProduct->Family.']]></Brand>
 							<Description><![CDATA['.$objProduct->WebLongDescription.']]></Description>'.$this->getBulletPoints($objProduct).'
 							<Manufacturer><![CDATA['.$objProduct->Family.']]></Manufacturer>
-							<ItemType>'.$objProduct->category->integration->amazon->item_type_keyword.'</ItemType>
+							'.$itemType.'
 						</DescriptionData>
 						'.$this->getProductDetails($objProduct).'
 					</Product>
 				</Message>
 			</AmazonEnvelope>';
+		Yii::log("Created product feed ".$strFeed, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+		return $strFeed;
+		
 	}
 
 	public function getUploadPriceFeed($objProduct)
 	{
-		return '<?xml version="1.0" encoding="utf-8"?>
+
+		$strFeed = '<?xml version="1.0" encoding="utf-8"?>
 				<AmazonEnvelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="amzn-envelope.xsd">
 				  <Header>
 				    <DocumentVersion>1.01</DocumentVersion>
@@ -820,11 +917,19 @@ class wsamazon extends ApplicationComponent {
 				    </Price>
 				  </Message>
 				</AmazonEnvelope>';
+		Yii::log("Created upload feed ".$strFeed, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+		return $strFeed;
 	}
 
 	public function getUploadPhotoFeed($objProduct)
 	{
-		return '<?xml version="1.0" encoding="utf-8" ?>
+		$url = Images::GetLink($objProduct->image_id,ImagesType::normal,true);
+
+		//If our URL is schema-less, prepend schema so Amazon is happy
+		if(substr($url,0,2)=='//')
+			$url = "http:".$url;
+
+		$strFeed =  '<?xml version="1.0" encoding="utf-8" ?>
 			<AmazonEnvelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="amznenvelope.xsd">
 				<Header>
 					<DocumentVersion>1.01</DocumentVersion>
@@ -837,11 +942,13 @@ class wsamazon extends ApplicationComponent {
 					<ProductImage>
 						 <SKU>'.$objProduct->code.'</SKU>
 						<ImageType>Main</ImageType>
-						<ImageLocation>'.Images::GetLink($objProduct->image_id,ImagesType::normal,true).'</ImageLocation>
+						<ImageLocation>'.$url.'</ImageLocation>
 					</ProductImage>
 				</Message>
 			</AmazonEnvelope>';
 
+		Yii::log("Created photo feed ".$strFeed, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+		return $strFeed;
 	}
 
 	public function getUpc($objProduct)
@@ -919,7 +1026,14 @@ class wsamazon extends ApplicationComponent {
 			$objEmail->subject = "Amazon Error";
 			$orderEmail = _xls_get_conf('ORDER_FROM','');
 			$objEmail->to = empty($orderEmail) ? _xls_get_conf('EMAIL_FROM') : $orderEmail;
-			$objEmail->save();
+
+
+			Yii::log($objEmail->htmlbody, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+
+			if(!$objEmail->save())
+				Yii::log("Error saving Email ".print_r($objEmail->getErrors(),true),
+					'error', 'application.'.__CLASS__.".".__FUNCTION__);
+
 		}
 
 

@@ -68,19 +68,13 @@ class ShoppingCart extends CApplicationComponent
 			} else {
 
 				$objCart = Cart::model()->findByPk($intCartId);
-				if (!($objCart instanceof Cart))
-				{
+				if (!$objCart || ($objCart->cart_type  != CartType::cart && $objCart->cart_type != CartType::awaitpayment)) {
 					//something has happened to the database object
 					Yii::log("Could not find cart ".$intCartId.", creating new one.", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 					$objCart = Cart::InitializeCart();
 					Yii::app()->user->setState('cartid',$objCart->id);
 				}
-				elseif($objCart->cart_type != CartType::cart && $objCart->cart_type != CartType::awaitpayment)
-				{
-					Yii::log("Found cart ".$intCartId." but ".$objCart->cart_type." is not editable type, so generate a new one", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-					$objCart = Cart::InitializeCart();
-					Yii::app()->user->setState('cartid',$objCart->id);
-				}
+
 
 			}
 			$this->_model = $objCart;
@@ -96,8 +90,9 @@ class ShoppingCart extends CApplicationComponent
 	protected function createCart()
 	{
 		$intCartId = Yii::app()->user->getState('cartid');
+		Yii::log("Creating cart, existing id is ".$intCartId, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
-		if(empty($intCartId)) {
+		if(empty($intCartId) && !Yii::app()->isCommonSSL) {
 
 			$objCustomer = Customer::GetCurrent();
 			$intCustomerid = null;
@@ -128,6 +123,7 @@ class ShoppingCart extends CApplicationComponent
 	/**
 	 * If the user had a cart in progress, merge the items into the current cart
 	 * @param null $objCartToMerge
+	 * @return bool
 	 */
 	public function loginMerge($objCartToMerge = null)
 	{
@@ -137,8 +133,14 @@ class ShoppingCart extends CApplicationComponent
 			$objCartInProgress = Cart::LoadLastCartInProgress(Yii::app()->user->id,$this->id);
 
 		if ($objCartInProgress) {
+			Yii::log("Found prior cart ".$objCartInProgress->id, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
-			$arrPastItems = $objCartInProgress->cartItems;
+			if(count($this->cartItems)==0)
+			{
+				$this->_model=$objCartInProgress;
+				$arrPastItems=array();
+			} else
+				$arrPastItems = $objCartInProgress->cartItems;
 
 			//Merge in any new items we had in our cart from this session
 			if (count($arrPastItems)>0)
@@ -168,13 +170,14 @@ class ShoppingCart extends CApplicationComponent
 			Yii::log("Error saving cart ".print_r($this->model->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		$this->UpdateCart();
 		$this->_model=Cart::model()->findByPk($this->id);
-
+		Yii::app()->user->setState('cartid',$this->id);
 		return true;
 	}
 
 	/**
 	 * Merge a document (i.e. quote) into the current cart.
 	 * @param null $objDocument
+	 * @return bool
 	 */
 	public function loginQuote($objDocument= null)
 	{
@@ -271,6 +274,16 @@ class ShoppingCart extends CApplicationComponent
 		return $this->model->name;
 	}
 
+
+	public function getCartQty()
+	{
+
+		$count=0;
+		foreach ($this->cartItems as $item)
+			$count += $item->qty;
+		return $count;
+	}
+
 	public function setTaxCodeId($id)
 	{
 		$this->model->tax_code_id = $id;
@@ -279,6 +292,15 @@ class ShoppingCart extends CApplicationComponent
 		$this->Recalculate();
 	}
 
+	/**
+	 * Forcibly assign a shopping cart to a specific cartid
+	 * @param $id
+	 */
+	public function assign($id)
+	{
+		Yii::app()->user->setState('cartid',$id);
+		$this->setModel($id);
+	}
 	/**
 	 * Add a product to the cart. Defaults to qty 1 unless specified
 	 * @param $mixProduct
@@ -319,7 +341,8 @@ class ShoppingCart extends CApplicationComponent
 
 			if (is_numeric($retVal) && is_null($auto)) //prevent circular logic adding
 				foreach($objProduct->productRelateds as $objProductAdditional) {
-					if($objProductAdditional->related->IsAddable &&
+					if(isset($objProductAdditional->related) &&
+						$objProductAdditional->related->IsAddable &&
 						$objProductAdditional->autoadd==1 &&
 						$objProductAdditional->related->master_model==0) {
 						$this->addProduct($objProductAdditional->related,$objProductAdditional->qty,null,true);
@@ -496,7 +519,13 @@ class ShoppingCart extends CApplicationComponent
 
 		if($this->model->id>0)
 		{
-			if(is_object($this->model->taxCode) && $this->model->taxCode->IsNoTax()) return false;
+			if(!isset($this->model->taxCode))
+			{
+				$objDestination = Destination::LoadDefault();
+				if(is_null($objDestination)) return false;
+				$this->setTaxCodeId($objDestination->taxcode);
+			}
+			if($this->model->taxCode->IsNoTax()) return false;
 			if (Yii::app()->params['TAX_INCLUSIVE_PRICING']) return true;
 
 			return false;
@@ -529,6 +558,7 @@ class ShoppingCart extends CApplicationComponent
 
 		if ($objCustomer instanceof Customer)
 		{
+			Yii::log("Assigning customer id #".$objCustomer->id, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			$this->model->customer_id = $objCustomer->id;
 			$this->model->save();
 			$this->model->UpdateCartCustomer();
@@ -665,6 +695,8 @@ class ShoppingCart extends CApplicationComponent
 					return $this->model->shipaddress;
 				else return null;
 
+			case 'originalSubTotal':
+				return self::calculateOriginalSubtotal();
 
 			default:
 				//As a clever trick to get to our model through the component,
@@ -676,6 +708,18 @@ class ShoppingCart extends CApplicationComponent
 
 		}
 
+	}
+
+	private function calculateOriginalSubtotal()
+	{
+		$originalSubTotal = 0;
+		if ($this->model->cartItems)
+		{
+			foreach($this->cartItems as $objItem)
+				$originalSubTotal += $objItem->sell_base * $objItem->qty;
+		}
+
+		return $originalSubTotal;
 	}
 
 	/**

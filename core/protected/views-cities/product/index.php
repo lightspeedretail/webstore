@@ -6,7 +6,7 @@
 ?>
 	<div id="product_details">
 		<div class="row-fluid">
-	        <div class="span5">
+	        <div class="span5 product_detail_image">
 		        <div id="photos">
 			        <?= $this->renderPartial('/product/_photos', array('model'=>$model), true); ?>
 	            </div>
@@ -19,7 +19,7 @@
 	        <div class="span7">
 	            <div class="row productheader">
 	                <h1 class="title"><?= CHtml::tag('div',array('id'=>CHtml::activeId($model,'title')),$model->Title); ?></h1>
-					<?php if(isset($model->family)): ?>
+					<?php if(_xls_get_conf('SHOW_FAMILY') && isset($model->family)): ?>
 						<h2 class="brand">By: <?= CHtml::link($model->family->family,$model->family->Link) ?></h2>
 					<?php endif; ?>
 		            <?php if (_xls_get_conf('SHOW_TEMPLATE_CODE', true)): ?>
@@ -67,7 +67,7 @@
 							            'size'=>'js:$("#SelectSize option:selected").val()',
 							            'color'=>'js:$("#SelectColor option:selected").val()'),
 						            'type'=>'POST',
-						            'success' => 'function(data) {
+							            'success' => 'function(data) {
 					                if (data=="multiple")
 					                    $("#WishitemShare").dialog("open");
 					                 else alert(data); }'
@@ -75,7 +75,7 @@
 				            ),CHtml::link(Yii::t('product', 'Add to Wish List'), '#'));
 			            ?>
 
-			            <div class="span1" <?php echo (_xls_get_conf('SHOW_QTY_ENTRY') ? '' : 'style="display:none"'); ?>>
+			            <div class="span1 intQty" <?php echo (_xls_get_conf('SHOW_QTY_ENTRY') ? '' : 'style="display:none"'); ?>>
 					            <?php echo $form->labelEx($model,'intQty'); ?>
 					            <?php echo $form->textField($model,'intQty'); ?>
 			            </div>
@@ -98,6 +98,7 @@
 				                    if (data.action=="alert") {
 				                      alert(data.errormsg);
 									} else if (data.action=="success") {
+										animateAddToCart();
 										'.(_xls_get_conf('AFTER_ADD_CART') ?
 						                'window.location.href="'.$this->createUrl("/cart").'"' :
 						                '$("#shoppingcart").html(data.shoppingcart);').'

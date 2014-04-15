@@ -22,10 +22,12 @@ class beanstreamaim extends WsPayment
 		$beanstream_url = "https://www.beanstream.com/scripts/process_transaction.asp";
 
 		$strState = $this->CheckoutForm->billingState;
-		if ($this->CheckoutForm->billingCountry != "US" && $this->CheckoutForm->billingCountry != "CA") $strState="--";
+		if($this->CheckoutForm->billingCountry != "US" && $this->CheckoutForm->billingCountry != "CA")
+			$strState = "--";
 
 		$strShipState = $this->CheckoutForm->shippingState;
-		if ($this->CheckoutForm->shippingCountry != "US" && $this->CheckoutForm->shippingCountry != "CA") $strShipState="--";
+		if ($this->CheckoutForm->shippingCountry != "US" && $this->CheckoutForm->shippingCountry != "CA")
+			$strShipState="--";
 
 		$beanstream_values = array (
 			"requestType"		=> "BACKEND",
@@ -47,7 +49,6 @@ class beanstreamaim extends WsPayment
 			"ordProvince"		=> $strState,
 			"ordCountry"		=> $this->CheckoutForm->billingCountry,
 
-
 			"shipName"			=> $this->CheckoutForm->shippingFirstName." ".$this->CheckoutForm->shippingLastName,
 			"shipAddress1"		=> $this->CheckoutForm->shippingAddress1,
 			"shipAddress2"		=> $this->CheckoutForm->shippingAddress2,
@@ -61,7 +62,7 @@ class beanstreamaim extends WsPayment
 
 		$beanstream_fields = "";
 
-		foreach( $beanstream_values as $key => $value )
+		foreach($beanstream_values as $key => $value )
 			$beanstream_fields .= "$key=" . urlencode( $value ) . "&";
 
 		$ch = curl_init($beanstream_url);
@@ -81,7 +82,8 @@ class beanstreamaim extends WsPayment
 		parse_str($resp, $resp_vals);
 
 
-		if($resp_vals['trnApproved'] != '1' ) {
+		if($resp_vals['trnApproved'] != '1' )
+		{
 			//unsuccessful
 			$arrReturn['success']=false;
 			$arrReturn['amount_paid']=0;
@@ -102,7 +104,6 @@ class beanstreamaim extends WsPayment
 		}
 
 		return $arrReturn;
-		
 
 	}
 

@@ -18,5 +18,13 @@ class CartShipping extends BaseCartShipping
 		return parent::model($className);
 	}
 
+	public function getShippingSell()
+	{
+		if ($this->shipping_taxable==1)
+			return $this->shipping_sell_taxed;
+		else
+			return $this->shipping_sell;
+	}
+
 
 }

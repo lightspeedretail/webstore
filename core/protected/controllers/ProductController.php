@@ -92,6 +92,8 @@ class ProductController extends Controller
 		$objEvent = new CEventProduct(get_class($this),'onActionProductView',$model);
 		_xls_raise_events('CEventProduct',$objEvent);
 
+		$this->widget('ext.wscartanimate.wscartanimate');
+
 		$this->render('index',array(
 			'model'=>$model,
 			'WishlistAddForm'=>$objWishlistAddForm,

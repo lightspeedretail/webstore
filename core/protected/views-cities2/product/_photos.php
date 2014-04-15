@@ -1,0 +1,14 @@
+<div class="row-fluid">
+	<?php $this->widget('ext.starplugins.cloudzoom',array(
+		'images'=>$model->ProductPhotos,
+		'instructions'=>'<legend>'.Yii::t('global','Hover over image to zoom').'</legend>',
+		'css_target'=>'targetarea sm-col-11',
+		'css_thumbs'=>'thumbs sm-col-11',
+		'zoomClass'=>'cloudzoom',
+		'zoomSizeMode'=>'lens',
+		'zoomPosition'=>Yii::app()->params['IMAGE_ZOOM']=='flyout' ? '3' : 'inside',
+		'zoomOffsetX'=>Yii::app()->params['IMAGE_ZOOM']=='flyout' ? 10 : 0,
+		'zoomFlyOut'=>Yii::app()->params['IMAGE_ZOOM']=='flyout' ? 'true' : 'false',
+	));
+	?>
+</div>

@@ -37,27 +37,22 @@ function _xls_get_conf($strKey, $mixDefault = ""){
  * @return string url
  */
 function _xls_site_url($strUrlPath =  '') {
-	if (substr($strUrlPath,0,4)=="http") return $strUrlPath; //we've passed through twice, don't double up
-	if (substr($strUrlPath,0,1)=="/") $strUrlPath = substr($strUrlPath,1,999); //remove a leading / so we don't // by accident
+	Yii::log("Function deprecated, should use \$this->createAbsoluteUrl instead", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+	return Yii::app()->createAbsoluteUrl($strUrlPath);
 
-	$usessl=false;
-
-	if (_xls_get_conf('ENABLE_SSL','0')==1) {
-		if (_xls_get_conf('SSL_NO_NEED_FORWARD',0) != 1)
-			$usessl = true;
-		elseif (	strstr($strUrlPath,"checkout") !== false ||
-			strstr($strUrlPath,"customer-register") !== false
-
-		) $usessl = true;
-	}
-
-	return _xls_site_dir($usessl) . '/' . $strUrlPath;
 }
 
-function _xls_theme_config($theme)
+function _xls_theme_config($strThemeName)
 {
-	$fnOptions = YiiBase::getPathOfAlias('webroot')."/themes/".$theme."/config.xml";
 
+	if(Theme::hasAdminForm($strThemeName))
+		return Yii::app()->getComponent('wstheme')->getAdminModel($strThemeName);
+
+
+
+
+
+	$fnOptions = YiiBase::getPathOfAlias('webroot')."/themes/".$strThemeName."/config.xml";
 	if (file_exists($fnOptions))
 	{
 		$strXml = file_get_contents($fnOptions);
@@ -68,57 +63,59 @@ function _xls_theme_config($theme)
 
 
 /**
- * Get a file from our CDN network.
+ * Get a file via cURL.
  * @param $url
  * @return bool|mixed
  */
 function getFile($url)
 {
-	if(stripos($url,".lightspeedretail.com")>0)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_VERBOSE, 0);
 
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_VERBOSE, 0);
 
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
 
-		$resp = curl_exec($ch);
-		curl_close($ch);
-		return $resp;
-	} else return false;
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
+	$resp = curl_exec($ch);
+	curl_close($ch);
+	return $resp;
 
 }
 
 
 /**
- * Download the Brooklyn template. We call this during install and also on the off chance that Brooklyn suddenly
+ * Download latest theme. We call this during install and also on the off chance that the default suddenly
  * goes missing.
  */
-function downloadBrooklyn()
+function downloadTheme($strTheme)
 {
-	$jLatest= getFile("http://updater.lightspeedretail.com/site/latestbrooklyn");
+	$jLatest= getFile("http://"._xls_get_conf('LIGHTSPEED_UPDATER','updater.lightspeedretail.com')."/site/latesttheme/".XLSWS_VERSIONBUILD."/".$strTheme);
 	$result = json_decode($jLatest);
+	if(empty($result))
+	{   Yii::log("ERROR attempting to locate latesttheme ".$strTheme." from LightSpeed", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		return false;
+	}
+
 	$strWebstoreInstall = "http://cdn.lightspeedretail.com/webstore/themes/".$result->latest->filename;
 
 	$data = getFile($strWebstoreInstall);
 	if (stripos($data,"404 - Not Found")>0 || empty($data)){
-		Yii::log("ERROR downloading themes/brooklyn.zip from LightSpeed", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		Yii::log("ERROR downloading theme ".$strTheme." from LightSpeed CDN", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		return false;
 	}
 
-	$f=file_put_contents("themes/brooklyn.zip", $data);
+	$f=file_put_contents("themes/".$result->latest->title.".zip", $data);
 	if ($f)
 	{
 		require_once( YiiBase::getPathOfAlias('application.components'). '/zip.php');
-		extractZip("brooklyn.zip",'',YiiBase::getPathOfAlias('webroot.themes'));
-		@unlink("themes/brooklyn.zip");
+		extractZip($result->latest->title.".zip",'',YiiBase::getPathOfAlias('webroot.themes'));
+		@unlink("themes/".$result->latest->title.".zip");
 	}
 	else {
-		Yii::log("ERROR downloading themes/brooklyn.zip from LightSpeed", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		Yii::log("ERROR saving themes/".$result->latest->title.".zip", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		return false;
 	}
 	return true;
@@ -232,7 +229,7 @@ function _xls_raise_events($strEvent,$objEvent)
 
 function _xls_facebook_login()
 {
-	if (_xls_get_conf('FACEBOOK_APPID',0)>0 && _xls_get_conf('FACEBOOK_SECRET',0)>0)
+	if (!empty(Yii::app()->params['FACEBOOK_APPID']) && !empty(Yii::app()->params['FACEBOOK_SECRET']))
 		return true;
 	else return false;
 }
@@ -275,6 +272,24 @@ function hex2rgb($hex) {
 	//return implode(",", $rgb); // returns the rgb values separated by commas
 	return $rgb; // returns an array with the rgb values
 }
+
+function json_encode_with_relations(array $models, $attributeNames) {
+	$attributeNames = explode(',', $attributeNames);
+
+	$rows = array(); //the rows to output
+	foreach ($models as $model) {
+		$row = array(); //you will be copying in model attribute values to this array
+		foreach ($attributeNames as $name) {
+			$name = trim($name); //in case of spaces around commas
+			$row[$name] = CHtml::value($model, $name); //this function walks the relations
+		}
+		$rows[] = $row;
+	}
+
+	return CJSON::encode($rows);
+
+}
+
 
 function _xls_get_sort_order() {
 	$strProperty = _xls_get_conf('PRODUCT_SORT_FIELD' , 'Name');
@@ -376,6 +391,12 @@ function camelize($string, $pascalCase = true)
  * @return int(bool)
  */
 function isValidEmail($email) {
+	$validator=new CEmailValidator;
+
+	if(!$validator->validateValue($email)){
+		return false;
+	}
+
 	$isValid = true;
 	$atIndex = strrpos($email, "@");
 	if (is_bool($atIndex) && !$atIndex)
@@ -565,17 +586,17 @@ function _xls_values_as_keys($arr) {
 
 /**
  * Set existing configuration value
- * @param string $key
+ * @param $strKey
  * @param string $mixDefault
- * @return bool success
+ * @return bool
  */
 function _xls_set_conf($strKey, $mixDefault = "") {
 	$conf = Configuration::LoadByKey($strKey);
+	Yii::app()->params[$strKey] = $mixDefault;
 	if(!$conf) return false;
 	$conf->key_value = $mixDefault;
 	$conf->modified = new CDbExpression('NOW()');
 	$conf->save();
-	Yii::app()->params[$strKey] = $mixDefault;
 	return true;
 }
 
@@ -623,7 +644,7 @@ EOS;
 	if (!$conf->save())
 		print_r($conf->getErrors());
 
-	Configuration::exportConfig();
+
 }
 
 /**
@@ -875,19 +896,22 @@ function _xls_send_email($id, $hideJson = false)
 
 		$mail->SetFrom($from, Yii::app()->params['STORE_NAME']);
 		$mail->Subject = $objMail->subject;
-		$mail->MsgHTML($objMail->htmlbody);
+        $mail->ClearAllRecipients();
 		$mail->AddAddress($objMail->to);
 		if(!empty(Yii::app()->params['EMAIL_BCC']))
-			if($objMail->to != Yii::app()->params['EMAIL_BCC'])
+			if($objMail->to != Yii::app()->params['EMAIL_BCC'] && $objMail->to == $from)
 				$mail->AddCC(Yii::app()->params['EMAIL_BCC']);
 
 		Yii::log("Contents of mail ".print_r($mail,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+
+        $mail->MsgHTML($objMail->htmlbody);
 		$blnResult = $mail->Send();
 
 		if($blnResult)
 		{
 			Yii::log("Sent email to ".$objMail->to." successfully.", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			$objMail->delete();
+            Yii::log("Email removed from queue", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			if (!$hideJson) echo json_encode("success");
 		}
 		else
@@ -970,10 +994,20 @@ function _xls_array_search($needle, $haystack) {
  */
 function _xls_array_search_begin($needle, $haystack) {
 	foreach($haystack as $elem) {
-		if(preg_match('/^' . $elem.'/',$needle))
+		if(preg_match('/^' . $elem .'/',$needle))
 			return true;
 	}
 	return false;
+}
+
+function _xls_array_search_restrict_begin($needle, $haystack) {
+    foreach($haystack as $elem) {
+        $elem = preg_quote($elem,'/');
+        $elem = substr_replace($elem, '', strpos($elem,"\\"), (strpos($elem,"\\")-strlen($elem)+1));
+        if(preg_match('/^' . $elem .'/',$needle))
+            return true;
+    }
+    return false;
 }
 
 /**
@@ -1146,15 +1180,7 @@ function _xls_301($strUrl) {
  *
  */
 function _xls_404() {
-	header('HTTP/1.1 404 Not Found');
-	$strFile = "404.php";
-	if(file_exists(CUSTOM_INCLUDES . $strFile)) {
-		include(CUSTOM_INCLUDES . $strFile);
-		exit(); }
-	elseif(file_exists('xlsws_includes/'.$strFile)) {
-		include('xlsws_includes/'.$strFile);
-	}
-	exit();
+	throw new CHttpException(404,'The requested page does not exist.');
 }
 
 /**
@@ -1474,7 +1500,7 @@ function _xls_is_idevice() {
 function _xls_is_ipad() {
 
 	if(isset($_SERVER['HTTP_USER_AGENT']))
-	return (bool) strpos($_SERVER['HTTP_USER_AGENT'],'iPad');
+		return (bool) strpos($_SERVER['HTTP_USER_AGENT'],'iPad');
 	else return false;
 }
 
@@ -1525,27 +1551,17 @@ function _xls_check_version($releasenotes = false)
 {
 	if(!Yii::app()->theme) return false;
 
-	$url = "http://updater.lightspeedretail.com";
-	//$url = "http://www.lsvercheck.site";
+	$url = "http://"._xls_get_conf('LIGHTSPEED_UPDATER','updater.lightspeedretail.com');
 
+	Yii::log("Checking Version (and reporting stats) to $url", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 	$storeurl = Yii::app()->createAbsoluteUrl("/");
 	$storeurl = str_replace("http://","",$storeurl);
 	$storeurl = str_replace("https://","",$storeurl);
 
-	$oXML = _xls_theme_config(Yii::app()->theme->name);
-
-	if(!is_null($oXML))
-	{
-		$strTheme = Yii::app()->theme->name;
-		$strThemeVersion = _xls_number_only((string)$oXML->version);
-		if(isset($oXML->noupdate) && $oXML->noupdate=='true' && $strTheme != "brooklyn")
-			$strThemeVersion="noupdate";
-
-	} else {
-		$strTheme = "unknown";
-		$strThemeVersion="noupdate";
-	}
+	$strTheme = Yii::app()->theme->name;
+	$strThemeVersion =
+		(Yii::app()->theme->info->noupdate ? "noupdate" : Yii::app()->theme->info->version);
 
 	if(isset($_SERVER['SERVER_SOFTWARE']))
 		$serversoftware=$_SERVER['SERVER_SOFTWARE'];
@@ -1562,9 +1578,27 @@ function _xls_check_version($releasenotes = false)
 		'serversoftware'=> $serversoftware,
 		'releasenotes'  => $releasenotes,
 		'themeversion'  => $strThemeVersion,
-		'schema'  => _xls_get_conf('DATABASE_SCHEMA_VERSION')
+		'schema'  => _xls_get_conf('DATABASE_SCHEMA_VERSION'),
+		'cid'  => _xls_get_conf('LIGHTSPEED_CID'),
+		'phpversion'  => PHP_VERSION,
+		'themefiles' => _xls_theme_report()
+
 
 	);
+	if(Yii::app()->params['LIGHTSPEED_MT']=='1')
+	{
+		//Since we could have two urls on multitenant, just grab the original one
+		$data['webstore']['customer']=Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL'];
+		$data['webstore']['type']="mt-pro";
+		if(Yii::app()->params['LIGHTSPEED_CLOUD']>0)
+		{
+			$data['webstore']['type']="mt-cloud";
+			$data['webstore']['cid']=Yii::app()->params['LIGHTSPEED_CLOUD'];
+		}
+
+	}
+
+	Yii::log("sending to stats ".print_r($data,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 	$json = json_encode($data);
 
 	$ch = curl_init($url);
@@ -1587,6 +1621,55 @@ function _xls_check_version($releasenotes = false)
 	return $resp;
 }
 
+//In order to evaluate view layer changes impact, we need to know
+//what files have changed in a customer theme. (This is useful for
+//judging risk during the development process)
+//We simply take an md5 hash of each file in the theme and compare
+//it to the hash of our original shipping file. Contents of the file
+//are not sent.
+function _xls_theme_report()
+{
+	$retVal = getThemeFiles(YiiBase::getPathOfAlias('webroot.themes').'/'.Yii::app()->theme->name);
+	return serialize($retVal);
+}
+
+function getThemeFiles($dir) {
+
+	$files = array();
+	if ($handle = opendir($dir)) {
+		while (false !== ($file = readdir($handle))) {
+			if ($file != "." && $file != "..") {
+				if(is_dir($dir.'/'.$file)) {
+					$dir2 = $dir.'/'.$file;
+					$files[] = getThemeFiles($dir2);
+				}
+				else {
+					//We only care about php and css files
+					if(substr($file,-4)==".php" || substr($file,-4)==".css" )
+						$files[] = str_replace(YiiBase::getPathOfAlias('webroot.themes').'/'.Yii::app()->theme->name."/","",$dir).
+							'/'.$file.",".md5_file($dir.'/'.$file);
+				}
+			}
+		}
+		closedir($handle);
+	}
+
+	return array_flat($files);
+}
+
+function array_flat($array) {
+	$tmp=array();
+	foreach($array as $a) {
+		if(is_array($a)) {
+			$tmp = array_merge($tmp, array_flat($a));
+		}
+		else {
+			$tmp[] = $a;
+		}
+	}
+
+	return $tmp;
+}
 function _xls_parse_language($string)
 {
 	$pattern = "|<".Yii::app()->language.".*>(.*)</".Yii::app()->language.">|U";
@@ -1604,6 +1687,14 @@ function _xls_parse_language($string)
 	}
 
 	return $string;
+}
+function _xls_parse_language_serialized($string)
+{
+	$output = @unserialize($string);
+	if (empty($output) || !is_array($output))
+        $output = array(Yii::app()->language => $string);
+
+	return $output;
 }
 
 /**
@@ -1747,6 +1838,7 @@ function _xls_recalculate_inventory() {
 
 
 }
+
 
 function mb_pathinfo($filepath,$portion = null) {
 	preg_match('%^(.*?)[\\\\/]*(([^/\\\\]*?)(\.([^\.\\\\/]+?)|))[\\\\/\.]*$%im',$filepath,$m);
@@ -1944,3 +2036,131 @@ function rcopy($src, $dst) {
 	} else if (file_exists ( $src ))
 		copy ( $src, $dst );
 }
+
+function RemoveEmptySubFolders($path)
+{
+	$empty=true;
+	foreach (glob($path.DIRECTORY_SEPARATOR."*") as $file)
+	{
+		$empty &= is_dir($file) && RemoveEmptySubFolders($file);
+	}
+	return $empty && @rmdir($path);
+}
+
+function _xls_custom_css_folder($local=false)
+{
+	if(Yii::app()->params['LIGHTSPEED_MT']=="1")
+		return "http://lightspeedwebstore.s3.amazonaws.com/".
+			Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL']."/themes/";
+	else
+	{
+		$strCustomFolder = Yii::app()->theme->info->useCustomFolderForCustomcss ? '/custom' : '';
+		return ($local ? YiiBase::getPathOfAlias('custom') : Yii::app()->baseUrl . $strCustomFolder) . "/themes/";
+	}
+
+}
+
+function _upload_default_header_to_s3()
+{
+	Gallery::LoadGallery(1);
+	$d = dir(YiiBase::getPathOfAlias('webroot')."/images/header");
+	while (false!== ($filename = $d->read()))
+	{
+
+
+		if ($filename == "defaultheader.png")
+		{
+			$model = new GalleryPhoto();
+			$model->gallery_id = 1;
+			$model->file_name = $filename;
+			$model->name = '';
+			$model->description = '';
+			$model->thumb_ext = 'png';
+			$model->save();
+			$arrImages["/images/header/".$filename] =
+				CHtml::image(Yii::app()->request->baseUrl."/images/header/".$filename);
+
+			$src = YiiBase::getPathOfAlias('webroot')."/images/header/".$filename;
+
+			$fileinfo = mb_pathinfo($filename);
+
+			$imageFile = new CUploadedFile($filename,
+				$src,
+				"image/".$fileinfo['extension'],
+				getimagesize($src),
+				null
+			);
+
+			if(Yii::app()->params['LIGHTSPEED_MT']=='1')
+				$model->setS3Image($imageFile);
+			_xls_set_conf('HEADER_IMAGE',
+				"//lightspeedwebstore.s3.amazonaws.com/".
+				_xls_get_conf('LIGHTSPEED_HOSTING_LIGHTSPEED_URL').
+				"/gallery/1/".$model->id.".png"
+			);
+
+		}
+	}
+
+
+
+}
+
+/**
+ * Indents a flat JSON string to make it more human-readable.
+ *
+ * @param string $json The original JSON string to process.
+ *
+ * @return string Indented version of the original JSON string.
+ */
+function prettyjson($json) {
+
+	$result      = '';
+	$pos         = 0;
+	$strLen      = strlen($json);
+	$indentStr   = '  ';
+	$newLine     = "\n";
+	$prevChar    = '';
+	$outOfQuotes = true;
+
+	for ($i=0; $i<=$strLen; $i++) {
+
+		// Grab the next character in the string.
+		$char = substr($json, $i, 1);
+
+		// Are we inside a quoted string?
+		if ($char == '"' && $prevChar != '\\') {
+			$outOfQuotes = !$outOfQuotes;
+
+			// If this character is the end of an element,
+			// output a new line and indent the next line.
+		} else if(($char == '}' || $char == ']') && $outOfQuotes) {
+			$result .= $newLine;
+			$pos --;
+			for ($j=0; $j<$pos; $j++) {
+				$result .= $indentStr;
+			}
+		}
+
+		// Add the character to the result string.
+		$result .= $char;
+
+		// If the last character was the beginning of an element,
+		// output a new line and indent the next line.
+		if (($char == ',' || $char == '{' || $char == '[') && $outOfQuotes) {
+			$result .= $newLine;
+			if ($char == '{' || $char == '[') {
+				$pos ++;
+			}
+
+			for ($j = 0; $j < $pos; $j++) {
+				$result .= $indentStr;
+			}
+		}
+
+		$prevChar = $char;
+	}
+
+	return $result;
+}
+

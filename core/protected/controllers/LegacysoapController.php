@@ -13,7 +13,7 @@ class LegacySoapController extends Controller
 {
 
 	public function init() {
-		Yii::app()->setViewPath(Yii::getPathOfAlias('application')."/views-cities");
+		Controller::initParams();
 		if(Yii::app()->params['INSTALLED'] != '1') die(); //No soap when not installed (or partially installed)
 
 		//do nothing since we don't need a PHP session created for SOAP transactions
@@ -22,12 +22,6 @@ class LegacySoapController extends Controller
 
 	public function actionIndex() {
 
-		if (isset($_SERVER['HTTP_TESTDB']))
-		{
-			Yii::app()->db->setActive(false);
-			Yii::app()->db->connectionString = 'mysql:host=localhost;dbname=copper-unittest';
-			Yii::app()->db->setActive(true);
-		}
 		if (!isset($_SERVER['HTTP_SOAPACTION'])) //isset($_GET['wsdl']))
 			$this->publishWsdl();
 		//error_log($_SERVER['HTTP_SOAPACTION']);
@@ -69,12 +63,7 @@ class LegacySoapController extends Controller
 
 
 	public function actionImage() {
-		if (isset($_SERVER['HTTP_TESTDB']))
-		{
-			Yii::app()->db->setActive(false);
-			Yii::app()->db->connectionString = 'mysql:host=localhost;dbname=copper-unittest';
-			Yii::app()->db->setActive(true);
-		}
+
 
 		$ctx=stream_context_create(array(
 			'http'=>array('timeout' => ini_get('max_input_time'))
@@ -105,7 +94,7 @@ class LegacySoapController extends Controller
 
 		} elseif ($position == 0) {
 			// save master product image
-			//error_log("ostdata is ".$postdata);
+			//error_log("postdata is ".$postdata);
 			if ($this->save_product_image($id, $postdata))
 				$this->successResponse("Image saved for product " . $id);
 			else
@@ -175,7 +164,6 @@ class LegacySoapController extends Controller
 
 		if(!$this->check_passkey($passkey))
 			return "Invalid Password";
-
 
 		return _xls_version();
 
@@ -324,20 +312,6 @@ class LegacySoapController extends Controller
 		}
 
 
-		// Check IP address
-		$ips = _xls_get_conf('LSAUTH_IPS');
-		if ((trim($ips) != '')) {
-			$found = false;
-			foreach (explode(',', $ips) as $ip)
-				if ($_SERVER['REMOTE_ADDR'] == trim($ip))
-					$found = true;
-			if ($found == false) {
-				_xls_log("SOAP ERROR :  Unauthorised SOAP Access from " . $_SERVER['REMOTE_ADDR'] . " - IP address is not in authorised list.");
-				return 0;
-			}
-		}
-
-
 		if($conf == strtolower(md5($passkey)))
 			return 1;
 		else{
@@ -419,6 +393,8 @@ class LegacySoapController extends Controller
 
 		//Convert incoming base64 to binary image
 		$blbImage = imagecreatefromstring($blbRawImage);
+		if ($blbImage === false)
+			$this->errorConflict('Invalid image format received', self::UNKNOWN_ERROR);
 
 		//Create event
 		$objEvent = new CEventPhoto('LegacysoapController','onUploadPhoto',$blbImage,$objProduct,0);
@@ -455,6 +431,8 @@ class LegacySoapController extends Controller
 
 		//Convert incoming base64 to binary image
 		$blbImage = imagecreatefromstring($blbRawImage);
+		if ($blbImage === false)
+			$this->errorConflict('Invalid image format received', self::UNKNOWN_ERROR);
 
 		//Create event
 		$objEvent = new CEventPhoto('LegacysoapController','onUploadPhoto',$blbImage,$objProduct,($intIndex+1));
@@ -478,7 +456,6 @@ class LegacySoapController extends Controller
 	){
 
 
-
 		if(!$this->check_passkey($passkey))
 			return self::FAIL_AUTH;
 
@@ -490,8 +467,8 @@ class LegacySoapController extends Controller
 				foreach($arrProduct as $key=>$val) {
 					switch ($key) {
 
-						case 'inventory': $objProduct->inventory = $val; break;
-						case 'inventoryTotal': $objProduct->inventory_total = $val; break;
+						case 'inventory': $objProduct->inventory = (float)$val; break;
+						case 'inventoryTotal': $objProduct->inventory_total = (float)$val; break;
 
 					}
 
@@ -499,11 +476,16 @@ class LegacySoapController extends Controller
 				// Now save the product
 				try {
 
-					$objProduct->save();
-					$objProduct->SetAvailableInventory();
-					//Create event
-					$objEvent = new CEventProduct('LegacysoapController','onUpdateInventory',$objProduct);
-					_xls_raise_events('CEventProduct',$objEvent);
+					if(!$objProduct->save())
+						Yii::log("Saving Products got errors ".print_r($objProduct->getErrors(),true),
+							'error', 'application.'.__CLASS__.".".__FUNCTION__);
+					else {
+						$objProduct->SetAvailableInventory();
+						//Create event
+						$objEvent = new CEventProduct('LegacysoapController','onUpdateInventory',$objProduct);
+						_xls_raise_events('CEventProduct',$objEvent);
+					}
+
 
 				}
 				catch(Exception $e) {
@@ -616,6 +598,7 @@ class LegacySoapController extends Controller
 
 		$strName = trim($strName);
 		$strName = trim($strName,'-');
+		$strName = substr($strName, 0, 255);
 		$strCode = trim($strCode);
 		$strCode = str_replace('"','',$strCode);
 		$strCode = str_replace("'",'',$strCode);
@@ -683,7 +666,7 @@ class LegacySoapController extends Controller
 		$fltReserved = $objProduct->CalculateReservedInventory();
 
 		$objProduct->inventory_reserved = $fltReserved;
-		if(_xls_get_conf('INVENTORY_FIELD_TOTAL',0) == 1)
+		if(Yii::app()->params['INVENTORY_FIELD_TOTAL'] == 1)
 			$objProduct->inventory_avail=($fltInventoryTotal-$fltReserved);
 		else
 			$objProduct->inventory_avail=($fltInventory-$fltReserved);
@@ -750,6 +733,13 @@ class LegacySoapController extends Controller
 				$objProduct->save();
 			}
 			$objFamily->UpdateChildCount();
+		} else {
+			if ($objProduct->family_id) {
+				$objFamily = Family::model()->findByAttributes(array('id'=>$objProduct->family_id));
+				$objProduct->family_id = null;
+				$objProduct->save();
+				$objFamily->UpdateChildCount();
+			}
 		}
 
 
@@ -1175,8 +1165,7 @@ class LegacySoapController extends Controller
 		$strCustomPage = trim($strCustomPage);
 
 		if (!$strCategory) {
-			QApplication::Log(E_USER_ERROR, 'uploader',
-				'Could not save empty category');
+			Yii::log("Could not save empty category", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::UNKNOWN_ERROR;
 		}
 
@@ -2443,14 +2432,26 @@ class LegacySoapController extends Controller
 				case "Images":
 
 					//Because we could have a huge number of Image entries, we need to just use SQL/DAO directly
-					$cmd = Yii::app()->db->createCommand('SELECT image_path FROM xlsws_images WHERE image_path IS NOT NULL');
+					$cmd = Yii::app()->db->createCommand("SELECT image_path FROM xlsws_images WHERE image_path IS NOT NULL AND left(image_path,2)<>'//'");
 					$dataReader=$cmd->query();
 					while(($image=$dataReader->read())!==false)
 						@unlink(Images::GetImagePath($image['image_path']));
 
 
+					$cmd = Yii::app()->db->createCommand("SELECT cloudinary_public_id FROM xlsws_images_cloud WHERE cloudinary_public_id IS NOT NULL");
+					$dataReader=$cmd->query();
+					while(($image=$dataReader->read())!==false)
+					{
+						$objEvent = new CEventPhoto('Images','onDeletePhoto',null,null,null);
+						$objEvent->cloudinary_public_id = $image['cloudinary_public_id'];
+						_xls_raise_events('CEventPhoto',$objEvent);
+						Yii::app()->db->createCommand("delete FROM xlsws_images_cloud WHERE cloudinary_public_id='".$image['cloudinary_public_id']."'");
+					}
 
-					//Yii::app()->db->createCommand()->truncateTable('xlsws_product_image_assn');
+					$objEvent = new CEventPhoto('LegacysoapController','onFlushTable',null,null,0);
+					_xls_raise_events('CEventPhoto',$objEvent);
+
+
 					$strTableName = "xlsws_images";
 					break;
 

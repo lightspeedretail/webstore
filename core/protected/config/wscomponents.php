@@ -17,26 +17,27 @@ function searchForComponents()
 	foreach (glob(dirname(__FILE__).'/../extensions/wsshipping/*', GLOB_ONLYDIR) as $moduleDirectory)
 		$arr[basename($moduleDirectory)] = array('class'=>'ext.wsshipping.'.basename($moduleDirectory).'.'.basename($moduleDirectory));
 
+	$arr['wstheme'] = array('class'=>'ext.wstheme.WsTheme');
+	$arr['themeManager']=array('themeClass'=>'Theme');
 	//Load any custom payment components
-	$path = realpath(dirname(__FILE__).'/../../../custom/extensions/payment');
+	$path = realpath(YiiBase::getPathOfAlias('webroot')."custom/extensions/payment");
 	$arrCustom = glob($path.'/*', GLOB_ONLYDIR);
 	if($arrCustom !== false && !empty($arrCustom))
 		foreach ($arrCustom as $moduleDirectory)
 			$arr[basename($moduleDirectory)] = array('class'=>'custom.extensions.payment.'.basename($moduleDirectory).'.'.basename($moduleDirectory));
 
 	//Load any custom shipping components
-	$path = realpath(dirname(__FILE__).'/../../../custom/extensions/shipping');
+	$path = realpath(YiiBase::getPathOfAlias('webroot')."custom/extensions/shipping");
 	$arrCustom = glob($path.'/*', GLOB_ONLYDIR);
 	if($arrCustom !== false && !empty($arrCustom))
 		foreach ($arrCustom as $moduleDirectory)
-			$arr[basename($moduleDirectory)] = array('class'=>'custom.extensions.shipping.'.basename($moduleDirectory).'.'.basename($moduleDirectory));
+			$arr[basename($moduleDirectory)] = array(
+				'class'=>'custom.extensions.shipping.'.basename($moduleDirectory).'.'.basename($moduleDirectory));
 
 	$arr['Smtpmail'] = array('class'=>'application.extensions.smtpmail.PHPMailer');
 
-	if (file_exists(dirname(__FILE__).'/../../../config/wslogging.php'))
-		$arr['log']=require(dirname(__FILE__).'/../../../config/wslogging.php');
-	else
-		$arr['log']=array(
+
+	$arr['log']=array(
 		'class'=>'CLogRouter',
 		'routes'=>array(
 			array(
@@ -45,7 +46,7 @@ function searchForComponents()
 			),
 			array(
 				'class'=>'CDbLogRoute',
-				'levels'=>'error,warning,info',
+				'levels'=>'error, warning',
 				'logTableName'=>'xlsws_log',
 				'connectionID'=>'db',
 			),

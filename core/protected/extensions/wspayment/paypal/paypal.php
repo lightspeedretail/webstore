@@ -7,6 +7,7 @@ class paypal extends WsPayment
 	protected $version = 1.0;
 	protected $uses_jumper = true;
 	protected $apiVersion = 1;
+	public $cloudCompatible = true;
 
 	/**
 	 * The run() function is called from Web Store to run the process.
@@ -33,25 +34,27 @@ class paypal extends WsPayment
 		$str .= _xls_make_hidden('business',   $paypal_email);
 		$str .= _xls_make_hidden('currency_code',   _xls_get_conf('CURRENCY_DEFAULT' , 'USD'));
 		$str .= _xls_make_hidden('item_name',   $this->objCart->id_str);
-		$str .= _xls_make_hidden('first_name',   $this->objCart->customer->first_name);
-		$str .= _xls_make_hidden('last_name',   $this->objCart->customer->last_name);
-		$str .= _xls_make_hidden('address1',   $this->objCart->billaddress->address1);
-		$str .= _xls_make_hidden('address2',   $this->objCart->billaddress->address2);
+		$str .= _xls_make_hidden('first_name',   $this->CheckoutForm->contactFirstName);
+		$str .= _xls_make_hidden('last_name',   $this->CheckoutForm->contactLastName);
+		$str .= _xls_make_hidden('address1',   $this->CheckoutForm->billingAddress1);
+		$str .= _xls_make_hidden('address2',   $this->CheckoutForm->billingAddress2);
 
-		$str .= _xls_make_hidden('city',   $this->objCart->billaddress->city);
-		$str .= _xls_make_hidden('state',   $this->objCart->billaddress->state);
-		$str .= _xls_make_hidden('zip',   $this->objCart->billaddress->postal);
-		$str .= _xls_make_hidden('lc',   $this->objCart->billaddress->country);
-		$str .= _xls_make_hidden('email',   $this->objCart->customer->email);
+		$str .= _xls_make_hidden('city',   $this->CheckoutForm->billingCity);
+		$str .= _xls_make_hidden('state',   $this->CheckoutForm->billingState);
+		$str .= _xls_make_hidden('zip',  $this->CheckoutForm->billingPostal);
+		$str .= _xls_make_hidden('email',   $this->CheckoutForm->contactEmail);
 		$str .= _xls_make_hidden('cartId',  $this->objCart->id_str);
-		$str .= _xls_make_hidden('phone1',   $this->objCart->customer->mainphone);
+		$str .= _xls_make_hidden('phone1',    $this->CheckoutForm->contactPhone);
 		$str .= _xls_make_hidden('rm',   '2');
 		$str .= _xls_make_hidden('no_shipping',   (isset($this->config['address']) ?  $this->config['address'] : 1));
 		$str .= _xls_make_hidden('no_note',   '1');
 
-		$str .= _xls_make_hidden('notify_url', Yii::app()->controller->createAbsoluteUrl('/cart/payment/'.$this->modulename));
-		$str .= _xls_make_hidden('return',   Yii::app()->controller->createAbsoluteUrl('/cart/receipt', array('getuid'=>$this->objCart->linkid)));
-		$str .= _xls_make_hidden('cancel_return',   Yii::app()->controller->createAbsoluteUrl('cart/restore', array('getuid'=>$this->objCart->linkid)));
+		$str .= _xls_make_hidden('notify_url',
+			Yii::app()->controller->createAbsoluteUrl('cart/payment/').'/'.$this->modulename);
+		$str .= _xls_make_hidden('return',
+			Yii::app()->controller->createAbsoluteUrl('cart/receipt', array('getuid'=>$this->objCart->linkid),'http'));
+		$str .= _xls_make_hidden('cancel_return',
+			Yii::app()->controller->createAbsoluteUrl('cart/restore', array('getuid'=>$this->objCart->linkid)));
 		$str .= _xls_make_hidden('amount',  round($this->objCart->total , 2));
 
 		$str .=  ('</FORM>');
@@ -76,8 +79,7 @@ class paypal extends WsPayment
 	 */
 	public function gateway_response_process() {
 
-		if(_xls_get_conf('DEBUG_PAYMENTS' , false)=="1")
-			Yii::log(get_class($this) . " IPN Transaction ".print_r($_POST,true), CLogger::LEVEL_ERROR, get_class($this));
+		Yii::log("IPN Transaction ".print_r($_POST,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 		$config = $this->getConfigValues(get_class($this));
 		if($config['live'] == 'live')
@@ -100,11 +102,11 @@ class paypal extends WsPayment
 		$resp = curl_exec($ch); //execute post and get results
 		curl_close ($ch);
 
-		if(_xls_get_conf('DEBUG_PAYMENTS' , false)=="1")
-			Yii::log(get_class($this) . " IPN Verify Response ".$resp, CLogger::LEVEL_ERROR, get_class($this));
+		Yii::log("IPN Verify Response ".$resp, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 
-		if (strpos($resp,"VERIFIED") !== FALSE) {
+		if (strpos($resp,"VERIFIED") !== FALSE)
+		{
 
 			if (Yii::app()->getRequest()->getPost('payment_status')=="Completed")
 			{
@@ -113,20 +115,25 @@ class paypal extends WsPayment
 					'amount' => Yii::app()->getRequest()->getPost('mc_gross'),
 					'success' => true,
 					'data' => Yii::app()->getRequest()->getPost('txn_id'),
-					'payment_date' => Yii::app()->getRequest()->getPost('payment_date')
+					'payment_date' => Yii::app()->getRequest()->getPost('payment_date'),
+					'output'=>' '
 				);
 				return $retarr;
 			}
 			else
 			{
 				Yii::log("Paypal reported ".
-					Yii::app()->getRequest()->getPost('payment_status')." payment on " . Yii::app()->getRequest()->getPost('item_name'), CLogger::LEVEL_INFO, get_class($this));
+					Yii::app()->getRequest()->getPost('payment_status')." payment on " .
+					Yii::app()->getRequest()->getPost('item_name'), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+
 				return false;
 			}
 
 
 
-		} else {
+		}
+		else
+		{
 			Yii::log("Paypal IPN verification failed " . print_r($_POST , true), 'error', get_class($this));
 			return false;
 		}

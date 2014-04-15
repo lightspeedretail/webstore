@@ -35,6 +35,17 @@ class CustomPageUrlRule extends CBaseUrlRule
 
 			return $retString;
 		}
+
+		if($route=="custompage/index")
+		{
+			$id = $params['id'];
+			$objCatTest = Category::LoadByRequestUrl($id);
+			if (!is_null($objCatTest))
+				$id .= "/".URLPattern::CustomPage; //avoid conflicting Custom Page and Product URL
+			return $id;
+		}
+
+
 		return false;  // this rule does not apply
 	}
 

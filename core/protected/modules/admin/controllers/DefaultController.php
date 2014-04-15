@@ -3,7 +3,7 @@
 class DefaultController extends AdminBaseController
 {
 
-	public $controllerName = "Configuration";
+	public $controllerName = "Store Settings";
 
 	//Codes for this controller
 	const STORE_INFORMATION = 2;
@@ -49,30 +49,31 @@ class DefaultController extends AdminBaseController
 
 	public function beforeAction($action)
 	{
-
-		$this->menuItems = array(
-			array('label'=>'Store', 'linkOptions'=>array('class'=>'nav-header')),
+			$this->menuItems = array(
+				array('label'=>'Store', 'linkOptions'=>array('class'=>'nav-header')),
 				array('label'=>'Store Information', 'url'=>array('default/edit', 'id'=>self::STORE_INFORMATION)),
 				array('label'=>'Email Sending Options', 'url'=>array('default/edit', 'id'=>self::EMAIL_SENDING_OPTIONS)),
 				array('label'=>'Localization', 'url'=>array('default/edit', 'id'=>self::LOCALIZATION)),
 				array('label'=>'Customer Registration', 'url'=>array('default/edit', 'id'=>self::CUSTOMER_REGISTRATION)),
 				//array('label'=>'Captcha Setup', 'url'=>array('site/contact')),
-			array('label'=>'Appearance', 'linkOptions'=>array('class'=>'nav-header')),
+				array('label'=>'Appearance', 'linkOptions'=>array('class'=>'nav-header')),
 				array('label'=>'Display Options', 'url'=>array('default/edit', 'id'=>self::TEMPLATE_OPTIONS)),
 				array('label'=>'Products', 'url'=>array('default/edit', 'id'=>self::PRODUCTS)),
 				array('label'=>'Inventory', 'url'=>array('default/edit', 'id'=>self::INVENTORY)),
 				array('label'=>'Product Photos', 'url'=>array('default/edit', 'id'=>self::PRODUCT_PHOTOS)),
 				array('label'=>'Carts', 'url'=>array('default/edit', 'id'=>self::CARTS)),
 				array('label'=>'Wish Lists', 'url'=>array('default/edit', 'id'=>self::WISH_LIST)),
-				array('label'=>'SROs', 'url'=>array('default/edit', 'id'=>self::SRO)),
-			array('label'=>'SEO', 'linkOptions'=>array('class'=>'nav-header')),
+				array('label'=>'SROs', 'url'=>array('default/edit', 'id'=>self::SRO), 'visible'=>!(_xls_get_conf("LIGHTSPEED_CLOUD")>0)),
+				array('label'=>'SEO', 'linkOptions'=>array('class'=>'nav-header')),
 				array('label'=>'URL Options', 'url'=>array('default/edit', 'id'=>self::SEO_URL)),
 				array('label'=>'Product Meta Data', 'url'=>array('default/edit', 'id'=>self::SEO_PRODUCT)),
 				array('label'=>'Category/Custom Title Format', 'url'=>array('default/edit', 'id'=>self::SEO_CATEGORY)),
 				array('label'=>'Category Meta Data', 'url'=>array('default/categorymeta')),
 
 
-		);
+
+			);
+
 
 		//run parent init() after setting menu so highlighting works
 		return parent::beforeAction($action);
@@ -98,7 +99,10 @@ class DefaultController extends AdminBaseController
 				return "To edit the actual language strings, use the Translation menu options under ".CHtml::link("Database",$this->createUrl("databaseadmin/index"));
 
 			case self::PRODUCT_PHOTOS:
-				return "Photo sizes are now under the ".CHtml::link("Themes->Set Photo Sizes",$this->createUrl('theme/edit',array('id'=>self::THEME_PHOTOS)))." menu. Please note these settings affect photos as they are uploaded. You will need to reflag a product photo and Update Store to see the changes.";
+				if(Yii::app()->params['LIGHTSPEED_MT']==1)
+					return "Change settings for how product images are processed for your Web Store.";
+					else
+						return "Please note these settings affect photos as they are uploaded. You will need to reflag a product photo and Update Store to see the changes.";
 
 			case self::SEO_PRODUCT:
 				return "<P>These settings control the Page Title and Meta Description using keys that represent product information. Each of these keys is wrapped with a percentage ({) sign. Most represent fields in the Product Card. {crumbtrail} and {rcrumbtrail} (reverse crumbtrail) are the product's category path. Below is the available list of keys:</p><P>{storename}, {name}, {description}, {shortdescription}, {longdescription}, {price}, {family}, {class}, {crumbtrail}, {rcrumbtrail}</p>You can use {storename} and {storetagline} for the homepage.";
@@ -126,15 +130,18 @@ class DefaultController extends AdminBaseController
 		{
 			if($oXML->webstore->version>XLSWS_VERSIONBUILD)
 			{
-				if(_xls_get_conf('AUTO_UPDATE','1')=='1' && $oXML->webstore->autopathfile)
-					$this->redirect($this->createUrl("upgrade/index",array('patch'=>$oXML->webstore->autopathfile)));
+				if( _xls_get_conf('LIGHTSPEED_HOSTING','0') != "1" &&
+					_xls_get_conf('AUTO_UPDATE','1')=='1' &&
+					$oXML->webstore->autopathfile
+				)
+					$this->redirect($this->createAbsoluteUrl("upgrade/index",array('patch'=>$oXML->webstore->autopathfile),'http'));
 				else
 					$this->render("newversion",array('oXML'=>$oXML->webstore));
 				return;
 			}
 			elseif(isset($oXML->webstore->schema) && $oXML->webstore->schema != "current")
 			{
-				$this->redirect($this->createUrl("upgrade/index")); //update without patch file
+				$this->redirect($this->createAbsoluteUrl("upgrade/index",array(),'http')); //update without patch file
 			}
 			elseif(isset($oXML->webstore->themedisplayversion))
 			{
@@ -164,7 +171,7 @@ class DefaultController extends AdminBaseController
 					if (!$model->save())
 						Yii::app()->user->setFlash('error',print_r($model->getErrors(),true));
 
-					else Yii::app()->user->setFlash('success',Yii::t('admin','Configuration updated on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
+					else Yii::app()->user->setFlash('success',Yii::t('admin','Store Settings updated on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
 
 				} else Yii::app()->user->setFlash('error',print_r($model->getErrors(),true));
 			}
@@ -212,8 +219,9 @@ class DefaultController extends AdminBaseController
 	public function actionReleasenotes()
 	{
 		$oXML = json_decode(_xls_check_version(true));
-
-//print_r($oXML);die();
+		if(!isset($oXML->webstore))
+			$this->redirect(Yii::app()->createUrl('admin/default'));
+		else
 		$this->render("releasenotes", array('oXML'=>$oXML->webstore));
 
 	}

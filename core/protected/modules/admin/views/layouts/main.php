@@ -15,6 +15,7 @@
         .sidebar-nav {
             padding: 9px 0;
         }
+
     </style>
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -28,22 +29,31 @@
 
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
+        <?php if(!Yii::app()->user->isGuest && !Yii::app()->user->getState('internal', false)): ?>
+        <div class="container-fluid topnav hidden-xs">
+            <a class="lslogo" href="http://www.lightspeedretail.com" target="_blank"></a>
+            <a class="brand" href="<?php echo $this->createUrl("default/index"); ?>">Web Store Admin</a>
+            <p class="navbar-text pull-right hidden-xs">
+                <?php
+                    echo CHtml::link('Logout ('.Yii::app()->user->firstname.')',array('default/logout'),array('class'=>'navbar-link'));
+                ?>
+            </p>
+            <?php if(!Yii::app()->user->isGuest && !Yii::app()->user->getState('internal', false)):
+                echo CHtml::link('Go To Public Site',Yii::app()->createAbsoluteUrl("/",array(),'http'),
+                    array(
+                        'class'=>'backToSite pull-right',
+                        'target'=>'_new'));
+            endif;
+            ?>
+        </div>
+        <?php endif; ?>
         <div class="container-fluid">
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </a>
-            <a class="brand" href="<?php echo $this->createUrl("default/index"); ?>">Admin Panel</a>
+            <a class="brand visible-xs" href="<?php echo $this->createUrl("default/index"); ?>">Web Store Admin</a>
+            <a class="visible-xs" id="menu-toggle" data-toggle="collapse" data-target=".nav-collapse"><?= Yii::t('global','Menu'); ?></a>
             <div class="nav-collapse collapse">
-                <p class="navbar-text pull-right">
-	                <?php if(!Yii::app()->user->isGuest && !Yii::app()->user->getState('internal', false))
-	                    echo CHtml::link('Logout ('.Yii::app()->user->firstname.')',array('default/logout'),array('class'=>'navbar-link'));
-	                ?>
-                </p>
 	            <?php $this->widget('zii.widgets.CMenu',array(
 		            'items'=>$this->moduleList,
-		            'htmlOptions'=>array('class'=>'nav'),
+		            'htmlOptions'=>array('class'=>'nav modulelist'),
 	                'activeCssClass'=>'active',
                 )); ?><!-- mainmenu -->
             </div><!--/.nav-collapse -->
@@ -51,7 +61,8 @@
     </div>
 </div>
 
-<div class="container-fluid">
+<div class="container-fluid"
+    <?= (!Yii::app()->user->isGuest && !Yii::app()->user->getState('internal', false)) ? ' id="admin-content"' : ''; ?> >
     <div class="row-fluid">
         <div class="span3">
             <div class="well sidebar-nav">
