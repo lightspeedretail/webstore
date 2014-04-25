@@ -9,34 +9,26 @@
 	?>
 	<div class="row">
 	    <div class="row">
-	        <div class="col-sm-2">
+	        <div class="col-sm-4 term">
 		        <?php echo $form->label($model,'q'); ?>
-		    </div>
-		    <div class="col-sm-3" style="margin-right: 20px;">
 		        <?php echo $form->textField($model,'q'); ?>
 		        <?php echo $form->error($model,'q'); ?>
 	        </div>
-		    <div class="col-sm-2">
+		    <div class="col-sm-4 cat">
 			    <?php echo $form->label($model,'cat'); ?>
-			</div>
-		    <div class="col-sm-3">
 			    <?php echo $form->dropDownList($model,'cat',Category::getTopLevelSearch(),array('prompt'=>Yii::t('global','All Categories'))); ?>
 			    <?php echo $form->error($model,'cat'); ?>
 		    </div>
 	    </div>
 
 	    <div class="row">
-	        <div class="col-sm-2">
-		        <?php echo $form->label($model,'startprice'); ?>
-		    </div>
-		    <div class="col-sm-3" style="margin-right: 20px;">
+		    <div class="col-sm-4 startprice">
+			    <?php echo $form->label($model,'startprice'); ?>
 		        <?php echo $form->textField($model,'startprice'); ?>
 		        <?php echo $form->error($model,'startprice'); ?>
 	        </div>
-	        <div class="col-sm-2">
-		        <?php echo $form->label($model,'endprice'); ?>
-		    </div>
-		    <div class="col-sm-3">
+		    <div class="col-sm-4 endprice">
+			    <?php echo $form->label($model,'endprice'); ?>
 		        <?php echo $form->textField($model,'endprice'); ?>
 		        <?php echo $form->error($model,'endprice'); ?>
 	        </div>

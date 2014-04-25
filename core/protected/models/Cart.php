@@ -682,13 +682,6 @@ class Cart extends BaseCart
 
 		$taxes = $nprice_taxes[1];
 
-		$this->tax1 += $taxes[1];
-		$this->tax2 += $taxes[2];
-		$this->tax3 += $taxes[3];
-		$this->tax4 += $taxes[4];
-		$this->tax5 += $taxes[5];
-
-
 		if ($this->tax_code_id != $intNoTax)
 			$this->shipping->shipping_sell_taxed = $this->shipping->shipping_sell + round(array_sum($taxes),2);
 		else
@@ -1004,6 +997,17 @@ class Cart extends BaseCart
 	}
 
 	/**
+	 * Get shipping charge for different webstore modes.
+	 *
+	 * @return shipping charge for the cart
+	 */
+	protected function getShippingCharge()
+	{
+		return $this->shipping->getShippingSell();
+	}
+
+
+	/**
 	 * Calculate how many pending orders are waiting to be downloaded
 	 * @return int
 	 */
@@ -1296,7 +1300,6 @@ class Cart extends BaseCart
 					return $this->shipping->getShippingSell();
 				else
 					return 0;
-
 
 			default:
 				return parent::__get($strName);

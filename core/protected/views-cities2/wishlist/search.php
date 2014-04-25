@@ -5,41 +5,45 @@
         </div>
     </div>
 
+	<?php if (count($objWishlists)>0) { ?>
     <div id="wishlistSearchLabel" class="row">
 	    <?= Yii::t('wishlist','Click on the wish list name to view.'); ?>
 	</div>
 
     <div class="row rowborder">
-        <div class="col-sm-3">
+        <div class="col-xs-3 col-sm-3 heading">
             <span class="cartlabel light"><?= Yii::t('global','Name'); ?></span>
         </div>
 
-	    <div class="col-sm-2 heading">
+	    <div class="col-xs-2 col-sm-2 heading">
             <span class="cartlabel light"><?= Yii::t('global','Contains'); ?></span>
         </div>
 
-        <div class="col-sm-4 heading">
+        <div class="col-xs-7 col-sm-7 heading">
             <span class="cartlabel light"><?= Yii::t('global','Description'); ?></span>
         </div>
-
-
     </div>
+	<?php } else { ?>
+		<div id="wishlistSearchLabel" class="row">
+			<?= Yii::t('wishlist','Search for a Wish List by email address'); ?>
+		</div>
+	<?php } ?>
 
 	<?php foreach ($objWishlists as $objWishlist): ?>
 	    <div class="row">
-	        <div class="col-sm-3 alpha">
+	        <div class="col-xs-3 col-sm-3 alpha">
 	            <span class="cartlabel">
 		            <?php echo CHtml::link($objWishlist->registry_name,
 			                Yii::app()->createUrl('wishlist/view',array('code'=>$objWishlist->gift_code)));
 					?>
 	        </div>
 
-	        <div class="col-sm-2">
+	        <div class="col-xs-2 col-sm-2">
 		        <?= Yii::t('global','{items} item|{items} items',array(count($objWishlist->wishlistItems),
 		            '{items}'=>count($objWishlist->wishlistItems))); ?>
 	        </div>
 
-		    <div class="col-sm-4">
+		    <div class="col-xs-7 col-sm-7">
 				<?= $objWishlist->registry_description ?>&nbsp;
 	        </div>
 

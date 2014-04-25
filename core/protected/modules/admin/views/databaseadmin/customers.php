@@ -12,20 +12,7 @@
 		'draggable'=>true,
 	),
 ));?>
-<?php $this->Widget('zii.widgets.jui.CJuiDialog',array(
-	'id'=>'setpw-modal',
-	'options'=>array(
-		'title'=>'Reset Password',
-		'autoOpen'=>false,
-		'modal'=>'true',
-		'width'=>'420',
-		'height'=>'363',
-		'scrolling'=>'no',
-		'resizable'=>true,
-		'position'=>'center',
-		'draggable'=>true,
-	),
-));?>
+
 <div class="span9">
 
     <h3>Customers</h3>
@@ -108,7 +95,6 @@
 				    ),
 			    )
 		    ),
-
 		    array(
 			    'class' => 'editable.EditableColumn',
 			    'name' => 'allow_login',
@@ -136,20 +122,12 @@
 
 			    )
 		    ),
-
 		    array(
 			    'name' => 'wishlist',
 			    'header'=>'Wishlists',
 			    'type' => 'raw',
 			    'value'=>'"<a href=\"#\" id=\"".$data->id."\" class=\"basic\">Wishlists</a>"',
 			    'headerHtmlOptions' => array('class' => 'span1'),
-		    ),
-		    array(
-			    'name' => 'resetpw',
-			    'header'=>'Reset Password',
-			    'type' => 'raw',
-			    'value'=>'"<a href=\"#\" id=\"".$data->id."\" class=\"resetpw\">Reset Password</a>"',
-			    'headerHtmlOptions' => array('class' => 'span2'),
 		    ),
 		    //We can't use this yet because LS isn't sending pricing levels for a qty of 1. Boourns.
 //		    array(
@@ -170,14 +148,9 @@
 //		    array(
 //			    'name' => 'modified',
 //		    ),
-
-
-
 		),
     ));
 	?>
-
-
 </div>
 
 

@@ -26,6 +26,11 @@ class DefaultController extends AdminBaseController
 	const SEO_CATEGORY = 23;
 	const THEME_PHOTOS = 29;
 
+	/**
+	 * Short Description.
+	 *
+	 * @return array
+	 */
 	public function actions()
 	{
 		return array(
@@ -33,6 +38,11 @@ class DefaultController extends AdminBaseController
 		);
 	}
 
+	/**
+	 * Short Description.
+	 *
+	 * @return array
+	 */
 	public function accessRules()
 	{
 		return array(
@@ -47,6 +57,12 @@ class DefaultController extends AdminBaseController
 		);
 	}
 
+	/**
+	 * Short Description.
+	 *
+	 * @param CAction $action
+	 * @return bool
+	 */
 	public function beforeAction($action)
 	{
 			$this->menuItems = array(
@@ -79,6 +95,12 @@ class DefaultController extends AdminBaseController
 		return parent::beforeAction($action);
 	}
 
+	/**
+	 * Short Description.
+	 *
+	 * @param $id
+	 * @return null|string
+	 */
 	public function getInstructions($id)
 	{
 		switch($id)
@@ -119,7 +141,14 @@ class DefaultController extends AdminBaseController
 
 	}
 
-
+	/**
+	 * Default action when no other routes specified.
+	 *
+	 * This action also checks to see if there are Web Store updates available and if so, installs (or prompts)
+	 * to keep Web Store up to date.
+	 *
+	 * @return void
+	 */
 	public function actionIndex()
 	{
 
@@ -151,10 +180,17 @@ class DefaultController extends AdminBaseController
 
 		}
 
+		if (Yii::app()->params['LIGHTSPEED_SHOW_RELEASENOTES'])
+			$this->redirect(Yii::app()->createUrl('admin/default/releasenotes'));
+
 		$this->render("index",array('inls'=>(Yii::app()->user->fullname=="LightSpeed" ? "1" : "0")));
 	}
 
-
+	/**
+	 * Short Description.
+	 *
+	 * @return void
+	 */
 	public function actionSidebar()
 	{
 		$id = Yii::app()->getRequest()->getQuery('id');
@@ -166,7 +202,8 @@ class DefaultController extends AdminBaseController
 			{
 
 				$model->attributes=$_POST['Modules'];
-				if($model->validate())  {
+				if($model->validate())
+				{
 
 					if (!$model->save())
 						Yii::app()->user->setFlash('error',print_r($model->getErrors(),true));
@@ -192,7 +229,11 @@ class DefaultController extends AdminBaseController
 		$this->redirect(Yii::app()->createUrl('admin/default'));
 	}
 
-
+	/**
+	 * Short Description.
+	 *
+	 * @return void
+	 */
 	public function actionCategorymeta()
 	{
 		$model = new Category();
@@ -202,12 +243,18 @@ class DefaultController extends AdminBaseController
 
 	}
 
+	/**
+	 * Short Description.
+	 *
+	 * @return void
+	 */
 	public function actionUpdateCategory()
 	{
 		$pk = Yii::app()->getRequest()->getPost('pk');
 		$name = Yii::app()->getRequest()->getPost('name');
 		$value = Yii::app()->getRequest()->getPost('value');
-		if ($value=='') $value=null;
+		if ($value=='')
+			$value=null;
 
 
 		Category::model()->updateByPk($pk,array($name=>$value));
@@ -216,13 +263,25 @@ class DefaultController extends AdminBaseController
 
 	}
 
+	/**
+	 * Show release notes (pulls from live site using a formatted URL).
+	 *
+	 * Customer can view this by using the menu option, and they are shown
+	 * automatically following an upgrade.
+	 *
+	 * @return void
+	 */
 	public function actionReleasenotes()
 	{
-		$oXML = json_decode(_xls_check_version(true));
-		if(!isset($oXML->webstore))
-			$this->redirect(Yii::app()->createUrl('admin/default'));
-		else
-		$this->render("releasenotes", array('oXML'=>$oXML->webstore));
+		//Turn off flag now that we've seen release notes
+		_xls_set_conf('LIGHTSPEED_SHOW_RELEASENOTES',0);
+
+		$strVersion = (string)XLSWS_VERSIONBUILD;
+		$strDashVersion = $strVersion[0] . '-' . $strVersion[1] . '-' . $strVersion[2];
+
+		$url = '//www.lightspeedretail.com/release-notes/webstore/web-store-' . $strDashVersion . '/?hide=yes';
+
+		$this->render("releasenotes", array('url'=>$url));
 
 	}
 

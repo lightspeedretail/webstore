@@ -357,14 +357,14 @@ class usps extends WsShipping
 				$strKey = $val->MailService;
 				$strRate = $val->Rate;
 				$strKey = $this->cleanMethodName($strKey);
-				$retval[$strKey] = floatval($strRate) + floatval($config['markup']);
+				$retval[$strKey] = floatval($strRate);
 			}
 		} else {
 			foreach($oXML->Package->Service as $key=>$val) {
 				$strKey = $val->SvcDescription;
 				$strRate = $val->Postage;
 				$strKey = $this->cleanMethodName($strKey);
-				$retval[$strKey] = floatval($strRate) + floatval($config['markup']);
+				$retval[$strKey] = $strRate;
 			}
 		}
 

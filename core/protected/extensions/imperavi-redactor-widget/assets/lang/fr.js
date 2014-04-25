@@ -16,6 +16,7 @@ $.Redactor.opts.langs['fr'] = {
 	header2: 'Titre 2',
 	header3: 'Titre 3',
 	header4: 'Titre 4',
+	header5: 'Titre 5',
 	bold:  'Gras',
 	italic: 'Italique',
 	fontcolor: 'Couleur du texte',
@@ -49,7 +50,7 @@ $.Redactor.opts.langs['fr'] = {
 	text: 'Texte',
 	mailto: 'Courriel',
 	web: 'Adresse URL',
-	video_html_code: 'Code d\'intégration de la vidéo',
+	video_html_code: 'Code d\'intégration du video',
 	file: 'Insérer un fichier...',
 	upload: 'Téléverser',
 	download: 'Télécharger',
@@ -66,6 +67,8 @@ $.Redactor.opts.langs['fr'] = {
 	link_new_tab: 'Ouvrir le lien dans un nouvel onglet',
 	underline: 'Souligner',
 	alignment: 'Alignement',
-	filename: 'Nom de fichier (optionnel)'
+	filename: 'Nom de fichier (optionnel)',
+	edit: 'Edit',
+	center: 'Center'
 };
 })( jQuery );

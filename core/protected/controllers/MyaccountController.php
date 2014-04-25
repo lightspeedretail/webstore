@@ -22,7 +22,6 @@ class MyaccountController extends Controller
 
 	public function beforeAction($action)
 	{
-
 //		if (_xls_get_conf('ENABLE_SSL')==1)
 //		{
 //			if(Yii::app()->isCommonSSL)
@@ -35,8 +34,8 @@ class MyaccountController extends Controller
 //		}
 
 		return parent::beforeAction($action);
-
 	}
+
 	public function actionIndex()
 	{
 
@@ -55,14 +54,15 @@ class MyaccountController extends Controller
 
 	public function actionEdit()
 	{
-
 		$model = new Customer();
 
 		//For logged in users we grab the current model
-		if (Yii::app()->user->isGuest) {
+		if (Yii::app()->user->isGuest)
+		{
 			$model->newsletter_subscribe = 1;
 		}
-		else {
+		else
+		{
 			//For current customers
 			$model = Customer::GetCurrent();
 
@@ -71,33 +71,39 @@ class MyaccountController extends Controller
 		// collect user input data
 		if(isset($_POST['Customer']))
 		{
-			if (is_null($model->id)) $model->scenario = 'create';
-			else $model->scenario = "update";
+			if (is_null($model->id))
+			{
+				$model->scenario = Customer::SCENARIO_INSERT;
+			}
+			else $model->scenario = Customer::SCENARIO_UPDATE;
 
 			$strPassword = $_POST['Customer']['password'];
-			if(empty($strPassword) && isset($_POST['Customer']['password']))
+			if (empty($strPassword) && isset($_POST['Customer']['password']))
 			{
 				unset($_POST['Customer']['password']);
-				if(empty($strPassword) && isset($_POST['Customer']['password_repeat'])) unset($_POST['Customer']['password_repeat']);
-			} else if ($model->scenario=="update") $model->scenario = "updatepassword";
+				if (empty($strPassword) && isset($_POST['Customer']['password_repeat']))
+					unset($_POST['Customer']['password_repeat']);
+			}
+			elseif ($model->scenario == Customer::SCENARIO_UPDATE) $model->scenario = Customer::SCENARIO_UPDATEPASSWORD;
 
 			$model->attributes=$_POST['Customer'];
 
 			if($model->validate())
 			{
 				//If we haven't created a new password, retain the old one -- need repeat to pass validation
-				if ($model->scenario=="create" || $model->scenario=="updatepassword")
+				if ($model->scenario== Customer::SCENARIO_INSERT || $model->scenario== Customer::SCENARIO_UPDATEPASSWORD)
 				{
-					$model->password = _xls_encrypt($strPassword);
+					//$model->password = _xls_encrypt($strPassword);
+					$model->password = $strPassword;
 					$model->password_repeat = $model->password;
 				}
 
-				if ($model->scenario=="create" && _xls_get_conf('MODERATE_REGISTRATION')==1)
+				if ($model->scenario== Customer::SCENARIO_INSERT && _xls_get_conf('MODERATE_REGISTRATION')==1)
 				{
 					$model->allow_login = Customer::UNAPPROVED_USER;
 					$model->record_type = Customer::REGISTERED;
 				}
-				elseif ($model->scenario=="create")
+				elseif ($model->scenario== Customer::SCENARIO_INSERT)
 				{
 					$model->allow_login = Customer::NORMAL_USER;
 					$model->record_type = Customer::REGISTERED;
@@ -113,13 +119,9 @@ class MyaccountController extends Controller
 				{
 
 					if (Yii::app()->user->isGuest)
-					{
-
 						$this->createAndLogin($model,$strPassword);
-					}
 					else
 						$this->triggerEmailCampaign($model,'onUpdateCustomer');
-
 
 					$this->redirect($this->createUrl("/myaccount"));
 				}
@@ -134,12 +136,83 @@ class MyaccountController extends Controller
 
 		$model->password = null; //don't bother sending password to form
 		$this->render('edit',array('model'=>$model));
+	}
 
+	/**
+	 * Handles the resetpassword scenario - that is, when a customer has forgotten
+	 * their password and has requested a reset.
+	 */
+	public function actionResetpassword()
+	{
+		$id = '';
+		$token = '';
+
+		if (!isset($_GET['id']) || !isset($_GET['token']))
+		{
+			throw new CHttpException(404, 'Please make sure you have all the required information from password reset email.');
+		}
+		else
+		{
+			$id = $_GET['id'];
+			$token = $_GET['token'];
+		}
+
+		if (!Yii::app()->user->isGuest)
+		{
+			$link = CHtml::link(Yii::t("customer", "logout"),
+				$this->createUrl("site/logout"));
+			Yii::app()->user->setFlash("info",
+				Yii::t("customer", "Please {logout} to reset a password.",
+					array("{logout}"=>$link)));
+			$this->redirect($this->createUrl('/myaccount'));
+		}
+
+		$model = Customer::model()->findByPk($id);
+
+		if (!$model)
+		{
+			Yii::app()->user->setFlash("error",
+				Yii::t("customer", "Could not find the specified customer.  Please request another password reset."));
+			$this->redirect($this->createUrl('site/login'));
+		}
+
+		$model->scenario = Customer::SCENARIO_RESETPASSWORD;
+
+		if (isset($_POST['Customer']))
+		{
+			$model->attributes = $_POST['Customer'];
+			$model->token = $token;
+
+			if ($model->save())
+			{
+				Yii::app()->user->setFlash("success",
+					Yii::t("customer", "Password updated, please login!"));
+				$this->redirect($this->createUrl('site/login'));
+			}
+
+			if ($model->hasErrors('token'))
+			{
+				Yii::app()->user->setFlash('error',
+					Yii::t('customer','Could not authorize password reset. Please request a new reset e-mail by clicking "Forgot Password" link.'));
+				$this->redirect($this->createUrl('site/login'));
+			}
+
+			Yii::app()->user->setFlash("error",
+				Yii::t("customer", "Could not reset password, please try again."));
+		}
+
+		$this->breadcrumbs = array(
+			Yii::t('global','My Account')=>$this->createUrl("/myaccount"),
+			Yii::t('global','Edit Account')=>$this->createUrl("myaccount/resetpassword")
+		);
+
+		// TODO - this is to accommodate deprecated themes with password fields
+		$model->password = null;
+		$this->render('password', array('model' => $model));
 	}
 
 	public function actionAddress()
 	{
-
 		if (Yii::app()->user->isGuest)
 			$this->redirect($this->createUrl("/myaccount"));
 
@@ -190,7 +263,6 @@ class MyaccountController extends Controller
 		if($id && $objCustomer->default_shipping_id==$model->id) $model->makeDefaultShipping=1;
 
 		$this->render('address',array('model'=>$model,'checkout'=>$checkout));
-
 	}
 
 	public function actionCreate()
@@ -266,11 +338,8 @@ class MyaccountController extends Controller
 
 	protected function triggerEmailCampaign($objCustomer,$strTrigger)
 	{
-		
 		$objEvent = new CEventCustomer('MyAccountController',$strTrigger,$objCustomer);
 		_xls_raise_events('CEventCustomer',$objEvent);
-
-
 	}
 
 }

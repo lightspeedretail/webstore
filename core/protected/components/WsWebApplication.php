@@ -12,7 +12,9 @@ class WsWebApplication extends CWebApplication
 		'site/login',
 		'site/logout',
 		'site/forgotpassword',
-		'myaccount/edit'
+		'site/sendemail',
+		'myaccount/edit',
+		'myaccount/resetpassword'
 	);
 
 	/**
@@ -45,7 +47,7 @@ class WsWebApplication extends CWebApplication
 	 * @param string $ampersand
 	 * @return string
 	 */
-	public function createAbsoluteUrl($route,$params=array(),$schema='',$ampersand='&')
+	public function createAbsoluteUrl($route, $params=array(), $schema='', $ampersand='&')
 	{
 		//If we explicitly passing schema, bypass our trickery and just do it normally
 		if($schema != '')
@@ -69,7 +71,7 @@ class WsWebApplication extends CWebApplication
 	/**
 	 * Because of our need to switch URLs in certain cases, we actually make all URLs absolute now
 	 */
-	public function createUrl($route,$params=array(),$ampersand='&',$schema='')
+	public function createUrl($route, $params=array(), $ampersand='&', $schema='')
 	{
 		//Get the URL without the host first
 		$url = parent::createUrl($route,$params,$ampersand);
@@ -115,7 +117,8 @@ class WsWebApplication extends CWebApplication
 			$host = str_replace(
 				$strCustomUrl,
 				$strLightSpeedUrl,
-				$this->getRequest()->getHostInfo('https'));
+				$this->getRequest()->getHostInfo('https')
+			);
 
 		}
 		else
@@ -124,7 +127,8 @@ class WsWebApplication extends CWebApplication
 			$host = str_replace(
 				$strLightSpeedUrl,
 				$strCustomUrl,
-				$this->getRequest()->getHostInfo('http'));
+				$this->getRequest()->getHostInfo('http')
+			);
 
 		}
 
@@ -153,7 +157,8 @@ class WsWebApplication extends CWebApplication
 	public function getisCommonSSL()
 	{
 		if($this->gethasCommonSSL() &&
-			$_SERVER['HTTP_HOST'] == Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL'])
+			$_SERVER['HTTP_HOST'] == Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL']
+		)
 			return true;
 
 		return false;
@@ -161,9 +166,11 @@ class WsWebApplication extends CWebApplication
 
 	protected function parseRoute($route)
 	{
-		if(stripos($route,"/")===false) return $route;
+		if(stripos($route,"/")===false)
+			return $route;
 		$arrRoute = explode("/",$route);
-		if(strlen($arrRoute[0])==0) return $arrRoute[1];
+		if(strlen($arrRoute[0])==0)
+			return $arrRoute[1];
 		else return $arrRoute[0];
 	}
 }

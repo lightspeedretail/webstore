@@ -5,7 +5,7 @@
  * @author Vitaliy Potapov <noginsk@rambler.ru>
  * @link https://github.com/vitalets/x-editable-yii
  * @copyright Copyright &copy; Vitaliy Potapov 2012
- * @version 1.2.0
+ * @version 1.3.1
 */
 
 /**
@@ -79,7 +79,14 @@ class Editable extends CWidget
     * @var string visibility of buttons. Can be boolean `false|true` or string `bottom`.
     * @see x-editable
     */
-    public $showbuttons = null;    
+    public $showbuttons = null;   
+    
+    /**
+    * @var string Strategy for sending data on server. Can be `auto|always|never`.
+    * When 'auto' data will be sent on server only if **pk** and **url** defined, otherwise new value will be stored locally.
+    * @see x-editable
+    */
+    public $send = null;  
     
     /**
     * @var boolean will editable be initially disabled. It means editable plugin will be applied to element,
@@ -181,7 +188,22 @@ class Editable extends CWidget
     * @see x-editable
     */
     public $display = null;
-
+    
+    /**
+    * DOM id of target where afterAjaxUpdate handler will call 
+    * live update of editable element
+    * 
+    * @var string
+    */
+    public $liveTarget = null;
+    /**
+    * jQuery selector of elements to wich will be applied editable.
+    * Usefull in combination of `liveTarget` when you want to keep field(s) editble
+    * after ajaxUpdate
+    * 
+    * @var string
+    */
+    public $liveSelector = null;
 
     // --- X-editable events ---
     /**
@@ -244,7 +266,8 @@ class Editable extends CWidget
     public $options = array();
 
     /**
-    * @var array HTML options of element
+    * @var array HTML options of element. In `EditableColumn` htmlOptions are PHP expressions 
+    * so you can use `$data` to bind values to particular cell, e.g. `'data-categoryID' => '$data->categoryID'`.
     */
     public $htmlOptions = array();
 
@@ -296,9 +319,21 @@ class Editable extends CWidget
                 
         /*
         If set this flag to true --> element content will stay empty 
-        and value will be rendered to data-value attribute to apply autotext after.
+        and value will be rendered to data-value attribute to apply autotext afterwards.
         */
         $this->_prepareToAutotext = self::isAutotext($this->options, $this->type);
+        
+        /*
+        For `date` and `datetime` we need format to be on php side to make conversions.
+        But we can not set default format as datepicker and combodate has different formats.
+        So do it here:
+        */
+        if (!$this->format && $this->type == 'date') {
+            $this->format = 'yyyy-mm-dd';
+        }
+        if (!$this->format && $this->type == 'datetime') {
+            $this->format = 'yyyy-mm-dd hh:ii:ss';
+        }
     }
 
     public function buildHtmlOptions()
@@ -306,7 +341,7 @@ class Editable extends CWidget
         //html options
         $htmlOptions = array(
             'href'      => '#',
-            'rel'       => $this->getSelector(),
+            'rel'       => $this->liveSelector ? $this->liveSelector : $this->getSelector(),
         );
 
         //set data-pk 
@@ -318,18 +353,39 @@ class Editable extends CWidget
         //and do not fill element contents
         if ($this->_prepareToAutotext) {
             //for date we use 'format' to put it into value (if text not defined)
-            if ($this->type == 'date') {
-                //if date comes as object, format it to string
-                if($this->value instanceOf DateTime || is_long($this->value)) {
+            if ($this->type == 'date' || $this->type == 'datetime') {
+                //if date comes as object OR timestamp, format it to string
+                if($this->value instanceOf DateTime || is_long($this->value) || (is_string($this->value) && ctype_digit($this->value))) {
                     /*
-                    * unfortunatly datepicker's format does not match Yii locale dateFormat,
-                    * we need replacements below to convert date correctly
+                    * unfortunatly bootstrap datepicker's format does not match 
+                    * Yii locale dateFormat, we need replacements below to convert 
+                    * date correctly.
+                    * 
+                    * Yii format: 
+                    * http://www.unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns
+                    * 
+                    * Datepicker format: 
+                    * https://github.com/eternicode/bootstrap-datepicker#format
+                    * 
+                    * Datetimepicker format: 
+                    * https://github.com/smalot/bootstrap-datetimepicker#format 
                     */
+                    //months: M --> MMM, m --> M
                     $count = 0;
                     $format = str_replace('MM', 'MMMM', $this->format, $count);
                     if(!$count) $format = str_replace('M', 'MMM', $format, $count);
                     if(!$count) $format = str_replace('m', 'M', $format);
-                    
+                    if($this->type == 'datetime') {
+                        //minutes: i --> m
+                        $format = str_replace('i', 'm', $format); 
+                        //hours: h --> H, H --> h
+                        $count = 0;
+                        $format = str_replace('h', 'H', $format, $count);
+                        if(!$count) {
+                            $format = str_replace('H', 'h', $format);                        
+                        }
+                    }
+                                        
                     if($this->value instanceof DateTime) {
                         $timestamp = $this->value->getTimestamp();
                     } else {
@@ -340,11 +396,20 @@ class Editable extends CWidget
                 }
             } 
 
-            $this->htmlOptions['data-value'] = $this->value;
+            if(is_scalar($this->value)) {
+                $this->htmlOptions['data-value'] = $this->value;
+            }
+            //if not scalar, value will be added to js options instead of html options
         }
 
         //merging options
         $this->htmlOptions = CMap::mergeArray($this->htmlOptions, $htmlOptions);
+        
+        //convert arrays to json string, otherwise yii can not render it: 
+        //"htmlspecialchars() expects parameter 1 to be string, array given"  
+        foreach($this->htmlOptions as $k => $v) {
+            $this->htmlOptions[$k] = is_array($v) ? CJSON::encode($v) : $v;
+        }
     }
 
     public function buildJsOptions()
@@ -357,6 +422,11 @@ class Editable extends CWidget
             'title' => CHtml::encode($this->title),
         );
         
+        //if value needed for autotext and it's not scalar --> add it to js options
+        if ($this->_prepareToAutotext && !is_scalar($this->value)) {
+            $options['value'] = $this->value; 
+        }
+        
         //support of CSRF out of box, see https://github.com/vitalets/x-editable-yii/issues/38
         if (Yii::app()->request->enableCsrfValidation) {
             $csrfTokenName = Yii::app()->request->csrfTokenName;
@@ -367,8 +437,22 @@ class Editable extends CWidget
         }        
 
         //simple options set directly from config
-        foreach(array('url', 'type', 'mode', 'placement', 'emptytext', 'params', 'inputclass', 'format', 'viewformat', 'template',
-                      'combodate', 'select2', 'viewseparator', 'showbuttons'
+        foreach(array(
+            'url', 
+            'type', 
+            'mode', 
+            'placement', 
+            'emptytext', 
+            'params', 
+            'inputclass', 
+            'format', 
+            'viewformat', 
+            'template',
+            'combodate', 
+            'select2', 
+            'viewseparator', 
+            'showbuttons',
+            'send',
                ) as $option) {
             if ($this->$option !== null) {
                 $options[$option] = $this->$option;
@@ -393,38 +477,31 @@ class Editable extends CWidget
             }
         }
 
-        //TODO: language for datepicker: use yii config's value if not defined directly
-
-        /*
-         unfortunatly datepicker's format does not match Yii locale dateFormat
-         so we cannot take format from application locale
-
-         see http://www.unicode.org/reports/tr35/#Date_Format_Patterns
-
-        if($this->type == 'date' && $this->format === null) {
-            $this->format = Yii::app()->locale->getDateFormat();
-        }
-        */
-        /*
-        if (isset($this->options['datepicker']) && !$this->options['datepicker']['language'] && yii::app()->language) {
-            $this->options['datepicker']['language'] = yii::app()->language;
-        }
-        */
-
         //callbacks
         foreach(array('validate', 'success', 'display') as $method) {
             if(isset($this->$method)) {
                 $options[$method]=(strpos($this->$method, 'js:') !== 0 ? 'js:' : '') . $this->$method;
             }
         }
-
+        
         //merging options
         $this->options = CMap::mergeArray($this->options, $options);
+        
+        //i18n for `clear` in date and datetime
+        if($this->type == 'date' || $this->type == 'datetime') {
+            if(!isset($this->options['clear'])) {
+                $this->options['clear'] = Yii::t('EditableField.editable', 'x clear');
+            }
+        }
     }
 
     public function registerClientScript()
     {
-        $script = "$('a[rel=\"{$this->htmlOptions['rel']}\"]')";
+        $selector = "a[rel=\"{$this->htmlOptions['rel']}\"]"; 
+        if($this->liveTarget) {
+            $selector = '#'.$this->liveTarget.' '.$selector;
+        }
+        $script = "$('".$selector."')";
 
         //attach events
         foreach(array('init', 'shown', 'save', 'hidden') as $event) {
@@ -441,7 +518,13 @@ class Editable extends CWidget
         $options = CJavaScript::encode($this->options);
         $script .= ".editable($options);";
 
-        Yii::app()->getClientScript()->registerScript(__CLASS__ . '#' . $this->id, $script);
+        //wrap in anonymous function for live update
+        if($this->liveTarget) {
+            $script .= "\n $('body').on('ajaxUpdate.editable', function(e){ if(e.target.id == '".$this->liveTarget."') yiiEditable(); });";
+            $script = "(function yiiEditable() {\n ".$script."\n}());";
+        }
+        
+        Yii::app()->getClientScript()->registerScript(__CLASS__ . '-' . $selector, $script);
 
         return $script;
     }
@@ -533,12 +616,15 @@ class Editable extends CWidget
 
     public function run()
     {
-        if($this->apply !== false) {
+        //Register script (even if apply = false to support live update)
+        if($this->apply !== false || $this->liveTarget) {
             $this->buildHtmlOptions();
             $this->buildJsOptions();
             $this->registerAssets();               
-            
             $this->registerClientScript();
+        }
+        
+        if($this->apply !== false) {
             $this->renderLink();
         } else {
             $this->renderText();
@@ -554,15 +640,16 @@ class Editable extends CWidget
 
     public function renderText()
     {
-        $encodedText = $this->encode ? CHtml::encode($this->text) : $this->text;
-        if($this->type == 'textarea') {
-             $encodedText = preg_replace('/\r?\n/', '<br>', $encodedText);
-        }
-        echo $encodedText;
+        echo $this->encode ? CHtml::encode($this->text) : $this->text;
     }
 
     public function getSelector()
     {
+        //for live updates selector should not contain pk
+        if($this->liveTarget) {
+            return $this->name;
+        }
+        
         $pk = $this->pk;
         if($pk === null) {
             $pk = 'new';
@@ -578,12 +665,14 @@ class Editable extends CWidget
                 $pk = join('_', $buffer);
             }       
         }
-         
+        
+        
         return $this->name.'_'.$pk;
     }
     
     /**
-    * Returns is autotext should be applied to widget
+    * Returns is autotext should be applied to widget: 
+    * e.g. for 'select' to display text for id
     * 
     * @param mixed $options
     * @param mixed $type
@@ -666,7 +755,33 @@ class Editable extends CWidget
         
         return $listData;
     }
-    
+
+    /**
+    * injects ajaxUpdate event into widget
+    *
+    * @param mixed $widget
+    */
+    public static function attachAjaxUpdateEvent($widget)
+    {
+        $trigger = '$("#'.$widget->id.'").trigger("ajaxUpdate.editable");';
+
+        //check if trigger already inserted by another column
+        if(strpos($widget->afterAjaxUpdate, $trigger) !== false) return;
+
+        //inserting trigger
+        if(strlen($widget->afterAjaxUpdate)) {
+            $orig = $widget->afterAjaxUpdate;
+            if(strpos($orig, 'js:')===0) $orig = substr($orig,3);
+            $orig = "\n($orig).apply(this, arguments);";
+        } else {
+            $orig = '';
+        }
+        $widget->afterAjaxUpdate = "js: function(id, data) {
+            $trigger $orig
+        }";
+
+        $widget->registerClientScript();
+    }    
     
 
     /**

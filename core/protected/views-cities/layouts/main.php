@@ -23,5 +23,8 @@
 
 		<?php echo $this->sharingFooter; ?>
 
+		<!-- backwards compatibility only, to be removed by verison 3.2 -->
+		<?php echo $this->loginDialog; ?>
+
 	</body>
 </html>

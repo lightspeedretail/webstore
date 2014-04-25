@@ -109,6 +109,11 @@ class ECCValidator extends CValidator{
 			
 		 $creditCardNumber = preg_replace('/[ -]+/', '', $creditCardNumber);
 
+		if(!$this->checkFormat($creditCardNumber))
+			Yii::log("CC failed pattern matching, probably picked wrong card type", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		elseif(!$this->mod10($creditCardNumber))
+			Yii::log("CC failed Luhn10 check", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+
 		 return $this->checkFormat($creditCardNumber) && $this->mod10($creditCardNumber);
 	}
 	/**

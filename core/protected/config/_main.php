@@ -19,18 +19,24 @@ Yii::setPathOfAlias('editable', dirname(__FILE__).DIRECTORY_SEPARATOR.'../core/p
 Yii::setPathOfAlias('ext', dirname(__FILE__).DIRECTORY_SEPARATOR.'../core/protected/extensions');
 Yii::setPathOfAlias('extensions', dirname(__FILE__).DIRECTORY_SEPARATOR.'../core/protected/extensions');
 
+//For customization, let's look in custom/config for a main.php which will be merged
+//Use this instead of modifying this main.php directly
+if(file_exists(realpath(dirname(__FILE__)."/../custom").'/config/main.php'))
+	$arrCustomConfig = require(realpath(dirname(__FILE__)."/../custom").'/config/main.php');
+else
+	$arrCustomConfig = array();
+
 // This is the main Web application configuration. Any writable
 // CWebApplication properties can be configured here.
-return array(
+return CMap::mergeArray(
+	array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'../core/protected',
 	'runtimePath' => dirname(__FILE__).DIRECTORY_SEPARATOR.'../runtime',
 	'name'=>'Web Store',
 	'sourceLanguage' => 'en',
 
 	// preloading 'log' component
-	'preload'=>(XLSWS_VERSION<'3.1.0' ?
-			array('log','bootstrap') : array('log')
-		),
+	'preload'=>array('log'),
 
 	// autoloading model and component classes
 	'import'=>array(
@@ -114,11 +120,6 @@ return array(
 				'shoppingcart'=>array(
 					'class'=>'ShoppingCart',
 				),
-				//Twitter bootstrap
-				'bootstrap'=>XLSWS_VERSION<'3.1.0' ? array(
-						'class'=>'ext.bootstrap.components.Bootstrap',
-						'responsiveCss'=>true,
-					) : array(),
 
 				'urlManager'=>array(
 					'urlFormat'=>'path',
@@ -215,14 +216,13 @@ return array(
 					)
 				),
 			)
-
 		),
 
 	// application-level parameters that can be accessed
 	// using Yii::app()->params['paramName']
-	'params'=>array(
-		// this is used in contact page
-		'mainfile'=>'yes',
-	),
-
+		'params'=>array(
+			// this is used in contact page
+			'mainfile'=>'yes',
+		)),
+	$arrCustomConfig
 );

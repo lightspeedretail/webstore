@@ -316,7 +316,8 @@ class Controller extends CController
 		Yii::setPathOfAlias('bootstrap',null);
 		$strBootstrap = Yii::app()->theme->info->bootstrap;
 
-		if(!isset($strBootstrap)) {
+		if(!isset($strBootstrap))
+		{
 			Yii::app()->setComponent('bootstrap',array(
 				'class'=>'ext.bootstrap.components.Bootstrap',
 				'responsiveCss'=>true,
@@ -324,9 +325,16 @@ class Controller extends CController
 			Yii::setPathOfAlias('bootstrap', dirname(__FILE__).DIRECTORY_SEPARATOR.'../extensions/bootstrap');
 			Yii::app()->bootstrap->init();
 		}
-		elseif(!empty($strBootstrap)) {
-			Yii::setPathOfAlias('bootstrap',
-				dirname(__FILE__).DIRECTORY_SEPARATOR.'../extensions/'.Yii::app()->theme->info->bootstrap);
+		elseif($strBootstrap == 'none')
+		{
+			//don't load bootstrap at all
+		}
+		elseif(!empty($strBootstrap))
+		{
+			Yii::setPathOfAlias(
+				'bootstrap',
+				dirname(__FILE__).DIRECTORY_SEPARATOR.'../extensions/'.Yii::app()->theme->info->bootstrap
+			);
 			Yii::app()->setComponent('bootstrap',array(
 				'class'=>'ext.'.Yii::app()->theme->info->bootstrap.'.components.Bootstrap'
 			));

@@ -1,6 +1,6 @@
 body { padding-top: 60px; padding-bottom: 40px;}
 .sidebar-nav { padding: 9px 0; }
-.hero-unit { padding-left: 20px; padding-top: 10px; }
+.hero-unit { padding: 10px 20px 40px; }
 input[type="text"] {  width: 240px; }
 select {  width:auto; }
 .hero-unit label {  font-size: 0.7em; font-weight: 600; text-align: right; padding-right: 5px;  }
@@ -145,7 +145,8 @@ h3 { margin-top: 2px; }
 #editcss .choosedefault {background: linear-gradient(to bottom, #FAFAFA 0%, #E5E5E5 94%, #D3D3D3 94%, #D3D3D3 100%) repeat scroll 0 0 rgba(0, 0, 0, 0); padding-top: 5px; padding-bottom: 5px;}
 .choosedefault input[type="radio"],.choosedefault label { margin-left: 10px; display: inline;}
 .choosedefault input[type="checkbox"] { margin-right: 5px; margin-left: 10px; margin-bottom: 5px;}
-.restoreoriginal { font-size: 0.9em; text-align: right;}
+.restoreoriginal { font-size: 0.9em; }
+.CodeMirror { border: 1px solid #DDD; }
 
 #btnCopy { display: hidden;}
 #btnClean { display: hidden;}
@@ -201,6 +202,7 @@ h3 { margin-top: 2px; }
 .navbar .nav.modulelist { margin-left: -20px; }
 
 #admin-content { margin-top: 30px; }
+.releasenoteheader { margin-bottom: 0px; padding-bottom: 10px;}
 
 #menu-toggle {
     float: right;

@@ -23,10 +23,12 @@
 
 	<link rel="shortcut icon" href="<?=Yii::app()->baseUrl."/images/favicon.ico" ?>" />
 
-	<?php foreach(Yii::app()->theme->info->cssfiles as $cssfile)
-		Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->cssUrl($cssfile)); ?>
-	<?php Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->cssUrl(Yii::app()->theme->config->CHILD_THEME)); ?>
-	<?php Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->cssUrl('custom')); ?>
+	<?php
+	foreach(Yii::app()->theme->info->cssfiles as $cssfile)
+		Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->cssUrl($cssfile));
+	Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->cssUrl(Yii::app()->theme->config->CHILD_THEME));
+	Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->cssUrl('custom'));
+	?>
 
 	<?php echo $this->renderPartial("/site/_google",null,true); ?>
 

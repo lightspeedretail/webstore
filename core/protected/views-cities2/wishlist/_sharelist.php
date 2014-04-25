@@ -8,9 +8,6 @@
 ));
 	echo $form->hiddenField($model,'code');
 	?>
-    <div class="row shortrow">
- 		<?= Yii::t('wishlist','Share via email'); ?>
-    </div>
 
     <div class="row midrow">
 		<?php echo $form->labelEx($model,'toName'); ?>

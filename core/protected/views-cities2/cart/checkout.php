@@ -355,7 +355,9 @@
 				            ))); ?>
 				            <?php echo $form->error($model,'billingCountry'); ?>
 	                    </div>
+		            </div>
 
+		            <div class="row">
 	                    <div class="col-sm-6">
 				            <?php echo $form->labelEx($model,'billingState'); ?>
 				            <?php echo $form->dropDownList($model,'billingState',

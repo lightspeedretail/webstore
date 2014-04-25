@@ -52,9 +52,6 @@
 						'altField' => '#self_pointing_id',
 						'altFormat' => _xls_convert_date_to_js(_xls_get_conf('DATE_FORMAT','Y-m-d')), // show to user format
 					),
-					'htmlOptions' => array(
-						'style' => 'height:30px;'
-					),
 				));	?>
 				<?php echo $form->error($model,'event_date'); ?>
 			</div>

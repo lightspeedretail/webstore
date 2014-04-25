@@ -6,13 +6,34 @@
 class AdminBaseController extends CController
 {
 
+	/**
+	 * @var string
+	 */
 	public $controllerName = "";
+	/**
+	 * @var
+	 */
 	public $editSectionName;
+	/**
+	 * @var
+	 */
 	public $editSectionInstructions;
+	/**
+	 * @var
+	 */
 	public $menuItems;
+	/**
+	 * @var array
+	 */
 	public $moduleList = array('test');
+	/**
+	 * @var
+	 */
 	public $assetUrl;
 
+	/**
+	 * @var bool
+	 */
 	public $debug = YII_DEBUG;
 
 	/**
@@ -26,14 +47,19 @@ class AdminBaseController extends CController
 	 * These keys do not apply to Multitenant mode, so remove them from any edit screens.
 	 * @var array
 	 */
-	public $hideMTKeys = array();
+	public $hideMTKeys = array('AUTO_UPDATE');
 
 	/**
 	 * These keys do not apply to Hosting mode, so remove them from any edit screens.
 	 * @var array
 	 */
-	public $hideHostedKeys = array('AUTO_UPDATE','AUTO_UPDATE_TRACK','ENABLE_SSL');
+	public $hideHostedKeys = array('AUTO_UPDATE_TRACK','ENABLE_SSL');
 
+	/**
+	 * Filter control for Admin Panel.
+	 *
+	 * @return array
+	 */
 	public function filters()
 	{
 		return array(
@@ -41,11 +67,16 @@ class AdminBaseController extends CController
 		);
 	}
 
-	// filterAccessControl()
-	//
-	//  This replicates the access control module in the base controller and lets us
-	//  do our own special rules that insure we fail closed.
-
+	/**
+	 * Filter Access Control.
+	 *
+	 * This replicates the access control module in the base controller and lets us
+	 * do our own special rules that insure we fail closed.
+	 *
+	 * @param CFilterChain $filterChain Yii passed object.
+	 *
+	 * @return void
+	 */
 	public function filterAccessControl($filterChain)
 	{
 		$rules = $this->accessRules();
@@ -54,10 +85,15 @@ class AdminBaseController extends CController
 		$rules[] = array('deny');
 
 		$filter = new CAccessControlFilter;
-		$filter->setRules( $rules );
+		$filter->setRules($rules);
 		$filter->filter($filterChain);
 	}
 
+	/**
+	 * What functions authorized and non-authorized users can access.
+	 *
+	 * @return array
+	 */
 	public function accessRules()
 	{
 		return array(
@@ -68,6 +104,13 @@ class AdminBaseController extends CController
 		);
 	}
 
+	/**
+	 * If we have SSL but we are not using the certificate, switch to it.
+	 *
+	 * Note that this is not used for license agreement yet, since we're pulling in non-SSL urls which error
+	 *
+	 * @return void
+	 */
 	public function verifySSL()
 	{
 
@@ -89,6 +132,13 @@ class AdminBaseController extends CController
 
 	}
 
+	/**
+	 * Verify our email address is valid using built in Validator.
+	 *
+	 * @param CActiveRecord $obj Configuration key.
+	 *
+	 * @return boolean
+	 */
 	public function validateEmail($obj)
 	{
 		$objV = new CEmailValidator();
@@ -97,6 +147,13 @@ class AdminBaseController extends CController
 		return true;
 	}
 
+	/**
+	 * Short Description.
+	 *
+	 * @param CAction $action Passed action from Yii.
+	 *
+	 * @return boolean
+	 */
 	public function beforeAction($action)
 	{
 		$this->verifySSL();
@@ -104,45 +161,67 @@ class AdminBaseController extends CController
 		$arrControllerList = $this->getControllerList();
 		$this->moduleList = $this->convertControllersToMenu($arrControllerList);
 
-        array_push($this->moduleList, array(
-            'label'=>'Go to Public Site',
-            'url'=>Yii::app()->createAbsoluteUrl("/",array(),'http'),
-            'itemOptions'=>array('class'=>'visible-xs')));
+		array_push(
+			$this->moduleList,
+			array(
+				'label' => 'Go to Public Site',
+				'url' => Yii::app()->createAbsoluteUrl("/", array(), 'http'),
+				'itemOptions' => array('class' => 'visible-xs'))
+		);
 
-		if(!Yii::app()->user->isGuest && !Yii::app()->user->getState('internal', false))
-			array_push($this->moduleList, array(
-            'label'=>'Logout ('.Yii::app()->user->firstname.')',
-            'url'=>array('default/logout'),
-            'itemOptions'=>array('class'=>'visible-xs')));
+		if (!Yii::app()->user->isGuest && !Yii::app()->user->getState('internal', false))
+		{
+			array_push(
+				$this->moduleList,
+				array(
+					'label' => 'Logout (' . Yii::app()->user->firstname . ')',
+					'url' => array('default/logout'),
+					'itemOptions' => array('class' => 'visible-xs'))
+			);
+		}
 
-        // remove the blank ajax button
-        array_shift($this->moduleList);
+		// remove the blank ajax button
+		array_shift($this->moduleList);
 
 		if (!isset($this->menuItems))
+		{
 			$this->menuItems = array(
-				array('label'=>'$this->menuItems not defined')
+				array('label' => '$this->menuItems not defined')
 			);
+		}
 		else
 			$this->setMenuHighlight();
 
 
+
 		$baseUrl = str_replace("/admin","/",Yii::app()->createAbsoluteUrl("admin"));
 
-		Yii::app()->clientScript->registerScript('helpers', '
+		Yii::app()->clientScript->registerScript(
+			'helpers',
+			'
           yii = {
               urls: {
                base: '.CJSON::encode($baseUrl).'
               }
           };
-      ',CClientScript::POS_HEAD);
+      ',
+			CClientScript::POS_HEAD
+		);
 
 
 		$this->registerAsset("js/bootbox.min.js");
 
 		if (Yii::app()->params['STORE_OFFLINE'] != '0')
-			Yii::app()->user->setFlash('warning',Yii::t('admin','Your store is currently set offline for maintenance -- you can access it via the url {url}',
-				array('{url}'=>Yii::app()->createAbsoluteUrl('site/index',array('offline'=>_xls_get_conf('STORE_OFFLINE'))))));
-
+		{
+			Yii::app()->user->setFlash(
+				'warning',
+				Yii::t(
+					'admin',
+					'Your store is currently set offline for maintenance -- you can access it via the url {url}',
+					array('{url}' => Yii::app()->createAbsoluteUrl('site/index', array('offline' => _xls_get_conf('STORE_OFFLINE'))))
+				)
+			);
+		}
 
 		if(isset($action->id) && $action->id=="edit")
 		{
@@ -159,33 +238,52 @@ class AdminBaseController extends CController
 
 	}
 
+	/**
+	 * Short Description.
+	 *
+	 * @return void
+	 */
 	public function actionEdit()
 	{
 		$id = Yii::app()->getRequest()->getQuery('id');
 
 		$model = Configuration::model()->findAllByAttributes(array('configuration_type_id'=>$id),array('order'=>'sort_order'));
 
-		if($this->IsCloud) $model = $this->sanitizeEditModule($model,'Cloud');
-		if($this->IsMT) $model = $this->sanitizeEditModule($model,'MT');
-		if($this->isHosted) $model = $this->sanitizeEditModule($model,'Hosted');
+		if ($this->IsCloud)
+			$model = $this->sanitizeEditModule($model, 'Cloud');
+		if ($this->IsMT)
+			$model = $this->sanitizeEditModule($model, 'MT');
+		if ($this->isHosted)
+			$model = $this->sanitizeEditModule($model, 'Hosted');
 
 		if(isset($_POST['Configuration']))
 		{
 			$valid=true;
-			foreach($model as $i=>$item)
+			foreach($model as $i => $item)
 			{
 				if(isset($_POST['Configuration'][$i]))
 					$item->attributes=$_POST['Configuration'][$i];
 
-				if ($item->options=="EMAIL")
+				if($item->key_name == "LANG_MENU" && $item->key_value == 1)
+				{
+					$itemLanguages = $model[2];
+					$itemLanguages->attributes = $_POST['Configuration'][2];
+					if (empty($itemLanguages->key_value))
+						$valid=false;
+				}
+
+				if ($item->options == "EMAIL")
 					$valid = $this->validateEmail($item) && $valid;
 				else
-					$valid=$item->validate() && $valid;
+					$valid = $item->validate() && $valid;
 				if (!$valid)
 				{
-					if ($item->options=="EMAIL")
+					if ($item->options == "EMAIL")
 						Yii::app()->user->setFlash('error',$item->title." is not a valid email address");
-					else {
+					else if ($item->key_name == "LANG_MENU")
+						Yii::app()->user->setFlash('error', "Languages field cannot be empty when language menu is enabled");
+					else
+					{
 						$err = $item->getErrors();
 						Yii::app()->user->setFlash('error',$item->title." -- ".print_r($err['key_value'][0],true));
 					}
@@ -193,53 +291,65 @@ class AdminBaseController extends CController
 					break;
 				}
 			}
-			if($valid)  {
-				foreach($model as $i=>$item)
+			if($valid)
+			{
+				foreach($model as $i => $item)
 				{
-					$item->attributes=$_POST['Configuration'][$i];
-					if ($item->options=="PASSWORD") $item->key_value=_xls_encrypt($item->key_value);
+					$item->attributes = $_POST['Configuration'][$i];
+					if ($item->options == "PASSWORD")
+						$item->key_value=_xls_encrypt($item->key_value);
 					if (!$item->save())
 						Yii::app()->user->setFlash('error',print_r($item->getErrors(),true));
-					else {
+					else
+					{
 						Yii::app()->user->setFlash('success',Yii::t('admin','Configuration updated on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
 						$item->postConfigurationChange();
 					}
 
-					if($item->key_name=='EMAIL_TEST' && $item->key_value==1)
+					if($item->key_name == 'EMAIL_TEST' && $item->key_value == 1)
 						$this->sendEmailTest();
-
 				}
-
-
-
-
 			}
 		}
 
 
-		foreach ($model as $i=>$item)
+		foreach ($model as $i => $item)
 		{
-			if ($item->key_name=="EMAIL_TEST") $item->key_value=0;
-			if ($item->options=="BOOL") $this->registerOnOff($item->id,"Configuration_{$i}_key_value",$item->key_value);
-			if ($item->options=="PASSWORD") $model[$i]->key_value=_xls_decrypt($model[$i]->key_value);
-			$model[$i]->title = Yii::t('admin',$item->title,
+			if ($item->key_name == "EMAIL_TEST")
+				$item->key_value = 0;
+			if ($item->options == "BOOL")
+				$this->registerOnOff($item->id, "Configuration_{$i}_key_value", $item->key_value);
+			if ($item->options == "PASSWORD")
+				$model[$i]->key_value = _xls_decrypt($model[$i]->key_value);
+			$model[$i]->title = Yii::t(
+				'admin',
+				$item->title,
 				array(
-					'{color}'=>_xls_regionalize('color'),
-					'{check}'=>_xls_regionalize('check'),
-				));
-			$model[$i]->helper_text = Yii::t('admin',$item->helper_text,
+					'{color}' => _xls_regionalize('color'),
+					'{check}' => _xls_regionalize('check'),
+				)
+			);
+			$model[$i]->helper_text = Yii::t(
+				'admin',
+				$item->helper_text,
 				array(
-					'{color}'=>_xls_regionalize('color'),
-					'{check}'=>_xls_regionalize('check'),
-				));
+					'{color}' => _xls_regionalize('color'),
+					'{check}' => _xls_regionalize('check'),
+				)
+			);
 		}
-
 
 		$this->render('admin.views.default.edit', array('model'=>$model));
 
 
 	}
 
+	/**
+	 * Module editing (e.g. shipping, payment, theme module).
+	 *
+	 * @return void
+	 * @throws CHttpException Error if invalid module passed.
+	 */
 	public function actionModule()
 	{
 		$id = Yii::app()->getRequest()->getQuery('id');
@@ -264,7 +374,12 @@ class AdminBaseController extends CController
 
 			$objModule = ($id == "wstheme" ? Modules::LoadByName(Yii::app()->theme->name) : Modules::LoadByName($id));
 
-			if($id == "wstheme") $objModule->active=1;
+			if($id == "wstheme")
+			{
+				$objModule->active=1;
+				$strOldChild = Yii::app()->theme->config->CHILD_THEME;
+			}
+
 			if(isset($_POST[$adminModelName]))
 			{
 				$config = $objModule->GetConfigValues();
@@ -292,6 +407,14 @@ class AdminBaseController extends CController
 
 						$this->updateMenuAfterEdit($id);
 
+						if($id == "wstheme")
+						{
+							$strNewChild = $new_config['CHILD_THEME'];
+							if ($strOldChild !== $strNewChild &&
+								$strNewChild !== 'custom')
+								Yii::app()->theme->config->activecss = $this->updateActiveCss($strNewChild,$strOldChild);
+						}
+
 					}
 				}
 				else
@@ -314,7 +437,7 @@ class AdminBaseController extends CController
 
 			//At this point, our $model has our values, so they are available for our form definition
 			$formDefinition = $model->getAdminForm();
-			foreach ($formDefinition['elements'] as $key=>$value)
+			foreach ($formDefinition['elements'] as $key => $value)
 				$formDefinition['elements'][$key]['layout']=
 					'<div class="span5 optionlabel">{label}</div><div class="span5 optionvalue">{input}</div>{error}<div class="span2 maxhint">{hint}</div>';
 
@@ -331,6 +454,11 @@ class AdminBaseController extends CController
 
 	}
 
+	/**
+	 * Short Description.
+	 *
+	 * @return void
+	 */
 	public function actionIntegration()
 	{
 		$this->registerAsset("js/tiers.js"); //This is just to set assetUrl
@@ -393,34 +521,40 @@ class AdminBaseController extends CController
 
 			//At this point, our $model has our values, so they are available for our form definition
 			$formDefinition = $model->getAdminForm();
-			foreach ($formDefinition['elements'] as $key=>$value)
+			foreach ($formDefinition['elements'] as $key => $value)
 				$formDefinition['elements'][$key]['layout']=
 					'<div class="span5 optionlabel">{label}</div><div class="span5 optionvalue">{input}</div>{error}<div class="span2 maxhint">{hint}</div>';
 
-
-
-			$this->render('admin.views.default.moduleedit',
-				array(  'objModule'=>$objModule,
-					'model'=>$model,
-					'form'=>new CForm($formDefinition,$model)
-				));
+			$this->render(
+				'admin.views.default.moduleedit',
+				array('objModule' => $objModule,
+					'model' => $model,
+					'form' => new CForm($formDefinition, $model)
+				)
+			);
 		}
 		else
 			$this->render('admin.views.default.noconfig'); //If null it means the AdminForm model file is missing
 
 	}
 
+	/**
+	 * Short Description.
+	 *
+	 * @return array
+	 */
 	protected function getControllerList()
 	{
 
 		$arrReturn = array();
 
 		$declaredClasses = get_declared_classes();
-		foreach (glob(Yii::getPathOfAlias('admin.controllers') . "/*Controller.php") as $controller){
+		foreach (glob(Yii::getPathOfAlias('admin.controllers') . "/*Controller.php") as $controller)
+		{
 			$class = basename($controller, ".php");
-			if (!in_array($class, $declaredClasses)) {
+			if (!in_array($class, $declaredClasses))
+			{
 				Yii::import("admin.controllers." . $class, true);
-
 			}
 			if (
 				$class != "LoginController" &&
@@ -432,7 +566,9 @@ class AdminBaseController extends CController
 				$class != "DatabaseadminController"
 
 			) //Keep these from showing up on top
-			$arrReturn[] = $class;
+			{
+				$arrReturn[] = $class;
+			}
 		}
 
 
@@ -441,90 +577,135 @@ class AdminBaseController extends CController
 
 	}
 
+	/**
+	 * Convert an array of controllers to an object that can be used with CMenu.
+	 *
+	 * @param array $arrControllerList Controller list array.
+	 *
+	 * @return array
+	 */
 	protected function convertControllersToMenu($arrControllerList)
 	{
 		$arrMenu = array();
-		foreach ($arrControllerList as $key=>$val)
+		foreach ($arrControllerList as $key => $val)
 		{
 			$arrItem = array();
 			$cControl = new $val('default');
-			$arrItem['label']=$cControl->controllerName;
-			$arrItem['url']=array(strtolower(substr($val,0,-10)).'/');
-			$arrItem['zclass']=$val;
+			$arrItem['label'] = $cControl->controllerName;
+			$arrItem['url'] = array(strtolower(substr($val, 0, -10)) . '/');
+			$arrItem['zclass'] = $val;
 			$arrMenu[] = $arrItem;
 		}
 		asort($arrMenu); //we sort on the order
 
-        $arrMenu = $this->arrangeControllers($arrMenu);
+		$arrMenu = $this->arrangeControllers($arrMenu);
 
-		foreach ($arrMenu as $key=>$val)
-			if (get_class($this)==$val['zclass']) { $arrMenu[$key]['active']=true; break; }
+		foreach ($arrMenu as $key => $val)
+		{
+			if (get_class($this) == $val['zclass'])
+			{
+				$arrMenu[$key]['active'] = true;
+				break;
+			}
+		}
 
-        // Highlight the System tab when a user accesses the DB controller
-        // No other tabs will be active so we don't need to check for another active tab
-        if ($this->controllerName == 'Db')
-            foreach ($arrMenu as $key=>$value)
-                if ($value['label']=='System')
-                    $arrMenu[$key]['active'] = true;
-
-
+		// Highlight the System tab when a user accesses the DB controller
+		// No other tabs will be active so we don't need to check for another active tab
+		if ($this->controllerName == 'Db')
+		{
+			foreach ($arrMenu as $key => $value)
+			{
+				if ($value['label'] == 'System')
+				{
+					$arrMenu[$key]['active'] = true;
+				}
+			}
+		}
 
 		return $arrMenu;
 	}
 
+	/**
+	 * Place Controllers in a specific order.
+	 *
+	 * We want these eight controllers to show up in this specific order in the admin panel.
+	 * any other controllers will appear at the end in alphabetical order.
+	 *
+	 * @param array $arrMenu Array of controllers.
+	 *
+	 * @return array
+	 */
+	protected function arrangeControllers($arrMenu)
+	{
+		$arrOrder = array('Ajax', 'Default', 'Theme', 'Payments', 'Shipping', 'Custompage', 'Integration', 'System');
 
-    /**
-     * we want these eight controllers to show up in this specific order in the admin panel.
-     * any other controllers will appear at the end in alphabetical order.
-     */
+		$arrSorted = array();
+		$i = 0;
+		foreach ($arrOrder as $module)
+		{
+			foreach ($arrMenu as $key => $item)
+			{
+				if ($module . 'Controller' == $item['zclass'])
+				{
+					$arrSorted[$i++] = $item;
+					unset($arrMenu[$key]);
+					break;
+				}
+			}
+		}
 
-    protected function arrangeControllers($arrMenu)
-    {
-        $arrOrder = array('Ajax','Default','Theme','Payments','Shipping','Custompage','Integration','System');
+		return array_merge($arrSorted, $arrMenu);
+	}
 
-        $arrSorted = array();
-        $i=0;
-        foreach ($arrOrder as $module)
-            foreach ($arrMenu as $key=>$item)
-            {
-                if ($module.'Controller' == $item['zclass'])
-                {
-                    $arrSorted[$i++] = $item;
-                    unset($arrMenu[$key]);
-                    break;
-                }
-            }
-
-        return array_merge($arrSorted,$arrMenu);
-    }
-
+	/**
+	 * Short Description.
+	 *
+	 * @return void
+	 */
 	protected function setMenuHighlight()
 	{
 
 		$id = Yii::app()->getRequest()->getQuery('id');
-		if (isset($id) && !empty($id)) {
-			foreach($this->menuItems as $key=>$item)
+		if (isset($id) && !empty($id))
+		{
+			foreach ($this->menuItems as $key => $item)
+			{
 				if (isset($item['url']) && isset($item['url']['id']))
-					if ($item['url']['id']==$id)
+				{
+					if ($item['url']['id'] == $id)
 					{
-						$this->menuItems[$key]['active']=true;
+						$this->menuItems[$key]['active'] = true;
 						$this->editSectionName = strip_tags($this->menuItems[$key]['label']);
 						$this->editSectionInstructions = $this->getInstructions($id);
 						break;
 					}
-		} else {
-			foreach($this->menuItems as $key=>$item)
+				}
+			}
+		}
+		else
+		{
+			foreach ($this->menuItems as $key => $item)
+			{
 				if (isset($item['url']))
-					if ($item['url'][0]==$this->id."/".$this->action->id)
+				{
+					if ($item['url'][0] == $this->id . "/" . $this->action->id)
 					{
-						$this->menuItems[$key]['active']=true;
+						$this->menuItems[$key]['active'] = true;
 						$this->editSectionName = strip_tags($this->menuItems[$key]['label']);
 						break;
 					}
-
+				}
+			}
 		}
 	}
 
+	/**
+	 * Register an asset for publishing in /assets.
+	 *
+	 * @param string $file Filename to register.
+	 *
+	 * @return mixed
+	 */
 	protected function registerAsset($file)
 	{
 		if ($this->debug == true)
@@ -535,14 +716,25 @@ class AdminBaseController extends CController
 		$path = $this->assetUrl . '/' . $file;
 		if(strpos($file, 'js') !== false)
 			return Yii::app()->clientScript->registerScriptFile($path);
-		else if(strpos($file, 'css') !== false)
+		elseif(strpos($file, 'css') !== false)
 			return Yii::app()->clientScript->registerCssFile($path);
 
 	}
 
-	public function registerOnOff($id,$sequence,$initValue)
+	/**
+	 * Register our on/off slider switch for /assets publishing.
+	 *
+	 * @param string  $id        Div id.
+	 * @param integer $sequence  Sequence number, useful for multiple switches.
+	 * @param string  $initValue Either on or off.
+	 *
+	 * @return void
+	 */
+	public function registerOnOff($id, $sequence, $initValue)
 	{
-		if ($initValue==0 || $initValue=='') $initValue = "off"; else $initValue="on";
+		if ($initValue == 0 || $initValue == '')
+			$initValue = "off";
+		else $initValue = "on";
 
 		$this->registerAsset("js/jquery.iphone-switch.js");
 
@@ -565,8 +757,10 @@ SETUP;
 
 
 	/**
-	 * Return Instructions to be displayed in admin panel. This function should be overridden in each controller
-	 * @param $id
+	 * Return Instructions to be displayed in admin panel. This function should be overridden in each controller.
+	 *
+	 * @param string $id Controller type.
+	 *
 	 * @return null
 	 */
 	protected function getInstructions($id)
@@ -586,29 +780,43 @@ SETUP;
 
 
 	/**
+	 * Change menu highlighting (useful for shipping/payment module screens that highlight Active).
+	 *
 	 * When we have changed a shipping or payment configuration, refresh the menu entry since the flag for live/test mode may have changed
 	 * We call this after a config save since our menu has been loaded earlier
-	 * @param $id
+	 *
+	 * @param integer $id Menu id.
+	 *
+	 * @return void
 	 */
 	protected function updateMenuAfterEdit($id)
 	{
-		foreach ($this->menuItems as $key=>$val)
+		foreach ($this->menuItems as $key => $val)
 		{
 			if (isset($val['url']['id']))
-				if ($val['url']['id']==$id) {
+			{
+				if ($val['url']['id'] == $id)
+				{
 					$this->menuItems[$key]['label'] = Yii::app()->getComponent($id)->AdminName;
 					$this->editSectionName = strip_tags($this->menuItems[$key]['label']);
 				}
+			}
 		}
 	}
 
-
-	public function scanModules($moduletype = "payment")
+	/**
+	 * Look for all modules (class files) in extensions folder.
+	 *
+	 * @param string $moduletype Type of module which determines what folder to scan.
+	 *
+	 * @return void
+	 */
+	public function scanModules($moduletype="payment")
 	{
 		if($moduletype=="theme")
 		{
 			$files = glob(YiiBase::getPathOfAlias("webroot.themes").'/*', GLOB_ONLYDIR);
-			foreach($files as $key=>$file)
+			foreach ($files as $key => $file)
 				if(stripos($file,"/themes/trash")>0 || stripos($file,"/themes/_customcss")>0)
 					unset($files[$key]);
 
@@ -618,7 +826,8 @@ SETUP;
 			$arrCustom = array();
 			if(file_exists(YiiBase::getPathOfAlias("custom.extensions.".$moduletype)))
 				$arrCustom = glob(realpath(YiiBase::getPathOfAlias("custom.extensions.".$moduletype)).'/*', GLOB_ONLYDIR);
-			if(!is_array($arrCustom)) $arrCustom = array();
+			if(!is_array($arrCustom))
+				$arrCustom = array();
 			$files=array_merge(glob(realpath(YiiBase::getPathOfAlias("ext.ws".$moduletype)).'/*', GLOB_ONLYDIR),$arrCustom);
 
 		}
@@ -687,8 +896,9 @@ SETUP;
 	}
 
 	/**
-	 * Boolean if this store is a Cloud store
-	 * @return bool
+	 * Boolean if this store is a Cloud store.
+	 *
+	 * @return boolean
 	 */
 	public function getIsCloud()
 	{
@@ -698,8 +908,9 @@ SETUP;
 	}
 
 	/**
-	 * Boolen if this store is a Multitenant Store (could be Cloud or Pro)
-	 * @return bool
+	 * Boolen if this store is a Multitenant Store (could be Cloud or Pro).
+	 *
+	 * @return boolean
 	 */
 	public function getIsMT()
 	{
@@ -709,8 +920,9 @@ SETUP;
 	}
 
 	/**
-	 * Boolen if this store is a Hosted store
-	 * @return bool
+	 * Boolen if this store is a Hosted store.
+	 *
+	 * @return boolean
 	 */
 	public function getIsHosted()
 	{
@@ -719,13 +931,21 @@ SETUP;
 		return false;
 	}
 
-	protected function sanitizeEditModule($model,$keyType)
+	/**
+	 * Remove keys that we want to hide for certain hosting modes.
+	 *
+	 * @param array  $model   Configuration model of loaded keys.
+	 * @param string $strType Hosting mode (e.g. multi tenant, hosting, single tenant).
+	 *
+	 * @return array
+	 */
+	protected function sanitizeEditModule($model, $strType)
 	{
 
-		$keys = "hide".$keyType."Keys";
+		$keys = "hide".$strType."Keys";
 		$keyArray = $this->$keys;
 
-		foreach($model as $key=>$value)
+		foreach ($model as $key => $value)
 		{
 			if(in_array($value->key_name,$keyArray))
 				unset($model[$key]);
@@ -733,5 +953,41 @@ SETUP;
 
 
 		return $model;
+	}
+
+	/**
+	 * If the user changes the child theme (color set option) in the theme's admin form
+	 * remove the old child and add the new one to the active css array in the correct position.
+	 *
+	 * @param $newchildcss
+	 * @return array
+	 */
+
+	protected function updateActiveCss($strNewChild, $strOldChild)
+	{
+		$arrActiveCss = array_values(Yii::app()->theme->config->activecss);
+		$arrDefaultCss = Yii::app()->theme->info->cssfiles;
+
+		if (!in_array($strNewChild,$arrActiveCss))
+		{
+			$key = array_search('custom',$arrActiveCss);
+			if ($key && $key > 0 )
+				if (!in_array($arrActiveCss[$key-1],$arrDefaultCss))
+					$arrActiveCss[$key-1] = $strNewChild;
+				else
+				{
+					$arrActiveCss[$key] = $strNewChild;
+					array_push($arrActiveCss,'custom');
+				}
+			elseif (in_array($strOldChild,$arrActiveCss))
+			{
+				$key = array_search($strOldChild,$arrActiveCss);
+				$arrActiveCss[$key] = $strNewChild;
+			}
+			else
+				array_push($arrActiveCss,$strNewChild);
+		}
+
+		return $arrActiveCss;
 	}
 }

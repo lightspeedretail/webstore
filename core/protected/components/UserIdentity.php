@@ -28,7 +28,7 @@ class UserIdentity extends CUserIdentity
 		} elseif ($user->allow_login != Customer::NORMAL_USER && $user->allow_login != Customer::ADMIN_USER) {
 			$this->errorCode = self::ERROR_NOT_APPROVED;
 
-		} elseif ($user->password != $this->hash($this->password) && _xls_decrypt($user->password) != $this->password) {
+		} elseif (!$user->authenticate($this->password)) {
 
 			//is this an account that was set up via facebook login and doesn't have its own password?
 			if ($user->password=="facebook")
@@ -78,20 +78,26 @@ class UserIdentity extends CUserIdentity
 		$this->setState('fullname', $user->first_name.' '.$user->last_name);
 		$this->setState('firstname', $user->first_name);
 		$this->setState('profilephoto',Yii::app()->theme->baseUrl."/css/images/loginhead.png");
-		$user->last_login = new CDbExpression('NOW()');
 
 		if ($user->allow_login == Customer::ADMIN_USER)
 			$this->setState('role', 'admin');
 		else
 			$this->setState('role', 'user');
 
-		//If we used an md5 password from old webstore, let's re-encrypt it with the new format
-		if 	($user->password == $this->hash($this->password))
+		// Update the password storage format
+		if 	($user->password == $this->hash($this->password) ||
+			$this->password == _xls_decrypt($user->password))
 		{
-			Yii::log("Note, user's old MD5 password upgraded ".$user->fullname, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-			$user->password = _xls_encrypt($this->password);
+			$user->setScenario(Customer::SCENARIO_UPDATEPASSWORD);
+			$user->attributes = array(
+				"password" => $this->password,
+				"password_repeat" => $this->password
+			);
+			Yii::log("Note, user's old password format upgraded ".$user->fullname, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		}
-		$user->setScenario('update');
+
+		$user->last_login = new CDbExpression('UTC_TIMESTAMP()');
+
 		if (!$user->save())
 		{
 			Yii::log("ERROR Saving user record ".print_r($user->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);

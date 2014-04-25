@@ -1,0 +1,1 @@
+This directory used by Web Store when creating a custom main.php. A sample is included, simply rename it to main.php.

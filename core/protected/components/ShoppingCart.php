@@ -670,6 +670,9 @@ class ShoppingCart extends CApplicationComponent
 					return $this->model->shipping->shipping_sell;
 				else return 0;
 
+			case 'shippingCharge':
+				return $this->model->shippingCharge;
+
 			case 'customer':
 				if ($this->model->customer)
 					return $this->model->customer;

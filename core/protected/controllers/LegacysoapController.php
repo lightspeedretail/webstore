@@ -2204,7 +2204,7 @@ class LegacySoapController extends Controller
 			$strReturn .= "ShippingData:".base64encode($objCart->shipping->shipping_data).chr(13);
 
 			$shippingCost = $objCart->shipping->shipping_cost;
-			$shippingSell = $objCart->shipping->shipping_sell;
+			$shippingSell = $objCart->shippingCharge;
 
 			if(empty($shippingCost)) $shippingCost='0';
 			if(empty($shippingSell)) $shippingSell='0';

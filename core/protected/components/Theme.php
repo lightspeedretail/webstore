@@ -11,7 +11,10 @@ class Theme extends CTheme
 	public static function hasAdminForm($strThemeName)
 	{
 		$model = Yii::app()->getComponent('wstheme')->getAdminModel($strThemeName);
-		if($model) return true; else return false;
+		if($model)
+			return true;
+		else
+			return false;
 
 	}
 
@@ -26,12 +29,18 @@ class Theme extends CTheme
 		if(substr($cssFile,strlen($cssFile)-4,4)==".css")
 			$cssFile = substr($cssFile,0,-4);
 
-		$customCss = Yii::app()->theme->config->customcss;
-		if(empty($customCss) || !in_array($cssFile,$customCss))
+		// new install?
+		if (!is_array(Yii::app()->theme->config->activecss))
 			return parent::getBaseUrl()."/css/".$cssFile.".css";
-		else
-			return str_replace("http:","",_xls_custom_css_folder()).
-			"_customcss/".Yii::app()->theme->name."/".$cssFile.".css";
+
+		$arrActiveCss = Yii::app()->theme->config->activecss;
+
+		if(in_array($cssFile,$arrActiveCss))
+			if ($cssFile!=='custom')
+				return parent::getBaseUrl()."/css/".$cssFile.".css";
+			else
+				return str_replace("http:","",_xls_custom_css_folder()).
+				"_customcss/".Yii::app()->theme->name."/".$cssFile.".css";
 
 	}
 
@@ -130,10 +139,11 @@ class ThemeInfo
 
 			case 'cssfiles':
 				$model = Yii::app()->getComponent('wstheme')->getAdminModel(Yii::app()->theme->name);
-				if(!$model) return array('base','style');
+				if(!$model)
+					return array('base','style');
 				$form = new $model;
-				$arrCss= $form->cssfiles;
-				return explode(",",$arrCss);
+				$strCss = $form->cssfiles;
+				return explode(",",$strCss);;
 			break;
 
 			default:

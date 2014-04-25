@@ -43,7 +43,7 @@ class SystemController extends AdminBaseController
 					array('label'=>'Event Processors', 'url'=>array('system/edit', 'id'=>self::PROCESSORS)),
 					array('label'=>'Email Servers', 'url'=>array('system/edit', 'id'=>self::EMAIL_SERVERS)),
 					array('label'=>'Security', 'url'=>array('system/edit', 'id'=>self::SECURITY),
-						'visible'=>!(Yii::app()->params['LIGHTSPEED_MT']>0)),
+						'visible'=>!(Yii::app()->params['LIGHTSPEED_HOSTING'] == '1')),
 				array('label'=>'Tasks', 'linkOptions'=>array('class'=>'nav-header')),
 					array('label'=>'Purge Deleted Categories/Families', 'url'=>array('system/purge')),
 					array('label'=>'Erase abandoned carts &gt; '.intval(_xls_get_conf('CART_LIFE' , 30)).' days',
@@ -53,12 +53,13 @@ class SystemController extends AdminBaseController
 						'url'=>array('system/resynccloud'),
 						'visible'=>Yii::app()->params['LIGHTSPEED_CLOUD']>0
 					),
-                array('label'=>'Database', 'linkOptions'=>array('class'=>'nav-header')),
-                    array('label'=>'Database Admin', 'url'=>array('/admin/databaseadmin')),
+				array('label'=>'Database', 'linkOptions'=>array('class'=>'nav-header')),
+					array('label'=>'Database Admin', 'url'=>array('/admin/databaseadmin')),
 				array('label'=>'System Log', 'linkOptions'=>array('class'=>'nav-header')),
 					array('label'=>'View Log', 'url'=>array('system/log')),
 				array('label'=>'About', 'linkOptions'=>array('class'=>'nav-header')),
 					array('label'=>'System Information', 'url'=>array('system/info')),
+					array('label'=>'Latest Release Notes', 'url'=>array('default/releasenotes')),
 
 		);
 

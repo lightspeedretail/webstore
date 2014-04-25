@@ -1,17 +1,10 @@
 <div class="span9">
-	<div class="hero-unit">
-		<h4>Web Store update installed!</h4>
-
-		<div class="editinstructions">
-			<strong> Web Store <?php echo $oXML->displayversion ?> is now your current version.</strong>
-			<p>
-
-			</p>
-			<p>
-				<?php echo $oXML->releasenotes; ?>
-			</p>
-		</div>
-
+	<div class="hero-unit releasenoteheader">
+		<h4>Web Store <?php echo XLSWS_VERSION ?> Release Notes</h4>
 	</div>
+
+	<iframe class="span9 documentation" scrolling="no" src="<?php echo $url; ?>"></iframe>
+
+
 
 </div>

@@ -575,7 +575,18 @@ class CartController extends Controller
 
 		if(isset($_POST['CheckoutForm']))
 		{
-			Yii::log("Checkout form submission", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+			$strLogLevel = Yii::app()->getComponent('log')->routes{0}->levels;
+			if(stripos($strLogLevel,",info"))
+			{
+				$arrSubmitted = $_POST['CheckoutForm'];
+				// Redact sensitive information
+				if(isset($arrSubmitted['cardNumber']))
+					$arrSubmitted['cardNumber'] = "A ".strlen($arrSubmitted['cardNumber'])." digit number here";
+				if(isset($arrSubmitted['cardCVV']))
+					$arrSubmitted['cardCVV'] = "A ".strlen($arrSubmitted['cardCVV'])." digit number here";
+
+				Yii::log("*** CHECKOUT FORM *** Submission data: ".print_r($arrSubmitted,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+			}
 
 			$model->attributes=$_POST['CheckoutForm'];
 			if(Yii::app()->params['SHIP_SAME_BILLSHIP'])
@@ -607,19 +618,30 @@ class CartController extends Controller
 			//For any payment processor with its own form -- not including CC -- validate here
 			if($model->paymentProvider)
 			{
-				Yii::log(
-					"Form validation for card provider  ".$model->paymentProvider,
-					'info',
-					'application.'.__CLASS__.".".__FUNCTION__
-				);
+
 				$objPaymentModule = Modules::model()->findByPk($model->paymentProvider);
-				if(isset(Yii::app()->getComponent($objPaymentModule->module)->subform))
+				$objComponent = Yii::app()->getComponent($objPaymentModule->module);
+				if(isset($objComponent->subform))
 				{
-					$paymentSubform = Yii::app()->getComponent($objPaymentModule->module)->subform;
+
+					Yii::log(
+						"Form validation for card provider  ".strip_tags($objComponent->name()),
+						'info',
+						'application.'.__CLASS__.".".__FUNCTION__
+					);
+					$paymentSubform = $objComponent->subform;
 					$paymentSubformModel = new $paymentSubform;
 					$paymentSubformModel->attributes = isset($_POST[$paymentSubform]) ? $_POST[$paymentSubform] : array();
 					$subValidate = $paymentSubformModel->validate();
 					$valid = $subValidate && $valid;
+				}
+				else
+				{
+					Yii::log(
+						"Payment module " . strip_tags($objComponent->name()),
+						'info',
+						'application.' . __CLASS__ . "." . __FUNCTION__
+					);
 				}
 			}
 
@@ -649,8 +671,11 @@ class CartController extends Controller
 				if ($model->createPassword)
 				{
 
-					Yii::log("Password was part of CheckoutForm",
-						'info', 'application.'.__CLASS__.".".__FUNCTION__);
+					Yii::log(
+						"Password was part of CheckoutForm",
+						'info',
+						'application.' . __CLASS__ . "." . __FUNCTION__
+					);
 
 					// - Test to see if we can't just log in with email and pw
 					$identity=new UserIdentity($model->contactEmail,$model->createPassword);

@@ -9,7 +9,7 @@
     </div>
 
 	    <div class="tabbable">
-		    <ul class="nav nav-tabs langedit">
+		    <ul class="nav nav-tabs langedit" id="nav_tabs">
 			    <?php
 				    foreach($files as $file)
 					    echo '<li '.($file['tab']=='custom' ? 'class="active"' : '').
@@ -23,56 +23,57 @@
 			    {
 				    echo '<div class="tab-pane'.($file['tab']=='custom' ? ' active' : '').
 					    '" id="'.$file['tab'].'">';
-				    if ($file['tab'] != "custom") {
-					    echo '<div class="choosedefault">';
-					    echo CHtml::radioButtonList("radio".$file['tab'],$file['usecustom'],array(
-							    0=> Yii::t('admin','Use default {filename} from {themename} theme',
-							        array('{filename}'=>$file['filename'],'{themename}'=>ucfirst(Yii::app()->theme->name))),
-							    1=> Yii::t('admin','Use my custom version of {filename}',
-									array('{filename}'=>$file['filename'])))
-					    );
-					    echo '<div class="restoreoriginal">';
-					    echo '<label for="',"check".$file['tab'],'">';
 
+					echo '<div class="choosedefault">';
+				    echo '<div class="enable">';
+					    echo '<label for="',"check1".$file['tab'],'">';
+				        echo CHtml::checkBox("check1".$file['tab'],$file['useme'],array('value'=>'on'));
 					    echo Yii::t('global',
-						    "Restore original {file} file and erase my custom version permanently.",
-						    array('{file}'=>$file['filename'])
-					    );
-					    echo CHtml::checkBox("check".$file['tab'],false,array('value'=>'on'));
-					    echo '</label>';
-					    echo '</div></div>';
-				    } else echo CHtml::hiddenField("radio".$file['tab'],"1");
+						    "Use {file} with {themename}.",
+						    array('{file}'=>$file['filename'],'{themename}'=>ucfirst(Yii::app()->theme->name))
+				        );
+				        echo '</label>';
+					echo '</div>';
+					echo '</div>';
+				    if ($file['tab'] != "custom")
+					    echo CHtml::hiddenField("radio".$file['tab'],"0");
+				    else
+					    echo CHtml::hiddenField("radio".$file['tab'],"1");
 
-				    $this->widget('ImperaviRedactorWidget', array(
-					    'name' => 'content-'.$file['tab'],
-					    'value'=>  $file['contents'],
-					    'attribute' => 'page',
-					    'htmlOptions'=>array(
+				    $this->widget('Codemirror', array(
+					        'model' => $file,
+						    'name' => 'content'.$file['tab'],
+					        'value'=>  $file['contents'],
+						    'attribute' => 'page',
+						    'htmlOptions'=>array(
+							    'style'=>"height: 400px; width: 500px; padding-bottom: 20px;",
+							    'spellcheck'=>'false',
+						    ),
+						    'options' => array(
+							    'lineNumbers'=>true,
+							    'lineWrapping'=>true,
+							    'matchBrackets'=>true,
+							    'mode'=>'text/css',
+							    'readOnly' => $file['tab']!='custom',
+						    )
+					    ));
 
-						    'style'=>"height: 400px; padding-bottom: 20px;",
-						    'spellcheck'=>'false',
-					    ),
-					    'options' => array(
-						    'width'=> '500',
-						    'height'=> '400',
-						    'autoresize'=>false,
-						    'convertDivs'=>false,
-						    'linebreaks'=>true,
-						    'buttonSource'=>false,
-						    'convertLinks'=>false,
-						    'phpTags'=>false,
-						    'visual'=>true,
-						    'toolbar'=>false,
 
-					    )
-				    ));
 				    echo '</div>';
+
 			    }
 			    ?>
 		    </div>
 	    </div>
 
+    <script>
+        $(function () {
+            $('#nav_tabs a[data-toggle="tab"]').on('shown', (function (e) {
+                window['codeMirrorcontent'+ $(this).attr('href').slice(1)].refresh();
+            }));
 
+        });
+    </script>
 
 
 	<div class="row">

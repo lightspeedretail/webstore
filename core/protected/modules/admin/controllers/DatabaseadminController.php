@@ -30,7 +30,7 @@ class DatabaseadminController extends AdminBaseController
 
 		$this->menuItems =
 			array(
-                    array('label'=>'&larr; Back to System Menu', 'url'=>array('/admin/system')),
+					array('label'=>'&larr; Back to System Menu', 'url'=>array('/admin/system')),
 				array('label'=>'Customers', 'linkOptions'=>array('class'=>'nav-header')),
 					array('label'=>'Edit Customers', 'url'=>array('databaseadmin/customers')),
 				array('label'=>'Orders', 'linkOptions'=>array('class'=>'nav-header')),
@@ -45,11 +45,12 @@ class DatabaseadminController extends AdminBaseController
 			);
 
 		$arrLang = _xls_avail_languages();
-		if (count($arrLang)>1) {
+		if (count($arrLang)>1)
+		{
 			$this->menuItems[] = array('label'=>'Translations', 'linkOptions'=>array('class'=>'nav-header'));
 			$strOriginal = $arrLang[_xls_get_conf('LANG_CODE')];
 			array_shift($arrLang);
-			foreach($arrLang as $key=>$value)
+			foreach($arrLang as $key => $value)
 				$this->menuItems[] = array(
 					'label'=>$strOriginal."=>".$value,
 					'url'=>array('databaseadmin/translate?dest='.$key));
@@ -151,7 +152,7 @@ class DatabaseadminController extends AdminBaseController
 		//
 		$model = CartPayment::model()->findByPk($id);
 		$objCart = Cart::model()->findByAttributes(array('payment_id'=>$id));
-		if (isset($_POST['Cart']) &&  isset($_POST['CartPayment']))
+		if (isset($_POST['Cart']) && isset($_POST['CartPayment']))
 		{
 
 			$objCart->attributes = $_POST['Cart'];
@@ -196,7 +197,8 @@ class DatabaseadminController extends AdminBaseController
 	 */
 	public function actionDelete()
 	{
-		foreach ($_POST['cid'] as $value) {
+		foreach ($_POST['cid'] as $value)
+		{
 			Yii::log("Admin Panel DELETE cart item ".$value, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			CartItem::model()->deleteByPk($value);
 		}
@@ -240,20 +242,23 @@ class DatabaseadminController extends AdminBaseController
 			if ($_POST['name']=='code' && $_POST['value']=="")
 			{
 				$items = CartItem::model()->findAll("product_id=".$_POST['pk']." AND (cart_type=".CartType::order." OR cart_type=".CartType::awaitpayment.")");
-				if ($items) {
+				if ($items)
+				{
 					echo "You cannot delete a product that has been used on an order";
-				} else {
+				}
+				else
+				{
 					_dbx("set foreign_key_checks=0;");
-					Product::model()->updateAll(array('image_id'=>null),'id ='.$_POST['pk']);
-					Images::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
-					ProductCategoryAssn::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
-                    ProductRelated::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
-                    ProductRelated::model()->deleteAllByAttributes(array('related_id'=>$_POST['pk']));
-                    ProductTags::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
-                    ProductQtyPricing::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
-                    ProductText::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
-					WishlistItem::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
-					TaskQueue::model()->deleteAllByAttributes(array('product_id'=>$_POST['pk']));
+					Product::model()->updateAll(array('image_id' => null), 'id =' . $_POST['pk']);
+					Images::model()->deleteAllByAttributes(array('product_id' => $_POST['pk']));
+					ProductCategoryAssn::model()->deleteAllByAttributes(array('product_id' => $_POST['pk']));
+					ProductRelated::model()->deleteAllByAttributes(array('product_id' => $_POST['pk']));
+					ProductRelated::model()->deleteAllByAttributes(array('related_id' => $_POST['pk']));
+					ProductTags::model()->deleteAllByAttributes(array('product_id' => $_POST['pk']));
+					ProductQtyPricing::model()->deleteAllByAttributes(array('product_id' => $_POST['pk']));
+					ProductText::model()->deleteAllByAttributes(array('product_id' => $_POST['pk']));
+					WishlistItem::model()->deleteAllByAttributes(array('product_id' => $_POST['pk']));
+					TaskQueue::model()->deleteAllByAttributes(array('product_id' => $_POST['pk']));
 					Product::model()->deleteByPk($_POST['pk']);
 					_dbx("set foreign_key_checks=1;");
 					echo "delete";
@@ -293,6 +298,7 @@ class DatabaseadminController extends AdminBaseController
 		} else {
 
 			$model = new Customer();
+
 			if (isset($_GET['q']))
 				$model->email = $_GET['q']; //we actually use this variable to search in several fields
 
@@ -308,7 +314,6 @@ class DatabaseadminController extends AdminBaseController
 			}
 
 			$this->registerAsset("js/wishlist.js");
-			$this->registerAsset("js/resetpw.js");
 			$this->render("customers", array('model'=>$model));
 		}
 
@@ -349,67 +354,6 @@ class DatabaseadminController extends AdminBaseController
 
 	}
 
-
-	/**
-	 * Reset/create new password for user, and send customer email
-	 */
-	public function actionResetPassword()
-	{
-
-		$id = Yii::app()->getRequest()->getQuery('id');
-
-		$model = Customer::model()->findByPk($id);
-
-		$Customer = Yii::app()->getRequest()->getPost('Customer');
-		if (isset($Customer)) {
-
-			$retVal='';
-
-			$model->password = _xls_encrypt($Customer['password_repeat']);
-			$model->save();
-
-			if($retVal=="")
-			{
-				Yii::app()->user->setFlash('success',Yii::t('admin','Password updated and sent for {user} at {time}.',array('{user}'=>$model->fullname,'{time}'=>date("d F, Y  h:i:sa"))));
-				$retVal = "success";
-
-                $theme = Yii::app()->getTheme();
-
-                if (file_exists(YiiBase::getPathOfAlias('webroot').'/themes/'.$theme->name.'/mail/_forgotpassword.php'))
-                    $path = 'webroot.themes.'.$theme->name.'.mail._forgotpassword';
-                else
-                    if ($theme->info->viewset)
-                        $path = 'application.views-'.$theme->info->viewset.'.mail._forgotpassword';
-                    else
-                        $path = 'application.views-cities.mail._forgotpassword';
-
-				$strHtmlBody =$this->renderPartial($path,array('model'=>$model), true);
-				$strSubject = Yii::t('global','Password reminder');
-
-				$objEmail = new EmailQueue;
-
-				$objEmail->htmlbody = $strHtmlBody;
-				$objEmail->subject = $strSubject;
-				$objEmail->to = $model->email;
-
-				$objEmail->save();
-				$bln = _xls_send_email($objEmail->id,true);
-
-				if (!$bln)
-					Yii::app()->user->setFlash('error',Yii::t('admin','Email failed to send to user'));
-
-			}
-
-			echo $retVal;
-		} else
-		echo $this->renderPartial("_resetpw",array('model'=>$model),true);
-
-
-
-	}
-
-
-
 	/**
 	 * Customer lookup and edit
 	 */
@@ -418,7 +362,8 @@ class DatabaseadminController extends AdminBaseController
 		//What language are we translating
 		$strDestLang = Yii::app()->getRequest()->getQuery('dest');
 		$strCategory = Yii::app()->getRequest()->getQuery('category');
-		if (empty($strCategory)) $strCategory="checkout";
+		if (empty($strCategory))
+			$strCategory="checkout";
 
 		if(isset($_POST['pk']) && isset($_POST['name']) && isset($_POST['value']))
 		{
@@ -457,7 +402,4 @@ class DatabaseadminController extends AdminBaseController
 
 
 	}
-
-
-
 }

@@ -23,12 +23,20 @@ class UpgradeController extends CController
 	{
 		$online = _xls_number_only($_POST['online']);
 
-		switch($online)
+		switch ($online)
 		{
-			case 10: $this->actionDownload(); break;
-			case 20: $this->actionVerifyVersion();break;
-			case 30: $this->actionVerifyWriteAccess();break;
-			case 40: $this->actionPlaceFiles();break;
+			case 10:
+				$this->actionDownload();
+				break;
+			case 20:
+				$this->actionVerifyVersion();
+				break;
+			case 30:
+				$this->actionVerifyWriteAccess();
+				break;
+			case 40:
+				$this->actionPlaceFiles();
+				break;
 
 			case 50:
 			case 55:
@@ -40,7 +48,8 @@ class UpgradeController extends CController
 			case 85:
 			case 90:
 			case 95:
-				$this->actionDatabaseUpgrade($online);break;
+				$this->actionDatabaseUpgrade($online);
+				break;
 		}
 
 	}
@@ -88,7 +97,8 @@ class UpgradeController extends CController
 		$VersionTo = $oXML->version_to;
 
 		//This installer will upgrade versions at least matching our From
-		if (version_compare(XLSWS_VERSION,$VersionFrom) < 0 || version_compare(XLSWS_VERSION,$VersionTo) > 0 ) {
+		if (version_compare(XLSWS_VERSION,$VersionFrom) < 0 || version_compare(XLSWS_VERSION,$VersionTo) > 0 )
+		{
 			echo
 				"ERROR: This updater can only update Web Store versions from $VersionFrom to $VersionTo and you have version "
 				. XLSWS_VERSION;
@@ -124,7 +134,8 @@ class UpgradeController extends CController
 					foreach($v->original_hash as $hash)
 						if (md5_file($v->filename) == $hash)
 						{
-							if (isset($_GET['check'])) echo $v->filename." matched on hash ".$hash."<br>";
+							if (isset($_GET['check']))
+								echo $v->filename." matched on hash ".$hash."<br>";
 							$blnError=0;
 						} //If one of our hashes matches, clear errorflag
 
@@ -148,8 +159,10 @@ class UpgradeController extends CController
 
 
 
-			if (!file_exists($strPathToCreate)) {
-				if (!mkdir($strPathToCreate, 0775, true)) {
+			if (!file_exists($strPathToCreate))
+			{
+				if (!mkdir($strPathToCreate, 0775, true))
+				{
 					$arrErrors[]
 						= $v->filename . " Error attempting to create folder " . $strPathToCreate;
 					$blnError = 1;
@@ -181,13 +194,15 @@ class UpgradeController extends CController
 		//If we reach this point, we're good to actually do the upgrade. Let's go!
 		$intCount = 0;
 		$errCount = 0;
-		foreach ($oXML->item as $v) {
+		foreach ($oXML->item as $v)
+		{
 			$intCount++;
 
 			$strOrigFileName= str_replace("./", YiiBase::getPathOfAlias('webroot')."/", $v->filename);
 			$strUpgradeFileName = str_replace("./", YiiBase::getPathOfAlias('webroot.runtime.upgrade')."/", $v->filename);
 
-			if (!file_exists($strUpgradeFileName)) {
+			if (!file_exists($strUpgradeFileName))
+			{
 				$v->action = 'skip';
 				if (XLSWS_VERSION != $oXML->version_to)
 				{ //We may run this multiple times after upgrading, don't show skips after initial upg
@@ -200,7 +215,8 @@ class UpgradeController extends CController
 
 				case 'install':
 					//These are easy, just move new file
-					if (!@copy($strUpgradeFileName, $strOrigFileName)) {
+					if (!@copy($strUpgradeFileName, $strOrigFileName))
+					{
 						$arrErrors[] = $strOrigFileName . " could not be copied";
 						$errCount++; //This is a severe error
 					} else {
@@ -219,28 +235,38 @@ class UpgradeController extends CController
 						$blnReplace = true;
 					else
 					{
-						foreach($v->original_hash as $hash)
+						foreach ($v->original_hash as $hash)
 						{
-							if (md5_file($strOrigFileName) == $hash) $blnReplace = true;
-							if ((md5_file($strOrigFileName) != $hash && $v->status == 'critical') || isset($v->ignore)) $blnReplace = true;
+							if (md5_file($strOrigFileName) == $hash)
+								$blnReplace = true;
+							if ((md5_file($strOrigFileName) != $hash && $v->status == 'critical') || isset($v->ignore))
+								$blnReplace = true;
 						}
 					}
 
-
-					if ($blnReplace) {
+					if ($blnReplace)
+					{
 						//Remove old file first, then copy new one, then remove upgrade copy
-						if (file_exists($strOrigFileName) && !@unlink($strOrigFileName)) {
+						if (file_exists($strOrigFileName) && !@unlink($strOrigFileName))
+						{
 							$arrErrors[] = $strOrigFileName . " could not be removed";
 							$errCount++; //This is a severe error
-						} else {
-							if (!@copy($strUpgradeFileName, $strOrigFileName)) {
+						}
+						else
+						{
+							if (!@copy($strUpgradeFileName, $strOrigFileName))
+							{
 								$arrErrors[] = $strOrigFileName . " could not be copied";
 								$errCount++; //This is a severe error
-							} else {
+							}
+							else
+							{
 								@unlink($strUpgradeFileName);
 							}
 						}
-					} else {
+					}
+					else
+					{
 						$arrErrors[] = $strOrigFileName . " (optional) modified, not replaced.";
 					}
 
@@ -249,7 +275,8 @@ class UpgradeController extends CController
 
 				case 'delete':
 					//These are easy, just remove old file
-					if (!@unlink($strOrigFileName)) {
+					if (!@unlink($strOrigFileName))
+					{
 						$arrErrors[] = $strOrigFileName . " could not be removed";
 						//Error but not enough to halt progress
 					}
@@ -257,7 +284,8 @@ class UpgradeController extends CController
 
 				case 'rename':
 					//Less destructive than a delete
-					if (!@rename($strOrigFileName, $strOrigFileName . '-old')) {
+					if (!@rename($strOrigFileName, $strOrigFileName . '-old'))
+					{
 						$arrErrors[] = $strOrigFileName . " could not be renamed";
 						$errCount++; //This is a severe error
 					}
@@ -288,7 +316,7 @@ class UpgradeController extends CController
 		$this->actionDatabaseUpgrade(44,50,'Applying latest database changes...');
 	}
 
-	public function actionDatabaseUpgrade($online = 50, $total=100, $tag='')
+	public function actionDatabaseUpgrade($online=50, $total=100, $tag='')
 	{
 
 		$oXML = $this->checkForDatabaseUpdates();
@@ -346,7 +374,8 @@ class UpgradeController extends CController
 		} else {
 			$tag .= " ".$oXML->schema;
 			$makeline = ($online+5);
-			if ($makeline>=$total) $makeline -= 5; //keep it from artificially ending
+			if ($makeline>=$total)
+				$makeline -= 5; //keep it from artificially ending
 			echo json_encode(array('result'=>"success",'makeline'=>$makeline,'tag'=>$tag,'total'=>$total));
 		}
 
@@ -371,7 +400,8 @@ class UpgradeController extends CController
 			//Since we could have two urls on multitenant, just grab the original one
 			$data['customer']=Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL'];
 			$data['type']="mt-pro";
-			if(Yii::app()->params['LIGHTSPEED_CLOUD']>0) $data['type']="mt-cloud";
+			if(Yii::app()->params['LIGHTSPEED_CLOUD']>0)
+				$data['type']="mt-cloud";
 
 		}
 		$json = json_encode($data);
@@ -382,12 +412,11 @@ class UpgradeController extends CController
 
 		curl_setopt($ch, CURLOPT_HEADER, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-		curl_setopt($ch, CURLOPT_HTTPHEADER,
-			array("Content-type: application/json"));
+		curl_setopt($ch, CURLOPT_HTTPHEADER,array("Content-type: application/json"));
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
 
@@ -453,11 +482,7 @@ class UpgradeController extends CController
 			Yii::app()->end();
 		}
 
-
-
-
-
-
+		return false;
 	}
 
 
@@ -466,7 +491,7 @@ class UpgradeController extends CController
 	 * If we have to move files or remove something specifically during an upgrade
 	 * @param $id
 	 */
-	protected function runTask($id)
+	public function runTask($id)
 	{
 		Yii::log("Running upgrade task $id.", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		switch($id)
@@ -494,7 +519,8 @@ class UpgradeController extends CController
 						$model->thumb_ext = $fileinfo['extension'];
 						$model->save();
 
-						$imageFile = new CUploadedFile($filename,
+						$imageFile = new CUploadedFile(
+							$filename,
 							$src,
 							"image/".$fileinfo['extension'],
 							getimagesize($src),
@@ -514,33 +540,41 @@ class UpgradeController extends CController
 			case 417:
 				//Remove wsconfig.php reference from /config/main.php
 
-				if(Yii::app()->params['LIGHTSPEED_MT']==1) return;	//only applies to single tenant
-				$maincontents = file_get_contents(YiiBase::getPathOfAlias('webroot')."/config/main.php");
+				if(Yii::app()->params['LIGHTSPEED_MT']==1)
+					return;	//only applies to single tenant
+				$main_config = file_get_contents(YiiBase::getPathOfAlias('webroot')."/config/main.php");
 
-				$maincontents=str_replace('if (file_exists(dirname(__FILE__).\'/wsconfig.php\'))
+				// @codingStandardsIgnoreStart
+				$main_config=str_replace('if (file_exists(dirname(__FILE__).\'/wsconfig.php\'))
 	$wsconfig = require(dirname(__FILE__).\'/wsconfig.php\');
-else $wsconfig = array();','$wsconfig = array();',$maincontents);
+else $wsconfig = array();','//For customization, let\'s look in custom/config for a main.php which will be merged
+//Use this instead of modifying this main.php directly
+if(file_exists(realpath(dirname(__FILE__)."/../custom").\'/config/main.php\'))
+	$arrCustomConfig = require(realpath(dirname(__FILE__)."/../custom").\'/config/main.php\');
+else
+	$arrCustomConfig = array();',$main_config);
 
-				//We actually catch this in two places, the second will make the first irrelevant anyway
-				$maincontents = str_replace('),$wsconfig);','),array());',$maincontents);
-
-				file_put_contents(YiiBase::getPathOfAlias('webroot')."/config/main.php",$maincontents);
+				$main_config = str_replace('),$wsconfig);','),
+	$arrCustomConfig
+);',$main_config);
+				// @codingStandardsIgnoreEnd
+				file_put_contents(YiiBase::getPathOfAlias('webroot')."/config/main.php",$main_config);
 				break;
 
 			case 423:
 				// add cart/cancel url rule for sim payment methods (ex. moneris) that require hardcoded cancel urls
 
-				$maincontents = file_get_contents(YiiBase::getPathOfAlias('webroot')."/config/main.php");
+				$main_config = file_get_contents(YiiBase::getPathOfAlias('webroot')."/config/main.php");
 
 				// check to see if the entry is already there and write it if it isn't
-				$position = strpos($maincontents,'cart/cancel');
+				$position = strpos($main_config,'cart/cancel');
 				if (!$position)
 				{
 					$comments = "\r\r\t\t\t\t\t\t// moneris simple integration requires a hardcoded cancel URL\r\t\t\t\t\t\t// any other methods that require something similar we can add a cart/cancel rule like this one\r\t\t\t\t\t\t";
 
-					$pos = strpos($maincontents,"sro/view',")+strlen("sro/view',");
-					$maincontents = substr_replace($maincontents, $comments."'cart/cancel/<order_id:\WO-[0-9]+>&<cancelTXN:(.*)>'=>'cart/cancel',\t\t\t\t\t\t",$pos,0);
-					file_put_contents(YiiBase::getPathOfAlias('webroot')."/config/main.php",$maincontents);
+					$pos = strpos($main_config,"sro/view',")+strlen("sro/view',");
+					$main_config = substr_replace($main_config, $comments."'cart/cancel/<order_id:\WO-[0-9]+>&<cancelTXN:(.*)>'=>'cart/cancel',\t\t\t\t\t\t",$pos,0);
+					file_put_contents(YiiBase::getPathOfAlias('webroot')."/config/main.php",$main_config);
 
 				}
 
@@ -550,13 +584,15 @@ else $wsconfig = array();','$wsconfig = array();',$maincontents);
 				// Add URL mapping for custom pages
 
 				// If the store's on multi-tenant server, do nothing
-				if(Yii::app()->params['LIGHTSPEED_MT']>0) return;
+				if(Yii::app()->params['LIGHTSPEED_MT']>0)
+					return;
 
 				$main_config = file_get_contents(YiiBase::getPathOfAlias('webroot')."/config/main.php");
 				$search_string = "'<id:(.*)>/pg'";
 
 				// Check if the entry already exists. If not, add the mapping.
-				if (strpos($main_config, $search_string) ===false) {
+				if (strpos($main_config, $search_string) ===false)
+				{
 					$position = strpos($main_config, "'<feed:[\w\d\-_\.()]+>.xml' => 'xml/<feed>', //xml feeds");
 					$custompage_mapping = "'<id:(.*)>/pg'=>array('custompage/index', 'caseSensitive'=>false,'parsingOnly'=>true), //Custom Page\r\t\t\t\t\t\t";
 					$main_config = substr_replace($main_config, $custompage_mapping, $position, 0);
@@ -564,7 +600,88 @@ else $wsconfig = array();','$wsconfig = array();',$maincontents);
 				}
 
 				break;
+
+			case 447:
+				// Remove bootstrap, add in separate main.php
+
+				// If the store's on multi-tenant server, do nothing
+				if(Yii::app()->params['LIGHTSPEED_MT']>0)
+					return;
+
+				$main_config = file_get_contents(YiiBase::getPathOfAlias('webroot')."/config/main.php");
+				// @codingStandardsIgnoreStart
+
+				//Remove preloading bootstrap, loaded now in Controller.php on demand if needed
+				$main_config=str_replace("\t\t\t'bootstrap',\n","",$main_config);
+
+				//Bootstrap is loaded on demand now
+				$main_config=str_replace("//Twitter bootstrap
+				'bootstrap'=>array(
+					'class'=>'ext.bootstrap.components.Bootstrap',
+					'responsiveCss'=>true,
+				),","",$main_config);
+
+				//Remove old email strings and facebook strings, they're loaded elsewhere now
+				$main_config=str_replace("//Email handling\n\t\t\t\t'email'=>require(dirname(__FILE__).'/wsemail.php'),\n","",$main_config);
+
+				//Remove old email strings and facebook strings, they're loaded elsewhere now
+				$main_config=str_replace("//Facebook integration\n\t\t\t\t'facebook'=>require(dirname(__FILE__).'/wsfacebook.php'),\n","",$main_config);
+
+
+				//for any main.php that was missing all of this before
+				$main_config = str_replace('),array());','),
+	$arrCustomConfig
+);',$main_config);
+				$main_config = str_replace('	\'params\'=>array(
+		// this is used in contact page
+		\'mainfile\'=>\'yes\',
+	),
+
+);','	\'params\'=>array(
+		// this is used in contact page
+		\'mainfile\'=>\'yes\',
+	)),
+	$arrCustomConfig
+);',$main_config);
+				$main_config = str_replace('// This is the main Web application configuration. Any writable
+// CWebApplication properties can be configured here.
+return array(','// This is the main Web application configuration. Any writable
+// CWebApplication properties can be configured here.
+return CMap::mergeArray(
+	array(',$main_config);
+
+				$search_string = "//For customization,";
+
+				// Check if the entry already exists. If not, add the mapping.
+				if (strpos($main_config, $search_string) === false)
+					$main_config = str_replace('Yii::setPathOfAlias(\'extensions\', dirname(__FILE__).DIRECTORY_SEPARATOR.\'../core/protected/extensions\');
+
+','Yii::setPathOfAlias(\'extensions\', dirname(__FILE__).DIRECTORY_SEPARATOR.\'../core/protected/extensions\');
+
+//For customization, let\'s look in custom/config for a main.php which will be merged
+//Use this instead of modifying this main.php directly
+if(file_exists(realpath(dirname(__FILE__)."/../custom").\'/config/main.php\'))
+	$arrCustomConfig = require(realpath(dirname(__FILE__)."/../custom").\'/config/main.php\');
+else
+	$arrCustomConfig = array();
+
+',$main_config);
+				// @codingStandardsIgnoreEnd
+
+
+				file_put_contents(YiiBase::getPathOfAlias('webroot')."/config/main.php",$main_config);
+
+				@unlink(YiiBase::getPathOfAlias('webroot')."/config/wsemail.php");
+				@unlink(YiiBase::getPathOfAlias('webroot')."/config/wsfacebook.php");
+
+				if (Yii::app()->theme)
+				{
+					$arrActiveCss = Yii::app()->theme->info->cssfiles;
+					$arrActiveCss[] = Yii::app()->theme->config->CHILD_THEME;
+					Yii::app()->theme->config->activecss = $arrActiveCss;
+				}
+
+				break;
 		}
 	}
-
 }

@@ -11,18 +11,18 @@
 	?>
 	<?php echo $form->errorSummary($model); ?>
         <div class="row shortrow">
-	        <div class="col-sm-2">
+	        <div class="col-xs-2 col-sm-2 qty">
 				<?php echo $form->labelEx($model,'qty'); ?>
 				<?php echo $form->textField($model,'qty'); ?>
 				<?php echo $form->error($model,'qty'); ?>
 	        </div>
-            <div class="col-sm-2">
+            <div class="col-xs-2 col-sm-2 priority">
 				<?php echo $form->label($model,'priority'); ?>
 	            <?php echo $form->dropDownList($model,'priority',$model->getPriorities()); ?>
 				<?php echo $form->error($model,'priority'); ?>
 	        </div>
 	    </div>
-        <div class="shortrow">
+        <div class="shortrow comment">
 		        <?php echo $form->label($model,'comment'); ?>
 		        <?php echo $form->textArea($model,'comment'); ?>
 				<?php echo $form->error($model,'comment'); ?>

@@ -11,13 +11,19 @@ class Configuration extends BaseConfiguration
 {
 	/**
 	 * Returns the static model of the specified AR class.
-	 * @return Configuration the static model class
+	 *
+	 * @return CActiveRecord Configuration the static model class.
 	 */
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
 	}
 
+	/**
+	 * Short Description.
+	 *
+	 * @return array
+	 */
 	public function rules()
 	{
 
@@ -33,54 +39,82 @@ class Configuration extends BaseConfiguration
 	}
 
 	/**
-	 * Bypasses our [param] file and loads key directly from database. Necessary for the NextOrderID as well
+	 * Bypasses our [param] file and loads key directly from database.
+	 *
+	 * Necessary for the NextOrderID as well
 	 * as LSKEY Soap calls
-	 * @param $strKey
+	 *
+	 * @param string $strKey Key name.
+	 *
 	 * @return bool|CActiveRecord
 	 */
-	public static function LoadByKey($strKey) {
-		$obj = Configuration::model()->findByAttributes(array('key_name' => $strKey) );
+	public static function loadByKey($strKey)
+	{
+		$obj = Configuration::model()->findByAttributes(array('key_name' => $strKey));
 		if ($obj)
 			return $obj;
 		else
 			return false;
 	}
 
-
-	public static function SetHighestWO()
+	/**
+	 * Short Description.
+	 *
+	 * @return void
+	 */
+	public static function setHighestWO()
 	{
 
 			$strOriginalNextId = _xls_get_conf('NEXT_ORDER_ID', false);
 			$intLastId = preg_replace("/[^0-9]/", "", Cart::GetCartLastIdStr());
 			$intDocLastId = preg_replace("/[^0-9]/", "", Document::GetCartLastIdStr());
-			if ($intDocLastId >$intLastId) $intLastId= $intDocLastId;
+			if ($intDocLastId >$intLastId)
+				$intLastId= $intDocLastId;
 			$intNextId = intval($intLastId) + 1;
-			if ($strOriginalNextId > $intNextId) $intNextId= $strOriginalNextId;
+			if ($strOriginalNextId > $intNextId)
+				$intNextId= $strOriginalNextId;
 			$strNextId = 'WO-' . $intNextId;
 
 			_xls_set_conf('NEXT_ORDER_ID',$strNextId);
 
 	}
 
-	public static function exportKeys($key,$salt)
+	/**
+	 * Short Description.
+	 *
+	 * @param $key
+	 * @param $salt
+	 * @return bool
+	 */
+	public static function exportKeys($key, $salt)
 	{
-		if(_xls_get_conf('LIGHTSPEED_CLOUD',0)>0 || _xls_get_conf('LIGHTSPEED_MT',0)>0) return true; //cloud mode doesn't use this
+		if(_xls_get_conf('LIGHTSPEED_CLOUD',0)>0 || _xls_get_conf('LIGHTSPEED_MT',0)>0)
+			return true; //cloud mode doesn't use this
 
 		$fp2 = fopen(YiiBase::getPathOfAlias('config')."/wskeys.php","w");
 
-		fwrite($fp2,"<?php
+		fwrite(
+			$fp2,
+			"<?php
 
 return array(
 			'key'=>'".$key."',
 			'salt'=>'".$salt."'
 			);
-");
+"
+		);
 		fclose($fp2);
 
 
 		return true;
 	}
 
+	/**
+	 * Short Description.
+	 *
+	 * @param $strId
+	 * @return array
+	 */
 	public static function getAdminDropdownOptions($strId)
 	{
 
@@ -90,26 +124,34 @@ return array(
 			case 'VIEWSET':
 				$arr = array();
 				$d = dir(YiiBase::getPathOfAlias('application'));
-				while (false!== ($filename = $d->read())) {
-					if (substr($filename,0,6)=="views-") {
-						$strView = substr($filename,6,100);
+				while (false !== ($filename = $d->read()))
+				{
+					if (substr($filename, 0, 6) == "views-")
+					{
+						$strView = substr($filename, 6, 100);
 						$arr[$strView] = ucfirst($strView);
 					}
 				}
 				$d->close();
+
 				return $arr;
 
 			case 'THEME':
 				$arr = array();
-				$d = dir(YiiBase::getPathOfAlias('webroot')."/themes");
-				while (false!== ($filename = $d->read())) {
-					if ($filename[0] != ".") {
-						$fnOptions = YiiBase::getPathOfAlias('webroot')."/themes/".$filename."/config.xml";
-						if (file_exists($fnOptions)) {
+				$d = dir(YiiBase::getPathOfAlias('webroot') . "/themes");
+				while (false !== ($filename = $d->read()))
+				{
+					if ($filename[0] != ".")
+					{
+						$fnOptions = YiiBase::getPathOfAlias('webroot') . "/themes/" . $filename . "/config.xml";
+						if (file_exists($fnOptions))
+						{
 							$strXml = file_get_contents($fnOptions);
 							$oXML = new SimpleXMLElement($strXml);
-							if($oXML->viewset)
+							if ($oXML->viewset)
+							{
 								$arr[$filename] = $oXML->name;
+							}
 						}
 					}
 				}
@@ -122,16 +164,23 @@ return array(
 				$fnOptions = YiiBase::getPathOfAlias('webroot')."/themes/"._xls_get_conf('THEME')."/config.xml";
 				$arr = array();
 
-				if (file_exists($fnOptions)) {
+				if (file_exists($fnOptions))
+				{
 					$strXml = file_get_contents($fnOptions);
 
 					// Parse xml for response values
 					$oXML = new SimpleXMLElement($strXml);
-					if($oXML->themes) {
+					if ($oXML->themes)
+					{
 						foreach ($oXML->themes->theme as $item)
+						{
 							$arr[(string)$item->valuestring] = (string)$item->keystring;
-					} else $arr['webstore']="n/a";
-				} else $arr['webstore']="config.xml missing";
+						}
+					}
+					else $arr['webstore'] = "n/a";
+				}
+				else $arr['webstore'] = "config.xml missing";
+
 				return $arr;
 				break;
 
@@ -235,7 +284,7 @@ return array(
 						$arr['*index'] = _sp("site/index.php");
 				}
 
-				foreach (CustomPage::model()->findAll(array('order'=>'title')) as $item)
+				foreach (CustomPage::model()->findAll(array('order' => 'title')) as $item)
 				{
 					$arr[$item->page_key] = $item->title;
 				}
@@ -245,8 +294,14 @@ return array(
 
 			//processors
 			case 'CEventPhoto':
-				return CHtml::listData(Modules::model()->findAllByAttributes(
-					array('category'=>'CEventPhoto'),array('order'=>'name')), 'module', 'name');
+				return CHtml::listData(
+					Modules::model()->findAllByAttributes(
+						array('category' => 'CEventPhoto'),
+						array('order' => 'name')
+					),
+					'module',
+					'name'
+				);
 			case 'PROCESSOR_RECOMMEND':
 				return array('wsrecommend'=>'Default');
 			case 'PROCESSOR_MENU':
@@ -275,7 +330,9 @@ return array(
 	}
 
 	/**
-	 * After saving this configuration item, perform any updates
+	 * After saving this configuration item, perform any updates.
+	 *
+	 * @return void
 	 */
 	public function postConfigurationChange()
 	{
@@ -284,21 +341,54 @@ return array(
 		{
 
 			case 'STORE_OFFLINE':
-				if ($this->key_value==1) {
-					$this->key_value=rand(2,99999999);
+				if ($this->key_value == 1)
+				{
+					$this->key_value = rand(2, 99999999);
 					$this->save();
-					Yii::app()->user->setFlash('warning',Yii::t('global','Your store is currently set offline for maintenance -- you can access it via the url {url}',
-						array('{url}'=>Yii::app()->createAbsoluteUrl('site/index',array('offline'=>$this->key_value)))));
-				} else Yii::app()->user->getFlash('warning');
-			break;
-
-
+					Yii::app()->user->setFlash(
+						'warning',
+						Yii::t(
+							'global',
+							'Your store is currently set offline for maintenance -- you can access it via the url {url}',
+							array('{url}' => Yii::app()->createAbsoluteUrl('site/index', array('offline' => $this->key_value)))
+						)
+					);
+				}
+				else Yii::app()->user->getFlash('warning');
+				break;
 		}
 
 
 	}
 
+	/**
+	 * Create a do-not-update file for hosting system.
+	 *
+	 * @param $intFileStatus
+	 * @return void
+	 */
+	protected function dummyUpdateFile($intFileStatus)
+	{
+		$file = YiiBase::getPathOfAlias('custom') . DIRECTORY_SEPARATOR . "do.not.update";
 
+		if(!$intFileStatus)
+		{
+			$objF = fopen($file, 'w');
+			fwrite($objF, "This file blocks Web Store auto-update, based on your Admin Panel switch.");
+			fclose($objF);
+		}
+		else
+		{
+			@unlink($file);
+		}
+	}
+
+	/**
+	 * Short Description.
+	 *
+	 * @param $lang
+	 * @return void
+	 */
 	protected function updateLanguages($lang)
 	{
 		$arr = explode(",",$lang);
@@ -344,6 +434,11 @@ return array(
 		return parent::beforeValidate();
 	}
 
+	/**
+	 * Short Description.
+	 *
+	 * @return bool
+	 */
 	protected function beforeSave()
 	{
 		if ($this->key_name=="STORE_TAGLINE")
@@ -352,25 +447,37 @@ return array(
 		return parent::beforeSave();
 	}
 
+	/**
+	 * After saving the model, run any tasks for various configuration keys.
+	 *
+	 * @return void
+	 */
 	protected function afterSave()
 	{
 
-		if ($this->key_name=="FEATURED_KEYWORD")
-			Product::SetFeaturedByKeyword($this->key_value);
-
-		if ($this->key_name=="LANGUAGES")
-			$this->updateLanguages($this->key_value);
-
-		if ($this->key_name=="SEO_URL_CATEGORIES")
+		switch ($this->key_name)
 		{
-			Yii::app()->params['SEO_URL_CATEGORIES'] = $this->key_value;
-			Product::ConvertSEO();
+			case "FEATURED_KEYWORD":
+				Product::SetFeaturedByKeyword($this->key_value);
+				break;
+
+			case "LANGUAGES":
+				$this->updateLanguages($this->key_value);
+				break;
+
+			case "SEO_URL_CATEGORIES":
+				Yii::app()->params['SEO_URL_CATEGORIES'] = $this->key_value;
+				Product::ConvertSEO();
+				break;
+
+			case 'AUTO_UPDATE':
+				//This is only applicable to Hosting mode
+				if (Yii::app()->params['LIGHTSPEED_HOSTING'])
+					$this->dummyUpdatefile((int)$this->key_value);
+				break;
 		}
 
-
-
-		return parent::afterSave();
+		parent::afterSave();
 
 	}
-
 }

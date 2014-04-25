@@ -5,7 +5,7 @@
  * @author Vitaliy Potapov <noginsk@rambler.ru>
  * @link https://github.com/vitalets/x-editable-yii
  * @copyright Copyright &copy; Vitaliy Potapov 2012
- * @version 1.2.0
+ * @version 1.3.1
  */
 
 /**
@@ -19,11 +19,11 @@
 class EditableSaver extends CComponent
 {
     /**
-     * scenarion used in model for update
+     * scenario used in model for update. Can be taken from `scenario` POST param
      *
      * @var mixed
      */
-    public $scenario = 'editable';
+    public $scenario;
 
     /**
      * name of model
@@ -101,34 +101,51 @@ class EditableSaver extends CComponent
         $this->primaryKey = yii::app()->request->getParam('pk');
         $this->attribute = yii::app()->request->getParam('name');
         $this->value = yii::app()->request->getParam('value');
+        $this->scenario = yii::app()->request->getParam('scenario');
 
         //checking params
         if (empty($this->attribute)) {
             throw new CException(Yii::t('EditableSaver.editable','Property "attribute" should be defined.'));
         }
-        if (empty($this->primaryKey)) {
+        
+        $this->model = new $this->modelClass();
+        
+        $isFormModel = $this->model instanceOf CFormModel;
+        $isMongo = EditableField::isMongo($this->model);
+        
+        if (empty($this->primaryKey) && !$isFormModel) {
             throw new CException(Yii::t('EditableSaver.editable','Property "primaryKey" should be defined.'));
         }
-
+        
         //loading model
-        $this->model = CActiveRecord::model($this->modelClass)->findByPk($this->primaryKey);
+        if($isMongo) {
+        	$this->model = $this->model->findByPk(new MongoID($this->primaryKey));
+		} elseif(!$isFormModel) {
+			$this->model = $this->model->findByPk($this->primaryKey);
+		}
+        
         if (!$this->model) {
             throw new CException(Yii::t('EditableSaver.editable', 'Model {class} not found by primary key "{pk}"', array(
                '{class}'=>get_class($this->model), '{pk}' => is_array($this->primaryKey) ? CJSON::encode($this->primaryKey) : $this->primaryKey)));
         }
+        
+        //keep parent model for mongo
+        $originalModel = $this->model;
+        
+        //resolve model only for mongo! we should check attribute safety
+        if($isMongo) {
+			$resolved = EditableField::resolveModels($this->model, $this->attribute);
+			$this->model = $resolved['model']; //can be related model now
+			$this->attribute = $resolved['attribute'];
+			$staticModel = $resolved['staticModel'];	        	
+		} else {
+			$staticModel = $this->model;
+		}
 
-        //set scenario
-        $this->model->setScenario($this->scenario);
-
-        //commented to be able to work with virtual attributes
-        //see https://github.com/vitalets/yii-bootstrap-editable/issues/15
-        /*
-        //is attribute exists
-        if (!$this->model->hasAttribute($this->attribute)) {
-            throw new CException(Yii::t('EditableSaver.editable', 'Model {class} does not have attribute "{attr}"', array(
-              '{class}'=>get_class($this->model), '{attr}'=>$this->attribute)));
+        //set scenario for main model
+        if($this->scenario) {
+            $originalModel->setScenario($this->scenario);
         }
-        */
 
         //is attribute safe
         if (!$this->model->isAttributeSafe($this->attribute)) {
@@ -146,10 +163,25 @@ class EditableSaver extends CComponent
         //trigger beforeUpdate event
         $this->beforeUpdate();
         $this->checkErrors();
-
-        //saving (no validation, only changed attributes)
-        if ($this->model->save(false, $this->changedAttributes)) {
-            //trigger afterUpdate event
+        
+        //remove virtual attributes (which NOT in DB table)
+        if(!$isMongo) {
+            $this->changedAttributes = array_intersect($this->changedAttributes, $originalModel->attributeNames()); 
+            if(count($this->changedAttributes) == 0) {
+                //can not pass empty array in model->save() method!
+                $this->changedAttributes = null;
+            }
+        }
+        
+        //saving (no validation, only changed attributes) note: for mongo save all!
+        if($isMongo) {
+            $result = $originalModel->save(false, null);
+        } elseif(!$isFormModel) {
+            $result = $originalModel->save(false, $this->changedAttributes);
+        } else {
+            $result = true;
+        } 
+        if ($result) {
             $this->afterUpdate();
         } else {
             $this->error(Yii::t('EditableSaver.editable', 'Error while saving record!'));

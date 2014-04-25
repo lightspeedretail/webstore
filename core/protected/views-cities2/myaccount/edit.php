@@ -2,7 +2,9 @@
 
 <?php
 /* Create a new wish list form. We use the Checkout ID to reuse our CSS formatting */
-?><div id="checkout">
+?>
+
+<div id="checkout" class="register">
 <?php if(_xls_facebook_login() && $model->id==0): ?>
 	<fieldset class="col-sm-12">
 		<h3><?php echo Yii::t('checkout','Make it simple. Register with your Facebook login.'); ?></h3>
@@ -14,7 +16,7 @@
 			'on_login'=>'window.location.href="'.Yii::app()->createUrl('facebook/create').'";',
 		)); ?>
 	</fieldset>
-	<h3><?php echo Yii::t('global','Or sign up manually'); ?></h3>
+	<h3 id="signup"><?php echo Yii::t('global','Or sign up manually'); ?></h3>
 <?php endif; ?>
 
 <?php $form=$this->beginWidget('CActiveForm', array(
@@ -68,33 +70,11 @@
        </div>
      </div>
 
-	  <div id="createaccount">
-		  <legend><?php
-			  echo (Yii::app()->user->isGuest ?  Yii::t('global','Choose a password') :
-				  Yii::t('global','Enter a new password here to change your password'));
-
-			  ?></legend>
-        <fieldset>
-            <div class="row">
-                <div class="col-sm-5">
-					<?php echo $form->labelEx($model,'password'); ?>
-					<?php echo $form->passwordField($model,'password', array('placeholder'=>"", 'autocomplete'=>"off")); ?>
-					<?php echo $form->error($model,'password'); ?>
-                </div>
-                <div class="col-sm-5">
-					<?php echo $form->labelEx($model,'password_repeat'); ?>
-					<?php echo $form->passwordField($model,'password_repeat',array('placeholder'=>"", 'autocomplete'=>"off")); ?>
-					<?php echo $form->error($model,'password_repeat'); ?>
-                </div>
-            </div>
-
-            <div class="row">
-
 	<?php if ($model->scenario == "update") { ?>
-		<div class="row-fluid">
+		<div class="row">
 			<div id="changepassword">
 				<?php
-				echo CHtml::link(Yii::t('account', "Change your password"), Yii::app()->createUrl('myaccount/updatepassword'));
+				echo CHtml::link(Yii::t('account', "Click here to change your password"), Yii::app()->createUrl('myaccount/updatepassword'));
 				?>
 			</div>
 		</div>
@@ -103,17 +83,21 @@
 	<?php if ($model->scenario == "insert") { ?>
 		<div id="createaccount">
 			<fieldset class="span12">
-				<legend class="hideme">Type in a Password</legend>      <!-- legend for W3C validation -->
-				<div class="row-fluid">
-					<div class="span5">
-						<?php echo $form->labelEx($model,'new_password'); ?>
-						<?php echo $form->passwordField($model,'new_password', array('placeholder'=>"", 'autocomplete'=>"off")); ?>
-						<?php echo $form->error($model,'new_password'); ?>
+				<legend>
+					<?php
+					echo Yii::t('global','Choose a password');
+					?>
+				</legend>      <!-- legend for W3C validation -->
+				<div class="row">
+					<div class="col-sm-5">
+						<?php echo $form->labelEx($model,'password'); ?>
+						<?php echo $form->passwordField($model,'password', array('placeholder'=>"", 'autocomplete'=>"off")); ?>
+						<?php echo $form->error($model,'password'); ?>
 					</div>
-					<div class="span5">
-						<?php echo $form->labelEx($model,'new_password_repeat'); ?>
-						<?php echo $form->passwordField($model,'new_password_repeat',array('placeholder'=>"", 'autocomplete'=>"off")); ?>
-						<?php echo $form->error($model,'new_password_repeat'); ?>
+					<div id="password_repeat" class="col-sm-5">
+						<?php echo $form->labelEx($model,'password_repeat'); ?>
+						<?php echo $form->passwordField($model,'password_repeat',array('placeholder'=>"", 'autocomplete'=>"off")); ?>
+						<?php echo $form->error($model,'password_repeat'); ?>
 					</div>
 				</div>
 			</fieldset>

@@ -9,7 +9,7 @@
  * @author Veaceslav Medvedev <slavcopost@gmail.com>
  * @author Alexander Makarov <sam@rmcreative.ru>
  *
- * @version 1.2.4
+ * @version 1.2.20
  *
  * @link https://github.com/yiiext/imperavi-redactor-widget
  * @link http://imperavi.com/redactor
@@ -151,7 +151,7 @@ class ImperaviRedactorWidget extends CInputWidget
 	public function setPlugins(array $plugins)
 	{
 		foreach ($plugins as $id => $plugin) {
-			if (!isset($plugin['baseUrl'], $plugin['basePath'])) {
+			if (!isset($plugin['baseUrl']) && !isset($plugin['basePath'])) {
 				$plugin['baseUrl'] = $this->getAssetsUrl() . '/plugins/' . $id;
 			}
 

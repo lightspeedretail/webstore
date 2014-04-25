@@ -9,6 +9,16 @@
  */
 class Customer extends BaseCustomer
 {
+	const SCENARIO_INSERT = 'create';
+	const SCENARIO_CREATEFB = 'createfb';
+	const SCENARIO_GUEST = 'guest';
+	const SCENARIO_UPDATE = 'myaccountupdate';
+	const SCENARIO_UPDATEPASSWORD = 'updatepassword';
+	const SCENARIO_RESETPASSWORD = 'resetpassword';
+
+	const RESET_PASSWORD_TOKEN_LENGTH = 32;
+	const RESET_PASSWORD_LIFETIME = 86400; // 1 day
+
 	const REGISTERED = 1;
 	const GUEST = 2;
 
@@ -20,7 +30,7 @@ class Customer extends BaseCustomer
 
 	public $email_repeat;
 	public $password_repeat;
-
+	public $token; //Security token for resetting password
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -31,7 +41,8 @@ class Customer extends BaseCustomer
 		return parent::model($className);
 	}
 
-	public function __toString() {
+	public function __toString()
+	{
 		return sprintf('Customer Object %s', $this->email);
 	}
 
@@ -45,6 +56,7 @@ class Customer extends BaseCustomer
 		return array(
 			array('created, modified', 'required'),
 			array('newsletter_subscribe', 'numerical', 'integerOnly'=>true),
+			array('allow_login', 'safe', 'on'=>'update'), //Note this update is Admin Panel, we use a different scenario for front-end update
 			array('first_name, last_name', 'length', 'max'=>64),
 			array('company, email, password', 'length', 'max'=>255),
 			array('currency', 'length', 'max'=>3),
@@ -53,9 +65,9 @@ class Customer extends BaseCustomer
 			array('last_login', 'safe'),
 
 
-			array('email', 'required','on'=>'create,createfb,update'),
-			array('first_name,last_name', 'required','on'=>'create,createfb,update,updatepassword'),
-			array('mainphone', 'required','on'=>'create,update,updatepassword'),
+			array('email', 'required','on'=>'create,createfb,myaccountupdate'),
+			array('first_name,last_name', 'required','on'=>'create,createfb,myaccountupdate,update,updatepassword'),
+			array('mainphone', 'required','on'=>'create,myaccountupdate,update,updatepassword'),
 			array('mainphone', 'length','min'=>7, 'max'=>32),
 			array('password,password_repeat', 'required','on'=>'create,updatepassword'),
 
@@ -64,8 +76,7 @@ class Customer extends BaseCustomer
 			array('email,email_repeat', 'safe'),
 			array('email', 'validateEmailUnique','on'=>'create,createfb'),
 			array('email_repeat', 'validateEmailRepeat','on'=>'create,createfb'),
-			// verifyCode needs to be entered correctly
-			//array('verifyCode', 'captcha', 'allowEmpty'=>!CCaptcha::checkRequirements()),
+
 
 			array('email', 'length', 'max'=>50),
 			array('email', 'compare', 'on'=>'create'),
@@ -73,11 +84,46 @@ class Customer extends BaseCustomer
 
 			array('password', 'length', 'max'=>255),
 			array('password_repeat', 'length', 'max'=>255),
-			array('password', 'compare', 'on'=>'create,formSubmitWithAccount,updatepassword'),
+			array('password', 'compare', 'on'=>'create,formSubmitWithAccount,updatepassword,resetpassword'),
 			array('password_repeat', 'safe'),
+			array('password,password_repeat', 'validatePasswordStrength', 'on'=>'create,formSubmitWithAccount,updatepassword,resetpassword'),
 
+			array('token', 'length', 'max'=>Customer::RESET_PASSWORD_TOKEN_LENGTH),
+			array('token', 'required', 'on'=>'resetpassword'),
+			array('token', 'validateToken', 'on'=>'resetpassword'),
 		);
 	}
+
+	/**
+	 * Declares customized attribute labels.
+	 * If not declared here, an attribute would have a label that is
+	 * the same as its name with the first letter in upper case.
+	 */
+	public function attributeLabels()
+	{
+		return array_merge(
+			parent::attributeLabels(),
+			array(
+				'active'=>'This is an active address',
+				'email_repeat'=>'Email Address (confirm)',
+				'password_repeat'=>'Password (confirm)',
+				'newsletter_subscribe'=> 'Allow us to send you emails about our products',
+				'mainphone'=>'Phone Number')
+		);
+	}
+
+	public function behaviors()
+	{
+		return array(
+			'CTimestampBehavior' => array(
+				'class' => 'zii.behaviors.CTimestampBehavior',
+				'createAttribute' => 'created',
+				'updateAttribute' => 'modified',
+				'timestampExpression' => new CDbExpression('UTC_TIMESTAMP()')
+			)
+		);
+	}
+
 	/**
 	 * @param $attribute
 	 * @param $params
@@ -89,10 +135,14 @@ class Customer extends BaseCustomer
 			$objCustomer = Customer::LoadByEmail($this->email);
 
 			if ($objCustomer instanceof Customer)
+			{
 				$this->addError('email',
-				Yii::t('checkout','Email address already exists in system. Please log in.')
-			);
-		} elseif($this->email != '') {
+					Yii::t('checkout', 'Email address already exists in system. Please log in.')
+				);
+			}
+		}
+		elseif ($this->email != '')
+		{
 
 			$objCustomer = Customer::GetCurrent();
 			$obj = Customer::model()->findAll('email = :email AND id <> :id',array(':email'=>$this->email,':id'=>$objCustomer->id));
@@ -105,6 +155,7 @@ class Customer extends BaseCustomer
 
 		}
 	}
+
 	/**
 	 * @param $attribute
 	 * @param $params
@@ -120,41 +171,80 @@ class Customer extends BaseCustomer
 		}
 	}
 
-
 	/**
-	 * Declares customized attribute labels.
-	 * If not declared here, an attribute would have a label that is
-	 * the same as its name with the first letter in upper case.
+	 * Ensure that a password meets our requirements
+	 * Return an error message detailing the failure if applicable.
+	 * @param string $password
+	 * @return string | false
 	 */
-	public function attributeLabels()
-	{
-		return array_merge(
-			parent::attributeLabels(),
-			array(
-			'active'=>'This is an active address',
-			'email_repeat'=>'Email Address (confirm)',
-			'password_repeat'=>'Password (confirm)',
-			'newsletter_subscribe'=> 'Allow us to send you emails about our products',
-			'mainphone'=>'Phone Number')
-			);
+	public function validatePasswordStrength($attribute, $params) {
+		if ($this->scenario == Customer::SCENARIO_GUEST && !$this->$attribute)
+			return;
+
+		$min_length = _xls_get_conf('MIN_PASSWORD_LEN',0);
+
+		if (strlen($this->$attribute) < $min_length)
+		{
+			$this->addError($attribute, Yii::t('customer',
+				'{attribute} too short. Must be a minimum of {length} characters.',
+				array(
+					'{attribute}'=>$this->getAttributeLabel($attribute),
+					'{length}'=>$min_length
+				)
+			));
+		}
 	}
 
+	/**
+	 * Validates the token necessary for a password reset (in the case of a
+	 * forgotten password.)
+	 * @param $attribute
+	 * @param $params
+	 */
+	public function validateToken($attribute, $params)
+	{
+		$valid_token = CPasswordHelper::verifyPassword($this->token, $this->temp_password);
+		$expired = time() - self::RESET_PASSWORD_LIFETIME > strtotime($this->modified);
+
+		if (!$valid_token || $expired)
+		{
+			$url = CHtml::link(
+				Yii::t('customer', 'password reset'),
+				Yii::app()->createUrl("site/login"));
+
+			$this->addError($attribute, Yii::t('yii',
+				'Security {attribute} is invalid.  Please try clicking again' .
+				' on the link in the email, or request another {loginurl}.',
+				array(
+					'{attribute}'=>$this->getAttributeLabel($attribute),
+					'{loginurl}'=>$url
+				)));
+		}
+		else
+		{
+			// Erase the token on successful validation
+			$this->token = null;
+			$this->temp_password = null;
+		}
+	}
 
 	public static function CreateFromCheckoutForm($checkoutForm)
 	{
-
 		$obj = new Customer();
 		$obj->first_name = $checkoutForm->contactFirstName;
 		$obj->last_name = $checkoutForm->contactLastName;
 		$obj->company = $checkoutForm->contactCompany;
 		$obj->mainphone = $checkoutForm->contactPhone;
 		$obj->email = $checkoutForm->contactEmail;
-		$obj->password = _xls_encrypt($checkoutForm->createPassword);
+		$obj->email_repeat = $checkoutForm->contactEmail_repeat;
+		$obj->password = $checkoutForm->createPassword;
+		$obj->password_repeat = $checkoutForm->createPassword_repeat;
 		$obj->newsletter_subscribe = $checkoutForm->receiveNewsletter;
 		$obj->record_type = Customer::NORMAL_USER;
 		$obj->currency = _xls_get_conf('DEFAULT_CURRENCY');
 		$obj->pricing_level=1;
 		$obj->allow_login = Customer::NORMAL_USER;
+		$obj->scenario = Customer::SCENARIO_INSERT;
 		if (!$obj->save())
 			Yii::log("Error creating user ".print_r($obj->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		else
@@ -185,12 +275,36 @@ class Customer extends BaseCustomer
 
 	}
 
+	/**
+	 * Compares the supplied password with the hashed password in the database.
+	 * @param $plain_text
+	 * @return bool
+	 */
+	public function authenticate($plain_text)
+	{
+		// Users with no password or guest records should not be able to login
+		// A registered user with an empty password can make a reset request
+		if (!$this->allow_login ||
+			!$this->password ||
+			$this->record_type == Customer::GUEST)
+		{
+			return false;
+		}
+
+		// Check the old ways of storing passwords, please get rid of this someday.
+		return (
+			md5($plain_text) == $this->password ||
+			$plain_text == _xls_decrypt($this->password) ||
+			CPasswordHelper::verifyPassword($plain_text, $this->password)
+		);
+	}
 
 	/**
 	 * Get the current customer object
 	 * @return obj customer
 	 */
-	public static function GetCurrent() {
+	public static function GetCurrent()
+	{
 
 		if (Yii::app()->user->isGuest)
 			return null;
@@ -200,60 +314,21 @@ class Customer extends BaseCustomer
 	}
 
 	/**
-	 * Ensure that a password meets our requirements
-	 * Return an error message detailing the failure if applicable.
-	 * @param string $password
-	 * @return string | false
+	 * Stores a cryptographically strong random string in temp_password to be
+	 * used as the URL key for a user-requested password reset.
+	 * @return bool True if a string was successfully stored, false otherwise.
 	 */
-	public static function VerifyPasswordStrength($strPassword) {
-		$intStrLen = strlen($strPassword);
-
-		if ($intStrLen < _xls_get_conf('MIN_PASSWORD_LEN',0))
-			return Yii::t('customer','Password too short. Must be a minimum of {length} characters.',
-					array('{length}'=>_xls_get_conf('MIN_PASSWORD_LEN')));
-
-		return false;
-	}
-
-	/**
-	 * Generate a random password
-	 * @param int $length
-	 * @param int $strength
-	 * @return string
-	 */
-	public static function GeneratePassword($length=2, $use_prefix=false) {
-
-		$pwgen = new PasswordHuman($length,$use_prefix);
-		$password = $pwgen->generate();
-
-		return $password;
-
-	}
-
-
-	public function getrandomPasswords()
+	public function GenerateTempPassword()
 	{
-		$arr = array();
-		for ($x=1; $x<=8; $x++)
-		{
-			$pw = self::GeneratePassword();
-			$arr[$pw]=$pw;
-			if ($x==1) $this->password_repeat = $pw;
-		}
-		return $arr;
+		$this->token = Yii::app()->getSecurityManager()->
+		generateRandomString(Customer::RESET_PASSWORD_TOKEN_LENGTH);
 
+		if (!$this->token)
+			return false;
 
+		$this->temp_password = CPasswordHelper::hashPassword($this->token);
+		return $this->save(false);
 	}
-
-	public function GenerateTempPassword() {
-		$strNewPassword = $this->GeneratePassword();
-
-		$this->temp_password=_xls_encrypt($strNewPassword);
-		$this->save();
-
-		return $strNewPassword;
-	}
-
 
 	/**
 	 * Retrieves a list of models based on the current search/filter conditions.
@@ -282,15 +357,24 @@ class Customer extends BaseCustomer
 
 	}
 
+	public function getFullname()
+	{
+		return $this->first_name." ".$this->last_name;
+	}
 
 	/**
 	 * Since Validate tests to make sure certain fields have values, populate requirements here such as the modified timestamp
 	 * @return boolean from parent
 	 */
-	protected function beforeValidate() {
+	protected function beforeValidate()
+	{
 		if ($this->isNewRecord)
 			$this->created = new CDbExpression('NOW()');
-		$this->modified = new CDbExpression('NOW()');
+		//When resetting a password, we are using the modified
+		//timestamp to determine if a reset token is still valid,
+		//so don't update the timestamp in that scenario.
+		if ($this->scenario != self::SCENARIO_RESETPASSWORD)
+			$this->modified = new CDbExpression('NOW()');
 
 		if (empty($this->preferred_language))
 			$this->preferred_language =  Yii::app()->language;
@@ -298,19 +382,59 @@ class Customer extends BaseCustomer
 		if (empty($this->currency))
 			$this->currency = _xls_get_conf('CURRENCY_DEFAULT','USD');
 
-        $this->email = strtolower($this->email);
-        $this->email_repeat = strtolower($this->email_repeat);
+		$this->email = strtolower($this->email);
+		$this->email_repeat = strtolower($this->email_repeat);
 
 
 		return parent::beforeValidate();
 	}
 
-	public function getFullname()
+	public function beforeSave()
 	{
-		return $this->first_name." ".$this->last_name;
+		if (
+			in_array(
+				$this->scenario,
+				array(
+					Customer::SCENARIO_INSERT,
+					Customer::SCENARIO_UPDATEPASSWORD,
+					Customer::SCENARIO_RESETPASSWORD
+				)
+			)
+			&&
+			$this->record_type == Customer::REGISTERED &&
+			$this->password
+		)
+		{
+			$hashCostParam = _xls_get_conf('PASSWORD_HASH_COST_PARAM');
+
+			if ($hashCostParam)
+				$this->password = CPasswordHelper::hashPassword($this->password, $hashCostParam);
+			else
+				$this->password = CPasswordHelper::hashPassword($this->password);
+		}
+
+		// If token is set it means a temp_password has just been created,
+		// in all other situations erase the temp_password on save
+		if (!$this->token)
+			$this->temp_password = null;
+
+		return parent::beforeSave();
 	}
 
-	public function __get($strName) {
+	protected function afterConstruct()
+	{
+		$this->newsletter_subscribe = 1;
+		$this->preferred_language = _xls_get_conf('LANG_CODE', 'en');
+		$this->currency = _xls_get_conf('CURRENCY_DEFAULT', 'USD');
+	}
+
+	protected function afterFind()
+	{
+		$this->email_repeat = $this->email;
+	}
+
+	public function __get($strName)
+	{
 		switch ($strName) {
 			case 'state':
 				return State::CodeById($this->state_id);

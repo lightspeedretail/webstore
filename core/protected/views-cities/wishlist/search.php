@@ -5,6 +5,7 @@
         </div>
     </div>
 
+	<?php if (count($objWishlists)>0): ?>
     <div class="row-fluid">
 	    <?= Yii::t('wishlist','Click on the wish list name to view.'); ?>
 	</div>
@@ -24,6 +25,7 @@
 
 
     </div>
+	<?php endif; ?>
 
 	<?php foreach ($objWishlists as $objWishlist): ?>
 	    <div class="row-fluid">

@@ -29,7 +29,6 @@
         </div>
 
         <div id="sidebar" class="span12">
-			<?php $this->widget("application.extensions.wsborderlookup.wsborderlookup",array()); ?>
 	        <?php if(_xls_get_conf('ENABLE_WISH_LIST'))
 				echo $this->renderPartial('/site/_wishlists',array(),true); ?>
 	    </div>

@@ -50,7 +50,8 @@ class ThemeController extends AdminBaseController
 					'url'=>array('theme/module')
 				),
 				array('label'=>'Edit CSS for '.ucfirst($this->currentTheme),
-					'url'=>array('theme/editcss')
+					'url'=>array('theme/editcss'),
+					'visible'=>Theme::hasAdminForm(Yii::app()->theme->name)
 				),
 				array('label'=>'View Theme Gallery',
 					'url'=>array('theme/gallery'),
@@ -128,19 +129,25 @@ class ThemeController extends AdminBaseController
 				}
 				else
 				{
+					$themename = $arrThemes[$_POST['theme']]['name'];
 					$mixResult = $this->trashTheme($_POST['theme']);
 					if ($mixResult===false)
 					{
-						Yii::app()->user->setFlash('error',
-							Yii::t('admin','The {file} theme can not be moved to trash.',
-								array('{file}'=>"<strong>".$_POST['theme']."</strong>"
-								)));
+						Yii::app()->user->setFlash(
+							'error',
+							Yii::t(
+								'admin',
+								'{file} is a default theme. Default LightSpeed Web Store themes cannot be trashed.',
+								array('{file}'=>"<strong>".$themename."</strong>"
+								)
+							)
+						);
 						$this->redirect($this->createUrl("theme/manage"));
 					}
 					$objModule = Modules::model()->findByAttributes(array('module'=>$_POST['theme'],'category'=>'theme'));
 					if($objModule) $objModule->delete();
 					$arrThemes = $this->getInstalledThemes();
-					Yii::app()->user->setFlash('info',Yii::t('admin','Theme {theme} has been moved to /trash on server.',array('{theme}'=>$_POST['theme'])));
+					Yii::app()->user->setFlash('info',Yii::t('admin','{theme} has been moved to /themes/trash on server.',array('{theme}'=>$themename)));
 				}
 
 			}
@@ -161,11 +168,13 @@ class ThemeController extends AdminBaseController
 	public function actionEditcss()
 	{
 
-		Yii::import('ext.imperavi-redactor-widget.ImperaviRedactorWidget');
+		Yii::import('ext.codemirror.Codemirror');
 
-		$this->editSectionInstructions = "<p>The css files below are part of your currently chosen theme. <b>The order of the tabs reflects the hierarchy of the files.</b> For example, custom.css is first because it's loaded last. Any items here will override any other files. The right-most tabs form the foundation of the theme. <b>Simple customizations can be made by simply adding to custom.css (you can copy from other files as a guide).</b> You may also edit other files which will then be used instead of the default. You can restore the default of any file by choosing the appropriate button.</p><p>As much as possible, we recommend restricting your changes to custom.css so theme upgrades work properly, if you wish to receive theme updates. You are free, however, to edit what you like.</p>";
+		$this->editSectionInstructions = "<p>The CSS files below are part of your currently chosen theme. <b>The order of the tabs reflects the hierarchy of the files.</b> For example, custom.css is first because it's loaded last. Any items here will override any other files. The right-most tabs form the foundation of the theme. <p><b>Simple Customizations can be made by simply adding to custom.css (you can copy from other files as a guide).</b> <p>You can also decide not to use a specific CSS file by unchecking the checkbox in the option bar under that file.</p>";
 
-		$customCss = Yii::app()->theme->config->customcss;
+		$arrActiveCss = Yii::app()->theme->config->activecss;
+		$arrDefaultCss = Yii::app()->theme->info->cssfiles;
+		$strChildTheme = Yii::app()->theme->config->CHILD_THEME;
 
 		$d = dir(YiiBase::getPathOfAlias('webroot')."/themes/".Yii::app()->theme->name."/css");
 		while (false!== ($filename = $d->read()))
@@ -176,6 +185,11 @@ class ThemeController extends AdminBaseController
 				$parts = mb_pathinfo($filename);
 				$arr['tab'] = $parts['filename'];
 				$arr['path']=$d->path."/".$filename;
+
+				if(!empty($arrActiveCss) && in_array($arr['tab'],$arrActiveCss))
+					$arr['useme'] = 1;
+				else
+					$arr['useme'] = 0;
 
 				//Are we using custom or regular
 				if(!empty($customCss) && in_array($arr['tab'],$customCss))
@@ -191,18 +205,38 @@ class ThemeController extends AdminBaseController
 					$arr['usecustom']=0;
 					$contents = file_get_contents($arr['path']);
 				}
-				$contents = str_replace("\n", "<br>\n", $contents);
 
 				$arr['contents']=$contents;
 
 				$files[$arr['tab']]=$arr;
 			}
-		$files = $this->setCssOrder($files);
+
+		$filestemp = array_values($files);
+		$keys = array();
+		foreach ($filestemp as $key => $file)
+		{
+			if (!in_array($file['tab'],$arrDefaultCss)
+				&& $file['tab'] !== $strChildTheme
+				&& $file['tab'] !== 'custom'
+			)
+				$keys[] = $key;
+		}
+
+		foreach ($keys as $key)
+			unset($filestemp[$key]);
+
+		$files = $this->setCssOrder($filestemp);
+
 
 		//We do our submit test way down here after we've loaded up the array
 		if (isset($_POST) && !empty($_POST))
 		{
-			$customCss=array();
+			// rebuild active css array
+			$arrActiveCss = $arrDefaultCss;
+			if ($strChildTheme !== 'custom')
+				$arrActiveCss[] = $strChildTheme;
+			$arrActiveCss[] = 'custom';
+
 			$objComponent=Yii::createComponent('ext.wscloud.wscloud');
 			foreach($files as $file)
 			{
@@ -211,7 +245,7 @@ class ThemeController extends AdminBaseController
 				$originalFile = @file_get_contents($arr['path']);
 				$originalFile = str_replace("\n", "<br>\n", $originalFile);
 
-				$customFile = $_POST['content-'.$arr['tab']];
+				$customFile = $_POST['content'.$arr['tab']];
 				$customFile = html_entity_decode($customFile);
 				$file['usecustom'] = $_POST['radio'.$arr['tab']];
 
@@ -236,13 +270,22 @@ class ThemeController extends AdminBaseController
 
 				}
 
+				if(isset($_POST['check1'.$arr['tab']]))
+				{
+					$useCheck = $_POST['check1'.$arr['tab']];
+					if($useCheck=="on")
+						$file['useme'] = 1;
+					else $file['useme'] = 0;
+				}
+				else $file['useme'] = 0;
+
 				if($originalFile==$customFile)
 					$file['usecustom']=0;
 				else
 				{
 					$file['contents']=trim(strip_tags($customFile));
-					if($file['usecustom']==1)
-						$customCss[]=$file['tab'];
+					if($file['usecustom']==1 && !in_array($file['tab'],$arrActiveCss))
+						$arrActiveCss[]=$file['tab'];
 
 					if(Yii::app()->params['LIGHTSPEED_MT']=="1")
 					{
@@ -260,9 +303,12 @@ class ThemeController extends AdminBaseController
 					}
 
 				}
+
+				if ($file['useme']==0)
+					unset($arrActiveCss[array_search($file['tab'],$arrActiveCss)]);
 			}
 
-			Yii::app()->theme->config->customcss = $customCss;
+			Yii::app()->theme->config->activecss = $arrActiveCss;
 			Yii::app()->user->setFlash('success',Yii::t('admin','CSS files saved'));
 			$this->redirect($this->createUrl("theme/editcss"));
 		}
@@ -579,7 +625,8 @@ class ThemeController extends AdminBaseController
 					'module'=>_xls_get_conf('THEME'),
 					'category'=>'theme'));
 
-				if (!$objCurrentSettings) {
+				if (!$objCurrentSettings)
+				{
 					$objCurrentSettings = new Modules;
 					$objCurrentSettings->active = 1;
 				}
@@ -614,9 +661,9 @@ class ThemeController extends AdminBaseController
 			{
 				//We found settings, load them
 				$arrDimensions = unserialize($objCurrentSettings->configuration);
-				if(is_array($arrDimensions))
+				if (is_array($arrDimensions))
 				{
-					foreach($arrDimensions as $key=>$val)
+					foreach ($arrDimensions as $key => $val)
 						_xls_set_conf($key,$val);
 				}
 
@@ -635,8 +682,12 @@ class ThemeController extends AdminBaseController
 				$objCurrentSettings->version = $themeVersion;
 				$objCurrentSettings->active = 1; //we use this for autochecking
 				if (!$objCurrentSettings->save())
-					Yii::log("Error on new module entry when switching themes ".
-						print_r($objCurrentSettings->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+					Yii::log(
+						"Error on new module entry when switching themes ".
+						print_r($objCurrentSettings->getErrors(),true),
+						'error',
+						'application.'.__CLASS__.".".__FUNCTION__
+					);
 
 			}
 
@@ -664,9 +715,20 @@ class ThemeController extends AdminBaseController
 		}
 		_xls_set_conf('CHILD_THEME',$child);
 
+		// now that we have changed themes, rebuild the activecss array
+		$arrActiveCss = Yii::app()->theme->info->cssfiles;
+		$arrActiveCss[] = Yii::app()->theme->config->CHILD_THEME;
+		Yii::app()->theme->config->activecss = $arrActiveCss;
 
-		Yii::app()->user->setFlash('success',Yii::t('admin','Theme set as "{theme}" at {time}.',
-			array('{theme}'=>ucfirst(Yii::app()->theme->name),'{time}'=>date("d F, Y  h:i:sa"))));
+
+		Yii::app()->user->setFlash(
+			'success',
+			Yii::t(
+				'admin',
+				'Theme set as "{theme}" at {time}.',
+				array('{theme}'=>Yii::app()->theme->info->name,'{time}'=>date("d F, Y  h:i:sa"))
+			)
+		);
 		$arrThemes = $this->getInstalledThemes();
 		$this->beforeAction('manage');
 		_xls_check_version(); //to report new active theme
@@ -1144,20 +1206,30 @@ class ThemeController extends AdminBaseController
 		*/
 
 		$newFiles = array();
-		$baseFile=null; $customFile=null; $styleFile=null;
+		$keys = array();
+		$baseFile=null; $customFile=null; $styleFile=null; $childFile=null;
+		$strChild = Yii::app()->theme->config->CHILD_THEME !== 'custom' ? Yii::app()->theme->config->CHILD_THEME : 'webstore';
+
 		foreach($files as $key=>$file)
 		{
-			if($file['filename']=="base.css") { $baseFile=$file; }
-			if($file['filename']=="style.css") { $styleFile=$file; }
-			if($file['filename']=="custom.css") { $customFile=$file; }
+			if($file['filename']=="base.css") { $baseFile=$file; $keys[] = $key; }
+			if($file['filename']=="style.css") { $styleFile=$file; $keys[] = $key; }
+			if($file['filename']=="custom.css") { $customFile=$file; $keys[] = $key; }
+			if($file['filename']==$strChild.".css") { $childFile=$file; $keys[] = $key; }
 		}
 		unset($files['custom']);
 		unset($files['base']);
 		unset($files['style']);
+		unset($files[$strChild]);
+
+		foreach ($keys as $key)
+			unset($files[$key]);
 
 		if(!is_null($baseFile)) $newFiles[] = $baseFile;
 		if(!is_null($styleFile)) $newFiles[] = $styleFile;
-		$newFiles += $files;
+		foreach ($files as $file)
+			array_push($newFiles, $file);
+		if(!is_null($childFile)) $newFiles[] = $childFile;
 		if(!is_null($customFile)) $newFiles[] = $customFile;
 		else
 			$newFiles[] = array(
@@ -1168,7 +1240,7 @@ class ThemeController extends AdminBaseController
 				'contents'=> Yii::t('css','/* Custom.css, use to override any element */')
 			);
 
-		$newFiles = array_reverse($newFiles,true);
+		$newFiles = array_values(array_reverse($newFiles,true));
 		return $newFiles;
 	}
 

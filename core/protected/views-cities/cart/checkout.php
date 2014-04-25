@@ -389,7 +389,7 @@
 	            <div class="span4" >
 					<?php echo $form->textField($model,'promoCode'); ?>
 	            </div>
-	            <div class="offset2 span4" >
+	            <div class="offset4 span3" >
                     <?php echo CHtml::ajaxButton (Yii::t('checkout','Apply Promo Code'),
                         array('cart/applypromocode'),
 			            array('type'=>"POST",
@@ -448,7 +448,7 @@
 		        <?php echo $form->error($model,'shippingPriority',null,false,false); ?>
             </div>
 
-            <div class="span3" >
+            <div class="span3 btncalc" >
 	            <?php echo CHtml::ajaxButton (
 		            Yii::t('checkout','Click to Calculate Shipping'),
 		                array('cart/ajaxcalculateshipping'),

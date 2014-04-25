@@ -93,7 +93,7 @@
 
 	                    <tr>
 	                        <td class="summary"><?=$cart->shipping->shipping_data?></td>
-	                        <td class="rightprice"><?= _xls_currency($cart->shipping_sell)?></td>
+	                        <td class="rightprice"><?= _xls_currency($cart->shippingCharge)?></td>
 	                    </tr>
 
 

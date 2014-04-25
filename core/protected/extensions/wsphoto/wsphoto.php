@@ -1,11 +1,12 @@
 <?php
 
 //Default photo processor
-class wsphoto extends ApplicationComponent {
+class wsphoto extends ApplicationComponent
+{
 
 
 	public $category = "CEventPhoto";
-	public $name = "Web Store Internal";
+	public $name = "Web Store Internal Photo Processor";
 
 	//Event map
 	//onUploadPhoto()
@@ -51,7 +52,8 @@ class wsphoto extends ApplicationComponent {
 
 		//Save image record
 		Yii::trace("saving $strImageName",'application.'.__CLASS__.".".__FUNCTION__);
-		if (!$objImage->save()) {
+		if (!$objImage->save())
+		{
 			Yii::log("Error saving image " . print_r($objImage->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return false;
 		}
@@ -63,14 +65,15 @@ class wsphoto extends ApplicationComponent {
 		if ($intSequence==0)
 		{
 			$objProduct->image_id = $objImage->id;
-			if (!$objProduct->save()) {
+			if (!$objProduct->save())
+			{
 				Yii::log("Error updating product " . print_r($objProduct->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				return false;
 			}
 		}
 
 
-		$this->createThumbnails($objProduct,$objImage);
+		$this->createThumbnails($objImage);
 
 		return true;
 
@@ -82,12 +85,10 @@ class wsphoto extends ApplicationComponent {
 	 * Create all our thumbnail sizes are part of our upload process
 	 * @param $objImage
 	 */
-	protected function createThumbnails($objProduct,$objImage)
+	protected function createThumbnails($objImage)
 	{
 
-
-
-		foreach(ImagesType::$NameArray as $intType=>$value)
+		foreach (ImagesType::$NameArray as $intType => $value)
 		{
 
 			if ($intType>0) //exclude original size
@@ -106,9 +107,16 @@ class wsphoto extends ApplicationComponent {
 	 * @param $objImage
 	 * @param $intNewWidth
 	 * @param $intNewHeight
+	 * @param $intType
 	 */
-	protected function createThumb($objImage,$intNewWidth,$intNewHeight,$type)
+	protected function createThumb($objImage, $intNewWidth, $intNewHeight, $intType)
 	{
+
+		// Verify that the size doesn't already exist in the db (usually the original which
+		// we don't want to overwrite)
+		$objImageThumbnail = Images::LoadByRowidSize($objImage->id, $intType);
+		if(!is_null($objImageThumbnail))
+			return;
 
 		//Get our original file from LightSpeed
 		$strOriginalFile=$objImage->image_path;
@@ -121,17 +129,20 @@ class wsphoto extends ApplicationComponent {
 
 		$image = Yii::app()->image->load($strOriginalFileWithPath);
 
-        $quality = _xls_get_conf('IMAGE_QUALITY', '75');
-        $sharpness = _xls_get_conf('IMAGE_SHARPEN', '20');
+		$quality = _xls_get_conf('IMAGE_QUALITY', '75');
+		$sharpness = _xls_get_conf('IMAGE_SHARPEN', '20');
 
-        if($sharpness != 0){
-            $image->resize($intNewWidth,$intNewHeight)
-                ->quality($quality)
-                ->sharpen($sharpness);
-        } else {
-            $image->resize($intNewWidth,$intNewHeight)
-                ->quality($quality);
-        }
+		if ($sharpness != 0)
+		{
+			$image->resize($intNewWidth, $intNewHeight)
+				->quality($quality)
+				->sharpen($sharpness);
+		}
+		else
+		{
+			$image->resize($intNewWidth, $intNewHeight)
+				->quality($quality);
+		}
 
 		if (Images::IsWritablePath($strNewThumbnail)) //Double-check folder permissions
 		{
@@ -176,9 +187,4 @@ class wsphoto extends ApplicationComponent {
 			Yii::log("Directory permissions error writing " . $strNewThumbnail, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		
 	}
-
-
 }
-
-
-?>
