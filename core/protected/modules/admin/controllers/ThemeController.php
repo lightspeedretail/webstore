@@ -152,6 +152,19 @@ class ThemeController extends AdminBaseController
 
 			}
 
+			if (isset($_POST['themePreview']))
+			{
+				$arrThemePreview = explode(',',$_POST['themePreview']);
+				Yii::app()->user->setflash(
+					'info',
+					Yii::t(
+						'admin',
+						'Copy and paste the following link into your web browser<br><strong>'.
+						Yii::app()->createAbsoluteUrl('site/index',array('theme'=>$arrThemePreview[0],'themekey'=>$arrThemePreview[1])).'</strong>'
+					)
+				);
+			}
+
 		}
 
 		if(isset(Yii::app()->theme))
@@ -980,22 +993,37 @@ class ThemeController extends AdminBaseController
 				'beta'=>($model->beta ? ' beta' : ''),
 				'img'=> CHtml::image(Yii::app()->createUrl("themes/".$strThemeName."/".$model->thumbnail),$model->name),
 				'parent'=> $model->parent,
-				'options'=>CHtml::link(Yii::t('global','Click to configure'),   "module")
+				'options'=>CHtml::link(Yii::t('global','Click to configure'),   "module"),
+				'preview'=> (!Yii::app()->user->isGuest && !Yii::app()->user->getState('internal', false)) ?
+					CHtml::link(
+						Yii::t('global','Preview'),
+						Yii::app()->createAbsoluteUrl('site/index',array('theme'=>$strThemeName,'themekey'=>$this->generatePreviewThemeKey($strThemeName))),
+						array('target'=>'_blank')
+					) : CHtml::htmlButton(
+							Yii::t('global','Preview'),
+							array(
+								'type'=>'submit',
+								'name'=>'themePreview',
+								'value'=>$strThemeName.','.$this->generatePreviewThemeKey($strThemeName)))
 			);
 		}
 		else
 		{
 			$arr = $this->loadConfigXML($strThemeName);
 			$arr['beta'] = false; //old XML doesn't support this field
+			$arr['preview'] = Yii::t('admin','AdminForm required for Preview');
+			Yii::log($strThemeName. ' requires an AdminForm for Preview to be enabled', 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+
 			return $arr;//Old style, xml
 		}
 
 
 	}
 
-
-
-
+	protected function generatePreviewThemeKey($strThemeName)
+	{
+		return substr(md5($strThemeName.gmdate('d')),0,10);
+	}
 
 
 	/*

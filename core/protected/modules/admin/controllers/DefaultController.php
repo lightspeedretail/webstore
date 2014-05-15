@@ -26,6 +26,8 @@ class DefaultController extends AdminBaseController
 	const SEO_CATEGORY = 23;
 	const THEME_PHOTOS = 29;
 
+	const ACCESS_WARNING = 32;
+
 	/**
 	 * Short Description.
 	 *
@@ -47,7 +49,7 @@ class DefaultController extends AdminBaseController
 	{
 		return array(
 			array('allow',
-				'actions'=>array('edit','index','sidebar','categorymeta','updatecategory','releasenotes'),
+				'actions'=>array('edit','index','sidebar','categorymeta','updatecategory','releasenotes','accesswarning'),
 				'roles'=>array('admin'),
 			),
 			array('allow',
@@ -71,6 +73,7 @@ class DefaultController extends AdminBaseController
 				array('label'=>'Email Sending Options', 'url'=>array('default/edit', 'id'=>self::EMAIL_SENDING_OPTIONS)),
 				array('label'=>'Localization', 'url'=>array('default/edit', 'id'=>self::LOCALIZATION)),
 				array('label'=>'Customer Registration', 'url'=>array('default/edit', 'id'=>self::CUSTOMER_REGISTRATION)),
+				array('label'=>'Access Warning', 'url'=>array('default/accesswarning')),
 				//array('label'=>'Captcha Setup', 'url'=>array('site/contact')),
 				array('label'=>'Appearance', 'linkOptions'=>array('class'=>'nav-header')),
 				array('label'=>'Display Options', 'url'=>array('default/edit', 'id'=>self::TEMPLATE_OPTIONS)),
@@ -285,5 +288,60 @@ class DefaultController extends AdminBaseController
 
 	}
 
+	public function actionAccessWarning()
+	{
+		$objModule = Modules::model()->findByAttributes(array('module' => 'wsaccesswarning'));
 
+		//Setting this cookie here to prevent site access warning
+		//message from coming up on admin panel
+		Yii::app()->request->cookies['access_warning'] = new CHttpCookie('access_warning', 'false');
+
+		Yii::app()->setComponent('wsaccesswarning', array(
+			'class'=>'ext.wsaccesswarning.wsaccesswarning'
+		));
+
+		$objComponent = Yii::app()->getComponent('wsaccesswarning');
+		$model = $objComponent->getAdminModel();
+
+		if (isset($_POST[$objComponent->getAdminModelName()]))
+		{
+			$model->attributes = $_POST[$objComponent->getAdminModelName()];
+			if ($model->validate() === true)
+			{
+				$objModule->configuration = serialize($model->attributes);
+				$objModule->active = $_POST['Modules']['active'];
+				$objModule->save();
+				Yii::app()->user->setFlash('success',Yii::t('admin','Configuration updated on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
+			}
+		}
+		else
+		{
+			$model->attributes = $objModule->GetConfigValues();
+		}
+
+		if ($objModule instanceof Modules)
+		{
+			$formDefinition = $model->getAdminForm();
+
+			// Copied from AdminBaseController.php actionModule - is this really necessary?
+			// TODO: Review/fix this.
+			foreach ($formDefinition['elements'] as $key => $value)
+				$formDefinition['elements'][$key]['layout']=
+					'<div class="span5 optionlabel">{label}</div><div class="span5 optionvalue">{input}</div>{error}<div class="span2 maxhint">{hint}</div>';
+
+			$this->registerOnOff($objModule->id,'Modules_active',$objModule->active);
+			$this->render(
+				'admin.views.default.moduleedit',
+				array('objModule' => $objModule,
+					'model' => $model,
+					'form' => new CForm($formDefinition, $model)
+				)
+			);
+		}
+		else
+		{
+			echo 'module not found';
+			// Render a 'module not found' page.
+		}
+	}
 }

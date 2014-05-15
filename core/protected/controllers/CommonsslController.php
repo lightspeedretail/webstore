@@ -142,6 +142,10 @@ class CommonsslController extends Controller
 				$url .= "?c=".urlencode(_xls_encrypt($cartID.",".date("His")));
 		}
 
+		//We are setting this cookie here
+		//TODO: Move this code to the extension itself so that we don't have to perform tasks that are extension-specific.
+		Yii::app()->request->cookies['access_warning'] = new CHttpCookie('access_warning', 'false');
+
 		//Finally, onward to the page
 		$this->redirect($url);
 

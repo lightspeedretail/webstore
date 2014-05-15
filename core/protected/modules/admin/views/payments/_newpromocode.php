@@ -39,14 +39,28 @@
 <div class="row">
     <div class="pull-right" >
 	    <?php echo CHtml::ajaxSubmitButton(Yii::t('global','Save'),
-		    array('payments/newpromo'),
-		    array(
-			    'type'=>"POST",
-			    'success'=>'js:function(data) {
-	                if (data=="success")
-	                window.location.reload();
-                 }',
-		    ),array('id'=>'btnSubmit','class'=>'btn btn-primary btn-small')); ?>
+			array('payments/newpromo'),
+			array(
+				'type'=>"POST",
+				'dataType'=>"JSON",
+				'success'=>'js:function(data) {
+					if (data.result === "success") {
+						window.location.reload();
+					} else {
+						// data contains validation errors.
+						var errors = data.errors;
+
+						for (errorAttribute in errors) {
+							if (errors.hasOwnProperty(errorAttribute)) {
+								var errorId = "#' . CHtml::activeId('PromoCode', 'code') . '_em_' . '";
+								$(errorId).html(errors[errorAttribute]);
+								$(errorId).show();
+							}
+						}
+					}
+				}',
+			),
+			array('id'=>'btnSubmit','class'=>'btn btn-primary btn-small')); ?>
     </div>
 </div>
 

@@ -73,7 +73,7 @@
     </div>
 
 
-    <div id="createaccount">
+    <div id="createaccount" class="checkoutpage">
         <fieldset class="col-sm-10">
             <legend><?php echo Yii::t('checkout','Create a Free Account!'); ?></legend>
             <div class="row instructions">

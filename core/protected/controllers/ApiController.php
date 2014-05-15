@@ -15,11 +15,25 @@ class ApiController extends CController
 	const CLIENT_WS_API_KEY = 'HTTP_X_WS_API_KEY';
 
 	private $format = 'json';
-	// }}}
-	// {{{ init
+
+
+	/**
+	 * List of exposed configuration keys.
+	 * We can add to this list as necessary
+	 *
+	 * @var array
+	 */
+
+	private $arrExposedConfigKeys = array(
+		'LIGHTSPEED_CID',
+		'LIGHTSPEED_SHOW_RELEASENOTES'
+	);
+
+
 	/**
 	 * @return array action filters
 	 */
+
 	public function init()
 	{
 		Controller::initParams();
@@ -28,6 +42,7 @@ class ApiController extends CController
 	/**
 	 * @return array action filters
 	 */
+
 	public function filters()
 	{
 		return array();
@@ -59,6 +74,7 @@ class ApiController extends CController
 	 * @access public
 	 * @return void
 	 */
+
 	public function actionCreate()
 	{
 		$this->_checkAuth();
@@ -84,7 +100,61 @@ class ApiController extends CController
 		}
 		$this->_sendResponse(200,json_encode(array('status'=>'success')));
 
-	} // }}}
+	}
+
+
+	/**
+	 * Update an existing item(s).
+	 *
+	 * @return void
+	 */
+
+	public function actionUpdate()
+	{
+		self::_checkApiKey();
+
+		switch($_GET['model'])
+		{
+			case 'configuration':
+				//Configuration keys are handled a bit differently than normal records
+				$boolUpdate = false;
+				$arrBadKeys = array();
+				$json = file_get_contents('php://input');
+				$obj = json_decode($json);
+				foreach($obj as $var => $value)
+					if (in_array($var, $this->arrExposedConfigKeys))
+					{
+						_xls_set_conf($var,$value);
+						$boolUpdate = true;
+					}
+					else
+						$arrBadKeys[] = $var;
+
+				_upload_default_header_to_s3();
+				_xls_check_version(); //Register ourselves to stat server
+				break;
+			// Get an instance of the respective model
+			default:
+				$this->_sendResponse(
+					501,
+					sprintf('Mode <b>update</b> is not implemented for model <b>%s</b>',$_GET['model'])
+				);
+				exit;
+		}
+		if (!empty($arrBadKeys))
+			$this->_sendResponse(
+				$boolUpdate ? 200 : 400,
+				json_encode(
+					array(
+						'badkeys'=>implode(',',$arrBadKeys),
+						'message'=>'You have included keys that are either invalid or not exposed at this time.'
+					)
+				)
+			);
+		else
+			$this->_sendResponse(200,json_encode(array('status'=>'success')));
+
+	}
 
 	// {{{ Other Methods
 	// {{{ _sendResponse
@@ -260,7 +330,7 @@ class ApiController extends CController
 
 		if ($apiKey !== $serverApiKey)
 		{
-			$this->_sendResponse(401);
+			$this->_sendResponse(412);
 		}
 	}
 

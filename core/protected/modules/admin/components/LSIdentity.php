@@ -15,12 +15,16 @@ class LSIdentity extends CUserIdentity
 
 	public function authenticate()
 	{
-
 		//We're logging in directly from LightSpeed
-		$password = md5(gmdate('d') . _xls_get_conf('LSKEY'));
-		$password2 = md5(date('d') . _xls_get_conf('LSKEY'));
+		$key = _xls_get_conf('LSKEY');
+		$passwords = array(
+			md5(gmdate('d') . $key),
+			md5(gmdate('d', strtotime('-1 day')) .  $key),
+			md5(gmdate('d', strtotime('+1 day')) .  $key));
 
-		if(isset($this->username) && isset($this->password) && ($this->password == $password || $this->password == $password2))
+		if (isset($this->username) &&
+			isset($this->password) &&
+			in_array($this->password, $passwords))
 		{
 			$this->errorCode = self::ERROR_NONE;
 			$this->_id = 1;

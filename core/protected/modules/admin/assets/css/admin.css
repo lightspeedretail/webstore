@@ -224,6 +224,11 @@ h3 { margin-top: 2px; }
     text-decoration: none;
 }
 
+/* Used for textareas where the error needs to display on the right-hand side */
+textarea.narrow {
+	max-width: 240px;
+}
+
 @media only screen and (max-width: 1001px) { /* through LightSpeed */
     body { font-size: 13px;}
     input[type="text"] {  width: 200px; }
@@ -232,6 +237,11 @@ h3 { margin-top: 2px; }
     .themeicon.selected {  border: 4px solid #c6d0e5; }
     .themeicon img {  width: 168px; height: 147px; border:1px solid #a0a0a0; }
     .themetitle { width: 115px;}
+
+	/* Used for textareas where the error needs to display on the right-hand side */
+	textarea.narrow {
+		max-width: 200px;
+	}
 }
 
 @media (max-width: 979px) { /* necessary bootstrap overrides */
@@ -248,7 +258,6 @@ h3 { margin-top: 2px; }
     .navbar .brand { margin-left: -20px; }
     .nav-collapse .nav > li > a { font-weight: inherit; }
     .navbar-inverse .nav-collapse .nav > li.active > a { color: white; }
-
 }
 
 @media (max-width: 767px ) { /* iphones */
@@ -279,8 +288,10 @@ h3 { margin-top: 2px; }
     .navbar-inverse .nav-collapse .nav > li.active > a { color: white; }
     .navbar-inverse .nav-collapse .nav > li > a:hover { background-color: rgb(58,58,58); }
     #admin-content { margin-top: 0px; }
+
 }
 
 @media (min-width: 980px) {
     .visible-xs, .navbar .brand.visible-xs { display: none; }
 }
+

@@ -6,8 +6,8 @@
 			<?php if (Yii::app()->getRequest()->getQuery('n'))
 				echo "<h4>".Yii::t('admin','Your current theme has an update available. Click Upgrade Theme below the icon to download the latest version.')."</h4> ";
 
-				echo Yii::t('admin','Choose the theme you wish to use by selecting the graphic and clicking Make Active to switch to the theme. Change options for the currently active theme below the image. Your currently active theme is always listed first.',array('{color}'=>_xls_regionalize('color')));
-
+				echo Yii::t('admin','<p>Choose the theme you wish to use by selecting the graphic and clicking Make Active to switch to the theme. Change options for the currently active theme below the image. Your currently active theme is always listed first.</p>',array('{color}'=>_xls_regionalize('color')));
+				echo Yii::t('admin','<p>You can also Preview any theme by clicking the relevant <strong>Preview</strong> link.</p>')
 
 			?>
 		</div>
@@ -45,7 +45,7 @@
 						'htmlOptions'=>array('id'=>'btnUpgrade','name'=>'btnUpgrade','value'=>'btnUpgrade'),
 					)); else echo CHtml::tag('div',array(
 						    'class'=>'themeoptions',),
-					    $key == $currentTheme ? $objTheme['options'] : "") ;
+					    $key == $currentTheme ? $objTheme['options'] : $objTheme['preview']) ;
 					echo '</div>';
 				endforeach;
 			?>

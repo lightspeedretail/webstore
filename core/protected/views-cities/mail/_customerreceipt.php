@@ -23,7 +23,7 @@
 	<table>
 	    <tr>
 	        <th class="graphicheader">
-				<?php echo CHtml::link(CHtml::image(CController::createAbsoluteUrl(_xls_get_conf('HEADER_IMAGE'),array(),'http')), Yii::app()->baseUrl."/"); ?>
+		        <?php echo CHtml::link(CHtml::image($this->pageAbsoluteHeaderImage), $this->createUrl("site/index")); ?>
 	        </th>
 	    </tr>
 	</table>

@@ -25,7 +25,7 @@ class Family extends BaseFamily
 
 	public static function LoadByRequestUrl($strName) {
 
-		return Family::model()->findByAttributes(array('request_url'=>$strName));
+		return Family::model()->findByAttributes(array('request_url'=>urldecode($strName)));
 	}
 
 	public static function LoadByFamily($strName) {
@@ -174,14 +174,13 @@ class Family extends BaseFamily
 	}
 	public function getLink() {
 
-		return Yii::app()->createAbsoluteUrl("/brand/".$this->request_url);
+		return Yii::app()->createAbsoluteUrl("/brand/".urlencode($this->request_url));
 
 	}
 	public function getUrl()
 	{
 		return $this->getLink();
 	}
-
 
 	public function __get($strName) {
 		switch ($strName) {

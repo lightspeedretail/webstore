@@ -41,6 +41,7 @@ class PromoCode extends BasePromoCode
 		// will receive user inputs.
 		return array(
 			array('code', 'required', 'on'=>'checkout'),
+			array('code', 'unique', 'on'=>array('create', 'copy'), 'message'=>Yii::t('global','Promo code must be unique.')),
 			array('amount', 'required', 'on'=>'create'),
 			array('code', 'validatePromocode', 'on'=>'checkout'),
 			array('enabled, exception, type, qty_remaining', 'numerical', 'integerOnly'=>true, 'on'=>'create'),

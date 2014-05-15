@@ -183,6 +183,7 @@ class PaymentsController extends AdminBaseController
 
 					if (strlen($strCodeToCreate)>0) { //Since we may have blank lines, verify the code is legitimate
 						$objNewCode = new PromoCode;
+						$objNewCode->setScenario('copy');
 						$objNewCode->code = $strCodeToCreate;
 						$objNewCode->qty_remaining = 1;
 						$objNewCode->enabled = 1;
@@ -193,6 +194,12 @@ class PaymentsController extends AdminBaseController
 						$objNewCode->valid_until = $objCodeTemplate->valid_until;
 						$objNewCode->lscodes = $objCodeTemplate->lscodes;
 						$objNewCode->threshold = $objCodeTemplate->threshold;
+
+						if ($objNewCode->validate() === false)
+						{
+							$intFailures++;
+							continue;
+						}
 
 						if ($objNewCode->save())
 							$intSuccesses++;
@@ -229,6 +236,14 @@ class PaymentsController extends AdminBaseController
 		if ($name=='qty_remaining' && $value=='') $value=null;
 		if ($name=='threshold' && $value=='') $value=null;
 
+		// Check for existing code.
+		$existingPromoCode = PromoCode::model()->findByAttributes(array('code'=>$value));
+		if (is_null($existingPromoCode) === false)
+		{
+			throw new CHttpException(400, Yii::t('global','Promo code must be unique.'));
+			return;
+		}
+
 		if ($name=='code' && $value=='')
 		{   PromoCode::model()->deleteByPk($pk); echo "delete"; }
 		else
@@ -250,12 +265,17 @@ class PaymentsController extends AdminBaseController
 			if ($objPromo->validate())
 			{
 				if($objPromo->save())
-					echo "success";
+					echo CJSON::encode(array('result'=>'success'));
 
 			}
-
-
-
+			else
+			{
+				echo CJSON::encode(
+					array(
+						'result'=>'failure',
+						'errors'=>$objPromo->getErrors())
+				);
+			}
 		}
 
 

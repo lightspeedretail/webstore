@@ -94,8 +94,8 @@ class Category extends BaseCategory
 					$children = self::parseTree($objRet, $objItem->id);
 					if (Yii::app()->params['DISPLAY_EMPTY_CATEGORY'] || is_array($children) || $objItem->hasVisibleProducts )
 						$return[] = array(
-						'text'=>CHtml::link($objItem->label,$objItem->Link),
-						'label' => $objItem->label,
+						'text'=>CHtml::link(Yii::t('categories',$objItem->label), $objItem->Link),
+						'label' => Yii::t('categories', $objItem->label),
 						'link' => $objItem->Link,
 						'request_url' => $objItem->request_url,
 						'url' => $objItem->Link,
@@ -279,7 +279,7 @@ class Category extends BaseCategory
 	}
 
 	protected function GetSlug() {
-		return urlencode(str_replace('/', '_', $this->label));
+		return urlencode(str_replace('/', '_', Yii::t('categories', $this->label)));
 	}
 
 	protected function HasImage() {
@@ -300,11 +300,11 @@ class Category extends BaseCategory
 	}
 
 	protected function GetLink() {
-		return Yii::app()->createUrl('search/browse', array('cat' => $this->request_url));
+		return Yii::app()->createUrl('search/browse', array('cat' => urlencode($this->request_url)));
 	}
 
 	protected function GetAbsoluteUrl() {
-		return Yii::app()->createAbsoluteUrl('search/browse', array('cat' => $this->request_url));
+		return Yii::app()->createAbsoluteUrl('search/browse', array('cat' => urlencode($this->request_url)));
 	}
 
 
@@ -321,9 +321,9 @@ class Category extends BaseCategory
 				if ($objGrandParent->meta_description)
 					return $objGrandParent->meta_description;
 			}
-			return $this->label;
+			return Yii::t('categories',$this->label);
 		}
-		else return $this->label;
+		else return Yii::t('categories',$this->label);
 
 	}
 
@@ -383,20 +383,34 @@ class Category extends BaseCategory
 			if(!is_null($objCategory->parent))
 				do {
 					if ($objCategory instanceof Category)
-						array_push($arrPath , $strType=='names' ?
-							$objCategory->label : array( 'key' => $objCategory->id , 'tag' => 'c' ,
-								'name' => $objCategory->label , 'url' => $objCategory->Link,
-								'link' => $objCategory->Link));
+						array_push(
+							$arrPath,
+							$strType=='names' ?
+							Yii::t('categories', $objCategory->label) :
+							array(
+								'key' => $objCategory->id,
+								'tag' => 'c',
+								'name' => Yii::t('categories', $objCategory->label),
+								'url' => $objCategory->Link,
+								'link' => $objCategory->Link)
+						);
 
 					$objCategory = $objCategory->parent0;
 
 				} while (isset($objCategory->parent) && !is_null($objCategory->parent));
 
 			if ($objCategory instanceof Category)
-				array_push($arrPath , $strType=='names' ?
-					$objCategory->label : array( 'key' => $objCategory->id , 'tag' => 'c' ,
-						'name' => $objCategory->label , 'url' => $objCategory->Link,
-						'link' => $objCategory->Link));
+				array_push(
+					$arrPath,
+					$strType=='names' ?
+					Yii::t('categories', $objCategory->label) :
+					array(
+						'key' => $objCategory->id,
+						'tag' => 'c',
+						'name' => Yii::t('categories', $objCategory->label),
+						'url' => $objCategory->Link,
+						'link' => $objCategory->Link)
+				);
 		}
 		catch (Exception $objExc) {
 			Yii::log('GetTrail failed, probably uploading categories out of order : ' . $objExc, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
@@ -422,13 +436,13 @@ class Category extends BaseCategory
 		if(!is_null($objCategory->parent))
 			do {
 				if ($objCategory instanceof Category)
-					$arrPath[$objCategory->label] = $objCategory->Link;
+					$arrPath[Yii::t('categories', $objCategory->label)] = $objCategory->Link;
 				$objCategory = $objCategory->parent0;
 
 			} while (!is_null($objCategory->parent));
 
 		if ($objCategory instanceof Category)
-			$arrPath[$objCategory->label] = $objCategory->Link;
+			$arrPath[Yii::t('categories', $objCategory->label)] = $objCategory->Link;
 
 		$arrPath = array_reverse($arrPath);
 		return $arrPath;
@@ -459,9 +473,21 @@ class Category extends BaseCategory
 
 	public static function getTopLevelSearch()
 	{
+		$translateCategory = function ($category) {
+			return Yii::t('categories', $category);
+		};
 
-		return CHtml::listData(Category::model()->findAllByAttributes(array('parent'=>null),array('order'=>'label')), 'id', 'label');
-
+		return array_map(
+			$translateCategory,
+			CHtml::listData(
+				Category::model()->findAllByAttributes(
+					array('parent'=>null),
+					array('order'=>'label')
+				),
+				'id',
+				'label'
+			)
+		);
 	}
 
 
@@ -500,7 +526,7 @@ class Category extends BaseCategory
 	}
 
 	public static function LoadByRequestUrl($strName) {
-		return Category::model()->findByAttributes(array('request_url'=>$strName));
+		return Category::model()->findByAttributes(array('request_url'=>urldecode($strName)));
 	}
 
 
@@ -567,7 +593,7 @@ class Category extends BaseCategory
 		$strItem = Yii::t('global',_xls_get_conf($strConf, '{storename}'),
 			array(
 				'{storename}'=>_xls_get_conf('STORE_NAME',''),
-				'{name}'=>$this->label,
+				'{name}'=>Yii::t('categories', $this->label),
 				'{crumbtrail}'=>$strCrumbNames,
 				'{rcrumbtrail}'=>$strCrumbNamesR,
 
@@ -712,4 +738,3 @@ class Category extends BaseCategory
 //Category::$DefaultOrdering = QQ::Clause(
 //	QQ::OrderBy(QQN::Category()->Position, QQN::Category()->label)
 //);
-

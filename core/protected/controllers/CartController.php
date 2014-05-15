@@ -382,8 +382,15 @@ class CartController extends Controller
 
 	public function actionRestoreDeclined()
 	{
+		$p = new CHtmlPurifier();
+		$sanitizedReason = $p->purify(Yii::app()->getRequest()->getQuery('reason'));
+
 		//restore a Declined Cart
-		Yii::app()->user->setFlash('error',Yii::t('cart','Error: {error}',array('{error}'=>Yii::app()->getRequest()->getQuery('reason'))));
+		Yii::app()->user->setFlash(
+			'error',
+			Yii::t('cart', 'Error: {error}', array('{error}'=>$sanitizedReason))
+		);
+
 		$this->actionRestore();
 	}
 
@@ -444,7 +451,12 @@ class CartController extends Controller
 			//Tell the user what happened if we're waiting on payment
 			if ($objCart->cart_type==CartType::awaitpayment)
 			{
-				Yii::app()->user->setFlash('warning',Yii::t('cart','You cancelled your payment attempt. Try again or choose another payment method.'));
+				// Only set a warning flash if there's not already a more serious issue.
+				if (Yii::app()->user->hasFlash('error') === false)
+				{
+					Yii::app()->user->setFlash('warning',Yii::t('cart','You cancelled your payment attempt. Try again or choose another payment method.'));
+				}
+
 				//And go back to checkout
 				Yii::app()->controller->redirect(array('cart/checkout'));
 			}
@@ -784,7 +796,6 @@ class CartController extends Controller
 						$this->refresh();
 					}
 					$objCart->shipaddress_id = $model->intShippingAddress = $objAddress->id;
-
 					unset($objAddress);
 
 				}
@@ -793,6 +804,8 @@ class CartController extends Controller
 					{
 						$objCustomer->default_shipping_id = $model->intShippingAddress;
 						$objCustomer->save();
+						$objCart->UpdateCartCustomer();
+						$objCart->UpdateCart();
 					}
 
 				//If billing address is value, then choose that

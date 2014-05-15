@@ -113,7 +113,7 @@ class ThemeConfig
 	/*
 	 * Get a key from the module. If it's not defined, use the xlsws_configuration as a backup
 	 */
-	public function __set($name,$mixValue)
+	public function __set($name, $mixValue)
 	{
 
 		$arrConfig = Yii::app()->getComponent('wstheme')->getConfigValues(Yii::app()->theme->name);
@@ -143,7 +143,7 @@ class ThemeInfo
 					return array('base','style');
 				$form = new $model;
 				$strCss = $form->cssfiles;
-				return explode(",",$strCss);;
+				return explode(",",$strCss);
 			break;
 
 			default:

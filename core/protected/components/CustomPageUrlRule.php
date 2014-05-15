@@ -51,7 +51,8 @@ class CustomPageUrlRule extends CBaseUrlRule
 
 	public function parseUrl($manager,$request,$pathInfo,$rawPathInfo)
 	{
-		if (preg_match('%^[a-z0-9()\-_\.]+$%', $pathInfo, $matches))
+		$pathInfo = urlencode($pathInfo);
+		if (preg_match('/^[a-zA-Z0-9%()\-_\.]+$/', $pathInfo, $matches))
 		{
 
 			if (!empty($matches)) {

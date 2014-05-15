@@ -168,7 +168,7 @@ class CustomPage extends BaseCustomPage
 	}
 
 	public static function LoadByRequestUrl($strName) {
-		return CustomPage::model()->findByAttributes(array('request_url'=>$strName));
+		return CustomPage::model()->findByAttributes(array('request_url'=>urldecode($strName)));
 	}
 
 	public static function LoadByKey($strKey) {
@@ -292,8 +292,6 @@ class CustomPage extends BaseCustomPage
 		}
 		return empty($return) ? null : $return;
 	}
-
-
 
 	/**
 	 * Since Validate tests to make sure certain fields have values, populate requirements here such as the modified timestamp

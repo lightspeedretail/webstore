@@ -34,7 +34,7 @@ class wsamazon extends ApplicationComponent {
 	protected $APPLICATION_NAME;
 	protected $APPLICATION_VERSION = "0.0.1";
 	protected $service;
-
+	protected $no_image_upload_tag;
 
 	public function init()
 	{
@@ -50,6 +50,9 @@ class wsamazon extends ApplicationComponent {
 		$amazon_tag = $this->objModule->getConfig('amazon_tag');
 		if(!empty($amazon_tag))
 			$this->amazon_tag = $amazon_tag;
+		$no_image_upload_tag = $this->objModule->getConfig('no_image_upload_tag');
+		if (!empty($no_image_upload_tag))
+			$this->no_image_upload_tag = $no_image_upload_tag;
 		$this->MWS_ACCESS_KEY_ID = $this->objModule->getConfig('AMAZON_MWS_ACCESS_KEY_ID');
 		$this->MWS_SECRET_ACCESS_KEY = $this->objModule->getConfig('AMAZON_MWS_SECRET_ACCESS_KEY');
 		$this->APPLICATION_NAME = _xls_get_conf('STORENAME')." MyCompany_AmazonMWS";
@@ -128,6 +131,9 @@ class wsamazon extends ApplicationComponent {
 
 		if(!empty($this->amazon_tag))
 			Yii::log("Filtering by tag ".$this->amazon_tag, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+
+		if (!empty($this->no_image_upload_tag))
+			Yii::log("Filtering by tag ".$this->no_image_upload_tag, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 		$objProduct = $event->objProduct;
 		if (!empty($objProduct->upc) &&
@@ -228,6 +234,7 @@ class wsamazon extends ApplicationComponent {
 
 		if ($objProduct instanceof Product)
 		{
+			Yii::log("Uploading image ".$objProduct->image_id, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			$feed = $this->getUploadPhotoFeed($objProduct);
 
 			if (stripos($feed,'no_product') === false) //we have a real image, not the default no product image
@@ -304,7 +311,7 @@ class wsamazon extends ApplicationComponent {
 				$ts1 = strtotime($objProduct->modified);
 				$ts2 = strtotime($objImage->created);
 				$seconds_diff = $ts2 - $ts1;
-				if(floor($seconds_diff/3600) < 2)
+				if(floor($seconds_diff/3600) < 2 && !$objProduct->hasTag($this->no_image_upload_tag))
 					TaskQueue::CreateEvent('integration',get_class($this),'uploadphoto',null,$product_id);
 
 				return true;

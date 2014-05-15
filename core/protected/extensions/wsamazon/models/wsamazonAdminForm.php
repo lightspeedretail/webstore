@@ -8,6 +8,7 @@ class wsamazonAdminForm extends CFormModel
 	public $AMAZON_MWS_SECRET_ACCESS_KEY;
 	public $amazon_check_time; //how far back to check for time
 	public $amazon_tag; //optional tag to restrict items
+	public $no_image_upload_tag; //optional tag to prevent image upload
 	public $product; //shipping product
 	public $ls_payment_method; //payment method
 
@@ -19,7 +20,7 @@ class wsamazonAdminForm extends CFormModel
 		return array(
 			array('AMAZON_MERCHANT_ID,AMAZON_MWS_ACCESS_KEY_ID,AMAZON_MARKETPLACE_ID,
 			AMAZON_MWS_SECRET_ACCESS_KEY,amazon_check_time,product,ls_payment_method','required'),
-			array('amazon_tag','safe')
+			array('amazon_tag, no_image_upload_tag','safe')
 		);
 	}
 
@@ -37,6 +38,7 @@ class wsamazonAdminForm extends CFormModel
 			'AMAZON_MWS_SECRET_ACCESS_KEY'=>'Marketplace Secret ID',
 			'amazon_check_time'=>'On hourly connect, download orders within',
 			'amazon_tag'=>'Optional, only upload products with the tag',
+			'no_image_upload_tag' => 'Optional, do not upload product images with the tag',
 			'product'=>'Shipping Product',
 			'ls_payment_method'=>'Payment Method',
 		);
@@ -92,6 +94,10 @@ class wsamazonAdminForm extends CFormModel
 				'amazon_tag'=>array(
 					'type'=>'text',
 					'maxlength'=>64,
+				),
+				'no_image_upload_tag' => array (
+					'type' => 'text',
+					'maxlength' => 64,
 				),
 				'product'=>array(
 					'type'=>'text',

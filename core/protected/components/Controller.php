@@ -34,6 +34,7 @@ class Controller extends CController
 	public $pageImageUrl;
 	public $pageHeader;
 	public $pageHeaderImage;
+	public $pageAbsoluteHeaderImage;
 	public $pageGoogleVerify;
 	public $pageGoogleFonts;
 	public $sharingHeader;
@@ -148,8 +149,33 @@ class Controller extends CController
 				die("you have no theme set");
 		}
 
-		$this->buildBootstrap();
+		if (isset($_GET['theme']) && isset($_GET['themekey']))
+		{
+			$strTheme = CHtml::encode($_GET['theme']);
+			$strThemeKey = CHtml::encode($_GET['themekey']);
 
+			if ($this->verifyPreviewThemeKey($strTheme, $strThemeKey))
+			{
+					Yii::app()->theme = $strTheme;
+					$this->registerPreviewThemeScript($strTheme, $strThemeKey);
+			}
+			else
+			{
+				Yii::log(
+					"Invalid theme preview link for" . $strTheme  . ". Navigate to Admin Panel to generate a new link.",
+					'error',
+					'application.' . __CLASS__ . "." . __FUNCTION__
+				);
+			}
+
+		}
+
+
+
+		$this->buildBootstrap();
+		if(_xls_facebook_login())
+			$this->getFacebookLogin();
+		
 		if (Yii::app()->params['STORE_OFFLINE'] != '0' || Yii::app()->params['INSTALLED'] != '1')
 		{
 			if (isset($_GET['offline']))
@@ -195,10 +221,16 @@ class Controller extends CController
 		$this->pageImageUrl ='';
 
 		$pageHeaderImage = Yii::app()->params['HEADER_IMAGE'];
-		if (substr($pageHeaderImage,0,2)!="//" && substr($pageHeaderImage,0,4)!="http")
-			$this->pageHeaderImage = Yii::app()->baseUrl.$pageHeaderImage;
-		else
+		if (substr($pageHeaderImage,0,2) != "//" && substr($pageHeaderImage,0,4) != "http")
+		{
+			$this->pageAbsoluteHeaderImage = substr(Yii::app()->createAbsoluteUrl($pageHeaderImage, array(), 'http'), 5);
 			$this->pageHeaderImage = $pageHeaderImage;
+		}
+		else
+		{
+			$this->pageAbsoluteHeaderImage = $pageHeaderImage;
+			$this->pageHeaderImage = $pageHeaderImage;
+		}
 
 		Yii::app()->shoppingcart->UpdateMissingProducts();
 		Yii::app()->shoppingcart->RevalidatePromoCode();
@@ -209,10 +241,11 @@ class Controller extends CController
 		if (_xls_get_conf('SHOW_SHARING',0))
 			$this->buildSharing();
 
+		$this->buildAccessWarning();
+
 		$this->gridProductsPerRow = _xls_get_conf('PRODUCTS_PER_ROW',3);
 
-		if(_xls_facebook_login())
-			$this->getFacebookLogin();
+
 
 		Yii::app()->clientScript->registerMetaTag(
 			"LightSpeed Web Store " . XLSWS_VERSION,
@@ -342,6 +375,22 @@ class Controller extends CController
 		}
 
 
+	}
+
+	protected function buildAccessWarning()
+	{
+		try
+		{
+			Yii::app()->setComponent('wsaccesswarning' ,array(
+				'class'=>'ext.wsaccesswarning.wsaccesswarning'
+			));
+
+			Yii::app()->wsaccesswarning->displayAccessWarning();
+		}
+		catch(Exception $ex)
+		{
+			Yii::log("Failed to load wsaccesswarning extension", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		}
 	}
 
 	/**
@@ -579,6 +628,23 @@ class Controller extends CController
 		if(Yii::app()->params['LIGHTSPEED_HOSTING']>0)
 			return true;
 		return false;
+	}
+
+	protected function verifyPreviewThemeKey($strThemeName, $strKey)
+	{
+		return ($strKey === substr(md5($strThemeName.gmdate('d')),0,10));
+	}
+
+	protected function registerPreviewThemeScript($strThemeName, $strkey)
+	{
+		$script = "$('a').each(function(elem) { $(this).attr('href', $(this).attr('href') + '?theme=$strThemeName&themekey=$strkey'); });\n";
+
+		// tweaks
+		$script .= "$('div.product_cell_label').each(function(elem) { $(this).attr('onclick', $(this).attr('onclick').substring(0,$(this).attr('onclick').length-1) + '?theme=$strThemeName&themekey=$strkey\"'); });";
+		$script .= "$('div.wishlistnew').each(function(elem) { $(this).attr('onclick', $(this).attr('onclick').substring(0,$(this).attr('onclick').length-1) + '?theme=$strThemeName&themekey=$strkey\"'); });";
+
+		Yii::app()->clientScript->registerScript('themepreview',$script,CClientScript::POS_END);
+
 	}
 
 
