@@ -140,6 +140,7 @@ return CMap::mergeArray(
 						'cart/share/<code:[\w\d\-_\.()]+>' => 'cart/share',
 						'cart/quote/<code:[\w\d\-_\.()]+>' => 'cart/quote',
 						'sro/view/<code:[\w\d\-_\.()]+>' => 'sro/view',
+						'install/<action:\w+>'=>'install/<action>',
 
 						// moneris simple integration requires a hardcoded cancel URL
 						// any other methods that require something similar we can add a cart/cancel rule like this one
@@ -183,6 +184,11 @@ return CMap::mergeArray(
 //					'servers'=>array(
 //						array('host'=>'localhost', 'port'=>11211),
 //					),
+//				),
+
+//				'cache'=>array(
+//					'class'=>'system.caching.CDbCache',
+//					'cacheTableName' => 'c' . md5($_SERVER['HTTP_HOST']) // Table name must start with a letter in sqlite.
 //				),
 
 				'cronJobs'=>array(

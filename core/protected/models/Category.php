@@ -9,6 +9,9 @@
  */
 class Category extends BaseCategory
 {
+	const PARSE_TREE_CACHE_ID = 'Category::parseTree';
+	const PARSE_TREE_CACHE_TIME = 30;
+
 	public $objCategories;
 	public $integrated;
 
@@ -54,18 +57,44 @@ class Category extends BaseCategory
 	}
 
 
-	public static function GetTree() {
+	public static function GetTree()
+	{
 
-		$criteria = new CDbCriteria();
-		$criteria->alias = 'Category';
+		$blnCache = false;
+		$arrFormattedParseTree = false;
 
-		$criteria->order = 'menu_position';
+		if(isset(Yii::app()->cache))
+		{
+			$blnCache = true;
+			$arrFormattedParseTree = Yii::app()->cache->get(self::PARSE_TREE_CACHE_ID);
+		}
 
-	    $objRet = Category::model()->findAll($criteria);
+		if ($arrFormattedParseTree === false)
+		{
+			$dependency = new CDbCacheDependency('SELECT MAX(modified) FROM xlsws_category');
+			$criteria = new CDbCriteria();
+			$criteria->alias = 'Category';
+			$criteria->order = 'menu_position';
+			$criteria->index = 'id';
 
-		return Category::getDataFormatted(Category::parseTree($objRet,0));
+			$arrCategories = Category::model()->cache(1000, $dependency)->findAll($criteria);
+			$arrCategoriesChildren = self::_getCategoriesChildren($arrCategories);
+			$arrParsedTree = Category::parseTree($arrCategories, $arrCategoriesChildren);
+			$arrFormattedParseTree = Category::getDataFormatted($arrParsedTree);
 
+			if ($blnCache)
+			{
+				Yii::app()->cache->set(
+					self::PARSE_TREE_CACHE_ID,
+					$arrFormattedParseTree,
+					self::PARSE_TREE_CACHE_TIME
+				);
+			}
+		}
+
+		return $arrFormattedParseTree;
 	}
+
 
 
 	public function GetBranchPath() {
@@ -78,50 +107,106 @@ class Category extends BaseCategory
 		}
 
 		return $results;
-
 	}
-	public static function parseTree($objRet, $root = 0)
-	{
-		$return = array();
-		# Traverse the tree and search for direct children of the root
-		foreach($objRet as $objItem) {
-			# A direct child is found
 
-			if($objItem->parent == $root) {
-				# Remove item from tree (we don't need to traverse this again)
-				//unset($objItem);
-				# Append the child into result array and parse its children
-					$children = self::parseTree($objRet, $objItem->id);
-					if (Yii::app()->params['DISPLAY_EMPTY_CATEGORY'] || is_array($children) || $objItem->hasVisibleProducts )
-						$return[] = array(
-						'text'=>CHtml::link(Yii::t('categories',$objItem->label), $objItem->Link),
-						'label' => Yii::t('categories', $objItem->label),
-						'link' => $objItem->Link,
-						'request_url' => $objItem->request_url,
-						'url' => $objItem->Link,
-						'id' => $objItem->id,
-						'child_count' => $objItem->child_count,
-						'children' => $children,
-						'items' => $children
-					);
+	/**
+	 * Get an array of containing the children for each category.
+	 * @param array $arrCategories the categories you are interested in.
+	 * @return array an array indexed on category ID containing the child category IDs.
+	 */
+	protected static function _getCategoriesChildren($arrCategories)
+	{
+		// Build an array of children indexed on category ID.
+		$arrCategoriesChildren = array();
+		$arrCategoriesChildren['null'] = array();
+
+		// Build a menu tree containing child links.
+		foreach($arrCategories as $category)
+		{
+			if (isset($arrCategories[$category->id]) === false)
+				$arrCategories[$category->id] = array();
+
+			if ($category->parent !== null)
+			{
+				if (isset($arrCategoriesChildren[$category->parent]) === false)
+					$arrCategoriesChildren[$category->parent] = array();
+
+				array_push($arrCategoriesChildren[$category->parent], $category->id);
+			} else {
+				array_push($arrCategoriesChildren['null'], $category->id);
 			}
 		}
-		return empty($return) ? null : $return;
+
+		return $arrCategoriesChildren;
 	}
 
+	/**
+	 * Gets information about all categories which should be
+	 * displayed whose parent (or grandparent, or great-grandparent, etc) is
+	 * $parentCategoryId.
+	 * @param array $arrCategories the complete list of categories.
+	 * @param array $arrCategoriesChildren an array indexed on category id which
+	 * contains the children categories for each category.
+	 * @param integer parentCategoryId the ID of the parent category to start
+	 * the recursive search from.
+	 * @return array an list of arrays, where each array contains category
+	 * details sufficient to construct the products menu.
+	 */
+	public static function parseTree($arrCategories, $arrCategoriesChildren, $iParentCategoryId = null)
+	{
+		$arrReturn = array();
 
+		// Get the list of children for this category.
+		if ($iParentCategoryId === null)
+			$arrCategoryChildren = $arrCategoriesChildren['null'];
+		elseif (isset($arrCategoriesChildren[$iParentCategoryId]))
+			$arrCategoryChildren = $arrCategoriesChildren[$iParentCategoryId];
+		else
+			$arrCategoryChildren = array();
 
-	public function getSubcategoryTree($menuTree = null)
+		// Add each child category, if appropriate.
+		foreach($arrCategoryChildren as $categoryId)
+		{
+			$category = $arrCategories[$categoryId];
+
+			// Remove this category from the tree, it doesn't need to be travered again.
+			unset($arrCategories[$categoryId]);
+
+			// Get the children by recursing, using this category as the parent.
+			$children = self::parseTree($arrCategories, $arrCategoriesChildren, $category->id);
+
+			if (Yii::app()->params['DISPLAY_EMPTY_CATEGORY'] ||
+				is_array($children) ||
+				$category->hasVisibleProducts)
+			{
+				$arrReturn[] = array(
+					'text' => CHtml::link(Yii::t('categories',$category->label), $category->Link),
+					'label' => Yii::t('categories', $category->label),
+					'link' => $category->Link,
+					'request_url' => $category->request_url,
+					'url' => $category->Link,
+					'id' => $category->id,
+					'child_count' => $category->child_count,
+					'children' => $children,
+					'items' => $children
+				);
+			}
+		}
+
+		return empty($arrReturn) ? null : $arrReturn;
+	}
+
+	public function getSubcategoryTree($arrMenuTree = null)
 	{
 
-		if(is_null($menuTree))
+		if(is_null($arrMenuTree))
 			return null;
 
-		if(!is_null($this->parent) && isset($menuTree[$this->parent0->request_url]['items']))
-			$menuTree = $menuTree[$this->parent0->request_url]['items'];
+		if(!is_null($this->parent) && isset($arrMenuTree[$this->parent0->request_url]['items']))
+			$arrMenuTree = $arrMenuTree[$this->parent0->request_url]['items'];
 
 		$compareArray = array($this->request_url=>'');
-		$subcatArray = array_intersect_key($menuTree,$compareArray);
+		$subcatArray = array_intersect_key($arrMenuTree,$compareArray);
 
 		if(isset($subcatArray[$this->request_url]['items']))
 			return $subcatArray[$this->request_url]['items'];
@@ -233,12 +318,35 @@ class Category extends BaseCategory
 		if ($this->child_count == 0)
 			return false;
 
-		foreach($this->xlswsProducts as $product)
-			if($product->IsDisplayable)
-				return true;
+		$productInventoryField = Product::GetInventoryField();
 
-		return false;
+		// Query products in this category.
+		$query = Yii::app()->db->createCommand()
+			->select()
+			->from('xlsws_product')
+			->where('web=1')
+			->join(
+				'xlsws_product_category_assn pca',
+				'pca.product_id = id AND pca.category_id = :id',
+				array(':id' => $this->id)
+			)
+			->limit(1);
+
+		// If this config item is set, then we take into account the product inventory level.
+		if (Yii::app()->params['INVENTORY_OUT_ALLOW_ADD'] == Product::InventoryMakeDisappear)
+		{
+			$query->andWhere(array('OR', 'inventoried != 1', $productInventoryField . ' > 0'));
+		}
+
+		$blnDisplayableProductExists = $query->queryRow();
+
+		if ($blnDisplayableProductExists)
+			return true;
+		else
+			return false;
 	}
+
+
 
 	protected function HasProducts() {
 		if ($this->child_count > 0)

@@ -33,7 +33,7 @@ abstract class BaseStringsource extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('category', 'length', 'max'=>32),
-			array('message', 'safe'),
+			array('message', 'length', 'max'=>1024),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, category, message', 'safe', 'on'=>'search'),

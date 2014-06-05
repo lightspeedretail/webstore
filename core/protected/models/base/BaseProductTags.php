@@ -8,8 +8,8 @@
  * @property string $tag_id
  *
  * The followings are the available model relations:
- * @property Product $product
  * @property Tags $tag
+ * @property Product $product
  *
  * @package application.models.base
  * @name BaseProductTags
@@ -47,8 +47,8 @@ abstract class BaseProductTags extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'product' => array(self::BELONGS_TO, 'Product', 'product_id'),
 			'tag' => array(self::BELONGS_TO, 'Tags', 'tag_id'),
+			'product' => array(self::BELONGS_TO, 'Product', 'product_id'),
 		);
 	}
 

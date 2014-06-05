@@ -32,10 +32,10 @@ abstract class BaseCategoryAddl extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('menu_position, modified', 'required'),
+			array('menu_position', 'required'),
 			array('parent, menu_position', 'numerical', 'integerOnly'=>true),
 			array('label', 'length', 'max'=>64),
-			array('created', 'safe'),
+			array('created, modified', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, label, parent, menu_position, created, modified', 'safe', 'on'=>'search'),

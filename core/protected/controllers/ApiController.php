@@ -120,6 +120,7 @@ class ApiController extends CController
 				$boolUpdate = false;
 				$arrBadKeys = array();
 				$json = file_get_contents('php://input');
+
 				$obj = json_decode($json);
 				foreach($obj as $var => $value)
 					if (in_array($var, $this->arrExposedConfigKeys))
@@ -129,9 +130,6 @@ class ApiController extends CController
 					}
 					else
 						$arrBadKeys[] = $var;
-
-				_upload_default_header_to_s3();
-				_xls_check_version(); //Register ourselves to stat server
 				break;
 			// Get an instance of the respective model
 			default:
@@ -298,7 +296,8 @@ class ApiController extends CController
 	private function _checkAuth()
 	{
 		// Check if we have the USERNAME and PASSWORD HTTP headers set?
-		if(!(isset($_SERVER['HTTP_X_'.self::APPLICATION_ID.'_PASSWORD']))) {
+		if(!(isset($_SERVER['HTTP_X_'.self::APPLICATION_ID.'_PASSWORD'])))
+		{
 			// Error: Unauthorized
 			$this->_sendResponse(401);
 		}

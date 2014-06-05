@@ -11,8 +11,8 @@
  * @property double $price
  *
  * The followings are the available model relations:
- * @property PricingLevels $pricingLevel
  * @property Product $product
+ * @property PricingLevels $pricingLevel
  *
  * @package application.models.base
  * @name BaseProductQtyPricing
@@ -53,8 +53,8 @@ abstract class BaseProductQtyPricing extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'pricingLevel' => array(self::BELONGS_TO, 'PricingLevels', 'pricing_level'),
 			'product' => array(self::BELONGS_TO, 'Product', 'product_id'),
+			'pricingLevel' => array(self::BELONGS_TO, 'PricingLevels', 'pricing_level'),
 		);
 	}
 

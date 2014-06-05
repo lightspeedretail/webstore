@@ -34,3 +34,6 @@ RedirectMatch 410 ^/.*\.tpl$
 # block all .log (log files), .sql (sql dump/export) and .conf (config files) files
 # in case some day these files move to another directory
 RedirectMatch 410 ^.*\.(sql|log|conf)$ 
+
+# block any repo folders that may exist
+RedirectMatch 404 /\\.(svn|git|gitignore|gitmodules|idea|hg|bzr|cvs)(/|$)

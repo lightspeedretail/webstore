@@ -15,8 +15,8 @@
  * @property string $datetime_cre
  *
  * The followings are the available model relations:
- * @property Customer $customer
  * @property Cart $cart
+ * @property Customer $customer
  *
  * @package application.models.base
  * @name BaseEmailQueue
@@ -57,8 +57,8 @@ abstract class BaseEmailQueue extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'customer' => array(self::BELONGS_TO, 'Customer', 'customer_id'),
 			'cart' => array(self::BELONGS_TO, 'Cart', 'cart_id'),
+			'customer' => array(self::BELONGS_TO, 'Customer', 'customer_id'),
 		);
 	}
 

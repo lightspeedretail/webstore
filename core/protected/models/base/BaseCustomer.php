@@ -33,9 +33,9 @@
  *
  * The followings are the available model relations:
  * @property Cart[] $carts
+ * @property PricingLevels $pricingLevel
  * @property CustomerAddress $defaultBilling
  * @property CustomerAddress $defaultShipping
- * @property PricingLevels $pricingLevel
  * @property CustomerAddress[] $customerAddresses
  * @property Document[] $documents
  * @property EmailQueue[] $emailQueues
@@ -64,7 +64,6 @@ abstract class BaseCustomer extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('created, modified', 'required'),
 			array('record_type, email_verified, check_same, newsletter_subscribe, html_email, allow_login', 'numerical', 'integerOnly'=>true),
 			array('first_name, last_name', 'length', 'max'=>64),
 			array('lightspeed_id, default_billing_id, default_shipping_id, facebook', 'length', 'max'=>20),
@@ -73,7 +72,7 @@ abstract class BaseCustomer extends CActiveRecord
 			array('pricing_level', 'length', 'max'=>11),
 			array('preferred_language, mainphonetype', 'length', 'max'=>8),
 			array('mainphone, lightspeed_user', 'length', 'max'=>32),
-			array('last_login', 'safe'),
+			array('created, modified, last_login', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, record_type, first_name, last_name, lightspeed_id, company, default_billing_id, default_shipping_id, currency, email, email_verified, pricing_level, preferred_language, mainphone, mainphonetype, lightspeed_user, facebook, check_same, newsletter_subscribe, html_email, password, temp_password, allow_login, created, modified, last_login', 'safe', 'on'=>'search'),
@@ -89,9 +88,9 @@ abstract class BaseCustomer extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'carts' => array(self::HAS_MANY, 'Cart', 'customer_id'),
+			'pricingLevel' => array(self::BELONGS_TO, 'PricingLevels', 'pricing_level'),
 			'defaultBilling' => array(self::BELONGS_TO, 'CustomerAddress', 'default_billing_id'),
 			'defaultShipping' => array(self::BELONGS_TO, 'CustomerAddress', 'default_shipping_id'),
-			'pricingLevel' => array(self::BELONGS_TO, 'PricingLevels', 'pricing_level'),
 			'customerAddresses' => array(self::HAS_MANY, 'CustomerAddress', 'customer_id'),
 			'documents' => array(self::HAS_MANY, 'Document', 'customer_id'),
 			'emailQueues' => array(self::HAS_MANY, 'EmailQueue', 'customer_id'),

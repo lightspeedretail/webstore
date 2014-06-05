@@ -41,13 +41,13 @@
  * @property integer $fk_promo_id
  *
  * The followings are the available model relations:
+ * @property Document $document
  * @property CustomerAddress $billaddress
  * @property CartPayment $payment
  * @property CustomerAddress $shipaddress
  * @property CartShipping $shipping
  * @property Customer $customer
  * @property TaxCode $taxCode
- * @property Document $document
  * @property CartItem[] $cartItems
  * @property Document[] $documents
  * @property EmailQueue[] $emailQueues
@@ -74,7 +74,6 @@ abstract class BaseCart extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('modified', 'required'),
 			array('cart_type, tax_inclusive, item_count, downloaded, fk_promo_id', 'numerical', 'integerOnly'=>true),
 			array('currency_rate, subtotal, tax1, tax2, tax3, tax4, tax5, total', 'numerical'),
 			array('id_str, po, linkid', 'length', 'max'=>64),
@@ -83,7 +82,7 @@ abstract class BaseCart extends CActiveRecord
 			array('currency', 'length', 'max'=>3),
 			array('tax_code_id', 'length', 'max'=>11),
 			array('origin, send_to', 'length', 'max'=>255),
-			array('datetime_cre, datetime_due, printed_notes, submitted', 'safe'),
+			array('datetime_cre, datetime_due, printed_notes, submitted, modified', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, id_str, customer_id, shipaddress_id, billaddress_id, shipping_id, payment_id, document_id, po, cart_type, status, currency, currency_rate, datetime_cre, datetime_due, printed_notes, tax_code_id, tax_inclusive, subtotal, tax1, tax2, tax3, tax4, tax5, total, item_count, downloaded, lightspeed_user, origin, gift_registry, send_to, submitted, modified, linkid, fk_promo_id', 'safe', 'on'=>'search'),
@@ -98,13 +97,13 @@ abstract class BaseCart extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'document' => array(self::BELONGS_TO, 'Document', 'document_id'),
 			'billaddress' => array(self::BELONGS_TO, 'CustomerAddress', 'billaddress_id'),
 			'payment' => array(self::BELONGS_TO, 'CartPayment', 'payment_id'),
 			'shipaddress' => array(self::BELONGS_TO, 'CustomerAddress', 'shipaddress_id'),
 			'shipping' => array(self::BELONGS_TO, 'CartShipping', 'shipping_id'),
 			'customer' => array(self::BELONGS_TO, 'Customer', 'customer_id'),
 			'taxCode' => array(self::BELONGS_TO, 'TaxCode', 'tax_code_id'),
-			'document' => array(self::BELONGS_TO, 'Document', 'document_id'),
 			'cartItems' => array(self::HAS_MANY, 'CartItem', 'cart_id'),
 			'documents' => array(self::HAS_MANY, 'Document', 'cart_id'),
 			'emailQueues' => array(self::HAS_MANY, 'EmailQueue', 'cart_id'),

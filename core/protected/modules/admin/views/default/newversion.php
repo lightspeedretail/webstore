@@ -1,5 +1,5 @@
 <div class="span9">
-	<div class="hero-unit">
+	<div class="hero-unit documentation">
 		<h4 class="newalert">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;New Version Alert</h4>
 
 		<div class="editinstructions">
@@ -11,15 +11,13 @@
 
 				<?php if (_xls_get_conf('LIGHTSPEED_HOSTING',0)=="0")
 					echo "You can apply this update by clicking on <strong>".
-						CHtml::link('APPLY WEBSTORE UPDATE',$this->createAbsoluteUrl("upgrade/index",array('patch'=>$oXML->autopathfile),'http'))."</strong>.";
+						CHtml::link('APPLY WEBSTORE UPDATE',$strUpdateUrl)."</strong>.";
 				?>
 
-			</p>
+			</p><p>Note, you can also enable Auto Update in <?php echo CHtml::link('System Configuration',$this->createUrl('/admin/system/edit?id=1')); ?> to apply future updates automatically.</p>
 
-			<strong>Release Notes:</strong></br>
-			<p>
-				<?php echo $oXML->releasenotes; ?>
-			</p>
+			<strong>Release Notes:</strong><br>
+			<iframe class="span9 documentation" scrolling="no" src="<?php echo $strReleaseNotesUrl; ?>"></iframe>
 		</div>
 
 	</div>

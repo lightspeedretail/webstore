@@ -31,10 +31,10 @@ abstract class BaseSessions extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id, created', 'required'),
+			array('id', 'required'),
 			array('expire', 'numerical', 'integerOnly'=>true),
 			array('id', 'length', 'max'=>32),
-			array('modified, data', 'safe'),
+			array('created, modified, data', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, expire, created, modified, data', 'safe', 'on'=>'search'),

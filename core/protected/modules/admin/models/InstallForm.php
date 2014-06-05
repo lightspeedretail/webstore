@@ -28,7 +28,7 @@ class InstallForm extends CFormModel
 	public $EMAIL_SMTP_PORT;
 	public $EMAIL_SMTP_USERNAME;
 	public $EMAIL_SMTP_PASSWORD;
-	public $EMAIL_SMTP_SECURITY_MODE;
+	public $EMAIL_SMTP_SECURITY_MODE = 0;
 
 
 

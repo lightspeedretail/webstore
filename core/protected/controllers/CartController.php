@@ -386,19 +386,16 @@ class CartController extends Controller
 		$sanitizedReason = $p->purify(Yii::app()->getRequest()->getQuery('reason'));
 
 		//restore a Declined Cart
-		Yii::app()->user->setFlash(
-			'error',
-			Yii::t('cart', 'Error: {error}', array('{error}'=>$sanitizedReason))
-		);
-
-		$this->actionRestore();
+		$errorMessage = Yii::t('cart', 'Error: {error}', array('{error}'=>$sanitizedReason));
+		$this->actionRestore($errorMessage);
 	}
 
 	/**
 	 * Restore a cart based on a link. Typically used when cancelling an Simple Integration payment which returns back
 	 * to the site
+	 * @param String $errorMessage an optional error message to display.
 	 */
-	public function actionRestore()
+	public function actionRestore($errorMessage=null)
 	{
 
 		$strLink = Yii::app()->getRequest()->getQuery('getuid');
@@ -452,7 +449,11 @@ class CartController extends Controller
 			if ($objCart->cart_type==CartType::awaitpayment)
 			{
 				// Only set a warning flash if there's not already a more serious issue.
-				if (Yii::app()->user->hasFlash('error') === false)
+				if ($errorMessage !== null)
+				{
+					Yii::app()->user->setFlash('error', $errorMessage);
+				}
+				else
 				{
 					Yii::app()->user->setFlash('warning',Yii::t('cart','You cancelled your payment attempt. Try again or choose another payment method.'));
 				}
@@ -689,49 +690,66 @@ class CartController extends Controller
 						'application.' . __CLASS__ . "." . __FUNCTION__
 					);
 
-					// - Test to see if we can't just log in with email and pw
-					$identity=new UserIdentity($model->contactEmail,$model->createPassword);
+					// Test to see if we can log in with the provided password.
+					$identity = new UserIdentity($model->contactEmail,$model->createPassword);
 					$identity->authenticate();
 
-					//Buyer is trying to enter email and password but since they match an existing account, just log in
-					if($identity->errorCode===UserIdentity::ERROR_NONE)
-						Yii::app()->user->login($identity,3600*24*30);
-
-					//Oops, email is already in system but not with that password
-					if($identity->errorCode==UserIdentity::ERROR_PASSWORD_INVALID)
+					switch ($identity->errorCode)
 					{
-						Yii::app()->user->setFlash(
-							'error',
-							Yii::t('global','This email address already exists but that is not the correct password so we cannot log you in.')
-						);
-						Yii::log(
-							$model->contactEmail." login from checkout with invalid password",
-							'error',
-							'application.'.__CLASS__.".".__FUNCTION__
-						);
-						$this->refresh();
-						return;
+						case UserIdentity::ERROR_PASSWORD_INVALID:
+							//Oops, email is already in system but not with that password
+							Yii::app()->user->setFlash(
+								'error',
+								Yii::t('global','This email address already exists but that is not the correct password so we cannot log you in.')
+							);
+							Yii::log(
+								$model->contactEmail." login from checkout with invalid password",
+								'error',
+								'application.'.__CLASS__.".".__FUNCTION__
+							);
+							$this->refresh();
+							return;
+							break;
+						case UserIdentity::ERROR_USERNAME_INVALID:
+							$objCustomer = Customer::CreateFromCheckoutForm($model);
+							$identity = new UserIdentity($model->contactEmail, $model->createPassword);
+							$identity->authenticate();
+
+							if($identity->errorCode !== UserIdentity::ERROR_NONE)
+							{
+								Yii::log(
+									"Error logging in after creating account for ".
+									$model->contactEmail.". Error:".$identity->errorCode." Cannot continue",
+									'error',
+									'application.'.__CLASS__.".".__FUNCTION__
+								);
+
+								Yii::app()->user->setFlash(
+									'error',
+									Yii::t('global','Error logging in after creating account. Cannot continue.')
+								);
+
+								$this->refresh();
+								return;
+							}
+
+							break;
+						case UserIdentity::ERROR_NONE:
+							break;
+						default:
+							Yii::log(
+								"Error: Unhandled errorCode " . $identity->errorCode,
+								'error',
+								'application.'.__CLASS__.".".__FUNCTION__
+							);
+							break;
 					}
 
-					$objCustomer = Customer::CreateFromCheckoutForm($model);
-					$identity=new UserIdentity($model->contactEmail,$model->createPassword);
-					$identity->authenticate();
-					if($identity->errorCode===UserIdentity::ERROR_NONE)
-					{
-						$intTaxCode = Yii::app()->shoppingcart->tax_code_id; //Save tax code already chosen
-						Yii::app()->user->login($identity,3600*24*30);
-						Yii::app()->user->setState('createdoncheckout',1);
-						Yii::app()->shoppingcart->tax_code_id = $intTaxCode;
-					}
-					else {
-						Yii::log("Error logging in after creating account for ".
-							$model->contactEmail.". Error:".$identity->errorCode." Cannot continue",
-							'error', 'application.'.__CLASS__.".".__FUNCTION__);
-						Yii::app()->user->setFlash('error',
-							Yii::t('global','Error logging in after creating account. Cannot continue.'));
-						$this->refresh();
-						return;
-					}
+
+					$intTaxCode = Yii::app()->shoppingcart->tax_code_id; //Save tax code already chosen
+					Yii::app()->user->login($identity, 3600 * 24 * 30);
+					Yii::app()->user->setState('createdoncheckout',1);
+					Yii::app()->shoppingcart->tax_code_id = $intTaxCode;
 				}
 
 

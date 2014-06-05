@@ -129,8 +129,8 @@
 
 				<?php echo Yii::t('email',"This email is a confirmation for the order. To view details or track your order, click on the visit link:")  ?>
 				<?php echo CHtml::link(
-					Yii::app()->controller->createAbsoluteUrl('/cart/receipt', array('getuid'=>$cart->linkid)),
-					Yii::app()->controller->createAbsoluteUrl('/cart/receipt', array('getuid'=>$cart->linkid))); ?>
+					Yii::app()->controller->createAbsoluteUrl('cart/receipt', array('getuid'=>$cart->linkid)),
+					Yii::app()->controller->createAbsoluteUrl('cart/receipt', array('getuid'=>$cart->linkid))); ?>
 	            <br/><br/>
 
 				<?php echo Yii::t('email',"Please refer to your order ID ") ?> <?= $cart->id_str; ?> <?php echo Yii::t('email'," if you want to contact us about this order.") ?><br/><br/>

@@ -16,6 +16,7 @@
  * @property double $sell_base
  * @property double $sell_discount
  * @property double $sell_total
+ * @property integer $discount_type
  * @property string $serial_numbers
  * @property integer $tax_in
  * @property string $wishlist_item
@@ -50,14 +51,14 @@ abstract class BaseCartItem extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('cart_id, product_id, code, description, qty, sell, sell_base, sell_discount, sell_total, datetime_added, datetime_mod', 'required'),
-			array('cart_type, tax_in', 'numerical', 'integerOnly'=>true),
+			array('cart_type, discount_type, tax_in', 'numerical', 'integerOnly'=>true),
 			array('qty, sell, sell_base, sell_discount, sell_total', 'numerical'),
 			array('cart_id, product_id, wishlist_item', 'length', 'max'=>20),
 			array('code, description, serial_numbers', 'length', 'max'=>255),
 			array('discount', 'length', 'max'=>16),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, cart_id, cart_type, product_id, code, description, discount, qty, sell, sell_base, sell_discount, sell_total, serial_numbers, tax_in, wishlist_item, datetime_added, datetime_mod', 'safe', 'on'=>'search'),
+			array('id, cart_id, cart_type, product_id, code, description, discount, qty, sell, sell_base, sell_discount, sell_total, discount_type, serial_numbers, tax_in, wishlist_item, datetime_added, datetime_mod', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -94,6 +95,7 @@ abstract class BaseCartItem extends CActiveRecord
 			'sell_base' => 'Sell Base',
 			'sell_discount' => 'Sell Discount',
 			'sell_total' => 'Sell Total',
+			'discount_type' => 'Discount Type',
 			'serial_numbers' => 'Serial Numbers',
 			'tax_in' => 'Tax In',
 			'wishlist_item' => 'Wishlist Item',
@@ -125,6 +127,7 @@ abstract class BaseCartItem extends CActiveRecord
 		$criteria->compare('sell_base',$this->sell_base);
 		$criteria->compare('sell_discount',$this->sell_discount);
 		$criteria->compare('sell_total',$this->sell_total);
+		$criteria->compare('discount_type',$this->discount_type);
 		$criteria->compare('serial_numbers',$this->serial_numbers,true);
 		$criteria->compare('tax_in',$this->tax_in);
 		$criteria->compare('wishlist_item',$this->wishlist_item,true);

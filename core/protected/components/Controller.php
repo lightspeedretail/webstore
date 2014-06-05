@@ -51,6 +51,10 @@ class Controller extends CController
 	public $gridProductsRows;
 	public $custom_page_content;
 
+	/* Support lightweight repeated calls to getMenuTree by caching the result
+	 * for the lifetime of the component object. */
+	private $objFullTree = null;
+
 	/**
 	 * Dynamically load the configuration settings for the client and
 	 * establish Params to make everything faster
@@ -561,7 +565,8 @@ class Controller extends CController
 
 		} else $objFullTree = $objTree;
 
-		return $objFullTree;
+		$this->objFullTree = $objFullTree;
+		return $this->objFullTree;
 	}
 
 	/**
@@ -571,16 +576,18 @@ class Controller extends CController
 	 */
 	public function getMenuTreeTop()
 	{
-		$arrMenu = $this->MenuTree;
-		foreach($arrMenu as $key => $menuItem)
+		if ($this->objFullTree === null)
+			$this->objFullTree = $this->MenuTree;
+
+		foreach($this->objFullTree as $key => $menuItem)
 		{
 			if(isset($menuItem['children']))
-				unset($arrMenu[$key]['children']);
+				unset($this->objFullTree[$key]['children']);
 			if(isset($menuItem['items']))
-				unset($arrMenu[$key]['items']);
+				unset($this->objFullTree[$key]['items']);
 		}
 
-		return $arrMenu;
+		return $this->objFullTree;
 	}
 
 	/**

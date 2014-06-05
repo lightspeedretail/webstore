@@ -32,9 +32,10 @@ abstract class BaseCreditCard extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('enabled, modified', 'required'),
+			array('label, enabled', 'required'),
 			array('sort_order, enabled', 'numerical', 'integerOnly'=>true),
 			array('label, validfunc', 'length', 'max'=>32),
+			array('modified', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, label, sort_order, enabled, validfunc, modified', 'safe', 'on'=>'search'),

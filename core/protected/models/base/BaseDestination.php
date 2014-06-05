@@ -17,9 +17,9 @@
  * @property string $modified
  *
  * The followings are the available model relations:
+ * @property TaxCode $taxcode0
  * @property State $state0
  * @property Country $country0
- * @property TaxCode $taxcode0
  *
  * @package application.models.base
  * @name BaseDestination
@@ -42,11 +42,11 @@ abstract class BaseDestination extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('modified', 'required'),
 			array('base_charge, ship_free, ship_rate', 'numerical'),
 			array('country, state, taxcode', 'length', 'max'=>11),
 			array('zipcode1, zipcode2', 'length', 'max'=>10),
 			array('label', 'length', 'max'=>32),
+			array('modified', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, country, state, zipcode1, zipcode2, taxcode, label, base_charge, ship_free, ship_rate, modified', 'safe', 'on'=>'search'),
@@ -61,9 +61,9 @@ abstract class BaseDestination extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'taxcode0' => array(self::BELONGS_TO, 'TaxCode', 'taxcode'),
 			'state0' => array(self::BELONGS_TO, 'State', 'state'),
 			'country0' => array(self::BELONGS_TO, 'Country', 'country'),
-			'taxcode0' => array(self::BELONGS_TO, 'TaxCode', 'taxcode'),
 		);
 	}
 

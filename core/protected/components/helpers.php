@@ -1547,7 +1547,7 @@ function _xls_avail_languages()
 
 }
 
-function _xls_check_version($releasenotes = false)
+function _xls_check_version()
 {
 	if(!Yii::app()->theme) return false;
 
@@ -1576,7 +1576,6 @@ function _xls_check_version($releasenotes = false)
 		'autoupdate'    => (_xls_get_conf('AUTO_UPDATE','1')==1 ? "1" : "0"),
 		'theme'         => $strTheme,
 		'serversoftware'=> $serversoftware,
-		'releasenotes'  => $releasenotes,
 		'themeversion'  => $strThemeVersion,
 		'schema'  => _xls_get_conf('DATABASE_SCHEMA_VERSION'),
 		'cid'  => _xls_get_conf('LIGHTSPEED_CID'),
@@ -2164,3 +2163,30 @@ function prettyjson($json) {
 	return $result;
 }
 
+function _runMigrationTool($steps = null)
+{
+
+	$commandPath = Yii::app()->getBasePath() . DIRECTORY_SEPARATOR . 'commands';
+	$runner = new CConsoleCommandRunner();
+	$runner->addCommands($commandPath);
+	$commandPath = Yii::getFrameworkPath() . DIRECTORY_SEPARATOR . 'cli' . DIRECTORY_SEPARATOR . 'commands';
+	$runner->addCommands($commandPath);
+	$commandPath = Yii::app()->getBasePath() . DIRECTORY_SEPARATOR . 'helpers' . DIRECTORY_SEPARATOR . 'SingleMigrateCommand';
+	$runner->addCommands($commandPath);
+	if(is_null($steps))
+		$strCommand =  'migrate';
+	elseif($steps == 'set')
+		$strCommand =  'setmigrate';
+	elseif($steps == 'upgrade')
+		$strCommand =  'upgrademigrate';
+	else
+		$strCommand =  'singlemigrate';
+
+	Yii::log("Migrating with $strCommand", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+	$args = array('yiic', $strCommand, '--interactive=0','--migrationTable=xlsws_migrations');
+
+	ob_start();
+	$runner->run($args);
+	return htmlentities(ob_get_clean(), null, Yii::app()->charset);
+
+}

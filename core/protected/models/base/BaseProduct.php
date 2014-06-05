@@ -43,12 +43,12 @@
  * @property CartItem[] $cartItems
  * @property DocumentItem[] $documentItems
  * @property Images[] $images
+ * @property TaxStatus $taxStatus
  * @property Product $parent0
  * @property Product[] $products
  * @property Images $image
  * @property Family $family
  * @property Classes $class
- * @property TaxStatus $taxStatus
  * @property Category[] $xlswsCategories
  * @property ProductQtyPricing[] $productQtyPricings
  * @property ProductRelated[] $productRelateds
@@ -79,13 +79,13 @@ abstract class BaseProduct extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('code, modified', 'required'),
+			array('code', 'required'),
 			array('current, gift_card, inventoried, master_model, web, featured', 'numerical', 'integerOnly'=>true),
 			array('inventory, inventory_total, inventory_reserved, inventory_avail, product_height, product_length, product_width, product_weight, sell, sell_tax_inclusive, sell_web, sell_web_tax_inclusive', 'numerical'),
 			array('title, code, product_size, product_color, upc, request_url', 'length', 'max'=>255),
 			array('image_id, class_id, family_id, parent', 'length', 'max'=>20),
 			array('tax_status_id', 'length', 'max'=>11),
-			array('description_long, description_short, created', 'safe'),
+			array('description_long, description_short, created, modified', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, title, image_id, class_id, code, current, description_long, description_short, family_id, gift_card, inventoried, inventory, inventory_total, inventory_reserved, inventory_avail, master_model, parent, product_size, product_color, product_height, product_length, product_width, product_weight, tax_status_id, sell, sell_tax_inclusive, sell_web, sell_web_tax_inclusive, upc, web, request_url, featured, created, modified', 'safe', 'on'=>'search'),
@@ -103,12 +103,12 @@ abstract class BaseProduct extends CActiveRecord
 			'cartItems' => array(self::HAS_MANY, 'CartItem', 'product_id'),
 			'documentItems' => array(self::HAS_MANY, 'DocumentItem', 'product_id'),
 			'images' => array(self::HAS_MANY, 'Images', 'product_id'),
+			'taxStatus' => array(self::BELONGS_TO, 'TaxStatus', 'tax_status_id'),
 			'parent0' => array(self::BELONGS_TO, 'Product', 'parent'),
 			'products' => array(self::HAS_MANY, 'Product', 'parent'),
 			'image' => array(self::BELONGS_TO, 'Images', 'image_id'),
 			'family' => array(self::BELONGS_TO, 'Family', 'family_id'),
 			'class' => array(self::BELONGS_TO, 'Classes', 'class_id'),
-			'taxStatus' => array(self::BELONGS_TO, 'TaxStatus', 'tax_status_id'),
 			'xlswsCategories' => array(self::MANY_MANY, 'Category', '{{product_category_assn}}(product_id, category_id)'),
 			'productQtyPricings' => array(self::HAS_MANY, 'ProductQtyPricing', 'product_id'),
 			'productRelateds' => array(self::HAS_MANY, 'ProductRelated', 'product_id'),

@@ -27,9 +27,9 @@
  * @property Cart[] $carts1
  * @property Customer[] $customers
  * @property Customer[] $customers1
+ * @property Country $country
  * @property Customer $customer
  * @property State $state
- * @property Country $country
  * @property Document[] $documents
  * @property Document[] $documents1
  *
@@ -54,13 +54,12 @@ abstract class BaseCustomerAddress extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('modified', 'required'),
 			array('active, residential', 'numerical', 'integerOnly'=>true),
 			array('customer_id', 'length', 'max'=>20),
 			array('address_label, first_name, last_name, company, address1, address2, city', 'length', 'max'=>255),
 			array('state_id, country_id', 'length', 'max'=>11),
 			array('postal, phone', 'length', 'max'=>64),
-			array('created', 'safe'),
+			array('modified, created', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, customer_id, address_label, active, first_name, last_name, company, address1, address2, city, state_id, postal, country_id, phone, residential, modified, created', 'safe', 'on'=>'search'),
@@ -79,9 +78,9 @@ abstract class BaseCustomerAddress extends CActiveRecord
 			'carts1' => array(self::HAS_MANY, 'Cart', 'shipaddress_id'),
 			'customers' => array(self::HAS_MANY, 'Customer', 'default_billing_id'),
 			'customers1' => array(self::HAS_MANY, 'Customer', 'default_shipping_id'),
+			'country' => array(self::BELONGS_TO, 'Country', 'country_id'),
 			'customer' => array(self::BELONGS_TO, 'Customer', 'customer_id'),
 			'state' => array(self::BELONGS_TO, 'State', 'state_id'),
-			'country' => array(self::BELONGS_TO, 'Country', 'country_id'),
 			'documents' => array(self::HAS_MANY, 'Document', 'billaddress_id'),
 			'documents1' => array(self::HAS_MANY, 'Document', 'shipaddress_id'),
 		);

@@ -42,11 +42,11 @@ abstract class BaseWishlist extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('registry_name, html_content, after_purchase, customer_id, gift_code, created, modified', 'required'),
+			array('registry_name, html_content, after_purchase, customer_id, gift_code', 'required'),
 			array('visibility, after_purchase', 'numerical', 'integerOnly'=>true),
 			array('registry_name, ship_option, gift_code', 'length', 'max'=>100),
 			array('customer_id', 'length', 'max'=>20),
-			array('registry_description, event_date', 'safe'),
+			array('registry_description, event_date, created, modified', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, registry_name, registry_description, visibility, event_date, html_content, ship_option, after_purchase, customer_id, gift_code, created, modified', 'safe', 'on'=>'search'),

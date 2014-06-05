@@ -591,7 +591,7 @@ class Product extends BaseProduct
 	 * @return intenger
 	 */
 	public function getInventory() {
-		$strField = $this->GetInventoryField();
+		$strField = self::GetInventoryField();
 		$intInventory = $this->$strField;
 
 		if (_xls_get_conf('INVENTORY_RESERVED' , 0) == '1')
@@ -605,7 +605,7 @@ class Product extends BaseProduct
 	 * Return the property name representing the inventory field
 	 * @return string
 	 */
-	protected function GetInventoryField() {
+	static function GetInventoryField() {
 		$invType = _xls_get_conf('INVENTORY_FIELD_TOTAL','0');
 		if ($invType == '1')
 			return 'inventory_total';
@@ -824,7 +824,10 @@ class Product extends BaseProduct
 	 */
 	public function getPrice($intQuantity = 1) {
 
-		$taxInclusive = Yii::app()->shoppingcart->IsTaxIn;
+		if (!Customer::GetCurrent())
+			$taxInclusive = Yii::app()->params['TAX_INCLUSIVE_PRICING'];
+		else
+			$taxInclusive = Yii::app()->shoppingcart->IsTaxIn;
 
 
 		if (_xls_get_conf('PRICE_REQUIRE_LOGIN',0) == 1 && Yii::app()->user->isGuest)
@@ -1007,7 +1010,7 @@ class Product extends BaseProduct
 
 		$this->inventory_reserved = $fltReserved;
 
-		$strField = $this->GetInventoryField();
+		$strField = self::GetInventoryField();
 		$intInventory = $this->$strField;
 
 		$this->inventory_avail=($intInventory-$fltReserved);

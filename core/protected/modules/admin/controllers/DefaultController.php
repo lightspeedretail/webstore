@@ -155,25 +155,42 @@ class DefaultController extends AdminBaseController
 	public function actionIndex()
 	{
 
-	
+
 		$oXML = json_decode(_xls_check_version());
 
 		if (!empty($oXML))
 		{
-			if($oXML->webstore->version>XLSWS_VERSIONBUILD)
+			//We check for schema updates first to make sure our current version is up to date before pulling more code
+			if(isset($oXML->webstore->schema) && $oXML->webstore->schema != "current")
 			{
+				$strUpdateUrl = $this->createAbsoluteUrl("upgrade/index",array(),'http');//update without patch file
+				//Some circumstances because of domain switching could get https url, so double check here
+				$strUpdateUrl = str_replace("https://","http://",$strUpdateUrl);
+				$this->redirect($strUpdateUrl);
+			}
+			elseif($oXML->webstore->version>XLSWS_VERSIONBUILD)
+			{
+
+				$strUpdateUrl = $this->createAbsoluteUrl("upgrade/index",array('patch'=>$oXML->webstore->autopathfile),'http');
+				//Some circumstances because of domain switching could get https url, so double check here
+				$strUpdateUrl = str_replace("https://","http://",$strUpdateUrl);
+
 				if( _xls_get_conf('LIGHTSPEED_HOSTING','0') != "1" &&
 					_xls_get_conf('AUTO_UPDATE','1')=='1' &&
 					$oXML->webstore->autopathfile
 				)
-					$this->redirect($this->createAbsoluteUrl("upgrade/index",array('patch'=>$oXML->webstore->autopathfile),'http'));
+				{
+
+					$this->redirect($strUpdateUrl);
+				}
 				else
-					$this->render("newversion",array('oXML'=>$oXML->webstore));
+				{
+					$strVersion = (string)$oXML->webstore->version;
+					$strDashVersion = $strVersion[0] . '-' . $strVersion[1] . '-' . $strVersion[2];
+					$strReleaseNotesUrl = 'https://www.lightspeedretail.com/release-notes/webstore/web-store-' . $strDashVersion . '/?hide=yes';
+					$this->render("newversion",array('oXML'=>$oXML->webstore,'strUpdateUrl'=>$strUpdateUrl,'strReleaseNotesUrl'=>$strReleaseNotesUrl));
+				}
 				return;
-			}
-			elseif(isset($oXML->webstore->schema) && $oXML->webstore->schema != "current")
-			{
-				$this->redirect($this->createAbsoluteUrl("upgrade/index",array(),'http')); //update without patch file
 			}
 			elseif(isset($oXML->webstore->themedisplayversion))
 			{

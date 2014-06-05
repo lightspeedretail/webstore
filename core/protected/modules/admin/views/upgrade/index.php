@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/html" lang="en-US">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Web Store 3.0 Installation</title>
+	<title>Web Store Installation</title>
 	<link rel="stylesheet" href="http://cdn.lightspeedretail.com/bootstrap/css/bootstrap.css">
 	<style type="text/css">
 		.header-new {

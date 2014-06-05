@@ -121,6 +121,7 @@ class SiteController extends Controller
 		{
 			Yii::app()->setViewPath(Yii::getPathOfAlias('application') . "/views-cities");
 		}
+
 		$this->layout = '//layouts/errorlayout';
 
 		if ($error = Yii::app()->errorHandler->error)
@@ -136,7 +137,7 @@ class SiteController extends Controller
 			{
 				echo $error['message'];
 			}
-			else
+			elseif (Yii::app()->request->preferredAcceptType['type'] === 'text' && Yii::app()->request->preferredAcceptType['subType'] === 'html')
 			{
 				$this->render('error', $error);
 			}

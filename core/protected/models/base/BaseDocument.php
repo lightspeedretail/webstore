@@ -43,12 +43,12 @@
  *
  * The followings are the available model relations:
  * @property Cart[] $carts
+ * @property Cart $cart
  * @property CustomerAddress $billaddress
  * @property CustomerAddress $shipaddress
  * @property Customer $customer
- * @property DocumentShipping $shipping
  * @property DocumentPayment $payment
- * @property Cart $cart
+ * @property DocumentShipping $shipping
  * @property DocumentItem[] $documentItems
  *
  * @package application.models.base
@@ -72,7 +72,6 @@ abstract class BaseDocument extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('modified', 'required'),
 			array('order_type, fk_tax_code_id, tax_inclusive, item_count', 'numerical', 'integerOnly'=>true),
 			array('discount, cost_total, currency_rate, sell_total, subtotal, tax1, tax2, tax3, tax4, tax5, total', 'numerical'),
 			array('cart_id, customer_id, shipaddress_id, billaddress_id, shipping_id, payment_id, gift_registry', 'length', 'max'=>20),
@@ -80,7 +79,7 @@ abstract class BaseDocument extends CActiveRecord
 			array('status, lightspeed_user', 'length', 'max'=>32),
 			array('currency', 'length', 'max'=>3),
 			array('send_to', 'length', 'max'=>255),
-			array('datetime_cre, datetime_due, printed_notes, submitted', 'safe'),
+			array('datetime_cre, datetime_due, printed_notes, submitted, modified', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, cart_id, order_str, invoice_str, customer_id, shipaddress_id, billaddress_id, shipping_id, payment_id, discount, po, order_type, status, cost_total, currency, currency_rate, datetime_cre, datetime_due, sell_total, printed_notes, fk_tax_code_id, tax_inclusive, subtotal, tax1, tax2, tax3, tax4, tax5, total, item_count, lightspeed_user, gift_registry, send_to, submitted, modified, linkid', 'safe', 'on'=>'search'),
@@ -96,12 +95,12 @@ abstract class BaseDocument extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'carts' => array(self::HAS_MANY, 'Cart', 'document_id'),
+			'cart' => array(self::BELONGS_TO, 'Cart', 'cart_id'),
 			'billaddress' => array(self::BELONGS_TO, 'CustomerAddress', 'billaddress_id'),
 			'shipaddress' => array(self::BELONGS_TO, 'CustomerAddress', 'shipaddress_id'),
 			'customer' => array(self::BELONGS_TO, 'Customer', 'customer_id'),
-			'shipping' => array(self::BELONGS_TO, 'DocumentShipping', 'shipping_id'),
 			'payment' => array(self::BELONGS_TO, 'DocumentPayment', 'payment_id'),
-			'cart' => array(self::BELONGS_TO, 'Cart', 'cart_id'),
+			'shipping' => array(self::BELONGS_TO, 'DocumentShipping', 'shipping_id'),
 			'documentItems' => array(self::HAS_MANY, 'DocumentItem', 'document_id'),
 		);
 	}

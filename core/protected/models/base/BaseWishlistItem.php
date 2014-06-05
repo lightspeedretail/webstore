@@ -19,10 +19,10 @@
  *
  * The followings are the available model relations:
  * @property CartItem[] $cartItems
- * @property Wishlist $registry
- * @property Product $product
- * @property CartItem $cartItem
  * @property Customer $purchasedBy
+ * @property CartItem $cartItem
+ * @property Product $product
+ * @property Wishlist $registry
  *
  * @package application.models.base
  * @name BaseWishlistItem
@@ -45,11 +45,11 @@ abstract class BaseWishlistItem extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('registry_id, product_id, created, modified', 'required'),
+			array('registry_id, product_id', 'required'),
 			array('qty_received, priority, qty_received_manual', 'numerical', 'integerOnly'=>true),
 			array('qty', 'numerical'),
 			array('registry_id, product_id, cart_item_id, purchased_by', 'length', 'max'=>20),
-			array('comment', 'safe'),
+			array('comment, created, modified', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, registry_id, product_id, qty, qty_received, priority, comment, qty_received_manual, cart_item_id, purchased_by, created, modified', 'safe', 'on'=>'search'),
@@ -65,10 +65,10 @@ abstract class BaseWishlistItem extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'cartItems' => array(self::HAS_MANY, 'CartItem', 'wishlist_item'),
-			'registry' => array(self::BELONGS_TO, 'Wishlist', 'registry_id'),
-			'product' => array(self::BELONGS_TO, 'Product', 'product_id'),
-			'cartItem' => array(self::BELONGS_TO, 'CartItem', 'cart_item_id'),
 			'purchasedBy' => array(self::BELONGS_TO, 'Customer', 'purchased_by'),
+			'cartItem' => array(self::BELONGS_TO, 'CartItem', 'cart_item_id'),
+			'product' => array(self::BELONGS_TO, 'Product', 'product_id'),
+			'registry' => array(self::BELONGS_TO, 'Wishlist', 'registry_id'),
 		);
 	}
 

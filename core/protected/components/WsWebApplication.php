@@ -18,6 +18,15 @@ class WsWebApplication extends CWebApplication
 	);
 
 	/**
+	 * Routes that will always use HTTP rather than HTTPS.
+	 * @var array
+	 */
+	private $_arrNeverSecureRoutes = array(
+		'cart/receipt',
+		'search/browse'
+	);
+
+	/**
 	 * Routes that require SSL when we have an SSL certificate available
 	 * @var array
 	 */
@@ -105,11 +114,21 @@ class WsWebApplication extends CWebApplication
 			$strLightSpeedUrl = '';
 		}
 
-		//For specific controllers, pass these through (this is mostly AJAX)
-		if(in_array($strController,$this->_arrPassthroughControllers))
+		$httpHost = str_replace(
+			$strLightSpeedUrl,
+			$strCustomUrl,
+			$this->getRequest()->getHostInfo('http')
+		);
+
+		// For specific routes, we always use HTTP.
+		if (in_array($route, $this->_arrNeverSecureRoutes))
 		{
-			//This URL could be on either hostname so just pass through without schema
-			return $url;
+			//Force a switch to original URL without SSL
+			$host = str_replace(
+				$strLightSpeedUrl,
+				$strCustomUrl,
+				$this->getRequest()->getHostInfo('http')
+			);
 		}
 		elseif(in_array($route,$this->_arrNeedToSecureRoutes) || in_array($strController,$this->_arrNeedToSecureControllers))
 		{
@@ -120,6 +139,12 @@ class WsWebApplication extends CWebApplication
 				$this->getRequest()->getHostInfo('https')
 			);
 
+		}
+		elseif(in_array($strController,$this->_arrPassthroughControllers))
+		{
+			//For specific controllers, pass these through (this is mostly AJAX)
+			//This URL could be on either hostname so just pass through without schema
+			return $url;
 		}
 		else
 		{

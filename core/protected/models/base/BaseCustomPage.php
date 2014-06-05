@@ -42,12 +42,12 @@ abstract class BaseCustomPage extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('title, modified', 'required'),
+			array('title', 'required'),
 			array('tab_position, column_template, product_display', 'numerical', 'integerOnly'=>true),
 			array('page_key', 'length', 'max'=>32),
 			array('title', 'length', 'max'=>64),
 			array('request_url, meta_keywords, meta_description, product_tag', 'length', 'max'=>255),
-			array('page, created', 'safe'),
+			array('page, modified, created', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, page_key, title, page, request_url, meta_keywords, meta_description, modified, created, product_tag, tab_position, column_template, product_display', 'safe', 'on'=>'search'),

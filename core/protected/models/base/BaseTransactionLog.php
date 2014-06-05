@@ -33,9 +33,9 @@ abstract class BaseTransactionLog extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('created', 'required'),
 			array('cart_id', 'length', 'max'=>20),
 			array('logline', 'length', 'max'=>255),
+			array('created', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, cart_id, logline, created', 'safe', 'on'=>'search'),

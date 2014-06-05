@@ -39,11 +39,11 @@ abstract class BaseConfiguration extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('title, key_value, modified', 'required'),
+			array('title, key_name, key_value', 'required'),
 			array('configuration_type_id, sort_order, template_specific, param, required', 'numerical', 'integerOnly'=>true),
 			array('title, key_name', 'length', 'max'=>64),
 			array('helper_text, options', 'length', 'max'=>255),
-			array('created', 'safe'),
+			array('modified, created', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, title, key_name, key_value, helper_text, configuration_type_id, sort_order, modified, created, options, template_specific, param, required', 'safe', 'on'=>'search'),

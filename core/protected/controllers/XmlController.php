@@ -33,20 +33,24 @@ class XmlController extends Controller
 	public function actions()
 	{
 		//Dynamically read our built-in xml actions
-		$arrController = glob(dirname(__FILE__).'/../controllers/xml/*');
-        if (!is_array($arrController)) $arrController = array();
+		$arrController = glob(dirname(__FILE__) . '/../controllers/xml/*');
+		if (!is_array($arrController))
+			$arrController = array();
 
-		foreach ($arrController as $action) {
-			$cname = basename($action,'.php');
-			$arr[strtolower($cname)] = 'application.controllers.xml.'.basename($action,'.php');
+		foreach ($arrController as $action)
+		{
+			$cname = basename($action, '.php');
+			$arr[strtolower($cname)] = 'application.controllers.xml.' . basename($action, '.php');
 		}
 		//Dynamically read our custom xml actions
-        $arrCustom = glob(dirname(__FILE__).'/../../custom/xml/*');
-        if (!is_array($arrCustom)) $arrCustom = array();
+		$arrCustom = glob(dirname(__FILE__) . '/../../../custom/xml/*');
+		if (!is_array($arrCustom))
+			$arrCustom = array();
 
-        foreach ($arrCustom as $action) {
-			$cname = basename($action,'.php');
-			$arr[strtolower($cname)] = 'custom.xml.'.basename($action,'.php');
+		foreach ($arrCustom as $action)
+		{
+			$cname = basename($action, '.php');
+			$arr[strtolower($cname)] = 'custom.xml.' . basename($action, '.php');
 		}
 
 		return $arr;

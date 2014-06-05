@@ -271,7 +271,7 @@ class PromoCode extends BasePromoCode
 				$productTags = ProductTags::model()->findAllByAttributes(array('product_id'=>$objItem->product->id));
 				$strKeyword = trim(substr($strCode,8,255));
 				foreach ($productTags as $tag)
-					if ($tag->tag->tag==$strKeyword)
+					if (strtolower($tag->tag->tag) == $strKeyword)
 						$boolReturn = true;
 			}
 

@@ -7,9 +7,9 @@
  * @property integer $id
  * @property string $level
  * @property string $category
- * @property integer $logtime
- * @property string $message
  * @property string $created
+ * @property string $message
+ * @property integer $logtime
  *
  * @package application.models.base
  * @name BaseLog
@@ -32,13 +32,12 @@ abstract class BaseLog extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('created', 'required'),
 			array('logtime', 'numerical', 'integerOnly'=>true),
 			array('level, category', 'length', 'max'=>128),
-			array('message', 'safe'),
+			array('created, message', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, level, category, logtime, message, created', 'safe', 'on'=>'search'),
+			array('id, level, category, created, message, logtime', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -62,9 +61,9 @@ abstract class BaseLog extends CActiveRecord
 			'id' => 'ID',
 			'level' => 'Level',
 			'category' => 'Category',
-			'logtime' => 'Logtime',
-			'message' => 'Message',
 			'created' => 'Created',
+			'message' => 'Message',
+			'logtime' => 'Logtime',
 		);
 	}
 
@@ -82,9 +81,9 @@ abstract class BaseLog extends CActiveRecord
 		$criteria->compare('id',$this->id);
 		$criteria->compare('level',$this->level,true);
 		$criteria->compare('category',$this->category,true);
-		$criteria->compare('logtime',$this->logtime);
-		$criteria->compare('message',$this->message,true);
 		$criteria->compare('created',$this->created,true);
+		$criteria->compare('message',$this->message,true);
+		$criteria->compare('logtime',$this->logtime);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

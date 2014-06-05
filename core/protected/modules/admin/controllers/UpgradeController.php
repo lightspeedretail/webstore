@@ -65,6 +65,7 @@ class UpgradeController extends CController
 			echo json_encode(array('result'=>"success",'makeline'=>50,'tag'=>'Applying any database modifications.','total'=>100));
 			return;
 		}
+		Yii::log("Downloading $patch", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		//regex filename to make sure we're not passing something wrong
 
 		$d = YiiBase::getPathOfAlias('webroot')."/runtime/upgrade";
@@ -182,6 +183,13 @@ class UpgradeController extends CController
 		else
 			echo json_encode(array('result'=>"success",'makeline'=>40,'tag'=>'Moving upgraded files into place','total'=>100));
 	}
+
+	public function actionMigrateDatabase()
+	{
+		_runMigrationTool(1);
+	}
+
+
 
 
 	public function actionPlaceFiles()
@@ -319,9 +327,11 @@ class UpgradeController extends CController
 	public function actionDatabaseUpgrade($online=50, $total=100, $tag='')
 	{
 
-		$oXML = $this->checkForDatabaseUpdates();
+		Yii::log("Checking db to see if we're current", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 
-		if ($oXML->schema == "current")
+		$oXML = $this->isDatabaseCurrent();
+
+		if ($oXML->schema == 'current')
 		{
 			echo json_encode(array('result'=>"success",'makeline'=>$total,'tag'=>$tag,'total'=>$total));
 			return;
@@ -331,6 +341,11 @@ class UpgradeController extends CController
 
 		switch($oXML->changetype)
 		{
+
+			case 'yii':
+				//Don't do anything here, it was already done by the framework
+				break;
+
 			case 'run_task':
 
 				$this->runTask($oXML->schema);
@@ -363,12 +378,14 @@ class UpgradeController extends CController
 
 
 		}
-		_xls_set_conf('DATABASE_SCHEMA_VERSION',$oXML->schema);
+		if(is_numeric($oXML->schema))
+			_xls_set_conf('DATABASE_SCHEMA_VERSION',$oXML->schema);
 
-		$oXML = $this->checkForDatabaseUpdates();
+		$oXML = $this->isDatabaseCurrent(true);
 
 		if ($oXML->schema == "current")
 		{
+
 			echo json_encode(array('result'=>"success",'makeline'=>$total,'tag'=>$tag,'total'=>$total));
 			return;
 		} else {
@@ -381,8 +398,18 @@ class UpgradeController extends CController
 
 	}
 
-	protected function checkForDatabaseUpdates()
+	/**
+	 * Check to see if any schema updates need to be applied.
+	 *
+	 * Note this routine checks the Updater (deprecated, will be removed later) and
+	 * now uses the local Yii db migration routine.
+	 *
+	 * @param bool $blnCheckOnly optionally check but do not perform yii migration.
+	 * @return mixed
+	 */
+	protected function isDatabaseCurrent($blnCheckOnly=false)
 	{
+
 		$url = "http://"._xls_get_conf('LIGHTSPEED_UPDATER','updater.lightspeedretail.com')."/webstore";
 
 		$storeurl = $this->createAbsoluteUrl("/");
@@ -423,9 +450,58 @@ class UpgradeController extends CController
 		$resp = curl_exec($ch);
 		curl_close($ch);
 
-
 		$oXML= json_decode($resp);
+		$mixSchema = $oXML->wsdb->schema;
+
+		if ($mixSchema != 'current')
+			return $oXML->wsdb;
+
+		$oXML->wsdb->changetype = "yii";
+		$oXML->wsdb->schema = Yii::t('admin','Updating Database'); //Just because this is displayed during an update
+
+		/*
+		 * Before the first time we run this upgrade via the new method, we need to mark
+		 * the existing database up to a certain point so it doesn't think it's a new install
+		 */
+		$this->checkForMigrationTable();
+
+		/*
+		 * New db update routine, this will become the only item in this function later
+		 * That's why we're just adding instead of calling another function
+		 */
+		if(!$blnCheckOnly)
+		{
+			$strMigrationResults = _runMigrationTool(1);
+			if (stripos($strMigrationResults, "No new migration found") > 0 )
+				$oXML->wsdb->schema = 'current';
+
+		}
+
 		return $oXML->wsdb;
+	}
+
+	/**
+	 * See if the Migration tracking table exists.
+	 *
+	 * For a new install, this should always now exist because this is how new installs are made.
+	 * If we have a store that was originally <= 3.1.5, then we have to mark the migration
+	 * to catch it up.
+	 *
+	 * @return void
+	 */
+	protected function checkForMigrationTable()
+	{
+		$strQuery = "SHOW TABLES LIKE 'xlsws_migrations'";
+		$strResult = Yii::app()->db->createCommand($strQuery)->queryScalar();
+
+		//We don't have this table, meaning this is a recent upgrade but not a new install
+		if ($strResult != "xlsws_migrations")
+		{
+			Yii::log("Forcing creation of migrations table", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			_runMigrationTool('upgrade');
+		}
+
+
 	}
 	protected function getFile($url)
 	{

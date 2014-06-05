@@ -19,8 +19,28 @@ class SoapController extends CController
 	public function beforeAction($action)
 	{
 		if(_xls_get_conf('DEBUG_LS_SOAP_CALL') && isset($GLOBALS['HTTP_RAW_POST_DATA']))
-			Yii::log(print_r($GLOBALS['HTTP_RAW_POST_DATA'] , true),
-				CLogger::LEVEL_ERROR,'application.'.__CLASS__.".".__FUNCTION__.".".$action->id);
+		{
+			switch($action->id)
+			{
+				case 'bronze':
+					Yii::log(
+						print_r($GLOBALS['HTTP_RAW_POST_DATA'] , true),
+						CLogger::LEVEL_ERROR,
+						'application.'.__CLASS__.".".__FUNCTION__.".".$action->id
+					);
+					break;
+
+				case 'image':
+					Yii::log(
+						'Image uploading',
+						CLogger::LEVEL_ERROR,
+						'application.'.__CLASS__.".".__FUNCTION__.".".$action->id
+					);
+					break;
+
+			}
+
+		}
 
 		if(YII_DEBUG)
 			ini_set("soap.wsdl_cache_enabled", 0);

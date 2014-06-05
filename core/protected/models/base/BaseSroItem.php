@@ -21,8 +21,8 @@
  * @property string $datetime_mod
  *
  * The followings are the available model relations:
- * @property Product $product
  * @property Sro $sro
+ * @property Product $product
  *
  * @package application.models.base
  * @name BaseSroItem
@@ -65,8 +65,8 @@ abstract class BaseSroItem extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'product' => array(self::BELONGS_TO, 'Product', 'product_id'),
 			'sro' => array(self::BELONGS_TO, 'Sro', 'sro_id'),
+			'product' => array(self::BELONGS_TO, 'Product', 'product_id'),
 		);
 	}
 

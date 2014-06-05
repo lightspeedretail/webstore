@@ -38,9 +38,16 @@ namespace Cloudinary {
                 "detection" => \Cloudinary::option_get($options, "detection"),
                 "similarity_search" => \Cloudinary::option_get($options, "similarity_search"),
                 "auto_tagging" => \Cloudinary::option_get($options, "auto_tagging"),
+                "phash" => \Cloudinary::option_get($options, "phash"),
+                "upload_preset" => \Cloudinary::option_get($options, "upload_preset"),
                 "allowed_formats" => \Cloudinary::encode_array(\Cloudinary::option_get($options, "allowed_formats")));
-	    array_walk($params, function (&$value, $key){ $value = (is_bool($value) ? ($value ? "1" : "0") : $value);});
-	    return array_filter($params,function($v){ return !is_null($v) && ($v !== "" );});
+            array_walk($params, function (&$value, $key){ $value = (is_bool($value) ? ($value ? "1" : "0") : $value);});
+            return array_filter($params,function($v){ return !is_null($v) && ($v !== "" );});
+        }
+
+        public static function unsigned_upload($file, $upload_preset, $options = array())
+        {
+            return Uploader::upload($file, array_merge($options, array("unsigned"=>TRUE, "upload_preset"=>$upload_preset)));
         }
 
         public static function upload($file, $options = array())
@@ -218,7 +225,9 @@ namespace Cloudinary {
         public static function call_api($action, $params, $options = array(), $file = NULL)
         {
             $return_error = \Cloudinary::option_get($options, "return_error");
-            $params = \Cloudinary::sign_request($params, $options);
+            if (!\Cloudinary::option_get($options, "unsigned")) {
+                $params = \Cloudinary::sign_request($params, $options);
+            }
 
             $api_url = \Cloudinary::cloudinary_api_url($action, $options);
 
@@ -229,10 +238,12 @@ namespace Cloudinary {
 
             $post_params = array();
             if ($file) {
-                if (file_exists($file) && function_exists("curl_file_create")) {
-                    $post_params['file'] = curl_file_create($file);
-                } else if (!preg_match('/^@|^https?:|^s3:|^data:[^;]*;base64,([a-zA-Z0-9\/+\n=]+)$/', $file)) {
-                    $post_params["file"] = "@" . $file;
+                if (!preg_match('/^@|^https?:|^s3:|^data:[^;]*;base64,([a-zA-Z0-9\/+\n=]+)$/', $file)) {
+                    if (function_exists("curl_file_create")) {
+                        $post_params['file'] = curl_file_create($file);
+                    } else {
+                        $post_params["file"] = "@" . $file;
+                    }
                 } else {
                     $post_params["file"] = $file;
                 }

@@ -1,7 +1,13 @@
 <?php
 set_time_limit(300);
-
-define('DBARRAY_NUM', MYSQL_NUM);define('DBARRAY_ASSOC', MYSQL_ASSOC);define('DBARRAY_BOTH', MYSQL_BOTH);if (!defined('DB_EXPLAIN')) { define('DB_EXPLAIN', false);}if (!defined('DB_QUERIES')) { define('DB_QUERIES', false);}
+// @codingStandardsIgnoreStart
+define('DBARRAY_NUM', MYSQL_NUM);
+define('DBARRAY_ASSOC', MYSQL_ASSOC);
+define('DBARRAY_BOTH', MYSQL_BOTH);
+if (!defined('DB_EXPLAIN'))
+	define('DB_EXPLAIN', false);
+if (!defined('DB_QUERIES'))
+	define('DB_QUERIES', false);
 
 
 if (version_compare(PHP_VERSION, '5.3.0') < 0) {
@@ -46,12 +52,8 @@ if(count($arg))
 	if(isset($arg['help'])) showCommandLine();
 	if(isset($arg['dbupdate']) && $arg['dbupdate']==1)
 	{
-		if(empty($arg['url']))
-			die("dbupdate requires url key as well, such as --url=store.example.com\n\n");
-
-		//This is command line for applying any database updates
-		echo "\n**Applying latest database changes**\n\n";
-		runYii($arg['url'],'/install.php',49);
+		echo "**dbupdate command removed**\n\nUpdates should use yiic since you're already on the command line\n\n";
+		echo "\nCommand: core/protected/yiic migrate up --interactive=0\n\n";
 		die();
 	}
 	if(file_exists("config/main.php")) die("\nENTER 1 OR 2 FOR INSTRUCTIONS (ENTER 2 TO PAGE)\n\nENTER SEED NUMBER
@@ -66,8 +68,12 @@ INITIALIZING...\n\nYOU MUST DESTROY 17 KINGONS IN 30 STARDATES WITH 3 STARBASES\
 
 	echo "\n**Installing Web Store**\n\n";
 
+	$upgrade=0;
 	if(isset($arg['dboldname']))
+	{
 		$_POST['dboldname']=$arg['dboldname'];
+		$upgrade=1;
+	}
 
 	$arg=modifyArgs($arg);
 	downloadLatest();
@@ -111,10 +117,13 @@ INITIALIZING...\n\nYOU MUST DESTROY 17 KINGONS IN 30 STARDATES WITH 3 STARBASES\
 	}
 
 	if(isset($arg['hosted']))
-		$db->query("update xlsws_configuration set key_value=1 where key_name='LIGHTSPEED_HOSTING'");
+		$hosted=1;
+	else
+		$hosted=0;
+
 
 	echo "\nLaunching Yii bootstrap\n";
-	runYii($arg['url'],$arg['scriptname']);
+	runYii($arg['url'],$arg['scriptname'],1,$upgrade,$hosted);
 
 }
 else {
@@ -155,7 +164,7 @@ function showCommandLine()
 {
 	die("\n*error halting*\n\nusage: php install.php --dbhost=localhost --dbuser=root --dbpass=mypass --dbname=webstore --url=store.example.com --dboldname=webstorebak (optional) --hosted=1 (optional)\n\n");
 }
-function runYii($url,$scriptname,$sqlline=1)
+function runYii($url,$scriptname,$sqlline=1,$upgrade,$hosted)
 {
 	global $arg;
 	$_SERVER=array(
@@ -176,24 +185,16 @@ function runYii($url,$scriptname,$sqlline=1)
 	require_once($yii);
 	$objYii = Yii::createWebApplication($config);
 
-	//Since we're in this same instance, reread the variables we just wrote
-	//Because we've updated the config, rerun
-	Yii::app()->theme='brooklyn';
-	Yii::app()->language='en';
-	$objConfig = Configuration::model()->findAllByAttributes(array('param'=>'1'),array('order'=>'key_name'));
-	foreach ($objConfig as $oConfig)
-		Yii::app()->params[$oConfig->key_name]=str_replace('\'','\\\'',$oConfig->key_value);
-	Yii::app()->params['OFFLINE']=0;
-	Yii::app()->params['INSTALLED']=1;
-
-
-
-
 	do
 	{
 		$_POST['online']=$sqlline;
+		$_POST['upgrade']=$upgrade;
+		$_POST['hosted']=$hosted;
 		ob_start();
-		$objYii->runController("install/upgrade");
+		if($upgrade)
+			$objYii->runController("install/upgrade");
+		else
+			$objYii->runController("install/install");
 		$retVal = ob_get_contents();
 
 		$j = json_decode($retVal);
@@ -466,7 +467,8 @@ function displayNotAcceptable($checkenv)
 }
 function displayFormTwo()
 {
-	writeDB($_POST['dbhost'],$_POST['dbuser'],$_POST['dbpass'],$_POST['dbname']);
+	$sanitized = preg_replace('/[^a-zA-Z0-9\.\,\(\)@#!?]/', '', $_POST);
+	writeDB($sanitized['dbhost'],$sanitized['dbuser'],$sanitized['dbpass'],$sanitized['dbname']);
 
 
 
@@ -574,7 +576,9 @@ function displayFormTwo()
 							pinttimer=self.setInterval(function(){runUpgrade(key)},delay);
 						}else {
 							prunning=0;
-							online = online + 1;
+							if (obj.line) online = (obj.line*1) +1;
+							else online = online + 1;
+
 							if (delay>1050)
 							{
 								delay=delay-1000;
@@ -623,7 +627,7 @@ function displayFormTwo()
 				"&dbname=" + "<?php echo $_POST['dbname'] ?>" +
 				"&dboldname=" + "<?php echo $_POST['dboldname'] ?>";
 
-			var exporturl = window.location.href.replace("/install.php", "/install/upgrade");
+			var exporturl = window.location.href.replace("/install.php", "/install/<?php echo strlen($_POST['dboldname']) > 0 ? 'upgrade' : 'install' ?>");
 			$.ajax({
 				url: exporturl,
 				type:'POST',data:postvar,
@@ -764,18 +768,6 @@ return array(
 	@mkdir("config",0755,true);
 	$fp2 = fopen("config/wsdb.php","w");
 	if ($fp2 === false) die("Error, can't write file config/wsdb.php");
-	fwrite($fp2,$strtoexport);
-	fclose($fp2);
-
-
-	$strtoexport = "<?php
-
-return array(
-
-
-);";
-
-	$fp2 = fopen("config/wsemail.php","w");
 	fwrite($fp2,$strtoexport);
 	fclose($fp2);
 
@@ -1102,6 +1094,8 @@ function decompress($zipFile = '', $dirFromZip = '', $zipDir=null)
 						{
 							fwrite($fd, zip_entry_read($zip_entry, zip_entry_filesize($zip_entry)));
 							fclose($fd);
+							if (substr($completeName,-5) == '/yiic')
+								chmod($completeName, 0755);
 						}
 						else
 						{
@@ -1154,6 +1148,8 @@ function createDbConnection()
 /* The master function which is called by Javascript. We upgrade line by line */
 function runInstall($db,$sqlline = 0)
 {
+	global $arg;
+
 	if ($sqlline==0) return;
 
 	if (strlen($db->olddb)>0)
@@ -1165,24 +1161,39 @@ function runInstall($db,$sqlline = 0)
 	//The beginning of our line# process is for migrating
 
 	if ($upgrade)
+	{
 		$sqlstrings = initialMigrateTables().migrateTwoFiveToThree();
+		$arrSql = explode(";",$sqlstrings);
+		$total = count($arrSql)+13;
+		$lineDeduct=15;
+	}
 	else
-		$sqlstrings = migrateTwoFiveToThree();
+	{
+		$sqlstrings = ";;;";
+		$arrSql = explode(";",$sqlstrings);
+		$total = 16;
+		$lineDeduct=0;
+	}
 
-	$arrSql = explode(";",$sqlstrings);
-	$total = count($arrSql)+13;
 
 	switch ($sqlline)
 	{
 
 		case 1:
 
-			$dest = (isset($_POST['qa']) ? "qa/".$_POST['qa'] : "latestwebstore");
-			$cdn = (isset($_POST['qa']) ? "webstore-qa" : "webstore-full");
-			$jLatest= downloadFile("http://updater.lightspeedretail.com/site/".$dest);
-			$result = json_decode($jLatest);
-			return json_encode(array('result'=>"success",
-				'tag'=>'Downloading Web Store program file '.$result->latest->filename.'...','line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
+			if (!file_exists('core') && !file_exists('webstore.zip'))
+			{
+				$dest = (isset($_POST['qa']) ? "qa/".$_POST['qa'] : "latestwebstore");
+				$cdn = (isset($_POST['qa']) ? "webstore-qa" : "webstore-full");
+				$jLatest= downloadFile("http://updater.lightspeedretail.com/site/".$dest);
+				$result = json_decode($jLatest);
+				return json_encode(array('result'=>"success",
+						'tag'=>'Downloading Web Store program file '.$result->latest->filename.'...','line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
+
+			} else
+				return json_encode(array('result'=>"success",
+						'tag'=>'Skipping downloading','line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
+
 			break;
 
 		case 2:
@@ -1193,17 +1204,26 @@ function runInstall($db,$sqlline = 0)
 
 		case 3:
 			zipAndFolders();
-			$tag = "Applying pre-3.0 changes. Line #".$sqlline;
+			$tag = "Starting Install...";
 			return json_encode(array('result'=>"success",
 				'tag'=>$tag,'line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
 			break;
 
 		case 4:
+
 			if ($upgrade) $db->changedb('old');
 			if ($upgrade) if ($db->schemaNumber<217) up217($db);
 			if ($upgrade) $db->changedb('old');
 			if ($upgrade) if ($db->schemaNumber==217) up250($db,$sqlline);
 			$tag = "Applying pre-3.0 changes. Line #".$sqlline;
+			if (!$upgrade)
+			{
+				//we're going to skip ahead to the end. The butler did it!
+				$sqlline=15;
+				$tag = "Setting up new database, stand by...";
+				return json_encode(array('result'=>"success",
+						'tag'=>$tag,'line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
+			}
 			break;
 
 		case 5:
@@ -1225,6 +1245,7 @@ function runInstall($db,$sqlline = 0)
 		case 13:
 			if ($upgrade) $db->changedb('old');
 			if ($upgrade) if ($db->schemaNumber==251) up252($db);
+			if ($upgrade) prep252($db);
 			$tag = "Creating new tables. Line #".$sqlline;
 			break;
 
@@ -1238,24 +1259,24 @@ function runInstall($db,$sqlline = 0)
 		default:
 			$db->changedb('new');
 
-			$sqlStringtoRun = trim($arrSql[$sqlline-15],"\n\r\t");
-			$sqlStringtoRun = str_replace("{newdbname}",$db->newdb,$sqlStringtoRun);
-
-
-			if(!($upgrade==0 && strpos($sqlStringtoRun,'{olddbname}') !== false))
+			if($upgrade)
 			{
-				$sqlStringtoRun = str_replace("{olddbname}",$db->olddb,$sqlStringtoRun);
-				$db->query('SET NAMES utf8');
-				$db->query('SET FOREIGN_KEY_CHECKS=0');
-				$db->query($sqlStringtoRun);
-				if ($sqlline<28) $tag = "Creating tables";
-				if ($sqlline>=28 && $sqlline<=75) $tag = "Processing images table";
+				$sqlStringtoRun = trim($arrSql[$sqlline-15],"\n\r\t");
 
-			}
+				$sqlStringtoRun = str_replace("{newdbname}",$db->newdb,$sqlStringtoRun);
 
-			if ($sqlline==$total && !$upgrade)
-			{
-				initialDataLoad($db);
+
+				if(!($upgrade==0 && strpos($sqlStringtoRun,'{olddbname}') !== false))
+				{
+					$sqlStringtoRun = str_replace("{olddbname}",$db->olddb,$sqlStringtoRun);
+					$db->query('SET NAMES utf8');
+					$db->query('SET FOREIGN_KEY_CHECKS=0');
+					$db->query($sqlStringtoRun);
+					if ($sqlline<28) $tag = "Creating tables";
+					if ($sqlline>=28 && $sqlline<=75) $tag = "Processing images table";
+
+				}
+
 			}
 
 			//Build our main.php in config so we can run the system
@@ -1263,7 +1284,8 @@ function runInstall($db,$sqlline = 0)
 			{
 				makeHtaccess();
 				installMainConfig();
-				$tag = "Downloading default template (this is the halfway mark, isn't this exciting?!)...";
+				if(!isset($arg['hosted']))
+					$tag = "Downloading default template...";
 			}
 
 	}
@@ -1282,13 +1304,6 @@ function installMainConfig()
 	$fp2 = fopen("config/main.php","w");
 	fwrite($fp2,$configtext);
 	fclose($fp2);
-
-	//shell which will be updated later
-	$configtext = file_get_contents("core/protected/config/_wsfacebook.php");
-	$fp2 = fopen("config/wsfacebook.php","w");
-	fwrite($fp2,$configtext);
-	fclose($fp2);
-
 
 }
 
@@ -2894,7 +2909,7 @@ function migrateTwoFiveToThree()
 	update xlsws_configuration set `key_value`='description_short' where `key_name`='PRODUCT_SORT_FIELD' AND `key_value`='DescriptionShort';
 	update xlsws_configuration set `key_value`='' where `key_name`='LSKEY';
 	update xlsws_configuration set `options`='PASSWORD' where `key_name`='EMAIL_SMTP_PASSWORD';
-	update xlsws_configuration set `key_value`='brookyn' where `key_name`='DEFAULT_TEMPLATE';
+	update xlsws_configuration set `key_value`='brooklyn' where `key_name`='DEFAULT_TEMPLATE';
 	update xlsws_configuration set `title`='Non-inventoried Item Display Message' where `key_name`='INVENTORY_NON_TITLE';
 
 	INSERT IGNORE INTO `xlsws_configuration` (`title`, `key_name`, `key_value`, `helper_text`, `configuration_type_id`, `sort_order`, `modified`, `created`, `options`, `template_specific`, `param`) VALUES ('Photo Processor', 'CEventPhoto', 'wsphoto', 'Component that handles photos', '28', '1', CURRENT_TIMESTAMP, NULL, 'CEventPhoto', '0', '1');
@@ -4129,7 +4144,6 @@ function up250($db,$sqlline)
 					helper_text='If your store uses SROs for repairs and uploads them to Web Store, turn this option on to allow customers to view pending repairs.'
 					where `key`='ENABLE_SRO'");
 
-
 		$db->query("UPDATE `xlsws_configuration` SET `value`='250' where `key`='DATABASE_SCHEMA_VERSION'");
 
 	}
@@ -4154,6 +4168,18 @@ function up252($db)
 
 }
 
+function prep252($db)
+{
+
+	$db->query("UPDATE xlsws_cart set fk_tax_code_id=NULL where fk_tax_code_id='-1'");
+	$db->query("UPDATE xlsws_customer set id_customer=NULL where id_customer=''");
+	$db->query("ALTER TABLE xlsws_promo_code change valid_from valid_from TINYTEXT default NULL");
+	$db->query("ALTER TABLE xlsws_promo_code change valid_until valid_until TINYTEXT default NULL");
+	$db->query("UPDATE xlsws_promo_code set valid_from=NULL where valid_from=''");
+	$db->query("UPDATE xlsws_promo_code set valid_until=NULL where valid_until=''");
+
+}
+
 function afterMigrationCleanup($db)
 {
 	$db->query("DELETE from xlsws_configuration WHERE `key`='ADMIN_EMAIL'");
@@ -4169,10 +4195,6 @@ function afterMigrationCleanup($db)
 
 function parse_php_info()
 {
-	if ($_SERVER['REQUEST_URI'] == "/install.php?phpinfo") {
-		echo phpinfo();
-		die();
-	}
 	ob_start();
 	phpinfo();
 	$phpinfotemp = array('phpinfotemp' => array());
@@ -4249,6 +4271,8 @@ function xls_check_server_environment()
 //	$phpinfo['session']['session.use_only_cookies'] == "Off" ? "pass" : "fail");
 	$checked['PDO Library'] = isset($phpinfo['PDO']) ? "pass" : "fail";
 	$checked['pdo_mysql Library'] = isset($phpinfo['pdo_mysql']) ? "pass" : "fail";
+	$checked['pdo_sqlite Library'] = isset($phpinfo['pdo_sqlite']) ? "pass" : "fail";
+	$checked['Php_xml library'] = isset($phpinfo['xml']) ? "pass" : "fail";
 	$checked['Zip Library'] = isset($phpinfo['zip']) ? "pass" : "fail";
 	$checked['Soap Library'] = ($phpinfo['soap']['Soap Client'] == "enabled" ? "pass" : "fail");
 	$checked['OpenSSL'] = ($phpinfo['openssl']['OpenSSL support'] == "enabled" ? "pass" : "fail");
@@ -4386,3 +4410,4 @@ function modifyArgs($arg)
 	}
 	return $arg;
 }
+// @codingStandardsIgnoreBegin

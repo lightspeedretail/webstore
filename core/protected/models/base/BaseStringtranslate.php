@@ -35,7 +35,7 @@ abstract class BaseStringtranslate extends CActiveRecord
 			array('id', 'required'),
 			array('id', 'numerical', 'integerOnly'=>true),
 			array('language', 'length', 'max'=>16),
-			array('translation', 'safe'),
+			array('translation', 'length', 'max'=>1024),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, language, translation', 'safe', 'on'=>'search'),

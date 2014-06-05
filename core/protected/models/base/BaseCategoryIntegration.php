@@ -33,8 +33,9 @@ abstract class BaseCategoryIntegration extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
+			array('category_id', 'required'),
+			array('category_id, foreign_id', 'length', 'max'=>11),
 			array('module', 'length', 'max'=>30),
-			array('foreign_id', 'length', 'max'=>11),
 			array('extra', 'length', 'max'=>255),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
