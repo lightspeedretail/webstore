@@ -256,12 +256,20 @@ class WishlistController extends Controller
 
 					if ($objProduct->IsMaster)
 					{
-						if (!empty($strSize) && !empty($strColor)) //We passed a size color selection, so get the right item
+						if (isset($strSize) || isset($strColor)) //We passed a size and or color selection, so get the right item
 						{
-							$objProduct = Product::model()->findByAttributes(
-								array('parent'=>$intProductId,'product_size'=>$strSize,'product_color'=>$strColor));
+							$objProduct = Product::LoadChildProduct($intProductId, $strSize, $strColor);
+
+							if (!$objProduct instanceof Product)
+							{
+								echo Yii::t('wishlist',"Please choose options before selecting {button}",
+									array('{button}'=>Yii::t('product', 'Add to Wish List')));
+								return;
+							}
+
 							$model->id = $intProductId = $objProduct->id;
 						}
+
 						else
 						{
 							echo Yii::t('wishlist',"Please choose options before selecting {button}",
@@ -270,7 +278,6 @@ class WishlistController extends Controller
 						}
 
 					}
-
 
 					//If we don't have a wish list, create one and add. If we only have one wish list, add it. If we have more than
 					//one, we need to prompt for which one to add

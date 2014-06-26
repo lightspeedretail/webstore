@@ -97,7 +97,7 @@ class SearchController extends Controller
 				$this->pageDescription=$objCategory->PageDescription;
 				$this->pageImageUrl = $objCategory->CategoryImage;
 				$this->breadcrumbs = $objCategory->Breadcrumbs;
-				$this->pageHeader = Yii::t('categories', $objCategory->label);
+				$this->pageHeader = Yii::t('category', $objCategory->label);
 
 				$this->subcategories = $objCategory->getSubcategoryTree($this->MenuTree);
 
@@ -396,7 +396,7 @@ class SearchController extends Controller
 		if(isset($formModel['cat'])  && $formModel['cat']>0)
 		{
 			$objCategory = Category::model()->findbyPk($formModel['cat']);
-			$this->strBreadcrumbCat = Yii::t('categories',$objCategory->label);
+			$this->strBreadcrumbCat = Yii::t('category',$objCategory->label);
 			$intIdArray = array($objCategory->id);
 			$intIdArray = array_merge($intIdArray, $objCategory->GetBranchPath());
 			unset($arrBind[':cat']);

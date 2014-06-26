@@ -8,12 +8,13 @@
 	<?php if ($model->IsMine): ?>
 		<?= CHtml::tag('div',array(
 			'class'=>'span2 sharelist',
-			'onClick'=>'js:window.location.href="'.Yii::app()->createUrl('/wishlist').'"'),
+			'onclick'=>'window.location.href=\''.Yii::app()->createUrl('wishlist').'\''
+		),
 			CHtml::link(Yii::t('global','View All Lists'), '#'));
 		?>
 		<?= CHtml::tag('div',array(
 			'class'=>'span2 sharelist',
-			'onClick'=>'js:window.location.href="'.Yii::app()->createUrl('wishlist/edit',array('code'=>$model->gift_code)).'"'),
+			'onclick'=>'window.location.href=\''.Yii::app()->createUrl('wishlist/edit',array('code'=>$model->gift_code)).'\''),
 			CHtml::link(Yii::t('global','Settings'), '#'));
 		?>
 		<?= CHtml::tag('div',array(

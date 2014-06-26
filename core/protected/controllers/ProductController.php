@@ -132,36 +132,36 @@ class ProductController extends Controller
 	 */
 	public function actionGetmatrixproduct()
 	{
-		if(Yii::app()->request->isAjaxRequest) {
+		if (Yii::app()->request->isAjaxRequest)
+		{
 
 			$id = Yii::app()->getRequest()->getParam('id');
-			$strSize= Yii::app()->getRequest()->getParam('product_size');
-			$strColor= Yii::app()->getRequest()->getParam('product_color');
+			$strSize = Yii::app()->getRequest()->getParam('product_size');
+			$strColor = Yii::app()->getRequest()->getParam('product_color');
 
-			$objProduct = Product::model()->findByAttributes(array('parent'=>$id,'product_size'=>$strSize,'product_color'=>$strColor));
+			$objProduct = Product::LoadChildProduct($id, $strSize, $strColor);
 
-
-			$arrReturn['status']='success';
-			$arrReturn['id']=$objProduct->id;
-			$arrReturn['FormattedPrice']=$objProduct->Price;
-			$arrReturn['FormattedRegularPrice']=$objProduct->SlashedPrice;
-			$arrReturn['image_id']=CHtml::image(Images::GetLink($objProduct->image_id,ImagesType::pdetail));
-			$arrReturn['code']=$objProduct->code;
-			$arrReturn['title']=$objProduct->Title;
-			$arrReturn['InventoryDisplay']=$objProduct->InventoryDisplay;
+			$arrReturn['status'] = 'success';
+			$arrReturn['id'] = $objProduct->id;
+			$arrReturn['FormattedPrice'] = $objProduct->Price;
+			$arrReturn['FormattedRegularPrice'] = $objProduct->SlashedPrice;
+			$arrReturn['image_id'] = CHtml::image(Images::GetLink($objProduct->image_id, ImagesType::pdetail));
+			$arrReturn['code'] = $objProduct->code;
+			$arrReturn['title'] = $objProduct->Title;
+			$arrReturn['InventoryDisplay'] = $objProduct->InventoryDisplay;
 
 			if ($objProduct->WebLongDescription)
-				$arrReturn['description_long']=$objProduct->WebLongDescription;
-				else
-					$arrReturn['description_long']=$objProduct->parent0->WebLongDescription;
+				$arrReturn['description_long'] = $objProduct->WebLongDescription;
+			else
+				$arrReturn['description_long'] = $objProduct->parent0->WebLongDescription;
 
 			if ($objProduct->description_short)
-				$arrReturn['description_short']=$objProduct->WebShortDescription;
-				else
-					$arrReturn['description_short']=$objProduct->parent0->WebShortDescription;
+				$arrReturn['description_short'] = $objProduct->WebShortDescription;
+			else
+				$arrReturn['description_short'] = $objProduct->parent0->WebShortDescription;
 
 			Yii::app()->clientscript->scriptMap['jquery.js'] = false;
-			$arrReturn['photos'] = $this->renderPartial('/product/_photos', array('model'=>$objProduct), true,false);
+			$arrReturn['photos'] = $this->renderPartial('/product/_photos', array('model' => $objProduct), true, false);
 
 			echo json_encode($arrReturn);
 		}

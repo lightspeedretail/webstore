@@ -39,12 +39,12 @@
 
 					CHtml::tag('div',array(
 				    'class'=>'product_cell_graphic',
-				    'onClick'=>'js:window.location.href="'.$objProduct->Link.'"'),
+				    'onclick'=>'window.location.href=\''.$objProduct->Link.'\''),
 			        CHtml::link(CHtml::image($objProduct->ListingImage,$objProduct->Title), $objProduct->Link)).
 
 					CHtml::tag('div',array(
 					    'class'=>'product_cell_label',
-					    'onClick'=>'js:window.location.href="'.$objProduct->Link.'"'
+					    'onclick'=>'window.location.href=\''.$objProduct->Link.'\''
 				        ),
 				        CHtml::link(_xls_truncate($objProduct->Title , 50), $objProduct->Link).
 					        CHtml::tag('span',array('class'=>'product_cell_price_slash'),$objProduct->SlashedPrice).

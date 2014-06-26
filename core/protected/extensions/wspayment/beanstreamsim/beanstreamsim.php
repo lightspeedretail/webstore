@@ -2,10 +2,11 @@
 
 class beanstreamsim extends WsPayment
 {
+	const SHA1_HASH_STRING_LENGTH = 40;
+	const HASH_VALUE_SEARCH_STRING = "&hashValue=";
 
 	protected $defaultName = "Beanstream (US/CAN)";
 	protected $version = 1.0;
-	protected $uses_jumper = true;
 	protected $apiVersion = 1;
 	public $cloudCompatible = true;
 
@@ -16,9 +17,9 @@ class beanstreamsim extends WsPayment
 	public function run()
 	{
 
-		$beanstream_url	= "https://www.beanstream.com/scripts/payment/payment.asp";
+		$strBeanstreamUrl	= "https://www.beanstream.com/scripts/payment/payment.asp";
 
-		$beanstream_values = array (
+		$arrBeanStreamValues = array (
 			"merchant_id"		=> $this->config['login'],
 			"trnOrderNumber"	=> $this->objCart->id_str,
 			"trnAmount"			=> $this->objCart->total,
@@ -31,25 +32,24 @@ class beanstreamsim extends WsPayment
 			"ordProvince"		=> $this->CheckoutForm->billingState,
 			"ordCountry"		=> $this->CheckoutForm->billingCountry,
 			"ordPostalCode"		=> $this->CheckoutForm->billingPostal,
-			"hashValue"			=> $this->config['md5hash'],
 			"approvedPage"		=> Yii::app()->controller->createAbsoluteUrl('/cart/payment/'.$this->modulename),
-			"declinedPage"		=> Yii::app()->controller->createAbsoluteUrl('/cart/payment/'.$this->modulename)
+			"declinedPage"		=> Yii::app()->controller->createAbsoluteUrl('/cart/payment/'.$this->modulename),
 		);
 
-		$str = "";
+		$strQueryParams = http_build_query($arrBeanStreamValues);
 
-		$str .= "<FORM name=\"beanstream_form\" action=\"$beanstream_url\" method=\"POST\">";
-		foreach( $beanstream_values as $key => $value )
-			$str .= _xls_make_hidden($key, $value);
+		if ($this->config['sha1hash'])
+		{
+			$strHashValue = sha1($strQueryParams . $this->config['sha1hash']);
+			$strQueryParams .= '&' . 'hashValue=' . $strHashValue;
+		}
 
-		$str .=  ('</FORM>');
-
-
-		if(_xls_get_conf('DEBUG_PAYMENTS' , false)=="1")
-			_xls_log(get_class($this) . " sending ".$this->objCart->id_str." ".$str,true);
+		Yii::log("Attempting payment on cart " . $this->objCart->id_str, 'info', 'application.' . __CLASS__ . "." . __FUNCTION__);
+		$strJumpUrl =  $strBeanstreamUrl . '?' . $strQueryParams;
 
 		$arrReturn['api'] = $this->apiVersion;
-		$arrReturn['jump_form']=$str;
+		$arrReturn['jump_url'] = $strJumpUrl;
+
 		return $arrReturn;
 	}
 
@@ -61,43 +61,86 @@ class beanstreamsim extends WsPayment
 	 */
 	public function gateway_response_process()
 	{
-
-		$trnApproved = Yii::app()->getRequest()->getQuery('trnApproved');
 		$trnOrderNumber = Yii::app()->getRequest()->getQuery('trnOrderNumber');
+		$trnApproved = Yii::app()->getRequest()->getQuery('trnApproved');
 		$trnAmount = Yii::app()->getRequest()->getQuery('trnAmount');
 		$authCode = Yii::app()->getRequest()->getQuery('authCode');
 		$messageText = Yii::app()->getRequest()->getQuery('messageText');
 
-
-		if ($trnApproved == '1')
+		if ($this->config['sha1hash'])
 		{
-			$retArray =  array(
-				'order_id' => $trnOrderNumber,
-				'amount' => $trnAmount,
-				'success' => true,
-				'data' => $authCode,
-			);
+			if (!Yii::app()->getRequest()->getQuery('hashValue'))
+				return self::generateErrorResponse($trnOrderNumber, "Not able to validate the transaction");
 
+			$strRequestUri = Yii::app()->getRequest()->getRequestUri();
+			$strQueryString = Yii::app()->getRequest()->queryString;
+			$strHashValueParam = substr($strQueryString, strpos($strQueryString, self::HASH_VALUE_SEARCH_STRING) + strlen(self::HASH_VALUE_SEARCH_STRING));
+
+			if (strlen($strHashValueParam) > self::SHA1_HASH_STRING_LENGTH)
+			{
+				//SHA-1 hash value should be always 40 characters long.
+				//If there are anything else after the hashValue parameter,
+				//assume that the query string has been tempered with.
+				Yii::log("Invalid Beanstream response: " . $strRequestUri);
+				return self::generateErrorResponse($trnOrderNumber, "Not able to validate the transaction");
+			}
+
+			$strToHash = substr($strQueryString, 0, strpos($strQueryString, '&hashValue')) . $this->config['sha1hash'];
+			$strHashedRequestParams = sha1($strToHash);
+
+			if ($strHashedRequestParams !== Yii::app()->getRequest()->getQuery('hashValue'))
+			{
+				$arrReturn = self::generateErrorResponse($trnOrderNumber, "Payment transaction validation failed");
+				Yii::log("Declined: " . "Beanstream response hashValue validation failed.", 'error', 'application.' . __CLASS__ . "." . __FUNCTION__);
+			}
+			else
+			{
+				if ($trnApproved == '1')
+					$arrReturn =  self::generateSuccessResponse($trnOrderNumber, $trnAmount, $authCode);
+				else
+				{
+					$arrReturn = self::generateErrorResponse($trnOrderNumber, $messageText);
+					Yii::log("Declined: ".$messageText, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				}
+			}
 		}
 		else
 		{
-			$objCart = Cart::LoadByIdStr($trnOrderNumber);
+			if ($trnApproved == '1')
+				$arrReturn =  self::generateSuccessResponse($trnOrderNumber, $trnAmount, $authCode);
+			else
+			{
+				$arrReturn = self::generateErrorResponse($trnOrderNumber, $messageText);
+				Yii::log("Declined: ".$messageText, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			}
 
-			$url = Yii::app()->controller->createAbsoluteUrl('cart/restoredeclined', array('getuid'=>$objCart->linkid,'reason'=>$messageText));
-
-			$retArray =  array(
-				'order_id' => $trnOrderNumber,
-				'output' => "<html><head><meta http-equiv=\"refresh\" content=\"1;url=$url\"></head><body><a href=\"$url\">Verifying order, please wait...</a></body></html>",
-				'success' => false,
-			);
-
-			Yii::log("Declined: ".$messageText, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		}
 
-		return $retArray;
+		return $arrReturn;
 	}
 
+	private static function generateSuccessResponse($trnOrderNumber, $trnAmount, $authCode)
+	{
+		return array(
+			'order_id' => $trnOrderNumber,
+			'amount' => $trnAmount,
+			'success' => true,
+			'data' => $authCode,
+		);
+	}
 
+	private static function generateErrorResponse($trnOrderNumber, $messageText)
+	{
+		$objCart = Cart::LoadByIdStr($trnOrderNumber);
 
+		$url = Yii::app()->controller->createAbsoluteUrl('cart/restoredeclined', array('getuid'=>$objCart->linkid,'reason'=>$messageText));
 
+		$arrReturn =  array(
+			'order_id' => $trnOrderNumber,
+			'output' => "<html><head><meta http-equiv=\"refresh\" content=\"1;url=$url\"></head><body><a href=\"$url\">Verifying order, please wait...</a></body></html>",
+			'success' => false,
+		);
+
+		return $arrReturn;
+	}
 }

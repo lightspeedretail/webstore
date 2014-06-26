@@ -58,5 +58,6 @@
 	            </div>
 
 	    </tbody>
+	</table>
   </body>
 </html>

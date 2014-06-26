@@ -5,12 +5,15 @@
         </div>
 	    <?= CHtml::tag('div',array(
 			    'class'=>'span4 wishlistnew lightbutton spaceafter',
-			    'onClick'=>'js:window.location.href="'.Yii::app()->createUrl('wishlist/search').'"'),
+			    'onclick'=>'window.location.href=\''.Yii::app()->createUrl('wishlist/search').'\''
+		    ),
+
 		    CHtml::link(Yii::t('global','Wish List Search'), '#'));
 	    ?>
 	    <?= CHtml::tag('div',array(
 		    'class'=>'span4 wishlistnew darkbutton spaceafter',
-		    'onClick'=>'js:window.location.href="'.Yii::app()->createUrl('wishlist/create').'"'),
+			'onclick'=>'window.location.href=\''.Yii::app()->createUrl('wishlist/create').'\''
+		    ),
 	        CHtml::link(Yii::t('global','New Wish List'), '#'));
         ?>
 

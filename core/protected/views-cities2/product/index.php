@@ -59,8 +59,10 @@
 
 
 	            <?php if ($model->IsMaster): ?>
-	                    <?= $this->renderPartial('/product/_matrixdropdown', array('form'=>$form,'model'=>$model), true); ?>
-	           
+		            <?php $this->widget('ext.wsmenu.wsmatrixselector', array(
+				            'form'=> $form,
+				            'model'=> $model
+			            )); //matrix chooser ?>
 	            <?php endif; ?>
 
 	            <?php if (!_xls_get_conf('DISABLE_CART', false)): ?>

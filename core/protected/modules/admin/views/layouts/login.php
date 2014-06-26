@@ -3,13 +3,12 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title><?php echo $this->pageTitle; ?></title>
-	<link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css">
 	<?php $this->registerAsset('css/admin.css'); ?>
 	<style type="text/css">
 		.container { width: 338px; }
 
 		.header {
-			background: url("http://www.lightspeedretail.com/wp-content/themes/lightspeed/images/ecommerce/tab-1.png");
+			background: url("//www.lightspeedretail.com/wp-content/themes/lightspeed/images/ecommerce/tab-1.png");
 			width: 338px;
 			height: 50px;
 		}
@@ -47,8 +46,7 @@
 		#admin-login:focus {background-color: #000099;}
 
 	</style>
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-	<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 
 </head>
 

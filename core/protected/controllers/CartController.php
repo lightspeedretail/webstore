@@ -1623,9 +1623,11 @@ class CartController extends Controller
 			$strSize = Yii::app()->getRequest()->getParam('product_size');
 			$strColor = Yii::app()->getRequest()->getParam('product_color');
 
-			if (isset($strSize) && isset($strColor)) //We passed a size color selection, so get the right item
+
+			if (isset($strSize) || isset($strColor)) //We passed a size and or color selection, so get the right item
 			{
-				$objProduct = Product::model()->findByAttributes(array('parent'=>$intProductId,'product_size'=>$strSize,'product_color'=>$strColor));
+				$objProduct = Product::LoadChildProduct($intProductId, $strSize, $strColor);
+
 				if ($objProduct instanceof Product)
 					$intProductId = $objProduct->id;
 			}

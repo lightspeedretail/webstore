@@ -61,7 +61,7 @@
 				    'options'=>array(
 					    'onblur' => 'submit',
 					    'showbuttons' => false,
-					    'display' => 'js: function(value, sourceData) {
+					    'display' => 'js:function(value, sourceData) {
 							 if(value=="1") label = "✓"; else label = "off";
 						     var escapedValue = $("<div>").text(label).html();
 						     $(this).html(escapedValue);

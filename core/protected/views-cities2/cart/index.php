@@ -69,7 +69,8 @@ $form = $this->beginWidget('CActiveForm', array(
 	<?= CHtml::tag('div',array(
 		'id'=>'shoppingcartcontinue',
 		'class'=>'col-sm-4 checkoutlink',
-		'onClick'=>'js:window.location.href="'. $this->CreateUrl("cart/checkout").'"'),
+		'onclick'=>'window.location.href=\''. $this->CreateUrl("cart/checkout").'\''
+		),
 	Yii::t('cart','Checkout'));
 	?>
 	</div>

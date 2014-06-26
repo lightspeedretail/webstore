@@ -59,7 +59,6 @@ class Category extends BaseCategory
 
 	public static function GetTree()
 	{
-
 		$blnCache = false;
 		$arrFormattedParseTree = false;
 
@@ -71,16 +70,18 @@ class Category extends BaseCategory
 
 		if ($arrFormattedParseTree === false)
 		{
-			$dependency = new CDbCacheDependency('SELECT MAX(modified) FROM xlsws_category');
 			$criteria = new CDbCriteria();
 			$criteria->alias = 'Category';
 			$criteria->order = 'menu_position';
 			$criteria->index = 'id';
 
-			$arrCategories = Category::model()->cache(1000, $dependency)->findAll($criteria);
+			$arrCategories = Category::model()->findAll($criteria);
 			$arrCategoriesChildren = self::_getCategoriesChildren($arrCategories);
-			$arrParsedTree = Category::parseTree($arrCategories, $arrCategoriesChildren);
-			$arrFormattedParseTree = Category::getDataFormatted($arrParsedTree);
+			$arrFormattedParseTree = Category::parseTree(
+				$arrCategories,
+				$arrCategoriesChildren,
+				array('Category', 'formatForCMenuAndCTreeView')
+			);
 
 			if ($blnCache)
 			{
@@ -126,18 +127,46 @@ class Category extends BaseCategory
 			if (isset($arrCategories[$category->id]) === false)
 				$arrCategories[$category->id] = array();
 
-			if ($category->parent !== null)
+			$categoryParent = $category->parent;
+			if ($categoryParent !== null)
 			{
-				if (isset($arrCategoriesChildren[$category->parent]) === false)
-					$arrCategoriesChildren[$category->parent] = array();
+				if (isset($arrCategoriesChildren[$categoryParent]) === false)
+					$arrCategoriesChildren[$categoryParent] = array();
 
-				array_push($arrCategoriesChildren[$category->parent], $category->id);
+				array_push($arrCategoriesChildren[$categoryParent], $category->id);
 			} else {
 				array_push($arrCategoriesChildren['null'], $category->id);
 			}
 		}
 
 		return $arrCategoriesChildren;
+	}
+
+	/**
+	 * Callback for parseTree function which maps a category to the array
+	 * required for CMenu and CTreeView.
+	 * @param object $category A category model object.
+	 * @param array $children An array of category model objects.
+	 * @return array with 2 elements, [0] the index required for the CMenu array,
+	 * [1] the value required for the CMenu or CTreeView array.
+	 */
+	protected static function formatForCMenuAndCTreeView($category, $children) {
+		$categoryLink = $category->Link;
+		$categoryLabel = Yii::t('category', $category->label);
+
+		return array(
+			0 => $category['request_url'],
+			1 => array(
+				'id' => $category->id, // Required for CTreeView.
+				'label' => $categoryLabel, // Required for CMenu.
+				'text' => CHtml::link($categoryLabel, $categoryLink), // Required for CTreeView.
+				'url' => $categoryLink, // Required for CMenu.
+				'link' => $categoryLink, // Required for CMenu.
+				'items' => $children, // Required for CMenu.
+				'children' => $children, // Required for CTreeView.
+				'hasChildren' => (count($children) > 0), // Required for CTreeView.
+			)
+		);
 	}
 
 	/**
@@ -149,10 +178,13 @@ class Category extends BaseCategory
 	 * contains the children categories for each category.
 	 * @param integer parentCategoryId the ID of the parent category to start
 	 * the recursive search from.
-	 * @return array an list of arrays, where each array contains category
-	 * details sufficient to construct the products menu.
+	 * @param function fnCategoryMap A map function to apply to each category.
+	 * The function must take 2 arguments: $category, $categoryChildren and
+	 * return an array with 2 values: [0] the mapped index [1] the mapped
+	 * value.
+	 * @return Array of categories that have been mapped through $fnCategoryMap.
 	 */
-	public static function parseTree($arrCategories, $arrCategoriesChildren, $iParentCategoryId = null)
+	public static function parseTree($arrCategories, $arrCategoriesChildren, $fnCategoryMap, $iParentCategoryId = null)
 	{
 		$arrReturn = array();
 
@@ -167,33 +199,22 @@ class Category extends BaseCategory
 		// Add each child category, if appropriate.
 		foreach($arrCategoryChildren as $categoryId)
 		{
+			// Must be set because of FK constraint on xlsws_category.parent.
 			$category = $arrCategories[$categoryId];
 
-			// Remove this category from the tree, it doesn't need to be travered again.
-			unset($arrCategories[$categoryId]);
-
 			// Get the children by recursing, using this category as the parent.
-			$children = self::parseTree($arrCategories, $arrCategoriesChildren, $category->id);
+			$children = self::parseTree($arrCategories, $arrCategoriesChildren, $fnCategoryMap, $category->id);
 
 			if (Yii::app()->params['DISPLAY_EMPTY_CATEGORY'] ||
-				is_array($children) ||
+				count($children) ||
 				$category->hasVisibleProducts)
 			{
-				$arrReturn[] = array(
-					'text' => CHtml::link(Yii::t('categories',$category->label), $category->Link),
-					'label' => Yii::t('categories', $category->label),
-					'link' => $category->Link,
-					'request_url' => $category->request_url,
-					'url' => $category->Link,
-					'id' => $category->id,
-					'child_count' => $category->child_count,
-					'children' => $children,
-					'items' => $children
-				);
+				$fnApplied = call_user_func_array($fnCategoryMap, array($category, $children));
+				$arrReturn[$fnApplied[0]] = $fnApplied[1];
 			}
 		}
 
-		return empty($arrReturn) ? null : $arrReturn;
+		return $arrReturn;
 	}
 
 	public function getSubcategoryTree($arrMenuTree = null)
@@ -215,36 +236,7 @@ class Category extends BaseCategory
 
 	}
 
-
-	protected static function formatData($person) {
-		return array(
-			'text'=>$person['text'],
-			'label'=>$person['label'],
-			'link'=>$person['link'],
-			'request_url'=>$person['request_url'],
-			'url'=>$person['link'],
-			'id'=>$person['id'],
-			'child_count'=>$person['child_count'],
-			'hasChildren'=>isset($person['children']));
-	}
-
-	protected static function getDataFormatted($data) {
-		$personFormatted = array();
-		if (is_array($data))
-			foreach($data as $k=>$person) {
-				$str = $person['request_url'];
-				$personFormatted[$str] = Category::formatData($person);
-				$parents = null;
-				if (isset($person['children'])) {
-					$parents = Category::getDataFormatted($person['children']);
-					$personFormatted[$str]['children'] = $parents;
-					$personFormatted[$str]['items'] = $parents;
-				}
-			}
-		return $personFormatted;
-	}
-
-		/**
+	/**
 	 * Convenience methods accessed as properties
 	 */
 	//Todo: This needs to be a lot less hard-coded
@@ -318,8 +310,6 @@ class Category extends BaseCategory
 		if ($this->child_count == 0)
 			return false;
 
-		$productInventoryField = Product::GetInventoryField();
-
 		// Query products in this category.
 		$query = Yii::app()->db->createCommand()
 			->select()
@@ -332,9 +322,12 @@ class Category extends BaseCategory
 			)
 			->limit(1);
 
+
+
 		// If this config item is set, then we take into account the product inventory level.
 		if (Yii::app()->params['INVENTORY_OUT_ALLOW_ADD'] == Product::InventoryMakeDisappear)
 		{
+			$productInventoryField = Product::GetInventoryField();
 			$query->andWhere(array('OR', 'inventoried != 1', $productInventoryField . ' > 0'));
 		}
 
@@ -387,7 +380,7 @@ class Category extends BaseCategory
 	}
 
 	protected function GetSlug() {
-		return urlencode(str_replace('/', '_', Yii::t('categories', $this->label)));
+		return urlencode(str_replace('/', '_', Yii::t('category', $this->label)));
 	}
 
 	protected function HasImage() {
@@ -429,9 +422,9 @@ class Category extends BaseCategory
 				if ($objGrandParent->meta_description)
 					return $objGrandParent->meta_description;
 			}
-			return Yii::t('categories',$this->label);
+			return Yii::t('category',$this->label);
 		}
-		else return Yii::t('categories',$this->label);
+		else return Yii::t('category',$this->label);
 
 	}
 
@@ -494,11 +487,11 @@ class Category extends BaseCategory
 						array_push(
 							$arrPath,
 							$strType=='names' ?
-							Yii::t('categories', $objCategory->label) :
+							Yii::t('category', $objCategory->label) :
 							array(
 								'key' => $objCategory->id,
 								'tag' => 'c',
-								'name' => Yii::t('categories', $objCategory->label),
+								'name' => Yii::t('category', $objCategory->label),
 								'url' => $objCategory->Link,
 								'link' => $objCategory->Link)
 						);
@@ -511,11 +504,11 @@ class Category extends BaseCategory
 				array_push(
 					$arrPath,
 					$strType=='names' ?
-					Yii::t('categories', $objCategory->label) :
+					Yii::t('category', $objCategory->label) :
 					array(
 						'key' => $objCategory->id,
 						'tag' => 'c',
-						'name' => Yii::t('categories', $objCategory->label),
+						'name' => Yii::t('category', $objCategory->label),
 						'url' => $objCategory->Link,
 						'link' => $objCategory->Link)
 				);
@@ -544,13 +537,13 @@ class Category extends BaseCategory
 		if(!is_null($objCategory->parent))
 			do {
 				if ($objCategory instanceof Category)
-					$arrPath[Yii::t('categories', $objCategory->label)] = $objCategory->Link;
+					$arrPath[Yii::t('category', $objCategory->label)] = $objCategory->Link;
 				$objCategory = $objCategory->parent0;
 
 			} while (!is_null($objCategory->parent));
 
 		if ($objCategory instanceof Category)
-			$arrPath[Yii::t('categories', $objCategory->label)] = $objCategory->Link;
+			$arrPath[Yii::t('category', $objCategory->label)] = $objCategory->Link;
 
 		$arrPath = array_reverse($arrPath);
 		return $arrPath;
@@ -582,7 +575,7 @@ class Category extends BaseCategory
 	public static function getTopLevelSearch()
 	{
 		$translateCategory = function ($category) {
-			return Yii::t('categories', $category);
+			return Yii::t('category', $category);
 		};
 
 		return array_map(
@@ -701,7 +694,7 @@ class Category extends BaseCategory
 		$strItem = Yii::t('global',_xls_get_conf($strConf, '{storename}'),
 			array(
 				'{storename}'=>_xls_get_conf('STORE_NAME',''),
-				'{name}'=>Yii::t('categories', $this->label),
+				'{name}'=>Yii::t('category', $this->label),
 				'{crumbtrail}'=>$strCrumbNames,
 				'{rcrumbtrail}'=>$strCrumbNamesR,
 

@@ -222,12 +222,13 @@ class Controller extends CController
 		$this->pageTitle = Yii::app()->name." : ".Yii::app()->params['STORE_TAGLINE'];
 		$this->pageCanonicalUrl = $this->getCanonicalUrl();
 		$this->pageDescription = Yii::app()->params['STORE_TAGLINE'];
-		$this->pageImageUrl ='';
+		$this->pageImageUrl = '';
 
 		$pageHeaderImage = Yii::app()->params['HEADER_IMAGE'];
 		if (substr($pageHeaderImage,0,2) != "//" && substr($pageHeaderImage,0,4) != "http")
 		{
-			$this->pageAbsoluteHeaderImage = substr(Yii::app()->createAbsoluteUrl($pageHeaderImage, array(), 'http'), 5);
+
+			$this->pageAbsoluteHeaderImage = Yii::app()->createAbsoluteUrl($pageHeaderImage, array(), Yii::app()->params['ENABLE_SSL'] ? 'https' : 'http');
 			$this->pageHeaderImage = $pageHeaderImage;
 		}
 		else

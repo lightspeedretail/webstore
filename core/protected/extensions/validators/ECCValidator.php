@@ -150,8 +150,6 @@ class ECCValidator extends CValidator{
 	 */
 	public function validateCVV($creditCardCVV){
 
-		if (is_scalar($creditCardCVV)) $creditCardCVV = intval($creditCardCVV);
-
 		// grab the value out of the array
 		if(is_array($this->format))
 			$this->format = array_shift($this->format);
@@ -159,8 +157,12 @@ class ECCValidator extends CValidator{
 		if (!array_key_exists($this->format, $this->cvvpatterns))
 			$this->format = self::ALL;
 
-		return preg_match($this->cvvpatterns[$this->format],$creditCardCVV);
+		if (preg_match($this->cvvpatterns[$this->format], $creditCardCVV))
+		{
+			return true;
+		}
 
+		return false;
 	}
 
 	/**

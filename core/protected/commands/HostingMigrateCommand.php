@@ -112,7 +112,7 @@ class HostingMigrateCommand extends MigrateCommand
 
 			case 'S':
 				$intVer = Yii::app()->dbmt->createCommand("SELECT key_value FROM xlsws_configuration WHERE `key_name` = 'DATABASE_SCHEMA_VERSION'")->queryScalar();
-				if(!empty($intVer) && (int)$intVer < 448)
+				if(!empty($intVer) && (int)$intVer < 447)
 					$this->applyPatch();
 				Yii::app()->dbmt->createCommand("UPDATE xlsws_configuration SET `key_value` = 1 WHERE `key_name` = 'LIGHTSPEED_HOSTING'")->execute();
 				Yii::app()->dbmt->createCommand("UPDATE xlsws_configuration SET `key_value` = 1 WHERE `key_name` = 'ENABLE_SSL'")->execute();

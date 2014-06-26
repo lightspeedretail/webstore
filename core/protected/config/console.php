@@ -1,25 +1,32 @@
 <?php
 
-$strPath = realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR);
+$docroot = $_SERVER["SCRIPT_FILENAME"];
+if ($docroot[0] != "/")
+	$docroot = getcwd() . "/" . $docroot;
+
+//Move down three levels which brings us to root folder of Web Store
+$docroot = dirname(dirname(dirname($docroot)));
+
 // check for a testrun.ini
-if (file_exists ($strPath.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'testrun.ini')){
-	$_SERVER['testini'] = parse_ini_file($strPath.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'testrun.ini');
+if (file_exists($docroot . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'testrun.ini'))
+{
+	$_SERVER['testini'] = parse_ini_file($docroot . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'testrun.ini');
 	$_SERVER['HTTP_HOST'] = $_SERVER['testini']['HTTP_HOST'];
 }
 
 // This is the configuration for yiic console application.
 // Any writable CConsoleApplication properties can be configured here.
 return array(
-	'basePath'=>$strPath.'/core'.DIRECTORY_SEPARATOR.'protected',
-	'runtimePath'=>realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'runtime'),
+	'basePath' => $docroot . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'protected',
+	'runtimePath' => $docroot . DIRECTORY_SEPARATOR . 'runtime',
 
-	'name'=>'Web Store Updater',
+	'name' => 'Web Store Updater',
 
 	// preloading 'log' component
-	'preload'=>array('log'),
+	'preload' => array('log'),
 
 	// autoloading model and component classes
-	'import'=>array(
+	'import' => array(
 		'application.models.*',
 		'application.models.base.*',
 		'application.models.forms.*',
@@ -36,17 +43,17 @@ return array(
 	),
 
 	// application components
-	'components'=>array(
+	'components' => array(
 
 		// uncomment the following to use a MySQL database
-		'db'=> require(realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config').DIRECTORY_SEPARATOR.'wsdb.php'),
+		'db' => require($docroot . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'wsdb.php'),
 
-		'log'=>array(
-			'class'=>'CLogRouter',
-			'routes'=>array(
+		'log' => array(
+			'class' => 'CLogRouter',
+			'routes' => array(
 				array(
-					'class'=>'CFileLogRoute',
-					'levels'=>'error, warning',
+					'class' => 'CFileLogRoute',
+					'levels' => 'error, warning',
 				),
 			),
 		),

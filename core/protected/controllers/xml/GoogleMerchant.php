@@ -133,5 +133,7 @@ class GoogleMerchant extends CAction
 
 		echo '</channel>'.chr(13);
 		echo '</rss>';
+
+		Yii::app()->db->createCommand("UPDATE xlsws_modules set active=1 where module='wsgooglemerchant'")->execute();
 	}
 }

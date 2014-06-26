@@ -53,9 +53,9 @@ class Cart extends BaseCart
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('cart_type', 'numerical', 'integerOnly'=>true, 'min'=>CartType::order,'max'=>CartType::order, 'on'=>'manual','tooSmall'=>'Status must be set to Paid','tooBig'=>'Status must be set to Paid'),
-
-		)+parent::rules();
+			array('cart_type', 'numerical', 'integerOnly' => true, 'min' => CartType::order, 'max' => CartType::order, 'on' => 'manual', 'tooSmall' => 'Status must be set to Paid', 'tooBig' => 'Status must be set to Paid'),
+			array('downloaded', 'safe'),
+		) + parent::rules();
 	}
 
 	/**
@@ -657,9 +657,13 @@ class Cart extends BaseCart
 		$intNoTax = 999;
 		if ($objNoTax) $intNoTax = $objNoTax->lsid;
 
-		if (Yii::app()->params['TAX_INCLUSIVE_PRICING'] == '0')
-			if ($this->tax_code_id == $intNoTax)
-				return;
+		if (Yii::app()->params['TAX_INCLUSIVE_PRICING'] == '0' &&
+			$this->tax_code_id == $intNoTax)
+		{
+			$this->shipping->shipping_sell_taxed = $this->shipping->shipping_sell;
+			$this->shipping->save();
+			return;
+		}
 
 		$objShipProduct = Product::LoadByCode('SHIPPING');
 

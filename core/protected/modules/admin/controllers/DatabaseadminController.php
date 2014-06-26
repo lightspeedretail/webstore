@@ -149,11 +149,13 @@ class DatabaseadminController extends AdminBaseController
 
 		$id = Yii::app()->getRequest()->getQuery('id');
 
-		//
 		$model = CartPayment::model()->findByPk($id);
 		$objCart = Cart::model()->findByAttributes(array('payment_id'=>$id));
 		if (isset($_POST['Cart']) && isset($_POST['CartPayment']))
 		{
+
+			$objCart->setScenario('manual');
+			$model->setScenario('manual');
 
 			$objCart->attributes = $_POST['Cart'];
 			$model->attributes = $_POST['CartPayment'];
@@ -173,10 +175,6 @@ class DatabaseadminController extends AdminBaseController
 					break;
 
 			}
-
-
-			$objCart->setScenario('manual');
-			$model->setScenario('manual');
 
 			if ($objCart->validate() && $model->validate())
 			{

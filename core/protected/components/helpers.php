@@ -1511,10 +1511,11 @@ function _xls_is_ipad() {
 function _xls_is_iphone() {
 
 	if(isset($_SERVER['HTTP_USER_AGENT']) &&
-		strpos($_SERVER['HTTP_USER_AGENT'],'iPhone') ||
-		strpos($_SERVER['HTTP_USER_AGENT'],'iPod'))
+		(strpos($_SERVER['HTTP_USER_AGENT'],'iPhone') ||
+		strpos($_SERVER['HTTP_USER_AGENT'],'iPod')))
 		return true;
-	else return false;
+
+	return false;
 }
 
 /**
@@ -1580,7 +1581,8 @@ function _xls_check_version()
 		'schema'  => _xls_get_conf('DATABASE_SCHEMA_VERSION'),
 		'cid'  => _xls_get_conf('LIGHTSPEED_CID'),
 		'phpversion'  => PHP_VERSION,
-		'themefiles' => _xls_theme_report()
+		'themefiles' => _xls_theme_report(),
+		'configuration' => _xls_configuration_report()
 
 
 	);
@@ -1597,7 +1599,7 @@ function _xls_check_version()
 
 	}
 
-	Yii::log("sending to stats ".print_r($data,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+	Yii::log("sending to stats ".print_r($data,true), 'trace', 'application.'.__CLASS__.".".__FUNCTION__);
 	$json = json_encode($data);
 
 	$ch = curl_init($url);
@@ -1617,8 +1619,35 @@ function _xls_check_version()
 
 	$resp = curl_exec($ch);
 	curl_close($ch);
+
+
+	if(Yii::app()->params['LIGHTSPEED_HOSTING'] != 1 && _xls_check_migrations())
+	{
+		$oXML = json_decode($resp);
+		if (!empty($oXML) && isset($oXML->webstore))
+			$oXML->webstore->schema = "update";
+		$resp = json_encode($oXML);
+	}
+
 	return $resp;
 }
+
+/**
+ * Check for pending migrations.
+ *
+ * @return bool
+ */
+function _xls_check_migrations()
+{
+
+	$arrFiles = glob(Yii::getPathOfAlias('application').'/migrations/*.php');
+	$arrMigrations = preg_grep('/(m(\d{6}_\d{6})_.*?)\.php$/', $arrFiles);
+	$intCount = Yii::app()->db->createCommand("select count(*) from xlsws_migrations")->queryScalar();
+
+	return ((count($arrMigrations)+1) > $intCount);
+
+}
+
 
 //In order to evaluate view layer changes impact, we need to know
 //what files have changed in a customer theme. (This is useful for
@@ -1669,6 +1698,38 @@ function array_flat($array) {
 
 	return $tmp;
 }
+
+
+function _xls_configuration_report()
+{
+	//In order to make impact decisions, report how these configuration keys are set
+	//This array will report either the value or simply if they are set (in cases of sensitive data)
+	$_arrKeysToReport = array(
+		'EMAIL_FROM' => 'value',
+		'CURRENCY_DEFAULT' => 'value',
+		'FACEBOOK_APPID' => 'boolean',
+		'GOOGLE_ADWORDS' => 'boolean',
+		'GOOGLE_ANALYTICS' => 'boolean',
+		'ENABLE_SSL' => 'value',
+		'ADMIN_PANEL' => 'value',
+		'LANGUAGES' => 'value',
+		'LANG_MENU' => 'value'
+	);
+
+	//Report active modules
+	$retVal = CHtml::listData(Modules::model()->findAllByAttributes(array('active' => 1)), 'module', 'active');
+
+	//How big are some of these tables, affects upgrade processing time when we have to add indexes, etc. Trying to avoid timeouts.
+	$retVal['CART_LIFE'] = Yii::app()->db->createCommand("SELECT count(*) as thecount FROM xlsws_cart WHERE cart_type=4 AND modified > '".date("Y-m-d", strtotime("-30 DAYS"))."'")->queryScalar();
+	$retVal['WEB_PRODUCTS'] = Yii::app()->db->createCommand("SELECT count(*) as thecount FROM xlsws_product WHERE web=1")->queryScalar();
+	$retVal['TOTAL_PRODUCTS'] = Yii::app()->db->createCommand("SELECT count(*) as thecount FROM xlsws_product")->queryScalar();
+	$retVal['TOTAL_CATEGORIES'] = Yii::app()->db->createCommand("SELECT count(*) as thecount FROM xlsws_category")->queryScalar();
+	foreach ($_arrKeysToReport as $key => $value)
+		$retVal[$key] = ($value == "boolean" ? (empty(Yii::app()->params[$key]) ? 0 : 1) : Yii::app()->params[$key]);
+
+	return serialize($retVal);
+}
+
 function _xls_parse_language($string)
 {
 	$pattern = "|<".Yii::app()->language.".*>(.*)</".Yii::app()->language.">|U";

@@ -39,7 +39,6 @@ class Wishlist extends BaseWishlist
 			'registry_description' => 'Description (Optional)',
 			'visibility' => 'Visibility',
 			'event_date' => 'Event Date (Optional)',
-			'html_content' => 'Html Content',
 			'ship_option' => 'Ship Option',
 			'customer_id' => 'Customer',
 			'gift_code' => 'Gift Code',
@@ -279,9 +278,18 @@ class Wishlist extends BaseWishlist
 			$this->created = new CDbExpression('NOW()');
 		$this->modified = new CDbExpression('NOW()');
 
-		if($this->event_date=='') $this->event_date = null;
 
 		return parent::beforeValidate();
+	}
+
+	protected function beforeSave() {
+
+		if($this->event_date=='' || $this->event_date=='0000-00-00')
+			$this->event_date = null;
+
+
+		return parent::beforeSave();
+
 	}
 
 	public function __get($strName) {

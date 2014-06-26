@@ -4,7 +4,7 @@ class beanstreamsimAdminForm extends CFormModel
 {
 	public $label;
 	public $login;
-	public $md5hash;
+	public $sha1hash;
 	public $restrictcountry;
 	public $ls_payment_method;
 
@@ -15,7 +15,7 @@ class beanstreamsimAdminForm extends CFormModel
 	{
 		return array(
 			array('label,login,restrictcountry,ls_payment_method','required'),
-			array('md5hash', 'safe'),
+			array('sha1hash', 'safe'),
 		);
 	}
 
@@ -29,7 +29,7 @@ class beanstreamsimAdminForm extends CFormModel
 		return array(
 			'label'=>'Label',
 			'login'=>'Merchant ID',
-			'md5hash'=>'Optional MD5 Hash Value',
+			'sha1hash'=>'Optional SHA-1 Hash Key',
 			'restrictcountry'=>'Only allow this processor',
 			'ls_payment_method'=>'LightSpeed Payment Method',
 		);
@@ -48,7 +48,7 @@ class beanstreamsimAdminForm extends CFormModel
 					'type'=>'text',
 					'maxlength'=>64,
 				),
-				'md5hash'=>array(
+				'sha1hash'=>array(
 					'type'=>'text',
 					'maxlength'=>64,
 				),
@@ -63,8 +63,4 @@ class beanstreamsimAdminForm extends CFormModel
 			),
 		);
 	}
-
-
-
-
 }

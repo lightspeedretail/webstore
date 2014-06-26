@@ -243,39 +243,50 @@ class Product extends BaseProduct
 	/*
 	 * returns product photos in an array
 	*/
-	public function getProductPhotos($absolute=false)
+	public function getProductPhotos($absolute = false)
 	{
 		$objImages = Images::model()->findAll(array(
-			'condition'=>'product_id=:id AND `parent`=`id` order by `index`',
-			'params'=>array(':id'=>$this->id),
+			'condition' => 'product_id=:id AND `parent`=`id` order by `index`',
+			'params' => array(':id' => $this->id)
 		));
+
+		// If this is a child product and it has no images, check to see if the master has images and use those
+		if(count($objImages) == 0)
+		{
+			$objImages = Images::model()->findAll(array(
+				'condition' => 'product_id=:id AND `parent`=`id` order by `index`',
+				'params' => array(':id' => $this->parent)
+			));
+
+		}
+
 		$arrImages = array();
 
 		foreach ($objImages as $obj)
 		{
 			$a = array();
-			$a['image']=Images::GetLink($obj->id,ImagesType::pdetail,$absolute);
-			$a['image_thumb']=Images::GetLink($obj->id,ImagesType::preview,$absolute);
-			$a['image_alt']=$this->Title;
-			$a['image_desc']='';
-			$a['image_large']=Images::GetLink($obj->id,ImagesType::normal,$absolute);
+			$a['image'] = Images::GetLink($obj->id,ImagesType::pdetail,$absolute);
+			$a['image_thumb'] = Images::GetLink($obj->id,ImagesType::preview,$absolute);
+			$a['image_alt'] = $this->Title;
+			$a['image_desc'] = '';
+			$a['image_large'] = Images::GetLink($obj->id,ImagesType::normal,$absolute);
 			list($wt, $ht) = ImagesType::GetSize(ImagesType::pdetail);
-			if($obj->width<=$wt && $obj->height<=$ht)
-				$a['image_large']=$a['image'];
+			if($obj->width <= $wt && $obj->height <= $ht)
+				$a['image_large'] = $a['image'];
 
 			$arrImages[] = $a;
 
 		}
 
 		//This will force the no-product image
-		if(count($objImages)==0)
+		if(count($objImages) == 0)
 		{
 			$a = array();
-			$a['image']=Images::GetImageFallbackPath($absolute);
-			$a['image_large']=Images::GetImageFallbackPath();
-			$a['image_thumb']=Images::GetImageFallbackPath();
-			$a['image_alt']=$this->Title;
-			$a['image_desc']='';
+			$a['image'] = Images::GetImageFallbackPath($absolute);
+			$a['image_large'] = Images::GetImageFallbackPath();
+			$a['image_thumb'] = Images::GetImageFallbackPath();
+			$a['image_alt'] = $this->Title;
+			$a['image_desc'] = '';
 			$arrImages[] = $a;
 		}
 
@@ -1265,6 +1276,55 @@ class Product extends BaseProduct
 		return Product::model()->findByAttributes(array('code'=>$strCode),array('order'=>'web desc,id desc'));
 	}
 
+
+	/**
+	 * Find and return the correct child product when given the size, color and parent id.
+	 * The addition of 1 dimension matrices and other config options (eg. hide products
+	 * with no available inventory) affects the search credentials so the function
+	 * ensures that the correct object is returned.
+	 *
+	 * @param $intProductIdParent - row id of Master/Parent Product
+	 * @param $strSize - Size
+	 * @param $strColor - Color
+	 * @return CActiveRecord - Product Model Object
+	 */
+	public static function LoadChildProduct($intProductIdParent, $strSize, $strColor)
+	{
+		if (isset($strSize) && isset($strColor))
+			return Product::model()->findByAttributes(
+				array(
+					'parent' => $intProductIdParent,
+					'product_size' => $strSize,
+					'product_color'=> $strColor
+				)
+			);
+
+		// at this point we are in a 1 dimension matrix scenario
+
+		$objProdMaster = Product::model()->findByPk($intProductIdParent);
+
+		if (isset($strSize))
+		{
+			$arr = $objProdMaster->Colors;
+			$strColor = is_null(current($arr)) ? '' : current($arr);    // there is either one color or no color
+		}
+
+		else
+		{
+			$arr = $objProdMaster->Sizes;
+			$strSize = is_null(current($arr)) ? '' : current($arr);        // there is either one size or no size
+		}
+
+
+		return Product::model()->findByAttributes(
+			array(
+				'parent' => $intProductIdParent,
+				'product_size' => $strSize,
+				'product_color' => $strColor
+			)
+		);
+
+	}
 
 	/**
 	 * Retrieves a list of models based on the current search/filter conditions.

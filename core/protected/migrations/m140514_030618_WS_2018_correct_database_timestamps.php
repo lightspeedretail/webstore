@@ -31,11 +31,24 @@ class m140514_030618_WS_2018_correct_database_timestamps extends CDbMigration
 		$this->alterColumn('xlsws_wishlist_item','modified','datetime DEFAULT NULL');
 		$this->alterColumn('xlsws_wishlist_item','created','timestamp NULL DEFAULT CURRENT_TIMESTAMP');
 
-		$this->createIndex('product_id', 'xlsws_product_category_assn', 'product_id', FALSE);
-		$this->createIndex('category_id', 'xlsws_product_category_assn', 'category_id', FALSE);
-		$this->createIndex('language', 'xlsws_stringtranslate', 'language', FALSE);
 
+		$this->tryCreateIndex('product_id', 'xlsws_product_category_assn', 'product_id', FALSE);
+		$this->tryCreateIndex('category_id', 'xlsws_product_category_assn', 'category_id', FALSE);
+		$this->tryCreateIndex('language', 'xlsws_stringtranslate', 'language', FALSE);
+	}
 
+	private function tryCreateIndex($indexName,$tableName,$column,$unique)
+	{
+		try
+		{
+			$this->createIndex($indexName, $tableName, $column, $unique);
+		} catch (CDbException $e)
+		{
+			if ($e->errorInfo[1] !== 1061) // 1061 Duplicate key name
+			{
+				throw new Exception('Error creating key', 0, $e);  // not the error we were prepared to skip.
+			}
+		}
 	}
 
 	public function down()

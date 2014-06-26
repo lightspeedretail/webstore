@@ -50,7 +50,10 @@
 
 	            <?php if ($model->IsMaster): ?>
 	                <div class="row">
-	                    <?= $this->renderPartial('/product/_matrixdropdown', array('form'=>$form,'model'=>$model), true); ?>
+		                <?php $this->widget('ext.wsmenu.wsmatrixselector', array(
+				                'form'=> $form,
+				                'model'=> $model
+			                )); //matrix chooser ?>
 	                </div>
 	            <?php endif; ?>
 
