@@ -19,6 +19,8 @@ class cloudzoom extends CWidget
 	public $zoomFlyOut=true;
 	public $zoomOffsetX=0;
 	public $zoomOffsetY=0;
+	public $autoInside=665;
+	public $touchStartDelay=100;
 
 	public $css_target='targetarea';
 	public $css_thumbs = "thumbs";
@@ -96,6 +98,8 @@ BINDING;
 				zoomOffsetX: '.$this->zoomOffsetX.',
 				zoomOffsetY: '.$this->zoomOffsetY.',
 				zoomPosition: \''.$this->zoomPosition.'\',
+				autoInside: \''.$this->autoInside.'\',
+				touchStartDelay: \''.$this->touchStartDelay.'\',
 				zoomFlyOut: '.$this->zoomFlyOut);
 		$html .= CHtml::image($this->images[0]['image'],$this->images[0]['image_alt'],$options);
 		$html .= "</div>";

@@ -26,8 +26,8 @@ class Theme extends CTheme
 	public function getCssUrl($cssFile)
 	{
 		//Just in case someone passed the .css as part of the $cssFile
-		if(substr($cssFile,strlen($cssFile)-4,4)==".css")
-			$cssFile = substr($cssFile,0,-4);
+		if (substr($cssFile, strlen($cssFile) - 4, 4) == ".css")
+			$cssFile = substr($cssFile, 0, -4);
 
 		// new install?
 		if (!is_array(Yii::app()->theme->config->activecss))
@@ -35,12 +35,18 @@ class Theme extends CTheme
 
 		$arrActiveCss = Yii::app()->theme->config->activecss;
 
-		if(in_array($cssFile,$arrActiveCss))
-			if ($cssFile!=='custom')
-				return parent::getBaseUrl()."/css/".$cssFile.".css";
-			else
-				return str_replace("http:","",_xls_custom_css_folder()).
-				"_customcss/".Yii::app()->theme->name."/".$cssFile.".css";
+		if ($this->hasAdminForm(Yii::app()->theme->name))
+		{
+			if(in_array($cssFile,$arrActiveCss))
+				if ($cssFile !== 'custom')
+					return parent::getBaseUrl()."/css/".$cssFile.".css";
+				else
+					return str_replace("http:","",_xls_custom_css_folder()).
+					"_customcss/".Yii::app()->theme->name."/".$cssFile.".css";
+		}
+		else
+			return parent::getBaseUrl()."/css/".$cssFile.".css";
+
 
 	}
 

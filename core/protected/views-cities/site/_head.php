@@ -7,6 +7,7 @@
 	<![endif]-->
 
 	<link rel="canonical" href="<?= $this->CanonicalUrl; ?>"/>
+	<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
 	<meta name="description" content="<?= $this->pageDescription; ?>">
 	<meta property="og:title" content="<?= $this->pageTitle; ?>"/>
@@ -26,5 +27,9 @@
 	Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->cssUrl('custom'));
 	?>
 
+	<?php $this->widget('ext.wsiosorientationbugfix.iosorientationbugfix'); ?>
+
 	<?php echo $this->renderPartial("/site/_google",null,true); ?>
 </head>
+
+

@@ -1,0 +1,1362 @@
+<?xml version="1.0"?>
+<!-- Revision="$Revision: #C_1 $" -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<!--
+    $Date: 2012/03/23 $
+
+    AMAZON.COM CONFIDENTIAL.  This document and the information contained in it are
+    confidential and proprietary information of Amazon.com and may not be reproduced, 
+    distributed or used, in whole or in part, for any purpose other than as necessary 
+    to list products for sale on the www.amazon.com web site pursuant to an agreement 
+    with Amazon.com.
+    -->
+	<xsd:include schemaLocation="amzn-base.xsd"/>
+	<!--
+    Please read the corresponding documentation that contains the recommended values for elements
+    of type StringNotNull.
+    -->
+	<xsd:element name="Home">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ProductType" minOccurs="0">
+					<xsd:complexType>
+						<xsd:choice>
+							<xsd:element ref="BedAndBath"/>
+							<xsd:element ref="FurnitureAndDecor"/>
+							<xsd:element ref="Kitchen"/>
+							<xsd:element ref="OutdoorLiving"/>
+							<xsd:element ref="SeedsAndPlants"/>
+							<xsd:element ref="Art"/>
+							<xsd:element name="Home">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element ref="Battery" minOccurs="0"/>
+										<xsd:element name="ColorMap" type="StringNotNull"
+											minOccurs="0"/>
+										<xsd:element name="Finish" type="StringNotNull"
+											minOccurs="0"/>
+										<xsd:element name="IsStainResistant" type="xsd:boolean"
+											minOccurs="0"/>
+										<xsd:element name="LightSourceType" type="StringNotNull"
+											minOccurs="0"/>
+										<xsd:element name="Material" type="StringNotNull"
+											minOccurs="0"/>
+										<xsd:element name="MaximumCoverageArea" type="AreaDimensionOptionalUnit"
+											minOccurs="0"/>
+										<xsd:element name="NumberOfSets" type="TenDigitInteger"
+											minOccurs="0"/>
+										<xsd:element name="OutputCapacity"
+											type="VolumeRateDimension" minOccurs="0"/>
+										<xsd:element name="PieceCount" type="PositiveInteger"
+											minOccurs="0"/>
+										<xsd:element name="Shape" type="StringNotNull" minOccurs="0"/>
+										<xsd:element name="ThreadCount" type="PositiveInteger"
+											minOccurs="0"/>
+										<xsd:element name="TowelWeight" type="WeightDimension"
+											minOccurs="0"/>
+										<xsd:element name="VariationData" minOccurs="0">
+											<xsd:complexType>
+												<xsd:sequence>
+												<xsd:element name="VariationTheme" minOccurs="0">
+												<xsd:simpleType>
+												<xsd:restriction base="xsd:string">
+												<xsd:enumeration value="Size"/>
+												<xsd:enumeration value="Color"/>
+												<xsd:enumeration value="Scent"/>
+												<xsd:enumeration value="Size-Color"/>
+												<xsd:enumeration value="Size-Scent"/>
+												<xsd:enumeration
+												value="DisplayLength-DisplayWidth"/>
+												<xsd:enumeration value="DisplayLength-Material"/>
+												<xsd:enumeration value="DisplayLength-Size"/>
+												<xsd:enumeration value="DisplayLength-Color"/>
+												<xsd:enumeration
+												value="DisplayLength-DisplayHeight"/>
+												<xsd:enumeration value="DisplayWidth-Material"/>
+												<xsd:enumeration value="DisplayWidth-Size"/>
+												<xsd:enumeration value="DisplayWidth-Color"/>
+												<xsd:enumeration
+												value="DisplayWidth-DisplayHeight"/>
+												<xsd:enumeration
+												value="ItemPackageQuantity-Material"/>
+												<xsd:enumeration value="ItemPackageQuantity-Size"/>
+												<xsd:enumeration value="ItemPackageQuantity-Color"/>
+												<xsd:enumeration
+												value="ItemPackageQuantity-DisplayHeight"/>
+												<xsd:enumeration
+												value="DisplayWeight-ItemPackageQuantity"/>
+												<xsd:enumeration value="DisplayWeight-Material"/>
+												<xsd:enumeration value="DisplayWeight-Size"/>
+												<xsd:enumeration value="DisplayWeight-Color"/>
+												<xsd:enumeration
+												value="DisplayWeight-DisplayHeight"/>
+												<xsd:enumeration value="Material-DisplayLength"/>
+												<xsd:enumeration value="Material-DisplayWidth"/>
+												<xsd:enumeration value="Material-Size"/>
+												<xsd:enumeration value="Material-Color"/>
+												<xsd:enumeration value="Material-DisplayHeight"/>
+												<xsd:enumeration value="Size-DisplayLength"/>
+												<xsd:enumeration value="Size-DisplayWidth"/>
+												<xsd:enumeration value="Size-DisplayWeight"/>
+												<xsd:enumeration value="Size-Material"/>
+												<xsd:enumeration value="Size-Color"/>
+												<xsd:enumeration value="Size-DisplayHeight"/>
+												<xsd:enumeration value="Color-DisplayLength"/>
+												<xsd:enumeration value="Color-DisplayWidth"/>
+												<xsd:enumeration value="Color-ItemPackageQuantity"/>
+												<xsd:enumeration value="Color-DisplayWeight"/>
+												<xsd:enumeration value="Color-Material"/>
+												<xsd:enumeration value="Color-Size"/>
+												<xsd:enumeration value="Color-DisplayHeight"/>
+												<xsd:enumeration value="DisplayHeight"/>
+												<xsd:enumeration value="Material"/>
+												<xsd:enumeration value="DisplayWeight"/>
+												<xsd:enumeration value="DisplayLength"/>
+												<xsd:enumeration value="ItemPackageQuantity"/>
+												<xsd:enumeration value="DisplayLength-PatternName"/>
+												<xsd:enumeration value="DisplayLength-StyleName"/>
+												<xsd:enumeration value="DisplayWidth-PatternName"/>
+												<xsd:enumeration value="DisplayWidth-StyleName"/>
+												<xsd:enumeration value="Occasion-PatternName"/>
+												<xsd:enumeration
+												value="Occasion-ItemPackageQuantity"/>
+												<xsd:enumeration value="Occasion-Material"/>
+												<xsd:enumeration value="Occasion-StyleName"/>
+												<xsd:enumeration value="Occasion-Size"/>
+												<xsd:enumeration value="Occasion-Color"/>
+												<xsd:enumeration value="Occasion-DisplayHeight"/>
+												<xsd:enumeration value="PatternName-DisplayLength"/>
+												<xsd:enumeration value="PatternName-DisplayWidth"/>
+												<xsd:enumeration value="PatternName-Occasion"/>
+												<xsd:enumeration value="PatternName-Material"/>
+												<xsd:enumeration value="PatternName-StyleName"/>
+												<xsd:enumeration value="PatternName-Size"/>
+												<xsd:enumeration value="PatternName-Color"/>
+												<xsd:enumeration value="PatternName-DisplayHeight"/>
+												<xsd:enumeration value="MatteStyle-Material"/>
+												<xsd:enumeration value="MatteStyle-StyleName"/>
+												<xsd:enumeration value="MatteStyle-Size"/>
+												<xsd:enumeration value="MatteStyle-Color"/>
+												<xsd:enumeration
+												value="ItemPackageQuantity-Occasion"/>
+												<xsd:enumeration
+												value="ItemPackageQuantity-StyleName"/>
+												<xsd:enumeration value="DisplayWeight-StyleName"/>
+												<xsd:enumeration value="Material-PatternName"/>
+												<xsd:enumeration value="Material-MatteStyle"/>
+												<xsd:enumeration value="Material-StyleName"/>
+												<xsd:enumeration value="StyleName-DisplayLength"/>
+												<xsd:enumeration value="StyleName-DisplayWidth"/>
+												<xsd:enumeration value="StyleName-Occasion"/>
+												<xsd:enumeration value="StyleName-PatternName"/>
+												<xsd:enumeration value="StyleName-DisplayWeight"/>
+												<xsd:enumeration value="StyleName-Material"/>
+												<xsd:enumeration value="StyleName-Size"/>
+												<xsd:enumeration value="StyleName-Color"/>
+												<xsd:enumeration value="Size-Occasion"/>
+												<xsd:enumeration value="Size-PatternName"/>
+												<xsd:enumeration value="Size-MatteStyle"/>
+												<xsd:enumeration value="Size-StyleName"/>
+												<xsd:enumeration value="Color-Occasion"/>
+												<xsd:enumeration value="Color-PatternName"/>
+												<xsd:enumeration value="Color-MatteStyle"/>
+												<xsd:enumeration value="Color-StyleName"/>
+												<xsd:enumeration value="MatteStyle"/>
+												<xsd:enumeration value="PatternName"/>
+												<xsd:enumeration value="Occasion"/>
+												<xsd:enumeration value="StyleName"/>
+												<xsd:enumeration value="CustomerPackageType"/>
+												<xsd:enumeration
+												value="ColorName-CustomerPackageType"/>
+												<xsd:enumeration
+												value="SizeName-CustomerPackageType"/>
+												<xsd:enumeration
+												value="SizeName-ColorName-CustomerPackageType"/>
+												<xsd:enumeration
+												value="StyleName-CustomerPackageType"/>
+												<xsd:enumeration
+												value="SizeName-StyleName-CustomerPackageType"/>
+												</xsd:restriction>
+												</xsd:simpleType>
+												</xsd:element>
+												<xsd:element name="Size" type="StringNotNull"
+												minOccurs="0"/>
+												<xsd:element name="Color" type="StringNotNull"
+												minOccurs="0"/>
+												<xsd:element name="Scent" type="StringNotNull"
+												minOccurs="0"/>
+												<xsd:element name="CustomerPackageType"
+												type="StringNotNull" minOccurs="0"/>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+										<xsd:element name="Wattage" type="WattageDimensionOptionalUnit" minOccurs="0"/>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:choice>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="Parentage" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="collection-parent"/>
+							<xsd:enumeration value="variation-parent"/>
+							<xsd:enumeration value="base-product"/>
+							<xsd:enumeration value="parent"/>
+							<xsd:enumeration value="child"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="VariationData" minOccurs="0">                
+					<xsd:complexType>                                           
+						<xsd:sequence>                                          
+							
+							<xsd:element name="Parentage" minOccurs="0">
+							        <xsd:annotation>
+                                                                        <xsd:documentation>
+                                                                                Use of this element is deprecated. Please use Home/Parentage instead.
+                                                                                This element is present for backward-compatibility reasons only.
+                                                                        </xsd:documentation>
+                                                                </xsd:annotation>
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string">
+                                        <xsd:enumeration value="parent"/>
+                                        <xsd:enumeration value="child"/>
+                                    </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:element>
+							
+							<xsd:element name="VariationTheme" minOccurs="0">   
+								<xsd:simpleType>                                
+									<xsd:restriction base="xsd:string">         
+										<xsd:enumeration value="Size"/>
+                                        <xsd:enumeration value="Color"/>
+                                        <xsd:enumeration value="Length-Width"/>
+                                        <xsd:enumeration value="Length-Material"/>
+                                        <xsd:enumeration value="Length-Size"/>
+                                        <xsd:enumeration value="Length-Color"/>
+                                        <xsd:enumeration value="Length-Height"/>
+                                        <xsd:enumeration value="Width-Material"/>
+                                        <xsd:enumeration value="Width-Size"/>
+                                        <xsd:enumeration value="Width-Color"/>
+                                        <xsd:enumeration value="Width-Height"/>
+                                        <xsd:enumeration value="NumberOfItemsInPackage-Material"/>
+                                        <xsd:enumeration value="NumberOfItemsInPackage-Size"/>
+                                        <xsd:enumeration value="NumberOfItemsInPackage-Color"/>
+                                        <xsd:enumeration value="NumberOfItemsInPackage-Height"/>
+                                        <xsd:enumeration value="Weight-NumberOfItemsInPackage"/>
+                                        <xsd:enumeration value="Weight-Material"/>
+                                        <xsd:enumeration value="Weight-Size"/>
+                                        <xsd:enumeration value="Weight-Color"/>
+                                        <xsd:enumeration value="Weight-Height"/>
+                                        <xsd:enumeration value="Material-Length"/>
+                                        <xsd:enumeration value="Material-Width"/>
+                                        <xsd:enumeration value="Material-Size"/>
+                                        <xsd:enumeration value="Material-Color"/>
+                                        <xsd:enumeration value="Material-Height"/>
+                                        <xsd:enumeration value="Size-Length"/>
+                                        <xsd:enumeration value="Size-Width"/>
+                                        <xsd:enumeration value="Size-Weight"/>
+                                        <xsd:enumeration value="Size-Material"/>
+                                        <xsd:enumeration value="Size-Color"/>
+                                        <xsd:enumeration value="Size-Height"/>
+                                        <xsd:enumeration value="Color-Length"/>
+                                        <xsd:enumeration value="Color-Width"/>
+                                        <xsd:enumeration value="Color-NumberOfItemsInPackage"/>
+                                        <xsd:enumeration value="Color-Weight"/>
+                                        <xsd:enumeration value="Color-Material"/>
+                                        <xsd:enumeration value="Color-Size"/>
+                                        <xsd:enumeration value="Color-Height"/>
+                                        <xsd:enumeration value="Height"/>
+                                        <xsd:enumeration value="Material"/>
+                                        <xsd:enumeration value="Weight"/>
+                                        <xsd:enumeration value="Length"/>
+                                        <xsd:enumeration value="NumberOfItemsInPackage"/>
+                                        <xsd:enumeration value="Length-PatternName"/>
+                                        <xsd:enumeration value="Length-StyleName"/>
+                                        <xsd:enumeration value="Width-PatternName"/>
+                                        <xsd:enumeration value="Width-StyleName"/>
+                                        <xsd:enumeration value="Occasion-PatternName"/>
+                                        <xsd:enumeration value="Occasion-NumberOfItemsInPackage"/>
+                                        <xsd:enumeration value="Occasion-Material"/>
+                                        <xsd:enumeration value="Occasion-StyleName"/>
+                                        <xsd:enumeration value="Occasion-Size"/>
+                                        <xsd:enumeration value="Occasion-Color"/>
+                                        <xsd:enumeration value="Occasion-Height"/>
+                                        <xsd:enumeration value="PatternName-Length"/>
+                                        <xsd:enumeration value="PatternName-Width"/>
+                                        <xsd:enumeration value="PatternName-Occasion"/>
+                                        <xsd:enumeration value="PatternName-Material"/>
+                                        <xsd:enumeration value="PatternName-StyleName"/>
+                                        <xsd:enumeration value="PatternName-Size"/>
+                                        <xsd:enumeration value="PatternName-Color"/>
+                                        <xsd:enumeration value="PatternName-Height"/>
+                                        <xsd:enumeration value="MatteStyle-Material"/>
+                                        <xsd:enumeration value="MatteStyle-StyleName"/>
+                                        <xsd:enumeration value="MatteStyle-Size"/>
+                                        <xsd:enumeration value="MatteStyle-Color"/>
+                                        <xsd:enumeration value="NumberOfItemsInPackage-Occasion"/>
+                                        <xsd:enumeration value="NumberOfItemsInPackage-StyleName"/>
+                                        <xsd:enumeration value="Weight-StyleName"/>
+                                        <xsd:enumeration value="Material-PatternName"/>
+                                        <xsd:enumeration value="Material-MatteStyle"/>
+                                        <xsd:enumeration value="Material-StyleName"/>
+                                        <xsd:enumeration value="StyleName-Length"/>
+                                        <xsd:enumeration value="StyleName-Width"/>
+                                        <xsd:enumeration value="StyleName-Occasion"/>
+                                        <xsd:enumeration value="StyleName-PatternName"/>
+                                        <xsd:enumeration value="StyleName-Weight"/>
+                                        <xsd:enumeration value="StyleName-Material"/>
+                                        <xsd:enumeration value="StyleName-Size"/>
+                                        <xsd:enumeration value="StyleName-Color"/>
+                                        <xsd:enumeration value="Size-Occasion"/>
+                                        <xsd:enumeration value="Size-PatternName"/>
+                                        <xsd:enumeration value="Size-MatteStyle"/>
+                                        <xsd:enumeration value="Size-StyleName"/>
+                                        <xsd:enumeration value="Color-Occasion"/>
+                                        <xsd:enumeration value="Color-PatternName"/>
+                                        <xsd:enumeration value="Color-MatteStyle"/>
+                                        <xsd:enumeration value="Color-StyleName"/>
+                                        <xsd:enumeration value="MatteStyle"/>
+                                        <xsd:enumeration value="PatternName"/>
+                                        <xsd:enumeration value="Occasion"/>
+                                        <xsd:enumeration value="StyleName"/>
+                                        <xsd:enumeration value="Weight-Length-Color"/>
+                                        <xsd:enumeration value="Occasion-Size-Color"/>
+                                        <xsd:enumeration value="Weight-Length-Material"/>
+                                        <xsd:enumeration value="Weight-Length-StyleName"/>
+                                        <xsd:enumeration value="PatternName-Size-Occasion"/>  
+									</xsd:restriction>                          
+								</xsd:simpleType>                               
+							</xsd:element>                                      
+							
+							<xsd:element name="Size" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Color" type="StringNotNull" minOccurs="0"/>
+							
+						</xsd:sequence>                                         
+					</xsd:complexType>                                          
+				</xsd:element>
+				<xsd:element name="BatteryDescription" type="StringNotNull" minOccurs="0"/>
+				<xsd:element ref="ColorMap" minOccurs="0"/>
+				<xsd:element name="CanShipInOriginalContainer" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="CountryAsLabeled" type="CountryOfOriginType" minOccurs="0"/>
+				<xsd:element name="CountryOfOrigin" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:length value="2" fixed="true"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+
+				<xsd:element name="CountryProducedIn" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ImportDesignation" type="String" minOccurs="0" />				
+				<xsd:element name="FurDescription" type="LongString" minOccurs="0"/>
+				<xsd:element name="IdentityPackageType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="StringNotNull">
+							<xsd:enumeration value="bulk"/>
+							<xsd:enumeration value="frustration_free"/>
+							<xsd:enumeration value="traditional"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+                
+				<xsd:element name="IncludedComponents" type="StringNotNull" minOccurs="0"
+					maxOccurs="5"/>
+				<xsd:element name="FabricType" type="HundredString" minOccurs="0"
+								maxOccurs="3"/>
+				<xsd:element name="PatternName" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SeatHeight" type="LengthDimension" minOccurs="0"/>
+
+				<xsd:element name="SpecialFeatures" type="StringNotNull" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="StyleName" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Occasion" type="MediumStringNotNull" minOccurs="0"/>
+				<xsd:element name="MatteStyle" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="DisplayLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="DisplayWidth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="DisplayHeight" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="DisplayDepth" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="DisplayDiameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="DisplayVolume" type="VolumeDimension" minOccurs="0"/>
+				<xsd:element name="DisplayWeight" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="ItemPackageQuantity" type="xsd:positiveInteger" default="1"
+					minOccurs="0"/>
+				<xsd:element name="ManufacturerWarrantyDescription" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:normalizedString">
+							<xsd:maxLength value="1500"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+
+				<xsd:element name="Volume" type="VolumeIntegerDimension" minOccurs="0"/>
+				<xsd:element name="VolumeCapacity" type="VolumeIntegerDimension" minOccurs="0"/>
+				<xsd:element name="Material" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ThreadCount" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfPieces" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="SafetyWarning" type="LongStringNotNull" minOccurs="0"/>
+
+				<xsd:element name="AwardsWon" type="HundredFiftyStringNotNull" minOccurs="0"
+					maxOccurs="10"/>
+				<xsd:element name="BatteryAverageLife" type="PositiveDimension" minOccurs="0"/>
+				<xsd:element name="BatteryAverageLifeStandby" type="PositiveDimension" minOccurs="0"/>
+				<xsd:element name="BatteryChargeTime" type="PositiveDimension" minOccurs="0"/>
+				<xsd:element name="BatteryTypeLithiumIon" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="BatteryTypeLithiumMetal" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryEnergyContent" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryPackaging" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="batteries_contained_in_equipment"/>
+							<xsd:enumeration value="batteries_only"/>
+							<xsd:enumeration value="batteries_packed_with_equipment"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LithiumBatteryVoltage" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="LithiumBatteryWeight" type="xsd:decimal" minOccurs="0"/>
+				<xsd:element name="MfgWarrantyDescriptionLabor" type="SuperLongStringNotNull"
+					minOccurs="0"/>
+				<xsd:element name="MfgWarrantyDescriptionParts" type="SuperLongStringNotNull"
+					minOccurs="0"/>
+				<xsd:element name="MfgWarrantyDescriptionType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="NumberOfItemsInPackage" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumIonCells" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfLithiumMetalCells" type="xsd:positiveInteger"
+					minOccurs="0"/>
+				<xsd:element name="PowerSourceType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="RegionOfOrigin" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="SellerWarrantyDescription" type="SuperLongStringNotNull"
+					minOccurs="0"/>
+				<xsd:element name="SizeMap" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Warnings" type="LongStringNotNull" minOccurs="0"/>
+				<xsd:element name="Wattage" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="Length"   type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Width"    type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Height"   type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Depth"    type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Diameter" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Weight" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="Spread" type="LengthDimension" minOccurs="0"/>
+				
+				<xsd:element name="SunlightExposure" minOccurs="0">             
+					<xsd:simpleType>                                            
+						<xsd:restriction base="xsd:string">                     
+							<xsd:enumeration value="shade"/>                    
+							<xsd:enumeration value="partial-shade"/>            
+							<xsd:enumeration value="partial-sun"/>              
+							<xsd:enumeration value="full-sun"/>                 
+						</xsd:restriction>                                      
+					</xsd:simpleType>                                           
+				</xsd:element>                                                  
+				
+				<xsd:element name="MoistureNeeds" minOccurs="0">                
+					<xsd:simpleType>                                            
+						<xsd:restriction base="xsd:string">                     
+							<xsd:enumeration value="little-to-no-watering"/>    
+							<xsd:enumeration value="moderate-watering"/>        
+							<xsd:enumeration value="regular-watering"/>         
+							<xsd:enumeration value="constant-watering"/>        
+						</xsd:restriction>                                      
+					</xsd:simpleType>                                           
+				</xsd:element>                                                  
+				
+				<xsd:element name="USDAHardinessZone" minOccurs="0">            
+					<xsd:simpleType>                                            
+						<xsd:restriction base="xsd:positiveInteger">            
+							<xsd:minInclusive value="1"/>                       
+							<xsd:maxInclusive value="11"/>                      
+						</xsd:restriction>                                      
+					</xsd:simpleType>                                           
+				</xsd:element>                                                  
+				
+				<xsd:element name="SunsetClimateZone" minOccurs="0">            
+					<xsd:simpleType>                                            
+						<xsd:restriction base="xsd:positiveInteger">            
+							<xsd:minInclusive value="1"/>                       
+							<xsd:maxInclusive value="24"/>                      
+						</xsd:restriction>                                      
+					</xsd:simpleType>                                           
+				</xsd:element>
+				<xsd:element name="NumberOfSets" type="xsd:positiveInteger" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # Bed And Bath Classification Data
+     ###############################################################
+    -->
+	<xsd:element name="BedAndBath">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Battery" minOccurs="0"/>
+				<xsd:element name="CanShipInOriginalContainer" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="ColorMap" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="FabricWarmthDescription" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Finish" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="IdentityPackageType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="StringNotNull">
+							<xsd:enumeration value="bulk"/>
+							<xsd:enumeration value="frustration_free"/>
+							<xsd:enumeration value="traditional"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="IsStainResistant" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="LightSourceType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Material" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaximumCoverageArea" type="AreaDimensionOptionalUnit" minOccurs="0"/>
+				<xsd:element name="NumberOfSets" type="TenDigitInteger" minOccurs="0"/>
+				<xsd:element name="OutputCapacity" type="VolumeRateDimension" minOccurs="0"/>
+				<xsd:element name="PieceCount" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="Shape" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ThreadCount" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="TowelWeight" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="VariationData" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="VariationTheme" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="Size"/>
+										<xsd:enumeration value="Color"/>
+										<xsd:enumeration value="Scent"/>
+										<xsd:enumeration value="Size-Color"/>
+										<xsd:enumeration value="Size-Scent"/>
+										<xsd:enumeration value="DisplayLength-DisplayWidth"/>
+										<xsd:enumeration value="DisplayLength-Material"/>
+										<xsd:enumeration value="DisplayLength-Size"/>
+										<xsd:enumeration value="DisplayLength-Color"/>
+										<xsd:enumeration value="DisplayLength-DisplayHeight"/>
+										<xsd:enumeration value="DisplayWidth-Material"/>
+										<xsd:enumeration value="DisplayWidth-Size"/>
+										<xsd:enumeration value="DisplayWidth-Color"/>
+										<xsd:enumeration value="DisplayWidth-DisplayHeight"/>
+										<xsd:enumeration value="ItemPackageQuantity-Material"/>
+										<xsd:enumeration value="ItemPackageQuantity-Size"/>
+										<xsd:enumeration value="ItemPackageQuantity-Color"/>
+										<xsd:enumeration value="ItemPackageQuantity-DisplayHeight"/>
+										<xsd:enumeration value="DisplayWeight-ItemPackageQuantity"/>
+										<xsd:enumeration value="DisplayWeight-Material"/>
+										<xsd:enumeration value="DisplayWeight-Size"/>
+										<xsd:enumeration value="DisplayWeight-Color"/>
+										<xsd:enumeration value="DisplayWeight-DisplayHeight"/>
+										<xsd:enumeration value="Material-DisplayLength"/>
+										<xsd:enumeration value="Material-DisplayWidth"/>
+										<xsd:enumeration value="Material-Size"/>
+										<xsd:enumeration value="Material-Color"/>
+										<xsd:enumeration value="Material-DisplayHeight"/>
+										<xsd:enumeration value="Size-DisplayLength"/>
+										<xsd:enumeration value="Size-DisplayWidth"/>
+										<xsd:enumeration value="Size-DisplayWeight"/>
+										<xsd:enumeration value="Size-Material"/>
+										<xsd:enumeration value="Size-Color"/>
+										<xsd:enumeration value="Size-DisplayHeight"/>
+										<xsd:enumeration value="Color-DisplayLength"/>
+										<xsd:enumeration value="Color-DisplayWidth"/>
+										<xsd:enumeration value="Color-ItemPackageQuantity"/>
+										<xsd:enumeration value="Color-DisplayWeight"/>
+										<xsd:enumeration value="Color-Material"/>
+										<xsd:enumeration value="Color-Size"/>
+										<xsd:enumeration value="Color-DisplayHeight"/>
+										<xsd:enumeration value="DisplayHeight"/>
+										<xsd:enumeration value="Material"/>
+										<xsd:enumeration value="DisplayWeight"/>
+										<xsd:enumeration value="DisplayLength"/>
+										<xsd:enumeration value="ItemPackageQuantity"/>
+										<xsd:enumeration value="DisplayLength-PatternName"/>
+										<xsd:enumeration value="DisplayLength-StyleName"/>
+										<xsd:enumeration value="DisplayWidth-PatternName"/>
+										<xsd:enumeration value="DisplayWidth-StyleName"/>
+										<xsd:enumeration value="Occasion-PatternName"/>
+										<xsd:enumeration value="Occasion-ItemPackageQuantity"/>
+										<xsd:enumeration value="Occasion-Material"/>
+										<xsd:enumeration value="Occasion-StyleName"/>
+										<xsd:enumeration value="Occasion-Size"/>
+										<xsd:enumeration value="Occasion-Color"/>
+										<xsd:enumeration value="Occasion-DisplayHeight"/>
+										<xsd:enumeration value="PatternName-DisplayLength"/>
+										<xsd:enumeration value="PatternName-DisplayWidth"/>
+										<xsd:enumeration value="PatternName-Occasion"/>
+										<xsd:enumeration value="PatternName-Material"/>
+										<xsd:enumeration value="PatternName-StyleName"/>
+										<xsd:enumeration value="PatternName-Size"/>
+										<xsd:enumeration value="PatternName-Color"/>
+										<xsd:enumeration value="PatternName-DisplayHeight"/>
+										<xsd:enumeration value="MatteStyle-Material"/>
+										<xsd:enumeration value="MatteStyle-StyleName"/>
+										<xsd:enumeration value="MatteStyle-Size"/>
+										<xsd:enumeration value="MatteStyle-Color"/>
+										<xsd:enumeration value="ItemPackageQuantity-Occasion"/>
+										<xsd:enumeration value="ItemPackageQuantity-StyleName"/>
+										<xsd:enumeration value="DisplayWeight-StyleName"/>
+										<xsd:enumeration value="Material-PatternName"/>
+										<xsd:enumeration value="Material-MatteStyle"/>
+										<xsd:enumeration value="Material-StyleName"/>
+										<xsd:enumeration value="StyleName-DisplayLength"/>
+										<xsd:enumeration value="StyleName-DisplayWidth"/>
+										<xsd:enumeration value="StyleName-Occasion"/>
+										<xsd:enumeration value="StyleName-PatternName"/>
+										<xsd:enumeration value="StyleName-DisplayWeight"/>
+										<xsd:enumeration value="StyleName-Material"/>
+										<xsd:enumeration value="StyleName-Size"/>
+										<xsd:enumeration value="StyleName-Color"/>
+										<xsd:enumeration value="Size-Occasion"/>
+										<xsd:enumeration value="Size-PatternName"/>
+										<xsd:enumeration value="Size-MatteStyle"/>
+										<xsd:enumeration value="Size-StyleName"/>
+										<xsd:enumeration value="Color-Occasion"/>
+										<xsd:enumeration value="Color-PatternName"/>
+										<xsd:enumeration value="Color-MatteStyle"/>
+										<xsd:enumeration value="Color-StyleName"/>
+										<xsd:enumeration value="MatteStyle"/>
+										<xsd:enumeration value="PatternName"/>
+										<xsd:enumeration value="Occasion"/>
+										<xsd:enumeration value="StyleName"/>
+										<xsd:enumeration value="CustomerPackageType"/>
+										<xsd:enumeration value="ColorName-CustomerPackageType"/>
+										<xsd:enumeration value="SizeName-CustomerPackageType"/>
+										<xsd:enumeration
+											value="SizeName-ColorName-CustomerPackageType"/>
+										<xsd:enumeration value="StyleName-CustomerPackageType"/>
+										<xsd:enumeration
+											value="SizeName-StyleName-CustomerPackageType"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="Size" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Color" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Scent" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="StyleName" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="CustomerPackageType" type="StringNotNull"
+								minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="Wattage" type="WattageDimensionOptionalUnit" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # Furniture And Decor Classification Data
+     ###############################################################
+    -->
+	<xsd:element name="FurnitureAndDecor">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Battery" minOccurs="0"/>
+				<xsd:element name="CanShipInOriginalContainer" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="ColorMap" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Finish" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="IdentityPackageType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="StringNotNull">
+							<xsd:enumeration value="bulk"/>
+							<xsd:enumeration value="frustration_free"/>
+							<xsd:enumeration value="traditional"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="IsStainResistant" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="LightSourceType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Material" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaximumCoverageArea" type="AreaDimensionOptionalUnit" minOccurs="0"/>
+				<xsd:element name="NumberOfSets" type="TenDigitInteger" minOccurs="0"/>
+				<xsd:element name="OutputCapacity" type="VolumeRateDimension" minOccurs="0"/>
+				<xsd:element name="PieceCount" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="Shape" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ThreadCount" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="TowelWeight" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="VariationData" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="VariationTheme" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="Size"/>
+										<xsd:enumeration value="Color"/>
+										<xsd:enumeration value="Scent"/>
+										<xsd:enumeration value="Size-Color"/>
+										<xsd:enumeration value="Size-Scent"/>
+										<xsd:enumeration value="DisplayLength-DisplayWidth"/>
+										<xsd:enumeration value="DisplayLength-Material"/>
+										<xsd:enumeration value="DisplayLength-Size"/>
+										<xsd:enumeration value="DisplayLength-Color"/>
+										<xsd:enumeration value="DisplayLength-DisplayHeight"/>
+										<xsd:enumeration value="DisplayWidth-Material"/>
+										<xsd:enumeration value="DisplayWidth-Size"/>
+										<xsd:enumeration value="DisplayWidth-Color"/>
+										<xsd:enumeration value="DisplayWidth-DisplayHeight"/>
+										<xsd:enumeration value="ItemPackageQuantity-Material"/>
+										<xsd:enumeration value="ItemPackageQuantity-Size"/>
+										<xsd:enumeration value="ItemPackageQuantity-Color"/>
+										<xsd:enumeration value="ItemPackageQuantity-DisplayHeight"/>
+										<xsd:enumeration value="DisplayWeight-ItemPackageQuantity"/>
+										<xsd:enumeration value="DisplayWeight-Material"/>
+										<xsd:enumeration value="DisplayWeight-Size"/>
+										<xsd:enumeration value="DisplayWeight-Color"/>
+										<xsd:enumeration value="DisplayWeight-DisplayHeight"/>
+										<xsd:enumeration value="Material-DisplayLength"/>
+										<xsd:enumeration value="Material-DisplayWidth"/>
+										<xsd:enumeration value="Material-Size"/>
+										<xsd:enumeration value="Material-Color"/>
+										<xsd:enumeration value="Material-DisplayHeight"/>
+										<xsd:enumeration value="Size-DisplayLength"/>
+										<xsd:enumeration value="Size-DisplayWidth"/>
+										<xsd:enumeration value="Size-DisplayWeight"/>
+										<xsd:enumeration value="Size-Material"/>
+										<xsd:enumeration value="Size-Color"/>
+										<xsd:enumeration value="Size-DisplayHeight"/>
+										<xsd:enumeration value="Color-DisplayLength"/>
+										<xsd:enumeration value="Color-DisplayWidth"/>
+										<xsd:enumeration value="Color-ItemPackageQuantity"/>
+										<xsd:enumeration value="Color-DisplayWeight"/>
+										<xsd:enumeration value="Color-Material"/>
+										<xsd:enumeration value="Color-Size"/>
+										<xsd:enumeration value="Color-DisplayHeight"/>
+										<xsd:enumeration value="DisplayHeight"/>
+										<xsd:enumeration value="Material"/>
+										<xsd:enumeration value="DisplayWeight"/>
+										<xsd:enumeration value="DisplayLength"/>
+										<xsd:enumeration value="ItemPackageQuantity"/>
+										<xsd:enumeration value="DisplayLength-PatternName"/>
+										<xsd:enumeration value="DisplayLength-StyleName"/>
+										<xsd:enumeration value="DisplayWidth-PatternName"/>
+										<xsd:enumeration value="DisplayWidth-StyleName"/>
+										<xsd:enumeration value="Occasion-PatternName"/>
+										<xsd:enumeration value="Occasion-ItemPackageQuantity"/>
+										<xsd:enumeration value="Occasion-Material"/>
+										<xsd:enumeration value="Occasion-StyleName"/>
+										<xsd:enumeration value="Occasion-Size"/>
+										<xsd:enumeration value="Occasion-Color"/>
+										<xsd:enumeration value="Occasion-DisplayHeight"/>
+										<xsd:enumeration value="PatternName-DisplayLength"/>
+										<xsd:enumeration value="PatternName-DisplayWidth"/>
+										<xsd:enumeration value="PatternName-Occasion"/>
+										<xsd:enumeration value="PatternName-Material"/>
+										<xsd:enumeration value="PatternName-StyleName"/>
+										<xsd:enumeration value="PatternName-Size"/>
+										<xsd:enumeration value="PatternName-Color"/>
+										<xsd:enumeration value="PatternName-DisplayHeight"/>
+										<xsd:enumeration value="MatteStyle-Material"/>
+										<xsd:enumeration value="MatteStyle-StyleName"/>
+										<xsd:enumeration value="MatteStyle-Size"/>
+										<xsd:enumeration value="MatteStyle-Color"/>
+										<xsd:enumeration value="ItemPackageQuantity-Occasion"/>
+										<xsd:enumeration value="ItemPackageQuantity-StyleName"/>
+										<xsd:enumeration value="DisplayWeight-StyleName"/>
+										<xsd:enumeration value="Material-PatternName"/>
+										<xsd:enumeration value="Material-MatteStyle"/>
+										<xsd:enumeration value="Material-StyleName"/>
+										<xsd:enumeration value="StyleName-DisplayLength"/>
+										<xsd:enumeration value="StyleName-DisplayWidth"/>
+										<xsd:enumeration value="StyleName-Occasion"/>
+										<xsd:enumeration value="StyleName-PatternName"/>
+										<xsd:enumeration value="StyleName-DisplayWeight"/>
+										<xsd:enumeration value="StyleName-Material"/>
+										<xsd:enumeration value="StyleName-Size"/>
+										<xsd:enumeration value="StyleName-Color"/>
+										<xsd:enumeration value="Size-Occasion"/>
+										<xsd:enumeration value="Size-PatternName"/>
+										<xsd:enumeration value="Size-MatteStyle"/>
+										<xsd:enumeration value="Size-StyleName"/>
+										<xsd:enumeration value="Color-Occasion"/>
+										<xsd:enumeration value="Color-PatternName"/>
+										<xsd:enumeration value="Color-MatteStyle"/>
+										<xsd:enumeration value="Color-StyleName"/>
+										<xsd:enumeration value="MatteStyle"/>
+										<xsd:enumeration value="PatternName"/>
+										<xsd:enumeration value="Occasion"/>
+										<xsd:enumeration value="StyleName"/>
+										<xsd:enumeration value="CustomerPackageType"/>
+										<xsd:enumeration value="ColorName-CustomerPackageType"/>
+										<xsd:enumeration value="SizeName-CustomerPackageType"/>
+										<xsd:enumeration
+											value="SizeName-ColorName-CustomerPackageType"/>
+										<xsd:enumeration value="StyleName-CustomerPackageType"/>
+										<xsd:enumeration
+											value="SizeName-StyleName-CustomerPackageType"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="Size" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Color" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Scent" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="StyleName" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="CustomerPackageType" type="StringNotNull"
+								minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="Wattage" type="WattageDimensionOptionalUnit" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # Kitchen Classification Data
+     ###############################################################
+    -->
+	<xsd:element name="Kitchen">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Battery" minOccurs="0"/>
+				<xsd:element name="BladeType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BatteryCellComposition" type="BatteryCellTypeValues" minOccurs="0"/>	
+				<xsd:element name="BatteryFormFactor" type="HundredString" minOccurs="0"/>					
+				<xsd:element name="BladeMaterial" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="BladeLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="CanShipInOriginalContainer" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="ColorMap" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Finish" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="IdentityPackageType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="StringNotNull">
+							<xsd:enumeration value="bulk"/>
+							<xsd:enumeration value="frustration_free"/>
+							<xsd:enumeration value="traditional"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="IsStainResistant" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Material" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaximumCoverageArea" type="AreaDimensionOptionalUnit" minOccurs="0"/>
+				<xsd:element name="NumberOfSets" type="TenDigitInteger" minOccurs="0"/>
+				<xsd:element name="OccasionType" type="MediumStringNotNull" minOccurs="0"/>
+				<xsd:element name="OutputCapacity" type="VolumeRateDimension" minOccurs="0"/>
+				<xsd:element name="PieceCount" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="Shape" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ThreadCount" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="TowelWeight" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="VariationData" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="VariationTheme" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="Size"/>
+										<xsd:enumeration value="Color"/>
+										<xsd:enumeration value="Size-Color"/>
+										<xsd:enumeration value="DisplayLength-DisplayWidth"/>
+										<xsd:enumeration value="DisplayLength-Material"/>
+										<xsd:enumeration value="DisplayLength-Size"/>
+										<xsd:enumeration value="DisplayLength-Color"/>
+										<xsd:enumeration value="DisplayLength-DisplayHeight"/>
+										<xsd:enumeration value="DisplayWidth-Material"/>
+										<xsd:enumeration value="DisplayWidth-Size"/>
+										<xsd:enumeration value="DisplayWidth-Color"/>
+										<xsd:enumeration value="DisplayWidth-DisplayHeight"/>
+										<xsd:enumeration value="ItemPackageQuantity-Material"/>
+										<xsd:enumeration value="ItemPackageQuantity-Size"/>
+										<xsd:enumeration value="ItemPackageQuantity-Color"/>
+										<xsd:enumeration value="ItemPackageQuantity-DisplayHeight"/>
+										<xsd:enumeration value="DisplayWeight-ItemPackageQuantity"/>
+										<xsd:enumeration value="DisplayWeight-Material"/>
+										<xsd:enumeration value="DisplayWeight-Size"/>
+										<xsd:enumeration value="DisplayWeight-Color"/>
+										<xsd:enumeration value="DisplayWeight-DisplayHeight"/>
+										<xsd:enumeration value="Material-DisplayLength"/>
+										<xsd:enumeration value="Material-DisplayWidth"/>
+										<xsd:enumeration value="Material-Size"/>
+										<xsd:enumeration value="Material-Color"/>
+										<xsd:enumeration value="Material-DisplayHeight"/>
+										<xsd:enumeration value="Size-DisplayLength"/>
+										<xsd:enumeration value="Size-DisplayWidth"/>
+										<xsd:enumeration value="Size-DisplayWeight"/>
+										<xsd:enumeration value="Size-Material"/>
+										<xsd:enumeration value="Size-Color"/>
+										<xsd:enumeration value="Size-DisplayHeight"/>
+										<xsd:enumeration value="Color-DisplayLength"/>
+										<xsd:enumeration value="Color-DisplayWidth"/>
+										<xsd:enumeration value="Color-ItemPackageQuantity"/>
+										<xsd:enumeration value="Color-DisplayWeight"/>
+										<xsd:enumeration value="Color-Material"/>
+										<xsd:enumeration value="Color-Size"/>
+										<xsd:enumeration value="Color-DisplayHeight"/>
+										<xsd:enumeration value="DisplayHeight"/>
+										<xsd:enumeration value="Material"/>
+										<xsd:enumeration value="DisplayWeight"/>
+										<xsd:enumeration value="DisplayLength"/>
+										<xsd:enumeration value="ItemPackageQuantity"/>
+										<xsd:enumeration value="DisplayLength-PatternName"/>
+										<xsd:enumeration value="DisplayLength-StyleName"/>
+										<xsd:enumeration value="DisplayWidth-PatternName"/>
+										<xsd:enumeration value="DisplayWidth-StyleName"/>
+										<xsd:enumeration value="Occasion-PatternName"/>
+										<xsd:enumeration value="Occasion-ItemPackageQuantity"/>
+										<xsd:enumeration value="Occasion-Material"/>
+										<xsd:enumeration value="Occasion-StyleName"/>
+										<xsd:enumeration value="Occasion-Size"/>
+										<xsd:enumeration value="Occasion-Color"/>
+										<xsd:enumeration value="Occasion-DisplayHeight"/>
+										<xsd:enumeration value="PatternName-DisplayLength"/>
+										<xsd:enumeration value="PatternName-DisplayWidth"/>
+										<xsd:enumeration value="PatternName-Occasion"/>
+										<xsd:enumeration value="PatternName-Material"/>
+										<xsd:enumeration value="PatternName-StyleName"/>
+										<xsd:enumeration value="PatternName-Size"/>
+										<xsd:enumeration value="PatternName-Color"/>
+										<xsd:enumeration value="PatternName-DisplayHeight"/>
+										<xsd:enumeration value="MatteStyle-Material"/>
+										<xsd:enumeration value="MatteStyle-StyleName"/>
+										<xsd:enumeration value="MatteStyle-Size"/>
+										<xsd:enumeration value="MatteStyle-Color"/>
+										<xsd:enumeration value="ItemPackageQuantity-Occasion"/>
+										<xsd:enumeration value="ItemPackageQuantity-StyleName"/>
+										<xsd:enumeration value="DisplayWeight-StyleName"/>
+										<xsd:enumeration value="Material-PatternName"/>
+										<xsd:enumeration value="Material-MatteStyle"/>
+										<xsd:enumeration value="Material-StyleName"/>
+										<xsd:enumeration value="StyleName-DisplayLength"/>
+										<xsd:enumeration value="StyleName-DisplayWidth"/>
+										<xsd:enumeration value="StyleName-Occasion"/>
+										<xsd:enumeration value="StyleName-PatternName"/>
+										<xsd:enumeration value="StyleName-DisplayWeight"/>
+										<xsd:enumeration value="StyleName-Material"/>
+										<xsd:enumeration value="StyleName-Size"/>
+										<xsd:enumeration value="StyleName-Color"/>
+										<xsd:enumeration value="Size-Occasion"/>
+										<xsd:enumeration value="Size-PatternName"/>
+										<xsd:enumeration value="Size-MatteStyle"/>
+										<xsd:enumeration value="Size-StyleName"/>
+										<xsd:enumeration value="Color-Occasion"/>
+										<xsd:enumeration value="Color-PatternName"/>
+										<xsd:enumeration value="Color-MatteStyle"/>
+										<xsd:enumeration value="Color-StyleName"/>
+										<xsd:enumeration value="MatteStyle"/>
+										<xsd:enumeration value="PatternName"/>
+										<xsd:enumeration value="Occasion"/>
+										<xsd:enumeration value="StyleName"/>
+										<xsd:enumeration value="CustomerPackageType"/>
+										<xsd:enumeration value="ColorName-CustomerPackageType"/>
+										<xsd:enumeration value="SizeName-CustomerPackageType"/>
+										<xsd:enumeration
+											value="SizeName-ColorName-CustomerPackageType"/>
+										<xsd:enumeration value="StyleName-CustomerPackageType"/>
+										<xsd:enumeration
+											value="SizeName-StyleName-CustomerPackageType"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="Size" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Color" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="StyleName" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="CustomerPackageType" type="StringNotNull"
+								minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="Wattage" type="WattageDimensionOptionalUnit" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # Outdoor Living Classification Data
+     ###############################################################
+    -->
+	<xsd:element name="OutdoorLiving">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Battery" minOccurs="0"/>
+				<xsd:element name="CanShipInOriginalContainer" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="ColorMap" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="EngineType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="IdentityPackageType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="StringNotNull">
+							<xsd:enumeration value="bulk"/>
+							<xsd:enumeration value="frustration_free"/>
+							<xsd:enumeration value="traditional"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="IsStainResistant" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="HoseLength" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="Material" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="NumberOfSets" type="TenDigitInteger" minOccurs="0"/>
+				<xsd:element name="PoolType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PowerSource" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Theme" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="VariationData" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="VariationTheme" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="Size"/>
+										<xsd:enumeration value="Color"/>
+										<xsd:enumeration value="Size-Color"/>
+										<xsd:enumeration value="ItemDisplayLength-ItemDisplayWidth"/>
+										<xsd:enumeration value="ItemDisplayLength-MaterialType"/>
+										<xsd:enumeration value="ItemDisplayLength-SizeName"/>
+										<xsd:enumeration value="ItemDisplayLength-ColorName"/>
+										<xsd:enumeration value="ItemDisplayLength-ItemDisplayHeight"/>
+										<xsd:enumeration value="ItemDisplayWidth-MaterialType"/>
+										<xsd:enumeration value="ItemDisplayWidth-SizeName"/>
+										<xsd:enumeration value="ItemDisplayWidth-ColorName"/>
+										<xsd:enumeration value="ItemDisplayWidth-ItemDisplayHeight"/>
+										<xsd:enumeration value="ItemPackageQuantity-MaterialType"/>
+										<xsd:enumeration value="ItemPackageQuantity-SizeName"/>
+										<xsd:enumeration value="ItemPackageQuantity-ColorName"/>
+										<xsd:enumeration
+											value="ItemPackageQuantity-ItemDisplayHeight"/>
+										<xsd:enumeration
+											value="ItemDisplayWeight-ItemPackageQuantity"/>
+										<xsd:enumeration value="ItemDisplayWeight-MaterialType"/>
+										<xsd:enumeration value="ItemDisplayWeight-SizeName"/>
+										<xsd:enumeration value="ItemDisplayWeight-ColorName"/>
+										<xsd:enumeration value="ItemDisplayWeight-ItemDisplayHeight"/>
+										<xsd:enumeration value="MaterialType-ItemDisplayLength"/>
+										<xsd:enumeration value="MaterialType-ItemDisplayWidth"/>
+										<xsd:enumeration value="MaterialType-SizeName"/>
+										<xsd:enumeration value="MaterialType-ColorName"/>
+										<xsd:enumeration value="MaterialType-ItemDisplayHeight"/>
+										<xsd:enumeration value="SizeName-ItemDisplayLength"/>
+										<xsd:enumeration value="SizeName-ItemDisplayWidth"/>
+										<xsd:enumeration value="SizeName-ItemDisplayWeight"/>
+										<xsd:enumeration value="SizeName-MaterialType"/>
+										<xsd:enumeration value="SizeName-ColorName"/>
+										<xsd:enumeration value="SizeName-ItemDisplayHeight"/>
+										<xsd:enumeration value="ColorName-ItemDisplayLength"/>
+										<xsd:enumeration value="ColorName-ItemDisplayWidth"/>
+										<xsd:enumeration value="ColorName-ItemPackageQuantity"/>
+										<xsd:enumeration value="ColorName-ItemDisplayWeight"/>
+										<xsd:enumeration value="ColorName-MaterialType"/>
+										<xsd:enumeration value="ColorName-SizeName"/>
+										<xsd:enumeration value="ColorName-ItemDisplayHeight"/>
+										<xsd:enumeration value="ItemDisplayHeight"/>
+										<xsd:enumeration value="MaterialType"/>
+										<xsd:enumeration value="ItemDisplayWeight"/>
+										<xsd:enumeration value="ItemDisplayLength"/>
+										<xsd:enumeration value="ItemPackageQuantity"/>
+										<xsd:enumeration value="ItemDisplayLength-PatternName"/>
+										<xsd:enumeration value="ItemDisplayLength-StyleName"/>
+										<xsd:enumeration value="ItemDisplayWidth-PatternName"/>
+										<xsd:enumeration value="ItemDisplayWidth-StyleName"/>
+										<xsd:enumeration value="Occasion-PatternName"/>
+										<xsd:enumeration value="Occasion-ItemPackageQuantity"/>
+										<xsd:enumeration value="Occasion-MaterialType"/>
+										<xsd:enumeration value="Occasion-StyleName"/>
+										<xsd:enumeration value="Occasion-SizeName"/>
+										<xsd:enumeration value="Occasion-ColorName"/>
+										<xsd:enumeration value="Occasion-ItemDisplayHeight"/>
+										<xsd:enumeration value="PatternName-ItemDisplayLength"/>
+										<xsd:enumeration value="PatternName-ItemDisplayWidth"/>
+										<xsd:enumeration value="PatternName-Occasion"/>
+										<xsd:enumeration value="PatternName-MaterialType"/>
+										<xsd:enumeration value="PatternName-StyleName"/>
+										<xsd:enumeration value="PatternName-SizeName"/>
+										<xsd:enumeration value="PatternName-ColorName"/>
+										<xsd:enumeration value="PatternName-ItemDisplayHeight"/>
+										<xsd:enumeration value="MatteStyle-MaterialType"/>
+										<xsd:enumeration value="MatteStyle-StyleName"/>
+										<xsd:enumeration value="MatteStyle-SizeName"/>
+										<xsd:enumeration value="MatteStyle-ColorName"/>
+										<xsd:enumeration value="ItemPackageQuantity-Occasion"/>
+										<xsd:enumeration value="ItemPackageQuantity-StyleName"/>
+										<xsd:enumeration value="ItemDisplayWeight-StyleName"/>
+										<xsd:enumeration value="MaterialType-PatternName"/>
+										<xsd:enumeration value="MaterialType-MatteStyle"/>
+										<xsd:enumeration value="MaterialType-StyleName"/>
+										<xsd:enumeration value="StyleName-ItemDisplayLength"/>
+										<xsd:enumeration value="StyleName-ItemDisplayWidth"/>
+										<xsd:enumeration value="StyleName-Occasion"/>
+										<xsd:enumeration value="StyleName-PatternName"/>
+										<xsd:enumeration value="StyleName-ItemDisplayWeight"/>
+										<xsd:enumeration value="StyleName-MaterialType"/>
+										<xsd:enumeration value="StyleName-SizeName"/>
+										<xsd:enumeration value="StyleName-ColorName"/>
+										<xsd:enumeration value="SizeName-Occasion"/>
+										<xsd:enumeration value="SizeName-PatternName"/>
+										<xsd:enumeration value="SizeName-MatteStyle"/>
+										<xsd:enumeration value="SizeName-StyleName"/>
+										<xsd:enumeration value="ColorName-Occasion"/>
+										<xsd:enumeration value="ColorName-PatternName"/>
+										<xsd:enumeration value="ColorName-MatteStyle"/>
+										<xsd:enumeration value="ColorName-StyleName"/>
+										<xsd:enumeration value="MatteStyle"/>
+										<xsd:enumeration value="PatternName"/>
+										<xsd:enumeration value="Occasion"/>
+										<xsd:enumeration value="StyleName"/>
+										<xsd:enumeration value="CustomerPackageType"/>
+										<xsd:enumeration value="ColorName-CustomerPackageType"/>
+										<xsd:enumeration value="SizeName-CustomerPackageType"/>
+										<xsd:enumeration
+											value="SizeName-ColorName-CustomerPackageType"/>
+										<xsd:enumeration value="StyleName-CustomerPackageType"/>
+										<xsd:enumeration
+											value="SizeName-StyleName-CustomerPackageType"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="Size" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Color" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="StyleName" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="CustomerPackageType" type="StringNotNull"
+								minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="Wattage" type="WattageDimensionOptionalUnit" minOccurs="0"/>
+				<xsd:element name="Voltage" type="PositiveInteger" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # Seeds And Plants Classification Data
+     ###############################################################
+    -->
+	<xsd:element name="SeedsAndPlants">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Battery" minOccurs="0"/>
+				<xsd:element name="CanShipInOriginalContainer" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="ColorMap" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="IdentityPackageType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="StringNotNull">
+							<xsd:enumeration value="bulk"/>
+							<xsd:enumeration value="frustration_free"/>
+							<xsd:enumeration value="traditional"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Material" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MoistureNeeds" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="little-to-no-watering"/>
+							<xsd:enumeration value="moderate-watering"/>
+							<xsd:enumeration value="regular-watering"/>
+							<xsd:enumeration value="constant-watering"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="PoolType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="PowerSource" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Spread" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="SunlightExposure" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="shade"/>
+							<xsd:enumeration value="partial-shade"/>
+							<xsd:enumeration value="partial-sun"/>
+							<xsd:enumeration value="full-sun"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="SunsetClimateZone" minOccurs="0" maxOccurs="24">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:positiveInteger">
+							<xsd:minInclusive value="1"/>
+							<xsd:maxInclusive value="24"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="USDAHardinessZone" minOccurs="0" maxOccurs="11">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:positiveInteger">
+							<xsd:minInclusive value="1"/>
+							<xsd:maxInclusive value="11"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="VariationData" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="VariationTheme" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="Size"/>
+										<xsd:enumeration value="Color"/>
+										<xsd:enumeration value="Size-Color"/>
+										<xsd:enumeration value="StyleName"/>
+										<xsd:enumeration value="CustomerPackageType"/>
+										<xsd:enumeration value="ColorName-CustomerPackageType"/>
+										<xsd:enumeration value="SizeName-CustomerPackageType"/>
+										<xsd:enumeration
+											value="SizeName-ColorName-CustomerPackageType"/>
+										<xsd:enumeration value="StyleName-CustomerPackageType"/>
+										<xsd:enumeration
+											value="SizeName-StyleName-CustomerPackageType"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="Size" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Color" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="StyleName" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="CustomerPackageType" type="StringNotNull"
+								minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # Art and Craft Classification Data
+     ###############################################################
+    -->
+	<xsd:element name="Art">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Battery" minOccurs="0"/>
+				<xsd:element name="CanShipInOriginalContainer" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="ColorMap" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Finish" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="IdentityPackageType" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="StringNotNull">
+							<xsd:enumeration value="bulk"/>
+							<xsd:enumeration value="frustration_free"/>
+							<xsd:enumeration value="traditional"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="IsStainResistant" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="Material" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="MaximumCoverageArea" type="AreaDimensionOptionalUnit" minOccurs="0"/>
+				<xsd:element name="OutputCapacity" type="VolumeRateDimension" minOccurs="0"/>
+				<xsd:element name="PieceCount" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="PaintType" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Shape" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="ThreadCount" type="PositiveInteger" minOccurs="0"/>
+				<xsd:element name="TowelWeight" type="WeightDimension" minOccurs="0"/>
+				<xsd:element name="VariationData" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="VariationTheme" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="Size"/>
+										<xsd:enumeration value="Color"/>
+										<xsd:enumeration value="Scent"/>
+										<xsd:enumeration value="Size-Color"/>
+										<xsd:enumeration value="Size-Scent"/>
+										<xsd:enumeration value="DisplayLength-DisplayWidth"/>
+										<xsd:enumeration value="DisplayLength-Material"/>
+										<xsd:enumeration value="DisplayLength-Size"/>
+										<xsd:enumeration value="DisplayLength-Color"/>
+										<xsd:enumeration value="DisplayLength-DisplayHeight"/>
+										<xsd:enumeration value="DisplayWidth-Material"/>
+										<xsd:enumeration value="DisplayWidth-Size"/>
+										<xsd:enumeration value="DisplayWidth-Color"/>
+										<xsd:enumeration value="DisplayWidth-DisplayHeight"/>
+										<xsd:enumeration value="ItemPackageQuantity-Material"/>
+										<xsd:enumeration value="ItemPackageQuantity-Size"/>
+										<xsd:enumeration value="ItemPackageQuantity-Color"/>
+										<xsd:enumeration value="ItemPackageQuantity-DisplayHeight"/>
+										<xsd:enumeration value="DisplayWeight-ItemPackageQuantity"/>
+										<xsd:enumeration value="DisplayWeight-Material"/>
+										<xsd:enumeration value="DisplayWeight-Size"/>
+										<xsd:enumeration value="DisplayWeight-Color"/>
+										<xsd:enumeration value="DisplayWeight-DisplayHeight"/>
+										<xsd:enumeration value="Material-DisplayLength"/>
+										<xsd:enumeration value="Material-DisplayWidth"/>
+										<xsd:enumeration value="Material-Size"/>
+										<xsd:enumeration value="Material-Color"/>
+										<xsd:enumeration value="Material-DisplayHeight"/>
+										<xsd:enumeration value="Size-DisplayLength"/>
+										<xsd:enumeration value="Size-DisplayWidth"/>
+										<xsd:enumeration value="Size-DisplayWeight"/>
+										<xsd:enumeration value="Size-Material"/>
+										<xsd:enumeration value="Size-Color"/>
+										<xsd:enumeration value="Size-DisplayHeight"/>
+										<xsd:enumeration value="Color-DisplayLength"/>
+										<xsd:enumeration value="Color-DisplayWidth"/>
+										<xsd:enumeration value="Color-ItemPackageQuantity"/>
+										<xsd:enumeration value="Color-DisplayWeight"/>
+										<xsd:enumeration value="Color-Material"/>
+										<xsd:enumeration value="Color-Size"/>
+										<xsd:enumeration value="Color-DisplayHeight"/>
+										<xsd:enumeration value="DisplayHeight"/>
+										<xsd:enumeration value="Material"/>
+										<xsd:enumeration value="DisplayWeight"/>
+										<xsd:enumeration value="DisplayLength"/>
+										<xsd:enumeration value="ItemPackageQuantity"/>
+										<xsd:enumeration value="DisplayLength-PatternName"/>
+										<xsd:enumeration value="DisplayLength-StyleName"/>
+										<xsd:enumeration value="DisplayWidth-PatternName"/>
+										<xsd:enumeration value="DisplayWidth-StyleName"/>
+										<xsd:enumeration value="Occasion-PatternName"/>
+										<xsd:enumeration value="Occasion-ItemPackageQuantity"/>
+										<xsd:enumeration value="Occasion-Material"/>
+										<xsd:enumeration value="Occasion-StyleName"/>
+										<xsd:enumeration value="Occasion-Size"/>
+										<xsd:enumeration value="Occasion-Color"/>
+										<xsd:enumeration value="Occasion-DisplayHeight"/>
+										<xsd:enumeration value="PatternName-DisplayLength"/>
+										<xsd:enumeration value="PatternName-DisplayWidth"/>
+										<xsd:enumeration value="PatternName-Occasion"/>
+										<xsd:enumeration value="PatternName-Material"/>
+										<xsd:enumeration value="PatternName-StyleName"/>
+										<xsd:enumeration value="PatternName-Size"/>
+										<xsd:enumeration value="PatternName-Color"/>
+										<xsd:enumeration value="PatternName-DisplayHeight"/>
+										<xsd:enumeration value="MatteStyle-Material"/>
+										<xsd:enumeration value="MatteStyle-StyleName"/>
+										<xsd:enumeration value="MatteStyle-Size"/>
+										<xsd:enumeration value="MatteStyle-Color"/>
+										<xsd:enumeration value="ItemPackageQuantity-Occasion"/>
+										<xsd:enumeration value="ItemPackageQuantity-StyleName"/>
+										<xsd:enumeration value="DisplayWeight-StyleName"/>
+										<xsd:enumeration value="Material-PatternName"/>
+										<xsd:enumeration value="Material-MatteStyle"/>
+										<xsd:enumeration value="Material-StyleName"/>
+										<xsd:enumeration value="StyleName-DisplayLength"/>
+										<xsd:enumeration value="StyleName-DisplayWidth"/>
+										<xsd:enumeration value="StyleName-Occasion"/>
+										<xsd:enumeration value="StyleName-PatternName"/>
+										<xsd:enumeration value="StyleName-DisplayWeight"/>
+										<xsd:enumeration value="StyleName-Material"/>
+										<xsd:enumeration value="StyleName-Size"/>
+										<xsd:enumeration value="StyleName-Color"/>
+										<xsd:enumeration value="Size-Occasion"/>
+										<xsd:enumeration value="Size-PatternName"/>
+										<xsd:enumeration value="Size-MatteStyle"/>
+										<xsd:enumeration value="Size-StyleName"/>
+										<xsd:enumeration value="Color-Occasion"/>
+										<xsd:enumeration value="Color-PatternName"/>
+										<xsd:enumeration value="Color-MatteStyle"/>
+										<xsd:enumeration value="Color-StyleName"/>
+										<xsd:enumeration value="MatteStyle"/>
+										<xsd:enumeration value="PatternName"/>
+										<xsd:enumeration value="Occasion"/>
+										<xsd:enumeration value="StyleName"/>
+										<xsd:enumeration value="CustomerPackageType"/>
+										<xsd:enumeration value="ColorName-CustomerPackageType"/>
+										<xsd:enumeration value="SizeName-CustomerPackageType"/>
+										<xsd:enumeration
+											value="SizeName-ColorName-CustomerPackageType"/>
+										<xsd:enumeration value="StyleName-CustomerPackageType"/>
+										<xsd:enumeration
+											value="SizeName-StyleName-CustomerPackageType"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="Size" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Color" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="Scent" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="StyleName" type="StringNotNull" minOccurs="0"/>
+							<xsd:element name="CustomerPackageType" type="StringNotNull"
+								minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="Wattage" type="WattageDimensionOptionalUnit" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+     ###############################################################
+     # Home Classification Data
+     ###############################################################
+    -->
+</xsd:schema>

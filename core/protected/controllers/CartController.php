@@ -768,7 +768,6 @@ class CartController extends Controller
 						$objCustomer = Customer::model()->findByPk($intCustomerId);
 						$objCustomer->first_name = $model->contactFirstName;
 						$objCustomer->last_name = $model->contactLastName;
-						$objCustomer->last_name = $model->contactLastName;
 						$objCustomer->mainphone = $model->contactPhone;
 						$objCustomer->email = $model->contactEmail;
 						$objCustomer->save();
@@ -1087,7 +1086,7 @@ class CartController extends Controller
 
 				} else {
 					//Set some defaults for guest checkouts
-					$model->receiveNewsletter = 1;
+					$model->receiveNewsletter = Yii::app()->params['DISABLE_ALLOW_NEWSLETTER'] == 1 ? 0 : 1;
 
 				}
 			}

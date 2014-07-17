@@ -62,10 +62,14 @@ class Category extends BaseCategory
 		$blnCache = false;
 		$arrFormattedParseTree = false;
 
+		// Since the result of Category::parseTree depends on the language we
+		// need one cache entry per language.
+		$cacheKey = self::PARSE_TREE_CACHE_ID . '::' . Yii::app()->getLanguage();
+
 		if(isset(Yii::app()->cache))
 		{
 			$blnCache = true;
-			$arrFormattedParseTree = Yii::app()->cache->get(self::PARSE_TREE_CACHE_ID);
+			$arrFormattedParseTree = Yii::app()->cache->get($cacheKey);
 		}
 
 		if ($arrFormattedParseTree === false)
@@ -86,7 +90,7 @@ class Category extends BaseCategory
 			if ($blnCache)
 			{
 				Yii::app()->cache->set(
-					self::PARSE_TREE_CACHE_ID,
+					$cacheKey,
 					$arrFormattedParseTree,
 					self::PARSE_TREE_CACHE_TIME
 				);

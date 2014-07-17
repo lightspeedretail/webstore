@@ -339,24 +339,6 @@ function displayForm()
 	$dbpass = "";
 	$dbname = "";
 
-	if (file_exists("config/wsdb.php"))
-	{
-		$arrSql = require("config/wsdb.php");
-		if(isset($arrSql['username'])) $dbuser = $arrSql['username'];
-		if(isset($arrSql['password'])) $dbpass = $arrSql['password'];
-		if(isset($arrSql['connectionString']))
-		{
-			$connstring = $arrSql['connectionString'];
-			$arrC = array();
-			preg_match('/host=(.*);/', $connstring,$arrC);
-			$dbhost = $arrC[1];
-			preg_match('/dbname=(.*)/',$connstring,$arrC);
-			$dbname = $arrC[1];
-		}
-
-	}
-
-
 	?>
 
 

@@ -433,7 +433,7 @@ class m140411_120952_load_strings extends CDbMigration
 		$this->insert('xlsws_stringsource',array(
 				'id'=>96,
 				'category' =>'checkout',
-				'message' => 'Click to Calculate Shipping'
+				'message' => 'Calculate Shipping'
 			));
 
 		$this->insert('xlsws_stringsource',array(

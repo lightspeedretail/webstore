@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!-- edited with XMLSpy v2010 rel. 2 (http://www.altova.com) by Sunitha Basodi (amazon.com) -->
+<!-- Revision="$Revision: #1 $" -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<!--
+    $Date: 20011/07/26 $
+    AMAZON.COM CONFIDENTIAL.  This document and the information contained in it are
+    confidential and proprietary information of Amazon.com and may not be reproduced, 
+    distributed or used, in whole or in part, for any purpose other than as necessary 
+    to list products for sale on the www.amazon.com web site pursuant to an agreement 
+    with Amazon.com.
+    -->
+	<xsd:include schemaLocation="amzn-base.xsd"/>
+	<!--
+    Please read the corresponding documentation that contains the recommended values for elements
+    of type StringNotNull.
+    -->
+	<xsd:element name="SportsMemorabilia">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ProductType">
+					<xsd:simpleType>
+						<xsd:restriction base="HundredString">
+							<xsd:enumeration value="SportsMemorabilia"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="AuthenticatedBy" type="HundredString" minOccurs="1"/>
+				<xsd:element name="AuthenticityCertificateNumber" type="HundredString" minOccurs="0"/>
+				<xsd:element name="Autographed" type="xsd:boolean" minOccurs="0"/>			
+				<xsd:element name="ConditionProvidedBy" type="HundredString" minOccurs="1"/>
+				<xsd:element name="ConditionRating" type="HundredString" minOccurs="1"/>
+				<xsd:element name="EventName" type="HundredString" minOccurs="0"/>
+				<xsd:element name="GameUsed" type="HundredString" minOccurs="0"/>
+				<xsd:element name="IsVeryHighValue" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="ItemThickness" type="LengthDimension" minOccurs="0"/>
+				<xsd:element name="JerseyType" type="HundredString" minOccurs="0"/>
+				<xsd:element name="LeagueName" type="HundredString" minOccurs="0"/>
+				<xsd:element name="LotType" type="HundredString" minOccurs="0"/>
+				<xsd:element name="Material" type="HundredString" minOccurs="0"/>
+				<xsd:element name="NumberOfPages" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="NumberOfPieces" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="Packaging" type="HundredString" minOccurs="0"/>
+				<xsd:element name="PlayerName" type="HundredString" minOccurs="0"/>
+				<xsd:element name="Season" type="HundredString" minOccurs="0"/>
+				<xsd:element name="SignedBy" type="HundredString" minOccurs="0"/>
+				<xsd:element name="Sport" type="HundredString" minOccurs="0"/>
+				<xsd:element name="TeamName" type="HundredString" minOccurs="0"/>
+				<xsd:element name="UniformNumber" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="WhatsInTheBox" type="HundredString" minOccurs="0"/>
+				<xsd:element name="Year" type="xsd:positiveInteger" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

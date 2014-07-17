@@ -5,15 +5,17 @@
            class="pin-it-button" count-layout="none"><img border="0" src="//assets.pinterest.com/images/PinExt.png" title="Pin It"/>
         </a>
     </div>
-    <div id="pinterest" class="visible-mobile" >
-        <script>
-            function timedRedirect() {
-                setTimeout(location.href = "http://pinterest.com/pin/create/button/?url=<?= $this->getCanonicalUrl(); ?>&media=<?=
-                    $product->SmallImageAbsolute; ?>&description=<?= urlencode($product->Title); ?>",50);
-            }
-        </script>
-        <a onclick="timedRedirect()" class="pin-it-button" count-layout="none"><i></i></a>
-    </div>
+	<div id="pinterest" class="visible-mobile" >
+		<script>
+			function timedRedirect() {
+				setTimeout(function() {
+					window.open("http://pinterest.com/pin/create/button/?url=<?= $this->getCanonicalUrl(); ?>&media=<?=
+                    $product->SmallImageAbsolute; ?>&description=<?= urlencode($product->Title); ?>",'_blank');
+				}, 50);
+			}
+		</script>
+		<a onclick="timedRedirect()" class="pin-it-button" count-layout="none"><i></i></a>
+	</div>
     <div class="g-plusone" data-size="medium" data-annotation="none" data-width="50"></div>
     <?php if (_xls_facebook_login()): ?><script>(function (d) {
 		var js, id = 'facebook-jssdk';

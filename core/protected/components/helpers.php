@@ -902,10 +902,11 @@ function _xls_send_email($id, $hideJson = false)
 			if($objMail->to != Yii::app()->params['EMAIL_BCC'] && $objMail->to == $from)
 				$mail->AddCC(Yii::app()->params['EMAIL_BCC']);
 
-		Yii::log("Contents of mail ".print_r($mail,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-
         $mail->MsgHTML($objMail->htmlbody);
 		$blnResult = $mail->Send();
+
+		$mail->Password = '*password removed for logging*'; //replace the real password before logging
+		Yii::log("Contents of mail ".print_r($mail,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 		if($blnResult)
 		{

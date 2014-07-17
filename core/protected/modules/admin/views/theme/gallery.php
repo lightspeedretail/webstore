@@ -31,12 +31,12 @@
 				<?php if ($objTheme['newver']>0)
 					$this->widget('bootstrap.widgets.TbButton', array(
 					'buttonType'=>'submit',
-					'label'=>($objTheme['newver']==1 ? 'Update' : 'Install'),
-					'type'=>($objTheme['newver']==1 ? 'danger' : 'primary'),
+					'label'=>($objTheme['installed']==1 ? 'Update' : 'Install'),
+					'type'=>($objTheme['installed']==1 ? 'danger' : 'primary'),
 					'size'=>'small',
 					'htmlOptions'=>array(
 						'id'=>$objTheme['name'],
-						'value'=>($objTheme['newver']==1 ? 'update' : 'install'),
+						'value'=>($objTheme['installed']==1 ? 'update' : 'install'),
 						'name'=>$key,
 						'class'=>'galleryinstall',
 						'onclick'=>'js:$(this).addClass("installing");$(this).html("")'

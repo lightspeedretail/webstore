@@ -501,6 +501,9 @@ class Product extends BaseProduct
 	 */
 	protected function GetImageLink($type = ImagesType::normal,$absolute=false)
 	{
+		if (!$this->image_id && $this->IsChild())
+			return Images::GetLink($this->parent0->image_id, $type,$absolute);
+
 		return Images::GetLink($this->image_id, $type,$absolute);
 	}
 

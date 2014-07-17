@@ -59,7 +59,7 @@ class MyaccountController extends Controller
 		//For logged in users we grab the current model
 		if (Yii::app()->user->isGuest)
 		{
-			$model->newsletter_subscribe = 1;
+			$model->newsletter_subscribe = Yii::app()->params['DISABLE_ALLOW_NEWSLETTER'] == 1 ? 0 : 1;
 		}
 		else
 		{

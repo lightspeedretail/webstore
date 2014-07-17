@@ -8,6 +8,8 @@
 		'zoomSizeMode'=>'lens',
 		'zoomPosition'=>Yii::app()->params['IMAGE_ZOOM']=='flyout' ? '3' : 'inside',
 		'zoomOffsetX'=>Yii::app()->params['IMAGE_ZOOM']=='flyout' ? 10 : 0,
+		'autoInside'=>665,
+		'touchStartDelay'=>100,
 		'zoomFlyOut'=>Yii::app()->params['IMAGE_ZOOM']=='flyout' ? 'true' : 'false',
 	));
 	?>

@@ -141,27 +141,48 @@ class ProductController extends Controller
 
 			$objProduct = Product::LoadChildProduct($id, $strSize, $strColor);
 
-			$arrReturn['status'] = 'success';
-			$arrReturn['id'] = $objProduct->id;
-			$arrReturn['FormattedPrice'] = $objProduct->Price;
-			$arrReturn['FormattedRegularPrice'] = $objProduct->SlashedPrice;
-			$arrReturn['image_id'] = CHtml::image(Images::GetLink($objProduct->image_id, ImagesType::pdetail));
-			$arrReturn['code'] = $objProduct->code;
-			$arrReturn['title'] = $objProduct->Title;
-			$arrReturn['InventoryDisplay'] = $objProduct->InventoryDisplay;
+			if ($objProduct instanceof Product)
+			{
+				$arrReturn['status'] = 'success';
+				$arrReturn['id'] = $objProduct->id;
+				$arrReturn['FormattedPrice'] = $objProduct->Price;
+				$arrReturn['FormattedRegularPrice'] = $objProduct->SlashedPrice;
+				$arrReturn['image_id'] = CHtml::image(Images::GetLink($objProduct->image_id, ImagesType::pdetail));
+				$arrReturn['code'] = $objProduct->code;
+				$arrReturn['title'] = $objProduct->Title;
+				$arrReturn['InventoryDisplay'] = $objProduct->InventoryDisplay;
 
-			if ($objProduct->WebLongDescription)
-				$arrReturn['description_long'] = $objProduct->WebLongDescription;
+				if ($objProduct->WebLongDescription)
+					$arrReturn['description_long'] = $objProduct->WebLongDescription;
+				else
+					$arrReturn['description_long'] = $objProduct->parent0->WebLongDescription;
+
+				if ($objProduct->description_short)
+					$arrReturn['description_short'] = $objProduct->WebShortDescription;
+				else
+					$arrReturn['description_short'] = $objProduct->parent0->WebShortDescription;
+
+				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+				$arrReturn['photos'] = $this->renderPartial('/product/_photos', array('model' => $objProduct), true, false);
+
+			}
 			else
-				$arrReturn['description_long'] = $objProduct->parent0->WebLongDescription;
+			{
+				// options are missing so return the master product
 
-			if ($objProduct->description_short)
-				$arrReturn['description_short'] = $objProduct->WebShortDescription;
-			else
-				$arrReturn['description_short'] = $objProduct->parent0->WebShortDescription;
+				$objProduct = Product::model()->findByPk($id);
 
-			Yii::app()->clientscript->scriptMap['jquery.js'] = false;
-			$arrReturn['photos'] = $this->renderPartial('/product/_photos', array('model' => $objProduct), true, false);
+				$arrReturn['FormattedPrice'] = $objProduct->Price;
+				$arrReturn['code'] = $objProduct->code;
+				$arrReturn['title'] = $objProduct->Title;
+				$arrReturn['InventoryDisplay'] = $objProduct->InventoryDisplay;
+				if ($objProduct->WebLongDescription)
+					$arrReturn['description_long'] = $objProduct->WebLongDescription;
+				if ($objProduct->description_short)
+					$arrReturn['description_short'] = $objProduct->WebShortDescription;
+				$arrReturn['photos'] = $this->renderPartial('/product/_photos', array('model' => $objProduct), true, false);
+
+			}
 
 			echo json_encode($arrReturn);
 		}

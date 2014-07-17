@@ -30,10 +30,12 @@
 	Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->cssUrl('custom'));
 	?>
 
+	<?php $this->widget('ext.wsiosorientationbugfix.iosorientationbugfix'); ?>
+
 	<?php echo $this->renderPartial("/site/_google",null,true); ?>
 
 
-		<link href='http://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
 	<link href='http://fonts.googleapis.com/css?family=Fresca' rel='stylesheet' type='text/css'>
 	<link href='http://fonts.googleapis.com/css?family=Karla' rel='stylesheet' type='text/css'>
 

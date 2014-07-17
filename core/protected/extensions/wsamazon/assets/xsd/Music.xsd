@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Revision="$Revision: #1 $" -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<!--
+  			 $Date: 2008/05/16/ $      
+         AMAZON.COM CONFIDENTIAL.  This document and the information contained in it are
+         confidential and proprietary information of Amazon.com and may not be reproduced,
+         distributed or used, in whole or in part, for any purpose other than as necessary 
+         to list products for sale on the www.amazon.com web site pursuant to an agreement
+         with Amazon.com.
+	-->
+	<xsd:include schemaLocation="amzn-base.xsd"/>
+	<xsd:element name="Music">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ProductType">
+					<xsd:complexType>
+						<xsd:choice>
+							<xsd:element ref="MusicPopular"/>
+							<xsd:element ref="MusicClassical"/>
+						</xsd:choice>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+	###############################################################
+	# MusicPopular  Classification Data
+	###############################################################
+	-->
+	<xsd:element name="MusicPopular">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="MediaType" type="MusicMediaType"/>
+				<xsd:element name="VinylRecordDetails" type="VinylRecordDetailsType" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>This field is required for records (MediaType lp_record).</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="Format" type="MusicFormatType" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="AudioEncoding" type="AudioEncodingType" minOccurs="0"/>
+				<xsd:element name="NumberOfDiscs" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="RunTime" type="xsd:positiveInteger" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>The total run time, in minutes.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="Artist" type="MediumStringNotNull" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="Language" type="LanguageStringType" minOccurs="0"/>
+				<xsd:element name="OriginalPublicationDate" type="xsd:dateTime" minOccurs="0"/>
+				<xsd:element name="PublicationDate" type="xsd:dateTime" minOccurs="0"/>
+				<xsd:element name="SubjectKeywords" type="xsd:string" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="IsAdultProduct" type="xsd:boolean" minOccurs="0"/>
+                                <xsd:element name="Genre" type="StringNotNull" minOccurs="0"/>
+                                <xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+	###############################################################
+	# MusicClassical  Classification Data
+	###############################################################
+	-->
+	<xsd:element name="MusicClassical">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="MediaType" type="MusicMediaType"/>
+				<xsd:element name="VinylRecordDetails" type="VinylRecordDetailsType" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>This field is required for records (MediaType lp_record).</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="Format" type="MusicFormatType" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="AudioEncoding" type="AudioEncodingType" minOccurs="0"/>
+				<xsd:element name="NumberOfDiscs" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="RunTime" type="xsd:positiveInteger" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>The total run time, in minutes.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="Artist" type="MediumStringNotNull" minOccurs="0" maxOccurs="10"/>
+                                <xsd:element name="Performer" type="StringNotNull" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="Composer" type="MediumStringNotNull" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="Conductor" type="MediumStringNotNull" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="Orchestra" type="MediumStringNotNull" minOccurs="0" maxOccurs="10"/>
+				<xsd:element name="Language" type="LanguageStringType" minOccurs="0"/>
+				<xsd:element name="OriginalPublicationDate" type="xsd:dateTime" minOccurs="0"/>
+				<xsd:element name="PublicationDate" type="xsd:dateTime" minOccurs="0"/>
+				<xsd:element name="SubjectKeywords" type="xsd:string" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="IsAdultProduct" type="xsd:boolean" minOccurs="0"/>
+                                <xsd:element name="Genre" type="StringNotNull" minOccurs="0"/>
+                                <xsd:element name="CountryOfOrigin" type="CountryOfOriginType" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+	###############################################################
+	# Music Data Types
+	###############################################################
+	-->
+	<xsd:simpleType name="MusicMediaType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="lp_record"/>
+			<xsd:enumeration value="audioCD"/>
+			<xsd:enumeration value="cassette"/>
+			<xsd:enumeration value="dvd_audio"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="VinylRecordDetailsType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="lp"/>
+			<xsd:enumeration value="12_single"/>
+			<xsd:enumeration value="45"/>
+			<xsd:enumeration value="ep"/>
+			<xsd:enumeration value="78"/>
+			<xsd:enumeration value="other"/>
+			<xsd:enumeration value="unknown"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

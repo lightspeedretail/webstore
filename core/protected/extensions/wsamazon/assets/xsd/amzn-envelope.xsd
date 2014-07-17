@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+<!-- Revision="$Revision: #1 $" -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<!--
+	$Date: 2009/09/25 $
+
+	AMAZON.COM CONFIDENTIAL.  This document and the information contained in it are
+	confidential and proprietary information of Amazon.com and may not be reproduced, 
+	distributed or used, in whole or in part, for any purpose other than as necessary 
+	to list products for sale on the www.amazon.com web site pursuant to an agreement 
+	with Amazon.com.
+	-->
+	<xsd:include schemaLocation="amzn-base.xsd"/>
+	<xsd:include schemaLocation="amzn-header.xsd"/>
+	<xsd:include schemaLocation="CatPIL.xsd"/>
+	<xsd:include schemaLocation="Customer.xsd"/>
+	<xsd:include schemaLocation="FulfillmentCenter.xsd"/>
+	<xsd:include schemaLocation="FulfillmentOrderCancellationRequest.xsd"/>
+	<xsd:include schemaLocation="FulfillmentOrderRequest.xsd"/>
+        <xsd:include schemaLocation="Image.xsd"/>
+	<xsd:include schemaLocation="Inventory.xsd"/>
+	<xsd:include schemaLocation="Item.xsd"/>
+	<xsd:include schemaLocation="Listings.xsd"/>
+	<xsd:include schemaLocation="Loyalty.xsd"/>
+	<xsd:include schemaLocation="MultiChannelOrderReport.xsd"/>
+	<xsd:include schemaLocation="NavigationReport.xsd"/>
+	<xsd:include schemaLocation="Offer.xsd"/>
+	<xsd:include schemaLocation="OrderAcknowledgement.xsd"/>
+	<xsd:include schemaLocation="OrderAdjustment.xsd"/>
+	<xsd:include schemaLocation="OrderFulfillment.xsd"/>
+	<xsd:include schemaLocation="OrderNotificationReport.xsd"/>
+	<xsd:include schemaLocation="OrderReport.xsd"/>
+	<xsd:include schemaLocation="Override.xsd"/>
+	<xsd:include schemaLocation="Price.xsd"/>
+	<xsd:include schemaLocation="ProcessingReport.xsd"/>
+	<xsd:include schemaLocation="Product.xsd"/>
+	<xsd:include schemaLocation="ProductImage.xsd"/>
+	<xsd:include schemaLocation="Relationship.xsd"/>
+	<xsd:include schemaLocation="ReverseFeed.xsd"/>
+	<xsd:include schemaLocation="SettlementReport.xsd"/>
+	<xsd:include schemaLocation="Store.xsd"/>
+	<xsd:include schemaLocation="WebstoreItem.xsd"/>
+	<xsd:element name="AmazonEnvelope">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Header"/>
+				<xsd:element name="MessageType">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="CatPIL"/>
+							<xsd:enumeration value="Customer"/>
+							<xsd:enumeration value="FulfillmentCenter"/>
+							<xsd:enumeration value="FulfillmentOrderCancellationRequest"/>
+							<xsd:enumeration value="FulfillmentOrderRequest"/>
+                                                        <xsd:enumeration value="Image"/>
+							<xsd:enumeration value="Inventory"/>
+							<xsd:enumeration value="Item"/>
+							<xsd:enumeration value="Listings"/>
+							<xsd:enumeration value="Loyalty"/>
+							<xsd:enumeration value="MultiChannelOrderReport"/>
+							<xsd:enumeration value="NavigationReport"/>
+							<xsd:enumeration value="Offer"/>
+							<xsd:enumeration value="OrderAcknowledgement"/>
+							<xsd:enumeration value="OrderAdjustment"/>
+							<xsd:enumeration value="OrderFulfillment"/>
+							<xsd:enumeration value="OrderNotificationReport"/>
+							<xsd:enumeration value="OrderReport"/>
+							<xsd:enumeration value="Override"/>
+							<xsd:enumeration value="Price"/>
+							<xsd:enumeration value="ProcessingReport"/>
+							<xsd:enumeration value="Product"/>
+							<xsd:enumeration value="ProductImage"/>
+							<xsd:enumeration value="Relationship"/>
+							<xsd:enumeration value="ReverseItem"/>
+							<xsd:enumeration value="SettlementReport"/>
+							<xsd:enumeration value="Store"/>
+							<xsd:enumeration value="WebstoreItem"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element ref="MarketplaceName" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>
+						The MarketplaceName is only supported for 
+						Override feeds.
+						If included here, the MarketplaceName will
+						apply to all messages in the feed.
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="PurgeAndReplace" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="EffectiveDate" type="xsd:dateTime" minOccurs="0"/>
+				<xsd:element name="Message" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="MessageID" type="IDNumber"/>
+							<xsd:element name="OperationType" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="Update"/>
+										<xsd:enumeration value="Delete"/>
+										<xsd:enumeration value="PartialUpdate"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:choice>
+								<xsd:element ref="CatPIL"/>
+								<xsd:element ref="Customer"/>
+								<xsd:element ref="FulfillmentCenter"/>
+								<xsd:element ref="FulfillmentOrderCancellationRequest"/>
+								<xsd:element ref="FulfillmentOrderRequest"/>
+                                                                <xsd:element ref="Image"/>
+								<xsd:element ref="Inventory"/>
+								<xsd:element ref="Item"/>
+								<xsd:element ref="Listings"/>
+								<xsd:element ref="Loyalty"/>
+								<xsd:element ref="MultiChannelOrderReport"/>
+								<xsd:element ref="NavigationReport"/>
+								<xsd:element ref="Offer"/>
+								<xsd:element ref="OrderAcknowledgement"/>
+								<xsd:element ref="OrderAdjustment"/>
+								<xsd:element ref="OrderFulfillment"/>
+								<xsd:element ref="OrderNotificationReport"/>
+								<xsd:element ref="OrderReport"/>
+								<xsd:element ref="Override"/>
+								<xsd:element ref="Price"/>
+								<xsd:element ref="ProcessingReport"/>
+								<xsd:element ref="Product"/>
+								<xsd:element ref="ProductImage"/>
+								<xsd:element ref="Relationship"/>
+								<xsd:element ref="ReverseItem"/>
+								<xsd:element ref="SettlementReport"/>
+								<xsd:element ref="Store"/>
+								<xsd:element ref="WebstoreItem"/>
+							</xsd:choice>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

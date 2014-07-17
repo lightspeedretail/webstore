@@ -37,16 +37,13 @@ class SoapController extends CController
 						'application.'.__CLASS__.".".__FUNCTION__.".".$action->id
 					);
 					break;
-
 			}
-
 		}
 
 		if(YII_DEBUG)
 			ini_set("soap.wsdl_cache_enabled", 0);
 		@ini_set("soap.wsdl_cache_dir",Yii::getPathOfAlias('webroot.runtime'));
 		return parent::beforeAction($action);
-
 	}
 
 	public function actions()
@@ -59,15 +56,22 @@ class SoapController extends CController
 		);
 	}
 
-
-
 	protected function check_passkey($passkey)
 	{
-		$conf = _xls_get_conf('LSKEY','notset');
-		return ($conf == strtolower(md5($passkey)) ? 1 : 0);
+		$conf = strtolower(_xls_get_conf('LSKEY','notset'));
+
+		if ($conf === md5($passkey))
+			return true;
+		else
+		{
+			if ($conf == 'notset')
+				throw new CException("LSKEY not set.");
+			elseif (empty($passkey))
+				throw new CException("passkey is either null or empty string.");
+			elseif ($conf !== md5($passkey))
+				throw new CException("Incorrect passkey.");
+		}
 	}
-
-
 
 	/**
 	 * Get the currently installed Web Store version
@@ -76,16 +80,20 @@ class SoapController extends CController
 	 * @return string
 	 * @soap
 	 */
-	public function ws_version($passkey){
-
-		if(!$this->check_passkey($passkey))
-			return "Invalid Password";
-
+	public function ws_version($passkey)
+	{
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
+			return self::FAIL_AUTH;
+		}
 
 		return _xls_version();
-
 	}
-
 
 	/**
 	 * Echo current version
@@ -94,6 +102,7 @@ class SoapController extends CController
 	{
 		echo _xls_version();
 	}
+
 	/**
 	 * Force stat report
 	 */
@@ -101,6 +110,7 @@ class SoapController extends CController
 	{
 		_xls_check_version();
 	}
+
 	/**
 	 * Flushes a DB Table
 	 * This gets called during a Reset Store Products for the following tables in sequence:
@@ -111,22 +121,32 @@ class SoapController extends CController
 	 * @return string
 	 * @soap
 	 */
-	public function db_flush($passkey, $strObj) {
-
-		if (!$this->check_passkey($passkey))
+	public function db_flush($passkey, $strObj)
+	{
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
-		if (_xls_get_conf('DEBUG_RESET', 0) == 1) {
+		if (_xls_get_conf('DEBUG_RESET', 0) == 1)
+		{
 			_xls_log("Skipped flush operation due to DEBUG mode");
 			return self::OK;
 		}
 
-		if(!class_exists($strObj)){
+		if(!class_exists($strObj))
+		{
 			_xls_log("SOAP ERROR : There is no object type of $strObj" );
 			return self::NOT_FOUND;
 		}
 
-		if(in_array($strObj , array('Cart' , 'Configuration' , 'ConfigurationType' , 'CartType' , 'ViewLogType'))){
+		if(in_array($strObj , array('Cart' , 'Configuration' , 'ConfigurationType' , 'CartType' , 'ViewLogType')))
+		{
 			_xls_log("SOAP ERROR : Objects of type $strObj are not allowed for flushing" );
 			return self::UNKNOWN_ERROR;
 		}
@@ -143,7 +163,6 @@ class SoapController extends CController
 		ProductQtyPricing
 		Images
 		 */
-
 
 		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=0;')->execute();
 		//For certain tables, we flush related data as well
@@ -185,19 +204,13 @@ class SoapController extends CController
 				Yii::app()->db->createCommand()->truncateTable(ImagesCloud::model()->tableName());
 				$strTableName = "xlsws_images";
 				break;
-
 		}
+
 		//Then truncate the table
 		Yii::app()->db->createCommand()->truncateTable($strTableName);
-
-
 		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=1;')->execute();
 
-
-
 		return self::OK;
-
-
 	}
 
 	/**
@@ -213,16 +226,23 @@ class SoapController extends CController
 	 * @soap
 	 */
 	public function add_tax(
-		$passkey
-		,   $intNo
-		,   $intTaxRateId
-		,   $strTax
-		,   $fltMax
-		,   $blnCompounded
-	){
-
-		if(!$this->check_passkey($passkey))
+		$passkey,
+		$intNo,
+		$intTaxRateId,
+		$strTax,
+		$fltMax,
+		$blnCompounded
+	)
+	{
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		//Remove if we have this tax already, just readd
 		Tax::model()->deleteAllByAttributes(array('id'=>$intTaxRateId));
@@ -231,7 +251,8 @@ class SoapController extends CController
 		// Loads tax
 		$tax = Tax::LoadByLS($intNo);
 
-		if(!$tax){
+		if(!$tax)
+		{
 			$tax = new Tax();
 			$tax->id = $intTaxRateId;
 			$tax->lsid = $intNo;
@@ -241,18 +262,14 @@ class SoapController extends CController
 		$tax->max_tax = $fltMax;
 		$tax->compounded = $blnCompounded;
 
-		if (!$tax->save()) {
-
+		if (!$tax->save())
+		{
 			_xls_log("SOAP ERROR : Error adding tax $strTax " . print_r($tax->getErrors(),true));
 			return self::UNKNOWN_ERROR." Error adding tax $strTax " . print_r($tax->getErrors(),true);
 		}
 
 		return self::OK;
-
-
 	}
-
-
 
 	/**
 	 * Add a tax code into the WS
@@ -270,19 +287,26 @@ class SoapController extends CController
 	 * @soap
 	 */
 	public function add_tax_code(
-		$passkey
-		,   $intRowid
-		,   $strCode
-		,   $intListOrder
-		,   $fltTax1Rate
-		,   $fltTax2Rate
-		,   $fltTax3Rate
-		,   $fltTax4Rate
-		,   $fltTax5Rate
-	){
-
-		if(!$this->check_passkey($passkey))
+		$passkey,
+		$intRowid,
+		$strCode,
+		$intListOrder,
+		$fltTax1Rate,
+		$fltTax2Rate,
+		$fltTax3Rate,
+		$fltTax4Rate,
+		$fltTax5Rate
+	)
+	{
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		if ($strCode == "") //ignore blank tax codes
 		return self::OK;
@@ -310,7 +334,6 @@ class SoapController extends CController
 
 		TaxCode::VerifyAnyDestination();
 		return self::OK;
-
 	}
 
 	/**
@@ -328,18 +351,25 @@ class SoapController extends CController
 	 * @soap
 	 */
 	function add_tax_status(
-		$passkey
-		,   $intRowid
-		,   $strStatus
-		,   $blnTax1Exempt
-		,   $blnTax2Exempt
-		,   $blnTax3Exempt
-		,   $blnTax4Exempt
-		,   $blnTax5Exempt
-	){
-
-		if(!$this->check_passkey($passkey))
+		$passkey,
+		$intRowid,
+		$strStatus,
+		$blnTax1Exempt,
+		$blnTax2Exempt,
+		$blnTax3Exempt,
+		$blnTax4Exempt,
+		$blnTax5Exempt
+	)
+	{
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		if ($strStatus == "") //ignore blank tax statuses
 		return self::OK;
@@ -347,9 +377,8 @@ class SoapController extends CController
 		// Loads tax
 		$tax = TaxStatus::LoadByLS($intRowid);
 
-		if(!$tax){
+		if(!$tax)
 			$tax = new TaxStatus;
-		}
 
 		$tax->lsid = $intRowid;
 		$tax->status = $strStatus;
@@ -359,15 +388,14 @@ class SoapController extends CController
 		$tax->tax4_status = $blnTax4Exempt;
 		$tax->tax5_status = $blnTax5Exempt;
 
-		if (!$tax->save()) {
+		if (!$tax->save())
+		{
 			Yii::log("SOAP ERROR : Error saving category $strStatus " . print_r($tax->getErrors()), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::UNKNOWN_ERROR." Error saving category $strStatus " . print_r($tax->getErrors(),true);
 		}
 
 		return self::OK;
-
 	}
-
 
 	/**
 	 * Add a family
@@ -377,32 +405,37 @@ class SoapController extends CController
 	 * @return string
 	 * @soap
 	 */
-	public function add_family(
-		$passkey
-		,   $strFamily
-	){
-		if(!$this->check_passkey($passkey))
+	public function add_family($passkey, $strFamily)
+	{
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		if(trim($strFamily) == '') //ignore blank families
-		return self::OK;
+			return self::OK;
 
 
 		$family = Family::LoadByFamily($strFamily);
 
-		if(!$family){
+		if(!$family)
 			$family = new Family();
-		}
 
 		$family->family = $strFamily;
 		$family->request_url = _xls_seo_url($strFamily);
 
-		if (!$family->save()) {
+		if (!$family->save())
+		{
 			Yii::log("SOAP ERROR : Error saving family $strFamily " . print_r($family->getErrors()), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::UNKNOWN_ERROR." Error saving family $strFamily " . print_r($family->getErrors(),true);
 		}
-		return self::OK;
 
+		return self::OK;
 	}
 
 	/**
@@ -413,9 +446,17 @@ class SoapController extends CController
 	 * @return string
 	 * @soap
 	 */
-	public function flush_category($passkey) {
-		if (!$this->check_passkey($passkey))
+	public function flush_category($passkey)
+	{
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		try {
 			Yii::app()->db->createCommand()->truncateTable('xlsws_category_addl');
@@ -427,8 +468,6 @@ class SoapController extends CController
 		}
 
 		return self::OK;
-
-
 	}
 
 
@@ -463,11 +502,19 @@ class SoapController extends CController
 		$strCustomPage,
 		$intPosition,
 		$blbImage
-	) {
-
+	)
+	{
 		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=0;')->execute();
-		if (!$this->check_passkey($passkey))
+
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		// Prepare values
 		$strCategory = trim($strCategory);
@@ -499,24 +546,24 @@ class SoapController extends CController
 		$objCategoryAddl->modified = new CDbExpression('NOW()');
 		$objCategoryAddl->save();
 
-
-
-
 		//Now that we've successfully saved in our cache table, update the regular Category table
 		$objCategory = Category::model()->findByPk($intRowId);
 		// Failing that, create a new Category
-		if (!$objCategory) {
+		if (!$objCategory)
+		{
 			$objCategory = new Category();
 			$objCategory->created = new CDbExpression('NOW()');
 			$objCategory->id = $objCategoryAddl->id;
 		}
-		if ($objCategory) {
+		if ($objCategory)
+		{
 			$objCategory->label = $objCategoryAddl->label;
 			$objCategory->parent = $objCategoryAddl->parent;
 			$objCategory->menu_position = $objCategoryAddl->menu_position;
 		}
 
-		if (!$objCategory->save()) {
+		if (!$objCategory->save())
+		{
 
 			_xls_log("SOAP ERROR : Error saving category $strCategory " . print_r($objCategory->getErrors(),true));
 			return self::UNKNOWN_ERROR." Error saving category $strCategory " . print_r($objCategory->getErrors(),true);
@@ -525,8 +572,8 @@ class SoapController extends CController
 		$objCategory->UpdateChildCount();
 		$objCategory->request_url=$objCategory->GetSEOPath();
 
-		if (!$objCategory->save()) {
-
+		if (!$objCategory->save())
+		{
 			_xls_log("SOAP ERROR : Error saving category (after updating)$strCategory " . print_r($objCategory->getErrors(),true));
 			return self::UNKNOWN_ERROR." Error saving category (after updating)$strCategory " . print_r($objCategory->getErrors(),true);
 		}
@@ -543,9 +590,17 @@ class SoapController extends CController
 	 * @return string
 	 * @soap
 	 */
-	public function remove_product_images($passkey , $intRowid){
-		if(!$this->check_passkey($passkey))
+	public function remove_product_images($passkey , $intRowid)
+	{
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		$objProduct = Product::model()->findByPk($intRowid);
 		if (!$objProduct) //This is a routine clear for any upload, new products will always trigger here
@@ -608,43 +663,50 @@ class SoapController extends CController
 	 * @soap
 	 */
 	public function save_product(
-		$passkey
-		, $intRowid
-		, $strCode
-		, $strName
-		, $blbImage
-		, $strClassName
-		, $blnCurrent
-		, $strDescription
-		, $strDescriptionShort
-		, $strFamily
-		, $blnGiftCard
-		, $blnInventoried
-		, $fltInventory
-		, $fltInventoryTotal
-		, $blnMasterModel
-		, $intMasterId
-		, $strProductColor
-		, $strProductSize
-		, $fltProductHeight
-		, $fltProductLength
-		, $fltProductWidth
-		, $fltProductWeight
-		, $intTaxStatusId
-		, $fltSell
-		, $fltSellTaxInclusive
-		, $fltSellWeb
-		, $strUpc
-		, $blnOnWeb
-		, $strWebKeyword1
-		, $strWebKeyword2
-		, $strWebKeyword3
-		, $blnFeatured
-		, $strCategoryPath
-	){
-
-		if(!$this->check_passkey($passkey))
+		$passkey,
+		$intRowid,
+		$strCode,
+		$strName,
+		$blbImage,
+		$strClassName,
+		$blnCurrent,
+		$strDescription,
+		$strDescriptionShort,
+		$strFamily,
+		$blnGiftCard,
+		$blnInventoried,
+		$fltInventory,
+		$fltInventoryTotal,
+		$blnMasterModel,
+		$intMasterId,
+		$strProductColor,
+		$strProductSize,
+		$fltProductHeight,
+		$fltProductLength,
+		$fltProductWidth,
+		$fltProductWeight,
+		$intTaxStatusId,
+		$fltSell,
+		$fltSellTaxInclusive,
+	    $fltSellWeb,
+		$strUpc,
+		$blnOnWeb,
+		$strWebKeyword1,
+		$strWebKeyword2,
+		$strWebKeyword3,
+		$blnFeatured,
+		$strCategoryPath
+	)
+	{
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		// We must preservice the Rowid of Products within the Web Store
 		// database and must therefore see if it already exists
@@ -655,7 +717,6 @@ class SoapController extends CController
 			$objProduct->id = $intRowid;
 		}
 
-
 		$strName = trim($strName);
 		$strName = trim($strName,'-');
 		$strName = substr($strName, 0, 255);
@@ -664,7 +725,6 @@ class SoapController extends CController
 		$strCode = str_replace("'",'',$strCode);
 		if (empty($strName)) $strName='missing-name';
 		if (empty($strDescription)) $strDescription='';
-
 
 		$objProduct->code = $strCode;
 		$objProduct->title = $strName;
@@ -696,7 +756,6 @@ class SoapController extends CController
 		//If we're in TaxIn Mode, then SellWeb has tax and we reverse it.
 		if (_xls_get_conf('TAX_INCLUSIVE_PRICING',0)==1)
 		{
-
 			if($fltSellWeb != 0)
 			{
 				//Tax in with a sell on web price
@@ -720,8 +779,6 @@ class SoapController extends CController
 		$objProduct->upc = $strUpc;
 		$objProduct->web = $blnOnWeb;
 		$objProduct->featured = $blnFeatured;
-
-
 
 		$fltReserved = $objProduct->CalculateReservedInventory();
 
@@ -748,18 +805,17 @@ class SoapController extends CController
 
 		$arrTags = explode(",",$strTags);
 		ProductTags::DeleteProductTags($objProduct->id);
-		foreach ($arrTags as $indivTag) {
-			if (!empty($indivTag)) {
-
+		foreach ($arrTags as $indivTag)
+		{
+			if (!empty($indivTag))
+			{
 				$tag = Tags::model()->findByAttributes(array('tag'=>$indivTag));
 				if(!($tag instanceof Tags))
 				{
 					$tag = new Tags;
 					$tag->tag = $indivTag;
 					$tag->save();
-
 				}
-
 
 				$objProductTag = new ProductTags();
 				$objProductTag->product_id = $objProduct->id;
@@ -774,8 +830,6 @@ class SoapController extends CController
 			}
 		}
 
-
-
 		if (!empty($strFamily))
 		{
 			$objFamily = Family::model()->findByAttributes(array('family'=>$strFamily));
@@ -783,7 +837,9 @@ class SoapController extends CController
 			{
 				$objProduct->family_id = $objFamily->id;
 				$objProduct->save();
-			} else {
+			}
+			else
+			{
 				$objFamily = new Family;
 				$objFamily->family = $strFamily;
 				$objFamily->child_count=0;
@@ -793,8 +849,11 @@ class SoapController extends CController
 				$objProduct->save();
 			}
 			$objFamily->UpdateChildCount();
-		} else {
-			if ($objProduct->family_id) {
+		}
+		else
+		{
+			if ($objProduct->family_id)
+			{
 				$objFamily = Family::model()->findByAttributes(array('id'=>$objProduct->family_id));
 				$objProduct->family_id = null;
 				$objProduct->save();
@@ -819,9 +878,7 @@ class SoapController extends CController
 				$objProduct->save();
 			}
 			$objClass->UpdateChildCount();
-
 		}
-
 
 		// Save category
 		$strCategoryPath = trim($strCategoryPath);
@@ -844,11 +901,11 @@ class SoapController extends CController
 				$objCategory->UpdateChildCount();
 			}
 
-		} else ProductCategoryAssn::model()->deleteAllByAttributes(
-			array('product_id'=>$objProduct->id));
+		}
+		else
+			ProductCategoryAssn::model()->deleteAllByAttributes(array('product_id'=>$objProduct->id));
 
 		Product::ConvertSEO($intRowid); //Build request_url
-
 
 		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=1;')->execute();
 
@@ -869,15 +926,20 @@ class SoapController extends CController
 	 * @return string
 	 * @soap
 	 */
-	public function remove_related_products(
-		$passkey
-		, $intProductId
-	)
+	public function remove_related_products($passkey, $intProductId)
 	{
-		if (!$this->check_passkey($passkey))
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
-		try {
+		try
+		{
 			ProductRelated::model()->deleteAll('product_id= ' . $intProductId);
 		}
 		catch (Exception $e)
@@ -885,8 +947,8 @@ class SoapController extends CController
 			Yii::log("SOAP ERROR ".$e, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::UNKNOWN_ERROR;
 		}
-		return self::OK;
 
+		return self::OK;
 	}
 
 	/**
@@ -901,16 +963,22 @@ class SoapController extends CController
 	 * @soap
 	 */
 	public function add_related_product(
-		$passkey
-		,   $intProductId
-		,   $intRelatedId
-		,   $intAutoadd
-		,   $fltQty
-	){
-
-
-		if(!$this->check_passkey($passkey))
+		$passkey,
+		$intProductId,
+		$intRelatedId,
+		$intAutoadd,
+		$fltQty
+	)
+	{
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=0;')->execute();
 		$related = ProductRelated::LoadByProductIdRelatedId($intProductId , $intRelatedId);
@@ -918,28 +986,26 @@ class SoapController extends CController
 
 		$new = false;
 
-		if(!($related instanceof ProductRelated)){
+		if(!($related instanceof ProductRelated))
 			$related = new ProductRelated();
-		}
 
 		//You can't auto add a master product
 		if ($objProduct->master_model==1) $intAutoadd=0;
-
 
 		$related->product_id = $intProductId;
 		$related->related_id = $intRelatedId;
 		$related->autoadd = $intAutoadd;
 		$related->qty = $fltQty;
 
-
-		if (!$related->save()) {
+		if (!$related->save())
+		{
 			Yii::log("SOAP ERROR : Error saving related $intProductId " . print_r($related->getErrors()), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::UNKNOWN_ERROR." Error saving category $intProductId " . print_r($related->getErrors(),true);
 		}
 
 		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=1;')->execute();
-		return self::OK;
 
+		return self::OK;
 	}
 
 	/**
@@ -950,16 +1016,20 @@ class SoapController extends CController
 	 * @return string
 	 * @soap
 	 */
-	public function remove_product_qty_pricing(
-		$passkey
-		,   $intProductId
-	){
-
-		if(!$this->check_passkey($passkey))
+	public function remove_product_qty_pricing($passkey, $intProductId)
+	{
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
-
-		try {
+		try
+		{
 			ProductQtyPricing::model()->deleteAll('product_id= ' . $intProductId);
 		}
 		catch (Exception $e)
@@ -968,12 +1038,8 @@ class SoapController extends CController
 			return self::UNKNOWN_ERROR;
 		}
 
-
 		return self::OK;
-
 	}
-
-
 
 	/**
 	 * Add a qty-based product pricing
@@ -987,15 +1053,22 @@ class SoapController extends CController
 	 * @soap
 	 */
 	public function add_product_qty_pricing(
-		$passkey
-		,   $intProductId
-		,   $intPricingLevel
-		,   $fltQty
-		,   $fltPrice
-	){
-
-		if(!$this->check_passkey($passkey))
+		$passkey,
+		$intProductId,
+		$intPricingLevel,
+		$fltQty,
+		$fltPrice
+	)
+	{
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=0;')->execute();
 		$qtyP = new ProductQtyPricing();
@@ -1007,15 +1080,17 @@ class SoapController extends CController
 		$qtyP->price = $fltPrice;
 		$qtyP->save();
 
-		if (!$qtyP->save()) {
+		if (!$qtyP->save())
+		{
 			Yii::log("SOAP ERROR : Error saving qty pricing $intProductId " . print_r($qtyP->getErrors()), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::UNKNOWN_ERROR." Error saving qty pricing $intProductId " . print_r($qtyP->getErrors(),true);
 		}
 
 		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=1;')->execute();
-		return self::OK;
 
+		return self::OK;
 	}
+
 	/**
 	 * Add an order for display
 	 *
@@ -1030,37 +1105,57 @@ class SoapController extends CController
 	 * @return string
 	 * @soap
 	 */
-	public function add_order($passkey
-		, $strId
-		, $intDttDate
-		, $intDttDue
-		, $strPrintedNotes
-		, $strStatus
-		, $lightspeed_id
-		, $intTaxcode
-	){
-
-
-		if(!$this->check_passkey($passkey))
+	public function add_order(
+		$passkey,
+		$strId,
+		$intDttDate,
+		$intDttDue,
+		$strPrintedNotes,
+		$strStatus,
+		$lightspeed_id,
+		$intTaxcode
+	)
+	{
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
-
+		}
 
 		$objDocument = Document::LoadByIdStr($strId);
 
-		if(!($objDocument instanceof Document)) {
+		if(!($objDocument instanceof Document))
+		{
 			$objDocument = new Document();
-		} else {          // if cart already exists then delete the items
+		}
+		else
+		{          // if cart already exists then delete the items
 
 			foreach($objDocument->documentItems  as $item)
 			{
-				$item->qty = 0;
-				$item->save();
-				$item->product->SetAvailableInventory();
-				$item->delete();
+				try
+				{
+					$item->qty = 0;
+					$item->save();
+					$item->product->SetAvailableInventory();
+					$item->delete();
+				}
+				catch(Exception $ex)
+				{
+					Yii::log($ex->getMessage()
+						. "Store: " . $_SERVER['HTTP_HOST']
+						. "Item: " . CVarDumper::dumpAsString($item),
+						CLogger::LEVEL_ERROR,
+						'application.'.__CLASS__.".".__FUNCTION__
+					);
+				}
 			}
 
 		}
-
 
 		$objDocument->order_type = CartType::order;
 
@@ -1087,7 +1182,8 @@ class SoapController extends CController
 			Yii::log("SOAP ERROR : add_order ".print_r($objDocument->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::UNKNOWN_ERROR;
 		}
-		if ($objCart instanceof Cart) {
+		if ($objCart instanceof Cart)
+		{
 			$objCart->document_id = $objDocument->id;
 			$objCart->save();
 		}
@@ -1095,13 +1191,8 @@ class SoapController extends CController
 		if (substr($strId,0,3)=="WO-")
 			Configuration::SetHighestWO();
 
-
-
 		return self::OK;
 	}
-
-
-
 
 	/**
 	 * Add an order item
@@ -1116,17 +1207,25 @@ class SoapController extends CController
 	 * @return string
 	 * @soap
 	 */
-	public function add_order_item($passkey
-		, $strOrder
-		, $intProductId
-		, $fltQty
-		, $strDescription
-		, $fltSell
-		, $fltDiscount
-	){
-
-		if(!$this->check_passkey($passkey))
+	public function add_order_item(
+		$passkey,
+		$strOrder,
+		$intProductId,
+		$fltQty,
+		$strDescription,
+		$fltSell,
+		$fltDiscount
+	)
+	{
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		$objDocument = Document::LoadByIdStr($strOrder);
 		if(!$objDocument)
@@ -1136,11 +1235,9 @@ class SoapController extends CController
 		if(!$objProduct)
 			return self::OK; //We could be receiving an old document with an item that no longer exists
 
-
 		$strDescription = trim($strDescription);
 		if (empty($strDescription))
 			$strDescription=$objProduct->title;
-
 
 		$retVal = $objDocument->AddSoapProduct($objDocument->id,$objProduct,
 			$fltQty, $strDescription,
@@ -1158,8 +1255,8 @@ class SoapController extends CController
 
 	/* IMAGE routines below */
 
-	public function actionImage() {
-
+	public function actionImage()
+	{
 		$ctx=stream_context_create(array(
 			'http'=>array('timeout' => ini_get('max_input_time'))
 		));
@@ -1183,7 +1280,6 @@ class SoapController extends CController
 			$this->successResponse("Image saved for product " . $id);
 		else
 			$this->errorConflict('Problem saving image for product ' . $id, self::UNKNOWN_ERROR);
-
 	}
 
 	/**
@@ -1194,14 +1290,17 @@ class SoapController extends CController
 	 * @return string
 	 * @soap
 	 */
-	public function remove_image(
-		$passkey
-		, $intImageId
-	)
+	public function remove_image($passkey, $intImageId)
 	{
-		if (!$this->check_passkey($passkey))
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
-
+		}
 
 		//Find item in Cloud Image table
 		$objImageCloud = ImagesCloud::model()->findByAttributes(array('cloud_image_id'=>$intImageId));
@@ -1214,17 +1313,13 @@ class SoapController extends CController
 			//Find item in Images table
 			$model = Images::model()->findByPk($intCloudId);
 			$model->delete(); //we have to delete() instead of DeleteByPk since beforeDelete() needs to fire
-
-
 		}
 
 		return self::OK;
-
 	}
 
-
-	public function getDestination() {
-
+	public function getDestination()
+	{
 		if (isset($_SERVER['ORIG_PATH_INFO']))
 			$strPath=$_SERVER['ORIG_PATH_INFO'];
 		elseif (isset($_SERVER['PATH_INFO']))
@@ -1248,7 +1343,8 @@ class SoapController extends CController
 		return $destination;
 	}
 
-	public function errorInParams($msg) {
+	public function errorInParams($msg)
+	{
 		header('HTTP/1.0 422 Unprocessable Entity');
 		Yii::log($msg, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		echo $msg;
@@ -1256,7 +1352,8 @@ class SoapController extends CController
 		Yii::app()->end();
 	}
 
-	public function errorInImport($msg, $errCode) {
+	public function errorInImport($msg, $errCode)
+	{
 		header('HTTP/1.0 400 Bad Request');
 		Yii::log($msg, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		echo $msg;
@@ -1265,7 +1362,8 @@ class SoapController extends CController
 		Yii::app()->end();
 	}
 
-	public function successResponse($msg='Success!') {
+	public function successResponse($msg='Success!')
+	{
 		header('HTTP/1.0 200 OK');
 		header('Content-type: text/plain');
 		echo $msg;
@@ -1273,7 +1371,8 @@ class SoapController extends CController
 		Yii::app()->end();
 	}
 
-	public function errorConflict($msg, $errCode) {
+	public function errorConflict($msg, $errCode)
+	{
 		header('HTTP/1.0 409 Conflict');
 		Yii::log($msg, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		echo $msg;
@@ -1281,10 +1380,8 @@ class SoapController extends CController
 		Yii::app()->end();
 	}
 
-
-	public function saveProductImage($intRowid, $blbRawImage,$image_index,$imageId=null) {
-
-
+	public function saveProductImage($intRowid, $blbRawImage,$image_index,$imageId=null)
+	{
 		$objProduct = Product::model()->findByPk($intRowid);
 
 		if (!($objProduct instanceof Product)) {
@@ -1322,16 +1419,20 @@ class SoapController extends CController
 	 * @return string
 	 * @soap
 	 */
-	public function list_taxes(
-		$passkey
-	)
+	public function list_taxes($passkey)
 	{
-		if(!$this->check_passkey($passkey))
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		$obj = Tax::model()->findAll();
 		return CJSON::encode($obj);
-
 	}
 
 	/**
@@ -1341,18 +1442,21 @@ class SoapController extends CController
 	 * @return string
 	 * @soap
 	 */
-	public function list_tax_codes(
-		$passkey
-	)
+	public function list_tax_codes($passkey)
 	{
-		if(!$this->check_passkey($passkey))
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		$obj = TaxCode::model()->findAll();
 		return CJSON::encode($obj);
-
 	}
-
 
 	/**
 	 * Tax Status List
@@ -1361,16 +1465,20 @@ class SoapController extends CController
 	 * @return string
 	 * @soap
 	 */
-	public function list_tax_statuses(
-		$passkey
-	)
+	public function list_tax_statuses($passkey)
 	{
-		if(!$this->check_passkey($passkey))
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		$obj = TaxStatus::model()->findAll();
 		return CJSON::encode($obj);
-
 	}
 
 	/**
@@ -1381,13 +1489,17 @@ class SoapController extends CController
 	 * @return string
 	 * @soap
 	 */
-	public function get_order(
-		$passkey,
-		$id_str
-	)
+	public function get_order($passkey, $id_str)
 	{
-		if(!$this->check_passkey($passkey))
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		$obj = Cart::model()->findAllByAttributes(array('id_str'=>$id_str));
 		$modelAttributeNames = 'id,
@@ -1415,7 +1527,8 @@ class SoapController extends CController
 
 	}
 
-	protected function json_encode_orders($obj, $attributeNames) {
+	protected function json_encode_orders($obj, $attributeNames)
+	{
 		$attributeNames = explode(',', $attributeNames);
 
 		$order = $obj[0];
@@ -1458,13 +1571,17 @@ class SoapController extends CController
 	 * @return string
 	 * @soap
 	 */
-	public function update_order_downloaded_status_by_id($passkey
-		, $strId
-		, $intDownloaded
-	){
-
-		if(!$this->check_passkey($passkey))
+	public function update_order_downloaded_status_by_id($passkey, $strId, $intDownloaded)
+	{
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		try {
 			$objCart = Cart::LoadByIdStr($strId);
@@ -1476,8 +1593,6 @@ class SoapController extends CController
 		}
 
 		return self::OK;
-
-
 	}
 
 	/* CUSTOMER FUNCTIONS */
@@ -1492,9 +1607,15 @@ class SoapController extends CController
 	 */
 	public function get_customer($passkey,$id)
 	{
-
-		if(!$this->check_passkey($passkey))
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		$objCustomers = Customer::model()->findAll(array(
 			'condition'=>'id = :id AND record_type = :type',
@@ -1527,7 +1648,6 @@ class SoapController extends CController
 
 
 		return json_encode_with_relations($objCustomers,$modelAttributeNames);
-
 	}
 
 	/**
@@ -1539,14 +1659,19 @@ class SoapController extends CController
 	 * @return string
 	 * @soap
 	 */
-	public function assign_lightspeed_id($passkey,$id,$lightspeed_id)
+	public function assign_lightspeed_id($passkey, $id, $lightspeed_id)
 	{
-		if(!$this->check_passkey($passkey))
+		try
+		{
+			$this->check_passkey($passkey);
+		}
+		catch (Exception $ex)
+		{
+			Yii::log($ex->getMessage(), CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			return self::FAIL_AUTH;
+		}
 
 		Customer::model()->updateByPk($id,array('lightspeed_id'=>$lightspeed_id));
 		return self::OK;
-
 	}
-
 }

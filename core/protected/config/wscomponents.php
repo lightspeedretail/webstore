@@ -36,27 +36,28 @@ function searchForComponents()
 
 	$arr['Smtpmail'] = array('class'=>'application.extensions.smtpmail.PHPMailer');
 
-
 	$arr['log']=array(
 		'class'=>'CLogRouter',
 		'routes'=>array(
-			array(
-				'class'=>'CFileLogRoute',
-				'levels'=>'error, warning',
-			),
 			array(
 				'class'=>'CDbLogRoute',
 				'levels'=>'error, warning',
 				'logTableName'=>'xlsws_log',
 				'connectionID'=>'db',
 			),
+			array(
+				'class'=>'ext.syslogroute.ESysLogRoute',
+				'levels'=>'error, warning',
+				'categories'=>'application.*,system.*',
+			),
+			array(
+				'class'=>'CFileLogRoute',
+				'levels'=>'error, warning',
+			),
 		),
 	);
 
-
-
 	return $arr;
-
 }
 
 

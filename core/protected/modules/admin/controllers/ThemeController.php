@@ -1096,9 +1096,20 @@ class ThemeController extends AdminBaseController
 			$arr[$filename]['md5'] = $item->md5;
 			$arr[$filename]['options'] = "";
 			$arr[$filename]['newver'] = $item->newver;
+			$arr[$filename]['installed'] = $this->checkThemeInstalled($item->name);
 		}
 		return $arr;
 
+
+	}
+
+
+	protected static function checkThemeInstalled($strTheme)
+	{
+		if (_xls_get_conf('LIGHTSPEED_MT') == 1)
+			return 1;   // ignore check
+
+		return is_dir(YiiBase::getPathOfAlias('webroot').'/themes/'.strtolower($strTheme));
 
 	}
 

@@ -450,7 +450,7 @@
 
             <div class="span3 btncalc" >
 	            <?php echo CHtml::ajaxButton (
-		            Yii::t('checkout','Click to Calculate Shipping'),
+		            Yii::t('checkout','Calculate Shipping'),
 		                array('cart/ajaxcalculateshipping'),
 		            array('type'=>"POST",
 			            'dataType'=>'json',

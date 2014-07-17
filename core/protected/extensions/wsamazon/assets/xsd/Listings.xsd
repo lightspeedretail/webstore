@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!-- Revision="$Revision: #1 $" -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+        <!--
+    $Date: 2009/09/25 $
+
+    AMAZON.COM CONFIDENTIAL.  This document and the information contained in it are
+    confidential and proprietary information of Amazon.com and may not be reproduced,
+    distributed or used, in whole or in part, for any purpose other than as necessary
+    to list products for sale on the www.amazon.com web site pursuant to an agreement
+    with Amazon.com.
+    -->
+        <xsd:include schemaLocation="amzn-base.xsd"/>
+        <xsd:include schemaLocation="FulfillmentOrderCancellationRequest.xsd"/>
+        <xsd:include schemaLocation="FulfillmentOrderRequest.xsd"/>
+        <xsd:include schemaLocation="Inventory.xsd"/>
+        <xsd:include schemaLocation="Item.xsd"/>
+        <xsd:include schemaLocation="ListingSummary.xsd"/>
+        <xsd:include schemaLocation="Offer.xsd"/>
+        <xsd:include schemaLocation="Override.xsd"/>
+        <xsd:include schemaLocation="Price.xsd"/>
+        <xsd:include schemaLocation="Product.xsd"/>
+        <xsd:include schemaLocation="ProductImage.xsd"/>
+        <xsd:include schemaLocation="Relationship.xsd"/>
+        <xsd:include schemaLocation="WebstoreItem.xsd"/>
+
+        <xsd:element name="Listings">
+                <xsd:complexType>
+                        <xsd:sequence>
+                                <xsd:element ref="FulfillmentOrderCancellationRequest" minOccurs="0"/>
+                                <xsd:element ref="FulfillmentOrderRequest" minOccurs="0"/>
+                                <xsd:element ref="Inventory" minOccurs="0"/>
+                                <xsd:element ref="Item" minOccurs="0"/>
+                                <xsd:element ref="ListingSummary" minOccurs="0"/>
+                                <xsd:element ref="Offer" minOccurs="0"/>
+                                <xsd:element ref="Override" minOccurs="0"/>
+                                <xsd:element ref="Price" minOccurs="0"/>
+                                <xsd:element ref="Product" minOccurs="0"/>
+                                <xsd:element ref="ProductImage" minOccurs="0" maxOccurs="10"/>
+                                <xsd:element ref="Relationship" minOccurs="0"/>
+                                <xsd:element ref="WebstoreItem" minOccurs="0"/>
+                        </xsd:sequence>
+                </xsd:complexType>
+        </xsd:element>
+</xsd:schema>

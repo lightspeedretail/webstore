@@ -204,6 +204,11 @@ class DefaultController extends AdminBaseController
 			$this->redirect(Yii::app()->createUrl('admin/default/releasenotes'));
 
 		$this->render("index",array('inls'=>(Yii::app()->user->fullname=="LightSpeed" ? "1" : "0")));
+
+		// Deleting install.php for security reasons.
+		$installFile =  YiiBase::getPathOfAlias('webroot') . DIRECTORY_SEPARATOR . 'install.php';
+		if (file_exists($installFile))
+			unlink($installFile);
 	}
 
 	/**

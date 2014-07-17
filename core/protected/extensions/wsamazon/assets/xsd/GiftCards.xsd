@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<!-- Revision="$Revision: #1 $" -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<!--
+    $Date: 2011/07/21 $
+
+    AMAZON.COM CONFIDENTIAL.  This document and the information contained in it are
+    confidential and proprietary information of Amazon.com and may not be reproduced, 
+    distributed or used, in whole or in part, for any purpose other than as necessary 
+    to list products for sale on the www.amazon.com web site pursuant to an agreement 
+    with Amazon.com. 
+    -->
+	<xsd:include schemaLocation="amzn-base.xsd"/>
+	<xsd:element name="GiftCard">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ProductType">
+					<xsd:complexType>
+						<xsd:choice>
+							<xsd:element name="GiftCard">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="ItemDisplayHeight" type="LengthDimension"
+											minOccurs="0"/>
+										<xsd:element name="ItemDisplayLength" type="LengthDimension"
+											minOccurs="0"/>
+										<xsd:element name="ItemDisplayWeight" type="WeightDimension"
+											minOccurs="0"/>
+										<xsd:element name="ItemDisplayWidth" type="LengthDimension"
+											minOccurs="0"/>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="PhysicalGiftCard">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="ItemDisplayHeight" type="LengthDimension"
+											minOccurs="0"/>
+										<xsd:element name="ItemDisplayLength" type="LengthDimension"
+											minOccurs="0"/>
+										<xsd:element name="ItemDisplayWeight" type="WeightDimension"
+											minOccurs="0"/>
+										<xsd:element name="ItemDisplayWidth" type="LengthDimension"
+											minOccurs="0"/>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="ElectronicGiftCard"/>
+						</xsd:choice>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="Color" type="StringNotNull" minOccurs="0"/>
+				<xsd:element name="Count" type="xsd:positiveInteger" minOccurs="0"/>
+				<xsd:element name="DesignName" type="String" minOccurs="0"/>
+				<xsd:element name="Format" type="GiftCardsFormatType" minOccurs="0" maxOccurs="5"/>
+				<xsd:element name="Genre" type="StringNotNull" minOccurs="0" maxOccurs="18"/>
+				<xsd:element name="IsAdultProduct" type="xsd:boolean" minOccurs="0"/>
+				<xsd:element name="OccasionType" type="String" minOccurs="0" maxOccurs="27"/>
+				<xsd:element name="State" type="String" minOccurs="0" maxOccurs="52"/>
+				<xsd:element name="TargetGender" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="StringNotNull">
+							<xsd:enumeration value="male"/>
+							<xsd:enumeration value="female"/>
+							<xsd:enumeration value="unisex"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="VariationData" minOccurs="0">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="Parentage">
+								<xsd:simpleType>
+									<xsd:restriction base="String">
+										<xsd:enumeration value="parent"/>
+										<xsd:enumeration value="child"/>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="VariationTheme" minOccurs="0">
+								<xsd:simpleType>
+									<xsd:restriction base="String">
+										<xsd:enumeration value="Denomination"/>
+										<xsd:enumeration value="Denomination-DesignName"/>
+										<xsd:enumeration value="StyleName"/>										
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element ref="Denomination" minOccurs="0"/>
+							<xsd:element name="StyleName" type="StringNotNull" minOccurs="0"/>							
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

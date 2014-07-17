@@ -407,4 +407,9 @@ Sitemap: http://{$_SERVER['HTTP_HOST']}/store/sitemap.xml
 EOF;
 		Yii::app()->end();
 	}
+
+	public function actionSystemcheck()
+	{
+		$this->redirect("/systemcheck.php");
+	}
 }
