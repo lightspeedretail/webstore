@@ -43,9 +43,11 @@ class ewayaim extends WsPayment
 			$xmlRequest .= "<$key>$value</$key>";
 		$xmlRequest .= "</ewaygateway>";
 
-		if(_xls_get_conf('DEBUG_PAYMENTS' , false)=="1") {
+		if(_xls_get_conf('DEBUG_PAYMENTS' , false)=="1")
 			_xls_log(get_class($this) . " sending ".$this->objCart->id_str." for amt ".$this->objCart->total,true);
-		}
+
+		// in case troubleshooting logging is on and debug payments is off
+		Yii::log(" sending ".$this->objCart->id_str." for amt ".$this->objCart->total, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 		$xmlResponse = $this->sendTransactionToEway($xmlRequest);
 		$oXML = new SimpleXMLElement($xmlResponse);
@@ -91,15 +93,45 @@ class ewayaim extends WsPayment
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
-		$xmlResponse = curl_exec($ch);
+		$xmlResponse = $this->obfuscateResponse(curl_exec($ch));
 
-		if(_xls_get_conf('DEBUG_PAYMENTS' , false)=="1") {
-			_xls_log(get_class($this) . " receiving ".$xmlResponse,true);
-		}
+		if(_xls_get_conf('DEBUG_PAYMENTS' , false) == "1")
+			_xls_log(get_class($this) . " receiving ".$xmlResponse, true);
+
+		// in case troubleshooting logging is on and debug payments is off
+		Yii::log(" receiving ".$xmlResponse, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 		if(curl_errno( $ch ) == CURLE_OK)
 			return $xmlResponse;
 	}
+
+
+	/**
+	 * Find credit card number and replace all digits except
+	 * the last four with asterisks.
+	 *
+	 * @param $str
+	 * @return mixed
+	 */
+	function obfuscateResponse($str)
+	{
+		// We only need to perform obfuscation if the number is in the response
+		if (strpos($str,'Card Data Sent: ') != false)
+		{
+			$start = strpos($str,'Card Data Sent: ') + strlen('Card Data Sent: ');
+			$intCardNumLength = strpos($str,'</ewayTrxnError>') - $start;
+
+			$count = $intCardNumLength - 4; // keep last 4 digits
+
+			for ($i = 0; $i < $count; $i++)
+				$str = substr_replace($str, '*', $start + $i, 1);
+		}
+
+
+		return $str;
+
+	}
+
 
 
 }

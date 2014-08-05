@@ -11,7 +11,7 @@
  *
  */
 
-require_once "php-sdk-3.2.2/base_facebook.php";
+require_once "php-sdk-3.2.3/base_facebook.php";
 
 /**
  * Extends the BaseFacebook class with the intent of using

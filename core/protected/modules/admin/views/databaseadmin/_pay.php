@@ -1,6 +1,7 @@
 <div class="editorder" xmlns="http://www.w3.org/1999/html">
 
-    <p>To mark an order as paid manually, enter the payment details and click Save. The order will be downloaded to LightSpeed on the next Download Orders attempt.</p>
+	<p>To mark an order as paid manually, enter the payment details and click Save. The order will be downloaded to LightSpeed on the next Download Orders attempt.</p>
+	<p>The payment amount must be equal to the cart total for non-cash payment.</p>
 
 	<?php $form=$this->beginWidget('CActiveForm', array(
 	'enableAjaxValidation'=>true,

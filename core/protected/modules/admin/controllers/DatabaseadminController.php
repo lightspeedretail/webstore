@@ -149,45 +149,14 @@ class DatabaseadminController extends AdminBaseController
 
 		$id = Yii::app()->getRequest()->getQuery('id');
 
-		$model = CartPayment::model()->findByPk($id);
+		$objCartPayment = CartPayment::model()->findByPk($id);
 		$objCart = Cart::model()->findByAttributes(array('payment_id'=>$id));
 		if (isset($_POST['Cart']) && isset($_POST['CartPayment']))
 		{
-
-			$objCart->setScenario('manual');
-			$model->setScenario('manual');
-
-			$objCart->attributes = $_POST['Cart'];
-			$model->attributes = $_POST['CartPayment'];
-
-			switch($objCart->cart_type)
-			{
-				case CartType::order:
-					$objCart->status = OrderStatus::AwaitingProcessing;
-					$model->payment_status = OrderStatus::Completed;
-					$model->datetime_posted = new CDbExpression('NOW()');
-					break;
-
-				case CartType::awaitpayment:
-					$objCart->status = OrderStatus::AwaitingPayment;
-					$model->payment_status = NULL;
-					$model->datetime_posted = NULL;
-					break;
-
-			}
-
-			if ($objCart->validate() && $model->validate())
-			{
-				$objCart->save();
-				$model->save();
-				$objEvent = new CEventOrder('CartController','onCreateOrder',$objCart->id_str);
-				_xls_raise_events('CEventOrder',$objEvent);
-				echo "success";
-
-			} else echo implode(" ",_xls_convert_errors($objCart->getErrors() + $model->getErrors()));
-
-		} else echo $this->renderPartial("_pay",array('objCart'=>$objCart,'model'=>$model),true);
-
+			echo self::processManualPayment($objCart, $objCartPayment);
+		}
+		else
+			echo $this->renderPartial("_pay",array('objCart'=>$objCart,'model'=>$objCartPayment),true);
 	}
 
 	/**
@@ -393,11 +362,49 @@ class DatabaseadminController extends AdminBaseController
 
 			$this->render("translate", array('model'=>$model));
 		}
+	}
 
+	/**
+	 * Process manual payment on admin panel
+	 *
+	 * @param $objCart
+	 * @param $objCartPayment
+	 * @return string 'success' or error messages from the models
+	 */
+	public static function processManualPayment($objCart, $objCartPayment)
+	{
+		$objCart->setScenario('manual');
+		$objCartPayment->setScenario('manual');
 
+		$objCart->attributes = $_POST['Cart'];
+		$objCartPayment->attributes = $_POST['CartPayment'];
 
+		switch($objCart->cart_type)
+		{
+			case CartType::order:
+				$objCart->status = OrderStatus::AwaitingProcessing;
+				$objCartPayment->payment_status = OrderStatus::Completed;
+				$objCartPayment->datetime_posted = new CDbExpression('NOW()');
+				break;
 
+			case CartType::awaitpayment:
+				$objCart->status = OrderStatus::AwaitingPayment;
+				$objCartPayment->payment_status = NULL;
+				$objCartPayment->datetime_posted = NULL;
+				break;
 
+		}
 
+		if ($objCart->validate() && $objCartPayment->validate())
+		{
+			$objCart->save();
+			$objCartPayment->save();
+			$objEvent = new CEventOrder('CartController', 'onCreateOrder', $objCart->id_str);
+			_xls_raise_events('CEventOrder', $objEvent);
+			return "success";
+
+		}
+		else
+			return implode(" ", _xls_convert_errors($objCart->getErrors() + $objCartPayment->getErrors()));
 	}
 }

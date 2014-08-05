@@ -314,6 +314,8 @@ class ApiController extends CController
 		if (!(isset($_SERVER[self::CLIENT_WS_API_KEY])))
 		{
 			// Error: Unauthorized
+			Yii::log("CLIENT_WS_API_KEY was not found in the request from "  . $_SERVER['REMOTE_ADDR'],
+				CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			$this->_sendResponse(401);
 		}
 
@@ -321,6 +323,8 @@ class ApiController extends CController
 		{
 			// WS_API_KEY environment variable
 			// is not set on the server
+			Yii::log("SERVER_WS_API_KEY was not found on the server",
+				CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			$this->_sendResponse(500);
 		}
 
@@ -329,6 +333,8 @@ class ApiController extends CController
 
 		if ($apiKey !== $serverApiKey)
 		{
+			Yii::log("Incorrect API key from " . $_SERVER['REMOTE_ADDR'],
+				CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			$this->_sendResponse(412);
 		}
 	}

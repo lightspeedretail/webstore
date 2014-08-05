@@ -1864,6 +1864,8 @@ class CartController extends Controller
 				return $retVal;
 			}
 
+			$arrShippingTaxes = array();
+
 			Yii::log("Modules to show ".print_r($arrProvider,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			foreach($arrProvider as $moduleKey=>$moduleValue)
 			{
@@ -1909,7 +1911,10 @@ class CartController extends Controller
 								$intLsId
 							);
 							Yii::log("Taxes added ".print_r($taxes,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-							$arrSpeed['price'] += array_sum($taxes[1]);
+							if (Yii::app()->params['TAX_INCLUSIVE_PRICING'] == '1')
+								$arrSpeed['price'] += array_sum($taxes[1]);
+							else
+								$arrShippingTaxes[$moduleKey][$speedKey] = $taxes[1];
 						}
 
 						$strPriority[$moduleKey] .= CHtml::radioButtonList(
@@ -1956,7 +1961,7 @@ class CartController extends Controller
 			//Calculate cart total scenarios
 			//This function gives back our formatted taxes, shipping and total prices
 			Yii::log("Calculating Total scenarios", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-			$arrTotals = $this->calculateTotalScenarios($arrModuleName,$strPrices);
+			$arrTotals = $this->calculateTotalScenarios($arrModuleName, $strPrices, $arrShippingTaxes);
 
 			$arrShippingResult = array(
 				'result'=>'success',
@@ -1996,7 +2001,18 @@ class CartController extends Controller
 		}
 	}
 
-	protected function calculateTotalScenarios($arrProvider,$arrPrices)
+	/**
+	 * When an end user hits calculate shipping they are presented with the shipping options the Web Store has enabled.
+	 * This function calculates totals for each possible shipping option so that they can be cached such that when the
+	 * end user toggles through the options, the totals update dynamically on screen.
+	 *
+	 * @param $arrProvider - array of shipping providers
+	 * @param $arrPrices - array of prices of each shipping provider
+	 * @param $arrShippingTaxes - array of shipping taxes
+	 * @return array - includes an array of html required to render the cartitems, an array of html to render taxes, formatted pricing and totals
+	 */
+
+	protected function calculateTotalScenarios($arrProvider, $arrPrices, $arrShippingTaxes = array())
 	{
 
 		$arrTotalScenarios = array();
@@ -2018,12 +2034,26 @@ class CartController extends Controller
 			$value = str_replace("\n","",$value);
 			$arrCartItems[$moduleKey] = $value;
 
+			$objCart = Yii::app()->shoppingcart;
+
 			foreach ($moduleValue as $speedKey => $speedValue)
 			{
-				$arrTotalScenarios[$moduleKey][$speedKey] = _xls_currency(Yii::app()->shoppingcart->precalculateTotal($speedValue,0));
+				// if there are shipping taxes we must add them to the cart for
+				// each possible shipping scenario
+
+				if (!empty($arrShippingTaxes))
+					$objCart->AddTaxes($arrShippingTaxes[$moduleKey][$speedKey]);
+
+				$arrTotalScenarios[$moduleKey][$speedKey] = _xls_currency($objCart->precalculateTotal($speedValue,0));
 				$arrPrices[$moduleKey][$speedKey] = _xls_currency($speedValue);
 				$arrTaxes[$moduleKey][$speedKey] = $this->renderPartial('/cart/_carttaxes',
-					array('model'=>Yii::app()->shoppingcart),true);
+					array('model'=>$objCart), true);
+
+				// remove shipping taxes to accommodate the next loop
+				if (!empty($arrShippingTaxes))
+					$objCart->SubtractTaxes($arrShippingTaxes[$moduleKey][$speedKey]);
+
+
 			}
 
 		}

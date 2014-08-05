@@ -582,7 +582,7 @@ class ThemeController extends AdminBaseController
 					if ($file->type == "image/jpg" || $file->type == "image/png" || $file->type == "image/jpeg" || $file->type == "image/gif" ||
 						$file->type == 'image/vnd.microsoft.icon' || $file->type == "image/x-icon")
 					{
-						$path = str_replace("/core/protected","/images/",Yii::app()->basePath);
+						$path = str_replace("/runtime","/images/", Yii::getPathOfAlias('webroot.runtime'));
 						$retVal = $file->saveAs($path."favicon.ico");
 						$path2 = str_replace("/images/","/",$path);
 

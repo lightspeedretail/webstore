@@ -9,13 +9,17 @@ class m140704_193530_WS_2271_block_access_runtime extends CDbMigration
 			. DIRECTORY_SEPARATOR . '..'
 			. DIRECTORY_SEPARATOR . '..'
 			. DIRECTORY_SEPARATOR . '.htaccess';
-		$strHtaccessContent = file_get_contents($fileHtaccess);
 
-		if ($strHtaccessContent && strpos($strHtaccessContent, "RedirectMatch 404 /runtime/") === false)
+		if (file_exists($fileHtaccess))
 		{
-			$strToAppend = "\n# block runtime folder"
-				. "\nRedirectMatch 404 /runtime/";
-			file_put_contents($fileHtaccess, $strToAppend, FILE_APPEND | LOCK_EX);
+			$strHtaccessContent = file_get_contents($fileHtaccess);
+
+			if ($strHtaccessContent && strpos($strHtaccessContent, "RedirectMatch 404 /runtime/") === false)
+			{
+				$strToAppend = "\n# block runtime folder"
+					. "\nRedirectMatch 404 /runtime/";
+				file_put_contents($fileHtaccess, $strToAppend, FILE_APPEND | LOCK_EX);
+			}
 		}
 	}
 

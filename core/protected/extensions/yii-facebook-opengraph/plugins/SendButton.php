@@ -33,14 +33,22 @@ class SendButton extends SPluginBase
 	 */
 	public $href;
   /**
-	 * @var string the font to display in the button. Options: 'arial',
-   * 'lucida grande', 'segoe ui', 'tahoma', 'trebuchet ms', 'verdana'
+	 * @var integer Width of the Send button, defaults to 51px
 	 */
-	public $font;
+	public $width;
+  /**
+	 * @var integer Height of the Send button, defaults to 450px
+	 */
+	public $height;
   /**
 	 * @var string The color scheme for the plugin. Options: 'light', 'dark'
 	 */
 	public $colorscheme;
+  /**
+	 * @var string If your web site or online service, or a portion of your service,
+   * is directed to children under 13 you must enable this
+	 */
+	public $kid_directed_site;
   /**
 	 * @var string a label for tracking referrals; must be less than 50 characters
    * and can contain alphanumeric characters and some punctuation (currently +/=-.:_).

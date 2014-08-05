@@ -103,12 +103,17 @@ class ESysLogRoute extends CLogRoute
 					break;
 			}
 
-			if(!openlog($this->getLogName(), LOG_ODELAY | LOG_PID, $this->getLogFacility()))
-				throw new CException('Failed to initiate the logging subsystem.');
+			if(openlog($this->getLogName(), LOG_ODELAY | LOG_PID, $this->getLogFacility()))
+			{
+				$strLogId = $_SERVER['HTTP_HOST'];
 
-			syslog($pri, $_SERVER['HTTP_HOST'] . ': ' . $log[1] . ' - (' . $log[2] . ') - ' . $log[0]);
+				if (!empty(Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL']))
+					$strLogId = Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL'];
 
-			closelog();
+				syslog($pri, $strLogId . ': ' . $log[1] . ' - (' . $log[2] . ') - ' . $log[0]);
+
+				closelog();
+			}
 		}
 	}
 }

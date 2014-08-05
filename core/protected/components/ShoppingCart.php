@@ -593,6 +593,16 @@ class ShoppingCart extends CApplicationComponent
 		$this->model->UpdateWishList();
 	}
 
+	public function addTaxes($arr)
+	{
+		$this->model->addTaxes($arr);
+	}
+
+	public function subtractTaxes($arr)
+	{
+		$this->model->subtractTaxes($arr);
+	}
+
 	public function clearCachedShipping()
 	{
 		unset(Yii::app()->session['ship.modules.cache']);
