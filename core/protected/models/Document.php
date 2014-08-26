@@ -98,7 +98,13 @@ class Document extends BaseDocument
 	 */
 	public function UpdateDocument()
 	{
-		$this->save();
+		if (!$this->save())
+			Yii::log(
+				'Error saving Document, row id: '.$this->id."\n".print_r($this->getErrors(),true),
+				'error',
+				'application'.'.'.__CLASS__.'.'.__FUNCTION__.'.'.__LINE__
+			);
+
 		$this->refresh();
 
 
@@ -108,7 +114,13 @@ class Document extends BaseDocument
 		$this->UpdateCountAndSubtotal();
 		$this->UpdateTotal();
 
-		$this->save();
+		if (!$this->save())
+			Yii::log(
+				'Error saving Document, row id: '.$this->id."\n".print_r($this->getErrors(),true),
+				'error',
+				'application'.'.'.__CLASS__.'.'.__FUNCTION__.'.'.__LINE__
+			);
+
 		$this->refresh();
 	}
 
@@ -171,7 +183,7 @@ class Document extends BaseDocument
 		// Tax Inclusive && Want taxes, so return and set prices back to inclusive if needed
 		if ($this->fk_tax_code_id != $intNoTax) {
 			if (!$this->tax_inclusive) { //if the last destination was exclusive, and we have inclusive now, we need to reset the line items
-				$this->tax_inclusive = true;
+				$this->tax_inclusive = 1;
 				foreach ($this->documentItems as $objItem) {
 					// Set back tax inclusive prices
 					$objItem->sell = $objItem->product->GetPrice($objItem->qty);
@@ -183,7 +195,7 @@ class Document extends BaseDocument
 			return;
 		}
 
-		$this->tax_inclusive = false;
+		$this->tax_inclusive = 0;
 
 		// Tax Inclusive && Don't want taxes
 		foreach ($this->documentItems as $objItem) {

@@ -40,6 +40,11 @@ class SFacebook extends CApplicationComponent
   public $trustForwarded = false;
 
   /**
+   * @var boolean Indicates if we trust HTTP_X_FORWARDED_* headers.
+   */
+  public $allowSignedRequest = true;
+
+  /**
    * @var bool whether or not to check login status
    */
   public $status = true;
@@ -447,6 +452,7 @@ class SFacebook extends CApplicationComponent
             'secret' => $this->secret,
             'fileUpload' => $this->fileUpload,
             'trustForwarded' => $this->trustForwarded,
+            'allowSignedRequest' => $this->allowSignedRequest,
           ));
       } else {
         if (!$this->appId)

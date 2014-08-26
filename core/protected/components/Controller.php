@@ -225,12 +225,22 @@ class Controller extends CController
 		$this->pageImageUrl = '';
 
 		$pageHeaderImage = Yii::app()->params['HEADER_IMAGE'];
-		if (substr($pageHeaderImage,0,2) != "//" && substr($pageHeaderImage,0,4) != "http")
-		{
 
-			$this->pageAbsoluteHeaderImage = Yii::app()->createAbsoluteUrl($pageHeaderImage, array(), Yii::app()->params['ENABLE_SSL'] ? 'https' : 'http');
-			$this->pageHeaderImage = $pageHeaderImage;
+		if (substr($pageHeaderImage,0,4) != "http")
+		{
+			if (substr($pageHeaderImage,0,2) != "//")
+			{
+				$this->pageAbsoluteHeaderImage = Yii::app()->createAbsoluteUrl($pageHeaderImage, array(), Yii::app()->params['ENABLE_SSL'] ? 'https' : 'http');
+				$this->pageHeaderImage = $pageHeaderImage;
+			}
+
+			else
+			{
+				$this->pageAbsoluteHeaderImage = Yii::app()->params['ENABLE_SSL'] ? 'https:' . $pageHeaderImage : 'http:' . $pageHeaderImage;
+				$this->pageHeaderImage = $pageHeaderImage;
+			}
 		}
+
 		else
 		{
 			$this->pageAbsoluteHeaderImage = $pageHeaderImage;

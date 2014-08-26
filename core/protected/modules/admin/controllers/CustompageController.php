@@ -9,8 +9,8 @@ class CustompageController extends AdminBaseController
 	{
 		return array(
 			array('allow',
-				'actions'=>array('index','add','edit'),
-				'roles'=>array('admin'),
+				'actions' => array('index','add','edit'),
+				'roles' => array('admin'),
 			),
 		);
 	}
@@ -20,22 +20,22 @@ class CustompageController extends AdminBaseController
 	{
 
 
-		$arrModules =  CustomPage::model()->findAll(array('order'=>'title')); //Get active and inactive
+		$arrModules = CustomPage::model()->findAll(array('order' => 'title')); //Get active and inactive
 
 		$menuSidebar = array();
 
 		foreach ($arrModules as $module)
-			$menuSidebar[] = array('label'=>$module->title, 'url'=>array('custompage/edit', 'id'=>$module->id));
+			$menuSidebar[] = array('label' => $module->title, 'url' => array('custompage/edit', 'id' => $module->id));
 
 
 		$this->menuItems = array_merge(
 			array(
-				array('label'=>'Edit Pages', 'linkOptions'=>array('class'=>'nav-header'))
+				array('label' => 'Edit Pages', 'linkOptions' => array('class' => 'nav-header'))
 			),
 			$menuSidebar,
 			array(
-				array('label'=>'Custom Pages', 'linkOptions'=>array('class'=>'nav-header')),
-				array('label'=>'Create new page', 'url'=>array('custompage/add')),
+				array('label' => 'Custom Pages', 'linkOptions' => array('class' => 'nav-header')),
+				array('label' => 'Create new page', 'url' => array('custompage/add')),
 				//array('label'=>'Set active tabs', 'url'=>array('payments/promotasks')),
 
 			)
@@ -51,7 +51,12 @@ class CustompageController extends AdminBaseController
 
 		$model = new CustomPage();
 
-		$this->render('index',array('model'=>$model));
+		$this->render(
+			'index',
+			array('model' =>
+				$model
+			)
+		);
 
 	}
 
@@ -71,14 +76,27 @@ class CustompageController extends AdminBaseController
 					Yii::app()->user->setFlash('error',print_r($model->getErrors(),true));
 				else
 				{
-					Yii::app()->user->setFlash('success',Yii::t('admin','Custom page added on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
-					$this->redirect($this->createUrl("custompage/edit",array('id'=>$model->id)));
+					Yii::app()->user->setFlash(
+						'success',
+						Yii::t(
+							'admin',
+							'Custom page added on {time}.',
+							array('{time}' => date("d F, Y  h:i:sa")
+							)
+						)
+					);
+					$this->redirect(
+						$this->createUrl(
+							"custompage/edit",
+							array('id' => $model->id)
+						)
+					);
 
 				}
 			}
 
 		}
-		$this->render('edit',array('model'=>$model));
+		$this->render('edit',array('model' => $model));
 
 	}
 	public function actionEdit()
@@ -100,13 +118,13 @@ class CustompageController extends AdminBaseController
 
 		if (_xls_get_conf('LANG_MENU'))
 			$langs = _xls_comma_to_array(_xls_get_conf('LANG_OPTIONS'));
-		else $langs=array("en:English");
+		else $langs = array("en:English");
 
 
 
 		if(isset($_POST['CustomPage']))
 		{
-			$arrLangText=array();
+			$arrLangText = array();
 			foreach($langs as $lang)
 			{
 				$langa = explode(":",$lang);
@@ -114,7 +132,7 @@ class CustompageController extends AdminBaseController
 				$arrLangText[$def] = isset($_POST['content-'.$def]) ? $_POST['content-'.$def] : '';
 
 			}
-			$_POST['CustomPage']['page']= serialize($arrLangText);
+			$_POST['CustomPage']['page'] = serialize($arrLangText);
 			$model->attributes = $_POST['CustomPage'];
 			if ($model->validate())
 			{
@@ -125,13 +143,20 @@ class CustompageController extends AdminBaseController
 					$this->redirect($this->createUrl("custompage/index"));
 				}
 				else {
-					$model->request_url =  _xls_seo_url($model->title);
+					$model->request_url = _xls_seo_url($model->title);
 					if (!$model->save())
 						Yii::app()->user->setFlash('error',print_r($model->getErrors(),true));
 					else
 					{
-						Yii::app()->user->setFlash('success',
-							Yii::t('admin','Custom page updated on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
+						Yii::app()->user->setFlash(
+							'success',
+							Yii::t(
+								'admin',
+								'Custom page updated on {time}.',
+								array('{time}' => date("d F, Y  h:i:sa")
+								)
+							)
+						);
 						$this->beforeAction('edit'); //In case we renamed one and we want to update menu
 
 					}
@@ -139,7 +164,7 @@ class CustompageController extends AdminBaseController
 			}
 
 		}
-		$this->render('edit',array('model'=>$model));
+		$this->render('edit',array('model' => $model));
 
 	}
 

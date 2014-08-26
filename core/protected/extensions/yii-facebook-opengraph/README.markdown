@@ -50,9 +50,9 @@ Include the extension in your Yii config:
         //'frictionlessRequests'=>true, // JS SDK - enable frictionless requests for request dialogs
         //'html5'=>true,  // use html5 Social Plugins instead of XFBML
         //'ogTags'=>array(  // set default OG tags
-            //'title'=>'MY_WEBSITE_NAME',
-            //'description'=>'MY_WEBSITE_DESCRIPTION',
-            //'image'=>'URL_TO_WEBSITE_LOGO',
+            //'og:title'=>'MY_WEBSITE_NAME',
+            //'og:description'=>'MY_WEBSITE_DESCRIPTION',
+            //'og:image'=>'URL_TO_WEBSITE_LOGO',
         //),
       ),
     ),
@@ -119,6 +119,8 @@ CHANGE LOG:
 * 0.7 Upgraded to PHP SDK 3.2.2
 * 0.8 Fixed error with LoginButton plugin where inherited CWidget 'skin' property caused display error, added missing attributes to LoginButton, and added ability to specify custom profile image size
 * 0.8.1 Updated the PHP SDK cert chain bundle which was not update to date for some reason, and copied in a security fix from the PHP SDK as well
+* 0.9 Upgraded to PHP SDK 3.2.3
+* 0.10 Updated Social Plugins - removed LiveStream and added RecommendationsBar, EmbeddedPost and FollowButton (used to be SubscribeButton)
 
 * * *
 
@@ -129,5 +131,5 @@ Please log bugs to the GitHub tracker.
 Extension is posted on Yii website also:
 http://www.yiiframework.com/extension/facebook-opengraph/
 
-Updated Feb 17th 2013 by Evan Johnson
+Updated Nov 27th 2013 by Evan Johnson
 http://splashlabsocial.com

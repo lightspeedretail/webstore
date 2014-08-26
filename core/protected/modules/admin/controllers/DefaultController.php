@@ -192,8 +192,9 @@ class DefaultController extends AdminBaseController
 				}
 				return;
 			}
-			elseif(isset($oXML->webstore->themedisplayversion))
+			elseif(isset($oXML->webstore->themedisplayversion) && Yii::app()->params['LIGHTSPEED_HOSTING'] == 0)
 			{
+				// only self hosted customers should see this
 				$this->render("newtemplate",array('oXML'=>$oXML->webstore));
 				return;
 			}
@@ -301,8 +302,7 @@ class DefaultController extends AdminBaseController
 		//Turn off flag now that we've seen release notes
 		_xls_set_conf('LIGHTSPEED_SHOW_RELEASENOTES',0);
 
-		$strVersion = (string)XLSWS_VERSIONBUILD;
-		$strDashVersion = $strVersion[0] . '-' . $strVersion[1] . '-' . $strVersion[2];
+		$strDashVersion = str_replace('.', '-', XLSWS_VERSION);
 
 		$url = '//www.lightspeedretail.com/release-notes/webstore/web-store-' . $strDashVersion . '/?hide=yes';
 

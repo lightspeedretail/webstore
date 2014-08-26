@@ -78,14 +78,13 @@ class WebUser extends CWebUser {
 	{
 		//Only run this if we've really destroyed our session
 		//Otherwise we keep the cartid in session because of payment jumper pages
-		if(!Yii::app()->getSession()->IsStarted )
+		if(Yii::app()->getSession()->IsStarted == false)
 		{
 			Yii::log("Releasing cart", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-			Yii::app()->user->setState('cartid',null);
 			Yii::app()->shoppingcart->releaseCart();
 		}
-		parent::afterLogout();
 
+		parent::afterLogout();
 	}
 
 	public function hasFlashes()

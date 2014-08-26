@@ -44,13 +44,14 @@ if (!isset($model)) $model = Yii::app()->shoppingcart;
 				x
 			</td>
 			<td>
-	<span class="cart_qty"><?php
-		if (isset($this->intEditMode) && $this->intEditMode)
-			echo CHtml::textField(CHtml::activeId($item,'qty')."_".$item->id,$item->qty,array('class'=>'cart_qty_box'));
-		else echo $item->qty;
-		?></span>
+				<span class="cart_qty">
+					<?php
+					if (isset($this->intEditMode) && $this->intEditMode)
+						echo CHtml::textField(CHtml::activeId($item,'qty')."_".$item->id,$item->qty,array('class'=>'cart_qty_box'));
+					else echo $item->qty;
+					?>
+				</span>
 			</td>
-<!--			<td class="cart_decor">-->
 			<td class="eql">
                 =
 			</td>
@@ -58,44 +59,41 @@ if (!isset($model)) $model = Yii::app()->shoppingcart;
 				<?= _xls_currency($item->sell_total) ?>
 			</td>
 			<?php endforeach; ?>
+		</tr>
 
 
 
 		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+			<td colspan="6"></td>
 		</tr>
 
 		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-            <td class="visible1-mobile"><?= Yii::t('cart','Subtotal'); ?></td>
-            <td class="hidden1-mobile"><?= Yii::t('cart','Subtotal'); ?></td>
+			<td colspan="3"></td>
+			<td class="visible1-mobile"><?= Yii::t('cart','Subtotal'); ?></td>
+			<td class="hidden1-mobile"><?= Yii::t('cart','Subtotal'); ?></td>
 			<td class="cart_price"><span id="cartSubtotal"><?= _xls_currency($model->subtotal); ?></span></td>
 		</tr>
 
-		<?php echo $this->renderPartial('/cart/_carttaxes',array('model'=>$model),true); ?>
-
 		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-            <td class="visible1-mobile"><?= Yii::t('cart',"Shipping"); ?></td>
-            <td class="hidden1-mobile"><?= Yii::t('cart',"Shipping"); ?></td>
+			<td colspan="3"></td>
+			<td class="visible1-mobile"><?= Yii::t('cart',"Shipping"); ?></td>
+			<td class="hidden1-mobile"><?= Yii::t('cart',"Shipping"); ?></td>
 			<td class="cart_price"><span id="cartShipping"><?= _xls_currency($model->shipping_sell); ?></span></td>
 		</tr>
 
 		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-            <td class="visible1-mobile"><?= Yii::t('cart',"Total"); ?></td>
-            <td class="hidden1-mobile"><?= Yii::t('cart',"Total"); ?></td>
+			<td colspan="3"></td>
+			<td colspan="3" style="padding: 0">
+				<table id="cartTaxes">
+					<?php $this->renderPartial('/cart/_carttaxes',array('model'=>$model)); ?>
+				</table>
+			</td>
+		</tr>
+
+		<tr>
+			<td colspan="3"></td>
+			<td class="visible1-mobile"><?= Yii::t('cart',"Total"); ?></td>
+			<td class="hidden1-mobile"><?= Yii::t('cart',"Total"); ?></td>
 			<td class="cart_price"><span id="cartTotal"><?= _xls_currency($model->total); ?></span></td>
 		</tr>
 		</tbody>

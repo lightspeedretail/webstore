@@ -118,7 +118,6 @@ class Cart extends BaseCart
 	 * @return
 	 */
 	public static function GetCart() {
-
 		if(is_null(Yii::app()->user->getState('cartid'))) {
 			$objCart = Cart::InitializeCart();
 			Yii::app()->user->setState('cartid',$objCart->id);
@@ -665,7 +664,7 @@ class Cart extends BaseCart
 			return;
 		}
 
-		$objShipProduct = Product::LoadByCode('SHIPPING');
+		$objShipProduct = Product::LoadByCode($this->shipping->shipping_method);
 
 		$intTaxStatus = 0;
 		if ($objShipProduct)
@@ -686,19 +685,33 @@ class Cart extends BaseCart
 
 		$taxes = $nprice_taxes[1];
 
-		if ($this->tax_code_id != $intNoTax)
-			$this->shipping->shipping_sell_taxed = $this->shipping->shipping_sell + round(array_sum($taxes),2);
-		else
+		if ($this->tax_code_id == $intNoTax)
 			$this->shipping->shipping_sell_taxed = $this->shipping->shipping_sell;
 
-		/*
-		 * Legacy behavior assumes that the ShippingSell price does
-		 * not already contain taxes and that they must be added.
-		 * Cloud mode also expects taxes to already be included.
-		 */
+		else
+		{
+			if (Yii::app()->params['TAX_INCLUSIVE_PRICING'] == '1')
+			{
+				/*
+				 * Legacy behavior assumes that the ShippingSell price does
+				 * not already contain taxes and that they must be added.
+				 * Cloud mode also expects taxes to already be included.
+				 */
 
-		if ( Yii::app()->params['TAX_INCLUSIVE_PRICING'] == '1' && $this->tax_code_id != $intNoTax)
-			$this->shipping->shipping_sell += round(array_sum($taxes),2);
+				$this->shipping->shipping_sell += round(array_sum($taxes), 2);
+				$this->shipping->shipping_sell_taxed = $this->shipping->shipping_sell;
+			}
+
+			else
+			{
+				$this->shipping->shipping_sell_taxed = $this->shipping->shipping_sell + round(array_sum($taxes),2);
+				$this->tax1 += $taxes[1];
+				$this->tax2 += $taxes[2];
+				$this->tax3 += $taxes[3];
+				$this->tax4 += $taxes[4];
+				$this->tax5 += $taxes[5];
+			}
+		}
 
 
 
@@ -868,7 +881,7 @@ class Cart extends BaseCart
 		}
 
 		$objItem->qty = ($objItem->qty ? $objItem->qty : 0);
-        $objItem->sell_total = $objItem->sell_base*$objItem->qty;
+        $objItem->sell_total = $objItem->sell_base * $objItem->qty;
 		if (!$objItem->save())
 			print_r($objItem->getErrors());
 
@@ -1186,6 +1199,59 @@ class Cart extends BaseCart
 				$item->delete();
 			$objCart->delete();
 		}
+	}
+
+
+	/**
+	 * Adds taxes to cart
+	 *
+	 * @param $arr - array of 5 tax values
+	 */
+
+	public function addTaxes($arr)
+	{
+		if (count($arr) !== 5)
+			Yii::log(
+				'Taxes not added, incorrect size of passed array. Expecting 5, received '.count($arr),
+				'error',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
+		else
+		{
+			$arr = array_values($arr);  // normalize array keys
+			$this->tax1 += $arr[0];
+			$this->tax2 += $arr[1];
+			$this->tax3 += $arr[2];
+			$this->tax4 += $arr[3];
+			$this->tax5 += $arr[4];
+		}
+
+	}
+
+	/**
+	 * Subtract taxes from cart
+	 *
+	 * @param $arr - array of 5 tax values
+	 */
+
+	public function subtractTaxes($arr)
+	{
+		if (count($arr) !== 5)
+			Yii::log(
+				'Taxes not subtracted, incorrect size of passed array. Expecting 5, received '.count($arr),
+				'error',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
+		else
+		{
+			$arr = array_values($arr);  // normalize array keys
+			$this->tax1 -= $arr[0];
+			$this->tax2 -= $arr[1];
+			$this->tax3 -= $arr[2];
+			$this->tax4 -= $arr[3];
+			$this->tax5 -= $arr[4];
+		}
+
 	}
 
 

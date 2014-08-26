@@ -42,6 +42,22 @@ class CartPayment extends BaseCartPayment
 		}
 	}
 
+	public function beforeValidate()
+	{
+		//WS-2344 non-cash payment amount must be equal to the cart total
+		if ($this->carts && $this->scenario === 'manual')
+		{
+			//When payment information is manually entered in the admin panel.
+			//make sure the payment amount is equal to the cart total unless it's cash payment.
+			if ( $this->payment_module !== 'cashondelivery' && $this->payment_amount !== $this->carts[0]->total)
+			{
+				$this->addError('payment_amount', "The payment amount must be equal to the cart total in non-cash payments.");
+			}
+		}
+
+		return parent::beforeValidate();
+	}
+
 	public function __get($strName) {
 		switch ($strName) {
 			case 'payment_name':

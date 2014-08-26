@@ -98,8 +98,8 @@ class AdminBaseController extends CController
 	{
 		return array(
 			array('allow',
-				'actions'=>array('edit','module'),
-				'roles'=>array('admin'),
+				'actions' => array('edit','module'),
+				'roles' => array('admin'),
 			),
 		);
 	}
@@ -223,10 +223,10 @@ class AdminBaseController extends CController
 			);
 		}
 
-		if(isset($action->id) && $action->id=="edit")
+		if(isset($action->id) && $action->id == "edit")
 		{
 			//Remove some options that aren't applicable in Cloud right now
-			if(Yii::app()->params['LIGHTSPEED_CLOUD']>0)
+			if(Yii::app()->params['LIGHTSPEED_CLOUD'] > 0)
 			{
 				_dbx("update xlsws_configuration set key_value=0,configuration_type_id=0,sort_order=0 where key_name='SHIPPING_TAXABLE'");
 				_dbx("update xlsws_configuration set key_value=0,configuration_type_id=0,sort_order=0 where key_name='INVENTORY_FIELD_TOTAL'");
@@ -247,7 +247,10 @@ class AdminBaseController extends CController
 	{
 		$id = Yii::app()->getRequest()->getQuery('id');
 
-		$model = Configuration::model()->findAllByAttributes(array('configuration_type_id'=>$id),array('order'=>'sort_order'));
+		$model = Configuration::model()->findAllByAttributes(
+			array('configuration_type_id' => $id),
+			array('order' => 'sort_order')
+		);
 
 		if ($this->IsCloud)
 			$model = $this->sanitizeEditModule($model, 'Cloud');
@@ -258,18 +261,18 @@ class AdminBaseController extends CController
 
 		if(isset($_POST['Configuration']))
 		{
-			$valid=true;
+			$valid = true;
 			foreach($model as $i => $item)
 			{
 				if(isset($_POST['Configuration'][$i]))
-					$item->attributes=$_POST['Configuration'][$i];
+					$item->attributes = $_POST['Configuration'][$i];
 
 				if($item->key_name == "LANG_MENU" && $item->key_value == 1)
 				{
 					$itemLanguages = $model[2];
 					$itemLanguages->attributes = $_POST['Configuration'][2];
 					if (empty($itemLanguages->key_value))
-						$valid=false;
+						$valid = false;
 				}
 
 				if ($item->options == "EMAIL")
@@ -280,7 +283,7 @@ class AdminBaseController extends CController
 				{
 					if ($item->options == "EMAIL")
 						Yii::app()->user->setFlash('error',$item->title." is not a valid email address");
-					else if ($item->key_name == "LANG_MENU")
+					elseif ($item->key_name == "LANG_MENU")
 						Yii::app()->user->setFlash('error', "Languages field cannot be empty when language menu is enabled");
 					else
 					{
@@ -297,12 +300,20 @@ class AdminBaseController extends CController
 				{
 					$item->attributes = $_POST['Configuration'][$i];
 					if ($item->options == "PASSWORD")
-						$item->key_value=_xls_encrypt($item->key_value);
+						$item->key_value = _xls_encrypt($item->key_value);
 					if (!$item->save())
 						Yii::app()->user->setFlash('error',print_r($item->getErrors(),true));
 					else
 					{
-						Yii::app()->user->setFlash('success',Yii::t('admin','Configuration updated on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
+						Yii::app()->user->setFlash(
+							'success',
+							Yii::t(
+								'admin',
+								'Configuration updated on {time}.',
+								array('{time}' => date("d F, Y  h:i:sa")
+								)
+							)
+						);
 						$item->postConfigurationChange();
 					}
 
@@ -339,7 +350,7 @@ class AdminBaseController extends CController
 			);
 		}
 
-		$this->render('admin.views.default.edit', array('model'=>$model));
+		$this->render('admin.views.default.edit', array('model' => $model));
 
 
 	}
@@ -354,7 +365,7 @@ class AdminBaseController extends CController
 	{
 		$id = Yii::app()->getRequest()->getQuery('id');
 
-		if(Yii::app()->controller->id=="theme" && Yii::app()->controller->action->id == "module")
+		if(Yii::app()->controller->id == "theme" && Yii::app()->controller->action->id == "module")
 			$id = "wstheme";
 
 		$objComponent = Yii::app()->getComponent($id);
@@ -376,7 +387,7 @@ class AdminBaseController extends CController
 
 			if($id == "wstheme")
 			{
-				$objModule->active=1;
+				$objModule->active = 1;
 				$strOldChild = Yii::app()->theme->config->CHILD_THEME;
 			}
 
@@ -397,7 +408,15 @@ class AdminBaseController extends CController
 						Yii::app()->user->setFlash('error',print_r($objModule->getErrors(),true));
 					else
 					{
-						Yii::app()->user->setFlash('success',Yii::t('admin','Configuration updated on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
+						Yii::app()->user->setFlash(
+							'success',
+							Yii::t(
+								'admin',
+								'Configuration updated on {time}.',
+								array('{time}' => date("d F, Y  h:i:sa")
+								)
+							)
+						);
 						Yii::app()->getComponent($id)->init(); //force a reload of config
 
 
@@ -438,7 +457,7 @@ class AdminBaseController extends CController
 			//At this point, our $model has our values, so they are available for our form definition
 			$formDefinition = $model->getAdminForm();
 			foreach ($formDefinition['elements'] as $key => $value)
-				$formDefinition['elements'][$key]['layout']=
+				$formDefinition['elements'][$key]['layout'] =
 					'<div class="span5 optionlabel">{label}</div><div class="span5 optionvalue">{input}</div>{error}<div class="span2 maxhint">{hint}</div>';
 
 
@@ -447,10 +466,25 @@ class AdminBaseController extends CController
 			$this->registerAsset("js/tiers.js");
 			$this->registerAsset("js/offerservices.js");
 
-			$this->render('admin.views.default.moduleedit', array('objModule'=>$objModule,'model'=>$model,'form'=>new CForm($formDefinition,$model)));
+			$this->render(
+				'admin.views.default.moduleedit',
+				array(
+					'objModule' => $objModule,
+					'model' => $model,
+					'form' => new CForm(
+							$formDefinition,
+							$model
+						)
+				)
+			);
 		}
 		else
-			$this->render('admin.views.default.noconfig',array('id'=>$id)); //If null it means the AdminForm model file is missing
+			$this->render(
+				'admin.views.default.noconfig',
+				array(
+					'id' => $id
+				)
+			); //If null it means the AdminForm model file is missing
 
 	}
 
@@ -494,7 +528,15 @@ class AdminBaseController extends CController
 						Yii::app()->user->setFlash('error',print_r($objModule->getErrors(),true));
 					else
 					{
-						Yii::app()->user->setFlash('success',Yii::t('admin','Configuration updated on {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
+						Yii::app()->user->setFlash(
+							'success',
+							Yii::t(
+								'admin',
+								'Configuration updated on {time}.',
+								array('{time}' => date("d F, Y  h:i:sa")
+								)
+							)
+						);
 						//$objComponent->init(); //force a reload of config
 
 						//$this->updateMenuAfterEdit($id);
@@ -522,7 +564,7 @@ class AdminBaseController extends CController
 			//At this point, our $model has our values, so they are available for our form definition
 			$formDefinition = $model->getAdminForm();
 			foreach ($formDefinition['elements'] as $key => $value)
-				$formDefinition['elements'][$key]['layout']=
+				$formDefinition['elements'][$key]['layout'] =
 					'<div class="span5 optionlabel">{label}</div><div class="span5 optionvalue">{input}</div>{error}<div class="span2 maxhint">{hint}</div>';
 
 			$this->render(
@@ -587,22 +629,24 @@ class AdminBaseController extends CController
 	protected function convertControllersToMenu($arrControllerList)
 	{
 		$arrMenu = array();
-		foreach ($arrControllerList as $key => $val)
+
+		foreach ($arrControllerList as $key => $strName)
 		{
 			$arrItem = array();
-			$cControl = new $val('default');
+			$cControl = new $strName('default');
 			$arrItem['label'] = $cControl->controllerName;
-			$arrItem['url'] = array(strtolower(substr($val, 0, -10)) . '/');
-			$arrItem['zclass'] = $val;
+			$arrItem['url'] = array(strtolower(substr($strName, 0, -10)) . '/'); // remove 'controller'
+			$arrItem['zclass'] = $strName;
+			$arrItem['linkOptions'] = array('id' => strtolower(substr($strName, 0, -10)));  // remove 'controller' from name
 			$arrMenu[] = $arrItem;
 		}
 		asort($arrMenu); //we sort on the order
 
 		$arrMenu = $this->arrangeControllers($arrMenu);
 
-		foreach ($arrMenu as $key => $val)
+		foreach ($arrMenu as $key => $arrController)
 		{
-			if (get_class($this) == $val['zclass'])
+			if (get_class($this) == $arrController['zclass'])
 			{
 				$arrMenu[$key]['active'] = true;
 				break;
@@ -613,9 +657,9 @@ class AdminBaseController extends CController
 		// No other tabs will be active so we don't need to check for another active tab
 		if ($this->controllerName == 'Db')
 		{
-			foreach ($arrMenu as $key => $value)
+			foreach ($arrMenu as $key => $arrController)
 			{
-				if ($value['label'] == 'System')
+				if ($arrController['label'] == 'System')
 				{
 					$arrMenu[$key]['active'] = true;
 				}
@@ -811,13 +855,13 @@ SETUP;
 	 *
 	 * @return void
 	 */
-	public function scanModules($moduletype="payment")
+	public function scanModules($moduletype = "payment")
 	{
-		if($moduletype=="theme")
+		if($moduletype == "theme")
 		{
 			$files = glob(YiiBase::getPathOfAlias("webroot.themes").'/*', GLOB_ONLYDIR);
 			foreach ($files as $key => $file)
-				if(stripos($file,"/themes/trash")>0 || stripos($file,"/themes/_customcss")>0)
+				if(stripos($file,"/themes/trash") > 0 || stripos($file,"/themes/_customcss") > 0)
 					unset($files[$key]);
 
 		}
@@ -828,7 +872,7 @@ SETUP;
 				$arrCustom = glob(realpath(YiiBase::getPathOfAlias("custom.extensions.".$moduletype)).'/*', GLOB_ONLYDIR);
 			if(!is_array($arrCustom))
 				$arrCustom = array();
-			$files=array_merge(glob(realpath(YiiBase::getPathOfAlias("ext.ws".$moduletype)).'/*', GLOB_ONLYDIR),$arrCustom);
+			$files = array_merge(glob(realpath(YiiBase::getPathOfAlias("ext.ws".$moduletype)).'/*', GLOB_ONLYDIR),$arrCustom);
 
 		}
 
@@ -836,10 +880,10 @@ SETUP;
 		{
 
 			$moduleName = mb_pathinfo($file,PATHINFO_BASENAME);
-			$version=0;
+			$version = 0;
 			$name = $moduleName;
 
-			if($moduletype=="theme")
+			if($moduletype =="theme")
 			{
 				$model = Yii::app()->getComponent('wstheme')->getAdminModel($moduleName);
 				$configuration = "";
@@ -853,7 +897,7 @@ SETUP;
 
 			} else {
 				try {
-				$version =  Yii::app()->getComponent($moduleName)->Version;
+				$version = Yii::app()->getComponent($moduleName)->Version;
 				$name = Yii::app()->getComponent($moduleName)->AdminNameNormal;
 				$configuration = Yii::app()->getComponent($moduleName)->getDefaultConfiguration();
 				}catch (Exception $e) {
@@ -869,14 +913,14 @@ SETUP;
 				try {
 
 					$objModule = new Modules();
-					$objModule->active=0;
+					$objModule->active = 0;
 					$objModule->module = $moduleName;
 					$objModule->category = $moduletype;
 
 
 
 					$objModule->version = $version;
-					$objModule->name =  $name;
+					$objModule->name = $name;
 					$objModule->configuration = $configuration;
 					if (!$objModule->save())
 						Yii::log("Found widget $moduleName could not install ".print_r($objModule->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
@@ -902,7 +946,7 @@ SETUP;
 	 */
 	public function getIsCloud()
 	{
-		if(Yii::app()->params['LIGHTSPEED_CLOUD']>0)
+		if(Yii::app()->params['LIGHTSPEED_CLOUD'] > 0)
 			return true;
 		return false;
 	}
@@ -914,7 +958,7 @@ SETUP;
 	 */
 	public function getIsMT()
 	{
-		if(Yii::app()->params['LIGHTSPEED_MT']>0)
+		if(Yii::app()->params['LIGHTSPEED_MT'] > 0)
 			return true;
 		return false;
 	}
@@ -926,7 +970,7 @@ SETUP;
 	 */
 	public function getIsHosted()
 	{
-		if(Yii::app()->params['LIGHTSPEED_HOSTING']>0)
+		if(Yii::app()->params['LIGHTSPEED_HOSTING'] > 0)
 			return true;
 		return false;
 	}
@@ -972,8 +1016,8 @@ SETUP;
 		{
 			$key = array_search('custom',$arrActiveCss);
 			if ($key && $key > 0 )
-				if (!in_array($arrActiveCss[$key-1],$arrDefaultCss))
-					$arrActiveCss[$key-1] = $strNewChild;
+				if (!in_array($arrActiveCss[$key - 1],$arrDefaultCss))
+					$arrActiveCss[$key - 1] = $strNewChild;
 				else
 				{
 					$arrActiveCss[$key] = $strNewChild;

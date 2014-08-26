@@ -21,8 +21,8 @@
 	<div class="bottomtabs">
 		<?php
 			foreach (CustomPage::model()->bottomtabs()->findAll() as $arrTab)
-				echo CHtml::link(Yii::t('global',$arrTab->title),$arrTab->Link).' / ';
-		echo CHtml::link(Yii::t('global','Sitemap'),$this->createUrl('site/map'));
+				echo CHtml::link(Yii::t('global',$arrTab->title),$arrTab->Link, array('id'=> $arrTab->request_url)).' / ';
+		echo CHtml::link(Yii::t('global','Sitemap'),$this->createUrl('site/map'),array('id'=>'site-map'));
 		?>
 	</div>
 	<div class="copyright">

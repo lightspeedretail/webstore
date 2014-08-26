@@ -457,10 +457,8 @@ class ShoppingCart extends CApplicationComponent
 	 */
 	public function releaseCart()
 	{
-
 		Yii::app()->user->setState('cartid',null);
 		$this->_model = null;
-
 	}
 
 	public function UpdateItemQuantity($objItem,$qty)
@@ -514,25 +512,36 @@ class ShoppingCart extends CApplicationComponent
 	//These are pass-through functions which go currently to our cart object
 
 
+	/* @return boolean whether the shopping cart uses tax inclusive pricing.
+	 */
 	public function getIsTaxIn()
 	{
-
-		if($this->model->id>0)
+		if($this->model->id == 0)
 		{
-			if(!isset($this->model->taxCode))
-			{
-				$objDestination = Destination::LoadDefault();
-				if(is_null($objDestination)) return false;
-				$this->setTaxCodeId($objDestination->taxcode);
-			}
-			if($this->model->taxCode->IsNoTax()) return false;
-			if (Yii::app()->params['TAX_INCLUSIVE_PRICING']) return true;
+			return (bool)Yii::app()->params['TAX_INCLUSIVE_PRICING'];
+		}
 
+		// If the cart taxCode is not set, use the default.
+		if(isset($this->model->taxCode) === false)
+		{
+			$objDestination = Destination::LoadDefault();
+
+			// No default tax destination, default to not tax inclusive.
+			if(is_null($objDestination))
+			{
+				return false;
+			}
+
+			$this->setTaxCodeId($objDestination->taxcode);
+		}
+
+		// taxCode is set now, check the taxCode setting.
+		if($this->model->taxCode->IsNoTax())
+		{
 			return false;
 		}
-		else
-			if (Yii::app()->params['TAX_INCLUSIVE_PRICING']) return true; else return false;
 
+		return (bool)Yii::app()->params['TAX_INCLUSIVE_PRICING'];
 	}
 
 	public function getPromoCode()
@@ -591,6 +600,16 @@ class ShoppingCart extends CApplicationComponent
 	public function UpdateWishList()
 	{
 		$this->model->UpdateWishList();
+	}
+
+	public function addTaxes($arr)
+	{
+		$this->model->addTaxes($arr);
+	}
+
+	public function subtractTaxes($arr)
+	{
+		$this->model->subtractTaxes($arr);
 	}
 
 	public function clearCachedShipping()

@@ -59,10 +59,7 @@ class monerissim extends WsPayment
 				// todo - account for electronics tax
 			}
 
-
-
-
-		$str .= _xls_make_hidden('shipping_cost', number_format(round($this->objCart->shipping_sell,2),2));
+		$str .= _xls_make_hidden('shipping_cost', number_format(round($this->objCart->shippingCharge,2),2));
 		$str .= _xls_make_hidden('note', $this->CheckoutForm->orderNotes);
 
 		$str .= _xls_make_hidden('bill_first_name',   $this->CheckoutForm->contactFirstName);
@@ -92,8 +89,8 @@ class monerissim extends WsPayment
 
 		$str .=  ('</FORM>');
 
-		if(_xls_get_conf('DEBUG_PAYMENTS' , false)=="1")
-			_xls_log(get_class($this) . " sending ".$this->objCart->id_str." in ".$this->config['live']." mode ".$str,true);
+		Yii::log(" sending ".$this->objCart->id_str." in ".$this->config['live']." mode ".$str,
+			'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 		$arrReturn['api'] = $this->apiVersion;
 		$arrReturn['jump_form']=$str;

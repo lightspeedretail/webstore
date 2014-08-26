@@ -37,6 +37,12 @@ class Comments extends SPluginBase
 	 * @var integer the number of comments to show by default. Default: 10. Minimum: 1
 	 */
 	public $num_posts;
+	/**
+	 * @var integer The order to use when displaying comments. Default: "social"
+   * Can be "social", "reverse_time", or "time". The different order types are explained here:
+   * https://developers.facebook.com/docs/plugins/comments/#faqorder
+	 */
+	public $order_by;
   /**
 	 * @var string whether to show the mobile-optimized version. Default: auto-detect
 	 */

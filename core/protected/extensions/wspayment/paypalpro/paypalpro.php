@@ -88,15 +88,22 @@ class paypalpro extends WsPayment
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $strPaypalPost);
 		$resp = curl_exec($ch);
 
-		//convrting NVPResponse to an Associative Array
+		//converting NVPResponse to an Associative Array
 		$nvpResArray=$this->deformatNVP($resp);
+		$strPaypalPost=$this->obfuscateStr($strPaypalPost);
 
-		if(_xls_get_conf('DEBUG_PAYMENTS' , false)=="1") {
-
-			Yii::log(" sending ".$this->objCart->id_str." for amt ".$this->objCart->total, 'error', get_class($this));
-			Yii::log(" string ".$strPaypalPost, 'error', get_class($this));
-			Yii::log(" receiving ".print_r($nvpResArray,true), 'error', get_class($this));
+		if(_xls_get_conf('DEBUG_PAYMENTS' , false) == "1")
+		{
+			_xls_log(get_class($this) . " sending ".$this->objCart->id_str." for amt ".$this->objCart->total, true);
+			_xls_log(get_class($this) . " string ".$strPaypalPost, true);
+			_xls_log(get_class($this) . " receiving ".print_r($nvpResArray,true), true);
 		}
+
+		// in case troubleshooting logging is on and debug payments is off
+		Yii::log(" sending ".$this->objCart->id_str." for amt ".$this->objCart->total, 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
+		Yii::log(" string ".$strPaypalPost, 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
+		Yii::log(" receiving ".print_r($nvpResArray,true), 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
+
 
 		if (curl_errno($ch)) {
 			// moving to display page to display curl errors
@@ -196,6 +203,30 @@ class paypalpro extends WsPayment
 			$nvpstr=substr($nvpstr,$valuepos+1,strlen($nvpstr));
 		}
 		return $nvpArray;
+	}
+
+
+	/**
+	 * Replaces all of the CVV number and all but the last
+	 * four digits of the credit card number with asterisks
+	 * before logging the string.
+	 *
+	 * @param $str
+	 * @return mixed
+	 */
+
+	function obfuscateStr($str)
+	{
+		$intCardNumLength = strpos($str, '&', strpos($str,'ACCT=')) - strpos($str,'ACCT=') - strlen('ACCT=') - 4; // except last 4 digits
+		$intCVVLength = strpos($str, '&', strpos($str, 'CVV2=')) - strpos($str, 'CVV2=') - strlen('CVV2=');  // entire cvv
+
+		$startCardNum = strpos($str,'ACCT=') + strlen('ACCT=');
+		$startCVV = strpos($str,'CVV2=') + strlen('CVV2=');
+
+		$str = substr_replace($str, str_repeat('*', $intCardNumLength), $startCardNum, $intCardNumLength);
+		$str = substr_replace($str, str_repeat('*', $intCVVLength), $startCVV, $intCVVLength);
+
+		return $str;
 	}
 
 

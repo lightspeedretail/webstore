@@ -30,6 +30,11 @@ class ActivityFeed extends SPluginBase
 	 * @var string a comma separated list of actions to show activities for
 	 */
 	public $action;
+	/**
+	 * @var string Display all actions associated with this app ID. This is
+   * usually inferred from the app ID you use to initiate the [JavaScript SDK].
+	 */
+	public $app_id;
   /**
 	 * @var integer The width of the plugin in pixels. Default width: 300px.
 	 */
@@ -46,15 +51,6 @@ class ActivityFeed extends SPluginBase
 	 * @var string The color scheme for the plugin. Options: 'light', 'dark'
 	 */
 	public $colorscheme;
-	/**
-	 * @var string The font to display in the plugin. Options: 'arial',
-	 * 'lucida grande', 'segoe ui', 'tahoma', 'trebuchet ms', 'verdana'
-	 */
-	public $font;
-	/**
-	 * @var string The border color of the plugin.
-	 */
-	public $border_color;
 	/**
 	 * @var boolean Specifies whether to always show recommendations in the plugin.
 	 *

@@ -197,8 +197,6 @@ class SearchController extends Controller
 
 	}
 
-
-
 	/**
 	 * Display our search results based on  criteria.
 	 */
@@ -232,13 +230,16 @@ class SearchController extends Controller
 		//Convert rows to objects for our view layer so it's consistent
 		$model = Product::model()->populateRecords($rows,false);
 
+		$strCurrentUrl = $this->createAbsoluteUrl(Yii::app()->request->getPathInfo() . '?' . http_build_query($formModel->attributes));
+		$strBreadcrumbText = '';
+
 		if (empty($this->strBreadcrumbCat))
-			$this->breadcrumbs = array(
-				Yii::t('global','Searching for "{terms}"',array('{terms}'=>$strQ))=>'',
-			);
-		else $this->breadcrumbs = array(
-			Yii::t('global','Searching for "{terms}" in category "{category}"',array('{terms}'=>$strQ,'{category}'=>$this->strBreadcrumbCat))=>'',
-		);
+			$strBreadcrumbText = Yii::t('global', 'Searching for "{terms}"', array('{terms}' => $strQ));
+		else
+			$strBreadcrumbText = Yii::t('global', 'Searching for "{terms}" in category "{category}"',
+									array('{terms}' => $strQ, '{category}' => $this->strBreadcrumbCat));
+
+		$this->breadcrumbs = array($strBreadcrumbText => $strCurrentUrl);
 
 		if(isset($_GET['cpc']))
 		{
@@ -255,9 +256,7 @@ class SearchController extends Controller
 			}
 		}
 
-		$this->CanonicalUrl = $this->createAbsoluteUrl('/search/results',$formModel->attributes,'',"&amp;");
-
-
+		$this->CanonicalUrl = $strCurrentUrl;
 
 		$this->returnUrl = $this->CanonicalUrl;
 		$this->pageImageUrl = "";
@@ -271,11 +270,7 @@ class SearchController extends Controller
 				'items_count'=>$numberOfRecords,
 				'pages'=>$pages,
 		));
-
-
-
 	}
-
 
 	/**
 	 * AJAX responder for Live Search (dropdown that appears when typing in letters in search box)

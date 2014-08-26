@@ -34,7 +34,7 @@ class LikeButton extends SPluginBase
 	 */
 	public $send;
   /**
-	 * @var string Three options : 'standard', 'button_count', 'box_count'
+	 * @var string Three options : 'standard', 'button_count', 'box_count', 'button'
 	 */
 	public $layout;
 	/**
@@ -42,7 +42,7 @@ class LikeButton extends SPluginBase
 	 */
 	public $show_faces;
 	/**
-	 * @var integer Width of the Like button, defults to 450px
+	 * @var integer Width of the Like button, defaults to 450px
 	 */
 	public $width;
 	/**

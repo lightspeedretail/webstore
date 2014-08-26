@@ -188,10 +188,12 @@ function xls_check_file_signatures($complete = false)
 
 function displaySystemCheckResult($checkenv)
 {
-	$warning_text = "<table class='table table-striped'>";
+	$warning_text = "<table id='header' class='table table-striped'>";
 	?><h2>System Check</h2><?php
 	$warning_text .= "<tr><td colspan='2'><b>SYSTEM CHECK for " . _ws_version() . "</b></td></tr>";
-	$warning_text .= "<tr><td colspan='2'>The chart below shows the results of the system check and if upgrades have been performed.</td></td>";
+	$warning_text .= "<tr><td colspan='2'>The chart below shows the results of the system check and if upgrades have been performed.</td></tr></table>";
+
+	$warning_text .=  "<table id='checklist' class='table table-striped'>";
 
 	$checkenv = array_merge($checkenv, xls_check_file_signatures());
 
@@ -200,7 +202,7 @@ function displaySystemCheckResult($checkenv)
 	foreach ($checkenv as $key => $value) {
 		$warning_text
 			.= "<tr><td>$key</td><td>" . (($value == "pass" || $value == $curver) ? "$value"
-				: "<font color='#cc0000'><b>$value</b></font>") . "</td>";
+				: "<font color='#cc0000'><b>$value</b></font>") . "</td></tr>";
 	}
 
 
@@ -214,6 +216,9 @@ function displaySystemCheckResult($checkenv)
 		<?php echo $warning_text; ?>
 	</div>
 	<p>&nbsp;</p>
+	</div>
+	</body>
+
 	<?php
 }
 

@@ -838,10 +838,14 @@ class Product extends BaseProduct
 	 */
 	public function getPrice($intQuantity = 1) {
 
-		if (!Customer::GetCurrent())
+		if (Customer::GetCurrent() == false)
+		{
 			$taxInclusive = Yii::app()->params['TAX_INCLUSIVE_PRICING'];
+		}
 		else
+		{
 			$taxInclusive = Yii::app()->shoppingcart->IsTaxIn;
+		}
 
 
 		if (_xls_get_conf('PRICE_REQUIRE_LOGIN',0) == 1 && Yii::app()->user->isGuest)

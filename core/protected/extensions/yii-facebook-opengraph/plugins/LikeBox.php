@@ -59,9 +59,9 @@ class LikeBox extends SPluginBase
 	 */
 	public $header;
   /**
-	 * @var string The border color of the plugin.
+	 * @var boolean Specifies whether or not to show a border around the plugin. Default: true
 	 */
-	public $border_color;
+	public $show_border;
 	/**
 	 * @var boolean for Places, specifies whether the stream contains posts
 	 * from the Place's wall or just checkins from friends. Default value: false.

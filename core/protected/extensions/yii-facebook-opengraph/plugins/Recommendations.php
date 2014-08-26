@@ -33,13 +33,13 @@ class Recommendations extends SPluginBase
 	 */
 	public $app_id;
 	/**
-	 * @var integer The height of the plugin in pixels. Default height: 300px.
-	 */
-	public $height;
-	/**
 	 * @var integer The width of the plugin in pixels. Default width: 300px.
 	 */
 	public $width;
+	/**
+	 * @var integer The height of the plugin in pixels. Default height: 300px.
+	 */
+	public $height;
 	/**
 	 * @var boolean Specifies whether to show the Facebook header.
 	 */
@@ -48,15 +48,6 @@ class Recommendations extends SPluginBase
 	 * @var string The color scheme for the plugin. Options: 'light', 'dark'
 	 */
 	public $colorscheme;
-	/**
-	 * @var string The font to display in the plugin. Options: 'arial', 'lucida grande',
-	 * 'segoe ui', 'tahoma', 'trebuchet ms', 'verdana'
-	 */
-	public $font;
-	/**
-	 * @var string The border color of the plugin.
-	 */
-	public $border_color;
   /**
 	 * @var string This specifies the context in which content links are opened. By
    * default all links within the plugin will open a new window. If you want the

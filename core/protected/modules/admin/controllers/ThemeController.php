@@ -43,30 +43,30 @@ class ThemeController extends AdminBaseController
 
 		$this->menuItems =
 			array(
-				array('label'=>'Manage My Themes',
-					'url'=>array('theme/manage')
+				array('label' => 'Manage My Themes',
+					'url' => array('theme/manage')
 				),
-				array('label'=>'Configure '.ucfirst($this->currentTheme),
-					'url'=>array('theme/module')
+				array('label' => 'Configure '.ucfirst($this->currentTheme),
+					'url' => array('theme/module')
 				),
-				array('label'=>'Edit CSS for '.ucfirst($this->currentTheme),
-					'url'=>array('theme/editcss'),
-					'visible'=>Theme::hasAdminForm(Yii::app()->theme->name)
+				array('label' => 'Edit CSS for '.ucfirst($this->currentTheme),
+					'url' => array('theme/editcss'),
+					'visible' => Theme::hasAdminForm(Yii::app()->theme->name)
 				),
-				array('label'=>'View Theme Gallery',
-					'url'=>array('theme/gallery'),
-					'visible'=>!(Yii::app()->params['LIGHTSPEED_MT']>0)
+				array('label' => 'View Theme Gallery',
+					'url' => array('theme/gallery'),
+					'visible' => !(Yii::app()->params['LIGHTSPEED_HOSTING'] > 0)    // only self hosted customers can download/upgrade themes on their own
 				),
-				array('label'=>'Upload Theme .Zip',
-					'url'=>array('theme/upload'),
-					'visible'=>!(Yii::app()->params['LIGHTSPEED_MT']>0)
+				array('label' => 'Upload Theme .Zip',
+					'url' => array('theme/upload'),
+					'visible' => !(Yii::app()->params['LIGHTSPEED_MT'] > 0)
 				),
-				array('label'=>'My Header/Image Gallery',
-					'url'=>array('theme/image','id'=>1),
+				array('label' => 'My Header/Image Gallery',
+					'url' => array('theme/image','id' => 1),
 				),
-				array('label'=>'Upload FavIcon',
-					'url'=>array('theme/favicon'),
-					'visible'=>!(Yii::app()->params['LIGHTSPEED_MT']>0)
+				array('label' => 'Upload FavIcon',
+					'url' => array('theme/favicon'),
+					'visible' => !(Yii::app()->params['LIGHTSPEED_MT'] > 0)
 				)
 
 
@@ -332,6 +332,14 @@ class ThemeController extends AdminBaseController
 
 	public function actionGallery()
 	{
+
+		if (Yii::app()->params['LIGHTSPEED_HOSTING'] > 0)
+		{
+			// prevent users from accessing action using a hard URL
+			$this->redirect($this->createUrl("theme/index"));
+		}
+
+
 		//Get list
 		$arrThemes = $this->GalleryThemes;
 
@@ -532,6 +540,13 @@ class ThemeController extends AdminBaseController
 		return $strCopyThemeFolder;
 	}
 
+
+	/**
+	 * Upload a theme .zip file
+	 *
+	 * @return void
+	 */
+
 	public function actionUpload()
 	{
 		if (isset($_POST['yt0']))
@@ -539,13 +554,21 @@ class ThemeController extends AdminBaseController
 			$file = CUploadedFile::getInstanceByName('theme_file');
 			if ($file->type == "application/zip")
 			{
-				$path = str_replace("/core/protected","",Yii::app()->basePath); //Since we're inside admin panel, bump up one folder
+				$path = Yii::getPathOfAlias('webroot'); // we need the proper webroot since we can be using a shared core
 				$retVal = $file->saveAs($path.'/themes/'.$file->name);
 				if ($retVal)
 				{
 					$blnExtract = $this->unzipFile($path.'/themes',$file->name);
-					Yii::app()->user->setFlash('success',Yii::t('admin','File {file} uploaded at {time}.',
-						array('{file}'=>"<strong>".$file->name."</strong>",'{time}'=>date("d F, Y  h:i:sa"))));
+					if ($blnExtract)
+					{
+						Yii::app()->user->setFlash('success',Yii::t('admin','File {file} uploaded at {time}.',
+							array('{file}'=>"<strong>".$file->name."</strong>",'{time}'=>date("d F, Y  h:i:sa"))));
+					}
+					else
+					{
+						Yii::app()->user->setFlash('error',Yii::t('admin','ERROR! File {file} could not be unzipped. {time}.',
+							array('{file}'=>"<strong>".$file->name."</strong>",'{time}'=>date("d F, Y  h:i:sa"))));
+					}
 				}
 				else
 					Yii::app()->user->setFlash('error',Yii::t('admin','ERROR! File {file} was not saved. {time}.',
@@ -582,7 +605,7 @@ class ThemeController extends AdminBaseController
 					if ($file->type == "image/jpg" || $file->type == "image/png" || $file->type == "image/jpeg" || $file->type == "image/gif" ||
 						$file->type == 'image/vnd.microsoft.icon' || $file->type == "image/x-icon")
 					{
-						$path = str_replace("/core/protected","/images/",Yii::app()->basePath);
+						$path = str_replace("/runtime","/images/", Yii::getPathOfAlias('webroot.runtime'));
 						$retVal = $file->saveAs($path."favicon.ico");
 						$path2 = str_replace("/images/","/",$path);
 
@@ -616,12 +639,16 @@ class ThemeController extends AdminBaseController
 
 	protected function unzipFile($path,$file)
 	{
-		$path = str_replace("/core/protected","/themes",Yii::app()->basePath);
+		$path = YiiBase::getPathOfAlias('webroot')."/themes";
 		require_once( YiiBase::getPathOfAlias('application.components'). '/zip.php');
 
+		$count_before = glob($path.'/*', GLOB_ONLYDIR);
 		extractZip($file,'',$path);
 
-		return true;
+		// if the unzip was successful we should have an extra directory
+		$count_after = glob($path.'/*', GLOB_ONLYDIR);
+
+		return $count_after > $count_before;
 	}
 
 	protected function changeTheme($post)
