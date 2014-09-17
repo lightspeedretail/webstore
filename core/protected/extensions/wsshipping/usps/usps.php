@@ -394,18 +394,19 @@ class usps extends WsShipping
 	 * @return string
 	 */
 	private function buildDomesticRateRequest() {
-		$r ='API=RateV3&XML=<?xml version="1.0"?>';
-		$r.= '<RateV3Request USERID="'.urlencode($this->uspsID).'">';
+		$r ='API=RateV4&XML=<?xml version="1.0"?>';
+		$r.= '<RateV4Request USERID="'.urlencode($this->uspsID).'">';
 		$r.='<Package ID="0">';
 		$r.='<Service>ALL</Service>';
 		$r.='<ZipOrigination>'.substr($this->zipOrigination,0,5).'</ZipOrigination>';
 		$r.='<ZipDestination>'.substr($this->zipDestination,0,5).'</ZipDestination>';
 		$r.='<Pounds>'.$this->pounds.'</Pounds>';
 		$r.='<Ounces>'.$this->ounces.'</Ounces>';
+		$r.='<Container></Container>';
 		$r.='<Size>Regular</Size>';
 		$r.='<Machinable>true</Machinable>';
 		$r.='</Package>';
-		$r.='</RateV3Request>';
+		$r.='</RateV4Request>';
 
 
 		return $r;
@@ -418,16 +419,22 @@ class usps extends WsShipping
 	 * @return string
 	 */
 	private function buildInternationalRateRequest() {
-		$r ='API=IntlRate&XML=<?xml version="1.0"?>';
-		$r.= '<IntlRateRequest USERID="'.urlencode($this->uspsID).'">';
+		$r ='API=IntlRateV2&XML=<?xml version="1.0"?>';
+		$r.= '<IntlRateV2Request USERID="'.urlencode($this->uspsID).'">';
 		$r.='<Package ID="0">';
 		$r.='<Pounds>'.$this->pounds.'</Pounds>';
 		$r.='<Ounces>'.$this->ounces.'</Ounces>';
 		$r.='<MailType>Package</MailType>';
 		$r.='<ValueOfContents>'.$this->value.'</ValueOfContents>';
 		$r.='<Country>'.$this->country.'</Country>';
+		$r.='<Container>RECTANGULAR</Container>';
+		$r.='<Size>Regular</Size>';
+		$r.='<Width></Width>';
+		$r.='<Length></Length>';
+		$r.='<Height></Height>';
+		$r.='<Girth></Girth>';
 		$r.='</Package>';
-		$r.='</IntlRateRequest>';
+		$r.='</IntlRateV2Request>';
 
 		return $r;
 	}

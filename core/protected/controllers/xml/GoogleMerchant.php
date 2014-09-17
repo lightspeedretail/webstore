@@ -33,7 +33,10 @@ class GoogleMerchant extends CAction
 		if(isset($_GET['group']))
 		{
 			$intGroup = _xls_number_only($_GET['group']);
-			if ($intGroup<1) $intGroup=1;
+			if ($intGroup < 1)
+			{
+				$intGroup = 1;
+			}
 			$parse = _xls_get_conf('GOOGLE_PARSE',5000);
 			switch ($intGroup)
 			{
@@ -46,23 +49,21 @@ class GoogleMerchant extends CAction
 
 		}
 
-		$arrProducts=Yii::app()->db->createCommand($sql)->query();
+		$arrProducts = Yii::app()->db->createCommand($sql)->query();
 		
-		while(($arrItem=$arrProducts->read())!==false)
+		while(($arrItem = $arrProducts->read()) !== false)
 		{
-
 			$objProduct = Product::model()->findByPk($arrItem['id']);
 
 			$arrGoogle = _xls_get_googlecategory($objProduct->id);
 			$strGoogle = $arrGoogle['Category'];
 
-
-
 			$arrTaxGrids = $objProduct->GetTaxRateGrid();
 			$arrTrail = Category::GetTrailByProductId($objProduct->id,'names');
 
 			//If our current category doesn't have Google set but we have a parent that does, use it
-			if (empty($strGoogle) && count($arrTrail)>1) {
+			if (empty($strGoogle) && count($arrTrail) > 1)
+			{
 				$arrGoogle = _xls_get_googleparentcategory($objProduct->id);
 				$strGoogle = $arrGoogle['Category'];
 			}
@@ -72,39 +73,54 @@ class GoogleMerchant extends CAction
 			echo chr(9)."<g:id>".$objProduct->id."</g:id>".chr(13);
 			echo chr(9).'<title><![CDATA['.strip_tags($objProduct->Title).']]></title>'.chr(13);
 			if ($objProduct->description_long)
+			{
 				echo chr(9).'<description><![CDATA['.$objProduct->WebLongDescription.']]></description>'.chr(13);
+			}
 			if ($strGoogle)
+			{
 				echo chr(9).'<g:google_product_category>'.$strGoogle.'</g:google_product_category>'.chr(13);
+			}
 			if ($arrTrail)
+			{
 				echo chr(9).'<g:product_type><![CDATA['.implode(" &gt; ",$arrTrail).']]></g:product_type>'.chr(13);
+			}
 			echo chr(9).'<link>'.$objProduct->AbsoluteUrl.'</link>'.chr(13);
 
-			if($objProduct->image_id) {
+			if($objProduct->image_id)
+			{
 				$arrProductImages = $objProduct->getProductPhotos(true);
-				if($arrProductImages) {
+				if($arrProductImages)
+				{
 					echo chr(9).'<g:image_link>'.$arrProductImages[0]['image'].'</g:image_link>'.chr(13);
 					for ($index = 1; $index < count($arrProductImages); $index++)
+					{
 						echo chr(9).'<g:additional_image_link>'.$arrProductImages[$index]['image'].'</g:additional_image_link>'.chr(13);
+					}
 				}
 			}
 
 			echo chr(9).'<g:condition>new</g:condition>'.chr(13);
 
 			if($objProduct->IsAddable)
+			{
 				echo chr(9).'<g:availability>in stock</g:availability>'.chr(13);
-			elseif ($intStockHandling==Product::InventoryAllowBackorders && $objProduct->Inventory<=0)
-				echo chr(9).'<g:availability>available for order</g:availability>'.chr(13);
-			elseif ($intStockHandling==Product::InventoryDisplayNotOrder && $objProduct->Inventory<=0)
+			}
+			else
+			{
 				echo chr(9).'<g:availability>out of stock</g:availability>'.chr(13);
+			}
 
 			echo chr(9).'<g:price>'.$objProduct->PriceValue.'</g:price>'.chr(13);
 			echo chr(9).'<g:brand><![CDATA['.$objProduct->Family.']]></g:brand>'.chr(13);
 			echo chr(9).'<g:gtin>'.$objProduct->upc.'</g:gtin>'.chr(13);
 			if ($intGoogleMPN)
+			{
 				echo chr(9).'<g:mpn><![CDATA['.$objProduct->code.']]></g:mpn>'.chr(13);
+			}
 
 
-			if (substr($strGoogle,0,7)=="Apparel") {
+			if (substr($strGoogle,0,7) == "Apparel")
+			{
 				echo chr(9).'<g:gender>'.$arrGoogle['Gender'].'</g:gender>'.chr(13);
 				echo chr(9).'<g:age_group>'.$arrGoogle['Age'].'</g:age_group>'.chr(13);
 			}
@@ -113,9 +129,12 @@ class GoogleMerchant extends CAction
 			echo chr(9).'<g:size><![CDATA['.$objProduct->product_size.']]></g:size>'.chr(13);
 
 			if ($objProduct->parent>0)
+			{
 				echo chr(9).'<item_group_id>'.$objProduct->parent.'</item_group_id>'.chr(13);
+			}
 
-			foreach ($arrTaxGrids as $arrTaxGrid) {
+			foreach ($arrTaxGrids as $arrTaxGrid)
+			{
 				echo chr(9).'<g:tax>'.chr(13);
 				echo chr(9).'   <g:country>'.$arrTaxGrid[0].'</g:country>'.chr(13);
 				echo chr(9).'  <g:region>'.$arrTaxGrid[1].'</g:region>'.chr(13);

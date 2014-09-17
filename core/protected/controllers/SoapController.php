@@ -2,7 +2,10 @@
 
 class SoapController extends CController
 {
-	const OK = "OK";
+	const OK = 'OK';
+
+	const BRONZE_ORDER_PROCESSING = 'Processing';
+	const BRONZE_ORDER_INVOICED = 'Invoiced';
 
 	public function init() {
 		Controller::initParams();
@@ -1106,10 +1109,11 @@ class SoapController extends CController
 		if(!($objDocument instanceof Document))
 		{
 			$objDocument = new Document();
+			$objDocument->status = $strStatus;
 		}
 		else
-		{          // if cart already exists then delete the items
-
+		{
+			// if cart already exists then delete the items
 			foreach($objDocument->documentItems  as $item)
 			{
 				try
@@ -1140,8 +1144,6 @@ class SoapController extends CController
 		$objDocument->datetime_due = date("Y-m-d H:i:s",trim($intDttDue));
 		$objDocument->fk_tax_code_id = $intTaxcode ? $intTaxcode : 0;
 
-		$objDocument->status = $strStatus;
-
 		$objCustomer = Customer::model()->findByAttributes(array('lightspeed_id'=>$lightspeed_id));
 		if ($objCustomer instanceof Customer)
 			$objDocument->customer_id = $objCustomer->id;
@@ -1150,7 +1152,16 @@ class SoapController extends CController
 		if ($objCart instanceof Cart)
 			$objDocument->cart_id = $objCart->id;
 
-		$objDocument->status = $strStatus;
+		/**
+		 * WS-2555
+		 * This is to deal with cases where bronze makes update_order_status call before add_order.
+		 * In that case, we need to compare the order status between the two calls and change the order status
+		 * only if the status in add_order call is later than one in update_order_status call.
+		 */
+		if (($objDocument->status == self::BRONZE_ORDER_PROCESSING) || empty($objDocument->status))
+		{
+			$objDocument->status = $strStatus;
+		}
 
 		if (!$objDocument->save())
 		{
@@ -1242,8 +1253,17 @@ class SoapController extends CController
 
 		$objDocument = Document::LoadByIdStr($strId);
 
-		if(!$objDocument)
-			throw new SoapFault("Document not found", WsSoapException::ERROR_NOT_FOUND);
+		/**
+		 * WS-2555
+		 * Sometimes bronze calls update_order_status before add_order.
+		 * When it happens, we create a new Document and set the status only.
+		 * The rest of the information should be updated by add_order call.
+		 */
+		if (!($objDocument instanceof Document))
+		{
+			$objDocument = new Document();
+			$objDocument->order_str = $strId;
+		}
 
 		$objDocument->status = $strStatus;
 
@@ -1554,8 +1574,17 @@ class SoapController extends CController
 				throw new WsSoapException("Cart with ID '" . $strId . "' was not found");
 			}
 			Cart::model()->updateByPk($objCart->id,array('downloaded'=>$intDownloaded,'status'=>OrderStatus::Downloaded));
-		} catch(WsSoapException $wsse) {
+		}
+		catch(WsSoapException $wsse)
+		{
 			$strMsg = "update_order_downloaded_status_by_id " . $wsse;
+			Yii::log("SOAP ERROR : $strMsg", CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
+
+			throw new SoapFault($strMsg, WsSoapException::ERROR_UNKNOWN);
+		}
+		catch(Exception $ex)
+		{
+			$strMsg = "Unknown error while trying to update downloaded status for the cart with ID '" . $strId . "'";
 			Yii::log("SOAP ERROR : $strMsg", CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 
 			throw new SoapFault($strMsg, WsSoapException::ERROR_UNKNOWN);

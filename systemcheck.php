@@ -10,7 +10,7 @@ function displayHeader()
 {
 	?>
 	<!DOCTYPE html>
-	<html xmlns="http://www.w3.org/1999/html" lang="en-US">
+	<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<title>Web Store System Check</title>
@@ -39,7 +39,7 @@ function displayHeader()
 
 	<div class="header-new">
 		<div class="header-inner">
-			<div class="logo"><img src="http://www.lightspeedretail.com/wp-content/themes/lightspeed/images/logo-mini.png"></div>
+			<div class="logo"><img src="http://www.lightspeedretail.com/wp-content/themes/lightspeed/images/logo-mini.png" alt="LightSpeed"></div>
 		</div>
 	</div>
 	<div class="container">
@@ -70,20 +70,13 @@ function xls_check_server_environment()
 		$checked['GD Library JPG'] = ($phpinfo['gd']['JPG Support'] == "enabled" ? "pass" : "fail");
 	else $checked['GD Library JPG']= "fail";
 	if ($checked['GD Library JPG'] == "fail") {
-		$checked['GD Library JPG'] = (
-		$phpinfo['gd']['JPEG Support'] == "enabled" ? "pass" : "fail");
+		$checked['GD Library JPG'] = ($phpinfo['gd']['JPEG Support'] == "enabled" ? "pass" : "fail");
 	}
 	$checked['GD Library PNG'] = ($phpinfo['gd']['PNG Support'] == "enabled" ? "pass" : "fail");
-//	$checked['GD Library Freetype Support'] = (
-//	$phpinfo['gd']['FreeType Support'] == "enabled" ? "pass" : "fail");
 	$checked['MCrypt Encryption Library'] = isset($phpinfo['mcrypt']) ? "pass" : "fail";
-	$checked['session.use_cookies must be turned On'] = (
-	$phpinfo['session']['session.use_cookies'] == "On" ? "pass" : "fail");
-//	$checked['session.use_only_cookies must be turned Off'] = (
-//	$phpinfo['session']['session.use_only_cookies'] == "Off" ? "pass" : "fail");
+	$checked['session.use_cookies must be turned On'] = ($phpinfo['session']['session.use_cookies'] == "On" ? "pass" : "fail");
 	$checked['PDO Library'] = isset($phpinfo['PDO']) ? "pass" : "fail";
 	$checked['pdo_mysql Library'] = isset($phpinfo['pdo_mysql']) ? "pass" : "fail";
-	$checked['pdo_sqlite Library'] = isset($phpinfo['pdo_sqlite']) ? "pass" : "fail";
 	$checked['Php_xml library'] = isset($phpinfo['xml']) ? "pass" : "fail";
 	$checked['Zip Library'] = isset($phpinfo['zip']) ? "pass" : "fail";
 	$checked['Soap Library'] = ($phpinfo['soap']['Soap Client'] == "enabled" ? "pass" : "fail");

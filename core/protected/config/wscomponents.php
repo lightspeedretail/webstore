@@ -57,6 +57,17 @@ function searchForComponents()
 		),
 	);
 
+	// Enable CSRF validation for forms
+	$arr['request'] = array(
+		'class' => 'HttpRequest',
+		'enableCsrfValidation' => true,
+		'enableCsrfValidationRoutes' =>
+			array(
+				'/myaccount',
+				'/cart/checkout'
+			),
+	);
+
 	return $arr;
 }
 
