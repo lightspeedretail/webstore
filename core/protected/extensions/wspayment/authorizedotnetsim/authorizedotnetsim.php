@@ -8,6 +8,7 @@ class authorizedotnetsim extends WsPayment
 	protected $uses_jumper = true;
 	protected $apiVersion = 1;
 	public $cloudCompatible = true;
+	protected $uses_credit_card = true;
 
 	const x_delim_char = "|";
 

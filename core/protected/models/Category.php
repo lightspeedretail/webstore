@@ -598,9 +598,6 @@ class Category extends BaseCategory
 
 	public function UpdateChildCount()
 	{
-
-
-
 		$criteria = new CDbCriteria();
 		$criteria->alias = 'Product';
 		$criteria->join='LEFT JOIN xlsws_product_category_assn as ProductAssn ON ProductAssn.product_id=Product.id';
@@ -619,8 +616,6 @@ class Category extends BaseCategory
 		$this->child_count = $intCount;
 		if (!$this->save())
 			Yii::log("Error saving category ".$this->label." ". print_r($this->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-
-
 
 		if(!$this->IsPrimary() && $this->ParentObject)
 			$this->ParentObject->UpdateChildCount();

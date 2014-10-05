@@ -7,6 +7,9 @@
  */
 class BaseCheckoutForm extends CFormModel
 {
+	// @var string The key for when an instance of CheckoutForm is stored in
+	// the user's session.
+	public static $sessionKey = 'checkoutform.cache';
 
 	public $contactFirstName;
 	public $contactLastName;
@@ -17,15 +20,22 @@ class BaseCheckoutForm extends CFormModel
 	public $createPassword;
 	public $createPassword_repeat;
 	public $receiveNewsletter;
+
 	public $billingLabel;
 	public $billingAddress1;
 	public $billingAddress2;
 	public $billingCity;
 	public $billingState;
 	public $billingPostal;
+
+	/**
+	 * @var The billing country code.
+	 */
 	public $billingCountry;
+
 	public $billingSameAsShipping;
 	public $billingResidential;
+
 	public $shippingLabel;
 	public $shippingFirstName;
 	public $shippingLastName;
@@ -35,12 +45,25 @@ class BaseCheckoutForm extends CFormModel
 	public $shippingCity;
 	public $shippingState;
 	public $shippingPostal;
+
+	/**
+	 * @var The shipping country code.
+	 */
 	public $shippingCountry;
 	public $shippingResidential;
-	public $promoCode;
 	public $shippingProvider;
 	public $shippingPriority;
+
+	public $promoCode;
 	public $paymentProvider;
+
+	public $pickupPerson;
+	public $pickupPersonEmail;
+	public $pickupPersonPhone;
+	public $recipientName;
+
+	public $company;
+	public $shippingPhone;
 
 	public $orderNotes;
 	public $acceptTerms;
@@ -48,10 +71,10 @@ class BaseCheckoutForm extends CFormModel
 	public $intShippingAddress;
 	public $intBillingAddress;
 
-
 	//If we are using a payment module with a credit card, we need these fields
-	public $uses_card;
 	public $cardNumber;
+	public $cardNumberLast4;
+	public $cardExpiry;         // string following this pattern "MM/YY"
 	public $cardExpiryMonth;
 	public $cardExpiryYear;
 	public $cardType;
@@ -91,12 +114,12 @@ class BaseCheckoutForm extends CFormModel
 
 		return array(
 			$retArray,
-			array('shippingLabel,billingLabel,shippingResidential,billingResidential,
+			array('shippingLabel,billingLabel,shippingResidential,billingResidential,recipientName,
 			contactFirstName ,contactLastName,contactCompany,contactPhone,contactEmail,contactEmailConfirm,createPassword,createPassword_repeat ,
 			receiveNewsletter,billingAddress1,billingAddress2 ,billingCity ,billingState ,billingPostal ,billingCountry ,billingSameAsShipping ,
 			shippingFirstName,shippingLastName,shippingAddress1,shippingAddress2,shippingCity,shippingState,shippingPostal,
-			shippingCountry,promoCode,shippingProvider,shippingPriority,paymentProvider,orderNotes,cardNumber,
-			cardExpiryMonth, cardExpiryYear,cardType,cardCVV,cardNameOnCard,intShippingAddress,intBillingAddress,acceptTerms','safe'),
+			shippingCountry,promoCode,shippingProvider,shippingPriority,paymentProvider,orderNotes,cardNumber,cardNumberLast4,cardExpiry,
+			cardExpiryMonth,cardExpiryYear,cardType,cardCVV,cardNameOnCard,intShippingAddress,intBillingAddress,acceptTerms','safe'),
 
 			array('contactFirstName, contactLastName,contactEmail, contactPhone',
 				'required','on'=>'formSubmitGuest,formSubmitCreatingAccount'),
@@ -105,7 +128,10 @@ class BaseCheckoutForm extends CFormModel
 				'validateBillingBlock','on'=>'formSubmitGuest,formSubmitCreatingAccount'),
 
 			array('shippingFirstName,shippingLastName,shippingAddress1,shippingCity,shippingCountry',
-				'validateShippingBlock','on'=>'CalculateShipping,formSubmitGuest,formSubmitCreatingAccount,formSubmitExistingAccount'),
+				'validateShippingBlock','on'=>'CalculateShipping,formSubmitGuest,formSubmitCreatingAccount,formSubmitExistingAccount,ShipToMe'),
+
+			array('shippingCountry,shippingPostal',
+				'validateShippingBlock','on'=>'MinimalShipping'),
 
 			array('shippingPostal,billingPostal',
 				'validatePostal','on'=>'CalculateShipping,formSubmitGuest,formSubmitCreatingAccount,formSubmitExistingAccount'),
@@ -134,8 +160,7 @@ class BaseCheckoutForm extends CFormModel
 			array('createPassword', 'length', 'max'=>255),
 			array('createPassword', 'compare', 'on'=>'formSubmitCreatingAccount'),
 			array('createPassword_repeat', 'safe'),
-			//array('createPassword1, createPassword2', 'required', 'on'=>'insert'),
-
+			array('createPassword,createPassword_repeat', 'PasswordLengthValidator', 'on'=>'formSubmitCreatingAccount'),
 		);
 	}
 
@@ -264,6 +289,7 @@ class BaseCheckoutForm extends CFormModel
 
 	}
 
+
 	/**
 	 * Declares customized attribute labels.
 	 * If not declared here, an attribute would have a label that is
@@ -272,6 +298,7 @@ class BaseCheckoutForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
+			'recipientName'=>'Recipient Name',
 			'contactFirstName'=>'First Name',
 			'contactLastName'=>'Last Name',
 			'contactCompany'=>'Company',
@@ -311,6 +338,8 @@ class BaseCheckoutForm extends CFormModel
 
 
 			'cardNumber'=>'Card Number',
+			'cardNumberLast4'=>'Card Number Last 4 Digits',
+			'cardExpiry'=>'Expiry Date',
 			'cardExpiryMonth'=>'Expiry Month',
 			'cardExpiryYear'=>'Expiry Year',
 			'cardType'=>'Card Type',
@@ -331,62 +360,64 @@ class BaseCheckoutForm extends CFormModel
 	}
 
 	/**
+	 * Returns a CHtml list mapping from the country code to the country name.
 	 * @return array
 	 */
 	public function getCountries() {
-
-		$criteria=new CDbCriteria();
-		$criteria->select="t1.id,t1.country";
-		$criteria->alias="t1";
-		$criteria->compare('active','1');
-		$criteria->order="sort_order,t1.country";
-		if (Yii::app()->params['SHIP_RESTRICT_DESTINATION'])
-			$criteria->join="JOIN ".Destination::model()->tableName().
-				" ON `".Destination::model()->tableName()."`.`country` = `t1`.`id`";
-
-		$model = Country::model()->findAll($criteria);
-
-		return CHtml::listData($model, 'id', 'country');
-
+		$model = Country::getShippingCountries();
+		return CHtml::listData($model, 'code', 'country');
 	}
 
 
-	//Called both from original form when displayed, and from AJAX query as Country changes (via Cart Controller)
 	/**
-	 * @param string $type
-	 * @param null $intCountry
-	 * @return array
+	 * This function returns the valid shipping states for a given country.
+	 *
+	 * Call this function with EITHER $countryType set to 'billing' or
+	 * 'shipping' - OR - $countryType set to something else entirely and
+	 * $intCountryId set to a country ID.
+	 *
+	 * If $countryType is 'billing' or 'shipping' then $countryType is used in
+	 * preference to $intCountryId. Otherwise $intCountryId is used. If
+	 * $countryType is not one of: billing, shipping; and $intCountryId is null
+	 * or not provided then the default country is used.
+	 *
+	 * This is not a good interface for a function but legacy view code relies on it.
+	 *
+	 * @param string $countryType Either 'billing' or 'shipping'; or some other value
+	 * in which case $intCountryId is used.
+	 * @param int|null $intCountryId An ID of a country.
+	 * @return CActiveRecord[] An array of States.
 	 */
-	public function getStates($type = 'billing',$intCountry = null) {
-
-		//These are only on first display so state list defaults to chosen country
-		if ($type=='billing' && !is_null($this->billingCountry) && is_null($intCountry)) $intCountry = $this->billingCountry;
-		if ($type=='shipping' && !is_null($this->shippingCountry) && is_null($intCountry)) $intCountry = $this->shippingCountry;
-
-		if (is_null($intCountry))
-			$intCountry = _xls_get_conf('DEFAULT_COUNTRY',224);
-
-		$criteria=new CDbCriteria();
-		$criteria->select="t1.id,t1.code";
-		$criteria->alias="t1";
-		$criteria->addCondition('country_id ='.$intCountry);
-		$criteria->addCondition('active=1');
-		$criteria->order="sort_order,t1.state";
-		if (Yii::app()->params['SHIP_RESTRICT_DESTINATION'])
+	public function getStates($countryType = 'billing', $intCountryId = null) {
+		if ($intCountryId === null)
 		{
-			//Do we have a wildcard for states? If not, filter by what we show
-			$objD = Destination::model()->findAll('country='.$intCountry.' AND state IS NULL');
-			if (count($objD)==0)
-				$criteria->join="JOIN ".Destination::model()->tableName().
-				" ON (`".Destination::model()->tableName()."`.`state` = `t1`.`id`)";
+			switch ($countryType)
+			{
+				case 'billing':
+					if ($this->billingCountry !== null)
+					{
+						$intCountryId = $this->billingCountry;
+					}
+					break;
+				case 'shipping':
+					if ($this->shippingCountry !== null)
+					{
+						$intCountryId = $this->shippingCountry;
+					}
+					break;
+					// For backwards compatibility we can't throw an error if another
+					// value is passed. Some older code (e.g.
+					// views-cities/myaccount.address.php) sends meaningless values
+					// values for $countryType to use the second parameter.
+			}
 		}
-		$model = State::model()->findAll($criteria);
 
-		$arrStates =  CHtml::listData($model, 'id', 'code');
+		if ($intCountryId === null)
+		{
+			$intCountryId = _xls_get_conf('DEFAULT_COUNTRY',224);
+		}
 
-		if (count($arrStates)==0)
-			$arrStates[null]="n/a";
-		return $arrStates;
+		return Country::getCountryShippingStates($intCountryId);
 	}
 
 	/**
@@ -450,15 +481,16 @@ class BaseCheckoutForm extends CFormModel
 	/**
 	 * @return string
 	 */
-	public function getPaymentModulesThatUseCard()
+	public function getStrPaymentModulesThatUseCard()
 	{
 		$arrModuleIds = array();
 		$arrModules = CHtml::listData(Modules::model()->findAllByAttributes(array('active'=>1,'category'=>'payment'),array('order'=>'sort_order,module')),'id','module');
 		foreach ($arrModules as $key => $value) {
 
 			try {
-				if (Yii::app()->getComponent($value))
-					if(Yii::app()->getComponent($value)->uses_credit_card)
+				$objComponent = Yii::app()->getComponent($value);
+				if ($objComponent)
+					if($objComponent->uses_credit_card && $objComponent->advancedMode)
 						$arrModuleIds[]=$key;
 			}
 			catch (Exception $e) {
@@ -468,6 +500,118 @@ class BaseCheckoutForm extends CFormModel
 		return "'".implode("','",$arrModuleIds)."'";
 
 	}
+
+
+	/**
+	 * Return an array of the active advanced payment methods
+	 *
+	 * @return array
+	 */
+
+	public function getPaymentModulesThatUseCard()
+	{
+		$arr = array();
+
+		$strIds = $this->getStrPaymentModulesThatUseCard();
+
+		// do we have active aim methods?
+		if ($strIds !== "''")
+		{
+			$arrIds = explode(',', $strIds);
+
+			foreach ($arrIds as $id)
+			{
+				$objModule = Modules::model()->findByPk((int)trim($id,"'"));
+				$config = unserialize($objModule->configuration);
+				$arr[$objModule->id] = $config['label'];
+			}
+		}
+
+		return $arr;
+	}
+
+	/**
+	 * Return an array of the simple payment methods
+	 *
+	 * @return array
+	 */
+
+	public function getSimPaymentModules()
+	{
+		$arrModules = array();
+		$objModules = Modules::model()->findAllByAttributes(array('active' => 1,'category' => 'payment'), array('order' => 'sort_order,module'));
+		foreach ($objModules as $obj)
+		{
+			$config = unserialize($obj->configuration);
+
+			try {
+				$objComponent = Yii::app()->getComponent($obj->module);
+				if ($objComponent)
+					if(!$objComponent->advancedMode)
+						$arrModules[$obj->id] = $config['label'];
+			}
+			catch (Exception $e) {
+				Yii::log("Could not find module $obj->module $e", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			}
+		}
+
+		return $arrModules;
+	}
+
+	/**
+	 * Return an array of the simple credit card payment methods
+	 *
+	 * @return array
+	 */
+
+	public function getSimPaymentModulesThatUseCard()
+	{
+		$arrModules = array();
+		$objModules = Modules::model()->findAllByAttributes(array('active' => 1,'category' => 'payment'), array('order' => 'sort_order,module'));
+		foreach ($objModules as $obj)
+		{
+			$config = unserialize($obj->configuration);
+
+			try {
+				$objComponent = Yii::app()->getComponent($obj->module);
+				if ($objComponent && $obj->module !== 'paypal')
+					if ($objComponent->uses_credit_card && !$objComponent->advancedMode)
+						$arrModules[] = array('id' => $obj->id, 'label' => $config['label']);
+			}
+			catch (Exception $e) {
+				Yii::log("Could not find module $obj->module $e", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			}
+		}
+
+		return $arrModules;
+	}
+
+	/**
+	 * Return an array of the simple non credit card payment methods
+	 *
+	 * @return array
+	 */
+
+	public function getSimPaymentModulesNoCard()
+	{
+		$arr = $this->getSimPaymentModules();
+		$arrCC = $this->getSimPaymentModulesThatUseCard();
+		$arrKeys = array();
+
+		foreach ($arrCC as $module)
+			if (in_array($module['label'], $arr))
+				$arrKeys[] = $module['id'];
+
+		// remove paypal
+		$paypal = Modules::LoadByName('paypal');
+		$arrKeys[] = $paypal->id;
+
+		foreach ($arrKeys as $key)
+			unset($arr[$key]);
+
+		return $arr;
+	}
+
 
 	/**
 	 * @return array
@@ -535,14 +679,16 @@ class BaseCheckoutForm extends CFormModel
 
 
 	/**
-	 * List of shippers, called when Checkout form is displayed. We only send information
-	 * from the cache since that would mean we're refreshing the form after an error
+	 * Array of shipping providers, mapping from the module ID to the name of
+	 * the provider. Called when Checkout form is displayed. We only send
+	 * information from the cache since that would mean we're refreshing the
+	 * form after an error
 	 * @return array
 	 */
 	public function getProviders()
 	{
-		if (isset(Yii::app()->session['ship.provider.cache']))
-			return Yii::app()->session['ship.provider.cache'];
+		if (isset(Yii::app()->session['ship.providerLabels.cache']))
+			return Yii::app()->session['ship.providerLabels.cache'];
 		else return array();
 
 	}
@@ -654,13 +800,13 @@ class BaseCheckoutForm extends CFormModel
 	/** for cached shipping */
 	public function getSavedScenarios()
 	{
-		if (isset(Yii::app()->session['ship.scenarios.cache']) &&
-			!empty(Yii::app()->session['ship.scenarios.cache'])
+		if (isset(Yii::app()->session['ship.formattedCartTotals.cache']) &&
+			!empty(Yii::app()->session['ship.formattedCartTotals.cache'])
 		) {
 			$strReturn = "{";
 
 			$outercount=0;
-			foreach (Yii::app()->session['ship.scenarios.cache'] as $key => $value) {
+			foreach (Yii::app()->session['ship.formattedCartTotals.cache'] as $key => $value) {
 				if ($outercount++>0) $strReturn .= ",";
 				$strReturn .= $key.":{";
 				$innercount=0;
@@ -680,10 +826,10 @@ class BaseCheckoutForm extends CFormModel
 	/** for cached shipping */
 	public function getSavedCartScenarios()
 	{
-		if (isset(Yii::app()->session['ship.cartscenarios.cache']) && is_array(Yii::app()->session['ship.cartscenarios.cache'])) {
+		if (isset(Yii::app()->session['ship.htmlCartItems.cache']) && is_array(Yii::app()->session['ship.htmlCartItems.cache'])) {
 			$strReturn = "{";
 			$outercount=0;
-			foreach (Yii::app()->session['ship.cartscenarios.cache'] as $key => $value) {
+			foreach (Yii::app()->session['ship.htmlCartItems.cache'] as $key => $value) {
 				if ($outercount++>0) $strReturn .= ",";
 				$value = str_replace("\t","",$value);
 				$strReturn .= $key.":'".addslashes($value)."'";

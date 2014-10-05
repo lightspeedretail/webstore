@@ -1,0 +1,88 @@
+#shipping {
+  p.introduction {
+    margin: -.5rem 0 1.5rem;
+    font-size: .9375rem;
+  }
+
+  table.shipping-options {
+    margin: 0;
+    border: 1px solid #ccc;
+    display: table;
+
+    td, th {
+      font-size: .875rem;
+      padding: .75em;
+    }
+
+    thead {
+      th {
+        color: #666;
+        font-weight: normal;
+        font-size: .8375rem;
+        background-color: #eee;
+        border-bottom: 1px solid #ccc;
+      }
+    }
+
+    tbody {
+      td, th {
+        color: #999;
+        border-bottom: 1px solid #eee;
+        padding: 1em .75em;
+      }
+      th {
+        color: #555;
+        font-size: .9375rem;
+
+        input { font-size: 1rem; }
+      }
+
+    }
+
+    label {
+      input { margin-right: 8px; }
+      &:hover { cursor: pointer; }
+    }
+  }
+}
+
+.shipping-instore {
+  label.checkbox {
+    text-align: left;
+    font-weight: bold;
+    font-size: 1rem;
+
+    &:hover { cursor: pointer; }
+
+    p {
+      font-weight: normal;
+      font-size: .8375rem;
+      margin: .125em 0 .75em 24px;
+    }
+  }
+
+  .shipping-instore-details {
+    @include clearfix();
+    margin: .25em 0 0 24px;
+
+    p.contact-info {
+      float: left;
+      width: 50%;
+      margin: 0 0 1.5em;
+    }
+  }
+
+  h4 {
+    margin: 0 0 .25em;
+    font-size: .8375rem;
+    color: #333;
+    text-transform: uppercase;
+  }
+}
+
+
+//MO
+
+.overlay #checkout label {
+  color: #555; font-size: 15px;
+}

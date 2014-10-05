@@ -1,0 +1,31 @@
+@media print {
+
+  body.overlay {
+    background: none;
+  }
+  .webstore-overlay {
+    section {
+      border: none;
+      width: 100%;
+      max-width: 100%;
+
+      header {
+        padding: 0 15px;
+
+        .exit { display: none; }
+      }
+      footer { display: none; }
+    }
+    .section-inner {
+      border: none;
+
+      .section-content {
+        padding: 0 15px;
+      }
+
+    }
+  }
+
+  .controls { display: none; }
+  .thankyou { display: none; }
+}

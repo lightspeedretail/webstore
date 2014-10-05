@@ -1,0 +1,18 @@
+{
+    "name": "leafo/scssphp-compass",
+    "description": "Compass for scssphp",
+    "homepage": "http://leafo.net/scssphp/",
+    "require": {
+        "leafo/scssphp": "dev-master"
+    },
+    "authors": [
+        {
+            "name": "Leaf Corcoran",
+            "email": "leafot@gmail.com",
+            "homepage": "http://leafo.net"
+        }
+    ],
+    "autoload": {
+        "classmap": ["compass.inc.php"]
+    }
+}

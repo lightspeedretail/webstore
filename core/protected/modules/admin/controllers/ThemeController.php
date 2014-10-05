@@ -17,9 +17,9 @@ class ThemeController extends AdminBaseController
 	{
 		return array(
 			array('allow',
-				'actions'=>array('index','edit','gallery','image','header',
-					'editcss','favicon','manage','upload','upgrade','module'),
-				'roles'=>array('admin'),
+				'actions' => array('index','edit','gallery','image','header','editcss',
+					'favicon','manage','upload','upgrade','module'),
+				'roles' => array('admin'),
 			),
 		);
 	}
@@ -67,8 +67,7 @@ class ThemeController extends AdminBaseController
 				array('label' => 'Upload FavIcon',
 					'url' => array('theme/favicon'),
 					'visible' => !(Yii::app()->params['LIGHTSPEED_MT'] > 0)
-				)
-
+				),
 
 			);
 

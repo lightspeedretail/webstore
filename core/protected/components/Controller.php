@@ -61,7 +61,7 @@ class Controller extends CController
 	 */
 	public static function initParams()
 	{
-		defined('DEFAULT_THEME') or define('DEFAULT_THEME','brooklyn');
+		defined('DEFAULT_THEME') or define('DEFAULT_THEME', 'brooklyn2014');
 
 		$Params = CHtml::listData(Configuration::model()->findAll(),'key_name','key_value');
 
@@ -311,7 +311,7 @@ class Controller extends CController
 			$app->language = $_GET['_lang'];
 			$app->session['_lang'] = $app->language;
 		}
-		else if (isset($app->session['_lang']))
+		elseif (isset($app->session['_lang']))
 		{
 			$app->language = $app->session['_lang'];
 		}
@@ -347,7 +347,7 @@ class Controller extends CController
 	 */
 	protected function buildSidebars() {
 
-		$this->arrSidebars = Modules::getSidebars();
+		$this->arrSidebars = Modules::getModulesByCategory();
 
 	}
 
@@ -621,7 +621,7 @@ class Controller extends CController
 	 */
 	public function getIsCloud()
 	{
-		if(Yii::app()->params['LIGHTSPEED_CLOUD']>0)
+		if (Yii::app()->params['LIGHTSPEED_CLOUD'] > 0)
 			return true;
 		return false;
 	}
@@ -632,7 +632,7 @@ class Controller extends CController
 	 */
 	public function getIsMT()
 	{
-		if(Yii::app()->params['LIGHTSPEED_MT']>0)
+		if (Yii::app()->params['LIGHTSPEED_MT'] > 0)
 			return true;
 		return false;
 	}
@@ -665,5 +665,21 @@ class Controller extends CController
 
 	}
 
+	/**
+	 * Renders JSON response.
+	 *
+	 * @param $data array containing the values that should be returned.
+	 * @return string The JSON encode data.
+	 */
+	public function renderJSON($data)
+	{
+		ob_clean();
+		header('Content-type: application/json');
+		$encodedData = CJSON::encode($data);
+		echo $encodedData;
+		Yii::app()->end();
+
+		return $encodedData;
+	}
 
 }

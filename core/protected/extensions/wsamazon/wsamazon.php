@@ -497,7 +497,8 @@ class wsamazon extends ApplicationComponent {
 									$objState->country_code,
 									$objState->code,
 									$shippingAddress->getPostalCode());
-								if (!$objDestination)
+
+								if ($objDestination === null)
 								{
 									Yii::log("Did not find destination, using default in Web Store ",
 										'info', 'application.'.__CLASS__.".".__FUNCTION__);

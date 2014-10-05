@@ -1,0 +1,15 @@
+
+/* tweaks */
+.editcartmodal.webstore-modal-cart { text-transform: none; }
+
+/*.editcartmodal.webstore-modal-cart input:focus {border: solid 1px #3287cc ; background-color: white;box-shadow:none; }*/
+
+.webstore-modal-cart table td.image { vertical-align: bottom; }
+
+/* promo code block */
+.webstore-modal-cart form.promo { background-color: white;}
+
+.webstore-modal-cart form.promo input:focus { padding: 11px 10px; }
+
+/* submit block */
+.webstore-modal-cart .submit button { text-transform: none; }

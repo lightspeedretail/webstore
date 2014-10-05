@@ -111,6 +111,26 @@ class Cart extends BaseCart
 
 	}
 
+	public function getDataProvider()
+	{
+		// Warning: Please modify the following code to remove attributes that
+		// should not be searched.
+
+		if ($this->id === null)
+			return new CArrayDataProvider(array());     // WS-2265 - The Edit Cart modal may display products when the cart is empty
+
+		$criteria = new CDbCriteria;
+		$criteria->compare('cart_id',$this->id);
+
+		return new CActiveDataProvider(new CartItem(), array(
+			'criteria' => $criteria,
+			'sort' => array(
+				'defaultOrder' => 'id ASC',
+			),
+			'pagination' => false,
+		));
+	}
+
 	/**
 	 * Initialize if needed and return the current Cart
 	 * This is used by unit tests to get a cart to work with for testing
@@ -201,10 +221,13 @@ class Cart extends BaseCart
 				$objDestination = Destination::LoadMatching(
 					$objCustomer->defaultShipping->country,
 					$objCustomer->defaultShipping->state,
-					$objCustomer->defaultShipping->postal);
+					$objCustomer->defaultShipping->postal
+				);
 
-				if(!$objDestination)
+				if($objDestination === null)
+				{
 					$objDestination = Destination::LoadDefault();
+				}
 
 				if(!$objDestination)
 					throw new CHttpException(500,'Web Store missing destination setup. Cannot continue.');
@@ -320,11 +343,13 @@ class Cart extends BaseCart
 	 * @param int $intQuantity
 	 * @return
 	 */
-	public function UpdateItemQuantity($objItem, $intQuantity) {
+	public function UpdateItemQuantity($objItem, $intQuantity)
+	{
 
-		if ($intQuantity <= 0) {
-			if($objItem->wishlist_item>0)
-				WishlistItem::model()->updateByPk($objItem->wishlist_item,array('cart_item_id'=>null));
+		if ($intQuantity <= 0)
+		{
+			if($objItem->wishlist_item > 0)
+				WishlistItem::model()->updateByPk($objItem->wishlist_item, array('cart_item_id' => null));
 			$objItem->delete();
 			return true;
 		}
@@ -332,16 +357,36 @@ class Cart extends BaseCart
 		if ($intQuantity == $objItem->qty)
 			return;
 
-		if (_xls_get_conf('PRICE_REQUIRE_LOGIN',0) == 1 && Yii::app()->user->isGuest) {
-			return Yii::t('cart','You must log in before Adding to Cart.');
+		if (_xls_get_conf('PRICE_REQUIRE_LOGIN',0) == 1 && Yii::app()->user->isGuest)
+		{
+			return array(
+				'errorId' => 'notLoggedIn',
+				'errorMessage' => Yii::t('cart','You must log in before Adding to Cart.')
+			);
 		}
 
 		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) < Product::InventoryAllowBackorders &&
 			$intQuantity > $objItem->qty &&
 			$objItem->product->inventoried &&
-			$objItem->product->inventory_avail < $intQuantity) {
-				return Yii::t('cart','Your chosen quantity is not available for ordering. Please come back and order later.');
+			$objItem->product->inventory_avail < $intQuantity)
+
+		{
+			if (_xls_get_conf('INVENTORY_DISPLAY' , 0) == 0)
+			{
+				$availQty = null;
+			} else {
+				$availQty = $objItem->product->inventory;
+			}
+
+			return array(
+				'errorId' => 'invalidQuantity',
+				'errorMessage' => Yii::t('cart','Your chosen quantity is not available for ordering. Please come back and order later.'),
+				'availQty' => $availQty
+			);
+
 		}
+
+
 
 
         // qty discount?
@@ -437,28 +482,35 @@ class Cart extends BaseCart
 	}
 
 	/**
-	 * Update Cart by applying a Promo Code
-	 * dryRun is deprecated, we shouldn't run this as a validation test
+	 * Update cart by applying promo code
+	 *
+	 * @return bool
 	 */
-	public function UpdatePromoCode($dryRun = false) {
+	public function UpdatePromoCode() {
 		if (!$this->fk_promo_id)
-			return;
+			return false;
 
 		$objPromoCode = PromoCode::model()->findByPk($this->fk_promo_id);
 
-		if (!($objPromoCode instanceof PromoCode))
-			return;
+		if (!($objPromoCode instanceof PromoCode) || !$objPromoCode->enabled)
+			return false;
 
-		if (!$objPromoCode->enabled)
-			return;
-
+		// In dollar amount discount, exit if there are
+		// any item with sell_discount value set
+		if ($objPromoCode->type == PromoCodeType::Flat)
+		{
+			foreach ($this->cartItems as $objItem)
+			{
+				if ($objItem->sell_discount > 0)
+					return false;
+			}
+		}
 
 		// Sort array by High Price to Low Price, reset discount to 0 to evaluate from the beginning
 		$arrSorted = array();
 		$intOriginalSubTotal=0;
 		foreach ($this->cartItems as $objItem) {
-			if (!$dryRun)
-				$objItem->discount = 0;
+			$objItem->discount = 0;
 			$arrSorted[] = $objItem;
 			$intOriginalSubTotal += $objItem->qty*$objItem->sell;
 		}
@@ -471,9 +523,8 @@ class Cart extends BaseCart
 				Yii::t('cart','Promo Code {promocode} no longer applies to your cart and has been removed.',
 					array('{promocode}'=>"<strong>".$objPromoCode->code."</strong>")));
 			$this->ResetDiscounts();
-			return;
+			return false;
 		}
-
 
 		if ($objPromoCode->type == PromoCodeType::Flat)
 			$intDiscount = $objPromoCode->amount;
@@ -481,10 +532,10 @@ class Cart extends BaseCart
 			$intDiscount = $objPromoCode->amount/100;
 		else {
 			Yii::log('Invalid PromoCode type ' . $objPromoCode->type, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-			return;
+			return false;
 		}
 
-		$bolApplied = false;
+		$blnApplied = false;
 
 		usort($arrSorted, array(get_class($this), 'CompareByPrice'));
 
@@ -517,15 +568,15 @@ class Cart extends BaseCart
 				$intItemDiscount = $intDiscount * $objItem->sell;
 			}
 
-			if (!$dryRun) {
+			if ($intItemDiscount > 0)
+			{
 				$objItem->discount = $intItemDiscount;
 				$objItem->save();
+				$blnApplied = true;
 			}
-
-			$bolApplied = true;
 		}
 
-		return $bolApplied;
+		return $blnApplied;
 	}
 
 	/**
@@ -885,7 +936,8 @@ class Cart extends BaseCart
 		if (!$objItem->save())
 			print_r($objItem->getErrors());
 
-		if (!$retVal = $this->UpdateItemQuantity($objItem, $intQuantity + $objItem->qty))
+		$retVal = $this->UpdateItemQuantity($objItem, $intQuantity + $objItem->qty);
+		if (!($retVal instanceof CartItem))
 			return $retVal;
 
 		$objItem->cart_id = $this->id;
@@ -1161,6 +1213,61 @@ class Cart extends BaseCart
 					return CustomerAddress::model()->findAllByPk($item->wishlistItem->registry->ship_option);
 		return null;
 
+	}
+
+	/**
+	 * During the Cart completion process, update (decrement) the usage quantity remaining
+	 * and add the promo code information to the order notes.
+	 *
+	 * @return void
+	 */
+
+	public function completeUpdatePromoCode()
+	{
+		$objPromo = null;
+
+		if ($this->fk_promo_id > 0)
+		{
+			$objPromo = PromoCode::model()->findByPk($this->fk_promo_id);
+
+			$this->printed_notes = implode("\n\n", array(
+				$this->printed_notes,
+				sprintf("%s: %s", _sp('Promo Code'), $objPromo->code)
+			));
+
+			foreach ($this->cartItems as $objItem)
+			{
+				if ($objItem->discount > 0)
+				{
+					$this->printed_notes = implode("\n", array(
+						$this->printed_notes,
+						sprintf(
+							"%s discount: %.2f",
+							$objItem->code,
+							$objItem->discount
+						)
+					));
+				}
+			}
+
+			if ($objPromo->qty_remaining > 0)
+			{
+				$objPromo->qty_remaining--;
+				$objPromo->save();
+			}
+		}
+
+		$this->save();
+	}
+
+	public function getTotalDiscount()
+	{
+		$total=0;
+		foreach($this->cartItems as $item)
+		{
+			$total += $item->discount * $item->qty;
+		}
+		return $total;
 	}
 
 	public function getTotalItemCount()

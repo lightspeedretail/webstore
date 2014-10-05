@@ -1,0 +1,256 @@
+.webstore-wishlist-view {
+  .section-content { position: relative; }
+
+  .wishlist-description {
+    padding: 0 0 10px;
+    max-width: 400px;
+  }
+
+  .wishlist-date {
+    position: relative;
+    margin: 0;
+    padding: 10px;
+
+    color: #666;
+    font-size: .9375rem;
+    border: 1px solid #ccc;
+
+    @include media(small) {
+      position: absolute;
+      right: 30px;
+      top: 30px;
+    }
+  }
+
+  h1 {
+    small {
+      font-size: .75rem;
+      color: #888;
+      border: 1px solid #ccc;
+      background-color: #f8f8f8;
+      padding: 3px 6px 2px;
+      margin-left: 10px;
+      text-transform: uppercase;
+    }
+  }
+}
+
+$share-block-height: 70px;
+
+.wishlist-share {
+  @extend %clearfix;
+  margin: 30px 0;
+  border: 1px solid #ddd;
+  height: $share-block-height;
+
+  h3 {
+    line-height: $share-block-height - 2px;
+    color: #666;
+    padding: 0 20px;
+    margin: 0;
+    display: inline-block;
+
+    float: left;
+  }
+
+  a {
+    display: inline-block;
+    line-height: $share-block-height - 2px;
+    float: left;
+    color: #666;
+
+    &.url {
+      display: none;
+      width: 50%;
+      overflow: hidden;
+      padding: 20px 10px 0;
+      line-height: 1.2;
+      font-size: .75rem;
+      word-wrap: break-word;
+      color: #888;
+
+      @include media(medium) {
+        display: inline-block;
+      }
+    }
+
+    &.service {
+      font-size: 0;
+      line-height: 1;
+      padding: 0 15px;
+      text-align: center;
+      float: right;
+      color: $blue;
+
+      &:before {
+        font-family: FontAwesome;
+        font-size: 1.5rem;
+        line-height: $share-block-height - 2px;
+      }
+      &:hover {color: darken($blue,10%); }
+
+      &.email:before { content: '\f003'; }
+      &.twitter:before { content: '\f099'; }
+      &.facebook:before { content: '\f09a'; }
+    }
+  }
+}
+
+.wishlist-buttons {
+  @extend %clearfix;
+
+  button {
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #999;
+    width: auto;
+    padding: 20px;
+    margin-bottom: 20px;
+
+
+    &:hover {
+      color: $blue;
+      border-color: $blue;
+      background: #fff;
+    }
+  }
+  .wishlist-settings {
+    float: right;
+    display: none;
+  }
+}
+
+.wishlist-lines {
+  thead {
+    th {
+      border-bottom: 1px solid #ccc;
+      color: #999;
+      text-transform: uppercase;
+      font-size: .875rem;
+      font-weight: normal;
+    }
+  }
+}
+
+
+.webstore-wishlist-view {
+  td.description {
+    .item-note {
+      color: #aaa;
+      display: block;
+      font-size: .8125rem;
+      font-weight: normal;
+    }
+    textarea {
+      display: none;
+      margin-top: 3px;
+      padding: 5px;
+      width: 100%;
+      border: 1px solid #ddd;
+    }
+  }
+
+  td.priority {
+    .label {
+      color: #888;
+      text-transform: uppercase;
+      font-size: .8125rem;
+    }
+    select { display: none; }
+  }
+
+
+
+  .purchased {
+    display: none;
+  }
+}
+
+.wishlist-lines {
+  .controls {
+    white-space: nowrap;
+    a { float: none; }
+  }
+
+  .edit, .save, .add-to-cart {
+    padding: 6px 8px 5px;
+    display: inline-block;
+    line-height: 1;
+    font-size: .75rem;
+    white-space: nowrap;
+    float: none;
+
+    background-color: $blue;
+    border: 1px solid $blue;
+    color: #fff;
+
+    @include transition(background-color .3s, color .3s, border-color .3s);
+
+    &:hover {
+      border-color: darken($blue,10%);
+      background-color: darken($blue,10%);
+    }
+  }
+
+  .save { display: none; }
+  .edit {
+    border-color: #ccc;
+    color: #999;
+    background: none;
+    margin-right: 6px;
+
+    &:hover {
+      background: none;
+      border-color: $blue;
+      color: $blue;
+    }
+  }
+
+  .in-cart {
+    .add-to-cart {
+      color: #999;
+      border-color: transparent;
+      background: transparent;
+
+    }
+  }
+
+  tr.active {
+    td.description {
+      padding-top: 10px;
+      padding-bottom: 10px;
+
+      textarea { display: block; }
+      .item-note { display: none; }
+    }
+
+    td.priority {
+      // span { display: block; }
+      .custom-select { display: block; }
+    }
+    td.controls {
+      a.save { display: inline-block; }
+      a.remove {
+        display: inline-block;
+        margin-left: 25px;
+        margin-top: -1px;
+      }
+      a.add-to-cart { display: none; }
+      a.save, a.remove { float: left; }
+    }
+  }
+}
+
+
+.webstore-wishlist-owner {
+  button.wishlist-settings { display: block; }
+  button.wishlist-purchases { display: none; }
+  .purchased { display: block; }
+  .wishlist-lines {
+    a.edit { display: inline-block; }
+  }
+  td.priority {
+    .label { display: none; }
+    select { display: block; }
+  }
+}

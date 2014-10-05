@@ -24,13 +24,22 @@ class ShoppingCart extends CApplicationComponent
 	/**
 	 * @var null
 	 */
-	private $_model=null;
+	private $_model = null;
+
 	/**
 	 * @param $id
 	 */
-	public function setModel($id)
+	public function setModelById($id)
 	{
-		$this->_model=Cart::model()->findByPk($id);
+		$this->_model = Cart::model()->findByPk($id);
+	}
+
+	/**
+	 * @param Cart $model A cart model to load.
+	 */
+	public function setModel(Cart $model)
+	{
+		$this->_model = $model;
 	}
 
 	/**
@@ -41,44 +50,51 @@ class ShoppingCart extends CApplicationComponent
 
 		if (!$this->_model)
 		{
-
 			$intCartId = Yii::app()->user->getState('cartid');
 
-			if(empty($intCartId)) {
-
+			if(empty($intCartId))
+			{
 				$objCustomer = Customer::GetCurrent();
 				$intCustomerid = null;
 
 				if ($objCustomer instanceof Customer)
+				{
 					$intCustomerid = $objCustomer->id;
+				}
 
 				$objCart = null;
 				if (!is_null($intCustomerid))
+				{
 					$objCart = Cart::LoadLastCartInProgress($intCustomerid);
+				}
+
 				if (is_null($objCart))
+				{
 					$objCart = new Cart();
+				}
 
 				//Logged in customers get a "real" cart
 				if(is_null($objCart) && !is_null($intCustomerid))
 				{
 					$objCart = Cart::InitializeCart();
-					Yii::app()->user->setState('cartid',$objCart->id);
+					Yii::app()->user->setState('cartid', $objCart->id);
 				}
-
-			} else {
-
+			}
+			else
+			{
 				$objCart = Cart::model()->findByPk($intCartId);
-				if (!$objCart || ($objCart->cart_type  != CartType::cart && $objCart->cart_type != CartType::awaitpayment)) {
+				if (!$objCart || ($objCart->cart_type != CartType::cart && $objCart->cart_type != CartType::awaitpayment))
+				{
 					//something has happened to the database object
 					Yii::log("Could not find cart ".$intCartId.", creating new one.", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 					$objCart = Cart::InitializeCart();
-					Yii::app()->user->setState('cartid',$objCart->id);
+					Yii::app()->user->setState('cartid', $objCart->id);
 				}
-
-
 			}
+
 			$this->_model = $objCart;
 		}
+
 		return $this->_model;
 	}
 
@@ -299,7 +315,7 @@ class ShoppingCart extends CApplicationComponent
 	public function assign($id)
 	{
 		Yii::app()->user->setState('cartid',$id);
-		$this->setModel($id);
+		$this->setModelById($id);
 	}
 	/**
 	 * Add a product to the cart. Defaults to qty 1 unless specified
@@ -365,6 +381,11 @@ class ShoppingCart extends CApplicationComponent
 
 	}
 
+	public function getDataProvider()
+	{
+		return $this->model->dataProvider;
+	}
+
 	/**
 	 * Shortcut to save cart
 	 * @return mixed
@@ -426,6 +447,17 @@ class ShoppingCart extends CApplicationComponent
 
 	}
 
+	/**
+	 * Removes the promo code and discounts that are applied to a shopping cart
+	 */
+	public function RemovePromoCode() {
+		$this->model->fk_promo_id = NULL;
+		$this->model->ResetDiscounts();
+		$this->model->save();
+		$this->model->refresh();
+		$this->Recalculate();
+		$this->model->refresh();
+	}
 
 	/**
 	 * Make sure our promo code still applies
@@ -549,9 +581,19 @@ class ShoppingCart extends CApplicationComponent
 		return $this->model->PromoCode;
 	}
 
+	public function completeUpdatePromoCode()
+	{
+		$this->model->completeUpdatePromoCode();
+	}
+
 	public function SetIdStr()
 	{
 		$this->model->SetIdStr();
+	}
+
+	public function getIdStr()
+	{
+		return $this->model->id_str;
 	}
 
 	/**
@@ -614,14 +656,13 @@ class ShoppingCart extends CApplicationComponent
 
 	public function clearCachedShipping()
 	{
-		unset(Yii::app()->session['ship.modules.cache']);
-		unset(Yii::app()->session['ship.taxes.cache']);
-		unset(Yii::app()->session['ship.provider.cache']);
 		unset(Yii::app()->session['ship.providerRadio.cache']);
-		unset(Yii::app()->session['ship.priorityRadio.cache']);
+		unset(Yii::app()->session['ship.htmlCartItems.cache']);
 		unset(Yii::app()->session['ship.prices.cache']);
-		unset(Yii::app()->session['ship.scenarios.cache']);
-		unset(Yii::app()->session['ship.cartscenarios.cache']);
+		unset(Yii::app()->session['ship.priorityRadio.cache']);
+		unset(Yii::app()->session['ship.providerLabels.cache']);
+		unset(Yii::app()->session['ship.taxes.cache']);
+		unset(Yii::app()->session['ship.formattedCartTotals.cache']);
 	}
 
 	/**
@@ -632,6 +673,8 @@ class ShoppingCart extends CApplicationComponent
 
 		switch ($strName) {
 
+			case 'attributes':
+				return $this->model->attributes;
 
 			case 'CartItems':
 			case 'cartItems':
@@ -657,11 +700,29 @@ class ShoppingCart extends CApplicationComponent
 					return 0;
 			else return $this->model->subtotal;
 
+			case 'subtotalFormatted':
+				if (empty($this->model->subtotal))
+					return '';
+				else return _xls_currency($this->model->subtotal);
+
 			case 'Taxes':
 				return $this->model->Taxes;
 
 			case 'Total':
 				return $this->total;
+
+			case 'TotalFormatted':
+			case 'totalFormatted':
+				return _xls_currency($this->total);
+
+			case 'TotalDiscount':
+			case 'totalDiscount':
+				return $this->model->totalDiscount;
+
+			case 'TotalDiscountFormatted':
+			case 'totalDiscountFormatted':
+				return _xls_currency($this->model->totalDiscount);
+
 
 			case 'Length':
 				return $this->model->Length;
@@ -768,4 +829,138 @@ class ShoppingCart extends CApplicationComponent
 
 	}
 
+	/* Largely copied form SoapController. */
+	/* @return String The shopping cart as a JSON-encoded string.
+	 */
+	public function asJSON() {
+		$attributeNames = array(
+			'id',
+			'billaddress',
+			'billaddress.country',
+			'billaddress.state',
+			'cartItems',
+			'cart_type',
+			'currency',
+			'customer',
+			'id_str',
+			'payment',
+			'printed_notes',
+			'shipaddress',
+			'shipaddress.country',
+			'shipaddress.state',
+			'shipping',
+			'status',
+			'subtotal',
+			'subtotalFormatted',
+			'tax1',
+			'tax2',
+			'tax3',
+			'tax4',
+			'tax5',
+			'taxCode',
+			'tax_inclusive',
+			'total',
+			'totalDiscount',
+			'totalFormatted',
+			'totalDiscountFormatted',
+			'totalItemCount',
+			'promoCode'
+		);
+		$response = array(); //you will be copying in model attribute values to this array
+
+		foreach ($attributeNames as $name)
+		{
+			$name = trim($name); //in case of spaces around commas
+			$response[$name] = CHtml::value($this->model, $name); //this function walks the relations
+		}
+
+		$response['subtotalFormatted'] = $this->subtotalFormatted;
+		$response['totalFormatted'] = $this->totalFormatted;
+		$response['totalDiscountFormatted'] = $this->totalDiscountFormatted;
+
+		$arrItems = $response['cartItems'];
+
+		foreach ($arrItems as $itemKey => $objItem)
+		{
+			list($taxCharged,$taxesIndividual,$taxRates) = Tax::CalculatePricesWithTax(
+				$objItem->sell_total,
+				$this->model->tax_code_id,
+				$objItem->product->tax_status_id
+			);
+
+			$arrTaxRatesForItem = array();
+
+			foreach ($taxRates as $key => $value)
+			{
+				if ($value > 0)
+				{
+					$arrTaxRatesForItem['tax'.$key.'_rate'] = $value;
+				}
+			}
+
+			// Convert to JSON in order to do merge of multi-dimension array.
+			// See http://stackoverflow.com/questions/2476876/how-do-i-convert-an-object-to-an-array
+			$arrItem = CJSON::decode(CJSON::encode($objItem), true);
+			$arrItem = array_merge($arrItem, $arrTaxRatesForItem);
+			$arrItems[$itemKey] = $arrItem;
+		}
+
+		$response['cartItems'] = $arrItems;
+		return CJSON::encode($response);
+	}
+
+	/**
+	 * Find the tax code associated with the provided address and update the
+	 * shopping cart to use it.
+	 *
+	 * @param string $shippingCountry The 2-letter country code for the country.
+	 * @param string $shippingState The 2-letter code for the state.
+	 * @param string $shippingPostal The postal code with all spaces removed.
+	 * @return void
+	 * @throws CException If tax destinations are not configured.
+	 */
+	public static function setTaxCodeFromAddress(
+		$shippingCountry,
+		$shippingState,
+		$shippingPostal)
+	{
+		// Calculate tax since that may change depending on shipping address.
+		Yii::log(
+			sprintf(
+				"Attempting to match with a defined Destination to Country/State/Postal %s/%s/%s",
+				$shippingCountry,
+				$shippingState,
+				$shippingPostal
+			),
+			'info',
+			'application.'.__CLASS__.".".__FUNCTION__
+		);
+
+		$objDestination = Destination::LoadMatching(
+			$shippingCountry,
+			$shippingState,
+			$shippingPostal
+		);
+
+		if ($objDestination !== null)
+		{
+			Yii::log("Matched Destination destination.id=".$objDestination->id." to tax code destination.taxcode=".$objDestination->taxcode, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+		} else {
+			Yii::log('Destination not matched, going with default (Any/Any)', 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+			$objDestination = Destination::LoadDefault();
+
+			if ($objDestination === null)
+			{
+				throw new CException(
+					Yii::t(
+						'checkout',
+						'Website configuration error. No tax destinations have been defined by the Store Administrator. Cannot continue.'
+					)
+				);
+			}
+		}
+
+		Yii::app()->shoppingcart->tax_code_id = $objDestination->taxcode;
+		Yii::app()->shoppingcart->UpdateCart();
+	}
 }

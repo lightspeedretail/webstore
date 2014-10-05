@@ -1,0 +1,109 @@
+body{
+  color: rgb(0, 0, 0);
+}
+
+.webstore-overlay{
+  h3 {
+    display: block;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    font-weight: bold;
+    line-height: normal;
+    font-size: 19px;
+  }
+  h1, h2, h3, h4, h5, h6{
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, sans-serif;
+    font-weight: bold;
+  }
+  button, input, select, textarea {
+    vertical-align: baseline;
+  }
+  h1 {
+    line-height: inherit;
+  }
+  li {
+    margin-bottom:0;
+  }
+  .button,
+  button,
+  input[type="submit"],
+  input[type="reset"],
+  input[type="button"] {
+    font-family:inherit;
+    text-transform: none;
+  }
+
+  input, input:focus {
+    border:solid 1px #ddd;
+    background-color: initial;
+  }
+
+  input:focus {
+    outline: -webkit-focus-ring-color auto 5px;
+  }
+
+  select, input[type="text"], input[type="password"], input[type="email"],input[type="text"]:focus,
+  input[type="password"]:focus, input[type="email"]:focus {
+    width: 100%;
+    background-color: transparent;
+    line-height: normal;
+    max-width: none;
+  }
+  @media only screen and (max-width: 960px){
+    select, input[type="text"], input[type="password"], input[type="email"], input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
+      max-width: none;
+    }
+  }
+
+
+  input[type=submit] {
+    margin-top: 0;
+  }
+
+}
+
+.overlay{
+  #checkout input[type="text"], #checkout input[type="password"], #checkout input[type="email"], #checkout input[type="select"], #checkout input[type="text"]:focus, #checkout input[type="password"]:focus, #checkout input[type="email"]:focus, #checkout input[type="select"]:focus {
+//    border: 1px solid #ddd;
+  }
+  #checkout label{
+    text-transform: none;
+  }
+
+
+}
+
+
+.webstore-modal{
+  select{
+    font-size: 11px;
+    height: 18px;
+    line-height: normal;
+  }
+
+  //bootstrap overwrite
+  .radio input[type="radio"], .checkbox input[type="checkbox"] {
+    margin-left:0;
+  }
+
+  .webstore-checkout .choices .button:focus {
+    height:46px;
+  }
+
+  button, input, select, textarea{
+    vertical-align:baseline;
+  }
+
+  //overwrite light.css
+  input[type=button], input[type=submit], button, label{
+    text-transform:none;
+  }
+
+}
+
+
+
+
+

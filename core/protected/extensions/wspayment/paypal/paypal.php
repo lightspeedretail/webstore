@@ -6,6 +6,7 @@ class paypal extends WsPayment
 	protected $defaultName = "PayPal";
 	protected $version = 1.0;
 	protected $uses_jumper = true;
+	protected $uses_credit_card = true;
 	protected $apiVersion = 1;
 	public $cloudCompatible = true;
 

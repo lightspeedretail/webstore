@@ -175,7 +175,7 @@ class Wishlist extends BaseWishlist
 	/**
 	 * @return array
 	 */
-	public function getShipOptions()
+	public function getShippingOptions()
 	{
 
 		$arrReturn = array(

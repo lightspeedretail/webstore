@@ -61,14 +61,12 @@ class Customer extends BaseCustomer
 			array('company, email, password', 'length', 'max'=>255),
 			array('currency', 'length', 'max'=>3),
 			array('preferred_language, mainphonetype', 'length', 'max'=>8),
-			array('mainphone', 'length', 'max'=>32),
+			array('mainphone', 'length','min'=>7, 'max'=>32),
 			array('last_login', 'safe'),
 
 
 			array('email', 'required','on'=>'create,createfb,myaccountupdate'),
 			array('first_name,last_name', 'required','on'=>'create,createfb,myaccountupdate,update,updatepassword'),
-			array('mainphone', 'required','on'=>'create,myaccountupdate,update,updatepassword'),
-			array('mainphone', 'length','min'=>7, 'max'=>32),
 			array('password,password_repeat', 'required','on'=>'create,updatepassword'),
 
 			// email has to be a valid email address
@@ -86,7 +84,7 @@ class Customer extends BaseCustomer
 			array('password_repeat', 'length', 'max'=>255),
 			array('password', 'compare', 'on'=>'create,formSubmitWithAccount,updatepassword,resetpassword'),
 			array('password_repeat', 'safe'),
-			array('password,password_repeat', 'validatePasswordStrength', 'on'=>'create,formSubmitWithAccount,updatepassword,resetpassword'),
+			array('password,password_repeat', 'PasswordLengthValidator', 'on'=>'create,formSubmitWithAccount,updatepassword,resetpassword'),
 
 			array('token', 'length', 'max'=>Customer::RESET_PASSWORD_TOKEN_LENGTH),
 			array('token', 'required', 'on'=>'resetpassword'),
@@ -168,30 +166,6 @@ class Customer extends BaseCustomer
 			$this->addError('email_repeat',
 				Yii::t('checkout','Email address does not match')
 			);
-		}
-	}
-
-	/**
-	 * Ensure that a password meets our requirements
-	 * Return an error message detailing the failure if applicable.
-	 * @param string $password
-	 * @return string | false
-	 */
-	public function validatePasswordStrength($attribute, $params) {
-		if ($this->scenario == Customer::SCENARIO_GUEST && !$this->$attribute)
-			return;
-
-		$min_length = _xls_get_conf('MIN_PASSWORD_LEN',0);
-
-		if (strlen($this->$attribute) < $min_length)
-		{
-			$this->addError($attribute, Yii::t('customer',
-				'{attribute} too short. Must be a minimum of {length} characters.',
-				array(
-					'{attribute}'=>$this->getAttributeLabel($attribute),
-					'{length}'=>$min_length
-				)
-			));
 		}
 	}
 

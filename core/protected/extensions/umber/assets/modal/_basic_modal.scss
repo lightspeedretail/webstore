@@ -1,0 +1,448 @@
+#webstore-container {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.webstore-modal {
+    //MO
+    input{
+      font-size: 100%;
+      margin-bottom: 0;
+      line-height: normal;
+      background-color: #fff;
+      border: 1px solid #cccccc;
+      &:focus{
+        border: 1px solid #3287cc;
+        outline:#3287cc;
+        background-color: transparent;
+        line-height: normal;
+      }
+
+    }
+    input[type="text"]{
+      border: none;
+      line-height: normal;
+        &:focus{
+          outline:solid 1px #3287cc;
+          line-height: normal;
+        }
+      }
+    //TODO:MO remove when Brooklyn2014 is fully implemented on the entire website
+    @media only screen and (max-width: 960px) { /*iPad and below */
+      select, input[type="text"], input[type="password"],
+      input[type="email"], input[type="text"]:focus,
+      input[type="password"]:focus,
+      input[type="email"]:focus  {
+        max-width: none;
+      }
+    }
+
+	visibility: hidden;
+	cursor: pointer;
+	position: fixed;
+	z-index: 2;
+
+	// Sets overlay background color
+	background-color: rgba(#000,0);
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	font-family: $webstore-modal-font;
+    text-align: center;
+
+	@include perspective(1300px);
+	@include transition-property(background-color);
+	@include transition-duration(.5s);
+
+	@include media(medium) {
+		&:before {
+			content: '';
+			display: inline-block;
+			height: 100%;
+			vertical-align: middle;
+			margin-right: -0.25em; /* Adjusts for spacing */
+		}
+	}
+
+	&.show {
+		visibility: visible;
+		background-color: rgba(#000,.5);
+
+		& section {
+			visibility: visible;
+
+			-webkit-transform: translateY(0%) rotateX(0deg);
+			-moz-transform: translateY(0%) rotateX(0deg);
+			-ms-transform: translateY(0%) rotateX(0deg);
+			transform: translateY(0%) rotateX(0deg);
+			opacity: 1;
+		}
+	}
+
+	section {
+		z-index: 2000;
+		visibility: hidden;
+		max-width: $modal-width;
+
+		// @include backface-visibility(hidden);
+		@include transform(translateY(100%) rotateX(90deg));
+		@include transform-style(preserve-3d);
+		@include transform-origin(0 100%);
+		@include transition(all 0.3s ease-out);
+
+		position: relative;
+		min-height: 100%;
+		padding-bottom: 59px;
+
+		text-align: left;
+		display: inline-block;
+		vertical-align: middle;
+
+		// Sets modal shadow
+		box-shadow: 1px 1px 5px rgba(0,0,0,.2);
+		width: 100%;
+
+		@include media(small) {
+			min-height: 0;
+			padding-bottom: 0;
+		}
+		&:hover { cursor: default; }
+	}
+
+	article, aside, main, form { background-color: #fff; }
+	form, header { padding: $modal-padding $modal-padding*2; }
+	header { padding: $modal-padding/2 $modal-padding; }
+	form { padding: 0; }
+	.breakaway { margin-top: 20px; }
+
+	button, input[type="button"], .button {
+          font: 1.25rem "Open Sans", "Helvetica Neue", Helvetica, sans-serif;
+
+		&.webstore-modal-close {
+			@include media(small) {
+				display: none;
+			}
+
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+
+			display: block;
+
+			background-color: #eee;
+			color: #999;
+			font: .875rem 'Open Sans', 'Helvetica Neue', sans-serif;
+			text-transform: uppercase;
+
+			&:hover {
+				background-color: #eee;
+				color: #666;
+			}
+			&:focus { outline: none; }
+		}
+	}
+
+    .twocolumn {
+      @extend %clearfix;
+      margin: 0;
+
+      .column { @extend %clearfix; }
+
+      @include media(small) {
+        .column {
+          float: left;
+          width: 50%;
+          padding: 0;
+        }
+      }
+      .content {
+        padding: 10px 20px 0;
+      }
+    }
+
+
+	form {
+		ol {
+			margin: 0;
+			list-style: none;
+			padding: 0;
+		}
+		li {
+			overflow: hidden;
+			position: relative;
+
+            &.split-3 {
+              label {
+                width: 32%;
+                display: inline-block;
+                vertical-align: top;
+                font-size: .7rem;
+                &:last-child {
+                  width: 33%;
+                }
+              }
+            }
+
+			&.options-split {
+				overflow: hidden;
+				width: 100%;
+
+				> *:first-child {
+					float: left;
+				}
+				> *:last-child {
+					float: right;
+				}
+			}
+		}
+	}
+
+  h1 {
+
+    font-weight: 600;
+    //MO conflicting with Edit cart Is this needed anywhere else?
+//    color: #777;
+//    text-transform: uppercase;
+    font: 1rem $webstore-modal-header-font-family;
+    font-weight: $webstore-modal-header-font-weight;
+    margin: .25rem 0;
+
+    .cancel {
+      position: absolute;
+      right: 20px;
+      top: 16px;
+      font-size: .75rem;
+      color: #777;
+      text-transform: none;
+      border-bottom: 1px solid #ccc;
+    }
+    small {
+      float: right;
+      color: #aaa;
+
+    }
+  }
+
+	h2 {
+		font-size: 1.5rem;
+		margin: .5em 0 1em;
+		color: #555;
+	}
+	h4 {
+		text-transform: uppercase;
+		margin: 0 0 .75em;
+		font-weight: 400;
+		color: #888;
+		font-size: 1rem;
+	}
+
+	header {
+		background-color: #eee;
+		border-bottom: 1px solid #ccc;
+	}
+
+	.invisible { visibility: hidden; }
+
+
+	footer.submit {
+		padding: 0;
+		background-color: #eee;
+		color: #999;
+		overflow: hidden;
+
+		input[type="submit"] {
+			@include transition-property(background-color);
+			@include transition-duration(.3s);
+
+			font: 1.25rem $webstore-modal-header-font-family;
+			font-weight: $webstore-modal-header-font-weight;
+
+			padding: $modal-padding;
+			background: $calltoaction-color;
+			width: 100%;
+			border: none;
+			color: #fff;
+			float: left;
+
+			&:hover {
+				background-color: darken($calltoaction-color,10%);
+			}
+		}
+	}
+
+	.hint, .info {
+		p {
+			margin: 0;
+			padding: 12px $modal-padding 11px;
+			color: #666;
+			font-size:.875rem;
+		}
+	}
+	.hint p { margin-right: 80px; }
+
+	input[type="text"], input[type="email"], input[type="password"], input[type="tel"] {
+		&.split-2 {
+			width: 50%;
+			float: left;
+			border-right: 1px solid #ccc;
+			&:last-child {
+				border-right: none;
+			}
+		}
+        &.split-3 {
+          width: 33%;
+          float: left;
+          border-right: 1px solid #ccc;
+          &:last-child {
+            border-right: none;
+            width: 34%;
+          }
+        }
+
+		&:focus {
+			box-shadow: inset 1px 1px 3px #ccc;
+			background-color: #f8f8f8;
+			outline: none;
+		}
+	}
+	label {
+		&.transient {
+			display: none;
+			color: #666;
+			position: absolute;
+			top: 3px;
+			left: $modal-padding;
+			font-size: .5rem;
+			text-transform: uppercase;
+			font-weight: bold;
+		}
+        &.text {
+          @include transition-property(background-color, color);
+          @include transition-duration(.3s);
+          display: block;
+          padding: $modal-padding;
+          font-size: .85rem;
+          color: #888;
+          cursor: pointer;
+          @include transition-property(color);
+          @include transition-duration(.3s);
+          background-color: #fff;
+        }
+		&.checkbox {
+			@include transition-property(background-color, color);
+			@include transition-duration(.3s);
+
+			display: block;
+			padding: $modal-padding;
+			font-size: .85rem;
+			color: #888;
+			cursor: pointer;
+			@include transition-property(color);
+			@include transition-duration(.3s);
+			background-color: #fff;
+
+			&:hover {
+				color: #555;
+			}
+
+			input {
+				font-size: 2em;
+              //MO
+//                margin-right: 6px;
+				margin-right: 2px;
+			}
+		}
+	}
+
+	.minor {
+		@include transition-property(background-color, color, border-color);
+		@include transition-duration(.3s);
+		text-decoration: none;
+		width: auto;
+		border-radius: 0;
+		background: none;
+		color: #aaa;
+		padding: 7px 6px;
+		text-align: right;
+		font-size: .75rem;
+		line-height: 1;
+		position: absolute;
+		right: 18px;
+		top: 18px;
+
+		strong {
+			font-weight: normal;
+			color: $calltoaction-color;
+			text-decoration: underline;
+		}
+
+		&:hover {
+			color: #888;
+			strong { color: darken($calltoaction-color,10%); }
+		}
+	}
+
+	label {
+		margin: 0 0 2px;
+		display: block;
+		color: #666;
+	}
+
+	input {
+		padding: 8px;
+        background-color:transparent;
+        -webkit-border-radius: 0;
+        -moz-border-radius: 0;
+        border-radius: 0;
+	}
+}
+
+.webstore-modal-narrow {
+	@include media(small) {
+		&:before {
+			content: '';
+			display: inline-block;
+			height: 100%;
+			vertical-align: middle;
+			margin-right: -0.25em; /* Adjusts for spacing */
+		}
+	}
+	section {
+		max-width: $modal-width-narrow;
+	}
+}
+
+//webstore Montreal overwrite
+.webstore-modal.show {
+  visibility: visible;
+  text-align: center;
+  -webkit-font-smoothing: initial;
+  display: inline-block;
+
+}
+
+//.editcartmodal.webstore-modal.show{
+//  background-color: #eee;
+//  text-align: center;
+//  display: inline-block;
+//}
+
+.webstore-modal * {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  padding-bottom: 0;
+}
+
+
+
+
+
+

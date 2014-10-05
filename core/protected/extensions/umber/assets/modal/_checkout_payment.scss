@@ -1,0 +1,413 @@
+.cvc-container {
+	position: relative;
+}
+.cvc-hint {
+	position: absolute;
+	top: -50%;
+	left: 100%;
+	width: 180px;
+
+	display: none;
+
+	margin-left: 5px;
+
+	box-shadow: 0 2px 4px rgba(0,0,0,.1);
+	border: 1px solid #ccc;
+	background-color: #fff;
+	padding: 10px 15px 0 15px;
+
+	p {
+		margin: 0 0 .75em;
+		font-size: .6875rem;
+	}
+
+	img {
+		width: 100px;
+		margin-bottom: -5px;
+	}
+}
+
+#payment {
+	.outofbandpayment {
+		padding-top: 5px;
+		padding-bottom: 45px;
+		margin-bottom: -8px;
+		position: relative;
+
+		.buttons {
+			@extend %clearfix;
+
+			display: -webkit-box;
+			display: -moz-box;
+			display: -ms-flexbox;
+			display: -webkit-flex;
+			display: flex;
+
+			justify-content: center;
+		}
+
+
+		button {
+			display: inline-block;
+			text-align: center;
+			font-size: .875rem;
+			width: 10rem;
+			padding: 10px;
+			border-radius: 2px;
+			margin: 0 7px;
+
+			&.paypal {
+				background-color: #179bd7;
+				&:hover {
+					background-color: darken(#179bd7, 10%);
+				}
+			}
+			&.amazon {
+				background-color: #f9d678;
+				color: #000;
+				&:hover {
+					background-color: darken(#f9d678, 10%);
+				}
+
+			}
+		}
+        //MO
+		.or-block {
+			position: absolute;
+			left: 0;
+			right: 0;
+			bottom: 0;
+		}
+
+        .spacer {
+          margin: 12px 0;
+        }
+
+      //MO alternate paypal buttons classes
+      .paypal-alt {
+        background-size: 175px 35px;
+        background-repeat: no-repeat;
+        background-color: transparent;
+        color: transparent;
+        cursor: pointer;
+        padding: 6px 0;
+        outline: 0;
+        border: 0px;
+        width: 175px;
+        height: 35px;
+      }
+
+      //MO
+      .paypal-orig {
+        background-image: url('/images/altpayments/paypal.png');
+        background-size: 100px 38px;
+        width: 100px;
+        height: 38px;
+      }
+
+      //MO
+      .paypal-blue {
+        background-image: url('/images/paypal-blue.png');
+      }
+
+      //MO
+      .paypal-white {
+        background-image: url('/images/paypal-white.png');
+      }
+
+	}
+
+	h4 {
+		margin: 0 0 .5em;
+	}
+
+	.address-form {
+		@extend %clearfix;
+		margin-bottom: 15px;
+
+        //MO
+        h4 { margin-top: 20px; }
+	}
+
+    //MO
+    .address-form.invisible {
+        display: none;
+        visibility: visible; // override bootstrap
+    }
+
+  .alt-payment-methods {
+    padding: 15px 30px 10px;
+    border: 1px solid #ccc;
+    border-bottom: none;
+
+    h4 {
+      text-transform: uppercase;
+      color: #444;
+      font-size: .8125rem;
+      margin: 0 0 1em;
+    }
+  }
+
+  .payment-methods {
+    input[type=radio] {
+      vertical-align: baseline;
+      margin: 4px 5px 0.5em 0;
+      width: 13px;
+      height: 13px;
+
+      &:checked + label {
+        color: #333;
+      }
+    }
+
+    label {
+      color: #777;
+      font-size: 0.875rem;
+      padding-left: 10px;
+      margin-bottom: 0.5rem;
+    }
+
+    //MO payment-simple page cc label
+    .sim-cc {
+      font-size: 19px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+
+    //MO payment-simple page cc radio
+    input.sim-cc-radio {
+      margin-top: 8px;
+    }
+  }
+
+  .checkset {
+    input[type=radio], input[type=checkbox] {
+      display: none;
+
+      &:checked + label.checklabel {
+        color: #333;
+
+        &:before {
+          border-color: #ccc;
+          @extend %icon-check-mark;
+        }
+      }
+    }
+  }
+
+  label.checklabel {
+    display: block;
+    margin: 0 0 .5em;
+    color: #999;
+    @include transition(all .4s);
+
+    &:before {
+      @extend %icon-prereqs;
+      margin: 0 8px -4px 0;
+      border-radius: 16px;
+      content: "";
+      display: inline-block;
+      width: 20px;
+
+      height: 20px;
+      border: 2px solid #ccc;
+      font-size: 24px;
+      color: #444;
+      text-align: center;
+      line-height: 15px;
+      text-indent: -2px;
+      float: left;
+    }
+
+    &:hover {
+      color: #444;
+      &:before { border-color: #999; }
+    }
+
+    &.error { color: #999; }
+  }
+
+  .alt-payment-methods {
+    padding: 15px 30px 10px;
+    border: 1px solid #ccc;
+    border-bottom: none;
+
+    h4 {
+      text-transform: uppercase;
+      color: #444;
+      font-size: .8125rem;
+      margin: 0 0 1em;
+    }
+  }
+
+  }
+
+	.address-blocks {
+
+
+		p {
+			font-size: .6875rem;
+			padding: 10px;
+
+			&:before {
+				display: none;
+			}
+		}
+	}
+
+	.creditcard {
+		@extend %clearfix;
+
+		border: 1px solid #ccc;
+		border-bottom: none;
+
+		padding: 30px 30px 0;
+		margin: 0;
+
+		&.creditcard-nosubmit {
+			border-bottom: 1px solid #ccc;
+			margin-bottom: 15px;
+		}
+
+		h3 {
+			margin: 0 0 .25em;
+		}
+
+		p.large {
+			margin: 0;
+			font-size: 1rem;
+		}
+
+		input.creditcard-number {
+			font-family: "ocraregular","OCR A Std","OCR A",Courier,"Courier New",monospace;
+			padding-left: 10px;
+			padding-right: 10px;
+			font-size: 1.325rem;
+
+			&::-webkit-input-placeholder {
+				font-size: 1.2rem;
+				line-height: 1.5;
+				font-family: $default-font-family;
+			}
+			&:-moz-placeholder {
+				font-size: 1.2rem;
+				line-height: 1.5;
+				font-family: $default-font-family;
+			}
+			&:-ms-input-placeholder {
+				font-size: 1.2rem;
+				line-height: 1.5;
+				font-family: $default-font-family;
+			}
+		}
+
+		.card-details {
+			background-color: #f8f8f8;
+			border: 1px solid #ddd;
+			padding: 20px 20px 15px;
+			border-radius: 10px;
+
+			ol.field-container-gap {
+				margin-bottom: 1rem;
+			}
+
+			input:focus {
+				background-color: #fff;
+				outline-color: rgb(91, 157, 217);
+				outline-offset: -2px;
+				outline-style: auto;
+				outline-width: 5px;
+			}
+
+			p.cardholder {
+				font-family: "ocraregular","OCR A Std","OCR A",Courier,"Courier New",monospace;
+				margin: .65em 0 0;
+				text-transform: uppercase;
+				font-size: 1.125rem;
+				color: #999;
+
+				a {
+					font-family: $default-font-family;
+					font-size: .8375rem;
+					text-transform: none;
+					border-bottom: 1px dotted #999;
+				}
+			}
+			.cardholder-field {
+				margin-top: 1em;
+
+				input {
+					height: 2.75rem;
+					font-size: .9375rem;
+					padding: 0 10px;
+				}
+			}
+
+		}
+		.cart-details-secondary {
+
+			li {
+				float: left;
+
+				&:first-child { margin-right: 1rem; }
+			}
+
+			.card-logo {
+				float: right;
+				height: 44px;
+
+
+				img {
+					display: none;
+					max-height: 44px;
+					position: relative;
+					top: 50%;
+					transform: translateY(-50%);
+
+					&.active {
+						display: block;
+					}
+				}
+			}
+		}
+
+
+	}
+
+	.shippingasbilling {
+		display: inline-block;
+		font-size: .8375rem;
+		padding: 20px 15px 15px;
+		color: #999;
+		font-weight: bold;
+        width: 100%;
+
+		:checked + .text {
+			color: #444;
+		}
+
+		.address-abbr {
+			color: #999;
+			font-weight: normal;
+			font-size: .75rem;
+		}
+
+		input {
+			float: left;
+			line-height: 2rem;
+			margin: .45em .5em 1em 0;
+			font-size: 1.25rem;
+		}
+	}
+
+
+
+
+
+//temporary fix, confirm exact styling with Kevin and Luke
+input#MultiCheckoutForm_cardNumber {
+  &:focus{
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
