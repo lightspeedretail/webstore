@@ -369,7 +369,8 @@ class m140429_224114_update_configuration extends CDbMigration
 		$this->insert('xlsws_configuration',array(
 				'title' =>'LightSpeed Updater URL',
 				'key_name' => 'LIGHTSPEED_UPDATER',
-				'key_value' => 'updater.lightspeedretail.com',
+//				'key_value' => 'updater.lightspeedretail.com',
+				'key_value' => 'copper.updater',
 				'helper_text' => 'Updater URL',
 				'configuration_type_id' => 0,
 				'sort_order' => 0,
