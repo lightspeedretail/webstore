@@ -34,16 +34,17 @@ class InstallController extends Controller
 	public function beforeAction($action)
 	{
 
-		defined('DEFAULT_THEME') or define('DEFAULT_THEME','brooklyn');
-		
-		if (strlen(Yii::app()->params['LSKEY'])>0 &&
+		defined('DEFAULT_THEME') or define('DEFAULT_THEME', 'brooklyn2014');
+
+		if (strlen(Yii::app()->params['LSKEY']) > 0 &&
 			$action->id != "install" &&
 			$action->id != "upgrade" &&
 			$action->id != "migratephotos")
 		{
-			throw new CHttpException(404,'The requested page does not exist.');
+			throw new CHttpException(404, 'The requested page does not exist.');
 			return false;
 		}
+
 		return parent::beforeAction($action);
 
 	}
