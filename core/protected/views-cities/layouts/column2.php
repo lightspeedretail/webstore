@@ -15,16 +15,18 @@
 
 	<div class="span3">
 
-		<?= $this->renderPartial('/site/_sidecart',null, true); ?>
-
-		<div id="shoppingcartcheckout" onclick="window.location.href='<?php echo Yii::app()->createUrl('cart/checkout') ?>'">
-			<div class="checkoutlink"><?php echo CHtml::link(Yii::t('cart','Checkout'),array('cart/checkout')) ?></div>
-			<div class="checkoutarrow"><?php echo CHtml::image(Yii::app()->theme->baseUrl."/css/images/checkoutarrow.png"); ?></div>
+        <div id="shoppingcart">
+			<?= $this->renderPartial('/site/_sidecart',null, true); ?>
 		</div>
 
-		<div id="shoppingcarteditcart" onclick="window.location.href='<?php echo Yii::app()->createUrl('/cart') ?>'">
-			<div class="editlink"><?php echo CHtml::link(Yii::t('cart','Edit Cart'),array('/cart')) ?></div>
-		</div>
+        <div id="shoppingcartcheckout" onclick="window.location.href='<?php echo Yii::app()->createUrl('cart/checkout') ?>'">
+            <div class="checkoutlink"><?php echo CHtml::link(Yii::t('cart','Checkout'),array('cart/checkout')) ?></div>
+            <div class="checkoutarrow"><?php echo CHtml::image(Yii::app()->theme->baseUrl."/css/images/checkoutarrow.png"); ?></div>
+        </div>
+
+        <div id="shoppingcarteditcart" onclick="window.location.href='<?php echo Yii::app()->createUrl('/cart') ?>'">
+            <div class="editlink"><?php echo CHtml::link(Yii::t('cart','Edit Cart'),array('/cart')) ?></div>
+        </div>
 
         <div id="sidebar" class="span12">
 	        <?php if(_xls_get_conf('ENABLE_WISH_LIST'))
@@ -33,5 +35,4 @@
 	</div>
 </div>
 
-<?php
-$this->endContent();
+<?php $this->endContent();

@@ -114,8 +114,6 @@ h3 { margin-top: 2px; }
 .themeicon.selected {  border: 8px solid #c6d0e5; }
 .themeicon label { padding: 0px; margin: 0px; width: 200px; height: 160px; text-align: left; }
 .themeoptions { font-size: 0.8em; min-height: 60px; }
-.themeoptions button { border: 0; font-weight: 200; font-size: 1em; color: #08C; background-color: transparent; }
-.themeoptions button:hover { color: #005580; text-decoration: underline; }
 .themeoptions select { margin-left: 13px; margin-top: 8px; width: 180px; }
 .themeselect { display: none; }
 .themeinstaller {  margin-left: 13px; font-size: 0.8em; font-weight: 600; }

@@ -13,8 +13,7 @@
  */
 
 
-class ImagesType
-{
+class ImagesType {
 	const normal = 0;
 	const small = 1;
 	const pdetail = 2;
@@ -23,9 +22,8 @@ class ImagesType
 	const category = 5;
 	const preview = 6;
 	const slider = 7;
-	const addtocartmodal = 8;
 
-	const MaxId = 8;
+	const MaxId = 7;
 
 	public static $NameArray = array(
 		0 => 'image',
@@ -35,8 +33,7 @@ class ImagesType
 		4 => 'listingimage',
 		5 => 'categoryimage',
 		6 => 'previewimage',
-		7 => 'sliderimage',
-		8 => 'addtocartmodalimage'
+		7 => 'sliderimage'
 	);
 
 	public static $SizeArray = array(
@@ -48,7 +45,6 @@ class ImagesType
 		5 => array(180, 180),
 		6 => array(30, 30),
 		7 => array(120, 120),
-		8 => array(100, 140),
 	);
 
 	public static $ConfigKeyArray = array(
@@ -59,8 +55,7 @@ class ImagesType
 		4 => 'LISTING_IMAGE',
 		5 => 'CATEGORY_IMAGE',
 		6 => 'PREVIEW_IMAGE',
-		7 => 'SLIDER_IMAGE',
-		8 => 'ADDTOCARTMODAL_IMAGE'
+		7 => 'SLIDER_IMAGE'
 	);
 
 	public static $TokenArray = array(
@@ -71,8 +66,7 @@ class ImagesType
 		4 => 'LISTING',
 		5 => 'CATEGORY',
 		6 => 'PREVIEW',
-		7 => 'SLIDER',
-		8 => 'ADDTOCARTMODAL'
+		7 => 'SLIDER'
 
 	);
 
@@ -99,15 +93,13 @@ class ImagesType
 
 			$fnOptions = YiiBase::getPathOfAlias('webroot')."/themes/".Yii::app()->theme->name."/config.xml";
 
-			if (file_exists($fnOptions))
-			{
+			if (file_exists($fnOptions)) {
 				$strXml = file_get_contents($fnOptions);
 
 				// Parse xml for response values
 				$oXML = new SimpleXMLElement($strXml);
 				Yii::log("Found config.xml values ".print_r($oXML,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-				if(isset($oXML->defaults->configuration))
-				{
+				if(isset($oXML->defaults->configuration)) {
 					foreach ($oXML->defaults->configuration as $item)
 					{
 						if((string)$item->key_name==$strCfgWidth)

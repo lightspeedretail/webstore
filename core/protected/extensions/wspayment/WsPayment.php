@@ -3,20 +3,9 @@
 	/* Payment module */
 class WsPayment extends WsExtension
 {
-	public $subformModel;
-
-	/**
-	 * Is this an Advanced Integration Method (AIM)?
-	 * @var bool
-	 */
 	public $advancedMode = false;
-
-	/**
-	 * Can Cloud Web Stores use this option?
-	 * @var bool
-	 */
+	public $subformModel;
 	public $cloudCompatible = false;
-
 	/**
 	 * The run() function is called from Web Store to actually do the process. It returns an array of the service
 	 * levels and prices available to the customer (as keys and values in the array, respectively).

@@ -31,26 +31,6 @@ class CartItem extends BaseCartItem
 		return false;
 	}
 
-	public function getSellOriginalTotal() {
-		return $this->sell * $this->qty;
-	}
-
-	public function getSellTotalFormatted() {
-		return _xls_currency($this->sell_total);
-	}
-
-	public function getSellFormatted() {
-		return _xls_currency($this->sell);
-	}
-
-	public function getSellDiscountFormatted() {
-		return _xls_currency($this->sell_discount);
-	}
-
-	public function getSellOriginalTotalFormatted() {
-		return _xls_currency($this->sellOriginalTotal);
-	}
-
 	public function GetPriceField() {
 		if ($this->getDiscounted())
 			return 'sell_discount';
@@ -184,28 +164,5 @@ class CartItem extends BaseCartItem
 		}
 
 		return $mixReturn;
-	}
-
-	public function getAttributes($names = true) {
-		$arrExtraAttributes = array(
-			'discounted',
-			'sellOriginalTotal',
-			'sellFormatted',
-			'sellDiscountFormatted',
-			'sellOriginalTotalFormatted',
-			'sellTotalFormatted'
-
-		);
-
-		$arrReturn = array();
-		foreach ($arrExtraAttributes as $attribute)
-		{
-			if (is_array($names) === false || in_array($attribute, $names))
-			{
-				$arrReturn[$attribute] = $this->__get($attribute);
-			}
-		}
-
-		return $arrReturn + parent::getAttributes($names);
 	}
 }

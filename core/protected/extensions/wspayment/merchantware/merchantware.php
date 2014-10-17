@@ -29,7 +29,7 @@ class merchantware extends WsPayment
 
 
 		//MerchantWARE expects expiry in 4 digit format
-		$card_info_expiry = _xls_number_only($this->CheckoutForm->cardExpiryMonth.substr($this->CheckoutForm->cardExpiryYear,2,2));
+		$card_info_expiry = $this->CheckoutForm->cardExpiryMonth.substr($this->CheckoutForm->cardExpiryYear,2,2);
 
 		//MerchantWARE expects no dashes in WO number
 		$wo = str_replace("-","",$this->objCart->id_str);
@@ -80,11 +80,7 @@ class merchantware extends WsPayment
 		curl_close ($ch);
 
 		if(_xls_get_conf('DEBUG_PAYMENTS' , false)=="1") {
-			Yii::log(
-				get_class($this) . " sending ".$this->objCart->id_str." for amt ".$this->objCart->total."\nSoap: ".$this->obfuscate($xml_data),
-				'error',
-				'application.'.__CLASS__.".".__FUNCTION__
-			);
+			Yii::log(get_class($this) . " sending ".$this->objCart->id_str." for amt ".$this->objCart->total, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			Yii::log(get_class($this) . " receiving ".$resp, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		}
 		$resp = preg_replace("/(<\/?)(\w+):([^>]*>)/", "$1$2$3", $resp);
@@ -136,35 +132,6 @@ class merchantware extends WsPayment
 
 
 
-	}
-
-
-	/**
-	 * Obfuscate sensitive data from log
-	 *
-	 * @param $str
-	 * @return mixed
-	 */
-
-	private function obfuscate($str)
-	{
-		// cc number
-		$needle1 = '<strPAN>';
-		$needle2 = '</strPAN>';
-		$pos1 = strpos($str, $needle1) + strlen($needle1);
-		$pos2 = strpos($str, $needle2);
-
-		$str = substr_replace($str, str_repeat('*', $pos2 - $pos1 - 4), $pos1, $pos2 - $pos1 - 4);
-
-		// cc cvv
-		$needle3 = '<strCVCode>';
-		$needle4 = '</strCVCode>';
-		$pos3 = strpos($str, $needle3) + strlen($needle3);
-		$pos4 = strpos($str, $needle4);
-
-		$str = substr_replace($str, str_repeat('*', $pos4 - $pos3), $pos3, $pos4 - $pos3);
-
-		return $str;
 	}
 
 

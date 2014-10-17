@@ -60,4 +60,7 @@
 		<div class="cart_price span5"><span id="subtotal"><?= _xls_currency(Yii::app()->shoppingcart->subtotal) ?></span>&nbsp;&nbsp;</div>
 	</div>
 
+
+
+
 </div>

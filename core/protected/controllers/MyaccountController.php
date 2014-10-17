@@ -336,27 +336,6 @@ class MyaccountController extends Controller
 		$this->redirect($url);
 	}
 
-	public function actionRemoveAddress()
-	{
-		$deactived = false;
-		$data = array("status" => "error");
-		$customer_address_id = $_POST['CustomerAddressId'];
-		if(isset($customer_address_id))
-		{
-			$deactived = CustomerAddress::deactivateCustomerShippingAddress($customer_address_id, Yii::app()->user->id);
-		}
-
-		if(Yii::app()->request->isAjaxRequest)
-		{
-			if($deactived) $data["status"] = "success";
-			$this->renderJSON($data);
-		}
-		else
-		{
-			$this->redirect(Yii::app()->request->urlReferrer);
-		}
-	}
-
 	protected function triggerEmailCampaign($objCustomer,$strTrigger)
 	{
 		$objEvent = new CEventCustomer('MyAccountController',$strTrigger,$objCustomer);

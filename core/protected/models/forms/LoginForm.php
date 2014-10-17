@@ -12,14 +12,6 @@ class LoginForm extends CFormModel
 	public $rememberMe  = true;
 	public $sharedLogin = false;
 
-
-	/**
-	 * Used in the new checkout to set the validation scenario
-	 * @var bool
-	 */
-
-	public $guest = false;
-
 	private $_identity;
 
 	/**
@@ -30,15 +22,12 @@ class LoginForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('guest, email, password', 'safe'),
-			// username is always required
-			array('email', 'required'),
-			// password is only required if the user is attempting to login
-			array('password', 'required', 'on' => 'Existing'),
-			// password needs to be authenticated
-			array('password', 'authenticate', 'on' => 'Existing'),
+			// username and password are required
+			array('email, password', 'required'),
 			// rememberMe needs to be a boolean
 			array('rememberMe', 'boolean'),
+			// password needs to be authenticated
+			array('password', 'authenticate'),
 		);
 	}
 
@@ -48,9 +37,9 @@ class LoginForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'email' => Yii::t('CheckoutForm','Email Address'),
-			'password' => Yii::t('CheckoutForm','Password'),
-			'rememberMe' => 'Remember me next time',
+			'email'=>Yii::t('CheckoutForm','Email Address'),
+			'password'=>Yii::t('CheckoutForm','Password'),
+			'rememberMe'=>'Remember me next time',
 		);
 	}
 
@@ -58,7 +47,7 @@ class LoginForm extends CFormModel
 	 * Authenticates the password.
 	 * This is the 'authenticate' validator as declared in rules().
 	 */
-	public function authenticate($attribute, $params)
+	public function authenticate($attribute,$params)
 	{
 		if(!$this->hasErrors())
 		{
@@ -184,9 +173,6 @@ class LoginForm extends CFormModel
     protected function beforeValidate() {
 
         $this->email = strtolower($this->email);
-
-	    if ($this->getScenario() === '')
-		    $this->setScenario('Existing');
 
         return parent::beforeValidate();
     }

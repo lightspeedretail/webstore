@@ -53,7 +53,7 @@ If we have gone to checkout previously, we can load our cached shipping informat
             $("#btnCalculate").click();
     }
     function changePayment(data) {
-        var cc = new Array(<?php echo $model->getStrPaymentModulesThatUseCard() ?>);
+        var cc = new Array(<?php echo $model->getPaymentModulesThatUseCard() ?>);
         var op = new Array(<?php echo $model->getPaymentModulesThatUseForms(true) ?>);
         if($.inArray(data,cc)> -1) $("#CreditCardForm").show();
         else $("#CreditCardForm").hide();

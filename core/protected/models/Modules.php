@@ -92,22 +92,22 @@ class Modules extends BaseModules
 
 	}
 
-	public static function isActive($str, $category)
+	public static function Active($str)
 	{
-		foreach(self::getModulesByCategory(true, $category) as $obj)
-			if($obj->module == $str) return true;
+		foreach(self::getSidebars(true) as $obj)
+			if($obj->module==$str) return true;
 
 		return false;
 
 	}
 
-	public static function getModulesByCategory($active = true, $category = WsExtension::SIDEBAR)
+	public static function getSidebars($active=true)
 	{
 		$criteria = new CDbCriteria();
 		if ($active)
-			$criteria->condition = "active=1 AND category='".$category."'";
+			$criteria->condition = "active=1 AND category='".WsExtension::SIDEBAR."'";
 		else
-			$criteria->condition = "category='".$category."'";
+			$criteria->condition = "category='".WsExtension::SIDEBAR."'";
 		$criteria->order = 'sort_order';
 		return Modules::model()->findAll($criteria);
 
@@ -165,20 +165,4 @@ class Modules extends BaseModules
 		}
 	}
 
-	/**
-	 * Define some specialized query scopes to make searching for specific db
-	 * info easier
-	 */
-	public function scopes() {
-		return array(
-			'shipping' => array(
-				'condition' => 'active = 1 AND category = "shipping"',
-				'order' => 'sort_order'
-			),
-			'payment' => array(
-				'condition' => 'active = 1 AND category = "payment"',
-				'order' => 'sort_order'
-			)
-		);
-	}
 }

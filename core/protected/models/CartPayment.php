@@ -68,19 +68,6 @@ class CartPayment extends BaseCartPayment
 					return "";
 				break;
 
-			case 'instructions':
-				if (Yii::app()->getComponent($this->payment_module)->advancedMode)
-					return null;
-				elseif (Yii::app()->getComponent($this->payment_module)->uses_credit_card && $this->payment_module !== 'paypal')
-					return "<strong>You'll pay on the next page.</strong><br>These details will be forwarded to our secure payment processor: ";
-				elseif ($this->payment_module === 'paypal')
-					return "You'll pay on the next page.";
-				else
-				{
-					$module = Modules::LoadByName($this->payment_module);
-
-					return $module->getConfig('customeralert');
-				}
 
 			default:
 				return parent::__get($strName);

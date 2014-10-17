@@ -9,9 +9,9 @@
  */
 class CustomerAddress extends BaseCustomerAddress
 {
-	const BILLING_ADDRESS = 1;
-	const SHIPPING_ADDRESS = 2;
-	const BOTH_ADDRESS = 3;
+	const BILLING_ADDRESS=1;
+	const SHIPPING_ADDRESS=2;
+	const BOTH_ADDRESS=3;
 
 	const RESIDENTIAL = 1;
 	const BUSINESS = 0;
@@ -22,7 +22,7 @@ class CustomerAddress extends BaseCustomerAddress
 	 * Returns the static model of the specified AR class.
 	 * @return CustomerAddress the static model class
 	 */
-	public static function model($className = __CLASS__)
+	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
 	}
@@ -36,19 +36,18 @@ class CustomerAddress extends BaseCustomerAddress
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('modified, address1, first_name, last_name, city', 'required', 'on' => 'Default'),
-			array('active, residential', 'numerical', 'integerOnly' => true),
-			array('customer_id', 'length', 'max' => 20),
-			array('address_label, first_name, last_name, company, address1, address2, city', 'length', 'max' => 255),
-			array('state_id, country_id', 'length', 'max' => 11),
-			array('postal', 'length', 'max' => 64),
-			array('phone', 'length', 'min' => 7, 'max' => 32),
-			array('store_pickup_email', 'email'),
-			array('postal', 'validatePostal', 'on' => 'Default'),
-			array('created, makeDefaultBilling, makeDefaultShipping', 'safe'),
+			array('modified,address1,first_name,last_name,city', 'required'),
+			array('active, residential', 'numerical', 'integerOnly'=>true),
+			array('customer_id', 'length', 'max'=>20),
+			array('address_label, first_name, last_name, company, address1, address2, city', 'length', 'max'=>255),
+			array('state_id, country_id', 'length', 'max'=>11),
+			array('postal', 'length', 'max'=>64),
+			array('phone', 'length','min'=>7, 'max'=>32),
+			array('postal','validatePostal'),
+			array('created,makeDefaultBilling,makeDefaultShipping', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, customer_id, address_label, active, first_name, last_name, store_pickup_email, company, address1, address2, city, state_id, postal, country_id, phone, residential, modified, created', 'safe', 'on' => 'search'),
+			array('id, customer_id, address_label, active, first_name, last_name, company, address1, address2, city, state_id, postal, country_id, phone, residential, modified, created', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -120,10 +119,14 @@ class CustomerAddress extends BaseCustomerAddress
 			return array();
 
 		return CustomerAddress::model()->findAllByAttributes(
-			array('customer_id' => Yii::app()->user->id, 'active' => '1'),
-			array('order' => 'modified DESC')
+			array('customer_id'=>Yii::app()->user->id,'active'=>'1'),
+			array('order'=>'modified DESC')
 		);
+
+
+
 	}
+
 
 	/**
 	 * See if Customer Address already exists by searching for passed information.
@@ -133,10 +136,7 @@ class CustomerAddress extends BaseCustomerAddress
 	 */
 	public static function findOrCreate($config = null)
 	{
-		if (is_null($config))
-		{
-			return null;
-		}
+		if(is_null($config)) return null;
 
 		//Search. If successful, return object, otherwise save (to create new object) and return that
 		$obj = new CustomerAddress();
@@ -161,25 +161,24 @@ class CustomerAddress extends BaseCustomerAddress
 		// Warning: Please modify the following code to remove attributes that
 		// should not be searched.
 
-		$criteria = new CDbCriteria;
+		$criteria=new CDbCriteria;
 
-		$criteria->compare('customer_id', $this->customer_id);
-		$criteria->compare('address_label', $this->address_label);
-		$criteria->compare('first_name', $this->first_name);
-		$criteria->compare('last_name', $this->last_name);
-		$criteria->compare('store_pickup_email', $this->store_pickup_email);
-		$criteria->compare('company', $this->company);
-		$criteria->compare('address1', $this->address1);
-		$criteria->compare('address2', $this->address2);
-		$criteria->compare('city', $this->city);
-		$criteria->compare('state_id', $this->state_id);
-		$criteria->compare('postal', $this->postal);
-		$criteria->compare('country_id', $this->country_id);
-		$criteria->compare('phone', $this->phone);
-		$criteria->compare('residential', $this->residential);
+		$criteria->compare('customer_id',$this->customer_id);
+		$criteria->compare('address_label',$this->address_label);
+		$criteria->compare('first_name',$this->first_name);
+		$criteria->compare('last_name',$this->last_name);
+		$criteria->compare('company',$this->company);
+		$criteria->compare('address1',$this->address1);
+		$criteria->compare('address2',$this->address2);
+		$criteria->compare('city',$this->city);
+		$criteria->compare('state_id',$this->state_id);
+		$criteria->compare('postal',$this->postal);
+		$criteria->compare('country_id',$this->country_id);
+		$criteria->compare('phone',$this->phone);
+		$criteria->compare('residential',$this->residential);
 
 		return new CActiveDataProvider($this, array(
-			'criteria' => $criteria,
+			'criteria'=>$criteria,
 		));
 	}
 	
@@ -187,42 +186,22 @@ class CustomerAddress extends BaseCustomerAddress
 	 * Since Validate tests to make sure certain fields have values, populate requirements here such as the modified timestamp
 	 * @return boolean from parent
 	 */
-	protected function beforeValidate()
-	{
-		if ($this->isNewRecord)
-		{
+	protected function beforeValidate() {
+		if ($this->isNewRecord) {
 			$this->created = new CDbExpression('NOW()');
+
 		}
 
 		if (empty($this->address_label))
-		{
 			$this->address_label = Yii::t('global','Unlabeled Address');
-		}
 
 		if (empty($this->state_id))
-		{
-			$this->state_id = null;
-		}
-
+			$this->state_id=null;
 		$this->modified = new CDbExpression('NOW()');
-
-		if (!isset($this->scenario))
-		{
-			$this->setScenario('Default');
-		}
 
 		return parent::beforeValidate();
 	}
 
-
-	public static function deactivateCustomerShippingAddress($address_id, $customer_id)
-	{
-		return CustomerAddress::model()->updateAll(
-			array("active" => 0),
-			'id = :id AND customer_id = :customer_id',
-			array(':id' => $address_id, ':customer_id' => $customer_id)
-		);
-	}
 
 	public function __get($strName) {
 		switch ($strName) {
@@ -236,12 +215,6 @@ class CustomerAddress extends BaseCustomerAddress
 					return Country::CodeById($this->country_id);
 				else return null;
 
-			case 'country_name':
-				if ($this->country_id)
-					return Country::CountryById($this->country_id);
-				else
-					return null;
-
 			case 'mainname':
 			case 'fullname':
 				return $this->first_name." ".$this->last_name;
@@ -252,14 +225,6 @@ class CustomerAddress extends BaseCustomerAddress
 					$this->city.chr(13).
 					$this->state." ".$this->postal.chr(13).
 					$this->country;
-
-			case 'htmlblock':
-				return
-				$this->address1.'<br>'.
-				(!empty($this->address2) ? $this->address2."<br>" : "").
-				$this->city.' '.
-				$this->state." ".$this->postal.'<br>'.
-				$this->country_name;
 
 			case 'shipblock':
 				return $this->first_name." ".$this->last_name.chr(13).
@@ -282,16 +247,6 @@ class CustomerAddress extends BaseCustomerAddress
 					return
 						Yii::t('global','Directly to gift recipient').'<br>'.
 						$this->first_name." ".$this->last_name;
-
-			case 'formattedblockcountry':
-				return
-					$this->first_name." ".$this->last_name.'<br>'.
-					$this->address1.'<br>'.
-					(!empty($this->company) ? $this->company."<br>" : "").
-					(!empty($this->address2) ? $this->address2."<br>" : "").
-					$this->city.' '.
-					$this->state." ".$this->postal.'<br>'.
-					$this->country_name;
 
 			default:
 				return parent::__get($strName);

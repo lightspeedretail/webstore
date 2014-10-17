@@ -14,30 +14,6 @@ class SiteController extends Controller
 {
 	public $layout = '//layouts/column2';
 
-	//	public function beforeAction($action)
-	//	{
-	//
-	//		if ($action->Id=="login" && _xls_get_conf('ENABLE_SSL')==1)
-	//		{
-	//			if(Yii::app()->params['LIGHTSPEED_HOSTING_COMMON_SSL'])
-	//				$this->verifyCommonSSL();
-	//
-	//			if(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on') {
-	//				$this->redirect(Yii::app()->createAbsoluteUrl('site/'.$action->Id,array(),'https'));
-	//				Yii::app()->end();
-	//			}
-	//		} else if(
-	//			$action->Id != "login" &&
-	//			$action->Id != "forgotpassword" &&
-	//			$action->Id != "sendemail" &&
-	//			Yii::app()->params['LIGHTSPEED_HOSTING_COMMON_SSL']
-	//		)
-	//			$this->verifyNoSharedSSL();
-	//
-	//		return parent::beforeAction($action);
-	//
-	//	}
-
 	/**
 	 * Default action.
 	 *
@@ -48,6 +24,7 @@ class SiteController extends Controller
 	 */
 	public function actionIndex()
 	{
+
 		$homePage = _xls_get_conf('HOME_PAGE', '*products');
 		switch ($homePage)
 		{
@@ -125,13 +102,6 @@ class SiteController extends Controller
 
 		if ($error = Yii::app()->errorHandler->error)
 		{
-			if (stripos(Yii::app()->request->userAgent, "curl/") !== false)
-			{
-				echo $error['code'] . " " . $error['type'] . " " . $error['message'] . "\n";
-				echo $error['trace'];
-				die();
-			}
-
 			if (Yii::app()->request->isAjaxRequest)
 			{
 				echo $error['message'];

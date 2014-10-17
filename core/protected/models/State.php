@@ -50,15 +50,7 @@ class State extends BaseState
 		$objState =  State::LoadByCode($strCode,$intCountry);
 		if ($objState instanceof State)
 			return $objState->id;
-		else return '';
-	}
-
-	public static function IdByName($strName, $intCountry)
-	{
-		$objState =  State::model()->findByAttributes(array('country_id' => $intCountry, 'state' => $strName));
-		if ($objState instanceof State)
-			return $objState->id;
-		else return '';
+		else return "";
 	}
 
 	/**
@@ -70,7 +62,7 @@ class State extends BaseState
 		$objState =  State::model()->findByPk($intId);
 		if ($objState instanceof State)
 			return $objState->code;
-		else return '';
+		else return "";
 	}
 
 	/**

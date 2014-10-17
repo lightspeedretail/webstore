@@ -52,7 +52,7 @@
         </div>
         <div class="row-fluid">
                 <label>Allow buyers to ship my wish list items directly to me at:</label>
-	            <?php echo $form->dropDownList($model,'ship_option',$model->getShippingOptions()); ?>
+	            <?php echo $form->dropDownList($model,'ship_option',$model->getShipOptions()); ?>
 				<?php echo $form->error($model,'ship_option'); ?>
         </div>
 		<div class="row-fluid spaceafter">

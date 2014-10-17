@@ -136,37 +136,6 @@ function _xls_regionalize($str)
 	}
 }
 
-
-/**
- * Return the custom url version of the passed url
- *
- * @param $url
- * @return string
- */
-function _xls_url_common_to_custom($url)
-{
-	return str_replace(
-		"https://".Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL'],
-		"http://".Yii::app()->params['LIGHTSPEED_HOSTING_CUSTOM_URL'],
-		$url
-	);
-}
-
-/**
- * Return the commom/shared url version of the passed url
- *
- * @param $url
- * @return string
- */
-function _xls_url_custom_to_common($url)
-{
-	return str_replace(
-		"http://".Yii::app()->params['LIGHTSPEED_HOSTING_CUSTOM_URL'],
-		"https://".Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL'],
-		$url
-	);
-}
-
 /**
  * Return the Base URL for the site
  * Also perform http/https conversion if need be.
@@ -275,7 +244,6 @@ function _xls_convert_errors($arrErrors)
 	}
 	return $newArray;
 }
-
 function _xls_convert_errors_display($arrErrors)
 {
 	$strReturn = "\n";
@@ -1232,139 +1200,6 @@ function _rd($url = '') {
 
 }
 
-
-/**
- * Return a customer address as a formatted string
- *
- * @param CustomerAddress $objAddress
- * @return null|string
- */
-
-function _xls_string_address($objAddress)
-{
-	if ($objAddress instanceof CustomerAddress === false)
-	{
-		Yii::log('Invalid CustomerAddress object', 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
-		return null;
-	}
-
-	$str = '';
-	$str .= $objAddress->address1 . ', ';
-	$str .= $objAddress->address2 ? $objAddress->address2 . ', ' : '';
-	$str .= $objAddress->city . ', ';
-	$str .= $objAddress->state_id ? State::CodeById($objAddress->state_id) . ', ' : '';
-	$str .= Country::CodeById($objAddress->country_id) . ', ';
-	$str .= $objAddress->postal;
-
-	return $str;
-}
-
-/**
- * Return an html formatted string of the Store Address
- *
- * @return string
- */
-
-function _xls_html_storeaddress()
-{
-	$str = '';
-	$str .= Yii::app()->params['STORE_ADDRESS1'] . '<br>';
-	$str .= Yii::app()->params['STORE_ADDRESS2'] ?  Yii::app()->params['STORE_ADDRESS2'] . '<br>' : '';
-	$str .= Yii::app()->params['STORE_CITY'] ?  Yii::app()->params['STORE_CITY'] . ', ' : '';
-	$str .= Yii::app()->params['STORE_STATE'] ?  State::CodeById(Yii::app()->params['STORE_STATE']) . '<br>' : '';
-	$str .= Yii::app()->params['STORE_COUNTRY'] ?  Country::CountryById(Yii::app()->params['STORE_COUNTRY']) . '<br>' : '';
-	$str .= Yii::app()->params['STORE_ZIP'] ?  Yii::app()->params['STORE_ZIP'] : '';
-
-	return $str;
-}
-
-/**
- * Return an html formatted string of store pickup details
- *
- * @param ShoppingCart $objCart
- * @return string
- */
-function _xls_html_storepickupdetails($objCart)
-{
-	if ($objCart === null)
-	{
-		$objCart = Yii::app()->shoppingcart;
-	}
-
-	$str = '';
-	if ($objCart->shipping->isStorePickup)
-	{
-		$str .= $objCart->shipaddress->first_name . ' ' . $objCart->shipaddress->last_name . '<br>';
-		$str .= $objCart->shipaddress->phone ? $objCart->shipaddress->phone . '<br>' : '';
-		$str .= $objCart->shipaddress->store_pickup_email ? $objCart->shipaddress->store_pickup_email : $objCart->customer->email;
-	}
-	else
-	{
-		Yii::log(
-			sprintf('CartShipping for cart id: %d is not store pickup', $objCart->id),
-			'error',
-			'application.'.__CLASS__.'.'.__FUNCTION__
-		);
-	}
-
-	return $str;
-}
-
-
-/**
- * Return an html formatted string version of the Cart's shipping address
- *
- * @param ShoppingCart $objCart
- * @return string
- */
-function _xls_html_shippingaddress($objCart)
-{
-	if ($objCart === null)
-	{
-		$objCart = Yii::app()->shoppingcart;
-	}
-	
-	$str = '';
-	$str .= $objCart->shipaddress->address1 . '<br>';
-	$str .= $objCart->shipaddress->address2 ? $objCart->shipaddress->address2 . '<br>' : '';
-	$str .= $objCart->shipaddress->city . ', ';
-	$str .= $objCart->shipaddress->state_id ? State::CodeById($objCart->shipaddress->state_id) . ', ' : '';
-	$str .= $objCart->shipaddress->postal ? $objCart->shipaddress->postal . '<br>' : '';
-	$str .= Country::CountryById($objCart->shipaddress->country_id);
-
-	return $str;
-
-}
-
-/**
- * Return an html formatted string version of the Cart's billing address
- *
- * @param ShoppingCart $objCart
- * @return string
- */
-function _xls_html_billingaddress($objCart)
-{
-	if ($objCart === null)
-	{
-		$objCart = Yii::app()->shoppingcart;
-	}
-	
-	if ($objCart->shipaddress_id == $objCart->billaddress_id)
-		return _xls_html_shippingaddress($objCart);
-
-	$str = '';
-	$str .= $objCart->billaddress->address1 . '<br>';
-	$str .= $objCart->billaddress->address2 ? $objCart->billaddress->address2 . '<br>' : '';
-	$str .= $objCart->billaddress->city . ', ';
-	$str .= $objCart->billaddress->state_id ? State::CodeById($objCart->billaddress->state_id) . ', ' : '';
-	$str .= $objCart->billaddress->postal ? $objCart->billaddress->postal . '<br>' : '';
-	$str .= Country::CountryById($objCart->billaddress->country_id);
-
-	return $str;
-}
-
-
-
 /**
  * Truncate a string to a given length
  * This function can be extended with _custom_truncate
@@ -1373,7 +1208,7 @@ function _xls_html_billingaddress($objCart)
  * @param int $len
  * @param string $etc
  */
-function _xls_truncate($text,$len,$etc = "&hellip;") {
+function _xls_truncate($text,$len,$etc = "...") {
 	if(function_exists('_custom_truncate'))
 		return _custom_truncate($text,$len,$etc);
 
@@ -2416,37 +2251,4 @@ function _runMigrationTool($steps = null)
 	$runner->run($args);
 	return htmlentities(ob_get_clean(), null, Yii::app()->charset);
 
-}
-
-
-/**
- * Implementation of Underscore.js findWhere.
- * Looks through the $arr and returns the first value that matches all of the
- * key-value pairs listed in properties.
- * @param array $arr An array of containing associative arrays.
- * @param array $properties An associative array of properties to match against
- * each element in $arr.
- * @return mixed The first matching element of $arr.
- */
-function findWhere($arr, $properties)
-{
-	if (is_array($arr) === false && $arr instanceof Traversable === false)
-	{
-		return null;
-	}
-
-	if (is_array($properties) === false)
-	{
-		return null;
-	}
-
-	foreach ($arr as $element)
-	{
-		if (sizeof(array_intersect_assoc($element, $properties)) === sizeof($properties))
-		{
-			return $element;
-		}
-	}
-
-	return null;
 }

@@ -38,12 +38,6 @@ class ThemeForm extends CFormModel
 	 */
 	protected $useCustomFolderForCustomcss = true;
 
-	/**
-	 * Whether this theme uses the new checkout process or not
-	 * @var bool
-	 */
-	protected $advancedCheckout = false;
-
 	/*
 	 * IMAGE SIZES
 	 */

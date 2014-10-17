@@ -61,12 +61,14 @@ class Customer extends BaseCustomer
 			array('company, email, password', 'length', 'max'=>255),
 			array('currency', 'length', 'max'=>3),
 			array('preferred_language, mainphonetype', 'length', 'max'=>8),
-			array('mainphone', 'length','min'=>7, 'max'=>32),
+			array('mainphone', 'length', 'max'=>32),
 			array('last_login', 'safe'),
 
 
 			array('email', 'required','on'=>'create,createfb,myaccountupdate'),
 			array('first_name,last_name', 'required','on'=>'create,createfb,myaccountupdate,update,updatepassword'),
+			array('mainphone', 'required','on'=>'create,myaccountupdate,update,updatepassword'),
+			array('mainphone', 'length','min'=>7, 'max'=>32),
 			array('password,password_repeat', 'required','on'=>'create,updatepassword'),
 
 			// email has to be a valid email address

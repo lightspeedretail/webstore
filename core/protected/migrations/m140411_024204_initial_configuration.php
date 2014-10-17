@@ -1792,9 +1792,9 @@ class m140411_024204_initial_configuration extends CDbMigration
 
 		$this->insert(
 			'xlsws_configuration', array(
-				'title' => 'Store Address 2',
+				'title' => 'Store City, State, Postal',
 				'key_name' => 'STORE_ADDRESS2',
-				'key_value' => '',
+				'key_value' => 'Anytown, NY 12345',
 				'helper_text' => 'Address line 2',
 				'configuration_type_id' => 2,
 				'sort_order' => 6,
