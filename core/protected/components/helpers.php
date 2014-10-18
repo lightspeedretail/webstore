@@ -99,6 +99,7 @@ function downloadTheme($strTheme)
 		return false;
 	}
 
+	Yii::log('Line: '.__LINE__."\n".print_r($result,true), 'error', __FUNCTION__);
 	$strWebstoreInstall = "http://cdn.lightspeedretail.com/webstore/themes/".$result->latest->filename;
 
 	$data = getFile($strWebstoreInstall);
