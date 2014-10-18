@@ -1,0 +1,183 @@
+.field-containers-small {
+	@extend %clearfix;
+
+	.field-container {
+		input, select {
+			height: 2.75rem;
+			font-size: .875rem;
+			padding: .25em 8px;
+		}
+		select {
+			font-size: .875rem;
+			color: #444;
+		}
+		p.hint {
+			color: #999;
+			top: 0px;
+			right: 10px;
+			font-size: .8375rem;
+			line-height: 1rem;
+		}
+	}
+}
+
+
+.fieldgroup {
+	@extend %clearfix;
+
+	border: 1px solid #ddd;
+	border-top: none;
+	overflow: hidden;
+    &.city-fieldgroup ol li:nth-child(1){
+      width: 20%;
+      input{
+        width:100%;
+        &:focus{
+          width: 100%!important;
+        }
+      }
+    }
+    &.city-fieldgroup ol li:nth-child(2){
+      width: 65%;
+      input{
+        width: 100%;
+        &:focus{
+          width: 100%!important;
+        }
+      }
+    }
+  &.city-fieldgroup ol li:nth-child(3){
+    width: 15%;
+    input{
+      width: 100%;
+      &:focus{
+        width: 100%!important;
+      }
+    }
+  }
+	.field-container {
+		float: left;
+        border-right: 1px solid #ddd;
+
+		input, select {
+            height: 2.375rem;
+            font-size: .75rem;
+			width: auto;
+			border: none;
+			margin: 0;
+		}
+	}
+
+	.field-container:last-child {
+		border-right: none;
+	}
+
+}
+
+.field-container.field-container-select {
+	select {
+		padding-right: 1.75rem;
+
+		&:hover, &:focus {
+			background: none;
+			cursor: pointer;
+		}
+	}
+
+	&:after {
+		font-family: FontAwesome;
+		display: inline-block;
+		content: "\f0d7";
+		font-size: 21px;
+		color: #bbb;
+		position: absolute;
+		right: .5rem;
+		top: 0;
+		pointer-events:none;
+		line-height: 2.75rem;
+	}
+
+	&.field-container-select-no-handle {
+		select { padding-right: 0; }
+		&:after {
+			content: ' ';
+		}
+	}
+}
+
+.fieldgroup .field-container.country {
+	float: left;
+	select { max-width: 7rem; }
+}
+
+.field-container.field-container-select-no-handle.country {
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+.field-container select.modal-accent-color { color: $blue; }
+
+ol.field-container-gap {
+	margin-bottom: 1rem;
+}
+
+
+.field-container-narrowed {
+	width: 75%;
+	float: left;
+}
+
+//MO
+.field-container-shipname {
+  width: 37.5%;
+  float: left;
+}
+//MO
+.field-container-pickupname {
+  width: 50%;
+  float: left;
+}
+
+.field-container-endcap {
+	float: left;
+	width: 25%;
+
+	a {
+		height: 2.75rem;
+		border: 1px solid #ccc;
+		line-height: 2.75rem;
+		color: #999;
+		padding:  0 8px;
+		font-size: .875rem;
+		display: inline-block;
+		width: 100%;
+		border-left: none;
+		text-decoration: none;
+
+		&:hover {
+			color: #666;
+		}
+	}
+}
+
+
+
+
+//MO, bootstrap overwrite
+.field-container-narrowed input:focus,.field-containers-small input:focus,
+.field-container-narrowed input:focus:required:invalid:focus, .field-containers-small input:focus:required:invalid:focus{
+  height: 2.75rem;
+  font-size: .875rem;
+  padding: .25em 8px;
+}
+
+.webstore-modal-overlay .address-form .fieldgroup .field-container input:focus,
+.webstore-modal-overlay .address-form .fieldgroup .field-container input:focus:required:invalid:focus{
+  height: 2.375rem;
+  font-size: .75rem;
+  width: auto;
+  border: none;
+  margin: 0;
+}
+

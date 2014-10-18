@@ -757,7 +757,7 @@ class m140411_024204_initial_configuration extends CDbMigration
 			'xlsws_configuration', array(
 				'title' => 'Site Theme',
 				'key_name' => 'THEME',
-				'key_value' => 'brooklyn',
+				'key_value' => 'brooklyn2014',
 				'helper_text' => 'The default template from templates directory to be used for Web Store',
 				'configuration_type_id' => 0,
 				'sort_order' => 2,
@@ -1792,9 +1792,9 @@ class m140411_024204_initial_configuration extends CDbMigration
 
 		$this->insert(
 			'xlsws_configuration', array(
-				'title' => 'Store City, State, Postal',
+				'title' => 'Store Address 2',
 				'key_name' => 'STORE_ADDRESS2',
-				'key_value' => 'Anytown, NY 12345',
+				'key_value' => '',
 				'helper_text' => 'Address line 2',
 				'configuration_type_id' => 2,
 				'sort_order' => 6,

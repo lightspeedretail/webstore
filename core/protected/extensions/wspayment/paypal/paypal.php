@@ -6,6 +6,7 @@ class paypal extends WsPayment
 	protected $defaultName = "PayPal";
 	protected $version = 1.0;
 	protected $uses_jumper = true;
+	protected $uses_credit_card = true;
 	protected $apiVersion = 1;
 	public $cloudCompatible = true;
 
@@ -54,7 +55,7 @@ class paypal extends WsPayment
 		$str .= _xls_make_hidden('return',
 			Yii::app()->controller->createAbsoluteUrl('cart/receipt', array('getuid'=>$this->objCart->linkid),'http'));
 		$str .= _xls_make_hidden('cancel_return',
-			Yii::app()->controller->createAbsoluteUrl('cart/restore', array('getuid'=>$this->objCart->linkid)));
+			Yii::app()->controller->createAbsoluteUrl('cart/restoredeclined', array('getuid'=>$this->objCart->linkid, 'reason' => 'Cancelled')));
 		$str .= _xls_make_hidden('amount',  round($this->objCart->total , 2));
 
 		$str .=  ('</FORM>');

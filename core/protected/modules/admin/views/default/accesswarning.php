@@ -6,8 +6,10 @@
     </div>
 
 <?php
-	$form=$this->beginWidget(
+	$form = $this->beginWidget(
 		'CActiveForm',
-		'enableClientValidation'=>true
+		array(
+			'enableClientValidation' => true
+		)
 	);
 ?>

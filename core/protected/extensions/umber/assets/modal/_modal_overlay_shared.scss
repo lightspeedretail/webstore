@@ -1,0 +1,420 @@
+// Shared styles used by modals and overlays
+.webstore-modal-overlay {
+  button, textarea {
+    @include border-radius(0);
+      //MO
+    text-transform:none;
+  }
+
+  //webstore Montreal overwrite see .webstore-modal * in _basic_modal.scss
+  * {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+
+  input[type="submit"] {
+    outline: none;
+  }
+  button, .button, input[type="button"]  {
+    @include transition-property(background-color,color);
+    @include transition-duration(.3s);
+
+    font-size: 1.25rem;
+    font-weight: $webstore-modal-header-font-weight;
+
+    padding: $modal-padding 0;
+    background: $calltoaction-color;
+    width: 100%;
+    border: none;
+    color: #fff;
+    float: left;
+    @include border-radius(0);
+    text-decoration: none;
+    text-align: center;
+
+    &:hover {
+      background-color: darken($calltoaction-color,10%);
+    }
+    &:focus {
+      outline: none;
+    }
+
+    &.inline {
+      font-family: $webstore-modal-font;
+      float: none;
+      width: auto;
+      padding: 11px 14px;
+      margin-left: -1px;
+      font-size: .9375rem;
+    }
+
+    &.inset {
+      @include transition-property(background-color, color, border-color);
+      @include transition-duration(.3s);
+
+      background: none;
+      border: 1px solid rgba(0,0,0,.1);
+      @include border-radius(0);
+      text-transform: uppercase;
+      color: #bbb;
+      padding: 7px 6px;
+      width: auto;
+      font-size: .7rem;
+      font-weight: 600;
+      line-height: 1;
+      position: absolute;
+      right: 18px;
+      top: 21px;
+
+      &:hover {
+        border-color: $calltoaction-color;
+        color: #fff;
+        background: $calltoaction-color;
+      }
+    }
+  }
+
+  table {
+    width: 100%;
+
+    th, td {
+      font-size: 1rem;
+    }
+    .money {
+      text-align: right;
+    }
+  }
+
+  .field-container {
+    position: relative;
+
+    &:before, &:after {
+      content: " "; /* 1 */
+      display: table; /* 2 */
+    }
+    &:after { clear: both; }
+
+    p.hint {
+      line-height: 2rem;
+      color: #888;
+      font-size: 1rem;
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      z-index: 1;
+      pointer-events:none;
+
+      @include transition-property(opacity);
+      @include transition-duration(.2s);
+
+      strong {
+        padding: 3px;
+        text-transform: uppercase;
+        color: #bbb;
+        font-size: .875rem;
+        font-weight: normal;
+      }
+
+      &.show {
+        opacity: 0;
+      }
+    }
+
+    label.placeheld {
+      opacity: 0;
+      z-index: 1;
+      position: absolute;
+      visibility: hidden;
+      top: 24px;
+      left: 20px;
+      transition: all 0.1s linear;
+      color: #aaa;
+      font-size: .875rem;
+
+      &.show, &.locked {
+        visibility: visible;
+        top: 12px;
+        opacity:1;
+      }
+    }
+
+    input { height: 4.25rem; }
+
+    input, input:focus:required:invalid {
+      transition: all 0.1s linear;
+
+      padding: .75em 20px;
+      box-shadow: none;
+      font-size: 1.25rem;
+      width: 100%;
+      //MO
+      @include border-radius(0);
+      border: 1px solid #ddd;
+
+      &.show {
+        padding: 1.25em 20px .25em;
+      }
+
+      &:focus {
+        background-color: #f8f8f8;
+        outline: none;
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.1);
+      }
+    }
+
+    select {
+      transition: all 0.1s linear;
+      border: none;
+      margin: 0;
+      font: 1.5rem $default-font-family;
+      @include border-radius(0);
+      padding: .9375em 20px;
+      box-shadow: none;
+      width: 100%;
+      background: none;
+      color: #bbb;
+      -webkit-appearance: none;
+      -moz-appearance:none;
+      -ms-appearance:none;
+      appearance:none;
+
+      &.show {
+        color: #333;
+        padding: 1.25em 20px .5em;
+      }
+
+
+      &:focus {
+        background-color: #f8f8f8;
+        outline: none;
+      }
+    }
+
+    &.field-container-nobottomborder {
+      input {
+        border-bottom: none;
+      }
+    }
+  }
+
+
+
+  .flippable {
+    height: 68px;
+    margin: 0 auto;
+    @include perspective(600px);
+
+    .side {
+      top: 0;
+      right: 0;
+      left: 0;
+      overflow: hidden;
+      height: inherit;
+      position: absolute;
+
+      @include transform(rotateX(-180deg));
+      @include transform-style(preserve-3d);
+      @include backface-visibility(hidden);
+      /* -- transition is the magic sauce for animation -- */
+      @include transition(all 0.4s ease-in-out);
+
+      p {
+        //MO bootstrap override
+        margin: 13px 0;
+      }
+
+    }
+
+    .front {
+      z-index: 900;
+      @include transform(rotateX(0deg) rotateY(0deg));
+      @include transform-style(preserve-3d);
+      @include backface-visibility(hidden);
+      /* -- transition is the magic sauce for animation -- */
+      @include transition(all .4s ease-in-out);
+    }
+    .back {
+      z-index: 800;
+      @include transform(rotateX(-180deg));
+      @include transform-style(preserve-3d);
+      @include backface-visibility(hidden);
+      /* -- transition is the magic sauce for animation -- */
+      @include transition(all .4s ease-in-out);
+    }
+
+    &.flip {
+      .front {
+        z-index: 900;
+        @include transform(rotateX(180deg));
+      }
+      .back {
+        z-index: 1000;
+        @include transform(rotateX(0deg) rotateY(0deg));
+      }
+    }
+  }
+
+  .form-error {
+    border-top: 3px solid $error-color;
+    padding: 12px 20px;
+    background-color: #FFF2F2;
+    border-bottom: 1px solid #ddd;
+
+    p {
+      margin: 0;
+      color: $error-color;
+      font-size: .85rem;
+    }
+  }
+
+  .success .form-error{
+    border-top: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    padding: 12px 20px;
+    background-color: $success-color;
+    border-bottom: 1px solid #ddd;
+
+    p {
+      margin: 0;
+      color: #666;
+      font-size: .85rem;
+    }
+  }
+
+  form.error {
+    input {
+      &::-webkit-input-placeholder {
+        color: #aaa;
+        @include transition-property(color);
+        @include transition-duration(1s);
+      }
+      &:-moz-placeholder {
+        color: #aaa;
+        @include transition-property(color);
+        @include transition-duration(1s);
+      }
+      &::-moz-placeholder {
+        color: #aaa;
+        @include transition-property(color);
+        @include transition-duration(1s);
+      }
+      &:-ms-input-placeholder {
+        color: #aaa;
+        @include transition-property(color);
+        @include transition-duration(1s);
+      }
+
+      &.error, &:invalid,  {
+        box-shadow: none;
+        color: #B4282E;
+
+        &::-webkit-input-placeholder { color: #B4282E; }
+        &:-moz-placeholder { color: #B4282E; }
+        &::-moz-placeholder { color: #B4282E; }
+        &:-ms-input-placeholder { color: #B4282E; }
+        &:focus { color: inherit; }
+      }
+    }
+
+    .field-container {
+      .required {
+        position: absolute;
+        top: 26px;
+        right: 20px;
+
+        font-weight: bold;
+        text-transform: uppercase;
+        color: $error-color;
+        font-size: .75rem;
+      }
+      &.password .required {
+        right: 160px;
+      }
+    }
+    .field-container-password .required {
+      right: 160px;
+    }
+  }
+
+}
+
+#confirm h4 {
+  margin: .5em 0 .25em;
+}
+
+
+.steps {
+
+  @include clearfix();
+  background-color: #f8f8f8;
+  border-bottom: 1px solid #ddd;
+  margin: -15px -30px 15px;
+  padding: 0;
+
+  li {
+    position: relative;
+    width: 33.3%;
+    height: 40px;
+
+    float: left;
+
+    color: #777;
+    font-size: .8375rem;
+    font-weight: bold;
+    line-height: 40px;
+    text-transform: uppercase;
+
+    text-align: center;
+    border-right: 1px solid #ddd;
+
+    &:last-child { border-right: none; }
+
+    &.completed {
+      color: #aaa;
+
+      //MO .webstore-label previously .label refractored to avoid boostrap conflict.
+      .webstore-label {
+        position: relative;
+        width: 28px;
+        display: inline-block;
+        height: 18px;
+
+        &:before {
+
+          @extend %icon-prereqs;
+          @extend %icon-check-mark;
+
+          position: absolute;
+          top: 2px;
+          left: 0;
+          height: 18px;
+          width: 18px;
+
+          display: inline-block;
+          color: #ccc;
+          line-height: 18px;
+          @include border-radius(20px);
+          border: 2px solid #ccc;
+          text-align: center;
+        }
+      }
+    }
+    &.current {
+      background-color: #eee;
+      color: #000;
+    }
+  }
+}
+
+//MO temporary fix
+p.hint{
+  margin:13.4px 0;
+}
+.controls a{
+  font-size: .75rem;
+//  TODO:remove this;
+  max-width: 43px;
+}

@@ -19,11 +19,14 @@ class GuestIdentity extends CUserIdentity
 	 */
 	public function __construct()
 	{
-		$user = new Customer;
+		$user = new Customer();
 		$user->record_type = Customer::GUEST;
 		$user->last_login = new CDbExpression('NOW()');
-		if (!$user->save())
+		if ($user->save() === false)
+		{
 			print_r($user->getErrors());
+		}
+
 		$this->setState('fullname', 'Guest');
 		$this->setState('firstname', 'Guest');
 		$this->_id = $user->id;
@@ -33,6 +36,4 @@ class GuestIdentity extends CUserIdentity
 	{
 		return $this->_id;
 	}
-
-
 }

@@ -1,0 +1,14 @@
+::-webkit-input-placeholder { color: #aaa !important; }
+:-moz-placeholder { /* Firefox 18- */ color: #aaa !important; }
+::-moz-placeholder { /* Firefox 19+ */ color: #aaa !important ; }
+:-ms-input-placeholder { color: #aaa !important; }
+
+
+//TODO: Ask design to get back to us on a common outline strategies across different browsers
+//and confirm to which forms it should apply.
+.quantity input, input.cc-exp , input.creditcard-number ,input.promo-code, #MultiCheckoutForm_orderNotes{
+  &:focus{
+    /* -webkit-focus-ring-color = '#5B9DD9' */
+    outline: #5B9DD9 auto 5px!important;
+  }
+}

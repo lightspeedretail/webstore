@@ -1,0 +1,44 @@
+/*
+Syntax error: Invalid CSS after "@media ": expected media query (e.g. print, screen, print and screen), was "{"
+        on line 3 of media.scss
+
+1: 
+2: // media syntax
+3: @media {
+4:     div { color: blue; }
+5: }
+6: @media what {
+7:     div { color: blue; }
+8: }
+
+Backtrace:
+media.scss:3
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/scss/parser.rb:1312:in `expected'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/scss/parser.rb:1248:in `expected'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/scss/parser.rb:1228:in `expr!'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/scss/parser.rb:402:in `media_directive'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/scss/parser.rb:221:in `special_directive'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/scss/parser.rb:193:in `directive'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/scss/parser.rb:659:in `block_child'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/scss/parser.rb:649:in `block_contents'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/scss/parser.rb:116:in `stylesheet'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/scss/parser.rb:41:in `parse'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/engine.rb:409:in `_to_tree'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/engine.rb:274:in `render'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/plugin/compiler.rb:378:in `update_stylesheet'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/plugin/compiler.rb:189:in `block in update_stylesheets'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/plugin/compiler.rb:186:in `each'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/plugin/compiler.rb:186:in `update_stylesheets'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/plugin.rb:82:in `update_stylesheets'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/exec.rb:489:in `watch_or_update'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/exec.rb:346:in `process_result'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/exec.rb:43:in `parse'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/lib/sass/exec.rb:22:in `parse!'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.3.8/bin/scss:13:in `<top (required)>'
+/usr/bin/scss:23:in `load'
+/usr/bin/scss:23:in `<main>'
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Syntax error: Invalid CSS after \"@media \": expected media query (e.g. print, screen, print and screen), was \"{\"\A         on line 3 of media.scss\A \A 1: \A 2: // media syntax\A 3: @media {\A 4:     div { color: blue; }\A 5: }\A 6: @media what {\A 7:     div { color: blue; }\A 8: }"; }

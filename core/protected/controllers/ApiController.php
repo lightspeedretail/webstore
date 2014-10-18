@@ -9,7 +9,6 @@ class ApiController extends CController
 	 * Key which has to be in HTTP USERNAME and PASSWORD headers
 	 */
 	Const APPLICATION_ID = 'WEBSTORE';
-	const NOT_FOUND = "NOT_FOUND";
 
 	// API key names
 	const SERVER_WS_API_KEY = 'WS_API_KEY';
@@ -58,28 +57,13 @@ class ApiController extends CController
 			case 'pendingorders':
 				$pendingOrders = Cart::getPendingOrders();
 				if ($pendingOrders)
-				{
 					self::_sendResponse(200, CJSON::encode($pendingOrders));
-				} else {
+				else
 					self::_sendResponse(404, "No pending orders were found.");
-				}
 				break;
-			case 'configuration':
-				$key = Yii::app()->getRequest()->getQuery('key');
-				$keyval = self::_getConfig($key);
-				if ($keyval == self::NOT_FOUND)
-				{
-					self::_sendResponse(501, sprintf('key not found'));
-					exit;
-				} else {
-					self::_sendResponse(200, CJSON::encode($keyval));
-				}
-				break;
+
 			default:
-				self::_sendResponse(
-					501,
-					sprintf('Mode <b>get</b> is not implemented for model <b>%s</b>', $_GET['model'])
-				);
+				self::_sendResponse(501, sprintf('Mode <b>get</b> is not implemented for model <b>%s</b>',$_GET['model']));
 				exit;
 		}
 	}
@@ -101,32 +85,21 @@ class ApiController extends CController
 				//Configuration keys are handled a bit differently than normal records
 				$json = file_get_contents('php://input');
 				$obj = json_decode($json);
-				foreach ($obj as $var => $value)
-				{
-					if ($var != 'Testing')
-					{
-						_xls_set_conf($var, $value);
-					}
-				}
-
-				$arrobj = (array) $obj;
-				// if we're doing testing, don't push or register
-				if (isset($arrobj['Testing']) == false)
-				{
-					_upload_default_header_to_s3();
-					_xls_check_version(); //Register ourselves to stat server
-				}
+				foreach($obj as $var => $value)
+					_xls_set_conf($var,$value);
+				_upload_default_header_to_s3();
+				_xls_check_version(); //Register ourselves to stat server
 				break;
 			// Get an instance of the respective model
 			default:
 				$this->_sendResponse(
 					501,
-					sprintf('Mode <b>create</b> is not implemented for model <b>%s</b>', $_GET['model'])
+					sprintf('Mode <b>create</b> is not implemented for model <b>%s</b>',$_GET['model'])
 				);
 				exit;
 		}
+		$this->_sendResponse(200,json_encode(array('status'=>'success')));
 
-		$this->_sendResponse(200, json_encode(array('status' => 'success')));
 	}
 
 
@@ -171,33 +144,14 @@ class ApiController extends CController
 				$boolUpdate ? 200 : 400,
 				json_encode(
 					array(
-						'badkeys' => implode(',', $arrBadKeys),
-						'message' => 'You have included keys that are either invalid or not exposed at this time.'
+						'badkeys'=>implode(',',$arrBadKeys),
+						'message'=>'You have included keys that are either invalid or not exposed at this time.'
 					)
 				)
 			);
 		else
-			$this->_sendResponse(200, json_encode(array('status' => 'success')));
+			$this->_sendResponse(200,json_encode(array('status'=>'success')));
 
-	}
-
-	/**
-	 * Get configuration
-	 *
-	 * @param string $passkey
-	 * @param string $confkey
-	 * @return string
-	 */
-	private function _getConfig($confkey)
-	{
-		$conf = Configuration::LoadByKey($confkey);
-
-		if(!$conf)
-		{
-			return self::NOT_FOUND;
-		}
-
-		return $conf->key_value;
 	}
 
 	// {{{ Other Methods

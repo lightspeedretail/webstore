@@ -449,14 +449,10 @@ function displayNotAcceptable($checkenv)
 }
 function displayFormTwo()
 {
-	$sanitized = preg_replace('/[^a-zA-Z0-9\.\,\(\)@#!?]/', '', $_POST);
+	$sanitized = preg_replace('/[^a-zA-Z0-9\.\,\(\)@#!?_]/', '', $_POST);
 	writeDB($sanitized['dbhost'],$sanitized['dbuser'],$sanitized['dbpass'],$sanitized['dbname']);
 
-
-
-
 	displayHeader();
-
 
 	if (strlen($_POST['dboldname'])>0)
 	{   $headerstring = "Installing and migrating..."; $quip = "You probably have time to get a coffee."; }

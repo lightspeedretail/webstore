@@ -8,9 +8,11 @@
  * @property string $payment_method
  * @property string $payment_module
  * @property string $payment_data
+ * @property string $payment_card
  * @property double $payment_amount
  * @property string $payment_status
  * @property string $datetime_posted
+ * @property string $card_digits
  * @property string $promocode
  *
  * The followings are the available model relations:
@@ -38,13 +40,15 @@ abstract class BaseCartPayment extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('payment_amount', 'numerical'),
-			array('payment_method, payment_data, promocode', 'length', 'max'=>255),
-			array('payment_module', 'length', 'max'=>64),
-			array('payment_status', 'length', 'max'=>100),
+			array('payment_method, payment_data, promocode', 'length', 'max' => 255),
+			array('payment_card', 'length', 'max' => 50),
+			array('payment_module', 'length', 'max' => 64),
+			array('payment_status', 'length', 'max' => 100),
 			array('datetime_posted', 'safe'),
+			array('card_digits', 'length', 'is' => 4),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, payment_method, payment_module, payment_data, payment_amount, payment_status, datetime_posted, promocode', 'safe', 'on'=>'search'),
+			array('id, payment_method, payment_module, payment_data, payment_card, payment_amount, payment_status, datetime_posted, card_digits, promocode', 'safe', 'on' => 'search'),
 		);
 	}
 
@@ -70,9 +74,11 @@ abstract class BaseCartPayment extends CActiveRecord
 			'payment_method' => 'Payment Method',
 			'payment_module' => 'Payment Module',
 			'payment_data' => 'Payment Data',
+			'payment_card' => 'Card Type',
 			'payment_amount' => 'Payment Amount',
 			'payment_status' => 'Payment Status',
 			'datetime_posted' => 'Datetime Posted',
+			'card_digits' => 'Card Last 4 Digits',
 			'promocode' => 'Promocode',
 		);
 	}
@@ -92,9 +98,11 @@ abstract class BaseCartPayment extends CActiveRecord
 		$criteria->compare('payment_method',$this->payment_method,true);
 		$criteria->compare('payment_module',$this->payment_module,true);
 		$criteria->compare('payment_data',$this->payment_data,true);
+		$criteria->compare('payment_card',$this->payment_card,true);
 		$criteria->compare('payment_amount',$this->payment_amount);
 		$criteria->compare('payment_status',$this->payment_status,true);
 		$criteria->compare('datetime_posted',$this->datetime_posted,true);
+		$criteria->compare('card_digits',$this->card_digits,true);
 		$criteria->compare('promocode',$this->promocode,true);
 
 		return new CActiveDataProvider($this, array(

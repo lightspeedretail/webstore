@@ -43,6 +43,10 @@ $this->Widget('zii.widgets.jui.CJuiDialog',array(
 	),
 ));
 ?><div class="span9">
+	<?php
+	if ($objModule->category == 'theme')
+		$this->renderPartial('admin.views.default._configurenotes');
+	?>
     <div class="hero-unit">
         <h3><?php echo $this->editSectionName; ?></h3>
         <?php if (strlen($this->editSectionInstructions)>8): ?>

@@ -7,6 +7,7 @@ class monerissim extends WsPayment
 	protected $defaultName = "Moneris";
 	protected $version = 1.0;
 	protected $uses_jumper = true;
+	protected $uses_credit_card = true;
 	protected $apiVersion = 1;
 	public $cloudCompatible = true;
 
@@ -99,30 +100,53 @@ class monerissim extends WsPayment
 
 	public function gateway_response_process() {
 
-		if(_xls_get_conf('DEBUG_PAYMENTS' , false)=="1")
-			Yii::log(get_class($this) . "  Transaction ".print_r($_POST,true), CLogger::LEVEL_ERROR, get_class($this));
+		if (_xls_get_conf('DEBUG_PAYMENTS', false) == 1)
+		{
+			Yii::log(__CLASS__ . "  Transaction ".print_r($_POST,true), 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
+		}
+
+		// The order id will come in as GET variable on a cancelled transaction.
+		// Otherwise, it comes in as a POST variable.
+
+		$webstore_order_id = null;
+		$response_order_id = Yii::app()->getRequest()->getQuery('order_id');
+
+		if (is_null($response_order_id) === true)
+		{
+			$response_order_id = Yii::app()->getRequest()->getPost('response_order_id');
+		}
+
+		if (is_null($response_order_id) === false)
+		{
+			// ex. WO-123-20140413124313 becomes WO-123
+			$webstore_order_id = substr($response_order_id, 0, strrpos($response_order_id, '-'));
+		}
+
+		$response_message = Yii::app()->getRequest()->getQuery('cancelTXN');
+
+		if (is_null($response_message) === false)
+		{
+			// Transaction was cancelled
+			Yii::log(__CLASS__ . ' cancelled order payment received ' . print_r($_GET, true), 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
+			return self::generateErrorResponse($webstore_order_id, $response_message);
+		}
 
 		$response_code = Yii::app()->getRequest()->getPost('response_code');
-		$response_order_id = Yii::app()->getRequest()->getPost('response_order_id');
-		if ($response_order_id !== null)
-		{
-			$response_order_id = substr($response_order_id, 0, strrpos($response_order_id, '-'));
-		}
 		$response_message = Yii::app()->getRequest()->getPost('message');
 		$charge_total = Yii::app()->getRequest()->getPost('charge_total');
 		$bank_transaction_id = Yii::app()->getRequest()->getPost('bank_transaction_id');
 		$result = Yii::app()->getRequest()->getPost('result');
 
-		if(empty($result) || empty($response_order_id) || is_null($response_code) || $response_code >= self::ERROR_RESPONSE_CODE)
+		if(empty($result) || empty($webstore_order_id) || is_null($response_code) || $response_code >= self::ERROR_RESPONSE_CODE)
 		{
-			Yii::log(get_class($this) . " failed order payment received " . print_r($_POST,true), CLogger::LEVEL_ERROR, get_class($this));
+			Yii::log(__CLASS__ . " failed order payment received " . print_r($_POST,true), 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
 
-			return self::generateErrorResponse($response_order_id, $response_message);
+			return self::generateErrorResponse($webstore_order_id, $response_message);
 		}
 
-		Yii::log(get_class($this) . " successfully processed payment " . print_r($_POST,true), CLogger::LEVEL_INFO, get_class($this));
+		Yii::log(__CLASS__ . " successfully processed payment " . print_r($_POST,true), 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
 
-		return self::generateSuccessResponse($response_order_id, $charge_total, $bank_transaction_id);
+		return self::generateSuccessResponse($webstore_order_id, $charge_total, $bank_transaction_id);
 	}
 
 	private static function generateSuccessResponse($orderId, $chargeTotal, $bankTransactionId)

@@ -1,0 +1,87 @@
+//************************************************************************//
+// Generate a variable ($all-text-inputs) with a list of all html5
+// input types that have a text-based input, excluding textarea.
+// http://diveintohtml5.org/forms.html
+//************************************************************************//
+$inputs-list: 'input[type="email"]',
+              'input[type="number"]',
+              'input[type="password"]',
+              'input[type="search"]',
+              'input[type="tel"]',
+              'input[type="text"]',
+              'input[type="url"]',
+
+              // Webkit & Gecko may change the display of these in the future
+              'input[type="color"]',
+              'input[type="date"]',
+              'input[type="datetime"]',
+              'input[type="datetime-local"]',
+              'input[type="month"]',
+              'input[type="time"]',
+              'input[type="week"]';
+
+$unquoted-inputs-list: ();
+
+@each $input-type in $inputs-list {
+  $unquoted-inputs-list: append($unquoted-inputs-list, unquote($input-type), comma);
+}
+
+$all-text-inputs: $unquoted-inputs-list;
+
+// You must use interpolation on the variable:
+// #{$all-text-inputs}
+//************************************************************************//
+//   #{$all-text-inputs}, textarea {
+//     border: 1px solid red;
+//   }
+
+// :hover and :focus pseudo elements
+// Added by Ricardo Zea
+// http://ricardozea.net
+// @ricardozea
+// Tracking: http://stackoverflow.com/questions/13180807/sass-create-mixin-for-input-fields
+
+$inputs-list-hf:'input[type="email"]:hover',
+                'input[type="number"]:hover',
+                'input[type="password"]:hover',
+                'input[type="search"]:hover',
+                'input[type="tel"]:hover',
+                'input[type="text"]:hover',
+                'input[type="url"]:hover',
+                'input[type="color"]:hover',
+                'input[type="date"]:hover',
+                'input[type="datetime"]:hover',
+                'input[type="datetime-local"]:hover',
+                'input[type="month"]:hover',
+                'input[type="time"]:hover',
+                'input[type="week"]:hover',
+
+                'input[type="email"]:focus',
+                'input[type="number"]:focus',
+                'input[type="password"]:focus',
+                'input[type="search"]:focus',
+                'input[type="tel"]:focus',
+                'input[type="text"]:focus',
+                'input[type="url"]:focus',
+                'input[type="color"]:focus',
+                'input[type="date"]:focus',
+                'input[type="datetime"]:focus',
+                'input[type="datetime-local"]:focus',
+                'input[type="month"]:focus',
+                'input[type="time"]:focus',
+                'input[type="week"]:focus';
+
+$unquoted-inputs-list-hf: ();
+
+@each $input-type-hf in $inputs-list-hf {
+  $unquoted-inputs-list-hf: append($unquoted-inputs-list-hf, unquote($input-type-hf), comma);
+}
+
+$all-text-inputs-hf: $unquoted-inputs-list-hf;
+
+// You must use interpolation on the variable:
+// #{$all-text-inputs-hf}
+//************************************************************************//
+//   #{$all-text-inputs-hf}, textarea {
+//     border: 1px solid red;
+//   }

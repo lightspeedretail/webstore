@@ -24,7 +24,7 @@ class m140429_224114_update_configuration extends CDbMigration
 
 		$this->update(
 			'xlsws_configuration',
-			array('key_name' => 'THEME', 'key_value' => 'brooklyn', 'title'=> 'Site Theme','options'=> 'THEME','configuration_type_id'=> 0,'sort_order'=> 2,'param'=>0),
+			array('key_name' => 'THEME', 'key_value' => 'brooklyn2014', 'title'=> 'Site Theme','options'=> 'THEME','configuration_type_id'=> 0,'sort_order'=> 2,'param'=>0),
 			'key_name = :key',
 			array(':key' => 'DEFAULT_TEMPLATE')
 		);
@@ -369,7 +369,8 @@ class m140429_224114_update_configuration extends CDbMigration
 		$this->insert('xlsws_configuration',array(
 				'title' =>'LightSpeed Updater URL',
 				'key_name' => 'LIGHTSPEED_UPDATER',
-				'key_value' => 'updater.lightspeedretail.com',
+//				'key_value' => 'updater.lightspeedretail.com',
+				'key_value' => 'copper.updater',
 				'helper_text' => 'Updater URL',
 				'configuration_type_id' => 0,
 				'sort_order' => 0,

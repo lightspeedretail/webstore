@@ -17,9 +17,9 @@ class ThemeController extends AdminBaseController
 	{
 		return array(
 			array('allow',
-				'actions'=>array('index','edit','gallery','image','header',
-					'editcss','favicon','manage','upload','upgrade','module'),
-				'roles'=>array('admin'),
+				'actions' => array('index','edit','gallery','image','header','editcss',
+					'favicon','manage','upload','upgrade','module'),
+				'roles' => array('admin'),
 			),
 		);
 	}
@@ -67,8 +67,7 @@ class ThemeController extends AdminBaseController
 				array('label' => 'Upload FavIcon',
 					'url' => array('theme/favicon'),
 					'visible' => !(Yii::app()->params['LIGHTSPEED_MT'] > 0)
-				)
-
+				),
 
 			);
 
@@ -833,7 +832,6 @@ class ThemeController extends AdminBaseController
 	 */
 	protected function copyThemeForCustomization($post)
 	{
-
 		//To create a complete copy, we need to copy our viewset first, and then the theme in use over it so we get it all
 		//Later on, the cleanup will strip out anything unused
 		$strOriginalThemeFolder = Yii::app()->theme->name;
@@ -856,7 +854,6 @@ class ThemeController extends AdminBaseController
 			array('{theme}'=>$strPrettyThemeCopyName,'{time}'=>date("d F, Y  h:i:sa"))));
 
 		return $this->changeTheme($post);
-
 	}
 
 
@@ -961,15 +958,26 @@ class ThemeController extends AdminBaseController
 		return array($strCopyThemeFolder,$strPrettyThemeCopyName);
 
 	}
+
 	protected function copyCoreThemeFiles($strOriginalThemeFolder,$strCopyThemeFolder)
 	{
 		$viewset = Yii::app()->theme->info->viewset;
-		if(empty($viewset)) $viewset="cities";
+		if (empty($viewset))
+		{
+			$viewset="cities";
+		}
+
 		$viewset = "/views-".$viewset;
 		$path = Yii::getPathOfAlias('application').$viewset;
-		recurse_copy("themes/$strOriginalThemeFolder","themes/$strCopyThemeFolder");
-		recurse_copy($path,"themes/$strCopyThemeFolder/views");
-		recurse_copy("themes/$strOriginalThemeFolder","themes/$strCopyThemeFolder");
+		recurse_copy("themes/$strOriginalThemeFolder", "themes/$strCopyThemeFolder");
+		recurse_copy($path, "themes/$strCopyThemeFolder/views");
+		recurse_copy("themes/$strOriginalThemeFolder", "themes/$strCopyThemeFolder");
+
+		// WS-2804 remove checkout views folder until further notice
+		if (Yii::app()->theme->info->advancedCheckout === true)
+		{
+			rrmdir("themes/$strCopyThemeFolder/views/checkout");
+		}
 	}
 
 	protected function renameAdminForm($strOriginalThemeFolder,$strCopyThemeFolder,$strPrettyThemeCopyName)

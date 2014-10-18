@@ -23,5 +23,14 @@ class CartShipping extends BaseCartShipping
 		return $this->shipping_sell;
 	}
 
+	public function getIsStorePickup()
+	{
+		if (isset($this->shipping_module))
+		{
+			return Yii::app()->getComponent($this->shipping_module)->IsStorePickup;
+		}
+
+		return false;
+	}
 
 }

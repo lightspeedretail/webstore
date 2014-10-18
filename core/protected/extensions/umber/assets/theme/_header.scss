@@ -1,0 +1,89 @@
+header {
+	@include background-image(linear-gradient(#ffffff, rgba(#ffffff,0)));
+	width: 100%;
+	position: fixed;
+	top: 0;
+	// left: 0;
+	// right: 0;
+
+}
+
+.header {
+   background-color: transparent;
+    -webkit-transition: background-color 400ms linear;
+    -moz-transition: background-color 400ms linear;
+    -o-transition: background-color 400ms linear;
+    -ms-transition: background-color 400ms linear;
+    transition: background-color 400ms linear;
+	&.scrolled {
+		background-color: #FFF;
+	}
+	padding: 2rem 0;
+	@include clearfix();
+	.brand, .webstore-features {
+		display: inline-block;
+	}
+
+	.brand {
+		width: 240px;
+		float: left;
+
+		p { display: none; }
+	}
+	.webstore-features {
+		float: right;
+	}
+
+	.brand {
+		img {
+			max-height: 50px;
+		}
+		img + h1 {
+			display: none;
+		}
+
+	}
+	.webstore-features {
+		.pages, form {
+			float: right;
+		}
+
+		.pages {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+
+			li {
+				display: inline-block;
+				line-height: 50px;
+				font-size: .8375rem;
+			}
+			a {
+				display: inline-block;
+				line-height: 50px;
+				padding: 0 10px;
+			}
+
+		}
+		.language-choices {
+			display: none;
+		}
+	}
+
+	.page-collection {
+		width: 100%;
+		@include clearfix();
+
+		ul {
+			padding: 0;
+			display: inline;
+		}
+		li {
+			display: inline;
+		}
+		a {
+			display: inline-block;
+			padding: 10px;
+		}
+	}
+}

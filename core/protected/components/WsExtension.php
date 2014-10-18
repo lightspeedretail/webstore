@@ -12,30 +12,35 @@ class WsExtension extends CComponent
 	const THEME = 'theme';
 
 	/**
-	 * shipping or billing extension
+	 * shipping or billing (payment) extension
 	 * @var string
 	 */
 	protected $moduleType = 'shipping';
+
 	/**
 	 * Name that appears to the shopper
 	 * @var string
 	 */
 	protected $strModuleName = "Web Store Module";
+
 	/**
 	 * Extension version number (note whole numbers only)
 	 * @var int
 	 */
 	protected $version = 1;
+
 	/**
-	 * For billing extensions, does it redirect offsite (Simple Integration a la Paypal)
+	 * For billing extensions, does it redirect offsite (SIM ex. Paypal)
 	 * @var bool
 	 */
 	protected $uses_jumper = false;
+
 	/**
-	 * For billing extensions, we we display credit card number field (Advanced Integration)
+	 * For billing extensions, where credit card details are involved (SIM or AIM)
 	 * @var bool
 	 */
 	protected $uses_credit_card = false;
+
 	/**
 	 * Internal Web Store API version number, to determine compatibility
 	 * @var int
@@ -44,28 +49,36 @@ class WsExtension extends CComponent
 
 	protected $active;
 
-
 	protected $config;
 
 	protected $objCart;
 	protected $CheckoutForm;
 
-	//If we have a subform (model file)
+	/**
+	 * If we have a subform (model file)
+	 * @var null
+	 */
 	public $subform = null;
 
 	public function init()
 	{
 		$this->objCart = Yii::app()->shoppingcart;
 		$this->config = $this->getConfigValues(get_class($this));
+
 		if (!isset($this->config['markup']))
-			$this->config['markup']=0;
+		{
+			$this->config['markup'] = 0;
+		}
 		$objModule = Modules::LoadByName(get_class($this));
+
 		if ($objModule instanceof Modules)
+		{
 			$this->active = $objModule->active;
+		}
 		else
+		{
 			$this->active = false;
-
-
+		}
 	}
 
 	/**
@@ -390,7 +403,6 @@ class WsExtension extends CComponent
 	 * Return false if processing has failed. Error can be returned as part
 	 * of the $errortext variable (ByRef)
 	 *
-	 * @param $cart
 	 * @return string|boolean
 	 */
 	public function process() {

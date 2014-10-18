@@ -30,7 +30,8 @@ class fedex extends WsShipping
 	{
 
 		if (!is_null($this->CheckoutForm)) {
-			$arrReturn = $this->total(null,
+			$arrReturn = $this->total(
+				null,
 				$this->objCart,
 				$this->CheckoutForm['shippingCountry'],
 				$this->CheckoutForm['shippingPostal'],
@@ -264,7 +265,7 @@ class fedex extends WsShipping
 
 
 		if(count($ret) <= 0) {
-			_xls_log("FedEx could not get rate for  $country, $state , $zipcode .  " );
+			_xls_log("FedEx could not get rate for $country, $state , $zipcode .  " );
 			_xls_log("FedEx request: " . print_r($request, true));
 			_xls_log("FedEx Response: " . print_r($response, true));
 

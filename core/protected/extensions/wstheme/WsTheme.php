@@ -118,5 +118,19 @@ class WsTheme extends WsExtension
 		return $arr;
 	}
 
+	/**
+	 * Return the parent theme name. If the theme has no parent, return the theme name.
+	 * if it's a main theme we get it's name
+	 *
+	 * @return string name of the theme
+	 */
+	public static function getThemeNameOrParentName()
+	{
+		if (is_null(Yii::app()->theme->info->parent) === false)
+		{
+			return Yii::app()->theme->info->parent;
+		}
 
+		return Yii::app()->theme->name;
+	}
 }
