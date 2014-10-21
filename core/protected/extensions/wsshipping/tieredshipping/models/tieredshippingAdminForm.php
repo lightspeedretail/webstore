@@ -31,7 +31,7 @@ class tieredshippingAdminForm extends CFormModel
 			'tierbased'=>'Tiers based on',
 			'offerservices'=>'Delivery Speed',
 			'restrictcountry'=>'Only allow this carrier to',
-			'product'=>'LightSpeed Product Code (case sensitive)',
+			'product'=>'Lightspeed Product Code (case sensitive)',
 		);
 	}
 

@@ -16,15 +16,15 @@
 		<tbody>
 		<tr>
 			<th><?php echo Yii::t('checkout', "Merchandise") ?></th>
-			<td id="CartSubtotal"><?php echo _xls_currency(Yii::app()->shoppingcart->subtotal) ?></td>
+			<td id="CartSubtotal" class="cart-subtotal"><?php echo _xls_currency(Yii::app()->shoppingcart->subtotal) ?></td>
 		</tr>
 		<tr>
 			<th><?php echo Yii::t('checkout', "Estimated Shipping") ?></th>
 			<td class="shipping-estimate"><?= $estimatedShipping ?></td>
 		</tr>
 		<tr id="PromoCodeLine" class="<?php echo Yii::app()->shoppingcart->promoCode ? 'webstore-promo-line' : 'webstore-promo-line hide-me';?>" >
-			<th><?php echo Yii::t('checkout', "Promo: ")?><span id="PromoCodeName"><?php echo Yii::app()->shoppingcart->promoCode ?></span></th>
-			<td><span id="PromoCodeStr"><?php echo Yii::app()->shoppingcart->totalDiscountFormatted ?></span></td>
+			<th><?php echo Yii::t('checkout', "Promo: ")?><span id="PromoCodeName" class="promo-code-name"><?php echo Yii::app()->shoppingcart->promoCode ?></span></th>
+			<td><span id="PromoCodeStr" class="promo-code-str"><?php echo Yii::app()->shoppingcart->totalDiscountFormatted ?></span></td>
 		</tr>
 
 		<?php $this->renderPartial('_checkout-taxes', array('cart' => Yii::app()->shoppingcart, 'selectedCartScenario' => $selectedCartScenario, 'confirmation' => false)); ?>

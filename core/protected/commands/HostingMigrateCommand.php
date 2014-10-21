@@ -219,7 +219,7 @@ class HostingMigrateCommand extends MigrateCommand
 						    ON DELETE NO ACTION
 						    ON UPDATE NO ACTION)
 						ENGINE = InnoDB  DEFAULT CHARSET=utf8;"; break;
-				case 413: $sql = "INSERT IGNORE INTO `xlsws_configuration` (title,key_name,key_value,helper_text,configuration_type_id,sort_order,created,template_specific,param)  VALUES ('LightSpeed Cloud Account','LIGHTSPEED_CLOUD','0','The Account number for LightSpeed Cloud',0,0,'2013-10-01',0,1);"; break;
+				case 413: $sql = "INSERT IGNORE INTO `xlsws_configuration` (title,key_name,key_value,helper_text,configuration_type_id,sort_order,created,template_specific,param)  VALUES ('Lightspeed Retail Account','LIGHTSPEED_CLOUD','0','The Account number for Lightspeed Retail',0,0,'2013-10-01',0,1);"; break;
 				case 415: $sql = "INSERT IGNORE INTO `xlsws_configuration` (title,key_name,key_value,helper_text,configuration_type_id,sort_order,created,template_specific,param) VALUES ('LightSpeed Multitenant Mode','LIGHTSPEED_MT','0','Flag for MT',0,0,'2013-10-01',0,1);"; break;
 				case 418: $sql = "UPDATE IGNORE xlsws_modules set category='theme' where category='template';"; break;
 				case 419: $sql = "CREATE TABLE IF NOT EXISTS `xlsws_images_cloud` ( `id` int(11) unsigned NOT NULL AUTO_INCREMENT, `image_id` bigint(20) unsigned NOT NULL, `cloud_image_id` bigint(20) unsigned NOT NULL, `cloudinary_public_id` varchar(100) DEFAULT NULL, `cloudinary_cloud_name` varchar(100) DEFAULT NULL, `cloudinary_version` bigint(20) unsigned DEFAULT NULL, PRIMARY KEY (`id`), KEY `image_id` (`image_id`), KEY `cloud_image_id` (`cloud_image_id`), CONSTRAINT `xlsws_images_cloud_ibfk_1` FOREIGN KEY (`image_id`) REFERENCES `xlsws_images` (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;"; break;

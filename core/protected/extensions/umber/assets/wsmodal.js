@@ -126,6 +126,17 @@ $(document).on(clickevent, function(e) {
     }
 });
 
+$(document).on('click', ".webstore-modal-close, .continue-shopping", function()  {
+    hideModal();
+});
+
+$(document).on('click', ".webstore-change-item", function()  {
+    hideModal();
+    setTimeout(function(){
+        showEditCartModal();
+    }, 1125);
+});
+
 // This ensures that back and forward buttons work correctly with the editcart modal
 $(function() {
     if (typeof History !== 'undefined' && typeof History.pushState !== 'undefined') {

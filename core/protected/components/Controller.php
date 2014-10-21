@@ -260,7 +260,7 @@ class Controller extends CController
 
 
 		Yii::app()->clientScript->registerMetaTag(
-			"LightSpeed Web Store " . XLSWS_VERSION,
+			"Lightspeed Web Store " . XLSWS_VERSION,
 			'generator',
 			null,
 			array(),

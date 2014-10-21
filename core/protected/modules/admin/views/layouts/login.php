@@ -8,15 +8,17 @@
 		.container { width: 338px; }
 
 		.header {
-			background: url("//www.lightspeedretail.com/wp-content/themes/lightspeed/images/ecommerce/tab-1.png");
+			background-image: url("/images/webstore-logo2x.png");
+			background-size: 338px 76px;
+			background-repeat: no-repeat;
+			display: block;
 			width: 338px;
-			height: 50px;
+			height: 76px;
 		}
 
 		.form {
 			padding: 15px 0px 5px 35px;
 			margin-top: 20px;
-			/*border: 1px solid #0077b3;*/
 			border-radius: 10px;
 			background-color: #f9f9f9;
 		}
@@ -34,7 +36,7 @@
 			color: #ffffff;
 			font-weight: bold;
 			padding: 10px 20px;
-			background-color: rgb(87,146,255);
+			background-color: #3287cc;
 			border-radius: 8px;
 			border: 0px;
 			transition: all 0.5s ease 0s;
@@ -43,7 +45,7 @@
 		input[type="submit"]:hover,
 		input[type="submit"]:focus,
 		#admin-login:hover,
-		#admin-login:focus {background-color: #000099;}
+		#admin-login:focus {background-color: #286ca3;}
 
 	</style>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>

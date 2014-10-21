@@ -16,8 +16,16 @@ class wseditcartmodal extends wsmodal
 
 		$cs->registerCssFile('//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css');
 		$cs->registerCssFile($assets . '/css/wseditcartmodal.css');
-		$cs->registerScriptFile($assets . '/js/wseditcartmodal.js');
 		$this->widget('ext.jquery-history-js.jqueryHistoryJs');
+
+		Yii::app()->clientScript->registerScript(
+			'instantiate checkout',
+			'
+			$(document).ready(function () {
+				checkout = new Checkout('.Checkout::getCheckoutJSOptions().');
+				});',
+			CClientScript::POS_HEAD
+		);
 
 		Yii::app()->clientScript->registerScript(
 			'editable',
@@ -38,8 +46,9 @@ class wseditcartmodal extends wsmodal
 							dataType: 'json',
 							success: function(data) {
 								if(data.action=='success') {
-									wseditcartmodal.redrawCart(JSON.parse(data.cartitems));
-
+									var shoppingCart = JSON.parse(data.cartitems);
+									checkout.redrawCart(shoppingCart, " . json_encode(CHtml::activeId('EditCart','promoCode')) . ");
+									$('#cartItemsTotal').text(shoppingCart.totalItemCount);
 									// Update the shipping estimate.
 									if (typeof wsShippingEstimator !== 'undefined') {
 										wsShippingEstimator.calculateShippingEstimates();
@@ -49,7 +58,7 @@ class wseditcartmodal extends wsmodal
 									var qty = $('#' + pk);
 									qty.val(data.availQty);
 									qty.change();
-									wseditcartmodal.tooltip.createTooltip(pk, '<strong>Only ' + data.availQty + ' are available at this time.</strong><br> If you’d like to order more please return at a later time or contact us.');
+									checkout.createTooltip(pk, '<strong>Only ' + data.availQty + ' are available at this time.</strong><br> If you’d like to order more please return at a later time or contact us.');
 								}
 								else {
 									alert(data.errormsg);

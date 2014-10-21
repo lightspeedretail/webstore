@@ -8,7 +8,7 @@ class ThemeForm extends CFormModel
 	protected $version = "0"; //use single digits, not 0.0.0
 	protected $description = "";
 	protected $noupdate = false;
-	protected $credit = "Designed by LightSpeed";
+	protected $credit = "Designed by Lightspeed";
 
 	protected $GoogleFonts; // use this value to load Google Fonts for your design, i.e. $GoogleFonts = "Tangerine|Inconsolata|Droid+Sans"
 	protected $bootstrap = "bootstrap2"; // use this value to load new bootstrap i.e. $bootstrap = "bootstrap3" or "none";
@@ -32,7 +32,7 @@ class ThemeForm extends CFormModel
 	/**
 	 * Store custom.css in custom folder.
 	 *
-	 * For stock themes from LightSpeed, save custom.css into the custom folder instead of the
+	 * For stock themes from Lightspeed, save custom.css into the custom folder instead of the
 	 * theme folder, so upgrades can be done more easily. If this is missing or false,
 	 * custom.css will be expected to be with the other css files in /css
 	 */

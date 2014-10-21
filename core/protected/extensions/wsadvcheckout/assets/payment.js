@@ -1,6 +1,6 @@
 $('input[name="MultiCheckoutForm[billingPostal]"]').on('keyup', function(e) {
 
-    var country = $("#MultiCheckoutForm_billingCountryCode :selected").val();
+    var country = $("#MultiCheckoutForm_billingCountry :selected").attr('code');
 
     if(this.value.length > 2) {
         zippothatnow(this.value, country);

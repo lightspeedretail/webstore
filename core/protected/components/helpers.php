@@ -95,16 +95,15 @@ function downloadTheme($strTheme)
 	$jLatest= getFile("http://"._xls_get_conf('LIGHTSPEED_UPDATER','updater.lightspeedretail.com')."/site/latesttheme/".XLSWS_VERSIONBUILD."/".$strTheme);
 	$result = json_decode($jLatest);
 	if(empty($result))
-	{   Yii::log("ERROR attempting to locate latesttheme ".$strTheme." from LightSpeed", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+	{   Yii::log("ERROR attempting to locate latesttheme ".$strTheme." from Lightspeed", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		return false;
 	}
 
-	Yii::log('Line: '.__LINE__."\n".print_r($result,true), 'error', __FUNCTION__);
 	$strWebstoreInstall = "http://cdn.lightspeedretail.com/webstore/themes/".$result->latest->filename;
 
 	$data = getFile($strWebstoreInstall);
 	if (stripos($data,"404 - Not Found")>0 || empty($data)){
-		Yii::log("ERROR downloading theme ".$strTheme." from LightSpeed CDN", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		Yii::log("ERROR downloading theme ".$strTheme." from Lightspeed CDN", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		return false;
 	}
 
@@ -1568,7 +1567,7 @@ function _xls_get_formatted_page_title($title,$meta = null) {
 		Yii::t('global',$meta,
 		array(
 			'{name}'=>$title,
-			'{storename}'=>_xls_get_conf('STORE_NAME','LightSpeed Web Store'),
+			'{storename}'=>_xls_get_conf('STORE_NAME','Lightspeed Web Store'),
 			'{storetagline}'=>_xls_get_conf('STORE_TAGLINE','Amazing products available to order online!'),
 		));
 
@@ -1586,7 +1585,7 @@ function _xls_format_email_subject($key='EMAIL_SUBJECT_CUSTOMER',$customer="", $
 		array(
 			'{customername}'=>$customer,
 			'{orderid}'=>$orderid,
-			'{storename}'=>_xls_get_conf('STORE_NAME','LightSpeed Web Store'),
+			'{storename}'=>_xls_get_conf('STORE_NAME','Lightspeed Web Store'),
 		));
 }
 

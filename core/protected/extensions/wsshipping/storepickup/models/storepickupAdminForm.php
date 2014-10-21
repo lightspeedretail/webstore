@@ -32,7 +32,7 @@ class storepickupAdminForm extends CFormModel
 			'offerservices'=>'Order Message',
 			'markup'=>'Handling Fee ($)',
 			'restrictcountry'=>'Only allow this carrier to',
-			'product'=>'LightSpeed Product Code (case sensitive)',
+			'product'=>'Lightspeed Product Code (case sensitive)',
 		);
 	}
 

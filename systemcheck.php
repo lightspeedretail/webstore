@@ -39,7 +39,7 @@ function displayHeader()
 
 	<div class="header-new">
 		<div class="header-inner">
-			<div class="logo"><img src="http://www.lightspeedretail.com/wp-content/themes/lightspeed/images/logo-mini.png" alt="LightSpeed"></div>
+			<div class="logo"><img src="http://www.lightspeedretail.com/wp-content/themes/lightspeed/images/logo-mini.png" alt="Lightspeed"></div>
 		</div>
 	</div>
 	<div class="container">

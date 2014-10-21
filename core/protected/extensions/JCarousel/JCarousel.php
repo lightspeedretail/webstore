@@ -378,7 +378,7 @@ class JCarousel extends CBaseListView
 	public $titleText;
 
 	/**
-	 * Added by LightSpeed - caption text that will appear below the photo, wrapped in a DIV using class "caption"
+	 * Added by Lightspeed - caption text that will appear below the photo, wrapped in a DIV using class "caption"
 	 * @var string
 	 */
 	public $captionText;

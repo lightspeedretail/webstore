@@ -229,8 +229,8 @@ class InstallForm extends CFormModel
 	public function getPage4()
 	{
 		return array(
-			'title'=> Yii::t('admin','Finally, enter your email server settings. {LightSpeed} Click for standard settings for: <a href=\'javascript:setupMail("smtp");\'>Standard SMTP</a>, <a href=\'javascript:setupMail("gmail");\'>Gmail</a>, <a href=\'javascript:setupMail("godaddy");\'>Godaddy</a>',
-					array('{LightSpeed}'=>_xls_get_conf('LIGHTSPEED_CLOUD',0)>0 ? '' : "These are generally identical to LightSpeed's setup in Tools->Setup->Advanced->Email." )),
+			'title'=> Yii::t('admin','Finally, enter your email server settings. {Lightspeed} Click for standard settings for: <a href=\'javascript:setupMail("smtp");\'>Standard SMTP</a>, <a href=\'javascript:setupMail("gmail");\'>Gmail</a>, <a href=\'javascript:setupMail("godaddy");\'>Godaddy</a>',
+					array('{Lightspeed}'=>_xls_get_conf('LIGHTSPEED_CLOUD',0)>0 ? '' : "These are generally identical to Lightspeed's setup in Tools->Setup->Advanced->Email." )),
 
 			'elements'=>array(
 				'EMAIL_SMTP_SERVER'=>array(

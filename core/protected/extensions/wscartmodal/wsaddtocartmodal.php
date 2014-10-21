@@ -25,7 +25,15 @@ class wsaddtocartmodal extends wsmodal
 		$assets = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'assets', false, -1, true);
 		$cs = Yii::app()->clientScript;
 		$cs->registerCssFile($assets . '/css/wsaddtocartmodal.css');
-		$cs->registerScriptFile($assets . '/js/wsaddtocartmodal.js');
+
+		Yii::app()->clientScript->registerScript(
+			'instantiate checkout',
+			'
+			$(document).ready(function () {
+				checkout = new Checkout('.Checkout::getCheckoutJSOptions().');
+				});',
+			CClientScript::POS_HEAD
+		);
 
 		// No item added to cart.
 		if(empty($this->objCartItem))

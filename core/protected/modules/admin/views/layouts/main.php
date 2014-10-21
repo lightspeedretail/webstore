@@ -6,6 +6,8 @@
 	    <meta name="description" content="">
 	    <meta name="author" content="">
 
+		<link rel="shortcut icon" href="<?=Yii::app()->baseUrl.'/images/favicon-32x32.png' ?>"/>
+
 	    <!-- Le styles -->
 	    <style type="text/css">
 	        body {

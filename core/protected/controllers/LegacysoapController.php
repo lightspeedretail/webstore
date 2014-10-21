@@ -1,6 +1,6 @@
 <?php
 /**
- * This controller only exists for backwards compatibility to let older LightSpeed talk to Web Store
+ * This controller only exists for backwards compatibility to let older Lightspeed talk to Web Store
  * per the old WSDL
  *
  * @category   Controller
@@ -671,7 +671,7 @@ class LegacySoapController extends Controller
 		else
 			$objProduct->inventory_avail=($fltInventory-$fltReserved);
 
-		//Because LightSpeed may send us products out of sequence (child before parent), we have to turn this off
+		//Because Lightspeed may send us products out of sequence (child before parent), we have to turn this off
 		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=0;')->execute();
 		if (!$objProduct->save()) {
 
@@ -2390,7 +2390,7 @@ class LegacySoapController extends Controller
 		}
 
 		/**
-		LightSpeed will send commands to flush the following tables
+		Lightspeed will send commands to flush the following tables
 		Product
 		Category
 		Tax
@@ -2558,7 +2558,7 @@ class LegacySoapController extends Controller
 				$objCart->delete();
 			}
 
-			//Delete any Web Orders that have been reuploaded from LightSpeed already
+			//Delete any Web Orders that have been reuploaded from Lightspeed already
 			$objCarts = Cart::model()->findAll("cart_type = :type AND status<>:status1 AND status<>:status2 AND status<>:status3",
 				array(':type'=>CartType::order,
 					':status1'=>OrderStatus::AwaitingPayment,
@@ -2588,7 +2588,7 @@ class LegacySoapController extends Controller
 
 
 	/**
-	 * Send the WSDL to the calling process (LightSpeed). This is a copy of the original WSDL generated
+	 * Send the WSDL to the calling process (Lightspeed). This is a copy of the original WSDL generated
 	 * by the old Web Store. To maintain backwards compatibility, we send this and convert calls into the new format
 	 * via this Legacy file. Cool, huh.
 	 */

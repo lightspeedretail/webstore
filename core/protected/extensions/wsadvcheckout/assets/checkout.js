@@ -61,15 +61,18 @@ Checkout.prototype.ajaxApplyPromoCode = function (cartId) {
             } else if (data.action === 'success') {
                 var shoppingCart = JSON.parse(data.shoppingCart);
                 $('.webstore-promo-line').show();
-                $('#PromoCodeLine').show();
                 var $this = $('.promocode-apply');
                 $this.addClass('promocode-applied');
-                $('#totalCart').html(shoppingCart['totalFormatted']);
-                $('#CartSubtotal').html(shoppingCart['subtotalFormatted']);
-                $('#PromoCodeStr').html(shoppingCart['totalDiscountFormatted']);
                 $this.html(this.removeButtonLabel);
-                this.redrawCart(JSON.parse(data.shoppingCart));
+                this.redrawCart(shoppingCart, cartId);
                 $('#' + cartId).prop('readonly', true);
+                $('.promo-code-value').prop('value', promoCodeValue);
+                // Remove the promo and discount line when the cart is empty.
+                if (shoppingCart.cartItems.length === 0) {
+                    this.ajaxRemovePromoCode(cartId);
+                    $('.webstore-promo-line').remove();
+                }
+
             }
         }.bind(this)
     });
@@ -86,13 +89,8 @@ Checkout.prototype.ajaxRemovePromoCode = function (cartId) {
         url: '/cart/modalremovepromocode',
         dataType: 'json',
         success: function(data) {
-            var $this = $('.promocode-apply');
-            $this.removeClass('promocode-applied');
-            $('.webstore-promo-line').hide();
-            $this.html(this.applyButtonLabel);
-            $('#'+cartId).val('');
-            this.redrawCart(JSON.parse(data.shoppingCart));
-            $('#' + cartId).prop('readonly', false);
+            this.clearPromoCode(cartId);
+            this.redrawCart(JSON.parse(data.shoppingCart), cartId);
         }.bind(this)
     });
 };
@@ -103,10 +101,10 @@ Checkout.prototype.ajaxRemovePromoCode = function (cartId) {
  * @param cartId the id of cart section in the DOM
  * @return {undefined}
  */
-Checkout.prototype.ajaxTogglePromoCodeEnterKey = function(event, cartId){
-    if (event.keyCode === 13) {
+Checkout.prototype.ajaxTogglePromoCodeEnterKey = function(e, cartId){
+    if (e.keyCode === 13) {
         this.ajaxTogglePromoCode(cartId);
-        event.preventDefault();
+        e.preventDefault();
     }
 };
 
@@ -116,7 +114,7 @@ Checkout.prototype.ajaxTogglePromoCodeEnterKey = function(event, cartId){
  * @param shoppingCart data that we get back from the shopping cart model as json
  * @return {undefined}
  */
-Checkout.prototype.redrawCart = function(shoppingCart) {
+Checkout.prototype.redrawCart = function(shoppingCart, cartId) {
     var rowBaseId = 'cart_row_',
         cartHasDiscount = false;
 
@@ -168,27 +166,40 @@ Checkout.prototype.redrawCart = function(shoppingCart) {
         }
     });
 
-    $('#taxTotal').html(shoppingCart.taxTotalFormatted);
-    $('#CartSubtotal').html(shoppingCart.subtotalFormatted);
-    $('#totalCart').html(shoppingCart.totalFormatted);
+    $('.cart-subtotal').html(shoppingCart.subtotalFormatted);
+    $('.shipping-estimate').html(shoppingCart.formattedShippingPrice);
+    $('.total-estimate').html(shoppingCart.totalFormatted);
+
+    // Taxes
+    $('.tax1-estimate').html(shoppingCart.formattedCartTax1);
+    $('.tax2-estimate').html(shoppingCart.formattedCartTax2);
+    $('.tax3-estimate').html(shoppingCart.formattedCartTax3);
+    $('.tax4-estimate').html(shoppingCart.formattedCartTax4);
+    $('.tax5-estimate').html(shoppingCart.formattedCartTax5);
+    $('.tax-estimate').html(shoppingCart.taxTotalFormatted);
 
     // If any kind of discount is applied in the cart, return its total in
     // dollars in the total section.
     if (cartHasDiscount) {
-        $('#PromoCodeLine').removeClass('hide-me');
-    }
-
-    // Remove the promo and discount line when the cart is empty.
-    if (shoppingCart.cartItems.length === 0) {
-        $('.webstore-promo-line').remove();
-        $('#PromoCodeLine').remove();
+        $('.webstore-promo-line').removeClass('hide-me');
     }
 
     // If valid promo code was applied display its name in the total section.
     if (typeof shoppingCart.promoCode === 'string' && shoppingCart.promoCode !== '' ) {
-        $('#PromoCodeLine').removeClass('hide-me');
-        $('#PromoCodeName').html(shoppingCart.promoCode);
-        $('#PromoCodeStr').html(shoppingCart.totalDiscountFormatted);
+        $('.webstore-promo-line').removeClass('hide-me');
+        $('.promo-code-name').html(shoppingCart.promoCode);
+        $('.promo-code-str').html(shoppingCart.totalDiscountFormatted);
+    }
+
+    // if purchase is below the minimum amount and promo code was applied, clear the promo code
+    if (shoppingCart.promoCode === null && $('.promocode-apply').hasClass('promocode-applied')) {
+        this.clearPromoCode(cartId);
+        $('#' + cartId + '_em_')
+            .find('p')
+            .text(cart.INVALID_PROMOCODE)
+            .end()
+            .hide()
+            .fadeIn();
     }
 };
 
@@ -211,6 +222,16 @@ Checkout.prototype.ajaxClearCart = function () {
     });
 };
 
+
+Checkout.prototype.clearPromoCode = function(cartId) {
+    var $this = $('.promocode-apply');
+    $this.removeClass('promocode-applied');
+    $('.webstore-promo-line').hide();
+    $this.html(cart.PROMOCODE_APPLY);
+    $('#' + cartId).val('');
+    $('#' + cartId).prop('readonly', false);
+}
+
 /**
  * Displays a tooltip when the user try to add a quantity for a product
  * that exceeds the quantity available
@@ -228,7 +249,7 @@ Checkout.prototype.createTooltip = function(targetId, message) {
     tooltip.offset({top: targetOffset.top - tooltip.height() / 2 - 50, left: targetOffset.left - tooltip.width() / 2});
     setTimeout(function() {
         $(".alert-tooltip").fadeOut(500, function() {$(this).remove();});
-    }, 4000)
+    }, 4000);
 };
 
 /**
@@ -240,9 +261,9 @@ Checkout.prototype.adjustPosition = function() {
     var targetId = this.targetId;
     var target = $('#' + targetId);
     var targetOffset = target.offset();
-    if (targetOffset != null)
+    if (targetOffset !== null) {
         tooltip.offset({top: targetOffset.top - tooltip.height() / 2 - 50, left: targetOffset.left - tooltip.width() / 2});
-
+    }
 };
 
 // END of Checkout();
@@ -346,7 +367,7 @@ OrderSummary.prototype.updateOrderSummary = function() {
 
 /**
  * Informs web store about the current shipping option choice.
- * TODO: remove duplication between this file and WsShippingEstimator.js.
+ * TODO: remove duplication between this file and ConfirmationShippingEstimator.js.
  */
 OrderSummary.prototype.postShippingChoice = function() {
     if (this.providerId === null || this.priorityLabel === null) {

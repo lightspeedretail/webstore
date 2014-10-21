@@ -32,6 +32,13 @@
 
 		Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->cssUrl(Yii::app()->theme->config->CHILD_THEME));
 		Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->cssUrl('custom'));
+
+		Yii::app()->clientScript->registerScriptFile(
+			Yii::app()->getAssetManager()->publish(
+				Yii::getPathOfAlias('ext.wsadvcheckout').'/assets/checkout.js'
+			),
+			CClientScript::POS_HEAD
+		);
 	?>
 
 	<?php $this->widget('ext.wsiosorientationbugfix.iosorientationbugfix'); ?>

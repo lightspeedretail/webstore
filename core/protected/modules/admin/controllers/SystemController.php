@@ -191,7 +191,7 @@ class SystemController extends AdminBaseController
 		}
 
 		if ($success)
-			Yii::app()->user->setFlash('success',Yii::t('admin','Done. This option has removed any categories and families you deleted in LightSpeed that may have been left on Web Store. {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
+			Yii::app()->user->setFlash('success',Yii::t('admin','Done. This option has removed any categories and families you deleted in Lightspeed that may have been left on Web Store. {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
 
 		$this->render("purge");
 

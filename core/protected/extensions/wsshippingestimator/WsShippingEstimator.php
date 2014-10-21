@@ -117,6 +117,11 @@ class WsShippingEstimator extends CWidget
 						'shippingLabel',
 						'formattedShippingPrice',
 						'formattedCartTax',
+						'formattedCartTax1',
+						'formattedCartTax2',
+						'formattedCartTax3',
+						'formattedCartTax4',
+						'formattedCartTax5',
 						'formattedCartTotal',
 					)
 				)

@@ -92,7 +92,7 @@ $(function () {
             $('input[type="email"]').focus();
             return false;
 
-            // If login form is visible and not in "reset password" mode validate password field
+        // If login form is visible and not in "reset password" mode validate password field
         } else if (
             $('footer .login').hasClass('invisible') === false &&
             loginButton.hasClass("is-login") &&
@@ -288,6 +288,11 @@ $(function () {
 
         var form = $('form');
 
+        // only click cancel if we're on the "forgot password" screen
+        var $cancel= $('.cancel');
+        if ($("#login-button").hasClass("is-login") === false && $cancel.length > 0) {
+            $cancel.trigger("click");
+        }
         // Activate 'Guest' validation
         $('#IsGuest').prop('checked', true);
         $('#IsGuest').prop('value', 1);
@@ -301,24 +306,15 @@ $(function () {
 
         login.formTitleText(login.GUEST_CHECKOUT_TITLE);
 
-        if ($('#LoginForm_email').val() === "") {
-            $('#LoginForm_email').focus();
-            login.renderError(form, login.EMAIL_REQUIRED);
-        }
-        else if ($('#LoginForm_email')[0].validity.valid === false) {
-            login.renderError(form, login.INVALID_EMAIL);
-            $('#LoginForm_email').focus();
-        }
-        else {
-            // Change to 'Guest Checkout' button
-            login.changeFooter('guest');
+        // Change to 'Guest Checkout' button
+        login.changeFooter('guest');
 
-            // Flip to password reset
-            var password_block = $('.password-block');
-            password_block.find('.step1').addClass('front');
-            password_block.find('.step2, .step3').removeClass('front');
-            password_block.removeClass('flip');
-        }
+        // Flip to password reset
+        var password_block = $('.password-block');
+        password_block.find('.step1').addClass('front');
+        password_block.find('.step2, .step3').removeClass('front');
+        password_block.removeClass('flip');
+
         return false;
     });
 

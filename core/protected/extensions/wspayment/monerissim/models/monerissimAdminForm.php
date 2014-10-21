@@ -34,7 +34,7 @@ class monerissimAdminForm extends CFormModel
 			'hpp_key' => 'HPP Key',
 			'live' => 'Deployment Mode',
 			'restrictcountry' => 'Only allow this processor',
-			'ls_payment_method' => 'LightSpeed Payment Method',
+			'ls_payment_method' => 'Lightspeed Payment Method',
 		);
 	}
 

@@ -160,15 +160,17 @@ h3 { margin-top: 2px; }
 
 .lslogo {
     float: left;
-    background: url("/images/logo_white.png") no-repeat scroll 12px 8px rgb(61,137,209);
-    background-size: auto 20px;
-    width: 110px; height: 35px;
-    margin-left: -20px;
+    margin-left: -10px;
+    margin-top:5px;
     margin-right: 20px;
-    transition-property: background;
-    transition-duration: 0.4s;
+    background-image: url("/images/ls-logo1002x.png");
+    background-size: 100px 23px;
+    background-repeat: no-repeat;
+    display: block;
+    width: 100px;
+    height: 23px;
 }
-.lslogo:hover { background-color: #155183; }
+
 .backToSite {
     background-color: #428bca;
     color: #fff;
@@ -231,7 +233,7 @@ textarea.narrow {
 	max-width: 240px;
 }
 
-@media only screen and (max-width: 1001px) { /* through LightSpeed */
+@media only screen and (max-width: 1001px) { /* through Lightspeed */
     body { font-size: 13px;}
     input[type="text"] {  width: 200px; }
     #xlsSearch { width: 100px; }

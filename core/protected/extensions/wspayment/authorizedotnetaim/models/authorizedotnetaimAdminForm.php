@@ -37,7 +37,7 @@ class authorizedotnetaimAdminForm extends CFormModel
 			'ccv'=>'Use CCV code Verification',
 			'specialcode'=>'Special Transaction Code (if any)',
 			'restrictcountry'=>'Only allow this processor',
-			'ls_payment_method'=>'LightSpeed Payment Method',
+			'ls_payment_method'=>'Lightspeed Payment Method',
 		);
 	}
 

@@ -7,7 +7,7 @@ class paypalpro extends WsPayment
 	protected $version = 1.0;
 	protected $uses_credit_card = true;
 	protected $apiVersion = 1;
-	public $advancedMode=true;
+	public $advancedMode = true;
 
 
 	/**

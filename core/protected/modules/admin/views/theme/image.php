@@ -4,7 +4,7 @@
 		<h3><?php echo Yii::t('admin','Manage Header and Uploaded Images'); ?></h3>
 		<div class="editinstructions">
 			<?php echo Yii::t('admin','Upload images here to be used as your header image, and with themes that require additional images.'); ?>
-			<?php  if(Yii::app()->user->fullname=="LightSpeed")
+			<?php  if(Yii::app()->user->fullname=="Lightspeed")
 				echo "<p><strong>".Yii::t('admin','To upload a new image, drag and drop a file on top of the Add button. NOTE: You can also log into Admin Panel externally at {url} to use the Add button normally.',array('{url}'=>$this->createAbsoluteUrl("/admin")))."</strong></p>";
 			else
 				echo Yii::t('admin','To upload a new image to add to your collection, click Add and select your file.');

@@ -118,7 +118,7 @@ class wsphoto extends ApplicationComponent
 		if(!is_null($objImageThumbnail))
 			return;
 
-		//Get our original file from LightSpeed
+		//Get our original file from Lightspeed
 		$strOriginalFile=$objImage->image_path;
 		$strTempThumbnail = Images::GetImageName($strOriginalFile, $intNewWidth, $intNewHeight,'temp');
 		$strNewThumbnail = Images::GetImageName($strOriginalFile, $intNewWidth, $intNewHeight);

@@ -82,7 +82,7 @@ class ThemeController extends AdminBaseController
 		switch($id)
 		{
 			case self::THEME_PHOTOS:
-				return "Note that these settings are used as photos are uploaded from LightSpeed. These sizes are saved for each theme.";
+				return "Note that these settings are used as photos are uploaded from Lightspeed. These sizes are saved for each theme.";
 		}
 	}
 
@@ -136,7 +136,7 @@ class ThemeController extends AdminBaseController
 							'error',
 							Yii::t(
 								'admin',
-								'{file} is a default theme. Default LightSpeed Web Store themes cannot be trashed.',
+								'{file} is a default theme. Default Lightspeed Web Store themes cannot be trashed.',
 								array('{file}'=>"<strong>".$themename."</strong>"
 								)
 							)

@@ -42,7 +42,7 @@
 						<tbody>
 							<tr>
 								<th colspan="2"><?php echo Yii::t('cart','Order Subtotal'); ?></th>
-								<td id="addtocart-ordersubtotal" class="money"><?php echo _xls_currency(Yii::app()->shoppingcart->subtotal) ?></td>
+								<td id="addtocart-ordersubtotal" class="money cart-subtotal"><?php echo _xls_currency(Yii::app()->shoppingcart->subtotal) ?></td>
 							</tr>
 							<?php
 								$this->widget(
@@ -53,13 +53,13 @@
 
 							<tr id="PromoCodeLine" class="<?php echo Yii::app()->shoppingcart->promoCode ? 'webstore-promo-line' : 'webstore-promo-line hide-me';?>" >
 								<td colspan="2"><?php echo Yii::t('cart','Promo & Discounts') ?></td>
-								<td id="addtocart-promodiscount" class="money"><?php echo Yii::app()->shoppingcart->totalDiscountFormatted; ?></td>
+								<td id="addtocart-promodiscount" class="money promo-code-str"><?php echo Yii::app()->shoppingcart->totalDiscountFormatted; ?></td>
 							</tr>
 						</tbody>
 						<tfoot>
 							<tr>
 								<th colspan="2"><?php echo Yii::t('cart','Total'); ?></th>
-								<td id="addtocart-subtotal" class="wsshippingestimator-total-estimate money"><?php echo _xls_currency($this->objCart->total); ?></td>
+								<td id="addtocart-subtotal" class="wsshippingestimator-total-estimate total-estimate money"><?php echo _xls_currency($this->objCart->total); ?></td>
 							</tr>
 						</tfoot>
 					</table>
@@ -81,8 +81,9 @@
 								CHtml::activeId($this->objCart,'promoCode'),
 								(Yii::app()->shoppingcart->promoCode !== null ? Yii::app()->shoppingcart->promoCode : ''),
 								array(
+									'class' => 'promo-code-value',
 									'placeholder' => Yii::t('cart','Enter Promo Code'),
-									'onkeypress' => 'return wsaddtocartmodal.ajaxTogglePromoCodeEnterKey(event, ' .
+									'onkeypress' => 'return checkout.ajaxTogglePromoCodeEnterKey(event, ' .
 										json_encode(CHtml::activeId($this->objCart,'promoCode')) .
 										');',
 									'readonly' => Yii::app()->shoppingcart->promoCode !== null
@@ -94,7 +95,7 @@
 								array(
 									'type' => 'button',
 									'class' => 'inset promocode-apply' . (Yii::app()->shoppingcart->promoCode !== null ? ' promocode-applied' : ''),
-									'onclick' => 'wsaddtocartmodal.ajaxTogglePromoCode(' .
+									'onclick' => 'checkout.ajaxTogglePromoCode(' .
 										json_encode(CHtml::activeId($this->objCart, 'promoCode')) .
 										');'
 								)

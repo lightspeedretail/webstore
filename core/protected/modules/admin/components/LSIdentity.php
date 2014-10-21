@@ -8,14 +8,14 @@
 class LSIdentity extends CUserIdentity
 {
 	/**
-	 * Authenticates LightSpeed direct login
+	 * Authenticates Lightspeed direct login
 	 */
 	private $_id;
 
 
 	public function authenticate()
 	{
-		//We're logging in directly from LightSpeed
+		//We're logging in directly from Lightspeed
 		$key = _xls_get_conf('LSKEY');
 		$passwords = array(
 			md5(gmdate('d') . $key),
@@ -28,8 +28,8 @@ class LSIdentity extends CUserIdentity
 		{
 			$this->errorCode = self::ERROR_NONE;
 			$this->_id = 1;
-			$this->setState('fullname', "LightSpeed");
-			$this->setState('firstname', "LightSpeed");
+			$this->setState('fullname', "Lightspeed");
+			$this->setState('firstname', "Lightspeed");
 			$this->setState('internal', true);
 
 			$this->setState('role', 'admin');

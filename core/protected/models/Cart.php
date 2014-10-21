@@ -664,7 +664,7 @@ class Cart extends BaseCart
 					$taxes = $objItem->product->CalculateTax(
 						TaxCode::GetDefault(), $objItem->sell);
 
-					// Taxes are deducted from cart for LightSpeed
+					// Taxes are deducted from cart for Lightspeed
 					$this->tax1 -= $taxes[1];
 					$this->tax2 -= $taxes[2];
 					$this->tax3 -= $taxes[3];

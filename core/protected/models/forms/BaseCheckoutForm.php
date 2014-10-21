@@ -373,7 +373,7 @@ class BaseCheckoutForm extends CFormModel
 
 		$objPaymentModule = Modules::model()->findByPk($this->paymentProvider);
 
-		if (Yii::app()->getComponent($objPaymentModule->module)->uses_credit_card)
+		if (Yii::app()->getComponent($objPaymentModule->module)->advancedMode)
 		{
 			switch ($attribute)
 			{

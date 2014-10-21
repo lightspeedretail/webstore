@@ -789,6 +789,9 @@ class CartController extends Controller
 						$objCustomer->mainphone = $model->contactPhone;
 						$objCustomer->email = $model->contactEmail;
 						$objCustomer->save();
+					} else {
+						$intCustomerId = $objCart->customer_id;
+						$objCustomer = Customer::model()->findByPk($intCustomerId);
 					}
 				} else {
 					$intCustomerId = Yii::app()->user->getId();
@@ -1023,8 +1026,8 @@ class CartController extends Controller
 				} else {
 					$arrPaymentResult = Yii::app()->getComponent($objPaymentModule->module)->setCheckoutForm($modelCheckout)->run();
 				}
-
 				// If we have a full Jump submit form, render it out here.
+
 				if (isset($arrPaymentResult['jump_form']))
 				{
 					Yii::log("Using payment jump form", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
@@ -1071,7 +1074,6 @@ class CartController extends Controller
 					//We have successful payment, so close out the order and show the receipt
 					$objCart->printed_notes .= $model->orderNotes;
 					$this->completeUpdatePromoCode();
-					$this->EmailReceipts($objCart);
 					$this->FinalizeCheckout($objCart);
 					return;
 				} else {
@@ -1344,6 +1346,8 @@ class CartController extends Controller
 
 		self::PostFinalizeHooks($objCart);
 
+		self::EmailReceipts($objCart);
+
 		if (!$blnBehindTheScenes)
 		{
 			//If we're behind a common SSL and we want to stay logged in
@@ -1416,9 +1420,9 @@ class CartController extends Controller
 
 						self::FinalizeCheckout($objCart, !Yii::app()->theme->info->advancedCheckout);
 
-						Yii::log('Checkout Finalized: ', 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
+						Yii::log('Checkout Finalized', 'info', __CLASS__.'.'.__FUNCTION__);
 						$this->EmailReceipts($objCart);
-						Yii::log('Receipts Emailed: ', 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
+						Yii::log('Receipts Emailed', 'info', __CLASS__.'.'.__FUNCTION__);
 
 						if (!isset($retVal['output']))
 						{
@@ -1540,12 +1544,12 @@ class CartController extends Controller
 	 * @param $objCart
 	 */
 	// @codingStandardsIgnoreStart
-	public function EmailReceipts($objCart)
+	public static function EmailReceipts($objCart)
 	// @codingStandardsIgnoreEnd
 	{
 		if (_xls_get_conf('EMAIL_SEND_CUSTOMER',0) == 1)
 		{
-			$strHtmlBody = $this->renderPartial(
+			$strHtmlBody = Yii::app()->controller->renderPartial(
 				'/mail/_customerreceipt',
 				array('cart' => $objCart),
 				true
@@ -1557,15 +1561,13 @@ class CartController extends Controller
 				$objCart->id_str
 			);
 
-			$objEmail = new EmailQueue;
+			$objEmail = new EmailQueue();
 
 			$objEmail->customer_id = $objCart->customer_id;
 			$objEmail->htmlbody = $strHtmlBody;
 			$objEmail->cart_id = $objCart->id;
 			$objEmail->subject = $strSubject;
 			$objEmail->to = $objCart->customer->email;
-
-			$objHtml = new HtmlToText;
 
 			// If we get back false, it means conversion failed which 99.9% of
 			// the time means improper HTML.
@@ -1580,7 +1582,7 @@ class CartController extends Controller
 
 		if (_xls_get_conf('EMAIL_SEND_STORE', 0) == 1)
 		{
-			$strHtmlBody = $this->renderPartial(
+			$strHtmlBody = Yii::app()->controller->renderPartial(
 				'/mail/_customerreceipt',
 				array('cart' => $objCart),
 				true
@@ -1600,8 +1602,6 @@ class CartController extends Controller
 			$objEmail->subject = $strSubject;
 			$orderEmail = _xls_get_conf('ORDER_FROM','');
 			$objEmail->to = empty($orderEmail) ? _xls_get_conf('EMAIL_FROM') : $orderEmail;
-
-			$objHtml = new HtmlToText;
 
 			// If we get back false, it means conversion failed which 99.9% of
 			// the time means improper HTML.
@@ -2067,8 +2067,15 @@ class CartController extends Controller
 			$checkoutForm->shippingPriority,
 			$checkoutForm->shippingCity,
 			$checkoutForm->shippingState,
-			$checkoutForm->shippingCountry
+			$checkoutForm->shippingCountryCode
 		);
+
+		$shippingEstimatorMessage = findWhere($wsShippingEstimatorOptions['messages'], array('code' => 'WARN'));
+		if ($shippingEstimatorMessage !== null)
+		{
+			$message = Yii::t('checkout', 'Your previous shipping selection is no longer available. Please choose an available shipping option.');
+			Yii::app()->user->setFlash('error', array($message));
+		}
 
 		// Save to session.
 		Shipping::saveCartScenariosToSession($arrCartScenario);

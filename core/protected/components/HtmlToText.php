@@ -10,7 +10,7 @@
  *    Jevon Wright - initial API and implementation
  ****************************************************************************/
 /*
-LightSpeed Notice: This file has been modified to incorporate functionality into a class.
+Lightspeed Notice: This file has been modified to incorporate functionality into a class.
 The original file can be sourced from http://journals.jevon.org/users/jevon-phd/entry/19818
 */
 /**

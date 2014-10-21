@@ -705,21 +705,36 @@ class ShoppingCart extends CApplicationComponent
 			case 'tax1Name':
 				return $this->model->tax1Name;
 
+			case 'formattedCartTax1':
+				return _xls_currency($this->model->tax1);
+
 			case 'tax2name':
 			case 'tax2Name':
 				return $this->model->tax2Name;
+
+			case 'formattedCartTax2':
+				return _xls_currency($this->model->tax2);
 
 			case 'tax3name':
 			case 'tax3Name':
 				return $this->model->tax3Name;
 
+			case 'formattedCartTax3':
+				return _xls_currency($this->model->tax3);
+
 			case 'tax4name':
 			case 'tax4Name':
 				return $this->model->tax4Name;
 
+			case 'formattedCartTax4':
+				return _xls_currency($this->model->tax4);
+
 			case 'tax5name':
 			case 'tax5Name':
 				return $this->model->tax5Name;
+
+			case 'formattedCartTax5':
+				return _xls_currency($this->model->tax5);
 
 			case 'tax_total':
 			case 'TaxTotal':
@@ -887,10 +902,15 @@ class ShoppingCart extends CApplicationComponent
 			'subtotal',
 			'subtotalFormatted',
 			'tax1',
+			'formattedCartTax1',
 			'tax2',
+			'formattedCartTax2',
 			'tax3',
+			'formattedCartTax3',
 			'tax4',
+			'formattedCartTax4',
 			'tax5',
+			'formattedCartTax5',
 			'taxCode',
 			'taxTotalFormatted',
 			'tax_inclusive',
@@ -914,6 +934,12 @@ class ShoppingCart extends CApplicationComponent
 		$response['totalFormatted'] = $this->totalFormatted;
 		$response['totalDiscountFormatted'] = $this->totalDiscountFormatted;
 
+		// Taxes
+		$response['formattedCartTax1'] = $this->formattedCartTax1;
+		$response['formattedCartTax2'] = $this->formattedCartTax2;
+		$response['formattedCartTax3'] = $this->formattedCartTax3;
+		$response['formattedCartTax4'] = $this->formattedCartTax4;
+		$response['formattedCartTax5'] = $this->formattedCartTax5;
 
 		$arrItems = $response['cartItems'];
 

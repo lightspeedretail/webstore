@@ -60,6 +60,9 @@
 								.done(function() {
 									wsShippingEstimator.toggleLoadingSpinner();
 									wsShippingEstimator.showScreen('choosing-shipping-option');
+								})
+								.fail(function()  {
+									wsShippingEstimator.toggleLoadingSpinner();
 								});"
 					)
 				);
@@ -120,6 +123,7 @@
 	echo CHtml::script(
 		'
 		var strCalculateButton = '. CJSON::encode(Yii::t('shipping', 'Calculate')) .';
+		var calculatingLabel = '. CJSON::encode(Yii::t('cart', 'Calculating...')) .';
 		$(document).ready(function () {
 			wsShippingEstimator = new WsShippingEstimator(' . $wsShippingEstimatorOptions . ');
 		});'

@@ -7,6 +7,7 @@ class WsPayment extends WsExtension
 
 	/**
 	 * Is this an Advanced Integration Method (AIM)?
+	 * Used for display purposes and checkoutform validation
 	 * @var bool
 	 */
 	public $advancedMode = false;

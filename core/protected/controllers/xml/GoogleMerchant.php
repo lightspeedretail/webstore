@@ -24,7 +24,7 @@ class GoogleMerchant extends CAction
 		echo ' <rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">'.chr(13);
 		echo '<channel>'.chr(13);
 
-		echo '		<title><![CDATA['._xls_get_conf('STORE_NAME','LightSpeed Web Store').']]></title>'.chr(13);
+		echo '		<title><![CDATA['._xls_get_conf('STORE_NAME','Lightspeed Web Store').']]></title>'.chr(13);
 		echo '		<link>'._xls_site_url().'</link>'.chr(13);
 		echo '		<description><![CDATA['._xls_get_conf('STORE_TAGLINE').']]></description>'.chr(13);
 

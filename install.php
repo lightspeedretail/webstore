@@ -980,7 +980,7 @@ function downloadLatest()
 		if(isset($_POST['debug'])) error_log("downloading $strWebstoreInstall",3,"error.txt");
 		$data = downloadFile($strWebstoreInstall);
 		if (stripos($data,"404 - Not Found")>0 || empty($data))
-			echo("ERROR downloading ".$result->latest->filename." from LightSpeed");
+			echo("ERROR downloading ".$result->latest->filename." from Lightspeed");
 		if(isset($_POST['debug'])) error_log("writing to to".$result->latest->filename,3,"error.txt");
 		$f=file_put_contents("webstore.zip", $data);
 		if(isset($_POST['debug'])) error_log("wrote to".$result->latest->filename,3,"error.txt");
@@ -990,7 +990,7 @@ function downloadLatest()
 			if(!isset($_POST['debug'])) @unlink("progress.txt");
 		}
 		else {
-			echo("ERROR downloading ".$result->latest->filename." from LightSpeed");
+			echo("ERROR downloading ".$result->latest->filename." from Lightspeed");
 		}
 	}
 }

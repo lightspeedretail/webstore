@@ -1,3 +1,12 @@
+<script>
+	var cart = <?php echo CJSON::encode(
+			array(
+				'INVALID_PROMOCODE' => Yii::t('checkout', 'Promo code is no longer applicable to this purchase.'),
+				'PROMOCODE_APPLY' => Yii::t('checkout', 'Apply')
+			)
+		);
+	?>
+</script>
 <div class="section-content" id="confirm">
 	<nav class="steps">
 		<ol>
@@ -200,7 +209,7 @@
 					<tbody>
 						<tr id="PromoCodeLine" class="<?php echo Yii::app()->shoppingcart->promoCode ? 'webstore-promo-line' : 'webstore-promo-line hide-me';?>" >
 							<th colspan='3'>
-								<?php echo Yii::t('cart','Promo & Discounts')." <td id=\"PromoCodeStr\">" . Yii::app()->shoppingcart->totalDiscountFormatted; ?></td>
+								<?php echo Yii::t('cart','Promo & Discounts').' <td id="PromoCodeStr" class="promo-code-str">' . Yii::app()->shoppingcart->totalDiscountFormatted; ?></td>
 							</th>
 						</tr>
 						<tr>
@@ -214,7 +223,7 @@
 
 					<tr class="total">
 						<th colspan='3'><?php echo Yii::t('cart','Total'); ?></th>
-						<td id="totalCart"><?php echo _xls_currency(Yii::app()->shoppingcart->total); ?></td>
+						<td id="totalCart" class="wsshippingestimator-total-estimate total-estimate"><?php echo _xls_currency(Yii::app()->shoppingcart->total); ?></td>
 					</tr>
 					</tbody>
 				</table>
@@ -223,11 +232,14 @@
 	</article>
 </div>
 <?php
+	$this->publishJS('confirmationShippingEstimator');
 	Yii::app()->clientScript->registerScript(
-		'instantiate checkout',
+		'instantiate checkout & wsEstimator',
 		'
+		var calculatingLabel = '. CJSON::encode(Yii::t('cart', 'Calculating...')) .';
 		$(document).ready(function () {
 			checkout = new Checkout('.Checkout::getCheckoutJSOptions().');
+			confirmationShippingEstimator = new ConfirmationShippingEstimator('.CJSON::encode($shippingEstimatorOptions).');
 		});',
 		CClientScript::POS_HEAD
 	);
@@ -250,8 +262,9 @@
 		                type: 'POST',
 		                dataType: 'json',
 		                success: function(data) {
-		                    if(data.action=='success') {
-		                        checkout.redrawCart(JSON.parse(data.cartitems));
+		                    if(data.action == 'success') {
+		                        checkout.redrawCart(JSON.parse(data.cartitems), " . json_encode(CHtml::activeId('Confirmation','promoCode')) . ");
+		                        confirmationShippingEstimator.calculateShippingEstimates();
 		                    }
 		                    else if(data.errorId === 'invalidQuantity'){
 		                        var qty = $('#' + pk);

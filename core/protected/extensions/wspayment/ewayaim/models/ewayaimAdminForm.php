@@ -30,7 +30,7 @@ class ewayaimAdminForm extends CFormModel
 			'login'=>'Login ID',
 			'live'=>'Deployment Mode',
 			'restrictcountry'=>'Only allow this processor',
-			'ls_payment_method'=>'LightSpeed Payment Method',
+			'ls_payment_method'=>'Lightspeed Payment Method',
 		);
 	}
 

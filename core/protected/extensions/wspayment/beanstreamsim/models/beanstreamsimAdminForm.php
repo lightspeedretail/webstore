@@ -31,7 +31,7 @@ class beanstreamsimAdminForm extends CFormModel
 			'login'=>'Merchant ID',
 			'sha1hash'=>'Optional SHA-1 Hash Key',
 			'restrictcountry'=>'Only allow this processor',
-			'ls_payment_method'=>'LightSpeed Payment Method',
+			'ls_payment_method'=>'Lightspeed Payment Method',
 		);
 	}
 

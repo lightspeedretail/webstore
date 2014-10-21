@@ -425,10 +425,6 @@ class CheckoutController extends Controller
 
 					$this->redirect($this->createUrl('/checkout/final'));
 				}
-				else
-				{
-					$error = $this->formatErrors($this->errors);
-				}
 			}
 			else
 			{
@@ -437,7 +433,6 @@ class CheckoutController extends Controller
 					'error',
 					'application.'.__CLASS__.'.'.__FUNCTION__
 				);
-				$error = $this->formatErrors($this->errors);
 			}
 		}
 
@@ -452,6 +447,8 @@ class CheckoutController extends Controller
 		{
 			Shipping::saveCartScenariosToSession($arrCartScenario);
 		}
+
+		$error = $this->formatErrors($this->errors);
 
 		$this->render(
 			'shippingoptions',
@@ -1061,7 +1058,38 @@ class CheckoutController extends Controller
 				$error = $this->formatErrors($arrErrors);
 			}
 
-			$this->render('confirmation', array('model' => $this->checkoutForm, 'cart' => $objCart, 'error' => $error));
+			try {
+				$arrCartScenario = Shipping::getCartScenarios($this->checkoutForm);
+			} catch (Exception $e) {
+				Yii::log('Unable to get cart scenarios: ' . $e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				$arrCartScenario = null;
+			}
+
+			if ($arrCartScenario !== null)
+			{
+				Shipping::saveCartScenariosToSession($arrCartScenario);
+			}
+
+			$wsShippingEstimatorOptions = WsShippingEstimator::getShippingEstimatorOptions(
+				$arrCartScenario,
+				$this->checkoutForm->shippingProvider,
+				$this->checkoutForm->shippingPriority,
+				$this->checkoutForm->shippingCity,
+				$this->checkoutForm->shippingState,
+				$this->checkoutForm->shippingCountryCode
+			);
+
+			$wsShippingEstimatorOptions['redirectToShippingOptionsUrl'] = Yii::app()->getController()->createUrl('shippingoptions');
+
+			$this->render(
+				'confirmation',
+				array(
+					'model' => $this->checkoutForm,
+					'cart' => $objCart,
+					'shippingEstimatorOptions' => $wsShippingEstimatorOptions,
+					'error' => $error
+				)
+			);
 		}
 	}
 
@@ -1180,11 +1208,11 @@ class CheckoutController extends Controller
 	{
 		if ($arrErrors !== null && is_array($arrErrors))
 		{
-			$arrAllErrors = $arrErrors + $this->checkoutForm->getErrors();
+			$arrAllErrors = $arrErrors + $this->checkoutForm->getErrors() + Yii::app()->user->getFlashes();
 		}
 		else
 		{
-			$arrAllErrors = $this->checkoutForm->getErrors();
+			$arrAllErrors = $this->checkoutForm->getErrors() + Yii::app()->user->getFlashes();
 		}
 
 		if (count($arrAllErrors) === 0)
@@ -1194,6 +1222,11 @@ class CheckoutController extends Controller
 
 		// $arrAllErrors is an array of array of errors.
 		$strErrors = _xls_convert_errors_display(_xls_convert_errors($arrAllErrors));
+
+		if (str_replace("\n", "", $strErrors) === "")
+		{
+			return null;
+		}
 
 		// Format errors for html display.
 		$strErrors = str_replace("\n", "<br>", $strErrors);
@@ -2004,6 +2037,7 @@ class CheckoutController extends Controller
 	{
 		// clear any existing shipping address info from the form
 		$this->checkoutForm->intShippingAddress = null;
+		$this->checkoutForm->billingSameAsShipping = null;
 		$this->checkoutForm->shippingAddress1 = null;
 		$this->checkoutForm->shippingAddress2 = null;
 		$this->checkoutForm->shippingCity = null;
@@ -2018,6 +2052,8 @@ class CheckoutController extends Controller
 		$this->checkoutForm->contactLastName = $this->checkoutForm->pickupLastName;
 		$this->checkoutForm->contactPhone = $this->checkoutForm->pickupPersonPhone;
 
+		$this->checkoutForm->orderNotes = $this->_storePickupNotes();
+
 		$this->checkoutForm->cardNameOnCard = $this->checkoutForm->shippingFirstName . ' ' . $this->checkoutForm->shippingLastName;
 
 		$obj = Modules::LoadByName('storepickup');
@@ -2026,6 +2062,16 @@ class CheckoutController extends Controller
 		$this->checkoutForm->shippingPriority = $data['offerservices'];
 
 		$this->saveForm();
+	}
+
+	private function _storePickupNotes()
+	{
+		$str = 'Contact Phone number for In-Store Pickup: ' . $this->checkoutForm->pickupPersonPhone;
+		$str .= "\nContact Email for In-Store Pickup: ";
+		$str .= $this->checkoutForm->pickupPersonEmail ? $this->checkoutForm->pickupPersonEmail : $this->checkoutForm->contactEmail;
+		$str .= "\n";
+
+		return $str;
 	}
 
 

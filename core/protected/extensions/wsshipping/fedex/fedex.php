@@ -2,7 +2,7 @@
 
 /**
  * UPS Module
- * created by LightSpeed
+ * created by Lightspeed
  */
 class fedex extends WsShipping
 {

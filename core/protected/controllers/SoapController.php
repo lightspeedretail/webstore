@@ -158,7 +158,7 @@ class SoapController extends CController
 		}
 
 		/**
-		LightSpeed will send commands to flush the following tables
+		Lightspeed will send commands to flush the following tables
 		Product
 		Category
 		Tax
@@ -779,7 +779,7 @@ class SoapController extends CController
 		else
 			$objProduct->inventory_avail=($fltInventory-$fltReserved);
 
-		//Because LightSpeed may send us products out of sequence (child before parent), we have to turn this off
+		//Because Lightspeed may send us products out of sequence (child before parent), we have to turn this off
 		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=0;')->execute();
 
 		if (!$objProduct->save()) {
@@ -1642,7 +1642,7 @@ class SoapController extends CController
 	}
 
 	/**
-	 * Assign LightSpeed User ID to Customer ID
+	 * Assign Lightspeed User ID to Customer ID
 	 *
 	 * @param string $passkey
 	 * @param int $id

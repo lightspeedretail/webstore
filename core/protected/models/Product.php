@@ -1003,7 +1003,7 @@ class Product extends BaseProduct
 		if (empty($intReservedA))
 			$intReservedA=0;
 
-		//Unattached orders (made independently in LightSpeed)
+		//Unattached orders (made independently in Lightspeed)
 		$intReservedB = $this->getDbConnection()->createCommand(
 					"SELECT SUM(qty) from ".DocumentItem::model()->tableName()." AS a
 					LEFT JOIN ".Document::model()->tableName()." AS b ON a.document_id=b.id

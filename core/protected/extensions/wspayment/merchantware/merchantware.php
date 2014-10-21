@@ -6,8 +6,8 @@ class merchantware extends WsPayment
 	protected $version = 1.0;
 	protected $uses_credit_card = true;
 	protected $apiVersion = 1;
-	public $advancedMode=true;
-	public $cloudCompatible=true;
+	public $advancedMode = true;
+	public $cloudCompatible = true;
 
 	const x_delim_char = "|";
 	private $paid_amount;

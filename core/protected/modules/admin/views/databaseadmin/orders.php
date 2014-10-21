@@ -3,7 +3,7 @@
     <h3>Downloaded Orders</h3>
 	<div class="span8">
 	    <div class="editinstructions">
-			<?php echo Yii::t('admin','To force an order to download again to LightSpeed, click the check under D/L (Download) and set to Not Downloaded. The order will be re-downloaded on the next LightSpeed download attempt.'); ?>
+			<?php echo Yii::t('admin','To force an order to download again to Lightspeed, click the check under D/L (Download) and set to Not Downloaded. The order will be re-downloaded on the next Lightspeed download attempt.'); ?>
 	    </div>
     </div>
         <div class="clearfix search">

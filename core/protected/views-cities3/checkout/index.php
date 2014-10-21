@@ -105,7 +105,7 @@
 							<?php
 							echo CHtml::linkButton(
 								Yii::t('global', 'Cancel'),
-								array('class' => 'button inset reset_toggle')
+								array('class' => 'button inset reset_toggle cancel')
 							); ?>
 						</div>
 					</li>

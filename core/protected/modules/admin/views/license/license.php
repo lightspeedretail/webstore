@@ -1,8 +1,8 @@
-<p>LightSpeed Retail Inc. (&quot;LIGHTSPEED RETAIL&quot;)</p>
+<p>Lightspeed Retail Inc. (&quot;LIGHTSPEED RETAIL&quot;)</p>
 
 <p><span style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></p>
 
-<p>END USER LICENCE AGREEMENT FOR LightSpeed&#0153; and/or LightSpeed Web Store&#0153; SOFTWARE PRODUCTS (&quot;SOFTWARE PRODUCT&quot;)</p>
+<p>END USER LICENCE AGREEMENT FOR Lightspeed&#0153; and/or Lightspeed Web Store&#0153; SOFTWARE PRODUCTS (&quot;SOFTWARE PRODUCT&quot;)</p>
 
 <p><o:p>&nbsp;</o:p></p>
 
@@ -232,7 +232,7 @@ yes">&nbsp; </span>to enter into this EULA and that LIGHTSPEED RETAIL<span
 	set forth in subparagraph (c)(1)(ii) of The Rights in Technical Data and
 	Computer SOFTWARE clause of DFARS 252.227-7013 or subparagraphs (c)(i) and (2)
 	of the Commercial Computer SOFTWARE-Restricted Rights at 48 CFR 52.227-19, as
-	applicable.<span style="mso-spacerun: yes">&nbsp; </span>Manufacturer is LightSpeed Retail Inc. / 7049 St-Urbain, Montreal, QC, Canada, H2S 3H4. </p>
+	applicable.<span style="mso-spacerun: yes">&nbsp; </span>Manufacturer is Lightspeed Retail Inc. / 7049 St-Urbain, Montreal, QC, Canada, H2S 3H4. </p>
 
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>
 
@@ -286,6 +286,6 @@ yes">&nbsp; </span>to enter into this EULA and that LIGHTSPEED RETAIL<span
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>
 
 <p class=MsoNormal>Should you have any questions concerning this EULA, or if
-	you desire to contact LIGHTSPEED RETAIL for any reason, please contact LightSpeed Retail Inc. by mail at: 7049 St-Urbain, Montreal, QC, Canada, H2S 3H4, by telephone at:
+	you desire to contact LIGHTSPEED RETAIL for any reason, please contact Lightspeed Retail Inc. by mail at: 7049 St-Urbain, Montreal, QC, Canada, H2S 3H4, by telephone at:
 	(514) 907-1801 or by electronic mail at:<span style="mso-spacerun: yes">&nbsp;
 </span>info@lightspeedretail.com.</p>

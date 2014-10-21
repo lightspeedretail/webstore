@@ -244,7 +244,7 @@ class Images extends BaseImages
 		}
 		return true;
 	}
-	/* Is this the original graphic provided by LightSpeed */
+	/* Is this the original graphic provided by Lightspeed */
 	public function IsPrimary() {
 		if ($this->id && ($this->id == $this->parent))
 			return true;
@@ -359,7 +359,7 @@ class Images extends BaseImages
 
 	/**
 	 * ToDo: need to update and make photo processors use a more condensed version of this
-	 * Create Thumbnail from LightSpeed original file. Technically to Web Store, any resized copy of the original
+	 * Create Thumbnail from Lightspeed original file. Technically to Web Store, any resized copy of the original
 	 * whether larger or smaller is considered a "thumbnail".
 	 * @param $intNewWidth
 	 * @param $intNewHeight
@@ -374,7 +374,7 @@ class Images extends BaseImages
 				$objImage->Delete();
 		}
 
-		//Get our original file from LightSpeed
+		//Get our original file from Lightspeed
 		$strOriginalFile=$this->image_path;
 		$strTempThumbnail = Images::GetImageName($strOriginalFile, $intNewWidth, $intNewHeight,'temp');
 		$strNewThumbnail = Images::GetImageName($strOriginalFile, $intNewWidth, $intNewHeight);

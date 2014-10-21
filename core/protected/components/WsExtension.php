@@ -179,8 +179,8 @@ class WsExtension extends CComponent
 	}
 
 	/**
-	 * Returns the Payment Method used within LightSpeed. This must match
-	 * the value within LightSpeed exactly.
+	 * Returns the Payment Method used within Lightspeed. This must match
+	 * the value within Lightspeed exactly.
 	 * @return string
 	 */
 	public function payment_method(Cart $cart) {
@@ -411,7 +411,7 @@ class WsExtension extends CComponent
 
 	/**
 	 * Return the paid amount that is actually going to come to store.
-	 * Returned value here will go into paid amount/deposit of LightSpeed.
+	 * Returned value here will go into paid amount/deposit of Lightspeed.
 	 *
 	 * @param Cart $cart
 	 * @return unknown_type

@@ -36,7 +36,7 @@ class flatrateAdminForm extends CFormModel
 			'offerservices'=>'Delivery Speed',
 			'restrictcountry'=>'Only allow this carrier to',
 			'markup'=>'Mark up ($)',
-			'product'=>'LightSpeed Product Code (case sensitive)',
+			'product'=>'Lightspeed Product Code (case sensitive)',
 		);
 	}
 

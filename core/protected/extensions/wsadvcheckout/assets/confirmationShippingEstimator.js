@@ -1,11 +1,11 @@
 'use strict';
-/* globals $, calculatingLabel:false, strCalculateButton:false */
-//TODO: Shipping estimator needs to be updated to take into account the case where there are no items in the cart, shipping should be 0.
+/* globals $,  calculatingLabel:false, strCalculateButton:false */
+
 /**
  * The WsShippingEstimator class handles interaction with the shipping
  * estimator and tooltip showing the shipping options.
  */
-function WsShippingEstimator(options) {
+function ConfirmationShippingEstimator(options) {
     this.getShippingRatesEndpoint = '/cart/getshippingrates';
     this.setShippingOptionEndpoint = '/cart/chooseshippingoption';
 
@@ -21,149 +21,54 @@ function WsShippingEstimator(options) {
     this.shippingState = options.shippingState || null;
     this.messages = options.messages || null;
     this.updateOnLoad = options.updateOnLoad || false;
+    this.redirectToShippingOptionsUrl = options.redirectToShippingOptionsUrl || null;
+    this.shippingOptions = [];
 
     if (typeof this.class !== 'string') {
         throw new Error('Must provide a string value for the class option.');
     }
 
-    this.$root = $('.' + this.class);
-    if (this.$root.length === 0) {
-        throw new Error('Unable to find element on page with class=' + this.class);
+    if (this.redirectToShippingOptionsUrl === null) {
+        throw new Error('A redirect URL to the shipping options is required');
     }
 
-    // jQuery selectors.
-    this.$estimateShippingAndTaxesLink = this.$root.find('.estimate-shipping-and-taxes-link');
-    this.$shippingPostalEntry = this.$root.find('.shipping-postal-entry');
-    this.$shippingPostalInput = this.$shippingPostalEntry.find('.shipping-postal-input');
-    this.$shippingCalculateButton = this.$shippingPostalEntry.find('button');
-    this.$shippingCountryPicker = this.$root.find('.shipping-country-picker');
-
-    this.$selectedCountryLink = this.$root.find('.shipping-country-link');
-
-    this.$shippingOptions = this.$root.filter('.shipping-options');
-    this.$closeShippingOptions = this.$shippingOptions.find('.close-shipping-options');
-
-    this.$shippingEstimateLine = this.$root.filter('.shipping-estimate-line');
-    this.$shippingPostalLink = this.$shippingEstimateLine.find('.shipping-postal-link');
-    this.$shippingEstimate = this.$shippingEstimateLine.find('.shipping-estimate');
-
-    this.$taxEstimateLine = this.$root.filter('.tax-estimate-line');
-    this.$taxEstimate = this.$taxEstimateLine.find('.tax-estimate');
-    this.$shippingCityStateLink = this.$taxEstimateLine.find('.shipping-city-state-link');
-
+    this.$shippingEstimate = $('.shipping-estimate');
+    this.$taxEstimate = $('.tax-estimate');
+    this.$tax1Estimate = $('.tax1-estimate');
+    this.$tax2Estimate = $('.tax2-estimate');
+    this.$tax3Estimate = $('.tax3-estimate');
+    this.$tax4Estimate = $('.tax4-estimate');
+    this.$tax5Estimate = $('.tax5-estimate');
     this.$totalEstimate = $('.wsshippingestimator-total-estimate');
+    this.cacheTotalEstimateFontSize = this.$totalEstimate.css('font-size');
 
     // While waiting to get a response from the shipping estimator some fields
     // can have their labels switched to Calculating...
     this.calculatingFields = [
         this.$totalEstimate,
+        this.$taxEstimate,
         this.$shippingEstimate,
-        this.$taxEstimate
+        this.$tax1Estimate,
+        this.$tax2Estimate,
+        this.$tax3Estimate,
+        this.$tax4Estimate,
+        this.$tax5Estimate
     ];
-
-    // These are the various possible states for each of the UI elements.
-    this.screens = {
-        // The initial state before any estimates are available.
-        'no-estimates': {
-            'show': [
-                this.$estimateShippingAndTaxesLink
-            ],
-            'hide': [
-                this.$shippingPostalEntry,
-                this.$shippingCountryPicker,
-                this.$selectedCountryLink,
-                this.$shippingOptions,
-                this.$taxEstimateLine,
-                this.$shippingEstimateLine
-            ]
-        },
-        'entering-postal': {
-            'show': [
-                this.$estimateShippingAndTaxesLink,
-                this.$selectedCountryLink,
-                this.$shippingPostalEntry
-            ],
-            'hide': [
-                this.$shippingCountryPicker,
-                this.$shippingOptions,
-                this.$taxEstimateLine,
-                this.$shippingEstimateLine
-            ]
-        },
-        'choosing-country': {
-            'show': [
-                this.$estimateShippingAndTaxesLink,
-                this.$selectedCountryLink,
-                this.$shippingCountryPicker
-            ],
-            'hide': [
-                this.$shippingPostalEntry,
-                this.$shippingOptions,
-                this.$taxEstimateLine,
-                this.$shippingEstimateLine
-            ]
-        },
-        'choosing-shipping-option': {
-            'show': [
-                this.$shippingEstimateLine,
-                this.$taxEstimateLine,
-                this.$shippingOptions
-            ],
-            'hide': [
-                this.$shippingPostalEntry,
-                this.$shippingCountryPicker,
-                this.$selectedCountryLink,
-                this.$estimateShippingAndTaxesLink
-            ]
-        },
-        'shipping-option-chosen': {
-            'show': [
-                this.$shippingEstimateLine,
-                this.$taxEstimateLine
-            ],
-            'hide': [
-                this.$shippingOptions,
-                this.$shippingPostalEntry,
-                this.$shippingCountryPicker,
-                this.$selectedCountryLink,
-                this.$estimateShippingAndTaxesLink
-            ]
-        }
-    };
-
-    // When a user enters their postal code, update the postal code link.
-    this.$shippingPostalInput.blur(function (e) {
-        this.$shippingPostalLink.html(e.target.value);
-
-        // this seems like a no-op but our data can be edited from both the add to
-        // cart and edit cart forms.
-        this.$shippingPostalInput.val(e.target.value);
-    }.bind(this));
-
-    // If shipping options are provided then the user has previously made a
-    // shipping choice.
-    if (this.shippingOptions !== null) {
-        this.redrawShippingOptions(this.shippingOptions);
-        this.showScreen('shipping-option-chosen');
-    }
 
     if (this.messages !== null) {
         this.handleMessages(this.messages);
     }
 
-    this.setCityStateLinkValue(this.shippingCity, this.shippingState);
-
     if (this.updateOnLoad === true) {
         this.calculateShippingEstimates();
     }
 }
-
 /**
  * Set which set of UI elements are displayed.
  * @param {string} screeId The ID of the screen in this.screens.
  * @param {string} [hideFunction=hide] The function to call on the jQuery selector.
  */
-WsShippingEstimator.prototype.showScreen = function(screenId, hideFunction) {
+ConfirmationShippingEstimator.prototype.showScreen = function(screenId, hideFunction) {
     var screenSettings = this.screens[screenId],
         elementToShow,
         elementToHide,
@@ -195,7 +100,7 @@ WsShippingEstimator.prototype.showScreen = function(screenId, hideFunction) {
  * Sets the selected country name.
  * @param {string} countryName The name of the country, e.g. "United States".
  */
-WsShippingEstimator.prototype.setSelectedCountry = function(option) {
+ConfirmationShippingEstimator.prototype.setSelectedCountry = function(option) {
     this.selectedCountryName = option.text();
     this.selectedCountryCode = option.val();
 
@@ -211,7 +116,7 @@ WsShippingEstimator.prototype.setSelectedCountry = function(option) {
  * @param {object} shippingOption A shippingOption object returned by Web Store.
  * @param {boolean} checked Whether the shippingOption should be checked.
  */
-WsShippingEstimator.prototype.addShippingOption = function(shippingOption) {
+ConfirmationShippingEstimator.prototype.addShippingOption = function(shippingOption) {
     var li = $('<li>').append(
         $('<label>')
             .addClass('radio')
@@ -244,7 +149,7 @@ WsShippingEstimator.prototype.addShippingOption = function(shippingOption) {
 /**
  * Toggle between showing and not showing the shipping options tooltip.
  */
-WsShippingEstimator.prototype.toggleShowShippingOptions = function() {
+ConfirmationShippingEstimator.prototype.toggleShowShippingOptions = function() {
     if (this.$shippingOptions.is(':visible')) {
         this.showScreen('shipping-option-chosen', 'fadeOut');
     } else {
@@ -256,7 +161,7 @@ WsShippingEstimator.prototype.toggleShowShippingOptions = function() {
  * Called once a shipping option has been selected. Updates the UI and informs
  * Web Store of the choice.
  */
-WsShippingEstimator.prototype.selectedShippingOption = function(selectedOption) {
+ConfirmationShippingEstimator.prototype.selectedShippingOption = function(selectedOption) {
     this.selectedProviderId = selectedOption.dataset.providerId;
     this.selectedPriorityLabel = selectedOption.dataset.priorityLabel;
 
@@ -279,7 +184,7 @@ WsShippingEstimator.prototype.selectedShippingOption = function(selectedOption) 
  * @param int providerId The ID for shipping provider.
  * @param string priorityLabel The label for the shipping priority.
  */
-WsShippingEstimator.prototype.selectShippingOption = function(providerId, priorityLabel) {
+ConfirmationShippingEstimator.prototype.selectShippingOption = function(providerId, priorityLabel) {
     if (providerId === null || priorityLabel === null) {
         // Select the first shipping option.
         this.$shippingOptions.each(
@@ -306,7 +211,7 @@ WsShippingEstimator.prototype.selectShippingOption = function(providerId, priori
  * Web Store.
  * @param {array} shippingOptions The shipping options returned by Web Store.
  */
-WsShippingEstimator.prototype.redrawShippingOptions = function(shippingOptions) {
+ConfirmationShippingEstimator.prototype.redrawShippingOptions = function(shippingOptions) {
     if ($.isArray(shippingOptions) === false) {
         throw new Error('shippingOptions must be an array.');
     }
@@ -327,24 +232,42 @@ WsShippingEstimator.prototype.redrawShippingOptions = function(shippingOptions) 
  * Return the selected shipping option.
  * @return {jQuery selector} The selected shipping option.
  */
-WsShippingEstimator.prototype.getSelectedShippingOption = function() {
+ConfirmationShippingEstimator.prototype.getSelectedShippingOption = function() {
     return this.$shippingOptions.find(':checked');
 };
 
 /**
  * Update the estimate lines based on the selected shipping option.
  */
-WsShippingEstimator.prototype.updateEstimates = function() {
-    var selectedShippingOption = this.getSelectedShippingOption();
-    if (selectedShippingOption.length === 0) {
+ConfirmationShippingEstimator.prototype.updateEstimates = function() {
+    if (this.shippingOptions.length === 0) {
         return;
     }
 
-    var selectionData = this.getSelectedShippingOption().data();
+    var selectionData = this.getShippingOption();
+
+    if (typeof(this.getShippingOption()) === 'undefined') {
+        return;
+    }
 
     this.$shippingEstimate.html(selectionData.formattedShippingPrice);
     this.$taxEstimate.html(selectionData.formattedCartTax);
+    this.$tax1Estimate.html(selectionData.formattedCartTax1);
+    this.$tax2Estimate.html(selectionData.formattedCartTax2);
+    this.$tax3Estimate.html(selectionData.formattedCartTax3);
+    this.$tax4Estimate.html(selectionData.formattedCartTax4);
+    this.$tax5Estimate.html(selectionData.formattedCartTax5);
+
     this.$totalEstimate.html(selectionData.formattedCartTotal);
+    this.$totalEstimate.css('font-size', this.cacheTotalEstimateFontSize);
+};
+
+ConfirmationShippingEstimator.prototype.getShippingOption = function() {
+    var option = $.grep(this.shippingOptions.shippingOptions, function(el, idx)  {
+       return (parseInt(el.providerId) === parseInt(this.selectedProviderId) &&
+           el.priorityLabel === this.selectedPriorityLabel);
+    }.bind(this));
+    return option[0];
 };
 
 /**
@@ -352,7 +275,7 @@ WsShippingEstimator.prototype.updateEstimates = function() {
  * @param element {DOM element} The <select> element that fired the onChange
  * event.
  */
-WsShippingEstimator.prototype.selectedCountry = function (element) {
+ConfirmationShippingEstimator.prototype.selectedCountry = function(element) {
     this.setSelectedCountry($(element).find(':selected'));
     this.showScreen('entering-postal');
 };
@@ -362,7 +285,7 @@ WsShippingEstimator.prototype.selectedCountry = function (element) {
  * @param {string} city The city.
  * @param {string} state The state code.
  */
-WsShippingEstimator.prototype.setCityStateLinkValue = function(city, state) {
+ConfirmationShippingEstimator.prototype.setCityStateLinkValue = function(city, state) {
     var values = [];
 
     if (city !== null)
@@ -384,7 +307,7 @@ WsShippingEstimator.prototype.setCityStateLinkValue = function(city, state) {
  *     code string A severity, either WARN or INFO.
  *     message string The message to display to the user.
  */
-WsShippingEstimator.prototype.handleMessages = function(messages) {
+ConfirmationShippingEstimator.prototype.handleMessages = function(messages) {
     var message;
 
     for (var i = 0, len = messages.length; i < len; i += 1) {
@@ -392,8 +315,7 @@ WsShippingEstimator.prototype.handleMessages = function(messages) {
 
         switch (message.code) {
             case 'WARN':
-                this.addShippingOptionsTopMessage(message.message);
-                this.showScreen('choosing-shipping-option');
+                window.location = this.redirectToShippingOptionsUrl;
                 break;
             case 'INFO':
                 this.addShippingOptionsBottomMessage(message.message);
@@ -406,7 +328,7 @@ WsShippingEstimator.prototype.handleMessages = function(messages) {
  * Add a message to the bottom of the shipping options tooltip.
  * @param string messageText The message to add.
  */
-WsShippingEstimator.prototype.addShippingOptionsBottomMessage = function(messageText) {
+ConfirmationShippingEstimator.prototype.addShippingOptionsBottomMessage = function(messageText) {
     this.$shippingOptions.find('ol').append(
         $('<li>')
             .addClass('webstore-shipping-choices-more')
@@ -418,7 +340,7 @@ WsShippingEstimator.prototype.addShippingOptionsBottomMessage = function(message
  * Add a message to the top of the shipping options tooltip.
  * @param string messageText The message to add.
  */
-WsShippingEstimator.prototype.addShippingOptionsTopMessage = function(messageText) {
+ConfirmationShippingEstimator.prototype.addShippingOptionsTopMessage = function(messageText) {
     this.$shippingOptions.find('ol').prepend(
         $('<li>')
             .addClass('webstore-shipping-choices-notice')
@@ -426,7 +348,7 @@ WsShippingEstimator.prototype.addShippingOptionsTopMessage = function(messageTex
     );
 };
 
-WsShippingEstimator.prototype.getPostal = function() {
+ConfirmationShippingEstimator.prototype.getPostal = function() {
     return this.$shippingPostalInput.val();
 };
 
@@ -435,85 +357,38 @@ WsShippingEstimator.prototype.getPostal = function() {
  * @return {jQuery promise} Returns a promise that is resolved when the
  * estimates come back from Web Store.
  */
-WsShippingEstimator.prototype.calculateShippingEstimates = function () {
-    var zippoPostal = this.getPostal();
-
-    if (zippoPostal === '') {
-        // Cannot get shipping estimates without a postal code.
-        return;
-    }
-
-    // TODO: This was copied from wsadvcheckout/assets/shipping.js and should be
-    // moved into a shared JavaScript file.
-    switch (this.selectedCountryCode) {
-        // for Great Britain and Canada, Zippopotam only uses the first 3 characters in the
-        // query URL. In case someone pastes in the full postal, we account for it here
-        case 'GB':
-        case 'CA':
-            zippoPostal = zippoPostal.substring(0, 3);
-            break;
-    }
-    // TODO End copied block.
+ConfirmationShippingEstimator.prototype.calculateShippingEstimates = function() {
+    this.toggleShowCalculatingOnFields();
 
     // This deferred is what's returned by this function.
     var deferred = $.Deferred();
 
-    // TODO: Show "Calculating" in Order Total, Shipping and Tax estimates - WS-2745
-
-    var uri = this.selectedCountryCode + '/' + zippoPostal;
-    $.ajax({
-        url: 'http://api.zippopotam.us/' + uri,
-        type: 'GET',
-        datatype: 'json',
-        crossDomain: true
-    }).always(function (placeData) {
-            this.toggleShowCalculatingOnFields();
-            var city = null,
-                stateCode = null;
-            if (placeData.places !== undefined) {
-                // Just use the first place in the response.
-                // TODO this doesn't work too well for all countries. For England, the
-                // 'place name' can be quite a few miles away and for England and the
-                // 'state abbreviation' is ENG.
-                city = placeData.places[0]['place name'];
-                stateCode = placeData.places[0]['state abbreviation'];
-                this.setCityStateLinkValue(city, stateCode);
-            } else {
-                // An error occurred in the hippo lookup.
-                // Probably a "404 not found" because the postcode and country
-                // combination isn't valid (according to hippo).
-                this.setCityStateLinkValue(null, null);
+    $.post(
+        this.getShippingRatesEndpoint,
+        {
+            'CheckoutForm[shippingCountryCode]': this.selectedCountryCode,
+            'CheckoutForm[shippingCity]': this.shippingCity,
+            'CheckoutForm[shippingState]': this.shippingState
+        }).done(function (shippingRatesResponse) {
+            if (typeof shippingRatesResponse.result === 'undefined' ||
+                shippingRatesResponse.result !== 'success'
+                ) {
+                // TODO: We have no way to handle an error here. See WS-2076 for a
+                // question aimed at Luke about how to display errors.
+                deferred.reject();
+                return;
             }
 
-            $.post(
-                this.getShippingRatesEndpoint,
-                {
-                    'CheckoutForm[shippingCountryCode]': this.selectedCountryCode,
-                    'CheckoutForm[shippingCity]': city,
-                    'CheckoutForm[shippingState]': stateCode,
-                    'CheckoutForm[shippingPostal]': this.getPostal()
-                }).done(function (shippingRatesResponse) {
-                    if (typeof shippingRatesResponse.result === 'undefined' ||
-                        shippingRatesResponse.result !== 'success'
-                        ) {
-                        // TODO: We have no way to handle an error here. See WS-2076 for a
-                        // question aimed at Luke about how to display errors.
-                        deferred.reject();
-                        return;
-                    }
+            var options = shippingRatesResponse.wsShippingEstimatorOptions;
 
-                    var options = shippingRatesResponse.wsShippingEstimatorOptions;
-                    this.redrawShippingOptions(options.shippingOptions);
-                    this.handleMessages(options.messages);
-                    this.selectedProviderId = options.selectedProviderId || null;
-                    this.selectedPriorityLabel = options.selectedPriorityLabel || null;
-                    this.selectShippingOption(this.selectedProviderId, this.selectedPriorityLabel);
-                    this.updateEstimates();
-                    deferred.resolve();
+            this.shippingOptions = options;
+            this.handleMessages(options.messages);
+            this.selectedProviderId = options.selectedProviderId || null;
+            this.selectedPriorityLabel = options.selectedPriorityLabel || null;
+            this.updateEstimates();
+            deferred.resolve();
 
-                }.bind(this));
         }.bind(this));
-
     return deferred.promise();
 };
 
@@ -522,8 +397,8 @@ WsShippingEstimator.prototype.calculateShippingEstimates = function () {
  * the button
  * @return {undefined}
  */
-WsShippingEstimator.prototype.toggleLoadingSpinner = function() {
-    if (this.$shippingCalculateButton.find('.fa-circle-o-notch').length > 0)
+ConfirmationShippingEstimator.prototype.toggleLoadingSpinner = function() {
+    if (this.$shippingCalculateButton.find('.fa-circle-o-notch').length > 1)
     {
         // we need to hide the spinner
         this.$shippingCalculateButton.html(strCalculateButton);
@@ -531,10 +406,9 @@ WsShippingEstimator.prototype.toggleLoadingSpinner = function() {
     }
     else
     {
-        this.$shippingCalculateButton.html("<i class='fa fa-circle-o-notch fa-spin fa-lg'></i>");
+        this.$shippingCalculateButton.html("<i class=\"fa fa-circle-o-notch fa-spin fa-lg\"></i>");
         this.$shippingCalculateButton.prop('disabled','disabled');
     }
-
 };
 
 /**
@@ -542,8 +416,10 @@ WsShippingEstimator.prototype.toggleLoadingSpinner = function() {
  * a recalculation of the shipping estimator's price
  * @return {undefined}
  */
-WsShippingEstimator.prototype.toggleShowCalculatingOnFields = function() {
+ConfirmationShippingEstimator.prototype.toggleShowCalculatingOnFields = function() {
     $.each(this.calculatingFields, function(idx, el) {
         el.html(calculatingLabel);
     });
+
+    this.$totalEstimate.css('font-size', '0.90rem');
 };

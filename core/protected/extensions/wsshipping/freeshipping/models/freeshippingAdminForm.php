@@ -59,7 +59,7 @@ class freeshippingAdminForm extends CFormModel
 			'qty_remaining'=>'Optional Promo Code Qty (blank=unlimited)',
 			'offerservices'=>'Delivery Speed',
 			'restrictcountry'=>'Only allow this carrier to',
-			'product'=>'LightSpeed Product Code (case sensitive)',
+			'product'=>'Lightspeed Product Code (case sensitive)',
 		);
 	}
 

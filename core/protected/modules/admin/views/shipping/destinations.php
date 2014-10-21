@@ -44,7 +44,7 @@
 	</div>
     <h3>Destinations</h3>
     <div class="editinstructions">
-        <p><?php echo Yii::t('admin','Define a destination including the appropriate tax code that applies to that location. ({tax} are downloaded from your LightSpeed {software} tax setup.) Destinations are applied from specific to general, so for example US/California will take priority over US/Any. Postal codes are optional if you need to define a very specific area. List order below does not matter.',
+        <p><?php echo Yii::t('admin','Define a destination including the appropriate tax code that applies to that location. ({tax} are downloaded from your Lightspeed {software} tax setup.) Destinations are applied from specific to general, so for example US/California will take priority over US/Any. Postal codes are optional if you need to define a very specific area. List order below does not matter.',
                 array('{software}'=>_xls_get_conf('LIGHTSPEED_CLOUD',0)>0 ? 'Cloud' : 'Pro',
                       '{tax}'=>_xls_get_conf('LIGHTSPEED_CLOUD',0)>0 ? 'Sales Taxes' : 'Tax Codes'));?></p>
         <p><?php echo Yii::t('admin','The Any/Any entry will apply if the customer shipping address does not match any other line.  (Note: Any/Any is ignored if {link} is active.) To delete an entry, choose Delete from the top of the Select Country dropdown.',
