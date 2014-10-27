@@ -9,7 +9,7 @@ class m140911_015316_WS_2638_store_address_updates extends CDbMigration
 
 		// insert new config keys but make sure they don't already exist
 		$sql = "SELECT * FROM xlsws_configuration WHERE key_name = 'STORE_CITY';";
-		$row = Yii::app()->db->createCommand($sql)->queryRow();
+		$row = $this->dbConnection->createCommand($sql)->queryRow();
 		if (empty($row))
 		{
 			$this->insert(
@@ -28,7 +28,7 @@ class m140911_015316_WS_2638_store_address_updates extends CDbMigration
 		}
 
 		$sql = "SELECT * FROM xlsws_configuration WHERE key_name = 'STORE_STATE';";
-		$row = Yii::app()->db->createCommand($sql)->queryRow();
+		$row = $this->dbConnection->createCommand($sql)->queryRow();
 		if (empty($row))
 		{
 			$this->insert('xlsws_configuration',array(
@@ -45,7 +45,7 @@ class m140911_015316_WS_2638_store_address_updates extends CDbMigration
 		}
 
 		$sql = "SELECT * FROM xlsws_configuration WHERE key_name = 'STORE_COUNTRY';";
-		$row = Yii::app()->db->createCommand($sql)->queryRow();
+		$row = $this->dbConnection->createCommand($sql)->queryRow();
 		if (empty($row))
 		{
 			$this->insert('xlsws_configuration',array(
@@ -62,7 +62,7 @@ class m140911_015316_WS_2638_store_address_updates extends CDbMigration
 		}
 
 		$sql = "SELECT * FROM xlsws_configuration WHERE key_name = 'STORE_ZIP';";
-		$row = Yii::app()->db->createCommand($sql)->queryRow();
+		$row = $this->dbConnection->createCommand($sql)->queryRow();
 		if (empty($row))
 		{
 			$this->insert('xlsws_configuration',array(

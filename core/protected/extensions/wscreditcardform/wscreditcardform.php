@@ -13,9 +13,28 @@ class wscreditcardform extends CWidget
 
 	public function run()
 	{
-		Yii::app()->clientScript->registerScriptFile( $this->assetUrl . '/assets/jquery.payment.js' );
-		Yii::app()->clientScript->registerScriptFile( $this->assetUrl . '/assets/wscreditcardform.js' );
-		$this->render('creditcardform', array('model'=>$this->model, 'form'=>$this->form));
+		Yii::app()->clientScript->registerScriptFile($this->assetUrl . '/assets/jquery.payment.js');
+		Yii::app()->clientScript->registerScriptFile($this->assetUrl . '/assets/wscreditcardform.js');
+
+		$arrEnabledCreditCardLabel = array_map(
+			function ($creditCard) {
+				return $creditCard->label;
+			},
+			CreditCard::model()->enabled()->findAll()
+		);
+
+		$this->render(
+			'creditcardform',
+			array(
+				'model' => $this->model,
+				'form' => $this->form,
+				'arrEnabledCreditCardLabel' => $arrEnabledCreditCardLabel,
+				'strCardTypeNotSupported' => Yii::t(
+					'checkout',
+					MultiCheckoutForm::DISABLED_CARD_TYPE
+				)
+			)
+		);
 	}
 
 }

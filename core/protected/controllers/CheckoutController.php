@@ -29,7 +29,6 @@ class CheckoutController extends Controller
 	public function beforeAction($action)
 	{
 		$linkid = Yii::app()->getRequest()->getQuery('linkid');
-		$this->publishJS('checkout');
 		$defaultErrorMsg = Yii::t('cart', 'Oops, you cannot checkout. ');
 		$modulesErrors = $this->_checkAllModulesConfigured();
 		if (count($modulesErrors) > 0)
@@ -809,12 +808,6 @@ class CheckoutController extends Controller
 				$this->checkoutForm->cardNumber = _xls_number_only($this->checkoutForm->cardNumber);
 				$this->checkoutForm->cardNumberLast4 = substr($this->checkoutForm->cardNumber, -4);  // only the last 4 digits
 
-				// to counter code in client side operations
-				if ($this->checkoutForm->cardType == 'AMEX')
-				{
-					$this->checkoutForm->cardType = 'AMERICAN_EXPRESS';
-				}
-
 				// prevent an exception if cardExpiry is left blank
 				if (isset($this->checkoutForm->cardExpiry) && $this->checkoutForm->cardExpiry !== '')
 				{
@@ -836,8 +829,39 @@ class CheckoutController extends Controller
 				// validate the form
 				if ($this->updateAddressId('billing') && $this->checkoutForm->validate() && $this->updatePaymentId())
 				{
+					try {
+						$arrCartScenario = Shipping::getCartScenarios($this->checkoutForm);
+					} catch (Exception $e) {
+						Yii::log('Unable to get cart scenarios: ' . $e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+						$arrCartScenario = null;
+					}
+
+					if ($arrCartScenario !== null)
+					{
+						Shipping::saveCartScenariosToSession($arrCartScenario);
+					}
+
+					$wsShippingEstimatorOptions = WsShippingEstimator::getShippingEstimatorOptions(
+						$arrCartScenario,
+						$this->checkoutForm->shippingProvider,
+						$this->checkoutForm->shippingPriority,
+						$this->checkoutForm->shippingCity,
+						$this->checkoutForm->shippingState,
+						$this->checkoutForm->shippingCountryCode
+					);
+
+					$wsShippingEstimatorOptions['redirectToShippingOptionsUrl'] = Yii::app()->getController()->createUrl('shippingoptions');
+
 					$this->layout = '/layouts/checkout-confirmation';
-					$this->render('confirmation', array('model' => $this->checkoutForm, 'cart' => Yii::app()->shoppingcart, 'error' => $error));
+					$this->render(
+						'confirmation',
+						array(
+							'model' => $this->checkoutForm,
+							'cart' => Yii::app()->shoppingcart,
+							'shippingEstimatorOptions' => $wsShippingEstimatorOptions,
+							'error' => $error
+						)
+					);
 				}
 
 				else
@@ -1250,19 +1274,11 @@ class CheckoutController extends Controller
 	 * @param $strFileName
 	 * @return void
 	 */
-
 	protected function publishJS($strFileName)
 	{
-		$assetsPath = Yii::getPathOfAlias('ext').'/wsadvcheckout/assets';
-
-		if (file_exists($assetsPath.'/'.$strFileName.'.js'))
-		{
-			$cs = Yii::app()->clientScript;
-			$assets = Yii::app()->getAssetManager()->publish($assetsPath);
-			$cs->registerScriptFile($assets . '/'.$strFileName.'.js', CClientScript::POS_END);
-		}
+		$asset = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('ext').'/wsadvcheckout/assets');
+		Yii::app()->clientScript->registerScriptFile($asset . '/' . $strFileName . '.js', CClientScript::POS_END);
 	}
-
 	/**
 	 * TODO: WS-2647 TUC customize the new checkout
 	 *
@@ -1584,6 +1600,26 @@ class CheckoutController extends Controller
 
 				else
 				{
+					$continue = true;
+
+					if (empty($model->billingAddress1) === true)
+					{
+						$this->errors[] = array(Yii::t('checkout', 'Billing Address cannot be blank'));
+						$continue = false;
+					}
+
+					if (empty($model->billingCity) === true)
+					{
+						$this->errors[] = array(Yii::t('checkout', 'Billing City cannot be blank'));
+						$continue = false;
+					}
+
+					if ($continue === false)
+					{
+						Yii::log('Billing address cannot be created or updated, information is missing', 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
+						return false;
+					}
+
 					$attributes = array(
 						'customer_id' => $objCart->customer_id,
 						'address1' => $model->billingAddress1,
@@ -1769,8 +1805,10 @@ class CheckoutController extends Controller
 	{
 		$objCart = Yii::app()->shoppingcart;
 
-		if (!is_null($objCart->payment_id))
+		if (is_null($objCart->payment_id) === false)
+		{
 			$objPayment = CartPayment::model()->findByPk($objCart->payment_id);
+		}
 		else
 		{
 			$objPayment = new CartPayment;

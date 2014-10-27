@@ -85,7 +85,7 @@
 		<h3 class="registered-name"><?php echo Yii::app()->params['STORE_NAME']; ?></h3>
 		<p>
 			<?php echo Yii::app()->params['STORE_PHONE']; ?><br>
-			<a href="mailto:orders@mystore.com"><?php echo Yii::app()->params['EMAIL_FROM']; ?></a>
+			<a href="mailto:<?= Yii::app()->params['EMAIL_FROM'];?>"><?php echo Yii::app()->params['EMAIL_FROM']; ?></a>
 		</p>
 	</div>
 	<?php if(Yii::app()->user->isGuest): ?>

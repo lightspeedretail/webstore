@@ -7,7 +7,8 @@ class m140919_135052_WS_2638_store_pickup_email extends CDbMigration
 		// add columns for WS-2638 Finalize checkout - Store Pickup
 
 		// get all columns from the table
-		$arr = Yii::app()->db->schema->getTable('xlsws_customer_address')->columns;
+		$dbComponent = $this->dbConnection;
+		$arr = $dbComponent->schema->getTable('xlsws_customer_address')->columns;
 
 		// add column if not exists
 		if (!array_key_exists('store_pickup_email', $arr))

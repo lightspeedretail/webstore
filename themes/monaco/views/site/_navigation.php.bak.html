@@ -1,0 +1,80 @@
+<?php
+function build_deskmenu($item) {
+	if ( !empty($item['hasChildren']) ) {
+		echo '<li class="nav_menuheader"><a href="'.$item["link"].'">'.$item["text"].'</a>';
+		echo '<ul class="submenu">';
+		foreach ( $item['children'] as $subitem ) {
+			build_submenu($subitem);
+		}
+		echo '</ul>';
+		echo '</li>';
+	} else {
+		echo '<li><a href="'.$item["link"].'">'.$item["text"].'</a></li>';
+	}
+}
+?>
+
+<?php
+function build_submenu($item) {
+	if ( !empty($item['hasChildren']) ) {
+		echo '<li class="nav_menuheader"><a href="'.$item["link"].'">'.$item["text"].'</a>';
+		echo '<ul class="submenu">';
+		foreach ( $item['children'] as $subitem ) {
+			build_submenu($subitem);
+		}
+		echo '</ul>';
+		echo '</li>';
+	} else {
+		echo '<li><a href="'.$item["link"].'">'.$item["text"].'</a></li>';
+	}
+}
+?>
+<?php echo CHtml::link(CHtml::image(Yii::app()->baseUrl._xls_get_conf('HEADER_IMAGE')), Yii::app()->baseUrl."/", array('class'=>'logo') ); ?>
+<?php $this->widget('application.extensions.wsmenu.wsmenu', array(
+		'categories'=> Category::GetTree(),
+		'menuheader'=> Yii::t('global','Products'),
+		'showarrow'=>false,
+		'CssClass' => 'menutab hidden-phone'
+	)); //products dropdown menu ?>
+	<i></i>
+	<span class='visible-phone'>Products</span>
+	<ul class='visible-phone'>
+		<?php foreach(Category::GetTree() as $item) { ?>
+			<?php build_submenu($item); ?>
+		<?php } ?>
+	</ul>
+<?php if (count(CustomPage::model()->toptabs()->findAll()))
+	$this->widget('zii.widgets.CMenu', array(
+	'id'=>'menutabs',
+	'itemCssClass'=>'',
+	'items'=>CustomPage::model()->toptabs()->findAll()
+)); ?>
+
+<span class='divider'></span>
+
+	<div class="login">
+		<?php if(Yii::app()->user->isGuest): ?>
+			<?php echo CHtml::link(Yii::t('global', 'Login'), array("site/login")); ?>
+			&nbsp;/&nbsp;
+			<a href="<?= _xls_site_url('myaccount/edit'); ?>"><?php echo Yii::t('global', 'Register'); ?></a>
+		<?php else: ?>
+			<?php echo CHtml::link(CHtml::image(Yii::app()->user->profilephoto).Yii::app()->user->firstname, array('/myaccount')); ?>
+			&nbsp;&nbsp;/&nbsp;&nbsp;<?php echo CHtml::link(Yii::t('global', 'Logout'), array("site/logout")); ?>
+			<?php endif; ?>
+	</div>
+
+	<div class="checkoutlink" class="wishlists shoppingcartholder">
+		<?php echo CHtml::link(Yii::t('Shopping Cart','n==1#Shopping Cart ({n})|n>1#Shopping Cart ({n})',Yii::app()->shoppingcart->totalItemCount), array('cart/index')) ?>
+		<?= $this->renderPartial('/site/_sidecart',null, true); ?>
+	</div>
+
+	<?php if(_xls_get_conf('LANG_MENU',0)): ?>
+		<div id="langmenu">
+			<?php $this->widget('application.extensions.'._xls_get_conf('PROCESSOR_LANGMENU').'.'._xls_get_conf('PROCESSOR_LANGMENU')); ?>
+		</div>
+	<?php endif; ?>
+
+
+
+
+

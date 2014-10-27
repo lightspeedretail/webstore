@@ -13,9 +13,9 @@ $('input[name="MultiCheckoutForm[billingPostal]"]').on('keyup', function(e) {
 
 });
 
-$('#MultiCheckoutForm_billingCountryCode').change(function() {
+$('#MultiCheckoutForm_billingCountry').change(function() {
     var postal = $('#MultiCheckoutForm_billingPostal').val();
-    var country = $("#MultiCheckoutForm_billingCountryCode :selected").attr('code');
+    var country = $("#MultiCheckoutForm_billingCountry :selected").attr('code');
 
     if (postal.length > 2) {
         zippothatnow(postal, country);

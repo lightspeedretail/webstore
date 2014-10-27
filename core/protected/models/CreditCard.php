@@ -34,6 +34,13 @@ class CreditCard extends BaseCreditCard
 		));
 	}
 
-
-
+	/* Define some specialized query scopes to make searching for specific db info easier */
+	public function scopes()
+	{
+		return array(
+			'enabled' => array(
+				'condition' => 'enabled = 1'
+			),
+		);
+	}
 }

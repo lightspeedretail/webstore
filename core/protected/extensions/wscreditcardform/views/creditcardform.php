@@ -1,20 +1,10 @@
 <script>
 	jQuery(function($) {
-		$('[data-numeric]').payment('restrictNumeric');
-		$('.creditcard-number').payment('formatCardNumber');
-		$('.cc-exp').payment('formatCardExpiry');
-		$('.cvv').payment('formatCardCVC');
-
-		$(".creditcard-number").keyup(function() {
-			var cardType = $.payment.cardType($('.creditcard-number').val());
-			if(cardType){
-				$('.card-logo img').removeClass('active');
-				$('.card-logo .'+ cardType).addClass('active');
-				$('.card-type').attr('value', cardType.toUpperCase());
-			}
+		new CreditCard({
+			enabledCardTypes: <?= CJSON::encode($arrEnabledCreditCardLabel); ?>,
+			cardTypeNotSupported: <?= CJSON::encode($strCardTypeNotSupported); ?>
 		});
 	});
-
 </script>
 
 <div class="payment-methods">
@@ -56,50 +46,74 @@
 	<div class="card-details">
 		<ol class="field-containers field-container-gap">
 			<li class="field-container">
-				<?php echo $form->labelEx(
-				$model,
-				'cardNumber',
-				$htmlOptions = array('class' => 'placeheld'),
-				array('label' => 'Credit Card Number')
-			);
-			echo $form->textField(
-				$model,
-				'cardNumber',
-				$htmlOptions = array('placeholder' => Yii::t('checkout', "Credit Card Number"),
-					'pattern' => "\d*", 'autocomplete' =>"creditcard-number",'class' => "creditcard-number",
-					'required' => "required")
-			);
+			<?php
+				echo $form->labelEx(
+					$model,
+					'cardNumber',
+					$htmlOptions = array('class' => 'placeheld'),
+					array('label' => 'Credit Card Number')
+				);
+
+				echo $form->textField(
+					$model,
+					'cardNumber',
+					$htmlOptions = array(
+						'placeholder' => Yii::t('checkout', 'Credit Card Number'),
+						'pattern' => '\d*',
+						'autocomplete' => 'creditcard-number',
+						'class' => 'creditcard-number',
+						'required' => 'required'
+					)
+				);
 			?>
 			</li>
 		</ol>
 
 		<ol class="field-containers field-containers-small cart-details-secondary">
 			<li class="field-container">
-				<?php echo $form->labelEx(
-				$model,
-				'cardExpiry',
-				$htmlOptions = array('class' => 'placeheld'),
-				array('label' => 'Expiration')
-			);
-			echo $form->textField(
-				$model,
-				'cardExpiry',
-				$htmlOptions = array('placeholder' => Yii::t('checkout', "MM / YY"),'size' => "6",'class' => "cc-exp", 'pattern' => "\d*",'autocomplete' =>"cc-exp", 'required' => "required")
-			);
+			<?php
+				echo $form->labelEx(
+					$model,
+					'cardExpiry',
+					$htmlOptions = array('class' => 'placeheld'),
+					array('label' => 'Expiration')
+				);
+
+				echo $form->textField(
+					$model,
+					'cardExpiry',
+					$htmlOptions = array(
+						'placeholder' => Yii::t('checkout', "MM / YY"),
+						'size' => "6",
+						'class' => "cc-exp",
+						'pattern' => "\d*",
+						'autocomplete' => "cc-exp",
+						'required' => "required"
+					)
+				);
 			?>
 			</li>
 			<li class="field-container">
-				<?php echo $form->labelEx(
-				$model,
-				'cardCVV',
-				$htmlOptions = array('class' => 'placeheld'),
-				array('label' => 'CVV')
-			);
-			echo $form->textField(
-				$model,
-				'cardCVV',
-				$htmlOptions = array('placeholder' => Yii::t('checkout', "CVV"), 'class' => "cvv", 'pattern' => "\d*",'autocomplete' => "off", 'size' => "4", 'required' => "required")
-			);
+			<?php
+				echo $form->labelEx(
+					$model,
+					'cardCVV',
+					$htmlOptions = array('class' => 'placeheld'),
+					array('label' => 'CVV')
+				);
+
+				echo $form->textField(
+					$model,
+					'cardCVV',
+					$htmlOptions = array(
+						'placeholder' => Yii::t('checkout', "CVV"),
+						'class' => "cvv",
+						'pattern' => "\d*",
+						'autocomplete' => "off",
+						'size' => "4",
+						'required' => "required"
+					)
+				);
 			?>
 			</li>
 			<li class="card-logo">
@@ -120,7 +134,7 @@
 		</p>
 		<ol class="field-containers cardholder-field" style="display: none;">
 			<li class="field-container">
-				<?php
+			<?php
 				echo $form->labelEx(
 					$model,
 					'cardNameOnCard',
@@ -131,8 +145,7 @@
 					'cardNameOnCard',
 					array()
 				);
-				?>
-
+			?>
 			</li>
 		</ol>
 	</div>

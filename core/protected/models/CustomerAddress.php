@@ -143,6 +143,7 @@ class CustomerAddress extends BaseCustomerAddress
 		$criteria = new CDbCriteria();
 		$criteria->addCondition('customer_id = :userid');
 		$criteria->addCondition('address1 is NOT NULL');
+		$criteria->addCondition('active = 1');
 		$criteria->params = array(':userid' => Yii::app()->user->id);
 		$criteria->order = 'modified DESC';
 

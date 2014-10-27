@@ -10,6 +10,11 @@ class MultiCheckoutForm extends CheckoutForm
 	const AUSTRALIA = 13;
 
 	/**
+	 * @var The string to translate when a credit card type is not enabled.
+	 */
+	const DISABLED_CARD_TYPE = '{card type} card type is not supported.';
+
+	/**
 	 * @var the last successfully validated scenario
 	 */
 	public $passedScenario;
@@ -63,10 +68,27 @@ class MultiCheckoutForm extends CheckoutForm
 
 			array('paymentProvider','required', 'on' => 'Payment, PaymentSim, PaymentStorePickup, PaymentStorePickupCC, PaymentStorePickupSimCC, Confirmation, ConfirmationSim, ConfirmationStorePickup, ConfirmationStorePickupCC'),
 
-			array('cardNumber, cardExpiryMonth, cardExpiryYear, cardType, cardCVV, cardNameOnCard',
-				'validateCard', 'on' => 'Payment, PaymentStorePickupCC, Confirmation'),
-
-			array('cardCVV', 'length', 'max' => 4, 'on' => 'Payment, PaymentStorePickupCC, Confirmation'),
+			// Credit card validation.
+			array(
+				'cardNumber, cardCVV, cardExpiryMonth, cardExpiryYear, cardNameOnCard',
+				'required',
+				'on' => 'Payment, PaymentStorePickupCC, Confirmation'
+			),
+			array(
+				'cardType',
+				'validateCardType',
+				'on' => 'Payment, PaymentStorePickupCC, Confirmation'
+			),
+			array(
+				'cardNumber',
+				'validateCardNumber',
+				'on' => 'Payment, PaymentStorePickupCC, Confirmation'
+			),
+			array(
+				'cardCVV',
+				'validateCardCVV',
+				'on' => 'Payment, PaymentStorePickupCC, Confirmation'
+			),
 
 			array('contactPhone', 'length', 'min' => 7, 'max' => 32),
 
@@ -85,6 +107,191 @@ class MultiCheckoutForm extends CheckoutForm
 
 		);
 
+	}
+
+	/**
+	 * Returns the ECC validator based on the attributes in this form.
+	 *
+	 * @return null|ECCValidator An instance of ECCValidator.
+	 */
+	protected function getCardValidator()
+	{
+		if (empty($this->paymentProvider))
+		{
+			Yii::log(
+				'Unable to get card validator: paymentProvider is empty',
+				'info',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
+			return null;
+		}
+
+		$objPaymentModule = Modules::model()->findByPk($this->paymentProvider);
+
+		if (Yii::app()->getComponent($objPaymentModule->module)->uses_credit_card === false)
+		{
+			Yii::log(
+				'Unable to get card validator: paypment provider does not use credit card',
+				'info',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
+			return null;
+		}
+
+		if (empty($this->cardType))
+		{
+			Yii::log(
+				'Unable to get card validator: cardType is empty.',
+				'info',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
+			return null;
+		}
+
+		$objCreditCard = CreditCard::model()->findByAttributes(
+			array('label' => $this->cardType)
+		);
+
+		if ($objCreditCard === null)
+		{
+			Yii::log(
+				sprintf('Unable to get card validator: no such card type found: %s', $this->cardType),
+				'info',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
+			return null;
+		}
+
+		Yii::import('ext.validators.ECCValidator');
+		$validatorFormat = 'ECCValidator::' . $objCreditCard->validfunc;
+		if (defined($validatorFormat) === false)
+		{
+			Yii::log(
+				sprintf('Unable to get card validator: no validator such validator: ', $validatorFormat),
+				'info',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
+			return null;
+		}
+
+		$cc = new ECCValidator();
+		$cc->format = array(constant($validatorFormat));
+		return $cc;
+	}
+
+	/**
+	 * Check the credit card type.
+	 * @param $attribute The attribute name.
+	 * @param $params Additional paremeters defined in the rules.
+	 * @return void
+	 */
+	public function validateCardType($attribute, $params)
+	{
+		if (empty($this->cardType) === true)
+		{
+			// If the card type isn't sent, we allow it and rely on the payment
+			// processor to decline if invalid.
+			Yii::log(
+				'Unable to validate card type - card type is empty.',
+				'info',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
+			return;
+		}
+
+		$arrEnabledCreditCardLabel = array_map(
+			function ($creditCard) {
+				return $creditCard->label;
+			},
+			CreditCard::model()->enabled()->findAll()
+		);
+
+		if (in_array($this->cardType, $arrEnabledCreditCardLabel) === false) {
+			$this->addError(
+				$attribute,
+				Yii::t(
+					'checkout',
+					static::DISABLED_CARD_TYPE,
+					array('{card type}' => $this->cardType)
+				)
+			);
+		}
+	}
+
+	/**
+	 * Check the credit card number.
+	 * @param $attribute The attribute name.
+	 * @param $params Additional paremeters defined in the rules.
+	 * @return void
+	 */
+	public function validateCardNumber($attribute, $params)
+	{
+		$validator = static::getCardValidator();
+		if ($validator === null)
+		{
+			$this->addError(
+				$attribute,
+				Yii::t(
+					'checkout',
+					'Unsupported card type.'
+				)
+			);
+			return;
+		}
+
+		if($validator->validateNumber($this->cardNumber) === false)
+		{
+			$this->addError(
+				$attribute,
+				Yii::t(
+					'checkout',
+					'Invalid Card Number or Type mismatch.'
+				)
+			);
+		} else {
+			Yii::log(
+				sprintf('Validated cardNumber as %s', $this->cardType),
+				'info',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
+		}
+	}
+
+	/**
+	 * Check the credit card CVV.
+	 * @param $attribute The attribute name.
+	 * @param $params Additional paremeters defined in the rules.
+	 * @return void
+	 */
+	public function validateCardCVV($attribute, $params)
+	{
+		$validator = static::getCardValidator();
+		if ($validator === null)
+		{
+			Yii::log(
+				'Unable to validate card CVV.',
+				'info',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
+			return;
+		}
+
+		if ($validator->validateCVV($this->cardCVV) === false)
+		{
+			$this->addError(
+				$attribute,
+				Yii::t(
+					'checkout',
+					'Invalid CVV or type mismatch.'
+				)
+			);
+		} else {
+			Yii::log(
+				sprintf('Validated cardCVV as %s', $this->cardType),
+				'info',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
+		}
 	}
 
 
@@ -170,15 +377,7 @@ class MultiCheckoutForm extends CheckoutForm
 		$str .= $this->shippingAddress2 ? $this->shippingAddress2 : '';
 		$str .= $this->shippingCity . ', ';
 		$str .= $this->shippingState ? $this->shippingState . ', ' : '';
-		if (is_numeric($this->shippingCountry) === true)
-		{
-			$str .= Country::CodeById($this->shippingCountry) . ' ';
-		}
-		else
-		{
-			$str .= $this->shippingCountry ? $this->shippingCountry . ' ' : '';
-		}
-
+		$str .= Country::CodeById($this->shippingCountry) . ' ';
 		$str .= $this->shippingPostal;
 
 		return $str;
@@ -197,14 +396,7 @@ class MultiCheckoutForm extends CheckoutForm
 		$str .= $this->billingAddress2 ? $this->billingAddress2 : '';
 		$str .= $this->billingCity . ', ';
 		$str .= $this->billingState ? $this->billingState . ', ' : '';
-		if (is_numeric($this->billingCountry) === true)
-		{
-			$str .= Country::CodeById($this->billingCountry) . ' ';
-		}
-		else
-		{
-			$str .= $this->billingCountry ? $this->billingCountry . ' ' : '';
-		}
+		$str .= Country::CodeById($this->billingCountry) . ' ';
 
 		$str .= $this->billingPostal;
 
@@ -225,7 +417,12 @@ class MultiCheckoutForm extends CheckoutForm
 		$str .= $this->shippingCity. ', ';
 		$str .= $this->shippingState ? $this->shippingState . ', ' : '';
 		$str .= $this->shippingPostal ? $this->shippingPostal . '<br>' : '';
-		$str .= _xls_country() === $this->shippingCountry ? '' : Country::CountryByCode($this->shippingCountry);
+
+		// Only show the country if different from the store default.
+		if ($this->shippingCountry != Yii::app()->params['DEFAULT_COUNTRY'])
+		{
+			$str .= Country::CountryById($this->shippingCountry);
+		}
 
 		return $str;
 	}
@@ -239,7 +436,9 @@ class MultiCheckoutForm extends CheckoutForm
 	public function getHtmlBillingAddress()
 	{
 		if ($this->billingSameAsShipping == 1)
+		{
 			return $this->getHtmlShippingAddress();
+		}
 
 		$str = '';
 		$str .= $this->billingAddress1 . '<br>';
@@ -247,7 +446,12 @@ class MultiCheckoutForm extends CheckoutForm
 		$str .= $this->billingCity. ', ';
 		$str .= $this->billingState ? $this->billingState . ', ' : '';
 		$str .= $this->billingPostal ? $this->billingPostal . '<br>' : '';
-		$str .= _xls_country() === $this->billingCountry ? '' : Country::CountryByCode($this->billingCountry). '<br>';
+
+		// Only show the country if different from the store default.
+		if ($this->billingCountry != Yii::app()->params['DEFAULT_COUNTRY'])
+		{
+			$str .= Country::CountryById($this->billingCountry);
+		}
 
 		return $str;
 	}
@@ -280,7 +484,7 @@ class MultiCheckoutForm extends CheckoutForm
 				$this->billingCity = $objAddress->city;
 				$this->billingState = State::CodeById($objAddress->state_id);
 				$this->billingPostal = $objAddress->postal;
-				$this->billingCountry = Country::CodeById($objAddress->country_id);
+				$this->billingCountry = $objAddress->country_id;
 				break;
 
 			case 'shipping':
@@ -291,7 +495,7 @@ class MultiCheckoutForm extends CheckoutForm
 				$this->shippingCity = $objAddress->city;
 				$this->shippingState = State::CodeById($objAddress->state_id);
 				$this->shippingPostal = $objAddress->postal;
-				$this->shippingCountry = Country::CodeById($objAddress->country_id);
+				$this->shippingCountry = $objAddress->country_id;
 				break;
 		}
 	}

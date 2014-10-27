@@ -1,0 +1,311 @@
+
+
+/* Note to web designers:
+this layout is designed with the Twitter Bootstrap layout system.
+You should not hard-code point sizes for fonts, you should use em or percentages
+so it degrades gracefully on smaller screens. Use http://pxtoem.com/ for conversion.
+See base.css for base point sizes used.
+
+We recommend placing customizations in webstore-custom.css which overrides elements in this
+file, and leaving this file untouched.
+*/
+
+/**** Global settings ******/
+
+body {color: #295A7F; background: url('images/bodyBg.jpg'); font-family: 'Karla', sans-serif;}
+
+h1, h2, h3, h4, h5, h6 { color: #295A7F; font-family: 'Karla', sans-serif;}
+input  { color: #eee; 
+	-webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;} 
+
+
+input:focus, input:hover { color: #eee; border: 10px solid #FEB800; background-color: #FEB800; }
+
+select, input[type="text"], input[type="password"], input[type="email"],input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus { color: #295A7F;  background-color: #3DC0DC;  }
+legend  {  color: #295A7F;  }
+a{ color: #295A7F; -webkit-transition: color 0.3s ease-in-out;
+  -moz-transition: color 0.3s ease-in-out;
+  -o-transition: color 0.3s ease-in-out;
+  transition: color 0.3s ease-in-out;}
+a:hover {   color: #295A7F; }
+.darkbutton a { background: #FEB800; color: #eee;  border: 1px solid #295A7F; border-radius: 10px; padding: 10px 15px; 
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;}
+
+.darkbutton a:hover {background: #F6643C; }
+
+.lightbutton, .lightbutton a {  background-color: #7f7f7f; color: #eee; }
+.smalldarkbutton {  background-color: #262626; color: #eee; }
+.smalllightbutton {  background-color: #7f7f7f; color: #eee; }
+.smalldarkbutton a, .smalllightbutton a { color: #eee; }
+
+
+/***** header *****/
+#headerArea {background: #295A7F; }
+#topbar {background: #295A7F;  }
+.shoppingnavigation a,  #login a, #shoppingcartbottom a  {color: #eee;}
+.shoppingnavigation a:hover,  #login a:hover, #shoppingcartbottom a:hover  {color: #FEB800;}
+
+
+
+/***** Login/Logout button *****/
+#login, #login a {  }
+
+/***** Navigation (Products dropdown) and tabs *****/
+
+
+.navbar-toggle .icon-bar {background: #F6FAFB;}
+
+#menubar {background: #3DC0DC; }
+.mainMenuBtn a {  color: #fff; font-family: 'Karla', sans-serif; font-size: 1.3em; 	
+
+-webkit-transition: color 0.3s ease-in-out;
+  -moz-transition: color 0.3s ease-in-out;
+  -o-transition: color 0.3s ease-in-out;
+  transition: color 0.3s ease-in-out;}
+
+.mainMenuBtn a:hover {  color: #FEB800; }
+
+
+#nav_products ul a { color: #eee; border-bottom: 1px dotted #cccccc;}
+#nav_products ul li ul li a { background: #2c2c2c; border-bottom: 1px dotted #cccccc; }
+#nav_products ul li ul li a:hover { background: #2c2c2c; border-bottom: 1px dotted #cccccc; }
+
+
+
+/***** Breadcrumbs ******/
+.breadcrumbs {  color: #295A7F; border-bottom: 1px dotted #1277C9;}
+.breadcrumbs a { color: #295A7F; }
+
+/***** Product Grid *****/
+.product_cell { border: 1px #295A7F solid; background: #fff;  
+	-webkit-transition: background 0.5s ease-in-out;
+  -moz-transition: background 0.5s ease-in-out;
+  -o-transition: background 0.5s ease-in-out;
+  transition: background 0.5s ease-in-out;}
+
+
+
+.product_cell:last-child { border-right: 2px #295A7F solid; }
+
+
+
+
+.product_cell:hover .product_cell_label { background: #FEB800;}
+.product_cell_label  { color: #eee; background: #3DC0DC;  -webkit-transition: background 0.5s ease-in-out;
+  -moz-transition: background 0.5s ease-in-out;
+  -o-transition: background 0.5s ease-in-out;
+  transition: background 0.5s ease-in-out;}
+.product_cell_label .product_cell_price_slash { color: #7f7f7f;}
+.product_cell a { color: #eee;}
+.product_cell_label a { color: #eee;}
+.product_cell_label .product_cell_price {color: #295A7F; font-size: 16px;}
+
+/***** Pagination *****/
+#pagination a {color: #888888;  }
+#pagination li.page.selected, #pagination li.page.selected a {color: #295A7F; }
+#pagination li { color: #c7c7c7; }
+
+
+/***** Search Box *****/
+#searchentry .search_box input { color: #295A7F; border: 1px solid #FEB800; background-color: #eee; padding: 6px; }
+#searchentry .searchTextBox .searched { color: #295A7F; }
+
+
+/***** Advanced Search Page *****/
+
+#advancedsearch input {border: 10px solid #3DC0DC; }
+#advancedsearch input:focus {border: 10px solid #3DC0DC;}
+#advancedsearch #btnSubmit {border: 10px solid #3DC0DC; }
+#advancedsearch input#btnSubmit:hover {border: 10px solid #FEB800; }
+
+/***** sidebar *****/
+
+.products {color: #3DC0DC; font-family: 'Karla', sans-serif; font-size: 1.4em;  background: #295A7F; }
+
+
+#menutree a { border-bottom: 1px dotted #1277C9; 
+	-webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;}
+
+
+#menutree a:hover { color: #3DC0DC;}
+
+
+
+/***** Mini Cart (right side shopping cart) *****/
+#shoppingcarttop .minicart_item { border-top: 1px dotted #bbbbbb; }
+#shoppingcarttop .emptymessage {  color: #295A7F; }
+
+    /* checkout button */
+#shoppingcartcheckout { background-color: #1277C9; color: #eee; }
+#shoppingcartcheckout:hover { background-color: #295A7F; color: #eee; }
+#shoppingcartcheckout .checkoutlink a { color: #eee; text-decoration: none;}
+    /* edit cart button */
+#shoppingcarteditcart {  background-color: #7f7f7f; color: #eee;  }
+#shoppingcarteditcart .editlink a { color: #eee; }
+    /* continue shopping button */
+#shoppingcartcontinue { background-color: #1277C9; color: #eee;  min-width: 90px; 
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+
+#shoppingcartcontinue:hover { background-color: #F6643C; color: #eee;  }
+#shoppingcartcontinue  a { color: #295A7F;}
+#shoppingcartcontinue:hover a {color: #eee;}
+
+#ShoppingCart button {background-color: #3DC0DC; border: 10px solid #3DC0DC;}
+#ShoppingCart button:hover {background-color: #FEB800; border: 10px solid #FEB800;}
+
+/**** Generic Cart is used both on checkout and on the Edit Cart screen ****/
+#genericcart .cartdecor { color: #295A7F; }
+/* when editing cart */
+#genericcart input[type="text"],#genericcart input[type="text"]:focus { background: url('images/bodyBg.jpg'); }
+
+.facebook_wall { border: 1px solid #295A7F; }
+/***** Sidebar Modules *****/
+#sidebar .clickbar { color: #555555; border: 1px dotted #999999; }
+
+/***** Product Details Page *****/
+
+/***** #product_details h1 {font-family: 'Pacifico', cursive;} *****/
+
+
+#product_details .price_reg { color: #555555;}
+
+#product_details .addcart {background: #FEB800; color: #eee; border: 1px solid #295A7F; border-radius: 10px; 
+
+	-webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;}
+
+#product_details .addcart:hover {background: #F6643C; }
+
+#product_details .addcart a {  color: #eee; }
+
+
+
+
+#product_details .addcart a { color: #eee;}
+
+#product_details .wishlist { background: #1277C9; color: #eee; border: 1px solid #295A7F;  border-radius: 10px;
+
+	-webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;}
+
+
+#product_details .wishlist:hover { background: #295A7F; }
+
+#product_details .wishlist a {  color: #eee; }
+
+
+
+#product_details .grid-view table.items tr.odd { background-color: #eee; }
+#product_details .grid-view table.items tr.even { background-color: #eee; }
+
+
+#product_details #photos legend { font-size: 0.7em;}
+
+
+
+/***** Checkout page and Registration Page *****/
+#checkout legend, #contact-form legend, #orderdisplay legend  { color: #295A7F;  }
+#checkout .warning, #checkout .errorMessage, #contact-form .warning, #contact-form .errorMessage { color: #F6643C; }
+#checkout input[type="text"], #checkout input[type="password"], #checkout input[type="email"], #checkout input[type="select"],#checkout input[type="text"]:focus,#checkout input[type="password"]:focus, #checkout input[type="email"]:focus, #checkout input[type="select"]:focus { padding: 6px; border: 1px dotted #295A7F;  }
+#contact-form input[type="text"], #contact-form input[type="password"], #contact-form input[type="email"], #contact-form input[type="select"],#contact-form input[type="text"]:focus,#contact-form input[type="password"]:focus, #contact-form input[type="email"]:focus, #contact-form input[type="select"]:focus { padding: 6px; border: 1px dotted #295A7F; }
+#checkout .red,#contact-form .red, .customer_reg_err_msg { color: #dd0000; }
+#checkout fieldset { border-bottom: 2px dotted #295A7F; }
+
+#checkout #PromoLabel { color: #007700; }
+
+.forgotpassword { color: #F6643C; }
+
+#contact-form textarea { background-color: #3DC0DC; border: 1px dotted #295A7F;}
+
+
+
+
+
+#contactFormContainer .col-sm-5 {padding-left: 0px; }
+
+#ContactForm_fromName, #ContactForm_contactSubject, #ContactForm_fromEmail, #ContactForm_contactBody {display: block;}
+
+#checkout textarea {background-color: #3DC0DC; border: 1px dotted #3B4250; }
+
+
+/***** Messages from system *****/
+.msg { color: #252525; }
+
+span.required { color: #A285C5; }
+
+/***** Order/SRO/Quote Display *****/
+#orderdisplay .cartlabel, #orderdisplay .label { font-weight: bold; color: #3DC0DC; }
+#orderdisplay input[type="text"],#genericcart input[type="text"]:focus { background-color: #eee;border-bottom: 1px solid black; }
+
+#orderdisplay fieldset { border-bottom: 2px dotted #295A7F; }
+
+/***** Order/SRO/Quote Display *****/
+#wishlistdisplay .rowborder { border-bottom: 1px dotted #295A7F;}
+
+#wishlistdisplay .link .disabled {color: #cccccc; background-color: #eee;}
+#wishlistdisplay .addcart  a { background: #FEB800; color: #eee; border: 1px solid #295A7F; border-radius: 10px; padding: 10px;}
+
+
+#wishlistdisplay .sharelist a  { background: #FEB800; color: #eee; border: 1px solid #295A7F; border-radius: 10px; padding: 10px;}
+
+#wishlistdisplay .editwish a { color: #eee; text-transform: uppercase; font-size: 0.8em;}
+
+#btnWishListDelete { background-color: #ff9c59;}
+#wishlistdisplay .btnDelete {}
+
+
+/***** Footy *****/
+#footer  { color: #eee; }
+#footerStoreName {color: #3DC0DC;}
+#footer .addresshours { background-color: #295A7F; }
+#footer .copyright {  color: #295A7F;   }
+
+/****** jCarousel skin ******/
+.jcarousel-skin-slider .jcarousel-container{border: 1px dotted #1277C9; }
+.jcarousel-skin-slider .jcarousel-item-placeholder{background:#fff;color:#295A7F}
+
+
+/****** site map ******/
+.treeview ul { background: url('images/bodyBg.jpg') !important; }
+
+@media only screen and (max-width: 767px) {/* iPhone */
+
+#topbar { background: #295A7F; }
+
+#menubar {border-bottom: 0px dotted #fff;}
+
+.shoppingnavigation a, #login a, #shoppingcartbottom a {color: #3DC0DC; }
+
+}
+
+/****** share wishlist ******/
+
+.ui-widget-content, .ui-widget textarea { color: #295A7F; font-family: 'Karla', sans-serif; }
+
+#ShareForm_toName:focus, #ShareForm_toEmail:focus {border-color: #3DC0DC;}
+
+.ui-widget-header {
+border: 1px solid #295A7F;
+background: #3DC0DC;
+color: #eee;
+font-weight: bold;
+}
+
+input#ShareForm_toEmail:hover, input#ShareForm_toName:hover { border: 10px solid #3DC0DC; }

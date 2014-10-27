@@ -7,7 +7,8 @@ class m140828_005057_WS_2486_finalize_checkout_aim extends CDbMigration
 		// add columns for WS-2486 Finalize Checkout AIM
 
 		// get all columns from the table
-		$arr = Yii::app()->db->schema->getTable('xlsws_cart_payment')->columns;
+		$dbComponent = $this->dbConnection;
+		$arr = $dbComponent->schema->getTable('xlsws_cart_payment')->columns;
 
 		// add column if not exists
 		if (!array_key_exists('payment_card', $arr))

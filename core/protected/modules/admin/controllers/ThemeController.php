@@ -759,6 +759,16 @@ class ThemeController extends AdminBaseController
 		$arrActiveCss[] = Yii::app()->theme->config->CHILD_THEME;
 		Yii::app()->theme->config->activecss = $arrActiveCss;
 
+		// Hide config options that are not supported in
+		// non brooklyn2014 based themes
+		if (Yii::app()->theme->info->advancedCheckout === false)
+		{
+			_xls_hideNewAdminPanelOptions();
+		}
+		else
+		{
+			_xls_showNewAdminPanelOptions();
+		}
 
 		Yii::app()->user->setFlash(
 			'success',

@@ -90,6 +90,10 @@ class ShoppingCart extends CApplicationComponent
 					$objCart = Cart::InitializeCart();
 					Yii::app()->user->setState('cartid', $objCart->id);
 				}
+				elseif ($objCart->cart_type == CartType::cart)
+				{
+					$objCart->UpdateCartCustomer();
+				}
 			}
 
 			$this->_model = $objCart;

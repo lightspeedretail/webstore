@@ -6,14 +6,14 @@ function mobilecheck() {
 
 clickevent = mobilecheck() ? 'touchstart' : 'click';
 
-function hideModal() {
-    $('.webstore-modal').removeClass('show');
+function closeAccessWarning() {
+    $('.webstore-modal-login').removeClass('show');
     $('.webstore-modal').fadeOut();
     $('body').removeClass('overflowHidden');
 }
 
-function showModal() {
-    $('.webstore-modal:first').addClass('show');
+function showAccessWarning() {
+    $('.webstore-modal-login').addClass('show');
     setTimeout(function() { $('.webstore-modal').find('input[autofocus]').focus(); }, 500);
 }
 
@@ -34,7 +34,7 @@ function injectAccessWarningDiv() {
 
 $('.webstore-modal').click( function() {
     $.cookie('access_warning', 'false');
-    hideModal();
+    closeAccessWarning();
 });
 
 $(document).ready( function() {
@@ -43,23 +43,23 @@ $(document).ready( function() {
     if ($.cookie('access_warning') == null) {
         // Hide browser scroll bar when the access warning modal is displayed.
         $('body').addClass('overflowHidden');
-        setTimeout(function() { showModal();}, 1000);
+        setTimeout(function() { showAccessWarning();}, 1000);
     }
 
     $('.webstore-modal').click(function() {
         $.cookie('access_warning', 'false');
-        hideModal();
+        closeAccessWarning();
     });
 
     $('input[type="submit"]').click(function() {
         $.cookie('access_warning', 'false');
-        hideModal();
+        closeAccessWarning();
     });
 
     $(document).keyup(function(e) {
         if (e.keyCode == 27) {
             $.cookie('access_warning', 'false');
-            hideModal();
+            closeAccessWarning();
         }   // esc
     });
 });
