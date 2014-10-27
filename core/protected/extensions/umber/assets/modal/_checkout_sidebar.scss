@@ -86,6 +86,9 @@
     p {
       font-size: .8375rem;
       margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     h3 {
       text-transform: none;

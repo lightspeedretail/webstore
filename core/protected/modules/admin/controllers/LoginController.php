@@ -26,7 +26,8 @@ class LoginController extends AdminBaseController
 
 		$this->layout = "login";
 
-		$model=new LoginForm;
+		$model = new LoginForm;
+		$model->setScenario('Existing');
 
 		// collect user input data
 		if(isset($_POST['LoginForm']))

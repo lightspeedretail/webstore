@@ -7,6 +7,10 @@ body{
   body{
     line-height:normal;
   }
+  //overwrite: base.css l.119
+  p {
+    margin-bottom:0px;
+  }
   .button, button, input[type="submit"], input[type="reset"], input[type="button"]{
     text-shadow:none;
   }
@@ -52,11 +56,6 @@ body{
     margin-bottom: 0;
   }
 
-  input, input:focus {
-    border:solid 1px #ddd;
-    background-color: initial;
-  }
-
   input:focus {
     outline: -webkit-focus-ring-color auto 5px;
   }
@@ -86,14 +85,34 @@ body{
   input[type=submit] {
     margin-top: 0;
   }
+
+  //overwrite light l.154, l.141 height auto height 30px
+  .submit-small{
+    .button:focus, input[type="button"]:focus {
+      //MO
+      min-height:50px;
+    }
+  }
+
   //overwrite base.css l.350
   form{
     margin-bottom: 0;
   }
+
+  section footer.submit p {
+    display: block;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+  }
 }
 
 .overlay{
-  #checkout input[type="text"], #checkout input[type="password"], #checkout input[type="email"], #checkout input[type="select"], #checkout input[type="text"]:focus, #checkout input[type="password"]:focus, #checkout input[type="email"]:focus, #checkout input[type="select"]:focus {
+  #checkout input[type="text"], #checkout input[type="password"],
+  #checkout input[type="email"], #checkout input[type="select"],
+  #checkout input[type="text"]:focus, #checkout input[type="password"]:focus,
+  #checkout input[type="email"]:focus, #checkout input[type="select"]:focus {
 //    border: 1px solid #ddd;
   }
   #checkout label{
@@ -134,11 +153,5 @@ body{
 
   /* JPickard - added this because in base.css: #shoppingcart {text-transform: uppercase} */
   text-transform: none;
-
-
 }
-
-
-
-
 

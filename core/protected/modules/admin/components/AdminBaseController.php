@@ -192,9 +192,7 @@ class AdminBaseController extends CController
 		else
 			$this->setMenuHighlight();
 
-
-
-		$baseUrl = str_replace("/admin","/",Yii::app()->createAbsoluteUrl("admin"));
+		$baseUrl = '//' . $_SERVER['HTTP_HOST'] . '/';
 
 		Yii::app()->clientScript->registerScript(
 			'helpers',

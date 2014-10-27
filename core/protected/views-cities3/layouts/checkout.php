@@ -52,7 +52,7 @@
 							$objPrivacy = CustomPage::LoadByKey('privacy');
 							if ($objPrivacy instanceof CustomPage && $objPrivacy->tab_position !== 0)
 							{
-								echo
+								echo ' '.
 								CHtml::link(
 									Yii::t('cart', 'Privacy Policy'),
 									$objPrivacy->Link,

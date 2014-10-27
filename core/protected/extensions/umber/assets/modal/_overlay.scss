@@ -144,7 +144,13 @@ body.overlay {
     footer {
       padding: 0;
 
+      &.submit input{
+        float: none;
+      }
+
       img { margin: 0 3px 0 0; }
+
+      &.submit input{ float:none; }
       p {
         margin: 3rem 0 1rem;
         text-align: center;

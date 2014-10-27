@@ -176,10 +176,58 @@ class CustomerAddress extends BaseCustomerAddress
 			$obj->save();
 			return $obj;
 		}
-
-
 	}
 
+	public static function updateAddressFromForm($id, $checkoutForm, $str = 'shipping')
+	{
+		$obj = self::model()->findByPk($id);
+
+		if ($obj === null)
+		{
+			Yii::log(sprintf('Customer address with id %s not found', $id), 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
+			return;
+		}
+
+		switch ($str)
+		{
+			case 'shipping':
+				$obj->first_name = $checkoutForm->shippingFirstName;
+				$obj->last_name = $checkoutForm->shippingLastName;
+				$obj->company = $checkoutForm->shippingCompany;
+				$obj->address1 = $checkoutForm->shippingAddress1;
+				$obj->address2 = $checkoutForm->shippingAddress2;
+				$obj->city = $checkoutForm->shippingCity;
+				$obj->state_id = $checkoutForm->shippingState;
+				$obj->country_id = $checkoutForm->shippingCountry;
+				$obj->postal = $checkoutForm->shippingPostal;
+				$obj->phone = $checkoutForm->contactPhone;
+				break;
+
+			case 'billing':
+				$obj->address1 = $checkoutForm->billingAddress1;
+				$obj->address2 = $checkoutForm->billingAddress2;
+				$obj->city = $checkoutForm->billingCity;
+				$obj->state_id = $checkoutForm->billingState;
+				$obj->country_id = $checkoutForm->billingCountry;
+				$obj->postal = $checkoutForm->billingPostal;
+				break;
+		}
+
+		if ($obj->save() === false)
+		{
+			Yii::log(
+				sprintf(
+					"Error saving customer address with id: %s \n %s",
+					$id,
+					print_r($obj->getErrors(), true)
+				),
+				'error',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
+		}
+
+		Yii::log(sprintf('Updated Customer address with id: %s', $id), 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
+	}
 
 	public function search()
 	{
@@ -316,7 +364,7 @@ class CustomerAddress extends BaseCustomerAddress
 					(!empty($this->address2) ? $this->address2."<br>" : "").
 					$this->city.' '.
 					$this->state." ".$this->postal.'<br>'.
-					$this->country_name;
+					(_xls_country() != $this->country ? $this->country_name : "");
 
 			default:
 				return parent::__get($strName);

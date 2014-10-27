@@ -47,8 +47,13 @@
     }
 
   }
+  .billing-block {
+    p{
+      font-size: .75rem;
+    }
 
-  .address-block {
+  }
+  .address-block{
     p {
       position: relative;
 
@@ -147,6 +152,7 @@
 
     &.address-block-alter {
       position: relative;
+      margin-bottom: 15px; //MO
 
       p {
         width: 60%;

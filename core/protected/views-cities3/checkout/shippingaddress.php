@@ -20,6 +20,7 @@ $form = $this->beginWidget(
 <!------------------------------------------------------------------------------------------------------------	Layout Markup -------------------------------------------------------------------------------------------------->
 <div class="modal-conditional-block active">
 	<?php $this->renderPartial('_shippingheader', array('model' => $model)); ?>
+	<div class="error-holder"><?= $error ?></div>
 	<ol class="address-blocks">
 		<?php if(count($model->objAddresses)>0): ?>
 			<?php foreach ($model->objAddresses as $key => $objAddress): ?>
@@ -29,7 +30,7 @@ $form = $this->beginWidget(
 						echo $objAddress->formattedblockcountry;
 						?>
 						<span class="controls">
-							<a href="/checkout/shipping?address_id=<?= $objAddress->id ?>"><?php echo Yii::t('checkout','Edit Address'); ?></a>
+							<a href="/checkout/editaddress?id=<?= $objAddress->id ?>&type=shipping"><?php echo Yii::t('checkout','Edit Address'); ?></a>
 							<?php echo Yii::t('checkout', 'or'); ?>
 							<?php
 							echo CHtml::ajaxLink(
@@ -55,14 +56,14 @@ $form = $this->beginWidget(
 					</p>
 					<div class="buttons">
 						<button name="Address_id" value="<?= $objAddress->id ?>" class="small <?= $key == 0 ? 'default' : ''; ?>">
-							<?php echo Yii::t('cart', 'Ship to this address'); ?>
+							<?php echo Yii::t('checkout', 'Ship to this address'); ?>
 						</button>
 					</div>
 				</li>
 			<?php endforeach; ?>
 		<?php endif; ?>
 		<li class="add">
-			<?php echo CHtml::link(Yii::t('cart','Add New Address'), '/checkout/shipping/', array('class' => 'small button')); ?>
+			<?php echo CHtml::link(Yii::t('checkout','Add New Address'), '/checkout/newaddress?type=shipping', array('class' => 'small button')); ?>
 		</li>
 	</ol>
 </div>

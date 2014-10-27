@@ -1411,48 +1411,6 @@ function _xls_html_billingaddress($objCart)
 	return $str;
 }
 
-function _xls_hideNewAdminPanelOptions()
-{
-	$arrKeys = array(
-		'STORE_CITY',
-		'STORE_STATE',
-		'STORE_COUNTRY',
-		'STORE_ZIP',
-	);
-
-	foreach ($arrKeys as $key)
-	{
-		$sql = sprintf('UPDATE `xlsws_configuration` SET `configuration_type_id` = 0 WHERE `key_name` = "%s"', $key);
-		_dbx($sql);
-	}
-
-	$sql = 'UPDATE `xlsws_configuration` SET `title` = "Store City, State, Zip" WHERE `key_name` = "STORE_ADDRESS2";';
-	_dbx($sql);
-}
-
-function _xls_showNewAdminPanelOptions()
-{
-	$arrKeys = array(
-		array('id' => 2, 'key' =>'STORE_CITY'),
-		array('id' => 2, 'key' =>'STORE_STATE'),
-		array('id' => 2, 'key' =>'STORE_COUNTRY'),
-		array('id' => 2, 'key' =>'STORE_ZIP'),
-	);
-
-	foreach ($arrKeys as $key)
-	{
-		$sql = sprintf(
-			'UPDATE `xlsws_configuration` SET `configuration_type_id` = %d WHERE `key_name` = "%s";',
-			$key['id'],
-			$key['key']
-		);
-
-		_dbx($sql);
-	}
-
-	$sql = 'UPDATE `xlsws_configuration` SET `title` = "Store Address 2" WHERE `key_name` = "STORE_ADDRESS2";';
-	_dbx($sql);
-}
 
 
 /**

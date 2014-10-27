@@ -63,10 +63,14 @@
 								})
 								.fail(function()  {
 									wsShippingEstimator.toggleLoadingSpinner();
+									$('.estimator-zip-error').removeClass('hide');
 								});"
 					)
 				);
 			?>
+		</div>
+		<div class="hide estimator-zip-error">
+			<p></p>
 		</div>
 	</td>
 </tr>
@@ -122,6 +126,8 @@
 <?php
 	echo CHtml::script(
 		'
+		var zipCodeError = '. CJSON::encode(Yii::t('checkout', "ERROR: Invalid zip code. Please try again")) .';
+		var zippoUnhandledError = '. CJSON::encode(Yii::t('checkout', "Shipping cannot be estimated at this time, but checkout is still possible")) .';
 		var strCalculateButton = '. CJSON::encode(Yii::t('shipping', 'Calculate')) .';
 		var calculatingLabel = '. CJSON::encode(Yii::t('cart', 'Calculating...')) .';
 		$(document).ready(function () {

@@ -19,43 +19,20 @@ $form = $this->beginWidget(
 </nav>
 
 <h1><?php echo Yii::t('checkout', 'Payment')?></h1>
-
-<div class="outofbandpayment">
-	<div class="buttons">
-		<?php
-		$paypal = Modules::LoadByName('paypal');
-		if ($paypal->active)
-		{
-			echo CHtml::htmlButton(
-				Yii::t('checkout', 'Pay with PayPal'),
-				array(
-					'class' => 'paypal',
-					'type' => 'submit',
-					'name' => 'Paypal',
-					'id' => 'Paypal',
-					'value' => $paypal->id,
-				)
-			);
-
-			echo CHtml::tag(
-				'div',
-				array('class' => 'or-block'),
-				''
-			);
-		}
-		?>
-	</div>
-</div>
+<?php
+$paypal = Modules::LoadByName('paypal');
+$simModulesCC = $model->getSimPaymentModulesThatUseCard();
+$count = count($simModulesCC);
+$this->renderPartial('_paypalbuttonsim', array('paypal' => $paypal, 'count' => $count));
+?>
 <!------------------------------------------------------------------------------------------------------------	Layout Markup -------------------------------------------------------------------------------------------------->
-
+<?php if (count($simModulesCC) > 0 || $paypal->active == true): ?>
 <div class="creditcard">
 	<div class="error-holder"><?= $error ?></div>
 	<div class="payment-methods">
 		<?php
-		$arr = $model->getSimPaymentModulesThatUseCard();
-		$count = count($arr);
 		$checked = 0;
-		foreach ($arr as $module)
+		foreach ($simModulesCC as $module)
 		{
 			echo $form->radioButton(
 				$model,
@@ -106,7 +83,7 @@ $form = $this->beginWidget(
 	</label>
 
 	<div class="address-form invisible">
-		<h4><?php echo Yii::t('checkout','Billing Address'); ?></h4>
+		<h4><?php echo Yii::t('checkout', 'Billing Address'); ?></h4>
 		<ol class="address-blocks">
 			<?php if(count($model->objAddresses) > 0): ?>
 				<?php foreach ($model->objAddresses as $objAddress): ?>
@@ -116,8 +93,29 @@ $form = $this->beginWidget(
 							echo $objAddress->formattedblockcountry;
 							?>
 							<span class="controls">
-							<a href="#">Edit Address</a> or <a class="delete">Delete</a>
-						</span>
+							<a href="/checkout/editaddress?id=<?= $objAddress->id ?>&type=billing"><?php echo Yii::t('checkout','Edit Address'); ?></a>
+								<?php echo Yii::t('checkout', 'or'); ?>
+								<?php
+								echo CHtml::ajaxLink(
+									Yii::t('checkout', 'Hide'),
+									'/myaccount/removeaddress',
+									array(
+										'type' => 'POST',
+										'data' => array(
+											'CustomerAddressId' => $objAddress->id,
+											'YII_CSRF_TOKEN' => Yii::app()->request->csrfToken
+										),
+										'success' => 'function(data) {
+										var addressBlock = $(this).parents(".address-block")[0];
+										$(addressBlock).remove();
+									}.bind(this)'
+									),
+									array(
+										'class' => 'delete'
+									)
+								);
+								?>
+							</span>
 						</p>
 						<div class="buttons">
 							<?php
@@ -138,44 +136,24 @@ $form = $this->beginWidget(
 				<?php endforeach; ?>
 			<?php endif; ?>
 			<li class="add">
-				<button class="small">Add New Address</button>
+				<?php echo CHtml::link(Yii::t('checkout', 'Add New Address'), '/checkout/newaddress?type=billing', array('class' => 'small button')); ?>
 			</li>
 		</ol>
 	</div>
-	</div>
-<div class="alt-payment-methods payment-methods">
-	<h4><?php echo Yii::t('checkout', 'Alternative Payment Methods'); ?></h4>
-	<?php
-	foreach ($model->simPaymentModulesNoCard as $id => $option)
-	{
-		echo $form->radioButton(
-			$model,
-			'paymentProvider',
-			array('uncheckValue' => null, 'value' => $id, 'id' => 'MultiCheckoutForm_paymentProvider_'.$id)
-		);
-		echo $form->labelEx(
-			$model,
-			'paymentProvider',
-			array('class' => 'payment-method', 'label' => Yii::t('checkout', $option), 'for' => 'MultiCheckoutForm_paymentProvider_'.$id)
-		);
-	}
-	?>
 </div>
-<footer class="submit">
-	<?php
-		echo
-			CHtml::submitButton(
-				'Submit',
-				array(
-					'type' => 'submit',
-					'class' => 'button',
-					'name' => 'Payment',
-					'id' => 'Payment',
-					'value' => Yii::t('checkout', "Review and Confirm Order")
-				)
-			);
-	?>
-</footer>
+
+<?php
+endif;
+$this->renderPartial(
+	'_altpaymentmethods',
+	array(
+		'model' => $model,
+		'form' => $form,
+		'paypal' => $paypal,
+		'simModulesCC' => $simModulesCC
+	)
+);
+?>
 
 <?php $this->endWidget(); ?>
 

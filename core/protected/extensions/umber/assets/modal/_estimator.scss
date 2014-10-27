@@ -67,9 +67,9 @@
 .shipping-postal-entry{
   position: relative;
   display: block;
-  //  //MO
-  //  margin-top: 17px;
-  //  min-height: 41px;
+//  //MO
+//  margin-top: 17px;
+//  min-height: 41px;
 
 
   button.inset{
@@ -173,10 +173,10 @@
 
 
 
-//ESTIMATOR TEMPORARY FIX;
+//ESTIMATOR TEMPORARY FIX - WILL BE CHANGED BASED ON LUKE'S NEW DESIGN http://jira.atlightspeed.net/browse/WS-3101;
 .radio label{
   float:left !important;
-  width: 75% !important;
+  width: 70% !important;
 }
 .radio input[type="radio"] {
   float:left !important;

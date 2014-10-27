@@ -22,10 +22,12 @@
 	</article>
 	<article class="column payment">
 		<h4><?php echo Yii::t('checkout','Payment Details'); ?></h4>
-		<p>
-			<?php
-			$this->renderPartial('_paymentdetails', array('cart' => $cart, 'isReceipt' => $isReceipt))
-			?>
-		</p>
+		<div class="billing-block">
+			<p>
+				<?php
+				$this->renderPartial('_paymentdetails', array('cart' => $cart, 'isReceipt' => $isReceipt))
+				?>
+			</p>
+		</div>
 	</article>
 </div>

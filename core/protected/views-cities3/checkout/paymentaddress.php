@@ -17,34 +17,12 @@ $form = $this->beginWidget(
 	</ol>
 </nav>
 
-<h1><?php Yii::t('checkout', 'Payment')?></h1>
+<h1><?php echo Yii::t('checkout', 'Payment')?></h1>
 
-<div class="outofbandpayment">
-	<div class="buttons">
-		<?php
-		$paypal = Modules::LoadByName('paypal');
-		if ($paypal->active)
-		{
-			echo CHtml::htmlButton(
-				Yii::t('checkout', 'Pay with PayPal'),
-				array(
-					'class' => 'paypal',
-					'type' => 'submit',
-					'name' => 'Paypal',
-					'id' => 'Paypal',
-					'value' => $paypal->id,
-				)
-			);
+<?php
+$this->renderPartial('_paypalbuttonaim');
+?>
 
-			echo CHtml::tag(
-				'div',
-				array('class' => 'or-block'),
-				''
-			);
-		}
-		?>
-	</div>
-</div>
 <div class="creditcard">
 	<div class="error-holder"><?= $error ?></div>
 
@@ -87,8 +65,27 @@ $form = $this->beginWidget(
 							echo $objAddress->formattedblockcountry;
 							?>
 							<span class="controls">
-							<a href="#">Edit Address</a> or <a class="delete">Delete</a>
-						</span>
+								<a href="/checkout/editaddress?id=<?= $objAddress->id ?>&type=billing"><?php echo Yii::t('checkout','Edit Address'); ?></a>
+								<?php echo Yii::t('checkout', 'or'); ?>
+								<?php
+								echo CHtml::ajaxLink(
+									Yii::t('checkout', 'Hide'),
+									'/myaccount/removeaddress',
+									array(
+										'type' => 'POST',
+										'data' => array(
+											'CustomerAddressId' => $objAddress->id,
+											'YII_CSRF_TOKEN' => Yii::app()->request->csrfToken
+										),
+										'success' => 'function(data) {
+										var addressBlock = $(this).parents(".address-block")[0];
+										$(addressBlock).remove();
+										}.bind(this)'
+									),
+									array('class' => 'delete')
+								);
+								?>
+							</span>
 						</p>
 						<div class="buttons">
 							<?php
@@ -109,16 +106,22 @@ $form = $this->beginWidget(
 				<?php endforeach; ?>
 			<?php endif; ?>
 			<li class="add">
-				<button class="small">Add New Address</button>
+				<?php echo CHtml::link(Yii::t('checkout', 'Add New Address'), '/checkout/newaddress?type=billing', array('class' => 'small button')); ?>
 			</li>
 		</ol>
 	</div>
 </div>
 
+<?php
+$simModules = $model->simPaymentModulesNoCard;
+$count = count($simModules);
+
+if ($count > 0):
+?>
 <div class="alt-payment-methods payment-methods">
 	<h4><?php echo Yii::t('checkout', 'Alternative Payment Methods'); ?></h4>
 	<?php
-	foreach ($model->simPaymentModulesNoCard as $id => $option)
+	foreach ($simModules as $id => $option)
 	{
 		echo $form->radioButton(
 			$model,
@@ -133,6 +136,7 @@ $form = $this->beginWidget(
 	}
 	?>
 </div>
+<?php endif; ?>
 	<!------------------------------------------------------------------------------------------------------------	Layout Markup -------------------------------------------------------------------------------------------------->
 <footer>
 	<?php

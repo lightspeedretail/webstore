@@ -28,6 +28,8 @@
 	border: 1px solid #ddd;
 	border-top: none;
 	overflow: hidden;
+
+    //MO
     &.city-fieldgroup ol li:nth-child(1){
       width: 20%;
       input{
@@ -60,8 +62,6 @@
         border-right: 1px solid #ddd;
 
 		input, select {
-            height: 2.375rem;
-            font-size: .75rem;
 			width: auto;
 			border: none;
 			margin: 0;
@@ -106,15 +106,16 @@
 }
 
 .fieldgroup .field-container.country {
-	float: left;
+    float: right;
 	select { max-width: 7rem; }
 }
 
-.field-container.field-container-select-no-handle.country {
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
-}
+//  MO removed this
+//.field-container.field-container-select-no-handle.country {
+//  border-left: 1px solid #ddd;
+//  border-right: 1px solid #ddd;
+//  border-bottom: 1px solid #ddd;
+//}
 
 .field-container select.modal-accent-color { color: $blue; }
 
@@ -122,43 +123,38 @@ ol.field-container-gap {
 	margin-bottom: 1rem;
 }
 
-
-.field-container-narrowed {
-	width: 75%;
-	float: left;
-}
-
-//MO
-.field-container-shipname {
-  width: 37.5%;
-  float: left;
-}
-//MO
-.field-container-pickupname {
+.field-container-split {
   width: 50%;
   float: left;
 }
+.field-container-split-latter {
+//  MO removed this, company input is misaligned with
+//  names input with this
+//  margin-left: -1px;
+}
+.field-container-toggle {
+  font-size: .8125rem;
 
-.field-container-endcap {
-	float: left;
-	width: 25%;
+  a {
+    display: inline-block;
+    padding: 9px 9px 3px;
+  }
+}
 
-	a {
-		height: 2.75rem;
-		border: 1px solid #ccc;
-		line-height: 2.75rem;
-		color: #999;
-		padding:  0 8px;
-		font-size: .875rem;
-		display: inline-block;
-		width: 100%;
-		border-left: none;
-		text-decoration: none;
+.company-container {
+  clear: both;
+}
 
-		&:hover {
-			color: #666;
-		}
-	}
+.field-container-select {
+  height: 2.75rem;
+  line-height: 2.75rem;
+
+  select { font-size: .875rem; }
+}
+
+.field-container-narrowed {
+  width: 75%;
+  float: left;
 }
 
 
@@ -174,8 +170,6 @@ ol.field-container-gap {
 
 .webstore-modal-overlay .address-form .fieldgroup .field-container input:focus,
 .webstore-modal-overlay .address-form .fieldgroup .field-container input:focus:required:invalid:focus{
-  height: 2.375rem;
-  font-size: .75rem;
   width: auto;
   border: none;
   margin: 0;

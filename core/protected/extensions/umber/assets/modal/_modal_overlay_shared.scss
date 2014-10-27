@@ -17,7 +17,8 @@
   input[type="submit"] {
     outline: none;
   }
-  button, .button, input[type="button"]  {
+
+  button, .button, input[type="button"], .button:focus, input[type="button"]:focus {
     @include transition-property(background-color,color);
     @include transition-duration(.3s);
 
@@ -193,8 +194,13 @@
     }
 
     &.field-container-nobottomborder {
+      input, input:focus {
+        border-bottom: none !important;
+      }
+    }
+    &.field-container-notopborder {
       input {
-        border-bottom: none;
+        border-top: none;
       }
     }
   }
@@ -258,14 +264,16 @@
 
   .form-error {
     border-top: 3px solid $error-color;
-    padding: 12px 20px;
+    padding: 12px 15px;
     background-color: #FFF2F2;
     border-bottom: 1px solid #ddd;
+    margin: -.5em 0 1em;
 
     p {
-      margin: 0;
+
       color: $error-color;
-      font-size: .85rem;
+      font-size: .8125rem;
+      line-height: 1.5;
     }
   }
 
@@ -276,6 +284,7 @@
     padding: 12px 20px;
     background-color: $success-color;
     border-bottom: 1px solid #ddd;
+    margin: -0.5em 0 1em;
 
     p {
       margin: 0;
@@ -390,8 +399,8 @@
           position: absolute;
           top: 2px;
           left: 0;
-          height: 18px;
-          width: 18px;
+          height: 20px;
+          width: 20px;
 
           display: inline-block;
           color: #ccc;
@@ -417,4 +426,10 @@ p.hint{
   font-size: .75rem;
 //  TODO:remove this;
   max-width: 43px;
+}
+
+//confirmation quantity on focus
+.webstore-overlay input, .webstore-overlay input:focus {
+  border: solid 1px #ddd;
+  background-color: initial;
 }

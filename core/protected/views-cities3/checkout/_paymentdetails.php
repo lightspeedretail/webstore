@@ -86,7 +86,8 @@ else
 			array('class' => 'card-tiny')
 		);
 		echo '<strong>' . $cart->payment->payment_name . '</strong>';
-		echo '<span class="payment-note">' . Yii::t('checkout', $cart->payment->instructions) . '</span>';
+		echo '<span class="payment-note">' . Yii::t('checkout', $cart->payment->instructions) . '</span><br>';
+		echo _xls_html_billingaddress($cart);
 	}
 
 	// All other SIM methods

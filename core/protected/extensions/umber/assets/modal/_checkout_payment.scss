@@ -128,6 +128,10 @@
     .address-form.invisible {
         display: none;
         visibility: visible; // override bootstrap
+        .fieldgroup .field-container input, .fieldgroup .field-container select {
+          height: 2.375rem;
+          font-size: .75rem;
+        }
     }
 
   .payment-methods {
@@ -221,6 +225,11 @@
     }
   }
 
+  //MO
+  .alt-payment-methods.borderclose {
+    border-top: 0;
+  }
+
   }
 
 	.address-blocks {
@@ -283,9 +292,16 @@
 		}
 
 		.card-details {
+            input, input#MultiCheckoutForm_cardExpiry:focus, input#MultiCheckoutForm_cardNumber:focus, input#MultiCheckoutForm_cardCVV:focus {
+              background-color: #fff;
+            }
+            input#MultiCheckoutForm_cardNumber:focus{
+              font-size: 1.325rem;
+            }
 			background-color: #f8f8f8;
 			border: 1px solid #ddd;
 			padding: 20px 20px 15px;
+            margin-top: 20px;
             @include border-radius(10px);
 
 			ol.field-container-gap {
@@ -360,6 +376,7 @@
 		color: #999;
 		font-weight: bold;
         width: 100%;
+        margin: 15px 0 20px;
 
 		:checked + .text {
 			color: #444;
@@ -377,11 +394,13 @@
 			margin: .45em .5em 1em 0;
 			font-size: 1.25rem;
 		}
+        //MO
+        span{
+            display: inline-block;
+            float: left;
+            width: 300px;
+        }
 	}
-
-
-
-
 
 //temporary fix, confirm exact styling with Kevin and Luke
 input#MultiCheckoutForm_cardNumber {

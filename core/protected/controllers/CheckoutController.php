@@ -4,6 +4,8 @@ class CheckoutController extends Controller
 {
 	public $layout;
 
+	const NEWADDRESS = 1;
+	const EDITADDRESS = 2;
 
 	/**
 	 * Our form model that we save, cache and retrieve
@@ -289,6 +291,204 @@ class CheckoutController extends Controller
 		$this->render('shipping', array('model' => $this->checkoutForm, 'error' => $error));
 	}
 
+
+	/**
+	 * Validate the GET variables and execute our
+	 * main function for the logged in user to
+	 * add a new address
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function actionNewAddress()
+	{
+		$strType = Yii::app()->getRequest()->getQuery('type');
+		if ($strType !== 'billing' && $strType !== 'shipping')
+		{
+			Yii::log('Incorrect string for type. Must be "shipping" or "billing"', 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
+			throw new Exception(Yii::t('checkout', 'Address type is missing or incorrect'));
+		}
+
+		$this->addressEditor($strType, self::NEWADDRESS);
+	}
+
+	/**
+	 * Validate the GET variables and execute our
+	 * main function to edit the logged in user's
+	 * existing address
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function actionEditAddress()
+	{
+		$strType = Yii::app()->getRequest()->getQuery('type');
+		if ($strType !== 'billing' && $strType !== 'shipping')
+		{
+			Yii::log('Incorrect string for type. Must be "shipping" or "billing"', 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
+			throw new Exception(Yii::t('checkout', 'Address type is missing or incorrect'));
+		}
+
+		$intAddressId = Yii::app()->getRequest()->getQuery('id');
+		$blnAddressBelongsToUser = $this->checkoutForm->addressBelongsToUser($intAddressId);
+
+		if ($blnAddressBelongsToUser === false)
+		{
+			Yii::log(
+				sprintf('Address %s does not belong to user %s', $intAddressId, Yii::app()->user->id),
+				'error',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
+			throw new Exception(Yii::t('checkout', 'Address id is null or does not belong to user'));
+		}
+
+		$this->addressEditor($strType, self::EDITADDRESS, $intAddressId);
+	}
+
+	/**
+	 * Main function for handling the addition of a new address
+	 * or editing of an existing address.
+	 *
+	 * @param $strType - either 'shipping' or 'billing'
+	 * @param $intAction - add address or edit address
+	 * @param null $intAddressId - id of address to be edited
+	 * @return void
+	 * @throws Exception
+	 */
+	protected function addressEditor($strType, $intAction, $intAddressId = null)
+	{
+		if ($strType === 'billing')
+		{
+			$strCancelAction = 'final';
+			$strRedirectPath = '/checkout/final';
+			$strPartial = '_paymentaddress';
+			if ($intAction === self::EDITADDRESS)
+			{
+				$strHeader = Yii::t('checkout', 'Update Billing Address');
+			}
+			else
+			{
+				$strHeader = Yii::t('checkout', 'Add Billing Address');
+			}
+		}
+		else
+		{
+			// it's shipping
+			$strCancelAction = 'shippingaddress';
+			$strRedirectPath = '/checkout/shippingaddress';
+			$strPartial = '_shippingaddress';
+			if ($intAction === self::EDITADDRESS)
+			{
+				$strHeader = Yii::t('checkout', 'Update Shipping Address');
+			}
+			else
+			{
+				$strHeader = Yii::t('checkout', 'Add Shipping Address');
+			}
+		}
+
+		// we shouldn't be in here if user is a guest
+		if (Yii::app()->user->isGuest === true)
+		{
+			$this->redirect($this->createUrl($strRedirectPath));
+		}
+
+		$this->publishJS('shipping');
+		$this->layout = '/layouts/checkout';
+
+		$this->loadForm();
+		$error = null;
+
+		if ($intAction === self::EDITADDRESS)
+		{
+			$this->checkoutForm->fillAddressFields($intAddressId, $strType);
+		}
+		else
+		{
+			// action is addaddress so clear all address
+			// fields and display a blank form
+			$this->checkoutForm->clearAddressFields($strType);
+		}
+
+		if (isset($_POST['MultiCheckoutForm']))
+		{
+			$this->checkoutForm->attributes = $_POST['MultiCheckoutForm'];
+
+			$this->checkoutForm->pickupFirstName = null;
+			$this->checkoutForm->pickupLastName = null;
+
+			if ($strType === 'billing')
+			{
+				$this->checkoutForm->billingState = State::IdByCode($this->checkoutForm->billingState, $this->checkoutForm->billingCountry);
+				$this->checkoutForm->billingPostal = strtoupper($this->checkoutForm->billingPostal);
+				if ($intAction === self::EDITADDRESS)
+				{
+					$this->checkoutForm->intBillingAddress = $intAddressId;
+					CustomerAddress::updateAddressFromForm($intAddressId, $this->checkoutForm, $strType);
+				}
+				else
+				{
+					$this->checkoutForm->intBillingAddress = null;
+				}
+			}
+			else
+			{
+				$this->checkoutForm->contactFirstName = $this->checkoutForm->shippingFirstName;
+				$this->checkoutForm->contactLastName = $this->checkoutForm->shippingLastName;
+				$this->checkoutForm->shippingCountry = Country::IdByCode($this->checkoutForm->shippingCountryCode);
+				$this->checkoutForm->shippingState = State::IdByCode($this->checkoutForm->shippingState, $this->checkoutForm->shippingCountry);
+				$this->checkoutForm->shippingPostal = strtoupper($this->checkoutForm->shippingPostal);
+				if ($intAction === self::EDITADDRESS)
+				{
+					$this->checkoutForm->intShippingAddress = $intAddressId;
+					CustomerAddress::updateAddressFromForm($intAddressId, $this->checkoutForm, $strType);
+				}
+				else
+				{
+					$this->checkoutForm->intShippingAddress = null;
+				}
+			}
+
+			$this->saveForm();
+
+			if ($this->updateAddressId($strType))
+			{
+				$this->saveForm();
+
+				switch ($strType)
+				{
+					case 'billing':
+						$this->redirect($this->createUrl('/checkout/final'));
+						break;
+
+					default:
+						$this->redirect($this->createUrl('/checkout/shippingaddress'));
+				}
+			}
+			else
+			{
+				$error = $this->formatErrors($this->errors);
+			}
+		}
+
+		$this->render(
+			'editaddress',
+			array(
+				'model' => $this->checkoutForm,
+				'error' => $error,
+				'partial' => $strPartial,
+				'cancel' => $strCancelAction,
+				'header' => $strHeader
+			)
+		);
+	}
+
+	/**
+	 * Display the logged in user's list of addresses
+	 * and handle them choosing one
+	 *
+	 * @return void
+	 */
 	public function actionShippingAddress()
 	{
 		$this->publishJS('shipping');
@@ -320,7 +520,7 @@ class CheckoutController extends Controller
 			}
 		}
 
-		$this->checkoutForm->objAddresses = $arrFirst + $arrObjAddresses;
+		$this->checkoutForm->objAddresses = array_values($arrFirst + $arrObjAddresses);
 
 		// populate our form with some default values in case the user
 		// was logged in already and bypassed checkout login
@@ -660,27 +860,6 @@ class CheckoutController extends Controller
 		}
 	}
 
-	public function actionPaymentAddress()
-	{
-		$this->publishJS('payment');
-		$this->layout = '/layouts/checkout';
-
-		$this->loadForm();
-
-		$this->checkoutForm->objAddresses = CustomerAddress::getActiveAddresses();
-
-		if (isset($_POST['CheckoutForm']))
-		{
-			$this->checkoutForm->attributes = $_POST['CheckoutForm'];
-		}
-
-		$this->saveForm();
-
-		$this->render('paymentaddress', array('model' => $this->checkoutForm));
-
-	}
-
-
 	/**
 	 * Get payment choice and have end user confirm and place order.
 	 * A user can choose a simple integration method which will redirect
@@ -940,6 +1119,9 @@ class CheckoutController extends Controller
 			{
 				$arrCheckbox['name'] = 'MultiCheckoutForm[intBillingAddress]';
 				$arrCheckbox['label'] = Yii::t('checkout', 'Use this as my billing address');
+
+				// get up to date address info
+				$this->checkoutForm->objAddresses = CustomerAddress::getActiveAddresses();
 
 				// set the current shipping address to be first in the array
 				// so that it becomes the first billing address option
@@ -1336,13 +1518,14 @@ class CheckoutController extends Controller
 		}
 
 		return $arr;
-
 	}
+
 
 	/**
 	 * Perform the final steps needed to finish an AIM web order
 	 *
-	 * @return bool
+	 * @return array|bool
+	 * @throws Exception
 	 */
 
 	public function executeCheckoutProcess()
@@ -1550,7 +1733,7 @@ class CheckoutController extends Controller
 				else
 				{
 					$attributes = array(
-						'customer_id' => isset($objCart->customer_id) ? $objCart->customer_id : null,
+						'customer_id' => $objCart->customer_id,
 						'first_name' => $model->shippingFirstName,
 						'last_name' => $model->shippingLastName,
 						'address1' => $model->shippingAddress1 ? $model->shippingAddress1 : null,
@@ -1561,7 +1744,7 @@ class CheckoutController extends Controller
 						'state_id' => isset($model->shippingCountry) && isset($model->shippingState) ? State::IdByCode($model->shippingState, $model->shippingCountry) : null,
 					);
 
-					if (isset($model->shippingAddress1) == false )
+					if (isset($model->shippingAddress1) == false)
 					{
 						// if address1 is blank, shopper has chosen store pickup
 						$attributes['store_pickup_email'] = $model->pickupPersonEmail ? $model->pickupPersonEmail : $model->contactEmail;
@@ -1580,7 +1763,7 @@ class CheckoutController extends Controller
 					$objAddress = CustomerAddress::findOrCreate($attributes);
 
 					$objAddress->address_label = $model->shippingLabel ? $model->shippingLabel : Yii::t('global', 'Unlabeled Address');
-					$objAddress->phone = $model->shippingPhone;
+					$objAddress->phone = is_null($model->shippingPhone) === true ? $model->contactPhone : $model->shippingPhone;
 					$objAddress->residential = $model->shippingResidential;
 				}
 
@@ -1598,7 +1781,8 @@ class CheckoutController extends Controller
 					$intAddressId = $model->intBillingAddress;
 				}
 
-				else
+				// billing address must have at least address1, city and country filled in
+				elseif ($model->billingAddress1 && $model->billingCity && $model->billingCountry)
 				{
 					$continue = true;
 
@@ -1654,6 +1838,12 @@ class CheckoutController extends Controller
 					}
 
 					$objAddress->residential = $model->billingResidential ? $model->billingResidential : $objAddress->residential;
+				}
+
+				else
+				{
+					$objAddress = null;
+					$intAddressId = null;
 				}
 
 				break;
@@ -1875,7 +2065,7 @@ class CheckoutController extends Controller
 
 		$arrPaymentResult = Yii::app()->getComponent($objPayment->payment_module)->setCheckoutForm($this->checkoutForm)->run();
 
-		Yii::log("$objPayment->payment_module result:\n".print_r($arrPaymentResult,true), 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
+		Yii::log("$objPayment->payment_module result:\n".print_r($arrPaymentResult, true), 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
 
 		return $this->finalizeOrder($arrPaymentResult);
 	}
@@ -2074,14 +2264,7 @@ class CheckoutController extends Controller
 	private function _fillFieldsForStorePickup()
 	{
 		// clear any existing shipping address info from the form
-		$this->checkoutForm->intShippingAddress = null;
-		$this->checkoutForm->billingSameAsShipping = null;
-		$this->checkoutForm->shippingAddress1 = null;
-		$this->checkoutForm->shippingAddress2 = null;
-		$this->checkoutForm->shippingCity = null;
-		$this->checkoutForm->shippingState = null;
-		$this->checkoutForm->shippingCountry = null;
-		$this->checkoutForm->shippingPostal = null;
+		$this->checkoutForm->clearAddressFields();
 
 		$this->checkoutForm->shippingFirstName = $this->checkoutForm->pickupFirstName;
 		$this->checkoutForm->shippingLastName = $this->checkoutForm->pickupLastName;

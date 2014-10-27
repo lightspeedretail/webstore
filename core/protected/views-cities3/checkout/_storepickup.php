@@ -41,7 +41,7 @@
 			<p>&nbsp;</p>
 
 			<ol class="field-containers-small" style="overflow:visible">
-				<li class="field-container field-container-pickupname">
+				<li class="field-container field-container-split">
 					<?php
 					echo $form->labelEx(
 						$model,
@@ -55,7 +55,7 @@
 					);
 					?>
 				</li>
-				<li class="field-container field-container-pickupname">
+				<li class="field-container field-container-split field-container-split-latter">
 					<?php
 					echo $form->labelEx(
 						$model,

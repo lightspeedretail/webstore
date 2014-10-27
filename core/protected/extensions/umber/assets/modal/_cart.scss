@@ -448,11 +448,13 @@
 		left: 0;
 		top: 0;
 		right: 0;
-		min-height: 150px;
 		background-color: #fff;
 		margin: 0;
 		padding: 0 0 67px;
 		box-shadow: 1px 1px 3px rgba(0,0,0,.1);
+        ol{
+          min-height: 120px;
+        }
 
 		@include media(small) {
 			left: -265px;
@@ -495,7 +497,14 @@
 
 		li:last-child label { border-bottom: none; }
 	}
-	li { display: inline; }
+	li {
+      display: inline;
+      margin-bottom: 0;
+          &:hover {
+              background-color: #eee;
+              cursor: pointer;
+          }
+    }
 
 	button {
 		width: 100%;
@@ -527,11 +536,6 @@
 			color: #999;
 			font-size: .9375rem;
 			@include media(small) { font-size: .75rem; }
-		}
-
-		&:hover {
-			background-color: #eee;
-			cursor: pointer;
 		}
 	}
 	input {

@@ -86,6 +86,7 @@
 
 	.payment {
 		p {
+            font-size: 0.75rem;
 			margin: 0 0 1.25em;
 			border: 1px solid #ddd;
 			padding: 15px 5px 15px 75px;
@@ -296,6 +297,9 @@
   float: right;
   margin-left: 4%;
   text-shadow: 0 0;
+  &:focus{
+    font-size: 1.125rem;
+  }
 }
 #checkout .quantity input{
   height:30px;
@@ -304,6 +308,11 @@
 #checkout .address-block button a{
   color: white;
   text-decoration: none;
+  //MO overwrite base.css line 183.
+  &:focus{
+    outline:none;
+  }
+
 }
 .webstore-overlay table.lines a {
   color: #555;

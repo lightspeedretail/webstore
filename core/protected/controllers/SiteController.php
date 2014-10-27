@@ -128,6 +128,7 @@ class SiteController extends Controller
 		}
 
 		$model = new LoginForm();
+		$model->setScenario('Existing');
 
 		$response_array = array();
 

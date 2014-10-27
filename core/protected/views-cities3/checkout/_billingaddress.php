@@ -78,10 +78,8 @@
 					);
 					?>
 				</li>
-
-
 			</ol>
-		<li class="field-container field-container-select field-container-select-no-handle country">
+		<li class="field-container field-container-select field-container-select-no-handle country country-container">
 			<?php
 			echo $form->dropDownList(
 				$model,
@@ -90,7 +88,6 @@
 				$htmlOptions = array('class' => 'modal-accent-color', 'options' => $this->countryCodes)
 			);
 			?>
-		</li>
 		</li>
 	</ol>
 </div>

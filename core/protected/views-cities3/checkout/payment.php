@@ -23,32 +23,10 @@ $form = $this->beginWidget(
 
 <h1><?php echo Yii::t('checkout', 'Payment')?></h1>
 
-<div class="outofbandpayment">
-	<div class="buttons">
-		<?php
-		$paypal = Modules::LoadByName('paypal');
-		if ($paypal->active)
-		{
-			echo CHtml::htmlButton(
-				Yii::t('checkout', 'Pay with PayPal'),
-				array(
-					'class' => 'paypal',
-					'type' => 'submit',
-					'name' => 'Paypal',
-					'id' => 'Paypal',
-					'value' => $paypal->id,
-				)
-			);
+<?php
+$this->renderPartial('_paypalbuttonaim');
+?>
 
-			echo CHtml::tag(
-				'div',
-				array('class' => 'or-block'),
-				''
-			);
-		}
-		?>
-	</div>
-</div>
 <div class="creditcard">
 <div class="error-holder"><?= $error ?></div>
 

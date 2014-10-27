@@ -33,7 +33,7 @@ class MultiCheckoutForm extends CheckoutForm
 				intShippingAddress, intBillingAddress, billingSameAsShipping,
 				shippingFirstName, shippingLastName,
 				shippingAddress1, shippingAddress2, shippingCity, shippingState, shippingPostal, shippingCountry, shippingCountryCode,
-				billingAddress1, billingAddress2, billingCity, billingState, billingPostal, billingCountry,
+				billingAddress1, billingAddress2, billingCity, billingState, billingPostal, billingCountry, billingCountryCode,
 				shippingProvider, shippingPriority,
 				paymentProvider,
 				cardNumber, cardNumberLast4, cardExpiry, cardExpiryMonth, cardExpiryYear, cardType, cardCVV, cardNameOnCard,
@@ -371,6 +371,12 @@ class MultiCheckoutForm extends CheckoutForm
 	 */
 	public function getStrShippingAddress()
 	{
+		// ensure address is up to date
+		if (empty($this->intShippingAddress) === false)
+		{
+			$this->fillAddressFields($this->intShippingAddress, 'shipping');
+		}
+
 		$str = '';
 
 		$str .= $this->shippingAddress1 . ', ';
@@ -417,6 +423,7 @@ class MultiCheckoutForm extends CheckoutForm
 		$str .= $this->shippingCity. ', ';
 		$str .= $this->shippingState ? $this->shippingState . ', ' : '';
 		$str .= $this->shippingPostal ? $this->shippingPostal . '<br>' : '';
+		$str .= _xls_country() === $this->shippingCountryCode ? '' : Country::CountryByCode($this->shippingCountryCode);
 
 		// Only show the country if different from the store default.
 		if ($this->shippingCountry != Yii::app()->params['DEFAULT_COUNTRY'])
@@ -475,7 +482,6 @@ class MultiCheckoutForm extends CheckoutForm
 			return;
 		}
 
-
 		switch ($str)
 		{
 			case 'billing':
@@ -490,12 +496,51 @@ class MultiCheckoutForm extends CheckoutForm
 			case 'shipping':
 				$this->shippingFirstName = $objAddress->first_name;
 				$this->shippingLastName = $objAddress->last_name;
+				$this->shippingCompany = $objAddress->company;
 				$this->shippingAddress1 = $objAddress->address1;
 				$this->shippingAddress2 = $objAddress->address2;
 				$this->shippingCity = $objAddress->city;
 				$this->shippingState = State::CodeById($objAddress->state_id);
 				$this->shippingPostal = $objAddress->postal;
 				$this->shippingCountry = $objAddress->country_id;
+				$this->contactPhone = $objAddress->phone;
+				break;
+		}
+	}
+
+
+	/**
+	 * Clear specified address fields from form
+	 *
+	 * @param string $str
+	 * @return void
+	 */
+	public function clearAddressFields($str = 'shipping')
+	{
+		switch ($str)
+		{
+			case 'shipping':
+				$this->intShippingAddress = null;
+				$this->billingSameAsShipping = null;
+				$this->shippingFirstName = null;
+				$this->shippingLastName = null;
+				$this->shippingAddress1 = null;
+				$this->shippingAddress2 = null;
+				$this->shippingCity = null;
+				$this->shippingState = null;
+				$this->shippingCountry = null;
+				$this->shippingPostal = null;
+				$this->contactPhone = null;
+				break;
+
+			case 'billing':
+				$this->intBillingAddress = null;
+				$this->billingAddress1 = null;
+				$this->billingAddress2 = null;
+				$this->billingCity = null;
+				$this->billingState = null;
+				$this->billingCountry = null;
+				$this->billingPostal = null;
 				break;
 		}
 	}
@@ -655,6 +700,32 @@ class MultiCheckoutForm extends CheckoutForm
 		$checkoutForm->shippingProvider = $cartScenario['providerId'];
 		$checkoutForm->shippingPriority = $cartScenario['priorityLabel'];
 		self::saveToSession($checkoutForm);
+	}
+
+
+	/**
+	 * See if the passed id is a match for
+	 * an address in objAddresses
+	 *
+	 * @param $intAddressId
+	 * @return bool
+	 */
+	public function addressBelongsToUser($intAddressId)
+	{
+		if ($intAddressId === null)
+		{
+			return false;
+		}
+
+		foreach ($this->objAddresses as $address)
+		{
+			if ($intAddressId === $address->id)
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

@@ -41,7 +41,15 @@
     @extend %clearfix;
     margin-bottom: 15px;
   }
-
+  //MO
+  input[type="submit"]:focus{
+    &#Payment{
+      height:64px;
+      line-height: normal;
+      font-size: 1.125rem;
+      padding: 20px 0;
+    }
+  }
 
   input[type="submit"], button, .button {
     width: 100%;
@@ -142,6 +150,9 @@ select[name="city_state"] { max-width: 12em; }
     font-size: .9375rem;
     padding: 15px 0;
   }
+
+  //MO
+  p { margin: 1rem 0; }
 }
 
 p.tip {
@@ -210,8 +221,3 @@ p.tip {
   }
 }
 
-//MO overwrite
-.webstore-modal-overlay .form-error p{
-  line-height: 1.3;
-  font-size: 0.6875rem;
-}

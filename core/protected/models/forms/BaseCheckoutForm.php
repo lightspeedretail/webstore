@@ -129,7 +129,7 @@ class BaseCheckoutForm extends CFormModel
 			$retArray,
 			array('shippingCountryCode, shippingLabel, billingLabel, shippingResidential, billingResidential, recipientName,
 			contactFirstName , contactLastName, contactCompany, contactPhone, contactEmail, contactEmailConfirm, createPassword, createPassword_repeat ,
-			receiveNewsletter, billingAddress1, billingAddress2, billingCity, billingState, billingPostal, billingCountry, billingSameAsShipping ,
+			receiveNewsletter, billingAddress1, billingAddress2, billingCity, billingState, billingPostal, billingCountry, billingCountryCode, billingSameAsShipping ,
 			shippingFirstName, shippingLastName, shippingAddress1, shippingAddress2, shippingCity, shippingState, shippingPostal,
 			shippingCountry, promoCode, shippingProvider, shippingPriority, paymentProvider, orderNotes, cardNumber, cardNumberLast4, cardExpiry,
 			cardExpiryMonth, cardExpiryYear, cardType, cardCVV, cardNameOnCard, intShippingAddress, intBillingAddress, acceptTerms', 'safe'),
@@ -1170,6 +1170,38 @@ class BaseCheckoutForm extends CFormModel
 			$this->shippingCountry = null;
 		} else {
 			$this->shippingCountry = $objShippingCountry->id;
+		}
+	}
+
+	/**
+	 * Virtual method for getting the billing country code.
+	 *
+	 * @return string The shipping country code, e.g. "US", "GB".
+	 */
+	public function getBillingCountryCode()
+	{
+		$objBillingCountry = Country::model()->findByPk($this->billingCountry);
+		if ($objBillingCountry === null)
+		{
+			return null;
+		}
+
+		return $objBillingCountry->code;
+	}
+
+	/*
+	 * Virtual method for setting the billing country code.
+	 *
+	 * @return void
+	 */
+	public function setBillingCountryCode($strCountryCode)
+	{
+		$objBillingCountry = Country::LoadByCode($strCountryCode);
+		if ($objBillingCountry === null)
+		{
+			$this->billingCountry = null;
+		} else {
+			$this->billingCountry = $objBillingCountry->id;
 		}
 	}
 }

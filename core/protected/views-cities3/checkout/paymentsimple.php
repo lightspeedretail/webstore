@@ -20,42 +20,21 @@ $form = $this->beginWidget(
 
 <h1><?php echo Yii::t('checkout', 'Payment')?></h1>
 
-<div class="outofbandpayment">
-	<div class="buttons">
-		<?php
-		$paypal = Modules::LoadByName('paypal');
-		if ($paypal->active)
-		{
-			echo CHtml::htmlButton(
-				Yii::t('checkout', 'Pay with PayPal'),
-				array(
-					'class' => 'paypal',
-					'type' => 'submit',
-					'name' => 'Paypal',
-					'id' => 'Paypal',
-					'value' => $paypal->id,
-				)
-			);
+<?php
+$paypal = Modules::LoadByName('paypal');
+$simModulesCC = $model->getSimPaymentModulesThatUseCard();
+$count = count($simModulesCC);
+$this->renderPartial('_paypalbuttonsim', array('paypal' => $paypal, 'count' => $count));
+?>
 
-			echo CHtml::tag(
-				'div',
-				array('class' => 'or-block'),
-				''
-			);
-		}
-		?>
-	</div>
-</div>
 <!------------------------------------------------------------------------------------------------------------	Layout Markup -------------------------------------------------------------------------------------------------->
-
+<?php if (count($simModulesCC) > 0 || $paypal->active == true): ?>
 <div class="creditcard">
 	<div class="error-holder"><?= $error ?></div>
 	<div class="payment-methods">
 		<?php
-		$arr = $model->getSimPaymentModulesThatUseCard();
-		$count = count($arr);
 		$checked = 0;
-		foreach ($arr as $module)
+		foreach ($simModulesCC as $module)
 		{
 			echo $form->radioButton(
 				$model,
@@ -118,43 +97,20 @@ $form = $this->beginWidget(
 
 <!------------------------------------------------------------------------------------------------------------	Layout Markup -------------------------------------------------------------------------------------------------->
 	<?php $this->renderPartial('_billingaddress',array('model' => $model, 'form' => $form) ); ?>
-
-
-
 </div>
-<div class="alt-payment-methods payment-methods">
-	<h4><?php echo Yii::t('checkout', 'Alternative Payment Methods'); ?></h4>
-	<?php
-	foreach ($model->simPaymentModulesNoCard as $id => $option)
-	{
-		echo $form->radioButton(
-			$model,
-			'paymentProvider',
-			array('uncheckValue' => null, 'value' => $id, 'id' => 'MultiCheckoutForm_paymentProvider_'.$id)
-		);
-		echo $form->labelEx(
-			$model,
-			'paymentProvider',
-			array('class' => 'payment-method', 'label' => Yii::t('checkout', $option), 'for' => 'MultiCheckoutForm_paymentProvider_'.$id)
-		);
-	}
-	?>
-</div>
-<footer class="submit">
-	<?php
-		echo
-			CHtml::submitButton(
-				'Submit',
-				array(
-					'type' => 'submit',
-					'class' => 'button',
-					'name' => 'Payment',
-					'id' => 'Payment',
-					'value' => Yii::t('checkout', "Review and Confirm Order")
-				)
-			);
-	?>
-</footer>
+
+<?php
+endif;
+$this->renderPartial(
+	'_altpaymentmethods',
+	array(
+		'model' => $model,
+		'form' => $form,
+		'paypal' => $paypal,
+		'simModulesCC' => $simModulesCC
+	)
+);
+?>
 
 <?php $this->endWidget(); ?>
 

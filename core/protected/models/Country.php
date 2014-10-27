@@ -144,6 +144,45 @@ class Country extends BaseCountry
 		return Country::model()->findAll($criteria);
 	}
 
+
+	/**
+	 * Return a list of countries with the passed
+	 * country code as the first option
+	 *
+	 * @param $code
+	 * @return array|CActiveRecord[]
+	 */
+	public static function sortShippingCountries($code)
+	{
+		if (is_null($code) === true)
+		{
+			$code = _xls_country();
+		}
+
+		$arrCountry = self::getShippingCountries();
+
+		$objMatchingCountry = null;
+
+		foreach ($arrCountry as $key => $country)
+		{
+			if ($country->code === $code)
+			{
+				$objMatchingCountry = $country;
+				unset($arrCountry[$key]);
+				break;
+			}
+		}
+
+		if (is_null($objMatchingCountry) === true)
+		{
+			// something has gone wrong
+			Yii::log(sprintf('Country with code %s not found in list', $code), 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
+			return $arrCountry;
+		}
+
+		return array_merge(array($objMatchingCountry), $arrCountry);
+	}
+
 	/**
 	 * Get the available shipping states for a given country.
 	 *
