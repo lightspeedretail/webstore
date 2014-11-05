@@ -1,5 +1,6 @@
 #thankyou {
   .section-content {
+    width: inherit; //MO fix for IE10 order summary.
     border-right: none;
   }
 

@@ -261,8 +261,8 @@ WsShippingEstimator.prototype.toggleShowShippingOptions = function() {
  * Web Store of the choice.
  */
 WsShippingEstimator.prototype.selectedShippingOption = function(selectedOption) {
-	this.selectedProviderId = selectedOption.dataset.providerId;
-	this.selectedPriorityLabel = selectedOption.dataset.priorityLabel;
+	this.selectedProviderId = $(selectedOption).data('provider-id');
+	this.selectedPriorityLabel = $(selectedOption).data('priority-label');
 
 	this.selectShippingOption(this.selectedProviderId, this.selectedPriorityLabel);
 	this.updateEstimates();
@@ -271,8 +271,8 @@ WsShippingEstimator.prototype.selectedShippingOption = function(selectedOption) 
 	$.post(
 		this.setShippingOptionEndpoint,
 		{
-			'CheckoutForm[shippingProviderId]': selectedOption.dataset.providerId,
-			'CheckoutForm[shippingPriorityLabel]': selectedOption.dataset.priorityLabel
+			'CheckoutForm[shippingProviderId]': $(selectedOption).data('provider-id'),
+			'CheckoutForm[shippingPriorityLabel]': $(selectedOption).data('priority-label')
 		}
 	);
 };
@@ -296,9 +296,9 @@ WsShippingEstimator.prototype.selectShippingOption = function(providerId, priori
 
 	var didSelectSomething = false;
 	this.$shippingOptions.find('input').each(function (inputIdx, input) {
-		if (input.dataset.providerId === providerId.toString() &&
-			input.dataset.priorityLabel === priorityLabel.toString()
-			) {
+		if ($(input).data('provider-id') === providerId.toString() &&
+			$(input).data('priority-label') === priorityLabel.toString()
+		) {
 			didSelectSomething = true;
 			$(input).prop('checked', true);
 		}

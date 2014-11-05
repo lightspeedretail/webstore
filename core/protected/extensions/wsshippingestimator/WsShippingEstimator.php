@@ -33,18 +33,33 @@ class WsShippingEstimator extends CWidget
 		$assets = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'assets', false, -1, true);
 		Yii::app()->clientScript->registerScriptFile($assets . '/js/WsShippingEstimator.js');
 
-		// Use the shipping scenarios and shipping address in the session.
-		$arrCartScenario = Shipping::loadCartScenariosFromSession();
 		$checkoutForm = MultiCheckoutForm::loadFromSessionOrNew();
 
 		// We may wish to update the shipping options right away if we know the
 		// cart has changed.
 		if ($this->updateShippingOptions)
 		{
-			$updateOnLoad = true;
+			// This check for shippingCountry being null is a workaround to fix
+			// WS-3180. When shippingCountry is null, we need to update the
+			// shipping estimates *now* because they will not be updated by the
+			// JavaScript (since the JavaScript in WsShippingEstimator requires
+			// country to be set). The reason we need to do this is because
+			// shippingCountry may be null when in-store pickup has been
+			// chosen.
+			// TODO: Fix this in WsShippingEstimator and remove this workaround.
+			if ($checkoutForm->shippingCountry === null)
+			{
+				Shipping::updateCartScenariosInSession();
+				$updateOnLoad = false;
+			} else {
+				$updateOnLoad = true;
+			}
 		} else {
 			$updateOnLoad = false;
 		}
+
+		// Use the shipping scenarios and shipping address in the session.
+		$arrCartScenario = Shipping::loadCartScenariosFromSession();
 
 		$wsShippingEstimatorOptions = self::getShippingEstimatorOptions(
 			$arrCartScenario,

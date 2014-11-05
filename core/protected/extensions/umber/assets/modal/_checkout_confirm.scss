@@ -1,5 +1,8 @@
 #confirm {
+	.section-inner{ width:100%; } //MO fix for IE10 order summary.
+
 	.section-content {
+		width: inherit; //MO fix for IE10 order summary.
 		border-right: none;
 	}
 
@@ -198,6 +201,8 @@
 			padding-right: .5em;
 			padding-left: .5em;
 			font-weight: bold;
+			//override base.css l.25
+			vertical-align: middle;
 
 			.price {
 				font-weight: normal;

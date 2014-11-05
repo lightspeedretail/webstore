@@ -399,8 +399,8 @@ function OrderSummary(options) {
  * @param {DOMElement} DOMElement A DOM element.
  */
 OrderSummary.prototype.optionSelected = function(DOMElement) {
-	this.providerId = DOMElement.dataset.providerId || null;
-	this.priorityLabel = DOMElement.dataset.priorityLabel || null;
+	this.providerId = $(DOMElement).data('provider-id') || null;
+	this.priorityLabel = $(DOMElement).data('priority-label') || null;
 
 	if (this.providerId === null || this.priorityLabel === null) {
 		throw new Error('Selected option does not have providerId and priorityLabel data- attributes.');
@@ -595,7 +595,7 @@ function WsEditCartModal(options) {
  */
 WsEditCartModal.prototype.updateCart = function(DOMInput) {
 	this.updateCartItemQty(
-		DOMInput.dataset.pk,
+		$(DOMInput).data('pk'),
 		DOMInput.value
 	).done(function(updateResponse) {
 		if (updateResponse.updateResult.errorId === 'invalidQuantity') {
