@@ -21,7 +21,7 @@
 		<div class="row-fluid">
 			<?php foreach(CustomerAddress::getAllAddresses() as $objAddress): ?>
 				<div class="span4 myaddress">
-					<?= CHtml::link("<strong>".$objAddress->address_label."</strong><br>".$objAddress->address1."<br>".$objAddress->city." ".$objAddress->state." ".$objAddress->postal.
+					<?= CHtml::link("<strong>".$objAddress->address_label."</strong><br>".$objAddress->htmlblock.
 						($objAddress->id==$model->default_billing_id ? "<br><span class='default'>".Yii::t('global','Default Billing Address')."</span>" : "").
 						($objAddress->id==$model->default_shipping_id ? "<br><span class='default'>".Yii::t('global','Default Shipping Address')."</span>" : ""),
 						Yii::app()->createUrl('myaccount/address',array('id'=>$objAddress->id))); ?>

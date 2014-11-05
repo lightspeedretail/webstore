@@ -50,8 +50,8 @@
 					)
 				);
 				// Show a button to retrieve shipping estimates.
-				echo CHtml::htmlButton (
-					Yii::t('cart','Calculate'),
+				echo CHtml::htmlButton(
+					Yii::t('cart', 'Calculate'),
 					array(
 						'class' => 'inset',
 						'onclick' => "
@@ -106,7 +106,7 @@
 <!-- Tax price estimate -->
 <tr class="<?= $cssClass . ' ' ?>webstore-estimator tax-estimate-line">
 	<th colspan="2">
-		<?php echo Yii::t('cart','Tax'); ?>
+		<?php echo Yii::t('cart', 'Tax'); ?>
 		<small>
 			<?php
 				echo CHtml::link(
@@ -123,15 +123,28 @@
 	<td class="tax-estimate money"><?= $formattedCartTax ?></td>
 </tr>
 
-<?php
-	echo CHtml::script(
-		'
-		var zipCodeError = '. CJSON::encode(Yii::t('checkout', "ERROR: Invalid zip code. Please try again")) .';
-		var zippoUnhandledError = '. CJSON::encode(Yii::t('checkout', "Shipping cannot be estimated at this time, but checkout is still possible")) .';
-		var strCalculateButton = '. CJSON::encode(Yii::t('shipping', 'Calculate')) .';
-		var calculatingLabel = '. CJSON::encode(Yii::t('cart', 'Calculating...')) .';
-		$(document).ready(function () {
-			wsShippingEstimator = new WsShippingEstimator(' . $wsShippingEstimatorOptions . ');
-		});'
-	);
-?>
+<script>
+	// TODO: Move these into a strings object or pass in as an option.
+	zipCodeError = <?= CJSON::encode(Yii::t('checkout', 'ERROR: Invalid zip code. Please try again')); ?>;
+	zippoUnhandledError = <?= CJSON::encode(Yii::t('checkout', 'Shipping cannot be estimated at this time, but checkout is still possible')) ?>;
+	strCalculateButton = <?= CJSON::encode(Yii::t('shipping', 'Calculate')) ?>;
+	calculatingLabel = <?= CJSON::encode(Yii::t('cart', 'Calculating...')) ?>;
+
+	$(document).ready(function () {
+		wsShippingEstimator = new WsShippingEstimator(<?= $wsShippingEstimatorOptions ?>);
+
+		<?php
+			// TODO: It isn't ideal to bind the promoCodeInput - ideally
+			// _shippingestimator.php wouldn't need to know about
+			// promoCodeInput. But we aren't presently managing the
+			// application in such a way that there's an easy alternative.
+		?>
+		if (typeof promoCodeInput !== 'undefined') {
+			promoCodeInput.wsShippingEstimator = wsShippingEstimator;
+		}
+
+		if (typeof wsEditCartModal !== 'undefined') {
+			wsEditCartModal.wsShippingEstimator = wsShippingEstimator;
+		}
+	});
+</script>

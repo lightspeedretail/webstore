@@ -1,9 +1,7 @@
 <div class="<?= $cssClass . ' ' ?>shipping-options webstore-shipping-choices">
-	<!-- TODO Speak to designers about why this is in a form. It doesn't need to be. -->
 	<form>
 		<ol>
 		</ol>
-		<!-- TODO Update CSS to use "options" rather than "choices" to be consistent." -->
 		<?php
 			echo CHtml::button(
 				Yii::t('cart', 'Done'),

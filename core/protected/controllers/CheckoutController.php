@@ -14,14 +14,12 @@ class CheckoutController extends Controller
 	 */
 	public $checkoutForm;
 
-
 	/**
 	 * Global errors array to facilitate usage in any function
 	 *
 	 * @var array
 	 */
 	public $errors = array();
-
 
 	public function init()
 	{
@@ -203,10 +201,22 @@ class CheckoutController extends Controller
 
 		$arrObjAddresses = CustomerAddress::getActiveAddresses();
 
+		if (CPropertyValue::ensureBoolean(Yii::app()->request->getQuery('error-destination')) === true)
+		{
+			$message = Yii::t('checkout', 'Sorry, we cannot ship to this destination');
+			array_push($this->errors, $message);
+			$error = $this->formatErrors($this->errors);
+		}
+
 		// if the logged in customer has at least one address on file
 		// take them to the page where they can select it
 		if (count($arrObjAddresses) > 0)
 		{
+			if (isset($message))
+			{
+				Yii::app()->user->setFlash('error', $message);
+			}
+
 			$this->redirect($this->createAbsoluteUrl('/checkout/shippingaddress'));
 		}
 
@@ -287,10 +297,13 @@ class CheckoutController extends Controller
 		}
 
 		$this->saveForm();
+		if (empty($this->checkoutForm->shippingCountry) === false)
+		{
+			$this->updateShipping();
+		}
 
 		$this->render('shipping', array('model' => $this->checkoutForm, 'error' => $error));
 	}
-
 
 	/**
 	 * Validate the GET variables and execute our
@@ -635,16 +648,29 @@ class CheckoutController extends Controller
 			}
 		}
 
-		try {
-			$arrCartScenario = Shipping::getCartScenarios($this->checkoutForm);
-		} catch (Exception $e) {
-			Yii::log('Unable to get cart scenarios: ' . $e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-			$arrCartScenario = null;
+		$arrCartScenario = Shipping::loadCartScenariosFromSession();
+
+		if ($this->checkValidDestination() === false)
+		{
+			Yii::log('Shipping destination is invalid', 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			$this->redirect(array('/checkout/shipping', 'error-destination' => true));
+			return;
 		}
 
-		if ($arrCartScenario !== null)
+		if (empty($arrCartScenario) === true)
 		{
-			Shipping::saveCartScenariosToSession($arrCartScenario);
+			try {
+				$arrCartScenario = Shipping::getCartScenarios($this->checkoutForm);
+			} catch (Exception $e) {
+				Yii::log('Unable to get cart scenarios: ' . $e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				$this->redirect(array('/checkout/shipping', 'error-destination' => true));
+				return;
+			}
+
+			if ($arrCartScenario !== null)
+			{
+				Shipping::saveCartScenariosToSession($arrCartScenario);
+			}
 		}
 
 		$error = $this->formatErrors($this->errors);
@@ -805,7 +831,7 @@ class CheckoutController extends Controller
 				$arrCheckbox['name'] = 'MultiCheckoutForm[intBillingAddress]';
 				$arrCheckbox['label'] = Yii::t('checkout', 'Use this as my billing address');
 
-				if (isset($objCart->customer->defaultBilling) === true)
+				if(isset($objCart->customer->defaultBilling) === true)
 				{
 					foreach ($arrAddresses as $key => $objAddress)
 					{
@@ -1008,20 +1034,10 @@ class CheckoutController extends Controller
 				// validate the form
 				if ($this->updateAddressId('billing') && $this->checkoutForm->validate() && $this->updatePaymentId())
 				{
-					try {
-						$arrCartScenario = Shipping::getCartScenarios($this->checkoutForm);
-					} catch (Exception $e) {
-						Yii::log('Unable to get cart scenarios: ' . $e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-						$arrCartScenario = null;
-					}
-
-					if ($arrCartScenario !== null)
-					{
-						Shipping::saveCartScenariosToSession($arrCartScenario);
-					}
+					$selectedCartScenario = Shipping::getSelectedCartScenarioFromSession();
 
 					$wsShippingEstimatorOptions = WsShippingEstimator::getShippingEstimatorOptions(
-						$arrCartScenario,
+						array($selectedCartScenario),
 						$this->checkoutForm->shippingProvider,
 						$this->checkoutForm->shippingPriority,
 						$this->checkoutForm->shippingCity,
@@ -1029,7 +1045,7 @@ class CheckoutController extends Controller
 						$this->checkoutForm->shippingCountryCode
 					);
 
-					$wsShippingEstimatorOptions['redirectToShippingOptionsUrl'] = Yii::app()->getController()->createUrl('shippingoptions');
+					$wsShippingEstimatorOptions['redirectToShippingOptionsUrl'] = Yii::app()->getController()->createUrl('shipping');
 
 					$this->layout = '/layouts/checkout-confirmation';
 					$this->render(
@@ -1102,7 +1118,29 @@ class CheckoutController extends Controller
 			}
 
 			$this->layout = '/layouts/checkout-confirmation';
-			$this->render('confirmation', array('model' => $this->checkoutForm, 'cart' => Yii::app()->shoppingcart, 'error' => $error));
+
+			$selectedCartScenario = Shipping::getSelectedCartScenarioFromSession();
+
+			$wsShippingEstimatorOptions = WsShippingEstimator::getShippingEstimatorOptions(
+				array($selectedCartScenario),
+				$this->checkoutForm->shippingProvider,
+				$this->checkoutForm->shippingPriority,
+				$this->checkoutForm->shippingCity,
+				$this->checkoutForm->shippingState,
+				$this->checkoutForm->shippingCountryCode
+			);
+
+			$wsShippingEstimatorOptions['redirectToShippingOptionsUrl'] = Yii::app()->getController()->createUrl('shippingoptions');
+
+			$this->render(
+				'confirmation',
+				array(
+					'model' => $this->checkoutForm,
+					'cart' => Yii::app()->shoppingcart,
+					'shippingEstimatorOptions' => $wsShippingEstimatorOptions,
+					'error' => $error
+				)
+			);
 		}
 
 		// end user has progressed here after choosing a shipping option or has
@@ -1132,7 +1170,7 @@ class CheckoutController extends Controller
 
 				if ($objCart->shipping->isStorePickup === true && isset($_POST['BillingAddress']) === false)
 				{
-					if (isset($objCart->customer->defaultBilling) === true)
+					if (is_null($objCart->customer->default_billing_id) === false)
 					{
 						$objTemp = $objCart->customer->defaultBilling;
 
@@ -1179,7 +1217,7 @@ class CheckoutController extends Controller
 					}
 				}
 
-				$this->checkoutForm->objAddresses = $arrFirst + $arrAddresses;
+				$this->checkoutForm->objAddresses = array_merge($arrFirst, $arrAddresses);
 				$this->render('paymentaddress', array('model' => $this->checkoutForm, 'checkbox' => $arrCheckbox, 'error' => $error));
 			}
 
@@ -1285,7 +1323,7 @@ class CheckoutController extends Controller
 				$this->checkoutForm->shippingCountryCode
 			);
 
-			$wsShippingEstimatorOptions['redirectToShippingOptionsUrl'] = Yii::app()->getController()->createUrl('shippingoptions');
+			$wsShippingEstimatorOptions['redirectToShippingOptionsUrl'] = Yii::app()->getController()->createUrl('shipping');
 
 			$this->render(
 				'confirmation',
@@ -1412,8 +1450,11 @@ class CheckoutController extends Controller
 	 */
 	protected function formatErrors($arrErrors = null)
 	{
-		if ($arrErrors !== null && is_array($arrErrors))
+		if ($arrErrors !== null)
 		{
+			// ensure $arrErrors is a 2 dimensional array
+			$arrErrors = _xls_make2dimArray($arrErrors);
+
 			$arrAllErrors = $arrErrors + $this->checkoutForm->getErrors() + Yii::app()->user->getFlashes();
 		}
 		else
@@ -1427,7 +1468,7 @@ class CheckoutController extends Controller
 		}
 
 		// $arrAllErrors is an array of array of errors.
-		$strErrors = _xls_convert_errors_display(_xls_convert_errors($arrAllErrors));
+		$strErrors = _xls_convert_errors_display(_xls_convert_errors(_xls_make2dimArray($arrAllErrors)));
 
 		if (str_replace("\n", "", $strErrors) === "")
 		{
@@ -1811,7 +1852,7 @@ class CheckoutController extends Controller
 						'city' => $model->billingCity,
 						'postal' => $model->billingPostal,
 						'country_id' => $model->billingCountry,
-						'state_id' => State::IdByCode($model->billingState, $model->billingCountry),
+						'state_id' => is_numeric($model->billingState) === true ? $model->billingState : State::IdByCode($model->billingState, $model->billingCountry),
 					);
 
 					Yii::log(
@@ -1901,18 +1942,16 @@ class CheckoutController extends Controller
 		if ($selectedCartScenario === null)
 		{
 			// user did not use estimator
-
-			// prevent an exception in case user chose store pickup
-			if (isset($this->checkoutForm->shippingCountry) === false)
+			try
 			{
-				// set to default country
-				$objCountry = Country::LoadByCode(_xls_country());
-				$this->checkoutForm->shippingCountry = $objCountry->id;
+				$arrCartScenarios = Shipping::getCartScenarios($this->checkoutForm);
+				Shipping::saveCartScenariosToSession($arrCartScenarios);
+				$selectedCartScenario = Shipping::getSelectedCartScenarioFromSession();
 			}
-
-			$arrCartScenarios = Shipping::getCartScenarios($this->checkoutForm);
-			Shipping::saveCartScenariosToSession($arrCartScenarios);
-			$selectedCartScenario = Shipping::getSelectedCartScenarioFromSession();
+			catch(Exception $e)
+			{
+				$selectedCartScenario = null;
+			}
 
 			if ($selectedCartScenario === null)
 			{
@@ -1969,6 +2008,8 @@ class CheckoutController extends Controller
 		}
 
 		Yii::app()->shoppingcart->shipping_id = $objShipping->id;
+		Yii::app()->shoppingcart->tax_code_id = $selectedCartScenario['shoppingCart']['tax_code_id'];
+
 		if (Yii::app()->shoppingcart->save() === false)
 		{
 			Yii::log(
@@ -2097,7 +2138,7 @@ class CheckoutController extends Controller
 //		else
 		$arrPaymentResult = Yii::app()->getComponent($objPayment->payment_module)->setCheckoutForm($this->checkoutForm)->run();
 
-		Yii::log(print_r($arrPaymentResult,true), 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
+		Yii::log(print_r($arrPaymentResult, true), 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
 
 		// SIM Credit Card method with form? Then render it
 		if (isset($arrPaymentResult['jump_form']))
@@ -2172,7 +2213,7 @@ class CheckoutController extends Controller
 		else
 		{
 			$error = isset($arrPaymentResult['result']) ? $arrPaymentResult['result'] : "UNKNOWN ERROR";
-			$this->errors = array($error);
+			$this->errors[] = $error;
 			Yii::log("Error executing payment:\n" . $error, 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
 			return false;
 		}
@@ -2360,53 +2401,6 @@ class CheckoutController extends Controller
 	}
 
 	/**
-	 * Formats an array of cart scenarios as required by the shipping options
-	 * page on the checkout.
-	 * @param array[] $arrCartScenario An array of cart scenarios. @see
-	 * Shipping::getCartScenarios.
-	 * @return array[] A formatted array of cart scenarios.
-	 */
-	protected static function formatCartScenarios($arrCartScenario)
-	{
-		$arrShippingOption = array();
-		foreach ($arrCartScenario as $cartScenario)
-		{
-			// We exclude in store pickup from this list.
-			if ($cartScenario['module'] === 'storepickup')
-			{
-				continue;
-			}
-
-			$shippingOptionPriceLabel = sprintf(
-				'%s %s',
-				$cartScenario['formattedShippingPrice'],
-				$cartScenario['shippingLabel']
-			);
-
-			$arrShippingOption[] = array(
-				'formattedShippingPrice' => $cartScenario['formattedShippingPrice'],
-				'formattedCartTotal' => $cartScenario['formattedCartTotal'],
-				'formattedCartTax1' => $cartScenario['formattedCartTax1'],
-				'formattedCartTax2' => $cartScenario['formattedCartTax2'],
-				'formattedCartTax3' => $cartScenario['formattedCartTax3'],
-				'formattedCartTax4' => $cartScenario['formattedCartTax4'],
-				'formattedCartTax5' => $cartScenario['formattedCartTax5'],
-				'module' => $cartScenario['module'],
-				'priorityIndex' => $cartScenario['priorityIndex'],
-				'priorityLabel' => $cartScenario['priorityLabel'],
-				'providerId' => $cartScenario['providerId'],
-				'providerLabel' => $cartScenario['providerLabel'],
-				'shippingLabel' => $cartScenario['shippingLabel'],
-				'shippingOptionPriceLabel' => $shippingOptionPriceLabel,
-				'shippingPrice' => $cartScenario['shippingPrice'],
-				'shippingProduct' => $cartScenario['shippingProduct']
-			);
-		}
-
-		return $arrShippingOption;
-	}
-
-	/**
 	 * Get the correct route for end user returning
 	 * to checkout within same session. We also
 	 * re-populate the cart depending on the scenario
@@ -2455,6 +2449,43 @@ class CheckoutController extends Controller
 				$route = null;
 		}
 
+		if (Yii::app()->shoppingcart->customer_id === null && Yii::app()->user->id > 0)
+		{
+			// something weird happened and the logged in user is not
+			// attached to the cart, so re-attach them
+			Yii::app()->shoppingcart->customer_id = Yii::app()->user->id;
+		}
+
 		return $route;
 	}
+
+	private function checkValidDestination()
+	{
+
+		$objDestination = Destination::LoadMatching(
+			$this->checkoutForm->shippingCountry,
+			$this->checkoutForm->shippingState,
+			$this->checkoutForm->shippingPostal
+		);
+
+		if (is_null($objDestination))
+		{
+			Yii::log('Destination not matched, going with default (Any/Any)', 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+			$objDestination = Destination::LoadDefault();
+
+			if ($objDestination === null)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+		return true;
+	}
 }
+
+// TODO: Write a method that just updates the shopping cart totals
+// based on previously cached shipping estimates.

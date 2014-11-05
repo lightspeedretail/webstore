@@ -15,6 +15,7 @@ class WsWebApplication extends CWebApplication
 		'site/sendemail',
 		'myaccount/edit',
 		'myaccount/address',
+		'myaccount/resetpassword',
 		'checkout/thankyou',
 	);
 

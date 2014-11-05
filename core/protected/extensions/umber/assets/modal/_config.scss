@@ -82,7 +82,7 @@ $link-active-color: darken($blue,20%);
     &:active { color: $link-active-color; }
     &:hover {
       color: $link-hover-color;
-      //MO boostrap overwrite
+      //MO boostrap override
       text-decoration: none;
     }
 

@@ -1,5 +1,4 @@
 <?php
-
 Yii::import('ext.umber.wsmodal');
 
 class wseditcartmodal extends wsmodal
@@ -12,7 +11,9 @@ class wseditcartmodal extends wsmodal
 		parent::run();
 
 		$cs = Yii::app()->clientScript;
-		$this->assetUrl = $assets = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'assets',false,-1,true);
+		$this->assetUrl = $assets = Yii::app()->getAssetManager()->publish(
+			dirname(__FILE__) . DIRECTORY_SEPARATOR . 'assets'
+		);
 
 		$cs->registerCssFile('//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css');
 		$cs->registerCssFile($assets . '/css/wseditcartmodal.css');
@@ -20,55 +21,36 @@ class wseditcartmodal extends wsmodal
 
 		Yii::app()->clientScript->registerScript(
 			'instantiate checkout',
-			'
-			$(document).ready(function () {
-				checkout = new Checkout('.Checkout::getCheckoutJSOptions().');
+			sprintf(
+				'$(document).ready(function () {
+					checkout = new Checkout(%s);
 				});',
+				Checkout::getCheckoutJSOptions()
+			),
 			CClientScript::POS_HEAD
 		);
 
 		Yii::app()->clientScript->registerScript(
-			'editable',
-			"
-			function removeItem(input) {
-				var pk = input.getAttribute('data-pk');
-				input.id = 'CartItem_qty_' + pk;
-				input.value = 0;
-				updateCart(input);
-			};
-		   function updateCart(input) {
-					var pk = input.id;
-					var obj = {'YII_CSRF_TOKEN': '".Yii::app()->request->csrfToken."'};
-					obj[pk] = input.value;
-
-					$.ajax({url: '".Yii::app()->controller->createUrl('cart/updatecart')."',
-							type: 'POST',
-							dataType: 'json',
-							success: function(data) {
-								if(data.action=='success') {
-									var shoppingCart = JSON.parse(data.cartitems);
-									checkout.redrawCart(shoppingCart, " . json_encode(CHtml::activeId('EditCart','promoCode')) . ");
-									$('#cartItemsTotal').text(shoppingCart.totalItemCount);
-									// Update the shipping estimate.
-									if (typeof wsShippingEstimator !== 'undefined') {
-										wsShippingEstimator.calculateShippingEstimates();
-									}
-								}
-								else if(data.errorId === 'invalidQuantity'){
-									var qty = $('#' + pk);
-									qty.val(data.availQty);
-									qty.change();
-									checkout.createTooltip(pk, '<strong>Only ' + data.availQty + ' are available at this time.</strong><br> If you’d like to order more please return at a later time or contact us.');
-								}
-								else {
-									alert(data.errormsg);
-								}
-							},
-							error: function(data) { alert('error'); },
-							data: obj
-					});
-
-			}",
+			'instantiate wsEditCartModal',
+			sprintf(
+				'$(document).ready(function () {
+					wsEditCartModal = new WsEditCartModal(%s);
+					wsEditCartModal.checkout = checkout;
+				});',
+				CJSON::encode(
+					array(
+						'checkoutUrl' => Yii::app()->controller->createUrl('/checkout'),
+						'updateCartUrl' => Yii::app()->createUrl('/cart/updatecartitem'),
+						'csrfToken' => Yii::app()->request->csrfToken,
+						'cartId' => CHtml::activeId('EditCart', 'promoCode'),
+						'invalidQtyMessage' => Yii::t(
+							'checkout',
+							'<strong>Only {qty} are available at this time.</strong><br> If you’d like ' .
+							'to order more please return at a later time or contact us.'
+						)
+					)
+				)
+			),
 			CClientScript::POS_HEAD
 		);
 
@@ -77,18 +59,20 @@ class wseditcartmodal extends wsmodal
 
 	public static function renderSellPrice($cartItem)
 	{
-		$renderedPrice = '';
 		if ($cartItem->discounted === true)
 		{
-			$renderedPrice = CHtml::tag(
+			$renderedPrice = sprintf(
+				'%s%s',
+				CHtml::tag(
 					'strike',
 					array(),
 					$cartItem->sellFormatted
-				).
-				$cartItem->sellDiscountFormatted;
-		}
-		else
+				),
+				$cartItem->sellDiscountFormatted
+			);
+		} else {
 			$renderedPrice = $cartItem->sellFormatted;
+		}
 
 		return $renderedPrice;
 	}

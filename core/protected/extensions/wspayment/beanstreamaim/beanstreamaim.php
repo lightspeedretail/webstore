@@ -22,19 +22,49 @@ class beanstreamaim extends WsPayment
 		$beanstream_url = "https://www.beanstream.com/scripts/process_transaction.asp";
 
 		$strState = $this->CheckoutForm->billingState;
-		if($this->CheckoutForm->billingCountry != "US" && $this->CheckoutForm->billingCountry != "CA")
+
+		// handle both legacy and advanced checkout
+		if (is_numeric($this->CheckoutForm->billingCountry) === true)
+		{
+			$strBillCountry = $this->CheckoutForm->billingCountryCode;
+		}
+		else
+		{
+			$strBillCountry = $this->CheckoutForm->billingCountry;
+		}
+
+		if($strBillCountry != "US" && $strBillCountry != "CA")
+		{
 			$strState = "--";
+		}
 
 		$strShipState = $this->CheckoutForm->shippingState;
-		if ($this->CheckoutForm->shippingCountry != "US" && $this->CheckoutForm->shippingCountry != "CA")
+
+		// handle both legacy and advanced checkout
+		if (is_numeric($this->CheckoutForm->shippingCountry))
+		{
+			$strShipCountry = $this->CheckoutForm->shippingCountryCode;
+		}
+		else
+		{
+			$strShipCountry = $this->CheckoutForm->shippingCountry;
+		}
+
+		if ($strShipCountry != "US" && $strShipCountry != "CA" && is_null($strShipCountry) === false)
+		{
 			$strShipState="--";
+		}
+		else
+		{
+			$strShipState = null;
+		}
 
 		$beanstream_values = array (
 			"requestType"		=> "BACKEND",
 			"merchant_id"		=> $this->config['login'],
 			"trnCardNumber"		=> _xls_number_only($this->CheckoutForm->cardNumber),
 			"trnCardOwner"		=> $this->CheckoutForm->cardNameOnCard,
-			"trnExpMonth"		=> $this->CheckoutForm->cardExpiryMonth,
+			"trnExpMonth"		=> trim($this->CheckoutForm->cardExpiryMonth),
 			"trnExpYear"		=> substr($this->CheckoutForm->cardExpiryYear,2,2),
 			"trnCardCvd"		=> $this->CheckoutForm->cardCVV,
 			"trnOrderNumber"	=> $this->objCart->id_str,
@@ -47,7 +77,7 @@ class beanstreamaim extends WsPayment
 			"ordPhoneNumber"	=> _xls_number_only($this->CheckoutForm->contactPhone),
 			"ordCity"			=> $this->CheckoutForm->billingCity,
 			"ordProvince"		=> $strState,
-			"ordCountry"		=> $this->CheckoutForm->billingCountry,
+			"ordCountry"		=> $strBillCountry,
 
 			"shipName"			=> $this->CheckoutForm->shippingFirstName." ".$this->CheckoutForm->shippingLastName,
 			"shipAddress1"		=> $this->CheckoutForm->shippingAddress1,
@@ -55,10 +85,11 @@ class beanstreamaim extends WsPayment
 			"shipCity"			=> $this->CheckoutForm->shippingCity,
 			"shipProvince"		=> $strShipState,
 			"shipPostalCode"	=> $this->CheckoutForm->shippingPostal,
-			"shipCountry"		=> $this->CheckoutForm->shippingCountry,
-			"shippingMethod"	=> $this->objCart->shipping->shipping_data
-
+			"shipCountry"		=> $strShipCountry,
+			"shippingMethod"	=> substr($this->objCart->shipping->shipping_data, 0, 63) // beanstream doesn't allow this field to be more than 64 characters
 		);
+
+		$beanstream_values = array_filter($beanstream_values);
 
 		$beanstream_fields = "";
 
@@ -85,9 +116,21 @@ class beanstreamaim extends WsPayment
 		if($resp_vals['trnApproved'] != '1' )
 		{
 			//unsuccessful
-			$arrReturn['success']=false;
-			$arrReturn['amount_paid']=0;
-			$arrReturn['result'] = Yii::t('global',urldecode($resp_vals['messageText']));
+			$arrReturn['success'] = false;
+			$arrReturn['amount_paid'] = 0;
+
+			// beanstream sometimes returns messages prefixed with <li> and suffixed with <br>
+			// we handle these bonkers messages here
+			$htmlMessage = urldecode($resp_vals['messageText']);
+			$message = strip_tags($htmlMessage, '<br>');
+			// remove the last <br> tag
+			$intPos = strrpos($message, '<br>');
+			if (empty($intPos) === false)
+			{
+				$message = substr($message, 0, $intPos);
+			}
+
+			$arrReturn['result'] = $message;
 			Yii::log("Declined: ".urldecode($resp_vals['messageText']), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 
 			if(stripos($resp_vals['messageText'],"Enter your phone number")>0)

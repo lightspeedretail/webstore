@@ -67,28 +67,21 @@ class Cart extends BaseCart
 		// Warning: Please modify the following code to remove attributes that
 		// should not be searched.
 
-		$criteria=new CDbCriteria;
-		$criteria->compare('id_str',$this->id_str,true,'OR');
-		$criteria->compare('datetime_cre',$this->datetime_cre,true,'OR');
-		$criteria->compare('downloaded',$this->downloaded,false,'AND');
-		$criteria->compare('cart_type',$this->cart_type);
-
-//		$criteria->with=array(
-//			'customer.first_name',
-//			'customer.last_name',
-//		);
+		$criteria = new CDbCriteria;
+		$criteria->compare('id_str', $this->id_str, true, 'OR');
+		$criteria->compare('datetime_cre', $this->datetime_cre, true, 'OR');
+		$criteria->compare('downloaded', $this->downloaded, false, 'AND');
+		$criteria->compare('cart_type', $this->cart_type);
 
 		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-			'sort'=>array(
-				'defaultOrder'=>'id_str DESC',
+			'criteria' => $criteria,
+			'sort' => array(
+				'defaultOrder' => 'id_str DESC',
 			),
 			'pagination' => array(
 				'pageSize' => 20,
 			),
 		));
-
-
 	}
 
 
@@ -96,7 +89,6 @@ class Cart extends BaseCart
 	 * @return Cart
 	 */
 	public static function InitializeCart() {
-
 			$objCart = new Cart();
 			$objCart->cart_type = CartType::cart;
 
@@ -104,8 +96,9 @@ class Cart extends BaseCart
 			$objCart->datetime_due = new CDbExpression('now() + INTERVAL '._xls_get_conf('CART_LIFE', 7).' DAY');
 			$objCart->ResetTaxIncFlag();
 			if(!$objCart->save())
-				Yii::log("Error initializing cart ".print_r($objCart->getErrors(),true),
-					'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			{
+				Yii::log("Error initializing cart ".print_r($objCart->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			}
 
 			return $objCart;
 
@@ -117,7 +110,9 @@ class Cart extends BaseCart
 		// should not be searched.
 
 		if ($this->id === null)
+		{
 			return new CArrayDataProvider(array());     // WS-2265 - The Edit Cart modal may display products when the cart is empty
+		}
 
 		$criteria = new CDbCriteria;
 		$criteria->compare('cart_id',$this->id);
@@ -138,26 +133,25 @@ class Cart extends BaseCart
 	 * @return
 	 */
 	public static function GetCart() {
-		if(is_null(Yii::app()->user->getState('cartid'))) {
+		if(is_null(Yii::app()->user->getState('cartid')))
+		{
 			$objCart = Cart::InitializeCart();
-			Yii::app()->user->setState('cartid',$objCart->id);
-			//Cart::UpdateCartCustomer();
+			Yii::app()->user->setState('cartid', $objCart->id);
 			return $objCart;
 		} else {
-
 			$objCart = Cart::model()->findByPk(Yii::app()->user->getState('cartid'));
-			if (!$objCart) {
+
+			if ($objCart === null)
+			{
 				//something has happened to the database object
 				Yii::log("Could not find cart ".Yii::app()->user->getState('cartid').", creating new one.", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-				Yii::app()->user->setState('cartid',null);
+				Yii::app()->user->setState('cartid', null);
 				$objCart = Cart::InitializeCart();
-				Yii::app()->user->setState('cartid',$objCart->id);
+				Yii::app()->user->setState('cartid', $objCart->id);
 			}
 
 			return $objCart;
-
 		}
-
 	}
 
 	/**
@@ -332,7 +326,7 @@ class Cart extends BaseCart
 		}
 
 		$objConf = Configuration::LoadByKey('NEXT_ORDER_ID');
-		$objConf->key_value = intval(preg_replace("/[^0-9]/", "", $this->id_str))+1;
+		$objConf->key_value = intval(preg_replace("/[^0-9]/", "", $this->id_str)) + 1;
 		$objConf->save();
 	}
 
@@ -341,37 +335,40 @@ class Cart extends BaseCart
 	 * Then force recalculation of Cart values
 	 * @param int $intItemId
 	 * @param int $intQuantity
-	 * @return
+	 * @return string[]|true|void|CartItem
 	 */
 	public function UpdateItemQuantity($objItem, $intQuantity)
 	{
-
 		if ($intQuantity <= 0)
 		{
 			if($objItem->wishlist_item > 0)
+			{
 				WishlistItem::model()->updateByPk($objItem->wishlist_item, array('cart_item_id' => null));
+			}
+
 			$objItem->delete();
 			return true;
 		}
 
 		if ($intQuantity == $objItem->qty)
+		{
 			return;
+		}
 
-		if (_xls_get_conf('PRICE_REQUIRE_LOGIN',0) == 1 && Yii::app()->user->isGuest)
+		if (_xls_get_conf('PRICE_REQUIRE_LOGIN', 0) == 1 && Yii::app()->user->isGuest)
 		{
 			return array(
 				'errorId' => 'notLoggedIn',
-				'errorMessage' => Yii::t('cart','You must log in before Adding to Cart.')
+				'errorMessage' => Yii::t('cart', 'You must log in before Adding to Cart.')
 			);
 		}
 
-		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) < Product::InventoryAllowBackorders &&
+		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0) < Product::InventoryAllowBackorders &&
 			$intQuantity > $objItem->qty &&
 			$objItem->product->inventoried &&
 			$objItem->product->inventory_avail < $intQuantity)
-
 		{
-			if (_xls_get_conf('INVENTORY_DISPLAY' , 0) == 0)
+			if (_xls_get_conf('INVENTORY_DISPLAY', 0) == 0)
 			{
 				$availQty = null;
 			} else {
@@ -380,25 +377,26 @@ class Cart extends BaseCart
 
 			return array(
 				'errorId' => 'invalidQuantity',
-				'errorMessage' => Yii::t('cart','Your chosen quantity is not available for ordering. Please come back and order later.'),
+				'errorMessage' => Yii::t('cart', 'Your chosen quantity is not available for ordering. Please come back and order later.'),
 				'availQty' => $availQty
 			);
-
 		}
 
+		// qty discount?
+		$arrtmp = ProductQtyPricing::model()->findAllByAttributes(
+			array('product_id' => $objItem->product_id, 'pricing_level' => 1)
+		);
 
+		$tmpprice = 0;
 
+		foreach ($arrtmp as $tmp)
+		{
+			$tmpprice = ($intQuantity >= $tmp->qty ? $tmp->price : $tmpprice);
+		}
 
-        // qty discount?
-        $arrtmp = ProductQtyPricing::model()->findAllByAttributes(array('product_id'=>$objItem->product_id, 'pricing_level'=>1));
-        $tmpprice = 0;
+		$objItem->discount = ($tmpprice > 0 ? $objItem->sell_base - $tmpprice : 0);
 
-        foreach ($arrtmp as $tmp)
-            $tmpprice = ($intQuantity>=$tmp->qty ? $tmp->price : $tmpprice);
-
-        $objItem->discount = ($tmpprice>0 ? $objItem->sell_base - $tmpprice : 0);
-
-        $objItem->qty = $intQuantity;
+		$objItem->qty = $intQuantity;
 		$objItem->save();
 
 		$this->UpdateCart();

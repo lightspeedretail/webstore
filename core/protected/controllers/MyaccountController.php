@@ -252,7 +252,15 @@ class MyaccountController extends Controller
 					$objCustomer->default_shipping_id=$model->id;
 				$objCustomer->save();
 
-				Yii::app()->shoppingcart->UpdateCartCustomer();
+				try
+				{
+					Yii::app()->shoppingcart->UpdateCartCustomer();
+				}
+				catch(Exception $e)
+				{
+					Yii::log("Error updating customer cart ".$e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				}
+
 				Yii::app()->shoppingcart->save();
 				$this->redirect($this->createUrl("/myaccount"));
 

@@ -24,8 +24,8 @@ if (count($simModules) > 0):
 endif;
 
 $totalSimMethods = count($simModulesCC) + count($simModules);
-$blnOnlyPaypalActive = ($totalSimMethods === 1 && $paypal->active == false);
-if ($totalSimMethods > 1 || $blnOnlyPaypalActive === false):
+$blnOnlyPaypalActive = ($totalSimMethods === 0 && $paypal->active == true);
+if ($totalSimMethods > 0 || $blnOnlyPaypalActive === false):
 ?>
 	<footer class="submit">
 		<?php

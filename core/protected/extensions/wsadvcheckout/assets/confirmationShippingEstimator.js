@@ -263,10 +263,15 @@ ConfirmationShippingEstimator.prototype.updateEstimates = function() {
 };
 
 ConfirmationShippingEstimator.prototype.getShippingOption = function() {
-    var option = $.grep(this.shippingOptions.shippingOptions, function(el, idx)  {
-       return (parseInt(el.providerId) === parseInt(this.selectedProviderId) &&
-           el.priorityLabel === this.selectedPriorityLabel);
-    }.bind(this));
+    var option = $.grep(
+		this.shippingOptions.shippingOptions,
+		function(el, idx) {
+			return (
+				parseInt(el.providerId) === parseInt(this.selectedProviderId) &&
+				el.priorityLabel === this.selectedPriorityLabel
+			);
+		}.bind(this));
+
     return option[0];
 };
 
@@ -422,4 +427,21 @@ ConfirmationShippingEstimator.prototype.toggleShowCalculatingOnFields = function
     });
 
     this.$totalEstimate.css('font-size', '0.90rem');
+};
+
+/**
+ * Called by PromoCodeInput when promocode has been applied or removed.
+ * @param string result The result of applying the promocode. One of:
+ * 'alert' - display an alert,
+ * 'error' -  an error occurred,
+ * 'success' - the promocode was applied or removed successfully,
+ * 'triggerCalc' - a free shipping promo code was applied or removed successfully.
+ */
+ConfirmationShippingEstimator.prototype.promoCodeChange = function (result) {
+	// TODO: If we could redraw the shipping method name in JavaScript then we
+	// could change this to only redirect on removal of promo code instead of
+	// both remove and appy.
+	if (result === 'triggerCalc') {
+		window.location = this.redirectToShippingOptionsUrl;
+	}
 };

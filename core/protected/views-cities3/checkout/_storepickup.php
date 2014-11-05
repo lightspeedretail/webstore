@@ -2,15 +2,23 @@
 	<div class="shipping-instore">
 		<label class="checkbox">
 			<?php
-			echo CHtml::checkBox(
-				'storePickupCheckBox',
-				false,
-				$htmlOptions = array(
-					'class' => 'instore-toggle',
-					'onclick' => 'updateShippingPriority(this.value)',
-					'uncheckValue' => null
-				)
-			); ?>
+			if ($shouldDisplayShippingAddresses)
+			{
+				echo CHtml::checkBox(
+					'storePickupCheckBox',
+					$isStorePickupSelected,
+					$htmlOptions = array(
+						'class' => 'instore-toggle',
+						'uncheckValue' => null
+					)
+				);
+			}   else    {
+				echo CHtml::hiddenField(
+					'storePickupCheckBox',
+					1
+				);
+			}
+			?>
 			<strong><?php echo Yii::t('checkout','In-Store Pickup'); ?></strong>
 
 			<p class="description">
@@ -19,26 +27,21 @@
 
 		</label>
 
-		<div class="shipping-instore-details modal-conditional-block">
+		<div class="shipping-instore-details modal-conditional-block <?= $onLoadDisplayInStorePickup ? 'active' : '' ?>">
 			<h4>
 				<?php
 				echo Yii::t('global','Store Details');
 				?>
 			</h4>
-			<p class="contact-info">
-				<?php
-				echo _xls_html_storeaddress();
-				?>
-			</p>
+			<div class="clearfix">
+				<p class="contact-info">
+					<?php echo _xls_html_storeaddress();?>
+				</p>
 
-			<p class="contact-info">
-				<?php
-				echo Yii::t('checkout', _xls_get_conf('STORE_HOURS'));
-				?>
-			</p>
-
-			<?php // to ensure position of the name fields, force a new line here ?>
-			<p>&nbsp;</p>
+				<p class="contact-info">
+					<?php echo Yii::t('checkout', _xls_get_conf('STORE_HOURS'));?>
+				</p>
+			</div>
 
 			<ol class="field-containers-small" style="overflow:visible">
 				<li class="field-container field-container-split">

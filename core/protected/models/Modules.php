@@ -153,7 +153,6 @@ class Modules extends BaseModules
 			case 'markup':
 				return $this->GetMarkup();
 
-
 			case 'payment_method':
 				return $this->GetPaymentMethod();
 
@@ -174,6 +173,12 @@ class Modules extends BaseModules
 			'shipping' => array(
 				'condition' => 'active = 1 AND category = "shipping"',
 				'order' => 'sort_order'
+			),
+			'notStorePickup' => array(
+				'condition' => 'module != "storepickup"'
+			),
+			'freeshipping' => array(
+				'condition' => 'active = 1 AND module = "freeshipping"'
 			),
 			'payment' => array(
 				'condition' => 'active = 1 AND category = "payment"',

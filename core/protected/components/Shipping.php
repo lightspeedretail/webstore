@@ -39,6 +39,12 @@ class Shipping
 
 		foreach ($shippingModules as $objModule)
 		{
+			if (empty($modifiedCheckoutForm->shippingCountry) === true &&
+				$objModule->module !== 'storepickup')
+			{
+				continue;
+			}
+
 			if (_xls_get_conf('DEBUG_SHIPPING', false))
 			{
 				Yii::log("Attempting to get the component for module ".$objModule->module, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
@@ -190,23 +196,21 @@ class Shipping
 	 */
 	public static function getCartScenarios($checkoutForm)
 	{
-		if (empty($checkoutForm->shippingCountry) === true)
-		{
-			throw new Exception(
-				Yii::t(
-					'checkout',
-					'Not enough details in checkoutForm to get shipping rates'
-				)
-			);
-		}
-
 		Yii::log('Getting shipping rates ' . print_r($checkoutForm, true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
-		Yii::app()->shoppingcart->setTaxCodeFromAddress(
-			$checkoutForm->shippingCountry,
-			$checkoutForm->shippingState,
-			$checkoutForm->shippingPostal
-		);
+		if (empty($checkoutForm->shippingCountry) === false)
+		{
+			Yii::app()->shoppingcart->setTaxCodeFromAddress(
+				$checkoutForm->shippingCountry,
+				$checkoutForm->shippingState,
+				$checkoutForm->shippingPostal
+			);
+			$savedTaxId = Yii::app()->shoppingcart->tax_code_id;
+		}
+		else
+		{
+			$savedTaxId = TaxCode::getDefaultCode();
+		}
 
 		$arrShippingProvider = self::getAvailableShippingProviders($checkoutForm);
 
@@ -225,9 +229,6 @@ class Shipping
 		// about the cart as if the related shipping option had been chosen.
 		$arrCartScenario = array();
 
-		// Store the cart tax code ID, to be restored later.
-		$savedTaxId = Yii::app()->shoppingcart->tax_code_id;
-
 		foreach ($arrShippingProvider as $shippingModuleId => $shippingProvider)
 		{
 			// Since Store Pickup means paying local taxes, set the cart so our
@@ -244,7 +245,7 @@ class Shipping
 			// Get the "shipping" product, which may vary from module to module.
 			$strShippingProduct = $shippingProvider['component']->LsProduct;
 
-			if (Yii::app()->params['SHIPPING_TAXABLE'] == '1')
+			if (Yii::app()->params['SHIPPING_TAXABLE'] == 1)
 			{
 				$objShipProduct = Product::LoadByCode($strShippingProduct);
 
@@ -277,7 +278,7 @@ class Shipping
 						$intLsId
 					);
 
-					Yii::log("Taxes retrieved " . print_r($taxes, true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+					Yii::log("Shipping Taxes retrieved " . print_r($taxes, true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 					// TODO Document why [1] ?
 					$taxOnShipping = $taxes[1];
@@ -294,7 +295,7 @@ class Shipping
 					}
 				}
 
-				$shoppingCart = clone Yii::app()->shoppingcart->getModel();
+				$shoppingCart = Yii::app()->shoppingcart->getModel();
 
 				$arrCartScenario[] = array(
 					'formattedCartSubtotal' => _xls_currency(Yii::app()->shoppingcart->subtotal),
@@ -326,9 +327,6 @@ class Shipping
 			}
 		}
 
-		Yii::app()->shoppingcart->tax_code_id = $savedTaxId;
-		Yii::app()->shoppingcart->UpdateCart();
-
 		// Sort the shipping options based on the price key.
 		usort(
 			$arrCartScenario,
@@ -353,18 +351,13 @@ class Shipping
 	 */
 	public static function saveCartScenariosToSession($arrCartScenario)
 	{
-		Yii::log(
-			'Saving ' . sizeof($arrCartScenario) . ' cart scenarios to session ' . print_r($arrCartScenario, true),
-			'info',
-			'application.'.__CLASS__.".".__FUNCTION__
-		);
-
 		Yii::app()->session[self::$cartScenariosSessionKey] = $arrCartScenario;
 	}
 
 	/**
 	 * Load a Shipping object from the user's session. Used for retrieving
 	 * previously calculated cart scenarios.
+	 * TODO: Should probably be renamed to getCartScenariosFromSession().
 	 * @return Shipping|null The Shipping object stored in the session.
 	 */
 	public static function loadCartScenariosFromSession()
@@ -402,6 +395,47 @@ class Shipping
 	}
 
 	/**
+	 * Get the selected cart scenario from the session.
+	 * If there's no selected cart scenario, formatted the shopping cart in the same way.
+	 * TODO: Create a CartScenario.php component and change this function to
+	 * CartScenario::formatFromShoppingCart().
+	 * @return CartScenario @see Shipping::getCartScenarios.
+	 */
+	public static function getSelectedCartScenarioFromSessionOrShoppingCart()
+	{
+		$selectedCartScenario = static::getSelectedCartScenarioFromSession();
+
+		if ($selectedCartScenario !== null)
+		{
+			return $selectedCartScenario;
+		}
+
+		// Return a version of the shopping cart formatted like a cart scenario.
+		$sc = Yii::app()->shoppingcart;
+		return array(
+			'formattedCartSubtotal' => _xls_currency($sc->subtotal),
+			'formattedCartTax' => $sc->taxTotalFormatted,
+			'formattedCartTax1' => $sc->formattedCartTax1,
+			'formattedCartTax2' => $sc->formattedCartTax2,
+			'formattedCartTax3' => $sc->formattedCartTax3,
+			'formattedCartTax4' => $sc->formattedCartTax4,
+			'formattedCartTax5' => $sc->formattedCartTax5,
+			'formattedCartTotal' => $sc->totalFormatted,
+			'formattedShippingPrice' => $sc->formattedShippingCharge,
+			'module' => null,
+			'priorityIndex' => null,
+			'priorityLabel' => null,
+			'providerId' => null,
+			'providerLabel' => null,
+			'shippingLabel' => null,
+			'shippingPrice' => null,
+			'shippingProduct' => null,
+			'shoppingCart' => null,
+			'sortOrder' => null
+		);
+	}
+
+	/**
 	 * Updates the cart scenarios stored in the session.
 	 *
 	 * @return void
@@ -422,6 +456,12 @@ class Shipping
 			$arrCartScenario = Shipping::getCartScenarios($checkoutForm);
 		} catch (Exception $e) {
 			Yii::log('Unable to get cart scenarios: ' . $e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+
+			// If there are no valid cart scenarios we can deselect whatever
+			// was previously selected.
+			$checkoutForm->shippingProvider = null;
+			$checkoutForm->shippingPriority = null;
+			MultiCheckoutForm::saveToSession($checkoutForm);
 			return null;
 		}
 

@@ -31,7 +31,7 @@ class beanstreamsim extends WsPayment
 			"ordAddress2"		=> $this->CheckoutForm->billingAddress2,
 			"ordCity"			=> $this->CheckoutForm->billingCity,
 			"ordProvince"		=> $this->CheckoutForm->billingState,
-			"ordCountry"		=> $this->CheckoutForm->billingCountry,
+			"ordCountry"		=> is_numeric($this->CheckoutForm->billingCountry) ? $this->CheckoutForm->billingCountryCode : $this->CheckoutForm->billingCountry,
 			"ordPostalCode"		=> $this->CheckoutForm->billingPostal,
 			"approvedPage"		=> Yii::app()->controller->createAbsoluteUrl('/cart/payment/'.$this->modulename),
 			"declinedPage"		=> Yii::app()->controller->createAbsoluteUrl('/cart/payment/'.$this->modulename),

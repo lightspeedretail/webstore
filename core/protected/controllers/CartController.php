@@ -10,7 +10,6 @@
  * @copyright  Copyright &copy; 2013 Xsilva Systems, Inc. http://www.lightspeedretail.com
  * @version    3.0
  * @since      2013-05-14
-
  */
 
 class CartController extends Controller
@@ -102,7 +101,7 @@ class CartController extends Controller
 
 		//Set breadcrumbs
 		$this->breadcrumbs = array(
-			Yii::t('global','Edit Cart') => array('/cart'),
+			Yii::t('global', 'Edit Cart') => array('/cart'),
 		);
 
 		//$this->layout = '//layouts/column2';
@@ -111,19 +110,19 @@ class CartController extends Controller
 		Yii::app()->shoppingcart->UpdateCart();
 
 		//Populate our Email Cart popup box
-		$CartShare = new ShareForm();
-		$CartShare->code = Yii::app()->shoppingcart->linkid;
-		$CartShare->comment = Yii::t(
+		$cartShare = new ShareForm();
+		$cartShare->code = Yii::app()->shoppingcart->linkid;
+		$cartShare->comment = Yii::t(
 			'wishlist',
 			'Please check out my shopping cart at {url}',
-			array('{url}' => Yii::app()->createAbsoluteUrl('cart/share', array('code' => $CartShare->code)))
+			array('{url}' => Yii::app()->createAbsoluteUrl('cart/share', array('code' => $cartShare->code)))
 		);
 
-		$this->render('index',array(
-			'CartShare' => $CartShare,
-		));
+		$this->render(
+			'index',
+			array('CartShare' => $cartShare)
+		);
 	}
-
 
 	/**
 	 * Update qty from cart
@@ -136,7 +135,7 @@ class CartController extends Controller
 			$retValue = null;
 			if (is_numeric($intNewQty))
 			{
-				$retValue = Yii::app()->shoppingcart->UpdateItemQuantity($item,$intNewQty);
+				$retValue = Yii::app()->shoppingcart->UpdateItemQuantity($item, $intNewQty);
 
 				if ($retValue instanceof CartItem === false && is_array($retValue))
 				{
@@ -147,32 +146,27 @@ class CartController extends Controller
 					$arrReturn['errormsg'] = $retValue['errorMessage'] ? $retValue['errorMessage'] : $retValue;
 					$arrReturn['availQty'] = $retValue['availQty'] ? $retValue['availQty'] : 'default';
 
-					Yii::log(''.print_r($arrReturn,true), 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
+					Yii::log(''.print_r($arrReturn, true), 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
 
-					echo json_encode($arrReturn);
-					return;
+					return $this->renderJSON($arrReturn);
 				}
 			}
-
 		}
 
 		$this->intEditMode = 1;
 		Yii::app()->shoppingcart->Recalculate();
-		$arrReturn['action'] = 'success';
 
-		if (Yii::app()->request->isAjaxRequest)  // coming from a modal
+		if (Yii::app()->request->isAjaxRequest)
 		{
-			$arrReturn['cartitems'] = Yii::app()->shoppingcart->asJSon();
-			echo json_encode($arrReturn);
+			return $this->renderJSON(
+				array(
+					'action' => 'success',
+					'cartitems' => $this->renderPartial('/cart/_cartitems', null, true)
+				)
+			);
 		}
 
-		else
-		{
-			$arrReturn['cartitems'] = $this->renderPartial('/cart/_cartitems',null,true);
-			$this->redirect(array('/cart'));
-		}
-
-
+		$this->redirect(array('/cart'));
 	}
 
 	/**
@@ -186,8 +180,8 @@ class CartController extends Controller
 			$this->intEditMode = 1;
 			Yii::app()->shoppingcart->Recalculate();
 			$arrReturn['action'] = 'success';
-			$arrReturn['cartitems'] = $this->renderPartial('/cart/_cartitems',null,true);
-			echo json_encode($arrReturn);
+			$arrReturn['cartitems'] = $this->renderPartial('/cart/_cartitems', null, true);
+			return $this->renderJSON($arrReturn);
 		}
 	}
 
@@ -209,7 +203,7 @@ class CartController extends Controller
 
 		if (!($objCart instanceof Cart))
 		{
-			throw new CHttpException(404,'The requested page does not exist.');
+			throw new CHttpException(404, 'The requested page does not exist.');
 		}
 
 		//Attempt to use an AJAX call to send any pending email. If it doesn't work, the Download process will catch it anyway.
@@ -223,17 +217,18 @@ class CartController extends Controller
 			$jsScript .= "$.ajax({url:\"".CController::createUrl('site/sendemail', array("id" => $objEmail->id))."\"});\n";
 		}
 
-		Yii::app()->clientScript->registerScript('sendemail',$jsScript,CClientScript::POS_READY);
+		Yii::app()->clientScript->registerScript('sendemail', $jsScript, CClientScript::POS_READY);
 
-		if (Yii::app()->theme->info->advancedCheckout)
+		if (Yii::app()->theme->info->advancedCheckout === true)
 		{
 			//If we were still logged in as guest at this point, log out
 			if ($objCart->customer->record_type == Customer::GUEST)
+			{
 				Yii::app()->user->logout();
+			}
 
 			$this->redirect('/checkout/thankyou/'.$strLink);
 		}
-
 
 		//If we have a document that supersedes our cart, then let's copy some key display fields (just make sure we don't save it!)
 		if ($objCart->document_id > 0)
@@ -252,13 +247,15 @@ class CartController extends Controller
 
 			if (Yii::app()->params['LIGHTSPEED_CLOUD'] > 0)
 			{
-				//ToDo: Update when Cloud begins to return shipping values, since this fix will cause total to include 2xshipping
+				// TODO: Update when Cloud begins to return shipping values,
+				// since this fix will cause total to include 2xshipping
 				$objCart->total += $objCart->shipping->shipping_sell;
 			}
 			else
 			{
-				//Because a new document shows shipping as an item, drop it from here
-				$objCart->shipping->shipping_data = Yii::t('cart','Shipping included below.');
+				// Because a new document shows shipping as an item, drop it
+				// from here.
+				$objCart->shipping->shipping_data = Yii::t('cart', 'Shipping included below.');
 				$objCart->shipping->shipping_sell = "(in details)";
 			}
 		}
@@ -290,11 +287,11 @@ class CartController extends Controller
 			//Use the same mechanism as we use when logging in and finding an old cart, since we merge items anyway
 			Yii::app()->shoppingcart->loginMerge($objCart);
 
-			Yii::app()->user->setFlash('success',Yii::t('cart','The shared cart items have been added to your cart.'));
+			Yii::app()->user->setFlash('success', Yii::t('cart', 'The shared cart items have been added to your cart.'));
 			//And go to cart view
 			Yii::app()->controller->redirect(array('/cart'));
 		} else {
-			Yii::app()->user->setFlash('error',Yii::t('cart','Cart not found or has already been checked out.'));
+			Yii::app()->user->setFlash('error', Yii::t('cart', 'Cart not found or has already been checked out.'));
 			//Go to home page
 			Yii::app()->controller->redirect(_xls_site_url());
 		}
@@ -311,13 +308,11 @@ class CartController extends Controller
 			Yii::app()->controller->redirect(_xls_site_url());
 		}
 
-
 		if (Yii::app()->shoppingcart->totalItemCount > 0)
 		{
-			Yii::app()->user->setFlash('error',Yii::t('cart','You have items in your cart already. A quote cannot be merged with an existing shopping cart. Please complete your checkout or clear your cart and try again.'));
+			Yii::app()->user->setFlash('error', Yii::t('cart', 'You have items in your cart already. A quote cannot be merged with an existing shopping cart. Please complete your checkout or clear your cart and try again.'));
 			Yii::app()->controller->redirect(_xls_site_url());
 			return;
-
 		}
 
 		//Use our class variable which is accessible from the view
@@ -352,9 +347,8 @@ class CartController extends Controller
 
 			//And go to cart view
 			Yii::app()->controller->redirect(array('/cart'));
-
 		} else {
-			Yii::app()->user->setFlash('error',Yii::t('cart','Quote not found.'));
+			Yii::app()->user->setFlash('error', Yii::t('cart', 'Quote not found.'));
 			//Go to home page
 			Yii::app()->controller->redirect(_xls_site_url());
 		}
@@ -389,8 +383,8 @@ class CartController extends Controller
 	}
 
 	/**
-	 * Restore a cart based on a link. Typically used when cancelling an Simple Integration payment which returns back
-	 * to the site
+	 * Restore a cart based on a link. Typically used when cancelling an Simple
+	 * Integration payment which returns back to the site
 	 * @param String $errorMessage an optional error message to display.
 	 */
 	public function actionRestore($errorMessage = null)
@@ -414,7 +408,6 @@ class CartController extends Controller
 		if ($objCart instanceof Cart && (
 				$objCart->cart_type == CartType::cart || $objCart->cart_type == CartType::awaitpayment))
 		{
-
 			$cartId = $objCart->id;
 
 			// If we had a Guest login, remove it to avoid showing logged in as
@@ -437,7 +430,6 @@ class CartController extends Controller
 					Yii::app()->session['checkout.cache'] = $model;
 				}
 			}
-
 
 			if (!Yii::app()->user->isGuest && Yii::app()->user->fullname == "Guest")
 			{
@@ -462,7 +454,7 @@ class CartController extends Controller
 				}
 				else
 				{
-					Yii::app()->user->setFlash('warning',Yii::t('cart','You cancelled your payment attempt. Try again or choose another payment method.'));
+					Yii::app()->user->setFlash('warning', Yii::t('cart', 'You cancelled your payment attempt. Try again or choose another payment method.'));
 				}
 
 				//And go back to checkout
@@ -471,7 +463,6 @@ class CartController extends Controller
 
 			//In all other cases, just go home
 			Yii::app()->controller->redirect(array('/site'));
-
 		} else {
 			self::redirectToReceipt($strLink);
 		}
@@ -498,7 +489,6 @@ class CartController extends Controller
 
 			if ($model->validate())
 			{
-
 				$strCode = $model->code;
 
 				//Make sure code we've been passed is valid
@@ -516,8 +506,8 @@ class CartController extends Controller
 					$model->fromName = $objCustomer->fullname;
 				}
 
-				$strHtmlBody = $this->renderPartial('/mail/_cart',array('model' => $model), true);
-				$strSubject = _xls_format_email_subject('EMAIL_SUBJECT_CART',$model->fromName,null);
+				$strHtmlBody = $this->renderPartial('/mail/_cart', array('model' => $model), true);
+				$strSubject = _xls_format_email_subject('EMAIL_SUBJECT_CART', $model->fromName,null);
 
 				$objEmail = new EmailQueue;
 
@@ -525,15 +515,7 @@ class CartController extends Controller
 				$objEmail->subject = $strSubject;
 				$objEmail->to = $model->toEmail;
 
-//				$objHtml = new HtmlToText;
-//
-//				//If we get back false, it means conversion failed which 99.9% of the time means improper HTML.
-//				$strPlain = $objHtml->convert_html_to_text($strHtmlBody);
-//				if ($strPlain !== false)
-//					$objEmail->plainbody = $strPlain;
-
 				$objEmail->save();
-
 
 				$response_array = array(
 					'status' => "success",
@@ -541,15 +523,13 @@ class CartController extends Controller
 					'url' => CController::createUrl('site/sendemail',array("id" => $objEmail->id)),
 					'reload' => true,
 				);
-
-
 			}
 			else {
 				$response_array['status'] = 'error';
 				$response_array['errormsg'] = _xls_convert_errors($model->getErrors());
 			}
 
-			echo json_encode($response_array);
+			$this->renderJSON($response_array);
 		}
 	}
 
@@ -762,25 +742,22 @@ class CartController extends Controller
 							break;
 					}
 
-
 					$intTaxCode = Yii::app()->shoppingcart->tax_code_id; //Save tax code already chosen
 					Yii::app()->user->login($identity, 3600 * 24 * 30);
-					Yii::app()->user->setState('createdoncheckout',1);
+					Yii::app()->user->setState('createdoncheckout', 1);
 					Yii::app()->shoppingcart->tax_code_id = $intTaxCode;
 				}
 
-
-				//If we're not logged in, create guest account, or get our logged in ID
+				// If we're not logged in, create guest account, or get our logged in ID.
 				if (Yii::app()->user->isGuest)
 				{
-
 					Yii::log("Creating Guest account to complete checkout", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 					if (is_null($objCart->customer_id))
 					{
 						//create a new guest ID
 						$identity = new GuestIdentity();
-						Yii::app()->user->login($identity,300);
+						Yii::app()->user->login($identity, 300);
 						$intCustomerId = $objCart->customer_id = $identity->getId();
 						$this->intGuestCheckout = 1;
 						$objCustomer = Customer::model()->findByPk($intCustomerId);
@@ -801,11 +778,10 @@ class CartController extends Controller
 				$objCart->customer_id = $intCustomerId;
 				if (trim($objCart->currency) == '')
 				{
-					$objCart->currency = _xls_get_conf('CURRENCY_DEFAULT' , 'USD');
+					$objCart->currency = _xls_get_conf('CURRENCY_DEFAULT', 'USD');
 				}
 
 				$objCart->save();
-
 
 				//If shipping address is value, then choose that
 				//otherwise enter new shipping address
@@ -817,7 +793,7 @@ class CartController extends Controller
 					Yii::log("Creating new shipping address", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 					if (empty($model->shippingLabel))
 					{
-						$model->shippingLabel = Yii::t('global','Unlabeled Address');
+						$model->shippingLabel = Yii::t('global', 'Unlabeled Address');
 					}
 
 					$objAddress = new CustomerAddress;
@@ -834,13 +810,13 @@ class CartController extends Controller
 					$objAddress->residential = $model->shippingResidential;
 					if (!$objAddress->save())
 					{
-						Yii::app()->user->setFlash('error',print_r($objAddress->getErrors(),true));
-						Yii::log("Error creating CustomerAddress Shipping ".print_r($objAddress->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+						Yii::app()->user->setFlash('error', print_r($objAddress->getErrors(), true));
+						Yii::log("Error creating CustomerAddress Shipping ".print_r($objAddress->getErrors(), true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 						$this->refresh();
 					}
+
 					$objCart->shipaddress_id = $model->intShippingAddress = $objAddress->id;
 					unset($objAddress);
-
 				}
 
 				if ($objCustomer instanceof Customer)
@@ -849,7 +825,15 @@ class CartController extends Controller
 					{
 						$objCustomer->default_shipping_id = $model->intShippingAddress;
 						$objCustomer->save();
-						$objCart->UpdateCartCustomer();
+						try
+						{
+							$objCart->UpdateCartCustomer();
+						}
+						catch(Exception $e)
+						{
+							Yii::log("Error updating customer cart ".$e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+						}
+
 						$objCart->UpdateCart();
 					}
 				}
@@ -859,14 +843,12 @@ class CartController extends Controller
 				if ($model->intBillingAddress)
 				{
 					$objCart->billaddress_id = $model->intBillingAddress;
-
 				} elseif ($model->billingSameAsShipping) {
 					$objCart->billaddress_id = $model->intBillingAddress = $model->intShippingAddress;
-
 				} else {
 					if (empty($model->billingLabel))
 					{
-						$model->billingLabel = Yii::t('checkout','Unlabeled address');
+						$model->billingLabel = Yii::t('checkout', 'Unlabeled address');
 					}
 
 					if (!Yii::app()->user->isGuest)
@@ -879,7 +861,6 @@ class CartController extends Controller
 							$model->contactLastName = $objCustomer->last_name;
 						}
 					}
-
 
 					$objAddress = new CustomerAddress;
 					$objAddress->customer_id = $intCustomerId;
@@ -897,14 +878,14 @@ class CartController extends Controller
 					$objAddress->residential = $model->billingResidential;
 					if (!$objAddress->save())
 					{
-						Yii::app()->user->setFlash('error',print_r($objAddress->getErrors(),true));
-						Yii::log("Error creating CustomerAddress Billing ".print_r($objAddress->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+						Yii::app()->user->setFlash('error', print_r($objAddress->getErrors(), true));
+						Yii::log("Error creating CustomerAddress Billing ".print_r($objAddress->getErrors(), true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 						$this->refresh();
 					}
+
 					$objCart->billaddress_id = $model->intBillingAddress = $objAddress->id;
 
 					unset($objAddress);
-
 				}
 
 				if ($objCustomer instanceof Customer)
@@ -998,10 +979,9 @@ class CartController extends Controller
 					{
 						print_r($objPayment->getErrors());
 					}
-
 				}
 
-				Yii::log("Payment method is ".$objPayment->payment_method, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+				Yii::log("Payment method is ".$objPaymentModule->payment_method, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 				$objPayment->payment_method = $objPaymentModule->payment_method;
 				$objPayment->payment_module = $objPaymentModule->module;
@@ -1300,6 +1280,7 @@ class CartController extends Controller
 				$objPromo->save();
 			}
 		}
+
 		$objCart->save();
 	}
 
@@ -1311,9 +1292,7 @@ class CartController extends Controller
 	 * @param null $objCart
 	 * @param bool $blnBehindTheScenes
 	 */
-	// @codingStandardsIgnoreStart
-	public static function FinalizeCheckout($objCart = null, $blnBehindTheScenes=false, $ecp = false)
-	// @codingStandardsIgnoreEnd
+	public static function FinalizeCheckout($objCart = null, $blnBehindTheScenes = false, $ecp = false)
 	{
 		Yii::log("Finalizing checkout", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 		if (!$objCart)
@@ -1324,6 +1303,9 @@ class CartController extends Controller
 		unset(Yii::app()->session['checkout.cache']);
 
 		self::PreFinalizeHooks($objCart);
+
+		self::EmailReceipts($objCart);
+		Yii::log('Receipt e-mails added to the queue', 'info', __CLASS__.'.'.__FUNCTION__);
 
 		// Mark as successful order, ready to download.
 		Yii::log("Marking as ".OrderStatus::AwaitingProcessing, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
@@ -1346,14 +1328,12 @@ class CartController extends Controller
 
 		self::PostFinalizeHooks($objCart);
 
-		self::EmailReceipts($objCart);
-
-		if (!$blnBehindTheScenes)
+		if ($blnBehindTheScenes === false)
 		{
 			//If we're behind a common SSL and we want to stay logged in
 			if (Yii::app()->isCommonSSL && $objCart->customer->record_type != Customer::GUEST)
 			{
-				Yii::app()->user->setState('sharedssl',1);
+				Yii::app()->user->setState('sharedssl', 1);
 			}
 
 			//If we were in as guest, immediately log out of guest account
@@ -1361,7 +1341,6 @@ class CartController extends Controller
 			{
 				Yii::app()->user->logout();
 			}
-
 
 			//Redirect to our receipt, we're done
 			Yii::app()->shoppingcart->releaseCart();
@@ -1379,7 +1358,7 @@ class CartController extends Controller
 	}
 
 	/**
-	 * Process payments coming in from third party systems, such as Paypal IPN and other AIM integration
+	 * Process payments coming in from third party systems, such as Paypal IPN and other SIM integrations
 	 */
 	public function actionPayment()
 	{
@@ -1418,11 +1397,11 @@ class CartController extends Controller
 							date("Y-m-d H:i:s",strtotime($retVal['payment_date'])) : new CDbExpression('NOW()');
 						$objPayment->save();
 
-						self::FinalizeCheckout($objCart, !Yii::app()->theme->info->advancedCheckout);
+						$blnBehindScenes = Checkout::behindTheScenes($strModule);
+
+						self::FinalizeCheckout($objCart, $blnBehindScenes);
 
 						Yii::log('Checkout Finalized', 'info', __CLASS__.'.'.__FUNCTION__);
-						$this->EmailReceipts($objCart);
-						Yii::log('Receipts Emailed', 'info', __CLASS__.'.'.__FUNCTION__);
 
 						if (!isset($retVal['output']))
 						{
@@ -1543,9 +1522,7 @@ class CartController extends Controller
 	 * Create an Email receipt for both the customer and the store, if needed. This goes to our emailqueue table
 	 * @param $objCart
 	 */
-	// @codingStandardsIgnoreStart
 	public static function EmailReceipts($objCart)
-	// @codingStandardsIgnoreEnd
 	{
 		if (_xls_get_conf('EMAIL_SEND_CUSTOMER',0) == 1)
 		{
@@ -1619,9 +1596,7 @@ class CartController extends Controller
 	 * If the shopper has chosen an address from the address book, copy the values to the normal
 	 * fields since they're needed for shipping and payment calculations
 	 */
-	// @codingStandardsIgnoreStart
 	protected function FillFieldsFromPreselect($checkoutForm)
-	// @codingStandardsIgnoreEnd
 	{
 		if ($checkoutForm->intShippingAddress > 0)
 		{
@@ -1684,9 +1659,7 @@ class CartController extends Controller
 	 * @param $objCart
 	 * @return mixed
 	 */
-	// @codingStandardsIgnoreStart
 	protected static function PreFinalizeHooks($objCart)
-	// @codingStandardsIgnoreEnd
 	{
 		$objEvent = new CEventOrder('CartController','onBeforeCreateOrder',$objCart->id_str);
 		_xls_raise_events('CEventOrder',$objEvent);
@@ -1699,9 +1672,7 @@ class CartController extends Controller
 	 * @param $objCart
 	 * @return mixed
 	 */
-	// @codingStandardsIgnoreStart
 	protected static function PostFinalizeHooks($objCart)
-	// @codingStandardsIgnoreEnd
 	{
 		$objEvent = new CEventOrder('CartController','onCreateOrder',$objCart->id_str);
 		_xls_raise_events('CEventOrder',$objEvent);
@@ -1753,13 +1724,13 @@ class CartController extends Controller
 			Yii::app()->shoppingcart->TaxCodeId = $objDestination->taxcode;
 			Yii::app()->shoppingcart->UpdateCart();
 
-			$arrReturn['cartitems'] = $this->renderPartial('/cart/_cartitems',null,true);
+			$arrReturn['cartitems'] = $this->renderPartial('/cart/_cartitems', null, true);
 			if (!empty(Yii::app()->session['ship.prices.cache']))
 			{
 				$arrReturn['action'] = 'triggerCalc';
 			}
 
-			echo json_encode($arrReturn);
+			return $this->renderJSON($arrReturn);
 		}
 	}
 
@@ -1778,7 +1749,6 @@ class CartController extends Controller
 
 			$strSize = Yii::app()->getRequest()->getParam('product_size');
 			$strColor = Yii::app()->getRequest()->getParam('product_color');
-
 
 			if (isset($strSize) || isset($strColor))
 			{
@@ -1800,7 +1770,7 @@ class CartController extends Controller
 			}
 
 			$intCount = Yii::app()->shoppingcart->item_count;
-			$intRowId = Yii::app()->shoppingcart->addProduct($intProductId,$intQty,$intWishId);
+			$intRowId = Yii::app()->shoppingcart->addProduct($intProductId, $intQty, $intWishId);
 
 			if ($intRowId)
 			{
@@ -1821,7 +1791,7 @@ class CartController extends Controller
 					);
 
 					$arrReturn['action'] = "alert";
-					$arrReturn['errormsg'] = Yii::t('global',$message);
+					$arrReturn['errormsg'] = Yii::t('global', $message);
 				} else {
 					Yii::log("Added item ".$intProductId." as cart_items id ".$intRowId, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 					$objCart = Yii::app()->shoppingcart;
@@ -1839,6 +1809,7 @@ class CartController extends Controller
 					{
 						$arrReturn['purchaseStatus'] = WishlistItem::model()->findByPk($intWishId)->PurchaseStatus;
 					}
+
 					$strCartfile = Yii::app()->getRequest()->getParam('cart');
 					$strCartfile = empty($strCartfile) ? "_sidecart" : $strCartfile;
 					$arrReturn['shoppingcart'] = $this->renderPartial(
@@ -1856,7 +1827,6 @@ class CartController extends Controller
 					'application.'.__CLASS__.".".__FUNCTION__
 				);
 			}
-
 		}
 	}
 
@@ -1883,28 +1853,6 @@ class CartController extends Controller
 	}
 
 	/**
-	 * Ajax receiver function to Apply Promocode on "add to cart" modal.
-	 * This function adds to the cart and then returns a JSON encoded string confirmation
-	 */
-	public function actionModalApplyPromocode()
-	{
-		$strPromoCode = Yii::app()->getRequest()->getParam('promoCode');
-		$result = $this->_applyPromoCode($strPromoCode);
-		$result['shoppingCart'] = Yii::app()->shoppingcart->asJSON();
-		$this->renderJSON($result);
-	}
-
-	/**
-	 * Ajax receiver function to Remove Promocode on "edit cart" modal.
-	 */
-	public function actionModalRemovePromoCode()
-	{
-		Yii::app()->shoppingcart->RemovePromoCode();
-		$result['shoppingCart'] = Yii::app()->shoppingcart->asJSON();
-		$this->renderJSON($result);
-	}
-
-	/**
 	 * Apply a promo code to the shopping cart. Stores the updated shipping and
 	 * cart scenarios in the session cache.
 	 * @param String $strPromoCode The promo code to apply.
@@ -1912,27 +1860,26 @@ class CartController extends Controller
 	 */
 	private function _applyPromoCode($strPromoCode)
 	{
-		$objCart = Yii::app()->shoppingcart;
-		if ($objCart->fk_promo_id > 0)
+		if (Yii::app()->shoppingcart->fk_promo_id > 0)
 		{
-			$arrReturn['action'] = "alert";
-			$arrReturn['errormsg'] = Yii::t('global',"Only one promo code can be applied");
-			return $arrReturn;
+			return array(
+				'action' => 'alert',
+				'errormsg' => Yii::t('global', 'Only one promo code can be applied')
+			);
 		}
 
-		$model = new PromoCode();
-		$model->code = $strPromoCode;
-		$model->setScenario('checkout');
-		if ($model->validate() === false)
+		$objPromoCode = new PromoCode();
+		$objPromoCode->code = $strPromoCode;
+		$objPromoCode->setScenario('checkout');
 
+		if ($objPromoCode->validate() === false)
 		{
-			$arrErrors = $model->getErrors();
-			$arrReturn['action'] = "error";
-			$arrReturn['errormsg'] = $arrErrors['code'][0];
-
-			return $arrReturn;
+			$arrErrors = $objPromoCode->getErrors();
+			return array (
+				'action' => 'error',
+				'errormsg' => $arrErrors['code'][0]
+			);
 		}
-
 
 		$objPromoCode = PromoCode::LoadByCode($strPromoCode);
 		Yii::app()->shoppingcart->applyPromoCode($objPromoCode);
@@ -1942,48 +1889,46 @@ class CartController extends Controller
 		// criteria have passed. So just apply and refresh the shipping list.
 		if ($objPromoCode->Shipping)
 		{
-			$arrReturn['action'] = 'triggerCalc';
-			$arrReturn['errormsg'] = Yii::t('global',"Congratulations! This order qualifies for Free Shipping!");
-		} else {
-			$arrReturn['action'] = "success";
-			$arrReturn['errormsg'] = Yii::t(
-				'global',
-				"Promo Code applied at {amount}.",
-				array('{amount}' =>
-					PromoCodeType::Display(
-						$objPromoCode->type,
-						$objPromoCode->amount
-					)
-				)
+			return array(
+				'action' => 'triggerCalc',
+				'errormsg' => Yii::t('global', 'Congratulations! This order qualifies for Free Shipping!')
 			);
-
-			// If this is an old cart (i.e. pre-Brooklyn 2014) then use this parameter to call calculateTotalScenarios() otherwise skip it.
-			if (Yii::app()->theme->info->advancedCheckout == false)
-			{
-				$checkoutForm = MultiCheckoutForm::loadFromSessionOrNew();
-				try {
-					$arrCartScenario = Shipping::getCartScenarios($checkoutForm);
-				} catch (Exception $e) {
-					Yii::log('Unable to get cart scenarios: ' . $e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-					$arrCartScenario = null;
-
-						// We have no shipping calculations yet.
-					$renderedCartItems = $this->renderPartial('/cart/_cartitems', null, true);
-				}
-
-				if ($arrCartScenario !== null)
-				{
-					$arrFormattedCartScenario = $this->formatCartScenarios($arrCartScenario);
-					$arrReturn['totals'] = $arrFormattedCartScenario['totals'];
-					$arrReturn['prices'] = $arrFormattedCartScenario['prices'];
-					$renderedCartItems = $arrFormattedCartScenario['renderedCartItems'];
-					Yii::app()->session['ship.formattedCartTotals.cache'] = $arrFormattedCartScenario['totals'];
-				}
-
-				$arrReturn['cartitems'] = $renderedCartItems;
-				Yii::app()->session['ship.htmlCartItems.cache'] = $renderedCartItems;
-			}
 		}
+
+		$arrReturn['action'] = 'success';
+		$arrReturn['errormsg'] = Yii::t(
+			'global',
+			'Promo Code applied at {amount}.',
+			array('{amount}' =>
+				PromoCodeType::Display(
+					$objPromoCode->type,
+					$objPromoCode->amount
+				)
+			)
+		);
+
+		$checkoutForm = MultiCheckoutForm::loadFromSessionOrNew();
+		try {
+			$arrCartScenario = Shipping::getCartScenarios($checkoutForm);
+		} catch (Exception $e) {
+			Yii::log('Unable to get cart scenarios: ' . $e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			$arrCartScenario = null;
+
+			// We have no shipping calculations yet.
+			$renderedCartItems = $this->renderPartial('/cart/_cartitems', null, true);
+		}
+
+		if ($arrCartScenario !== null)
+		{
+			$arrFormattedCartScenario = $this->formatCartScenarios($arrCartScenario);
+			$arrReturn['totals'] = $arrFormattedCartScenario['formattedCartTotals'];
+			$arrReturn['prices'] = $arrFormattedCartScenario['formattedShippingOptionPrices'];
+			$renderedCartItems = $arrFormattedCartScenario['renderedCartItems'];
+			Yii::app()->session['ship.formattedCartTotals.cache'] = $arrFormattedCartScenario['formattedCartTotals'];
+		}
+
+		$arrReturn['cartitems'] = $renderedCartItems;
+		Yii::app()->session['ship.htmlCartItems.cache'] = $renderedCartItems;
 
 		return $arrReturn;
 	}
@@ -2035,7 +1980,7 @@ class CartController extends Controller
 
 		// Transform the postcode as required by the shipping modules.
 		// TODO Can we move this?
-		$checkoutForm->shippingPostal = strtoupper(str_replace(" ", "", $checkoutForm->shippingPostal));
+		$checkoutForm->shippingPostal = strtoupper(str_replace(' ', '', $checkoutForm->shippingPostal));
 
 		// Minimal requirements for shipping: just address details.
 		$checkoutForm->scenario = 'MinimalShipping';
@@ -2044,8 +1989,8 @@ class CartController extends Controller
 		{
 			return $this->renderJSON(
 				array(
-					"result" => "error",
-					"errors" => $checkoutForm->getErrors())
+					'result' => 'error',
+					'errors' => $checkoutForm->getErrors())
 			);
 		}
 
@@ -2198,7 +2143,6 @@ class CartController extends Controller
 				true
 			);
 
-
 			// Create a radio button list for the priorities.
 			if (empty($arrPriorityRadioButtonList[$shippingModuleId]))
 			{
@@ -2283,7 +2227,7 @@ class CartController extends Controller
 
 		// Set up the exception handle for the remainder of this function.
 		$handleException = function (Exception $e) {
-			Yii::log($e->getMessage(),'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			Yii::log($e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return $this->renderJSON(
 				array(
 					'result' => 'error',
@@ -2360,7 +2304,6 @@ class CartController extends Controller
 			'taxes' => $arrFormattedCartScenario['renderedCartTaxes'],
 			'totals' => $arrFormattedCartScenario['formattedCartTotals']
 		);
-
 		Yii::log("Returning JSON encoded shipping", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 		return $this->renderJSON($arrReturn);
 	}
@@ -2405,5 +2348,288 @@ class CartController extends Controller
 				true
 			);
 		}
+	}
+
+	/**
+	 * Update the qty of a line item in the cart.
+	 */
+	public function actionUpdateCartItem()
+	{
+		$postCartItem = Yii::app()->getRequest()->getPost('CartItem', null);
+		if ($postCartItem === null || isset($postCartItem['id']) === false || isset($postCartItem['qty']) === false)
+		{
+			Yii::log(
+				sprintf('updateCart called with incorrect values %s', print_r($postCartItem, true)),
+				'error',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
+			return;
+		}
+
+		$blnDidUpdate = false;
+		foreach (Yii::app()->shoppingcart->cartItems as $cartItem)
+		{
+			if ($cartItem->id != $postCartItem['id'])
+			{
+				continue;
+			}
+
+			$updateResult = Yii::app()->shoppingcart->UpdateItemQuantity($cartItem, $postCartItem['qty']);
+
+			if ($updateResult instanceof CartItem === false && is_array($updateResult))
+			{
+				// Certain scenarios like Delete may return no string but
+				// also won't return object because it's gone.
+				return $this->renderJSON(
+					array(
+						'updateResult' => array(
+							'action' => 'alert',
+							'errorId' => $updateResult['errorId'] ? $updateResult['errorId'] : null,
+							'errormsg' => $updateResult['errorMessage'] ? $updateResult['errorMessage'] : $updateResult,
+							'availQty' => $updateResult['availQty'] ? $updateResult['availQty'] : null
+						)
+					)
+				);
+			}
+
+			$blnDidUpdate = true;
+		}
+
+		if ($blnDidUpdate === false)
+		{
+			return $this->renderJSON(
+				array(
+					'updateResult' => array(
+						'action' => 'alert',
+						'errormsg' => Yii::t(
+							'checkout',
+							'Unable to find a matching cart item.'
+						)
+					)
+				)
+			);
+		}
+
+		Yii::app()->shoppingcart->Recalculate();
+
+		$formattedShoppingCart = static::formatCartScenarioWithCartItems(
+			Shipping::getSelectedCartScenarioFromSessionOrShoppingCart()
+		);
+
+		// Note that we don't update the shipping estimates.  In the case where
+		// shipping estimates have been calculated, the totals in the response
+		// may be invalid.  The expectation is that the front-end will make an
+		// additional call to get updated totals.
+		return $this->renderJSON(
+			array(
+				'updateResult' => array(
+					'action' => 'success'
+				),
+				'shoppingCart' => $formattedShoppingCart
+			)
+		);
+	}
+
+	/**
+	 * Apply a promo code to the cart and return an array indicating what happened.
+	 * @param string $strPromoCode The promocode.
+	 * @return array An array indicating what happened.
+	 *	['success'] boolean Whether the promo code was applied.
+	 *	['action'] string Recommended action: alert|error|triggerCalc|success.
+	 *	['message'] string A message to display.
+	 */
+	protected function applyPromoCodeModal($strPromoCode)
+	{
+		if (Yii::app()->shoppingcart->PromoCode !== null)
+		{
+			return array(
+				'success' => false,
+				'action' => 'alert',
+				'message' => Yii::t('global', 'Only one promo code can be applied')
+			);
+		}
+
+		$objPromoCode = new PromoCode();
+		$objPromoCode->code = $strPromoCode;
+		$objPromoCode->setScenario('checkout');
+
+		if ($objPromoCode->validate() === false)
+		{
+			$arrErrors = $objPromoCode->getErrors();
+			return array (
+				'success' => false,
+				'action' => 'error',
+				'message' => $arrErrors['code'][0]
+			);
+		}
+
+		$objPromoCode = PromoCode::LoadByCode($strPromoCode);
+		Yii::app()->shoppingcart->applyPromoCode($objPromoCode);
+
+		// See if this promo code is supposed to turn on free shipping.
+		// This runs AFTER validate() so if we get here, it means that any
+		// criteria have passed. So just apply and refresh the shipping list.
+		if ($objPromoCode->Shipping)
+		{
+			// Update the shipping selection to use the free shipping module.
+			$objFreeShipping = Modules::model()->freeshipping()->find();
+
+			if ($objFreeShipping !== null)
+			{
+				$checkoutForm = MultiCheckoutForm::loadFromSession();
+				if ($checkoutForm !== null)
+				{
+					try {
+						$arrCartScenario = Shipping::getCartScenarios($checkoutForm);
+					} catch (Exception $e) {
+						$arrCartScenario = null;
+					}
+
+					if ($arrCartScenario !== null)
+					{
+						$freeShippingScenario = findWhere(
+							$arrCartScenario,
+							array(
+								'providerId' => $objFreeShipping->id
+							)
+						);
+
+						$checkoutForm = MultiCheckoutForm::loadFromSessionOrNew();
+						$checkoutForm->shippingProvider = $freeShippingScenario['providerId'];
+						$checkoutForm->shippingPriority = $freeShippingScenario['priorityLabel'];
+						MultiCheckoutForm::saveToSession($checkoutForm);
+					}
+				}
+			}
+
+			return array(
+				'success' => true,
+				'action' => 'triggerCalc',
+				'message' => Yii::t('global', 'Congratulations! This order qualifies for Free Shipping!')
+			);
+		}
+
+		return array(
+			'success' => true,
+			'action' => 'success'
+		);
+	}
+
+	/**
+	 * Ajax receiver function to Apply a Promocode on modals and new checkout
+	 * pages.
+	 */
+	public function actionApplyPromocodeModal()
+	{
+		$applyPromoCodeResult = $this->applyPromoCodeModal(
+			Yii::app()->getRequest()->getParam('promoCode')
+		);
+
+		// The option is provided to update the cart scenarios stored in the
+		// session. This is a performance optimization that allows the
+		// front-end to request updated cart totals separately using the
+		// shipping estimator.
+		if ($applyPromoCodeResult['success'] === true &&
+			Yii::app()->getRequest()->getPost('updateCartTotals') === 'true')
+		{
+			// TODO: create a method for updating cart scenarios in session
+			// that uses previous estimates rather than making calls to each
+			// shipping provider for situations where the totals might have
+			// changed but the shipping estimates won't have (for example, when
+			// applying a promo code).
+			Shipping::updateCartScenariosInSession();
+		}
+
+		$formattedShoppingCart = static::formatCartScenarioWithCartItems(
+			Shipping::getSelectedCartScenarioFromSessionOrShoppingCart()
+		);
+
+		return $this->renderJSON(
+			array(
+				'applyResult' => $applyPromoCodeResult,
+				'shoppingCart' => $formattedShoppingCart
+			)
+		);
+	}
+
+	/**
+	 * Ajax receiver function to remove the promocode on the modals and new
+	 * checkout page.
+	 */
+	public function actionRemovePromoCodeModal()
+	{
+		Yii::app()->shoppingcart->RemovePromoCode();
+
+		// The option is provided to update the cart scenarios stored in the
+		// session. This is a performance optimization that allows the
+		// front-end to request updated cart totals separately using the
+		// shipping estimator.
+		if (Yii::app()->getRequest()->getPost('updateCartTotals') === 'true')
+		{
+			Shipping::updateCartScenariosInSession();
+		}
+
+		// If the cart scenarios are updated, we can return a version of
+		// the shoppingcart with the newly updated totals.
+		$formattedShoppingCart = static::formatCartScenarioWithCartItems(
+			Shipping::getSelectedCartScenarioFromSessionOrShoppingCart()
+		);
+
+		$this->renderJSON(
+			array(
+				'removeResult' => array(
+					'action' => 'success'
+				),
+				'shoppingCart' => $formattedShoppingCart
+			)
+		);
+	}
+
+	/**
+	 * @return String[] The formatted cart items.
+	 */
+	protected static function formatCartItems($cartItems) {
+		return array_map(
+			function ($cartItem) {
+				return array(
+					'discount' => $cartItem->discount,
+					'id' => $cartItem->id,
+					'qty' => $cartItem->qty,
+					'sellDiscountFormatted' => $cartItem->sellDiscountFormatted,
+					'sellFormatted' => $cartItem->sellFormatted,
+					'sellTotalFormatted' => $cartItem->sellTotalFormatted
+				);
+			},
+			$cartItems
+		);
+	}
+
+	/**
+	 * Return a formatted cart based on a combination of the selected cart
+	 * scenario and the actual shopping cart.
+	 *
+	 * @return String[] The formatted cart scenario.
+	 */
+	protected static function formatCartScenarioWithCartItems($cartScenario) {
+		// We can only use the values from Yii::app()->shoppingcart which are
+		// not affected by shipping destination.
+		//
+		// TODO: It would be preferable not to mix values from
+		// Yii::app()->shoppingcart with values from $cartScenario.
+		return array(
+			'cartItems' => static::formatCartItems(Yii::app()->shoppingcart->cartItems),
+			'formattedCartSubtotal' => Yii::app()->shoppingcart->subtotalFormatted,
+			'formattedCartTax' => $cartScenario['formattedCartTax'],
+			'formattedCartTax1' => $cartScenario['formattedCartTax1'],
+			'formattedCartTax2' => $cartScenario['formattedCartTax2'],
+			'formattedCartTax3' => $cartScenario['formattedCartTax3'],
+			'formattedCartTax4' => $cartScenario['formattedCartTax4'],
+			'formattedCartTax5' => $cartScenario['formattedCartTax5'],
+			'formattedCartTotal' => $cartScenario['formattedCartTotal'],
+			'formattedShippingPrice' => $cartScenario['formattedShippingPrice'],
+			'id' => Yii::app()->shoppingcart->id,
+			'promoCode' => Yii::app()->shoppingcart->promoCode,
+			'totalDiscountFormatted' => Yii::app()->shoppingcart->totalDiscountFormatted
+		);
 	}
 }

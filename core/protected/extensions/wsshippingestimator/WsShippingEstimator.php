@@ -31,7 +31,6 @@ class WsShippingEstimator extends CWidget
 	{
 		// Required assets.
 		$assets = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'assets', false, -1, true);
-		Yii::app()->clientScript->registerCssFile($assets . '/css/wsshippingestimator.css');
 		Yii::app()->clientScript->registerScriptFile($assets . '/js/WsShippingEstimator.js');
 
 		// Use the shipping scenarios and shipping address in the session.

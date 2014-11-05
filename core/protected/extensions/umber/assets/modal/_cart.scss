@@ -244,7 +244,7 @@
 
 	input[type="number"] {
 		width: 3rem;
-        //webstore montreal overwrite
+        //webstore montreal override
         height:2rem;
 		text-align: center;
 		padding: 2px 4px;
@@ -335,6 +335,9 @@
 		input {
 			border: $input-border;
 			padding: 9px 8px;
+            &:focus{
+              padding: 9px 8px;
+            }
 		}
 
 		select.webstore-estimator-country-form {
@@ -423,126 +426,6 @@
 	}
 }
 
-.webstore-shipping-choices {
-	display: block;
-	background-color: rgba(0,0,0,.7);
-	height: 100%;
-	position: absolute;
-	top: 0;
-	right: 0;
-	left: 0;
-	z-index: 20;
-
-	@include media(small) {
-		position: relative;
-		background: none;
-		top: auto;
-		right: auto;
-		left: auto;
-		height: auto;
-	}
-
-	form {
-		z-index:10;
-		position: absolute;
-		left: 0;
-		top: 0;
-		right: 0;
-		background-color: #fff;
-		margin: 0;
-		padding: 0 0 67px;
-		box-shadow: 1px 1px 3px rgba(0,0,0,.1);
-        ol{
-          min-height: 120px;
-        }
-
-		@include media(small) {
-			left: -265px;
-			top: -24px;
-			width: 250px;
-			padding: 0 0 39px;
-
-			&:after, &:before {
-				left: 249px;
-				top: 75px;
-				border: solid transparent;
-				content: " ";
-				height: 0;
-				width: 0;
-				position: absolute;
-				pointer-events: none;
-			}
-
-			&:after {
-				border-color: rgba(255, 255, 255, 0);
-				border-left-color: #ffffff;
-				border-width: 10px;
-				margin-top: -10px;
-			}
-			&:before {
-				border-color: rgba(204, 204, 204, 0);
-				border-left-color: #bbb;
-				border-width: 11px;
-				margin-top: -11px;
-			}
-		}
-	}
-
-	ol {
-		margin: 0;
-		padding: 0 0 4px;
-		list-style: none;
-		border: 1px solid #ccc;
-		border-bottom: none;
-
-		li:last-child label { border-bottom: none; }
-	}
-	li {
-      display: inline;
-      margin-bottom: 0;
-          &:hover {
-              background-color: #eee;
-              cursor: pointer;
-          }
-    }
-
-	button {
-		width: 100%;
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		right: 0;
-
-		@include media(small) {
-			font-size: .875rem;
-			padding: 10px;
-		}
-	}
-
-	label {
-		padding: 8px 10px;
-		color: #666;
-		margin: 0;
-		font-weight: bold;
-		display: block;
-
-		@include media(small) {
-			font-size: .75rem;
-		}
-
-		small {
-			float: right;
-			font-weight: normal;
-			color: #999;
-			font-size: .9375rem;
-			@include media(small) { font-size: .75rem; }
-		}
-	}
-	input {
-		margin-right: 3px;
-	}
-}
-
 
 //MO
 .hide-me {
@@ -596,7 +479,7 @@
     }
   }
 }
-//MO overwrite against bootstrap background
+//MO override against bootstrap background
 .editcartmodal {
   @include media(medium) {
     &:before {

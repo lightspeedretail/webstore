@@ -398,7 +398,7 @@
 	}
 }
 
-//webstore Montreal overwrite
+//webstore Montreal override
 .webstore-modal.show {
   visibility: visible;
   text-align: center;
@@ -407,3 +407,16 @@
   display: inline-block;
 
 }
+//MO
+.estimator-zip-error{
+  float:left;
+  color: #a44039;
+  margin: 0;
+  font-size: 0.75rem;
+  padding: 3px 0 6px;
+  text-align: left;
+  p{
+    margin: 0;
+  }
+}
+

@@ -6,7 +6,7 @@
     text-transform:none;
   }
 
-  //webstore Montreal overwrite see .webstore-modal * in _basic_modal.scss
+  //webstore Montreal override see .webstore-modal * in _basic_modal.scss
   * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -143,7 +143,7 @@
 
     input { height: 4.25rem; }
 
-    input, input:focus:required:invalid {
+    input{
       transition: all 0.1s linear;
 
       padding: .75em 20px;

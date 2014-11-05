@@ -13,6 +13,7 @@ $form = $this->beginWidget(
 	)
 );
 ?>
+
 <nav class="steps">
 	<ol>
 		<li class="completed"><span class="webstore-label"></span><?php echo Yii::t('checkout', 'Shipping')?></li>
@@ -48,7 +49,6 @@ $this->renderPartial('_paypalbuttonaim');
 					'onclick' => '$(".address-form").fadeToggle();',
 					'checked' => "checked",
 					'disabled' => _xls_get_conf('SHIP_SAME_BILLSHIP') == 1 ? true : false,
-					'uncheckValue' => null
 				)
 			);
 			?>
@@ -68,10 +68,13 @@ $this->renderPartial('_paypalbuttonaim');
 	</label>
 
 	<!------------------------------------------------------------------------------------------------------------	Layout Markup -------------------------------------------------------------------------------------------------->
-	<?php $this->renderPartial('_billingaddress',array('model' => $model, 'form' => $form) ); ?>
+	<?php $this->renderPartial('_billingaddress', array('model' => $model, 'form' => $form)); ?>
 </div>
 
-
+<?php
+$simModules = $model->simPaymentModulesNoCard;
+if (count($simModules) > 0):
+?>
 <div class="alt-payment-methods payment-methods">
 		<h4><?php echo Yii::t('checkout', 'Alternative Payment Methods'); ?></h4>
 		<?php
@@ -90,6 +93,7 @@ $this->renderPartial('_paypalbuttonaim');
 		}
 		?>
 </div>
+<?php endif; ?>
 
 <footer class="submit">
 	<?php

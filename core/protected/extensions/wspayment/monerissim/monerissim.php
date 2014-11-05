@@ -11,6 +11,19 @@ class monerissim extends WsPayment
 	protected $apiVersion = 1;
 	public $cloudCompatible = true;
 
+	protected function formatCurrencyValue($amount)
+	{
+		// Moneris requires that currencies are formatted with exactly 2 decimals and without any thousand separators.
+		// See WS-3058.
+		// Moneris documentation: https://s3.amazonaws.com/uploads.hipchat.com/21792/814855/QVqvZKmaU8ZWTVY/moneris-eSELECTplus_HPP_IG.pdf
+		return number_format(
+			round($amount, 2),
+			2, // 2 decimal places.
+			'.', // Decimal separator.
+			'' // Thousands separator.
+		);
+	}
+
 	public function run()
 	{
 
@@ -34,31 +47,31 @@ class monerissim extends WsPayment
 			$str .= _xls_make_hidden('description'.$id, $item->description);
 			$str .= _xls_make_hidden('id'.$id, $item->code);
 			$str .= _xls_make_hidden('quantity'.$id, $item->qty);
-			$str .= _xls_make_hidden('price'.$id, number_format(round($item->sell_total,2),2));
+			$str .= _xls_make_hidden('price'.$id, self::formatCurrencyValue($item->sell_total));
 		}
 
 		foreach ($this->objCart->Taxes as $tax=>$taxvalue)
 			switch (strtolower($tax)) {
 				case 'gst':
 					if ($taxvalue>0)
-						$str .= _xls_make_hidden('gst', number_format(round($taxvalue,2),2));
+						$str .= _xls_make_hidden('gst', self::formatCurrencyValue($taxvalue));
 					break;
 
 				case 'pst':
 				case 'qst':
 					if ($taxvalue>0)
-						$str .= _xls_make_hidden('pst', number_format(round($taxvalue,2),2));
+						$str .= _xls_make_hidden('pst', self::formatCurrencyValue($taxvalue));
 					break;
 
 				case 'hst':
 					if ($taxvalue>0)
-						$str .= _xls_make_hidden('hst', number_format(round($taxvalue,2),2));
+						$str .= _xls_make_hidden('hst', self::formatCurrencyValue($taxvalue));
 					break;
 
 				// todo - account for electronics tax
 			}
 
-		$str .= _xls_make_hidden('shipping_cost', number_format(round($this->objCart->shippingCharge,2),2));
+		$str .= _xls_make_hidden('shipping_cost', self::formatCurrencyValue($this->objCart->shippingCharge));
 		$str .= _xls_make_hidden('note', $this->CheckoutForm->orderNotes);
 
 		$str .= _xls_make_hidden('bill_first_name',   $this->CheckoutForm->contactFirstName);
@@ -84,7 +97,7 @@ class monerissim extends WsPayment
 		$str .= _xls_make_hidden('ship_postal_code',   $this->CheckoutForm->shippingPostal);
 		$str .= _xls_make_hidden('ship_country',   $this->CheckoutForm->shippingCountry);
 
-		$str .= _xls_make_hidden('charge_total',  number_format(round($this->objCart->total , 2),2));
+		$str .= _xls_make_hidden('charge_total',  self::formatCurrencyValue($this->objCart->total));
 
 		$str .=  ('</FORM>');
 

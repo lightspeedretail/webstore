@@ -1,6 +1,8 @@
-<div class="error-holder">
-	<?php echo $error; ?>
-</div>
+<?php
+	echo CHtml::script(
+		'var cityPlaceholder = ' . CJSON::encode(Yii::t('checkout', "City")) . ';'
+	);
+?>
 <ol class="field-containers-small field-container-gap">
 	<li class="field-container field-container-split">
 		<?php

@@ -6,7 +6,7 @@ $this->layout = "/layouts/errorlayout";
 
 	<div class="span12">
 		<div id="headerimage">
-			<?php echo CHtml::link(CHtml::image(Yii::app()->baseUrl._xls_get_conf('HEADER_IMAGE')), Yii::app()->baseUrl."/"); ?>
+			<?php echo CHtml::link(CHtml::image(Yii::app()->baseUrl._xls_get_conf('HEADER_IMAGE'), Yii::t('cart','web store header image')), Yii::app()->baseUrl."/"); ?>
 		</div>
 	</div>
 

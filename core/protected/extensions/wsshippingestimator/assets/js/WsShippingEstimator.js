@@ -54,10 +54,8 @@ function WsShippingEstimator(options) {
 	this.$taxEstimate = this.$taxEstimateLine.find('.tax-estimate');
 	this.$shippingCityStateLink = this.$taxEstimateLine.find('.shipping-city-state-link');
 
+	this.$cartSubtotal = $('.cart-subtotal');
 	this.$totalEstimate = $('.wsshippingestimator-total-estimate');
-
-	this.$estimatorZipError = $('.estimator-zip-error');
-	this.$estimatorZipErrorText = this.$estimatorZipError.find('p');
 
 	// While waiting to get a response from the shipping estimator some fields
 	// can have their labels switched to Calculating...
@@ -218,7 +216,10 @@ WsShippingEstimator.prototype.setSelectedCountry = function(option) {
  * @param {boolean} checked Whether the shippingOption should be checked.
  */
 WsShippingEstimator.prototype.addShippingOption = function(shippingOption) {
-	var li = $('<li>').addClass('radio').append(
+	var li = $('<li>').append(
+		$('<label>')
+			.addClass('radio')
+			.append(
 				$('<input>')
 					.attr({
 						type: 'radio',
@@ -230,16 +231,18 @@ WsShippingEstimator.prototype.addShippingOption = function(shippingOption) {
 						'data-provider-id': shippingOption.providerId,
 						'data-priority-id': shippingOption.priorityId,
 						'data-priority-label': shippingOption.priorityLabel
-					}).change(function (e) {
-                                this.selectedShippingOption(e.target);
-			        }.bind(this))
-                ).append(
-                        $('<label>').append(shippingOption.shippingLabel)
-                ).append(
-                    $('<small>').append(shippingOption.formattedShippingPrice)
-                );
+					})
+			)
+			.append(shippingOption.shippingLabel)
+			.append(
+				$('<small>').append(shippingOption.formattedShippingPrice)
+			)
+			.change(function (e) {
+				this.selectedShippingOption(e.target);
+			}.bind(this))
+	);
 
-	this.$shippingOptions.find('ol').append(li)
+	this.$shippingOptions.find('ol').append(li);
 };
 
 /**
@@ -382,8 +385,8 @@ WsShippingEstimator.prototype.setCityStateLinkValue = function(city, state) {
 /**
  * Handle any messages that the server has sent us.
  * @param object[] messages An array of messages. Each message is an object with the following properties:
- *     code string A severity, either WARN or INFO.
- *     message string The message to display to the user.
+ *	   code string A severity, either WARN or INFO.
+ *	   message string The message to display to the user.
  */
 WsShippingEstimator.prototype.handleMessages = function(messages) {
 	var message;
@@ -510,6 +513,7 @@ WsShippingEstimator.prototype.calculateShippingEstimates = function () {
 						) {
 						// TODO: We have no way to handle an error here. See WS-2076 for a
 						// question aimed at Luke about how to display errors.
+						this.$totalEstimate.html(this.$cartSubtotal.html());
 						this.$estimatorZipErrorText.html(zipCodeError);
 						return deferred.reject();
 					}
@@ -521,7 +525,7 @@ WsShippingEstimator.prototype.calculateShippingEstimates = function () {
 					this.selectedPriorityLabel = options.selectedPriorityLabel || null;
 					this.selectShippingOption(this.selectedProviderId, this.selectedPriorityLabel);
 					this.updateEstimates();
-					deferred.resolve();
+					deferred.resolve(shippingRatesResponse);
 
 				}.bind(this));
 		}.bind(this));
@@ -538,17 +542,16 @@ WsShippingEstimator.prototype.toggleLoadingSpinner = function() {
 	if (this.$shippingCalculateButton.find('.fa-circle-o-notch').length > 0)
 	{
 		// we need to hide the spinner
-        this.$shippingCalculateButton.removeClass('inset-spinner');
+		this.$shippingCalculateButton.removeClass('inset-spinner');
 		this.$shippingCalculateButton.html(strCalculateButton);
 		this.$shippingCalculateButton.prop('disabled', false);
 	}
 	else
 	{
-        this.$shippingCalculateButton.addClass('inset-spinner');
+		this.$shippingCalculateButton.addClass('inset-spinner');
 		this.$shippingCalculateButton.html('<i class=\'fa fa-circle-o-notch fa-spin fa-lg\'></i>');
 		this.$shippingCalculateButton.prop('disabled','disabled');
 	}
-
 };
 
 /**
@@ -560,4 +563,17 @@ WsShippingEstimator.prototype.toggleShowCalculatingOnFields = function() {
 	$.each(this.calculatingFields, function(idx, el) {
 		el.html(calculatingLabel);
 	});
+};
+
+/**
+ * Called by PromoCodeInput when promocode has been applied or removed.
+ * @param string result The result of applying the promocode. One of:
+ * 'alert' - display an alert,
+ * 'error' -  an error occurred,
+ * 'success' - the promocode was applied or removed successfully,
+ * 'triggerCalc' - a free shipping promo code was applied or removed successfully.
+ */
+WsShippingEstimator.prototype.promoCodeChange = function (result) {
+	/* jshint unused: false */
+	this.calculateShippingEstimates();
 };

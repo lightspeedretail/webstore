@@ -1,5 +1,4 @@
 <script>
-	//Yii::app()->getClientScript()->registerScriptFile(ii::app()->baseUrl.'/js/header.js');
 	$(function() {
 		$("#topbar-cart-text").on('click', function(e) {
 			showEditCartModal();
@@ -7,14 +6,13 @@
 			e.preventDefault();
 		});
 	});
-
 </script>
 
 <div id="topbar" class="row-fluid page-header">
 	<div class="span9">
 	<!-- template header -->
 		<div id="headerimage" class="logo">
-			<?php echo CHtml::link(CHtml::image($this->pageHeaderImage),$this->createUrl("site/index")); ?>
+			<?php echo CHtml::link(CHtml::image($this->pageHeaderImage, 'web store header image'),$this->createUrl("site/index")); ?>
 		</div>
 
 		<ul>

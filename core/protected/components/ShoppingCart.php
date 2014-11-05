@@ -92,7 +92,13 @@ class ShoppingCart extends CApplicationComponent
 				}
 				elseif ($objCart->cart_type == CartType::cart)
 				{
-					$objCart->UpdateCartCustomer();
+					try{
+						$objCart->UpdateCartCustomer();
+					}
+					catch(Exception $e)
+					{
+						Yii::log("Error updating customer cart ".$e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+					}
 				}
 			}
 
@@ -147,50 +153,75 @@ class ShoppingCart extends CApplicationComponent
 	 */
 	public function loginMerge($objCartToMerge = null)
 	{
-
-		if(!is_null($objCartToMerge)) $objCartInProgress = $objCartToMerge;
-		else
-			$objCartInProgress = Cart::LoadLastCartInProgress(Yii::app()->user->id,$this->id);
-
-		if ($objCartInProgress) {
-			Yii::log("Found prior cart ".$objCartInProgress->id, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-
-			if(count($this->cartItems)==0)
-			{
-				$this->_model=$objCartInProgress;
-				$arrPastItems=array();
-			} else
-				$arrPastItems = $objCartInProgress->cartItems;
-
-			//Merge in any new items we had in our cart from this session
-			if (count($arrPastItems)>0)
-			{
-				foreach($arrPastItems as $objItem) {
-					$objProduct = Product::model()->findbyPk($objItem->product_id);
-					//we strip any discount from another cart usu. promo code
-					$retVal = $this->model->AddProduct($objProduct, $objItem->qty, $objItem->cart_type, $objItem->wishlist_item, $objItem->description,$objItem->sell,0);
-					if($objItem->wishlist_item>0)
-						WishlistItem::model()->updateByPk($objItem->wishlist_item,array('cart_item_id'=>$retVal));
-
-					if(is_null($objCartToMerge)) $objItem->delete();
-				}
-				//If we aren't being passed a cart from a share (that we don't want to delete), then remove the old cart in progress
-				if(is_null($objCartToMerge)) {
-					Yii::app()->user->setFlash('success',Yii::t('cart','Your prior cart has been restored.'));
-					$objCartInProgress->delete();
-				}
-				$this->model->UpdateMissingProducts();
-			}
-
+		if(is_null($objCartToMerge) === false)
+		{
+			$objCartInProgress = $objCartToMerge;
+		} else {
+			$objCartInProgress = Cart::LoadLastCartInProgress(Yii::app()->user->id, $this->id);
 		}
 
-		$this->model->customer_id=Yii::app()->user->id;
+		if ($objCartInProgress)
+		{
+			Yii::log("Found prior cart ".$objCartInProgress->id, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+
+			if(count($this->cartItems) == 0)
+			{
+				$this->_model = $objCartInProgress;
+				$arrPastItems = array();
+			} else {
+				$arrPastItems = $objCartInProgress->cartItems;
+			}
+
+			// Merge in any new items we had in our cart from this session.
+			if (count($arrPastItems) > 0)
+			{
+				foreach($arrPastItems as $objItem)
+				{
+					$objProduct = Product::model()->findbyPk($objItem->product_id);
+
+					//we strip any discount from another cart usu. promo code
+					$retVal = $this->model->AddProduct(
+						$objProduct,
+						$objItem->qty,
+						$objItem->cart_type,
+						$objItem->wishlist_item,
+						$objItem->description,
+						$objItem->sell,
+						0
+					);
+
+					if($objItem->wishlist_item > 0)
+					{
+						WishlistItem::model()->updateByPk($objItem->wishlist_item, array('cart_item_id' => $retVal));
+					}
+
+					if(is_null($objCartToMerge))
+					{
+						$objItem->delete();
+					}
+				}
+
+				//If we aren't being passed a cart from a share (that we don't want to delete), then remove the old cart in progress
+				if(is_null($objCartToMerge))
+				{
+					Yii::app()->user->setFlash('success', Yii::t('cart', 'Your prior cart has been restored.'));
+					$objCartInProgress->delete();
+				}
+
+				$this->model->UpdateMissingProducts();
+			}
+		}
+
+		$this->model->customer_id = Yii::app()->user->id;
 		$this->model->datetime_cre = new CDbExpression('NOW()'); //Reset time to current time
 		if(!$this->model->save())
-			Yii::log("Error saving cart ".print_r($this->model->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		{
+			Yii::log("Error saving cart ".print_r($this->model->getErrors(), true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		}
+
 		$this->UpdateCart();
-		$this->_model=Cart::model()->findByPk($this->id);
-		Yii::app()->user->setState('cartid',$this->id);
+		$this->_model = Cart::model()->findByPk($this->id);
+		Yii::app()->user->setState('cartid', $this->id);
 		return true;
 	}
 
@@ -199,35 +230,54 @@ class ShoppingCart extends CApplicationComponent
 	 * @param null $objDocument
 	 * @return bool
 	 */
-	public function loginQuote($objDocument= null)
+	public function loginQuote($objDocument = null)
 	{
+		if (is_null($objDocument))
+		{
+			return;
+		}
 
-		if(is_null($objDocument)) return;
-
-		$cartid=Yii::app()->user->getState('cartid');
+		$cartid = Yii::app()->user->getState('cartid');
 		if (empty($cartid))
+		{
 			$this->createCart();
+		}
 
 		$arrPastItems = $objDocument->documentItems;
 
-		//Merge in items from our quote to the cart
-		if (count($arrPastItems)>0) {
-			foreach($arrPastItems as $objItem) {
+		// Merge in items from our quote to the cart.
+		if (count($arrPastItems) > 0)
+		{
+			foreach($arrPastItems as $objItem)
+			{
 				$objProduct = Product::model()->findbyPk($objItem->product_id);
-				$retVal = $this->model->AddProduct($objProduct, $objItem->qty, CartType::quote,
-					$objItem->gift_registry_item, $objItem->description,$objItem->sell,$objItem->discount);
-				if (strlen($retVal)>5)
-					return $retVal;
-			}
+				$retVal = $this->model->AddProduct(
+					$objProduct,
+					$objItem->qty,
+					CartType::quote,
+					$objItem->gift_registry_item,
+					$objItem->description,
+					$objItem->sell,
+					$objItem->discount
+				);
 
+				if (strlen($retVal) > 5)
+				{
+					return $retVal;
+				}
+			}
 		}
-		$this->model->document_id=$objDocument->id;
+
+		$this->model->document_id = $objDocument->id;
 
 		$this->model->datetime_cre = new CDbExpression('NOW()'); //Reset time to current time
 		if(!$this->model->save())
+		{
 			Yii::log("Error saving cart ".print_r($this->model->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		}
+
 		$this->UpdateCart();
-		$this->_model=Cart::model()->findByPk($this->id);
+		$this->_model = Cart::model()->findByPk($this->id);
 
 		$this->assignCustomer(Yii::app()->user->id);
 		return true;
@@ -240,8 +290,10 @@ class ShoppingCart extends CApplicationComponent
 	public function verifyPrices()
 	{
 
-		if ($this->model->cart_type  != CartType::cart)
+		if ($this->model->cart_type != CartType::cart)
+		{
 			return;
+		}
 
 		$strFlash = '';
 		$arrItems = array();
@@ -251,31 +303,38 @@ class ShoppingCart extends CApplicationComponent
 			//Make sure our object is current and not cached through our relations
 			$objProduct = Product::model()->findByPk($item->product_id);
 
-			if ($item->sell_base != $objProduct->PriceValue) {
-			$strFlash .= Yii::t('cart','The item {item} in your cart has {updown} in price to {price}.',
-				array('{item}'=>$item->description,
-				  '{updown}'=>($item->sell_base > $objProduct->PriceValue ? Yii::t('cart','decreased') : Yii::t('cart','increased')),
-				  '{price}'=>$objProduct->getPrice(1,$this->IsTaxIn))) . "<br>";
+			if ($item->sell_base != $objProduct->PriceValue)
+			{
+				$strFlash .= Yii::t(
+					'cart',
+					'The item {item} in your cart has {updown} in price to {price}.',
+					array(
+						'{item}' => $item->description,
+						'{updown}' => ($item->sell_base > $objProduct->PriceValue ? Yii::t('cart', 'decreased') : Yii::t('cart', 'increased')),
+						'{price}' => $objProduct->getPrice(1, $this->IsTaxIn)
+					)
+				) . '<br>';
 
 				$arrItem['product'] = $objProduct;
 				$arrItem['qty'] = $item->qty;
 				$arrItem['wishlist_item'] = $item->wishlist_item;
 				$arrItems[] = $arrItem;
 				$item->delete();
-
-
-
 			}
 		}
 
 		if (!empty($strFlash))
-			Yii::app()->user->setFlash('info',$strFlash);
+		{
+			Yii::app()->user->setFlash('info', $strFlash);
+		}
 
 		$this->Recalculate();
 		foreach($arrItems as $arrItem)
-			$this->addProduct($arrItem['product'],$arrItem['qty'],$arrItem['wishlist_item']);
-		$this->Recalculate();
+		{
+			$this->addProduct($arrItem['product'], $arrItem['qty'], $arrItem['wishlist_item']);
+		}
 
+		$this->Recalculate();
 	}
 
 	/**
@@ -351,19 +410,8 @@ class ShoppingCart extends CApplicationComponent
 			$intQuantity = intval($intQuantity);
 		}
 
-		/*
-		 *  public function AddProduct($objProduct,
-			$intQuantity = 1,
-			$mixCartType = 0,
-			$intGiftItemId = null,
-			$strDescription = false,
-			$fltSell = false,
-			$fltDiscount = false)
-		 */
 		if ($objProduct instanceof Product)
 		{
-			$this->clearCachedShipping();
-
 			//Actually add product to cart
 			$retVal =  $this->model->AddProduct($objProduct,$intQuantity,CartType::cart,$intGiftItemId);
 
@@ -616,18 +664,28 @@ class ShoppingCart extends CApplicationComponent
 	public function assignCustomer($mixCustomer)
 	{
 		if(is_numeric($mixCustomer))
+		{
 			$objCustomer = Customer::model()->findByPk($mixCustomer);
-		else $objCustomer = $mixCustomer;
+		} else {
+			$objCustomer = $mixCustomer;
+		}
 
 		if ($objCustomer instanceof Customer)
 		{
 			Yii::log("Assigning customer id #".$objCustomer->id, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			$this->model->customer_id = $objCustomer->id;
 			$this->model->save();
-			$this->model->UpdateCartCustomer();
+			try{
+				$this->model->UpdateCartCustomer();
+			}
+			catch(Exception $e)
+			{
+				Yii::log("Error updating customer cart ".$e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			}
 			return true;
+		}
 
-		} else return false;
+		return false;
 	}
 
 	public function UpdateCartCustomer()
@@ -644,7 +702,6 @@ class ShoppingCart extends CApplicationComponent
 	{
 		$this->model->RecalculateInventoryOnCartItems();
 	}
-
 
 	public function Recalculate()
 	{
@@ -684,9 +741,7 @@ class ShoppingCart extends CApplicationComponent
 	 * @return int|mixed
 	 */
 	public function __get($strName) {
-
 		switch ($strName) {
-
 			case 'attributes':
 				return $this->model->attributes;
 
@@ -747,16 +802,18 @@ class ShoppingCart extends CApplicationComponent
 			case 'taxTotalFormatted':
 				return _xls_currency($this->model->TaxTotal);
 			case 'subtotal':
-				if (empty($this->model->subtotal)) {
+				if (empty($this->model->subtotal))
+				{
 					return 0;
 				}
-
 				return $this->model->subtotal;
 
 			case 'subtotalFormatted':
 				if (empty($this->model->subtotal))
+				{
 					return '';
-				else return _xls_currency($this->model->subtotal);
+				}
+				return _xls_currency($this->model->subtotal);
 
 			case 'Taxes':
 				return $this->model->Taxes;
@@ -775,7 +832,6 @@ class ShoppingCart extends CApplicationComponent
 			case 'TotalDiscountFormatted':
 			case 'totalDiscountFormatted':
 				return _xls_currency($this->model->totalDiscount);
-
 
 			case 'Length':
 				return $this->model->Length;
@@ -800,36 +856,55 @@ class ShoppingCart extends CApplicationComponent
 
 			case 'shipping_sell':
 				if ($this->model->shipping)
+				{
 					return $this->model->shipping->shipping_sell;
-				else return 0;
+				}
+				return 0;
+
+			case 'formattedShippingCharge':
+				if ($this->model && $this->model->shipping)
+				{
+					return _xls_currency($this->model->shippingCharge);
+				}
+				return _xls_currency(0);
 
 			case 'shippingCharge':
 				return $this->model->shippingCharge;
 
 			case 'customer':
 				if ($this->model->customer)
+				{
 					return $this->model->customer;
-				else return null;
+				}
+				return null;
 
 			case 'payment':
 				if ($this->model->payment)
+				{
 					return $this->model->payment;
-				else return null;
+				}
+				return null;
 
 			case 'shipping':
 				if ($this->model->shipping)
+				{
 					return $this->model->shipping;
-				else return null;
+				}
+				return null;
 
 			case 'billaddress':
 				if ($this->model->billaddress)
+				{
 					return $this->model->billaddress;
-				else return null;
+				}
+				return null;
 
 			case 'shipaddress':
 				if ($this->model->shipaddress)
+				{
 					return $this->model->shipaddress;
-				else return null;
+				}
+				return null;
 
 			case 'originalSubTotal':
 				return self::calculateOriginalSubtotal();
@@ -837,11 +912,10 @@ class ShoppingCart extends CApplicationComponent
 			default:
 				//As a clever trick to get to our model through the component,
 				if ($strName != "model" && $this->model->hasAttribute($strName))
+				{
 					return $this->model->$strName;
-				else
-					return parent::__get($strName);
-
-
+				}
+				return parent::__get($strName);
 		}
 
 	}
@@ -852,7 +926,9 @@ class ShoppingCart extends CApplicationComponent
 		if ($this->model->cartItems)
 		{
 			foreach($this->cartItems as $objItem)
+			{
 				$originalSubTotal += $objItem->sell_base * $objItem->qty;
+			}
 		}
 
 		return $originalSubTotal;
@@ -869,111 +945,16 @@ class ShoppingCart extends CApplicationComponent
 			case 'cartItems':
 				return $this->model->cartItems;
 
-
-
 			default:
 				//As a clever trick to get to our model through the component,
 				if ($strName != "model" && $this->model->hasAttribute($strName))
-					$this->model->__set($strName,$mixValue);
-				else
-					return parent::__set($strName,$mixValue);
-
-		}
-
-	}
-
-	/* Largely copied form SoapController. */
-	/* @return String The shopping cart as a JSON-encoded string.
-	 */
-	public function asJSON() {
-		$attributeNames = array(
-			'id',
-			'billaddress',
-			'billaddress.country',
-			'billaddress.state',
-			'cartItems',
-			'cart_type',
-			'currency',
-			'customer',
-			'id_str',
-			'payment',
-			'printed_notes',
-			'shipaddress',
-			'shipaddress.country',
-			'shipaddress.state',
-			'shipping',
-			'status',
-			'subtotal',
-			'subtotalFormatted',
-			'tax1',
-			'formattedCartTax1',
-			'tax2',
-			'formattedCartTax2',
-			'tax3',
-			'formattedCartTax3',
-			'tax4',
-			'formattedCartTax4',
-			'tax5',
-			'formattedCartTax5',
-			'taxCode',
-			'taxTotalFormatted',
-			'tax_inclusive',
-			'total',
-			'totalDiscount',
-			'totalFormatted',
-			'totalDiscountFormatted',
-			'totalItemCount',
-			'promoCode'
-		);
-		$response = array(); //you will be copying in model attribute values to this array
-
-		foreach ($attributeNames as $name)
-		{
-			$name = trim($name); //in case of spaces around commas
-			$response[$name] = CHtml::value($this->model, $name); //this function walks the relations
-		}
-
-		$response['taxTotalFormatted'] = $this->taxTotalFormatted;
-		$response['subtotalFormatted'] = $this->subtotalFormatted;
-		$response['totalFormatted'] = $this->totalFormatted;
-		$response['totalDiscountFormatted'] = $this->totalDiscountFormatted;
-
-		// Taxes
-		$response['formattedCartTax1'] = $this->formattedCartTax1;
-		$response['formattedCartTax2'] = $this->formattedCartTax2;
-		$response['formattedCartTax3'] = $this->formattedCartTax3;
-		$response['formattedCartTax4'] = $this->formattedCartTax4;
-		$response['formattedCartTax5'] = $this->formattedCartTax5;
-
-		$arrItems = $response['cartItems'];
-
-		foreach ($arrItems as $itemKey => $objItem)
-		{
-			list($taxCharged, $taxesIndividual, $taxRates) = Tax::CalculatePricesWithTax(
-				$objItem->sell_total,
-				$this->model->tax_code_id,
-				$objItem->product->tax_status_id
-			);
-
-			$arrTaxRatesForItem = array();
-
-			foreach ($taxRates as $key => $value)
-			{
-				if ($value > 0)
 				{
-					$arrTaxRatesForItem['tax'.$key.'_rate'] = $value;
+					$this->model->__set($strName,$mixValue);
+				} else {
+					return parent::__set($strName,$mixValue);
 				}
-			}
-
-			// Convert to JSON in order to do merge of multi-dimension array.
-			// See http://stackoverflow.com/questions/2476876/how-do-i-convert-an-object-to-an-array
-			$arrItem = CJSON::decode(CJSON::encode($objItem), true);
-			$arrItem = array_merge($arrItem, $arrTaxRatesForItem);
-			$arrItems[$itemKey] = $arrItem;
 		}
 
-		$response['cartItems'] = $arrItems;
-		return CJSON::encode($response);
 	}
 
 	/**

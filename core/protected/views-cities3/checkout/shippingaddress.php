@@ -15,14 +15,25 @@ $form = $this->beginWidget(
 
 
 <h1><?php echo Yii::t('checkout', 'Shipping'); ?></h1>
-
-<?php $this->renderPartial("_storepickup",array('model' => $model, 'form' => $form) ); ?>
-<!------------------------------------------------------------------------------------------------------------	Layout Markup -------------------------------------------------------------------------------------------------->
-<div class="modal-conditional-block active">
+<?php
+$shouldDisplayShippingAddresses = $model->shouldDisplayShippingAddresses();
+$isStorePickupSelected = $model->isStorePickupSelected();
+$onLoadDisplayInStorePickup = ($shouldDisplayShippingAddresses === false || $isStorePickupSelected);
+$this->renderPartial("_storepickup", array(
+		'model' => $model,
+		'form' => $form,
+		'shouldDisplayShippingAddresses' => $shouldDisplayShippingAddresses,
+		'isStorePickupSelected' => $isStorePickupSelected,
+		'onLoadDisplayInStorePickup' => $onLoadDisplayInStorePickup));
+?>
+<!--------------------------------------------- Layout Markup --------------------------------------------->
+<?php if ($shouldDisplayShippingAddresses): ?>
+<div class="modal-conditional-block <?= ($onLoadDisplayInStorePickup === false) ? 'active' : ''?>">
 	<?php $this->renderPartial('_shippingheader', array('model' => $model)); ?>
+	<?php $this->renderPartial('//site/_flashmessages'); ?>
 	<div class="error-holder"><?= $error ?></div>
 	<ol class="address-blocks">
-		<?php if(count($model->objAddresses)>0): ?>
+		<?php if(count($model->objAddresses) > 0): ?>
 			<?php foreach ($model->objAddresses as $key => $objAddress): ?>
 				<li class="address-block address-block-pickable">
 					<p class="webstore-label">
@@ -30,7 +41,7 @@ $form = $this->beginWidget(
 						echo $objAddress->formattedblockcountry;
 						?>
 						<span class="controls">
-							<a href="/checkout/editaddress?id=<?= $objAddress->id ?>&type=shipping"><?php echo Yii::t('checkout','Edit Address'); ?></a>
+							<a href="/checkout/editaddress?id=<?= $objAddress->id ?>&type=shipping"><?php echo Yii::t('checkout', 'Edit Address'); ?></a>
 							<?php echo Yii::t('checkout', 'or'); ?>
 							<?php
 							echo CHtml::ajaxLink(
@@ -52,7 +63,6 @@ $form = $this->beginWidget(
 								)
 							);
 							?>
-						</span>
 					</p>
 					<div class="buttons">
 						<button name="Address_id" value="<?= $objAddress->id ?>" class="small <?= $key == 0 ? 'default' : ''; ?>">
@@ -63,11 +73,18 @@ $form = $this->beginWidget(
 			<?php endforeach; ?>
 		<?php endif; ?>
 		<li class="add">
-			<?php echo CHtml::link(Yii::t('checkout','Add New Address'), '/checkout/newaddress?type=shipping', array('class' => 'small button')); ?>
+			<?php
+				echo CHtml::link(
+					Yii::t('checkout', 'Add New Address'),
+					'/checkout/newaddress?type=shipping',
+					array('class' => 'small button')
+				);
+			?>
 		</li>
 	</ol>
 </div>
-<!------------------------------------------------------------------------------------------------------------	Layout Markup -------------------------------------------------------------------------------------------------->
+<?php endif; ?>
+<!--------------------------------------------- Layout Markup --------------------------------------------->
 <?php $this->endWidget();?>
 <aside class="section-sidebar webstore-sidebar-summary">
 	<?php $this->renderPartial('_ordersummary'); ?>

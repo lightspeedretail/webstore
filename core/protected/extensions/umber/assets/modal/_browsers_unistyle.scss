@@ -9,3 +9,8 @@
     outline: #5B9DD9 auto 5px!important;
   }
 }
+
+//remove "clear field" X buttons IE
+::-ms-clear {
+   display: none;
+}

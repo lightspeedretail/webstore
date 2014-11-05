@@ -25,22 +25,27 @@
 
 	<?php
 		foreach(Yii::app()->theme->info->cssfiles as $cssfile)
+		{
 			Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->cssUrl($cssfile));
+		}
 
 		if (isset(Yii::app()->params['modal_css']))
+		{
 			Yii::app()->getClientScript()->registerCssFile(Yii::app()->params['modal_css']);
+		}
 
 		Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->cssUrl(Yii::app()->theme->config->CHILD_THEME));
 		Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->cssUrl('custom'));
 
 
-		$asset = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('ext').'/wsadvcheckout/assets');
+		$asset = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('ext') . '/wsadvcheckout/assets');
 		Yii::app()->clientScript->registerScriptFile($asset . '/checkout.js', CClientScript::POS_HEAD);
 	?>
 
 	<?php $this->widget('ext.wsiosorientationbugfix.iosorientationbugfix'); ?>
 
-	<?php echo $this->renderPartial("/site/_google",null,true); ?>
+	<?php $this->renderPartial('/site/_google'); ?>
+	<?php $this->renderPartial('ext.wscartmodal.views._cartscript'); ?>
 </head>
 
 

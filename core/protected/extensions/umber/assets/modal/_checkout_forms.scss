@@ -157,17 +157,6 @@ ol.field-container-gap {
   float: left;
 }
 
-
-
-
-//MO, bootstrap overwrite
-.field-container-narrowed input:focus,.field-containers-small input:focus,
-.field-container-narrowed input:focus:required:invalid:focus, .field-containers-small input:focus:required:invalid:focus{
-  height: 2.75rem;
-  font-size: .875rem;
-  padding: .25em 8px;
-}
-
 .webstore-modal-overlay .address-form .fieldgroup .field-container input:focus,
 .webstore-modal-overlay .address-form .fieldgroup .field-container input:focus:required:invalid:focus{
   width: auto;

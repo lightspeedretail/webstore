@@ -424,13 +424,6 @@
 /* line 413, /app/source/stylesheets/webstore/_basic_modal.scss */
 .webstore-modal .hint p {
     margin-right: 80px; }
-/* line 415, /app/source/stylesheets/webstore/_basic_modal.scss */
-.webstore-modal input[type="text"], .webstore-modal input[type="email"], .webstore-modal input[type="password"], .webstore-modal input[type="tel"] {
-    width: 100%;
-    padding: 20px;
-    font-size: 1.25rem;
-    border: none;
-    border-bottom: 1px solid #ccc; }
 /* line 422, /app/source/stylesheets/webstore/_basic_modal.scss */
 .webstore-modal input[type="text"].split-2, .webstore-modal input[type="email"].split-2, .webstore-modal input[type="password"].split-2, .webstore-modal input[type="tel"].split-2 {
     width: 50%;
@@ -570,7 +563,7 @@
     max-width: 1000px; }
 /* line 31, /app/source/stylesheets/webstore/_overlay.scss */
 .webstore-modal-overlay section {
-    background-color: #fff;
+    /*background-color: #fff;*/
     height: 100%;
     box-shadow: none;
     display: inline-block;
@@ -588,11 +581,11 @@
         padding-right: 60px;
         padding-left: 60px; } }
 /* line 55, /app/source/stylesheets/webstore/_overlay.scss */
-.webstore-modal-overlay header h1 {
-    font-size: 2.25rem;
-    margin: .5em 0 .35em;
-    text-transform: none;
-    color: #555; }
+/*.webstore-modal-overlay header h1 {*/
+    /*font-size: 2.25rem;*/
+    /*margin: .5em 0 .35em;*/
+    /*text-transform: none;*/
+    /*color: #555; }*/
 @media (min-width: 560px) {
     /* line 62, /app/source/stylesheets/webstore/_overlay.scss */
     .webstore-modal-overlay main {

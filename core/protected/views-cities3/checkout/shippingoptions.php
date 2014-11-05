@@ -64,42 +64,45 @@
 		</tr>
 	</thead>
 	<?php
-		$arrShippingOption = CheckoutController::formatCartScenarios($arrCartScenario);
+		$formattedCartScenarios = Checkout::formatCartScenarios($arrCartScenario);
 
 		$orderSummaryOptions = array(
 			'class' => '.summary',
-			'rates' => $arrShippingOption
+			'cartScenarios' => $formattedCartScenarios
 		);
 
 		Yii::app()->clientScript->registerScript(
 			'instantiate OrderSummary',
 			'$(document).ready(function () {
 				orderSummary = new OrderSummary(' . CJSON::encode($orderSummaryOptions) . ');
+				if (typeof promoCodeInput !== "undefined") {
+					promoCodeInput.orderSummary = orderSummary;
+				}
 			});',
 			CClientScript::POS_HEAD
 		);
 
-		foreach ($arrShippingOption as $optionIdx => $shippingOption): ?>
+		foreach ($formattedCartScenarios as $scenarioIdx => $cartScenario): ?>
 		<tr>
 			<td>
 				<?php
-					$id = CHtml::activeId('MultiCheckoutForm', 'shippingProvider_' . $optionIdx);
-					$isChecked = $shippingOption['providerId'] == $model->shippingProvider &&
-						$shippingOption['priorityLabel'] == $model->shippingPriority;
+					$id = CHtml::activeId('MultiCheckoutForm', 'shippingProvider_' . $scenarioIdx);
+					$isChecked = $cartScenario['providerId'] == $model->shippingProvider &&
+						$cartScenario['priorityLabel'] == $model->shippingPriority;
 
 					echo CHtml::radioButton(
 						'shippingOption',
 						$isChecked,
 						array(
 							'id' => $id,
-							'data-provider-id' => $shippingOption['providerId'],
-							'data-priority-label' => $shippingOption['priorityLabel'],
+							'data-provider-id' => $cartScenario['providerId'],
+							'data-priority-label' => $cartScenario['priorityLabel'],
 							'onclick' => 'orderSummary.optionSelected(this);'
 						)
 					);
 
 					echo CHtml::label(
-						$shippingOption['shippingOptionPriceLabel'],
+						$cartScenario['shippingOptionPriceLabel'],
 						$id
 					);
 				?>
@@ -123,5 +126,20 @@
 <?php $this->endWidget(); ?>
 
 <aside class="section-sidebar webstore-sidebar-summary">
-	<?php $this->renderPartial('_ordersummary'); ?>
+	<?php
+		$partialPromoCodeInput = $this->renderPartial(
+			'ext.wscartmodal.views._promocodeinput',
+			array(
+				'modelId' => 'Checkout',
+				'updateCartTotals' => false,
+				'reloadPageOnSuccess' => true
+			),
+			true
+		);
+
+		$this->renderPartial(
+			'_ordersummary',
+			array('partialPromoCodeInput' => $partialPromoCodeInput)
+		);
+	?>
 </aside>

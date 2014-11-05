@@ -55,14 +55,14 @@ class MultiCheckoutForm extends CheckoutForm
 			array('billingAddress1, billingCity, billingCountry',
 				'validateBillingBlock','on' => 'Payment, PaymentSim, PaymentStorePickupCC, PaymentStorePickupSimCC, Confirmation, ConfirmationSim'),
 
-			array('shippingState', 'validateState', 'on' => 'CalculateShipping, Shipping, ShippingOptions, Payment, PaymentSim, Confirmation, ConfirmationSim'),
+			array('shippingState', 'StateValidator', 'on' => 'CalculateShipping, Shipping, ShippingOptions, Payment, PaymentSim, Confirmation, ConfirmationSim'),
 
 			array('shippingPostal',
 				'validatePostal','on' => 'CalculateShipping, Shipping, ShippingOptions, Payment, PaymentSim, Confirmation, ConfirmationSim'),
 
 			array('shippingProvider, shippingPriority', 'required', 'on' => 'ShippingOptions, Payment, PaymentSim, Confirmation, ConfirmationSim'),
 
-			array('billingState', 'validateState', 'on' => 'Payment, PaymentSim, PaymentStorePickupCC, PaymentStorePickupSimCC, Confirmation, ConfirmationSim'),
+			array('billingState', 'StateValidator', 'on' => 'Payment, PaymentSim, PaymentStorePickupCC, PaymentStorePickupSimCC, Confirmation, ConfirmationSim'),
 
 			array('billingPostal', 'validatePostal', 'on' => 'Payment, PaymentSim, PaymentStorePickupCC, PaymentStorePickupSimCC, Confirmation, ConfirmationSim'),
 
@@ -98,7 +98,7 @@ class MultiCheckoutForm extends CheckoutForm
 			array('contactEmail_repeat', 'validateEmailRepeat', 'on' => 'Login'),
 
 			array('acceptTerms','required', 'requiredValue' => 1,
-				'message' => Yii::t('global','You must accept Terms and Conditions'),
+				'message' => Yii::t('global', 'You must accept Terms and Conditions'),
 				'on' => 'Confirmation, ConfirmationSim, ConfirmationStorePickup'),
 
 			array('createPassword', 'length', 'max' => 255),
@@ -206,7 +206,8 @@ class MultiCheckoutForm extends CheckoutForm
 			CreditCard::model()->enabled()->findAll()
 		);
 
-		if (in_array($this->cardType, $arrEnabledCreditCardLabel) === false) {
+		if (in_array($this->cardType, $arrEnabledCreditCardLabel) === false)
+		{
 			$this->addError(
 				$attribute,
 				Yii::t(
@@ -294,76 +295,6 @@ class MultiCheckoutForm extends CheckoutForm
 		}
 	}
 
-
-	/**
-	 * Until we figure out a better way to determine what country
-	 * addresses require the state field, we will force validation
-	 * for the ones we know should have it only
-	 *
-	 * @param $attributeName
-	 * @param $params
-	 * @return void
-	 */
-	public function validateState($attributeName, $params)
-	{
-		switch ($attributeName)
-		{
-			case 'shippingState':
-				$objCountry = Country::LoadByCode($this->shippingCountry);
-				break;
-			case 'billingState':
-				$objCountry = Country::LoadByCode($this->billingCountry);
-				break;
-			default:
-				// Cannot validate any other attributes.
-				return;
-		}
-
-		if ($objCountry === null)
-		{
-			// Country isn't valid, can't validate the state!
-			return;
-		}
-
-		$countriesToValidateState = array(
-			self::USA,
-			self::CANADA,
-			self::AUSTRALIA,
-		);
-
-		if (in_array($objCountry->id, $countriesToValidateState) === false)
-		{
-			// Do not attempt to validate the state.
-			return;
-		}
-
-		if (empty($this->$attributeName) === true)
-		{
-			$this->addError(
-				$attributeName,
-				Yii::t(
-					'yii',
-					'{attributeName} cannot be blank.',
-					array('{attributeName}' => $this->getattributeLabel($attributeName))
-				)
-			);
-		} else {
-			$objState = State::LoadByCode($this->$attributeName, $objCountry->id);
-
-			if ($objState === null)
-			{
-				$this->addError(
-					$attributeName,
-					Yii::t(
-						'yii',
-						'{attributeName} is invalid.',
-						array('{attributeName}' => $this->getattributeLabel($attributeName))
-					)
-				);
-			}
-		}
-	}
-
 	/**
 	 * Return shipping address as one line string
 	 *
@@ -396,6 +327,11 @@ class MultiCheckoutForm extends CheckoutForm
 	 */
 	public function getStrBillingAddress()
 	{
+		if ($this->billingSameAsShipping == 1)
+		{
+			return $this->getStrShippingAddress();
+		}
+
 		$str = '';
 
 		$str .= $this->billingAddress1 . ', ';
@@ -423,7 +359,6 @@ class MultiCheckoutForm extends CheckoutForm
 		$str .= $this->shippingCity. ', ';
 		$str .= $this->shippingState ? $this->shippingState . ', ' : '';
 		$str .= $this->shippingPostal ? $this->shippingPostal . '<br>' : '';
-		$str .= _xls_country() === $this->shippingCountryCode ? '' : Country::CountryByCode($this->shippingCountryCode);
 
 		// Only show the country if different from the store default.
 		if ($this->shippingCountry != Yii::app()->params['DEFAULT_COUNTRY'])
@@ -485,10 +420,16 @@ class MultiCheckoutForm extends CheckoutForm
 		switch ($str)
 		{
 			case 'billing':
+				$state = State::CodeById($objAddress->state_id);
+				if ($state === '')
+				{
+					$state = $this->billingState;
+				}
+
 				$this->billingAddress1 = $objAddress->address1;
 				$this->billingAddress2 = $objAddress->address2;
 				$this->billingCity = $objAddress->city;
-				$this->billingState = State::CodeById($objAddress->state_id);
+				$this->billingState = $state;
 				$this->billingPostal = $objAddress->postal;
 				$this->billingCountry = $objAddress->country_id;
 				break;
@@ -545,6 +486,12 @@ class MultiCheckoutForm extends CheckoutForm
 		}
 	}
 
+	/**
+	 * Load an instance of MultiCheckoutForm from the user's session. If
+	 * there's not one in the session, create a new one.
+	 * TODO: Should probably be renamed to getFromSessionOrNew().
+	 * @return CheckoutForm A CheckoutForm object.
+	 */
 	public static function loadFromSessionOrNew()
 	{
 		$checkoutForm = self::loadFromSession();
@@ -556,6 +503,11 @@ class MultiCheckoutForm extends CheckoutForm
 		return $checkoutForm;
 	}
 
+	/**
+	 * Load an instance of MultiCheckoutForm from the user's session.
+	 * TODO: Should probably be renamed to getFromSession().
+	 * @return CheckoutForm A CheckoutForm object.
+	 */
 	public static function loadFromSession()
 	{
 		$checkoutFormAttributes = Yii::app()->session->get(self::$sessionKey);
@@ -581,7 +533,7 @@ class MultiCheckoutForm extends CheckoutForm
 
 	/**
 	 * Returns the shipping country code from the session.
-	 * @return string|null The shipping provider ID thast the cart will ship using.
+	 * @return string|null The shipping provider ID that the cart will ship using.
 	 */
 	public static function getShippingProviderFromSession()
 	{
@@ -702,7 +654,6 @@ class MultiCheckoutForm extends CheckoutForm
 		self::saveToSession($checkoutForm);
 	}
 
-
 	/**
 	 * See if the passed id is a match for
 	 * an address in objAddresses
@@ -736,5 +687,43 @@ class MultiCheckoutForm extends CheckoutForm
 	public function isInStorePickupActive()
 	{
 		return Modules::isActive("storepickup", "shipping");
+	}
+
+	/**
+	* This method checks to see if the customer's addresses should be displayed in the shipping option.
+	*
+	* @return bool true if the store pickup is not the only option available | false if store pickup should only
+	* be displayed and not the addresses because it's the only option available in the admin by the store owner
+	*/
+	public function shouldDisplayShippingAddresses()
+	{
+		if (count(Modules::model()->shipping()->notStorePickup()->findAll()) > 0)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * This method checks if the customer has the In Store pickup option selected
+	 *
+	 * @return bool true if store pickup is selected | false otherwise
+	 */
+	public function isStorePickupSelected()
+	{
+		$shipping = Modules::model()->findByPk($this->shippingProvider);
+
+		if (is_null($shipping))
+		{
+			return false;
+		}
+
+		if ($shipping->module === 'storepickup')
+		{
+			return true;
+		}
+
+		return false;
 	}
 }

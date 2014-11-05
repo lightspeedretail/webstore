@@ -1,4 +1,0 @@
-theme-glencoe
-=============
-
-Glencoe Theme

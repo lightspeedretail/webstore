@@ -28,10 +28,12 @@ class wsaddtocartmodal extends wsmodal
 
 		Yii::app()->clientScript->registerScript(
 			'instantiate checkout',
-			'
-			$(document).ready(function () {
-				checkout = new Checkout('.Checkout::getCheckoutJSOptions().');
+			sprintf(
+				'$(document).ready(function () {
+					checkout = new Checkout(%s);
 				});',
+				Checkout::getCheckoutJSOptions()
+			),
 			CClientScript::POS_HEAD
 		);
 

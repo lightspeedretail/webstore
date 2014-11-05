@@ -23,7 +23,7 @@
 <table>
 	<tr>
 		<th class="graphicheader">
-			<?php echo CHtml::link(CHtml::image($this->pageAbsoluteHeaderImage), $this->createUrl("site/index")); ?>
+			<?php echo CHtml::link(CHtml::image($this->pageAbsoluteHeaderImage, Yii::t('cart','web store header image')), $this->createUrl("site/index")); ?>
 		</th>
 	</tr>
 </table>

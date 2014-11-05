@@ -241,4 +241,93 @@ class Checkout
 			'removeButtonLabel' => Yii::t('checkout', 'Remove')
 		));
 	}
+
+	/**
+	 * Formats an array of cart scenarios as required by the shipping options
+	 * page on the checkout.
+	 * @param array[] $arrCartScenario An array of cart scenarios. @see
+	 * Shipping::getCartScenarios.
+	 * @return array[] A formatted array of cart scenarios.
+	 */
+	public static function formatCartScenarios($arrCartScenario)
+	{
+		$arrShippingOption = array();
+		foreach ($arrCartScenario as $cartScenario)
+		{
+			// We exclude in store pickup from this list.
+			if ($cartScenario['module'] === 'storepickup')
+			{
+				continue;
+			}
+
+			$arrShippingOption[] = static::formatCartScenario($cartScenario);
+		}
+
+		return $arrShippingOption;
+	}
+
+	/**
+	 * Formats an cart scenarios as required by the shipping options page on
+	 * the checkout.
+	 * @param string[] $cartScenario An single cart scenarios. @see
+	 * Shipping::getCartScenarios.
+	 * @return string[] A formatted array of cart scenarios.
+	 */
+	public static function formatCartScenario($cartScenario)
+	{
+		$shippingOptionPriceLabel = sprintf(
+			'%s %s',
+			$cartScenario['formattedShippingPrice'],
+			$cartScenario['shippingLabel']
+		);
+
+		return array(
+			'formattedShippingPrice' => $cartScenario['formattedShippingPrice'],
+			'formattedCartTotal' => $cartScenario['formattedCartTotal'],
+			'formattedCartTax1' => $cartScenario['formattedCartTax1'],
+			'formattedCartTax2' => $cartScenario['formattedCartTax2'],
+			'formattedCartTax3' => $cartScenario['formattedCartTax3'],
+			'formattedCartTax4' => $cartScenario['formattedCartTax4'],
+			'formattedCartTax5' => $cartScenario['formattedCartTax5'],
+			'module' => $cartScenario['module'],
+			'priorityIndex' => $cartScenario['priorityIndex'],
+			'priorityLabel' => $cartScenario['priorityLabel'],
+			'providerId' => $cartScenario['providerId'],
+			'providerLabel' => $cartScenario['providerLabel'],
+			'shippingLabel' => $cartScenario['shippingLabel'],
+			'shippingOptionPriceLabel' => $shippingOptionPriceLabel,
+			'shippingPrice' => $cartScenario['shippingPrice'],
+			'shippingProduct' => $cartScenario['shippingProduct']
+		);
+	}
+
+
+	/**
+	 * Some SIM methods render the return/relay url (cart/payment/module) on their domain.
+	 * We specify the behaviour for those methods and others default to that handled
+	 * between advanced and legacy checkout
+	 *
+	 * TODO Refactor payment modules such that we assign a boolean
+	 * variable to each to handle this instead
+	 *
+	 *
+	 * @param $strModule - name of the payment module
+	 * @return bool
+	 */
+	public static function behindTheScenes($strModule)
+	{
+		switch ($strModule)
+		{
+			case 'paypal':
+				return false;
+
+			case 'authorizedotnetsim':
+				return true;
+
+			default:
+				break;
+		}
+
+		return !Yii::app()->theme->info->advancedCheckout;
+	}
 }

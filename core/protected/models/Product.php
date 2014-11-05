@@ -1449,6 +1449,8 @@ class Product extends BaseProduct
 			case 'CanonicalUrl':
 			case 'AbsoluteUrl':
 				return $this->GetAbsoluteUrl();
+			case 'AddToCartImage':
+				return $this->GetImageLink(ImagesType::addtocartmodal);
 
 			case 'ListingImage':
 				return $this->GetImageLink(ImagesType::listing);

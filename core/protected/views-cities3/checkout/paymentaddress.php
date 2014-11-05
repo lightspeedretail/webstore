@@ -140,16 +140,15 @@ if ($count > 0):
 	<!------------------------------------------------------------------------------------------------------------	Layout Markup -------------------------------------------------------------------------------------------------->
 <footer>
 	<?php
-		echo
-			CHtml::submitButton(
-				'Submit',
-				array(
-					'type' => 'submit',
-					'class' => 'button',
-					'name' => 'Payment',
-					'id' => 'Payment',
-					'value' => Yii::t('checkout', "Review and Confirm Order")
-				)
+		echo CHtml::submitButton(
+			'Submit',
+			array(
+				'type' => 'submit',
+				'class' => 'button',
+				'name' => 'Payment',
+				'id' => 'Payment',
+				'value' => Yii::t('checkout', "Review and Confirm Order")
+			)
 		);
 	?>
 </footer>

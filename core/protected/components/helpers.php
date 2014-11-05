@@ -585,6 +585,38 @@ function _xls_delim_to_array($val , $delim = ',') {
 	return $ret;
 }
 
+
+/**
+ * Convert a string or 1 dimensional array
+ * to a 2 dimensional array.
+ * Primarily meant to format an error(s)
+ * to mimic Yii validation error structure
+ *
+ * @param $arr
+ * @return array
+ */
+function _xls_make2dimArray($arr)
+{
+	if (is_array($arr) === false)
+	{
+		// string
+		return array(array($arr));
+	}
+
+	if (is_array(current($arr)) === false)
+	{
+		// 1 dimension array
+		$newArr = array();
+		foreach ($arr as $key => $item) {
+			$newArr[$key] = array($item);
+		}
+
+		return $newArr;
+	}
+
+	return $arr;
+}
+
 /**
  * Create a hidden for input our of a name and value
  *

@@ -6,7 +6,6 @@ class tieredshipping extends WsShipping
 	protected $defaultName = "Tier-Based Shipping";
 
 	public function run() {
-
 		$fltCriteria = $this->objCart->subtotal;
 		if ($this->config['tierbased']=="weight")
 			$fltCriteria = $this->objCart->Weight;

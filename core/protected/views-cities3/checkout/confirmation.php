@@ -1,12 +1,7 @@
-<script>
-	var cart = <?php echo CJSON::encode(
-			array(
-				'INVALID_PROMOCODE' => Yii::t('checkout', 'Promo code is no longer applicable to this purchase.'),
-				'PROMOCODE_APPLY' => Yii::t('checkout', 'Apply')
-			)
-		);
-	?>
-</script>
+<?php
+	$modelId = 'Confirmation';
+?>
+
 <div class="section-content" id="confirm">
 	<nav class="steps">
 		<ol>
@@ -30,7 +25,7 @@
 				array(
 					'class' => 'button',
 					'id' => 'place-order',
-					'type'=>'submit',
+					'type' => 'submit',
 					'name' => 'Confirmation'
 				)
 			);?>
@@ -39,10 +34,10 @@
 				echo $form->checkBox(
 					$model,
 					'receiveNewsletter',
-					$htmlOptions = array('checked'=> Yii::app()->params['DISABLE_ALLOW_NEWSLETTER'] ? '' : 'checked')
+					$htmlOptions = array('checked' => Yii::app()->params['DISABLE_ALLOW_NEWSLETTER'] ? '' : 'checked')
 				);
 
-				echo Yii::t('checkout',"I'd like to receive special offers and product information by email");
+				echo Yii::t('checkout', "I'd like to receive special offers and product information by email");
 			?>
 		</label>
 		<div class="comments">
@@ -55,24 +50,24 @@
 				echo $form->textArea(
 					$model,
 					'orderNotes',
-					$htmlOptions = array('placeholder' => Yii::t('checkout', 'Enter your comment or special request'))
+					array('placeholder' => Yii::t('checkout', 'Enter your comment or special request'))
 				);
 			?>
 		</div>
 		<p class="terms">
 			<?php
-				echo Yii::t('checkout','By clicking "Place Order" you agree to our ');
+				echo Yii::t('checkout', 'By clicking "Place Order" you agree to our ');
 				echo
 					CHtml::link(
 						Yii::t('checkout', 'Terms and Conditions'),
 						array("/terms-and-conditions"),
-						array('target' => "_blank", 'class' => "hasborder" )
+						array('target' => '_blank', 'class' => 'hasborder' )
 					);
 				echo
 					$form->checkBox(
 						$model,
 						'acceptTerms',
-						$htmlOptions = array('checked'=> 'checked', 'style' => 'display: none')
+						array('checked' => 'checked', 'style' => 'display: none')
 					);
 			?>
 		</p>
@@ -102,8 +97,11 @@
 	<article class="cart">
 		<?php
 			$this->widget(
-				'zii.widgets.grid.CGridView', array(
-					'htmlOptions'=> array('class'=>'lines lines-container'),
+				'zii.widgets.grid.CGridView',
+				array(
+					'htmlOptions' => array(
+						'class' => 'lines lines-container'
+					),
 					'id' => 'user-grid',
 					'itemsCssClass' => 'lines',
 					'dataProvider' => Yii::app()->shoppingcart->dataProvider,
@@ -112,10 +110,10 @@
 						array(
 							'type' => 'raw',
 							'value' => '"<strong>".$data->qty."</strong>".CHtml::numberField("CartItem_qty[$data->id]",$data->qty,array(
-			                                        "data-pk"=>$data->id,
-			                                        "size" => "3",
-			                                        "onchange" =>"updateCart(this)",
-			                                    ))',
+													"data-pk"=>$data->id,
+													"size" => "3",
+													"onchange" =>"wsEditCartModal.updateCart(this)",
+												))',
 							'htmlOptions' => array(
 								'class' => 'quantity',
 								'size' => '2'
@@ -123,12 +121,12 @@
 						),
 						array(
 							'type' => 'raw',
-							'value' => 'CHtml::image(
-								   Images::GetLink($data -> product -> image_id,ImagesType::slider))
-								   .CHtml::tag("td",array("class" => "description"),
-								   CHtml::link("<strong>".$data -> product->title." "."</strong>"
-								   .Yii::app()->getController()->renderPartial(\'_formattedCartItemSellPriceWithDiscount\', array(\'cartItem\' => $data), true), $data -> product->Link, array())
-								   )',
+							'value' => '
+								CHtml::image($data->product->SliderImage) .
+								CHtml::tag("td",array("class" => "description"),
+								CHtml::link("<strong>".$data -> product->title." "."</strong>" .
+								Yii::app()->getController()->renderPartial(\'_formattedCartItemSellPriceWithDiscount\', array(\'cartItem\' => $data), true), $data -> product->Link, array())
+								)',
 							'htmlOptions' => array(
 								'class' => 'image'
 							),
@@ -136,9 +134,9 @@
 						array(
 							'type' => 'raw',
 							'value' => 'CHtml::link("Edit","#",array(
-											//"data-pk"=>$data->id,"class"=>"edit", "onclick"=>"$(this).closest(\'tr\').addClass(\'active\'); $(this).closest(\'input\').focus();  return false;")
-											"data-pk"=>$data->id,"class"=>"edit", "onclick"=>"$(this).closest(\'tr\').addClass(\'active\'); $(this).closest(\'input\').focus(); return false;")
-											).CHtml::link("&times;","#",array("data-pk"=>$data->id,"class"=>"remove", "onclick"=>"removeItem(this); return false;"))',
+								//"data-pk"=>$data->id,"class"=>"edit", "onclick"=>"$(this).closest(\'tr\').addClass(\'active\'); $(this).closest(\'input\').focus();  return false;")
+								"data-pk"=>$data->id,"class"=>"edit", "onclick"=>"$(this).closest(\'tr\').addClass(\'active\'); $(this).closest(\'input\').focus(); return false;")
+								).CHtml::link("&times;","#",array("data-pk"=>$data->id,"class"=>"remove", "onclick"=>"wsEditCartModal.removeItem(this); return false;"))',
 							'htmlOptions' => array(
 								'class' => 'controls'
 							),
@@ -163,7 +161,7 @@
 						CHtml::tag(
 							'div',
 							array(
-								'id' => CHtml::activeId('Confirmation','promoCode') . '_em_',
+								'id' => CHtml::activeId($modelId, 'promoCode') . '_em_',
 								'class' => 'form-error',
 								'style' => 'display: none'
 							),
@@ -172,116 +170,116 @@
 				?>
 				<div style="position:relative;">
 					<?php
-					echo CHtml::textField(
-						CHtml::activeId('Confirmation','promoCode'),
-						(Yii::app()->shoppingcart->promoCode !== null ? Yii::app()->shoppingcart->promoCode : ''),
-						array(
-							'placeholder' => Yii::t('cart','Promo Code'),
-							'class' => "promo-code",
-							'onkeypress' => 'return checkout.ajaxTogglePromoCodeEnterKey(event, ' .
-								json_encode(CHtml::activeId('Confirmation','promoCode')) .
-								');',
-							'readonly' => Yii::app()->shoppingcart->promoCode !== null
-						)
-					);
-					echo CHtml::htmlButton (
-						Yii::app()->shoppingcart->promoCode !== null ? Yii::t('cart', 'Remove') : Yii::t('cart', 'Apply'),
-						array(
-							'type' => 'button',
-							'class' => 'inset' . ' promocode-apply' . (Yii::app()->shoppingcart->promoCode !== null ? ' promocode-applied' : ''),
-							'style' => 'position:absolute;',
-							'onclick' => 'checkout.ajaxTogglePromoCode(' .
-								json_encode(CHtml::activeId('Confirmation','promoCode')) .
-								');'
-						)
-					);
+						$this->renderPartial(
+							'ext.wscartmodal.views._promocodeinput',
+							array('modelId' => $modelId, 'updateCartTotals' => true, 'reloadPageOnSuccess' => false)
+						);
 					?>
 				</div>
 				<div class="form-error" style="display: none">
 					<p>something bad happened...</p>
 				</div>
 				<p class="description">
-					<?php echo Yii::t('cart','Specials, promotional offers and discounts') ?>
+					<?php echo Yii::t('cart', 'Specials, promotional offers and discounts') ?>
 				</p>
 			</form>
 			<div class="totals">
 				<table class="totals">
 					<tbody>
-						<tr id="PromoCodeLine" class="<?php echo Yii::app()->shoppingcart->promoCode ? 'webstore-promo-line' : 'webstore-promo-line hide-me';?>" >
+						<tr id="PromoCodeLine" class="<?= Yii::app()->shoppingcart->promoCode ? 'webstore-promo-line' : 'webstore-promo-line hide-me';?>" >
 							<th colspan='3'>
-								<?php echo Yii::t('cart','Promo & Discounts').' <td id="PromoCodeStr" class="promo-code-str">' . Yii::app()->shoppingcart->totalDiscountFormatted; ?></td>
+								<?= Yii::t('cart', 'Promo & Discounts'); ?>
+								<td id="PromoCodeStr" class="promo-code-str">
+									<?= Yii::app()->shoppingcart->totalDiscountFormatted; ?>
+								</td>
 							</th>
 						</tr>
 						<tr>
-							<th colspan='3'><?php echo Yii::t('cart','Shipping'); ?>
-								<small><?php echo Yii::app()->shoppingcart->shipping->shipping_data; ?></small>
+							<th colspan='3'><?php echo Yii::t('cart', 'Shipping'); ?>
+								<small><?= Yii::app()->shoppingcart->shipping->shipping_data; ?></small>
 							</th>
-							<td class="shipping-estimate"><?php echo _xls_currency(Yii::app()->shoppingcart->shipping_sell) ?></td>
+							<td class="shipping-estimate">
+								<?= _xls_currency(Yii::app()->shoppingcart->shipping_sell); ?>
+							</td>
 						</tr>
 
-						<?php $this->renderPartial('_checkout-taxes', array('cart' => Yii::app()->shoppingcart, 'selectedCartScenario' => null, 'confirmation' => true)); ?>
+						<?php
+							$this->renderPartial(
+								'_checkout-taxes',
+								array(
+									'cart' => Yii::app()->shoppingcart,
+									'selectedCartScenario' => null,
+									'confirmation' => true
+								)
+							);
+						?>
 
-					<tr class="total">
-						<th colspan='3'><?php echo Yii::t('cart','Total'); ?></th>
-						<td id="totalCart" class="wsshippingestimator-total-estimate total-estimate"><?php echo _xls_currency(Yii::app()->shoppingcart->total); ?></td>
-					</tr>
+						<tr class="total">
+							<th colspan='3'><?php echo Yii::t('cart', 'Total'); ?></th>
+							<td id="totalCart" class="wsshippingestimator-total-estimate total-estimate">
+								<?= _xls_currency(Yii::app()->shoppingcart->total); ?>
+							</td>
+						</tr>
 					</tbody>
 				</table>
 			</div>
 		</div>
 	</article>
 </div>
+<?php $this->publishJS('confirmationShippingEstimator'); ?>
 <?php
-	$this->publishJS('confirmationShippingEstimator');
-	Yii::app()->clientScript->registerScript(
-		'instantiate checkout & wsEstimator',
-		'
-		var calculatingLabel = '. CJSON::encode(Yii::t('cart', 'Calculating...')) .';
-		$(document).ready(function () {
-			checkout = new Checkout('.Checkout::getCheckoutJSOptions().');
-			confirmationShippingEstimator = new ConfirmationShippingEstimator('.CJSON::encode($shippingEstimatorOptions).');
+Yii::app()->clientScript->registerScript(
+	'instantiate checkout',
+	sprintf(
+		'$(document).ready(function () {
+			checkout = new Checkout(%s);
 		});',
-		CClientScript::POS_HEAD
-	);
-
-	Yii::app()->clientScript->registerScript(
-		'editable',
-		"
-		function removeItem(input) {
-			var pk = input.getAttribute('data-pk');
-			input.id = 'CartItem_qty_' + pk;
-			input.value = 0;
-			updateCart(input);
-		};
-	   function updateCart(input) {
-			var pk = input.id;
-			var obj = {'YII_CSRF_TOKEN': '".Yii::app()->request->csrfToken."'};
-				obj[pk] = input.value;
-
-		        $.ajax({url: '".Yii::app()->controller->createUrl('cart/updatecart')."',
-		                type: 'POST',
-		                dataType: 'json',
-		                success: function(data) {
-		                    if(data.action == 'success') {
-		                        checkout.redrawCart(JSON.parse(data.cartitems), " . json_encode(CHtml::activeId('Confirmation','promoCode')) . ");
-		                        confirmationShippingEstimator.calculateShippingEstimates();
-		                    }
-		                    else if(data.errorId === 'invalidQuantity'){
-		                        var qty = $('#' + pk);
-		                        qty.val(data.availQty);
-		                        qty.change();
-		                        checkout.createTooltip(pk, '<strong>Only ' + data.availQty +
-		                        ' are available at this time.</strong><br> If you&quot;d like to order more please return at a later time or contact us.');
-		                    }
-		                    else {
-		                        alert(data.errormsg);
-		                    }
-		                },
-						error: function(data) { alert('error'); },
-						data: obj
-				});
-		}",
-		CClientScript::POS_HEAD
-	);
+		Checkout::getCheckoutJSOptions()
+	),
+	CClientScript::POS_HEAD
+);
 ?>
+<script>
+	// TODO: Move these into a strings object or pass in as an option.
+	strCalculateButton = <?= CJSON::encode(Yii::t('shipping', 'Calculate')) ?>;
+	calculatingLabel = <?= CJSON::encode(Yii::t('cart', 'Calculating...')) ?>;
 
+	$(document).ready(function () {
+		confirmationShippingEstimator = new ConfirmationShippingEstimator(<?= CJSON::encode($shippingEstimatorOptions) ?>);
+
+		<?php
+			// TODO: It isn't ideal to bind the promoCodeInput - ideally
+			// confirmation.php wouldn't need to know about
+			// promoCodeInput. But we aren't presently managing the
+			// application in such a way that there's an easy alternative.
+		?>
+
+		if (typeof promoCodeInput !== 'undefined') {
+			promoCodeInput.wsShippingEstimator = confirmationShippingEstimator;
+		}
+	});
+</script>
+<?php
+	Yii::app()->clientScript->registerScript(
+		'instantiate wsEditCartModal',
+		sprintf(
+			'$(document).ready(function () {
+				wsEditCartModal = new WsEditCartModal(%s);
+				wsEditCartModal.checkout = checkout;
+				wsEditCartModal.wsShippingEstimator = confirmationShippingEstimator;
+			});',
+			CJSON::encode(
+				array(
+					'updateCartUrl' => Yii::app()->createUrl('/cart/updatecartitem'),
+					'csrfToken' => Yii::app()->request->csrfToken,
+					'cartId' => CHtml::activeId($modelId, 'promoCode'),
+					'invalidQtyMessage' => Yii::t(
+						'checkout',
+						'<strong>Only {qty} are available at this time.</strong><br> If you’d like ' .
+						'to order more please return at a later time or contact us.'
+					)
+				)
+			)
+		),
+		CClientScript::POS_END
+	);

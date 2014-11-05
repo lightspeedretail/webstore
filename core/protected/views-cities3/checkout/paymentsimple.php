@@ -1,6 +1,10 @@
 <?php
 CHtml::$afterRequiredLabel = '';
 
+echo CHtml::script(
+	'var cityPlaceholder = ' . CJSON::encode(Yii::t('checkout', "City")) . ';'
+);
+
 $form = $this->beginWidget(
 	'CActiveForm',
 	array(
@@ -75,7 +79,6 @@ $this->renderPartial('_paypalbuttonsim', array('paypal' => $paypal, 'count' => $
 				'onclick' => '$(".address-form").fadeToggle();',
 				'checked' => "checked",
 				'disabled' => _xls_get_conf('SHIP_SAME_BILLSHIP') == 1 ? true : false,
-				'uncheckValue' => null
 			)
 		);
 		?>

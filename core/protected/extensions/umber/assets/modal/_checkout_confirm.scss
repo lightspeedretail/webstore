@@ -308,7 +308,7 @@
 #checkout .address-block button a{
   color: white;
   text-decoration: none;
-  //MO overwrite base.css line 183.
+  //MO override base.css line 183.
   &:focus{
     outline:none;
   }
