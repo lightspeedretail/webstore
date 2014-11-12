@@ -89,19 +89,18 @@ class Cart extends BaseCart
 	 * @return Cart
 	 */
 	public static function InitializeCart() {
-			$objCart = new Cart();
-			$objCart->cart_type = CartType::cart;
+		$objCart = new Cart();
+		$objCart->cart_type = CartType::cart;
 
-			$objCart->datetime_cre = new CDbExpression('NOW()');;
-			$objCart->datetime_due = new CDbExpression('now() + INTERVAL '._xls_get_conf('CART_LIFE', 7).' DAY');
-			$objCart->ResetTaxIncFlag();
-			if(!$objCart->save())
-			{
-				Yii::log("Error initializing cart ".print_r($objCart->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-			}
+		$objCart->datetime_cre = new CDbExpression('NOW()');;
+		$objCart->datetime_due = new CDbExpression('now() + INTERVAL '._xls_get_conf('CART_LIFE', 7).' DAY');
+		$objCart->ResetTaxIncFlag();
+		if(!$objCart->save())
+		{
+			Yii::log("Error initializing cart ".print_r($objCart->getErrors(), true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		}
 
-			return $objCart;
-
+		return $objCart;
 	}
 
 	public function getDataProvider()

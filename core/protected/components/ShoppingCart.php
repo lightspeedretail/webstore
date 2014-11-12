@@ -43,62 +43,67 @@ class ShoppingCart extends CApplicationComponent
 	}
 
 	/**
+	 * Get the Cart model underlying this shoppingcart.
+	 *
 	 * @return CActiveRecord|Cart|null
 	 */
 	public function getModel()
 	{
-
-		if (!$this->_model)
+		// The first time this method is called, we initialise the cart model.
+		if ($this->_model === null)
 		{
-			$intCartId = Yii::app()->user->getState('cartid');
-
-			if(empty($intCartId))
+			$objCustomer = Customer::GetCurrent();
+			if ($objCustomer instanceof Customer)
 			{
-				$objCustomer = Customer::GetCurrent();
-				$intCustomerid = null;
+				$intCustomerId = $objCustomer->id;
+			} else {
+				$intCustomerId = null;
+			}
 
-				if ($objCustomer instanceof Customer)
-				{
-					$intCustomerid = $objCustomer->id;
-				}
+			// Attempt to load the cart from the session.
+			$intSessionCartId = Yii::app()->user->getState('cartid', null);
 
+			if($intSessionCartId === null)
+			{
+				// The user doesn't have a cart in their session.
 				$objCart = null;
-				if (!is_null($intCustomerid))
+
+				// Attempt to load the user's last cart.
+				if ($intCustomerId !== null)
 				{
-					$objCart = Cart::LoadLastCartInProgress($intCustomerid);
+					$objCart = Cart::LoadLastCartInProgress($intCustomerId);
 				}
 
 				if (is_null($objCart))
 				{
 					$objCart = new Cart();
 				}
-
-				//Logged in customers get a "real" cart
-				if(is_null($objCart) && !is_null($intCustomerid))
-				{
-					$objCart = Cart::InitializeCart();
-					Yii::app()->user->setState('cartid', $objCart->id);
-				}
 			}
 			else
 			{
-				$objCart = Cart::model()->findByPk($intCartId);
-				if (!$objCart || ($objCart->cart_type != CartType::cart && $objCart->cart_type != CartType::awaitpayment))
+				$objCart = Cart::model()->findByPk($intSessionCartId);
+
+				// TODO: Document why we create new carts when cart_type is not
+				// one of CartType::cart or CartType::awaitpayment.
+				$requiresNewCart = (
+					$objCart === null ||
+					$objCart->cart_type != CartType::cart && $objCart->cart_type != CartType::awaitpayment
+				);
+
+				if ($requiresNewCart === true)
 				{
-					//something has happened to the database object
-					Yii::log("Could not find cart ".$intCartId.", creating new one.", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+					Yii::log(
+						sprintf(
+							'User had cart %s in their session, but creating a new one (cart type is %s).',
+							$intSessionCartId,
+							$objCart->cart_type
+						),
+						'error',
+						'application.'.__CLASS__.".".__FUNCTION__
+					);
+
 					$objCart = Cart::InitializeCart();
 					Yii::app()->user->setState('cartid', $objCart->id);
-				}
-				elseif ($objCart->cart_type == CartType::cart)
-				{
-					try{
-						$objCart->UpdateCartCustomer();
-					}
-					catch(Exception $e)
-					{
-						Yii::log("Error updating customer cart ".$e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-					}
 				}
 			}
 
@@ -675,13 +680,6 @@ class ShoppingCart extends CApplicationComponent
 			Yii::log("Assigning customer id #".$objCustomer->id, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			$this->model->customer_id = $objCustomer->id;
 			$this->model->save();
-			try{
-				$this->model->UpdateCartCustomer();
-			}
-			catch(Exception $e)
-			{
-				Yii::log("Error updating customer cart ".$e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-			}
 			return true;
 		}
 

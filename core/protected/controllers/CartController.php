@@ -219,7 +219,7 @@ class CartController extends Controller
 
 		Yii::app()->clientScript->registerScript('sendemail', $jsScript, CClientScript::POS_READY);
 
-		if (Yii::app()->theme->info->advancedCheckout === true)
+		if (Yii::app()->theme->info->advancedCheckout)
 		{
 			//If we were still logged in as guest at this point, log out
 			if ($objCart->customer->record_type == Customer::GUEST)
@@ -1328,12 +1328,12 @@ class CartController extends Controller
 
 		self::PostFinalizeHooks($objCart);
 
-		if ($blnBehindTheScenes === false)
+		if (!$blnBehindTheScenes)
 		{
 			//If we're behind a common SSL and we want to stay logged in
 			if (Yii::app()->isCommonSSL && $objCart->customer->record_type != Customer::GUEST)
 			{
-				Yii::app()->user->setState('sharedssl', 1);
+				Yii::app()->user->setState('sharedssl',1);
 			}
 
 			//If we were in as guest, immediately log out of guest account
@@ -1397,9 +1397,7 @@ class CartController extends Controller
 							date("Y-m-d H:i:s",strtotime($retVal['payment_date'])) : new CDbExpression('NOW()');
 						$objPayment->save();
 
-						$blnBehindScenes = Checkout::behindTheScenes($strModule);
-
-						self::FinalizeCheckout($objCart, $blnBehindScenes);
+						self::FinalizeCheckout($objCart, !Yii::app()->theme->info->advancedCheckout);
 
 						Yii::log('Checkout Finalized', 'info', __CLASS__.'.'.__FUNCTION__);
 
@@ -1965,18 +1963,16 @@ class CartController extends Controller
 	 */
 	public function actionGetShippingRates()
 	{
-		if (isset($_POST['CheckoutForm']) === false)
-		{
-			return $this->renderJSON(
-				array(
-					'result' => 'error',
-					'errormsg' => 'Must POST a CheckoutForm'
-				)
-			);
-		}
-
 		$checkoutForm = MultiCheckoutForm::loadFromSessionOrNew();
-		$checkoutForm->attributes = $_POST['CheckoutForm'];
+
+		// If no CheckoutForm is posted, then the checkoutForm stored in the
+		// session is used.  This is completely valid when we want updated
+		// rates, but haven't modified (or perhaps don't know) the shipping
+		// address.
+		if (isset($_POST['CheckoutForm']))
+		{
+			$checkoutForm->attributes = $_POST['CheckoutForm'];
+		}
 
 		// Transform the postcode as required by the shipping modules.
 		// TODO Can we move this?
@@ -2019,7 +2015,7 @@ class CartController extends Controller
 		if ($shippingEstimatorMessage !== null)
 		{
 			$message = Yii::t('checkout', 'Your previous shipping selection is no longer available. Please choose an available shipping option.');
-			Yii::app()->user->setFlash('error', array($message));
+			Yii::app()->user->setFlash('error', $message);
 		}
 
 		// Save to session.

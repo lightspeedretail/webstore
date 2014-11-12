@@ -100,7 +100,7 @@ class paypal extends WsPayment
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // Returns response data instead of TRUE(1)
 		curl_setopt($ch, CURLOPT_POSTFIELDS, rtrim( $paypal_fields, "& " )); // use HTTP POST to send form data
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE); // uncomment this line if you get no gateway response.
-		$resp = curl_exec($ch); // execute post and get results
+		$resp = curl_exec($ch); //execute post and get results
 		curl_close ($ch);
 
 		Yii::log("IPN Verify Response ".$resp, 'info', 'application.'.__CLASS__.".".__FUNCTION__);

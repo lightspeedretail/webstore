@@ -1,4 +1,6 @@
 <?php
+// TODO: Refactor so that the changes to the cart (especially updateShipping
+// and updateTaxes) occur through a neater interface.
 
 class CheckoutController extends Controller
 {
@@ -201,6 +203,9 @@ class CheckoutController extends Controller
 
 		$arrObjAddresses = CustomerAddress::getActiveAddresses();
 
+		// In some cases an address may be rejected.
+		// TODO: it's not ideal to rely on the client to tell us whether to
+		// display an error or not.
 		if (CPropertyValue::ensureBoolean(Yii::app()->request->getQuery('error-destination')) === true)
 		{
 			$message = Yii::t('checkout', 'Sorry, we cannot ship to this destination');
@@ -237,11 +242,21 @@ class CheckoutController extends Controller
 				$this->_fillFieldsForStorePickup();
 				$this->checkoutForm->setScenario('StorePickup');
 
-				if ($this->checkoutForm->validate() && $this->updateShipping() && $this->updateAddressId())
+				if ($this->checkoutForm->validate() && $this->updateAddressId())
 				{
+					// Update the shipping scenarios based on the new address.
+					$this->saveForm();
+					Shipping::updateCartScenariosInSession();
+
+					// Update the cart taxes.
+					$this->updateTaxes();
+
+					// Update shipping. If in-store pickup was chosen then we need to
+					// ensure the cart shipping values are updated.
+					$this->updateShipping();
+
 					// save the passed scenario
 					$this->checkoutForm->passedScenario = $this->checkoutForm->getScenario();
-					$this->saveForm();
 
 					// Go straight to payment
 					$this->redirect($this->createUrl('/checkout/final'));
@@ -255,11 +270,19 @@ class CheckoutController extends Controller
 			// shipping address is entered
 			else
 			{
+				// Check whether the in-store pickup was previously selected.
+				// If it was, unset it.
+				if ($this->checkoutForm->isStorePickupSelected())
+				{
+					$this->checkoutForm->shippingProvider = null;
+					$this->checkoutForm->shippingPriority = null;
+					$this->checkoutForm->pickupFirstName = null;
+					$this->checkoutForm->pickupLastName = null;
+				}
+
 				$this->checkoutForm->contactFirstName = $this->checkoutForm->shippingFirstName;
 				$this->checkoutForm->contactLastName = $this->checkoutForm->shippingLastName;
 				$this->checkoutForm->shippingPostal = strtoupper($this->checkoutForm->shippingPostal);
-				$this->checkoutForm->pickupFirstName = null;
-				$this->checkoutForm->pickupLastName = null;
 			}
 
 			// validate before we can progress
@@ -270,9 +293,18 @@ class CheckoutController extends Controller
 				// update the cart
 				if ($this->updateAddressId('shipping'))
 				{
-					// save the passed scenario
+					// Save the passed scenario.
 					$this->checkoutForm->passedScenario = $this->checkoutForm->getScenario();
 					$this->saveForm();
+
+					// Update the shipping scenarios based on the new address.
+					Shipping::updateCartScenariosInSession();
+
+					// Update the cart shipping. Do not update the taxes yet -
+					// it is possible user has entered an invalid tax
+					// destination. The tax destinations are checking on the
+					// shippingoptions page.
+					$this->updateShipping();
 
 					$this->redirect($this->createUrl('/checkout/shippingoptions'));
 				}
@@ -528,7 +560,7 @@ class CheckoutController extends Controller
 		{
 			if ($address->id == $objCart->customer->default_shipping_id)
 			{
-				$arrFirst['first'] = $address;  // assign an index to avoid accidental overwrite (line 314)
+				$arrFirst['first'] = $address;  // assign an index to avoid accidental overwrite
 				unset($arrObjAddresses[$key]);
 			}
 		}
@@ -537,12 +569,12 @@ class CheckoutController extends Controller
 
 		// populate our form with some default values in case the user
 		// was logged in already and bypassed checkout login
-		if (!isset($this->checkoutForm->contactEmail))
+		if (isset($this->checkoutForm->contactEmail) === false)
 		{
 			$this->checkoutForm->contactEmail = $objCart->customer->email;
 		}
 
-		if (!isset($this->checkoutForm->contactEmail_repeat))
+		if (isset($this->checkoutForm->contactEmail_repeat) === false)
 		{
 			$this->checkoutForm->contactEmail_repeat = $objCart->customer->email;
 		}
@@ -552,50 +584,103 @@ class CheckoutController extends Controller
 			$this->checkoutForm->attributes = $_POST['MultiCheckoutForm'];
 		}
 
-		if (isset($_POST['storePickupCheckBox']) && $_POST['storePickupCheckBox'] == 1)
+		$hasErrors = false;
+		$inStorePickupSelected = (isset($_POST['storePickupCheckBox']) && $_POST['storePickupCheckBox'] == 1);
+
+		// If in-store pickup was previously selected but has been deselected, make sure it's no longer used.
+		if ($inStorePickupSelected === false && $this->checkoutForm->isStorePickupSelected())
+		{
+			// TODO: Factor out this and the similar check in actionShipping.
+			$this->checkoutForm->shippingProvider = null;
+			$this->checkoutForm->shippingPriority = null;
+			$this->checkoutForm->pickupFirstName = null;
+			$this->checkoutForm->pickupLastName = null;
+		}
+
+		// Store pickup.
+		if ($inStorePickupSelected === true)
 		{
 			// store pickup is chosen
 			$this->_fillFieldsForStorePickup();
 			$this->checkoutForm->setScenario('StorePickup');
 
-			if ($this->checkoutForm->validate() && $this->updateShipping() && $this->updateAddressId())
-			{
-				// save the passed scenario
-				$this->checkoutForm->passedScenario = $this->checkoutForm->getScenario();
-				$this->saveForm();
+			$redirectUrl = $this->createUrl('/checkout/final');
 
-				$this->redirect($this->createUrl('/checkout/final'));
-			}
-			else
+			if ($this->checkoutForm->validate() === false)
 			{
-				$error = $this->formatErrors($this->errors);
+				$hasErrors = true;
 			}
 		}
 
+		// An address was selected.
 		elseif (isset($_POST['Address_id']))
 		{
 			// an existing shipping address is chosen
 			$this->_fetchCustomerShippingAddress($_POST['Address_id']);
 			$this->checkoutForm->setScenario('Shipping');
-
-			// update cart and validate before we can progress
-			if ($this->updateAddressId('shipping') && $this->checkoutForm->validate())
+			$redirectUrl = $this->createUrl('/checkout/shippingoptions');
+			if ($this->checkoutForm->validate() == false)
 			{
-				// save the passed scenario
-				$this->checkoutForm->passedScenario = $this->checkoutForm->getScenario();
-				$this->saveForm();
-
-				$this->redirect($this->createUrl('/checkout/shippingoptions'));
+				$hasErrors = true;
 			}
-			else
+		} else {
+			// Nothing was posted, just render the shipping address page.
+			$this->render(
+				'shippingaddress',
+				array(
+					'model' => $this->checkoutForm,
+					'error' => $error
+				)
+			);
+			return;
+		}
+
+		// Update address ID if there are no errors.
+		if ($hasErrors === false)
+		{
+			$this->updateAddressId();
+
+			// An error occurred in updateAddressId.
+			if (count($this->errors))
 			{
-				$error = $this->formatErrors($this->errors);
+				$hasErrors = true;
 			}
 		}
 
-		$this->saveForm();
-		$this->render('shippingaddress', array('model' => $this->checkoutForm, 'error' => $error));
+		// A validation error occurred.
+		if ($hasErrors === true)
+		{
+			$error = $this->formatErrors($this->errors);
+			$this->render(
+				'shippingaddress',
+				array(
+					'model' => $this->checkoutForm,
+					'error' => $error
+				)
+			);
+			return;
+		}
 
+		// Update the shipping scenarios based on the new address.
+		$this->saveForm();
+		Shipping::updateCartScenariosInSession();
+
+		// If in-store pickup was selected we need to update the cart now
+		// before moving to checkout/final. Otherwise, the address will be
+		// validated at the next step and the taxes updated.
+		if ($inStorePickupSelected === true)
+		{
+			// Update the cart taxes.
+			$this->updateTaxes();
+
+			// Update shipping. If in-store pickup was chosen then we need to
+			// ensure the cart shipping values are updated.
+			$this->updateShipping();
+		}
+
+		// Save the passed scenario and redirect to the next stage.
+		$this->checkoutForm->passedScenario = $this->checkoutForm->getScenario();
+		$this->redirect($redirectUrl);
 	}
 
 
@@ -612,69 +697,86 @@ class CheckoutController extends Controller
 		$this->loadForm();
 		$error = null;
 
-		// get the shipping priority
+		// Check whether the user has selected a shipping option.
 		if (isset($_POST['MultiCheckoutForm']))
 		{
-			$checkoutForm = $_POST['MultiCheckoutForm'];
-
-			if (isset($checkoutForm['shippingProvider']) && isset($checkoutForm['shippingPriority']))
-			{
-				$this->checkoutForm->shippingProvider = $checkoutForm['shippingProvider'];
-				$this->checkoutForm->shippingPriority = $checkoutForm['shippingPriority'];
-				MultiCheckoutForm::saveToSession($this->checkoutForm);
-			}
-
+			$this->checkoutForm->attributes = $_POST['MultiCheckoutForm'];
 			$this->checkoutForm->setScenario('ShippingOptions');
 
-			// validate before we can progress
-			if ($this->checkoutForm->validate())
+			if ($this->checkoutForm->validate() === true)
 			{
-				if ($this->updateShipping())
-				{
-					// save the passed scenario
-					$this->checkoutForm->passedScenario = $this->checkoutForm->getScenario();
-					$this->saveForm();
+				$this->saveForm();
 
-					$this->redirect($this->createUrl('/checkout/final'));
-				}
+				// Update the cart shipping in the database.
+				$this->updateShipping();
+				$this->checkoutForm->passedScenario = $this->checkoutForm->getScenario();
+				$this->redirect($this->createUrl('/checkout/final'));
 			}
 			else
 			{
 				Yii::log(
-					print_r($this->checkoutForm->getErrors(), true),
+					sprintf(
+						'Validation of the checkout form failed: %s',
+						print_r($this->checkoutForm->getErrors(), true)
+					),
 					'error',
 					'application.'.__CLASS__.'.'.__FUNCTION__
 				);
 			}
 		}
 
-		$arrCartScenario = Shipping::loadCartScenariosFromSession();
-
+		// In the case where the destination does not have a defined tax code,
+		// return to the shipping page with an error message.
 		if ($this->checkValidDestination() === false)
 		{
-			Yii::log('Shipping destination is invalid', 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			Yii::log(
+				sprintf(
+					'Shipping destination is invalid: country=%s state=%s postal=%s',
+					$this->checkoutForm->shippingCountry,
+					$this->checkoutForm->shippingState,
+					$this->checkoutForm->shippingPostal
+				),
+				'error',
+				'application.'.__CLASS__.".".__FUNCTION__
+			);
+
 			$this->redirect(array('/checkout/shipping', 'error-destination' => true));
 			return;
 		}
 
-		if (empty($arrCartScenario) === true)
-		{
-			try {
-				$arrCartScenario = Shipping::getCartScenarios($this->checkoutForm);
-			} catch (Exception $e) {
-				Yii::log('Unable to get cart scenarios: ' . $e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-				$this->redirect(array('/checkout/shipping', 'error-destination' => true));
-				return;
-			}
+		// Update the cart taxes prior to updating the cart scenarios.
+		$this->updateTaxes();
 
-			if ($arrCartScenario !== null)
-			{
-				Shipping::saveCartScenariosToSession($arrCartScenario);
-			}
+		$arrCartScenario = Shipping::loadCartScenariosFromSession();
+
+		// In the case where no shipping options are available, return to the
+		// shipping page with an error message.
+		// TODO: This isn't quite right. If store pickup is the only option, we
+		// also want to display this error because store pickup is not shown
+		// shown on the shipping options screen. See WS-3267.
+		if ($arrCartScenario === null || count($arrCartScenario) === 0)
+		{
+			Yii::log(
+				sprintf(
+					'No shipping options available: country=%s state=%s postal=%s',
+					$this->checkoutForm->shippingCountry,
+					$this->checkoutForm->shippingState,
+					$this->checkoutForm->shippingPostal
+				),
+				'info',
+				'application.'.__CLASS__.".".__FUNCTION__
+			);
+
+			$this->redirect(array('/checkout/shipping', 'error-destination' => true));
+			return;
 		}
 
 		$error = $this->formatErrors($this->errors);
 
+		// Render the shipping options.
+		// The options themselves are loaded from the session.
+		// The implication here is that before redirecting to this page, ensure
+		// that the shipping options stored in the session are up to date.
 		$this->render(
 			'shippingoptions',
 			array(
@@ -1302,20 +1404,10 @@ class CheckoutController extends Controller
 				$error = $this->formatErrors($arrErrors);
 			}
 
-			try {
-				$arrCartScenario = Shipping::getCartScenarios($this->checkoutForm);
-			} catch (Exception $e) {
-				Yii::log('Unable to get cart scenarios: ' . $e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-				$arrCartScenario = null;
-			}
-
-			if ($arrCartScenario !== null)
-			{
-				Shipping::saveCartScenariosToSession($arrCartScenario);
-			}
+			$selectedCartScenario = Shipping::getSelectedCartScenarioFromSession();
 
 			$wsShippingEstimatorOptions = WsShippingEstimator::getShippingEstimatorOptions(
-				$arrCartScenario,
+				array($selectedCartScenario),
 				$this->checkoutForm->shippingProvider,
 				$this->checkoutForm->shippingPriority,
 				$this->checkoutForm->shippingCity,
@@ -1750,6 +1842,8 @@ class CheckoutController extends Controller
 	/**
 	 * Update the cart shipping address or billing address.
 	 * Create address if required.
+	 * TODO: This function could probably have a better name and might be
+	 * better off on CheckoutForm.
 	 *
 	 * @param string $str
 	 * @return bool
@@ -1865,7 +1959,7 @@ class CheckoutController extends Controller
 
 					if (isset($objAddress->address_label) === false)
 					{
-						$objAddress->address_label = $model->billingLabel ? $model->billingLabel : Yii::t('global','Unlabeled Address');
+						$objAddress->address_label = $model->billingLabel ? $model->billingLabel : Yii::t('global', 'Unlabeled Address');
 					}
 
 					if (isset($objAddress->first_name) === false)
@@ -1880,7 +1974,6 @@ class CheckoutController extends Controller
 
 					$objAddress->residential = $model->billingResidential ? $model->billingResidential : $objAddress->residential;
 				}
-
 				else
 				{
 					$objAddress = null;
@@ -1919,8 +2012,9 @@ class CheckoutController extends Controller
 				break;
 		}
 
-		if (!$objCart->save())
+		if ($objCart->save() === false)
 		{
+			// TODO: We might want to add an error here.
 			Yii::log("Error saving Cart:\n".print_r($objCart->getErrors()), 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
 		}
 		else
@@ -1932,38 +2026,30 @@ class CheckoutController extends Controller
 	}
 
 	/**
-	 * Add/Update cart shipping
+	 * Update the cart shipping (xlsws_cart_shipping) based on selected
+	 * shipping scenario from the session. Before calling this make sure that
+	 * the shipping scenarios in the session are up to date and the
+	 * checkoutForm in the session uses the desired providerId and
+	 * priorityLabel.
 	 *
-	 * @return bool
+	 * If no cart shipping already exists, one will be created.
+	 * If an error occurs it will be added to $this->errors in the Yii's model error format.
+	 * @See CModel::getErrors().
+	 *
+	 * @return bool true if the shipping was updated, false otherwise.
 	 */
 	protected function updateShipping()
 	{
 		$selectedCartScenario = Shipping::getSelectedCartScenarioFromSession();
 		if ($selectedCartScenario === null)
 		{
-			// user did not use estimator
-			try
-			{
-				$arrCartScenarios = Shipping::getCartScenarios($this->checkoutForm);
-				Shipping::saveCartScenariosToSession($arrCartScenarios);
-				$selectedCartScenario = Shipping::getSelectedCartScenarioFromSession();
-			}
-			catch(Exception $e)
-			{
-				$selectedCartScenario = null;
-			}
-
-			if ($selectedCartScenario === null)
-			{
-				Yii::log('Cannot update shipping, no scenario selected', 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-				$this->errors = Yii::t('cart', 'No shipping option selected.');
-				return false;
-			}
+			Yii::log('Cannot update shipping, no scenario selected', 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			return false;
 		}
 
 		Yii::log("Shipping Product " . $selectedCartScenario['shippingProduct'], 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
-		// If we have a shipping object already, update it, otherwise create it
+		// If we have a shipping object already, update it, otherwise create it.
 		if (Yii::app()->shoppingcart->shipping_id !== null)
 		{
 			$objShipping = CartShipping::model()->findByPk(Yii::app()->shoppingcart->shipping_id);
@@ -1971,10 +2057,10 @@ class CheckoutController extends Controller
 		else
 		{
 			$objShipping = new CartShipping;
-			if (!$objShipping->save())
+			if ($objShipping->save() === false)
 			{
 				Yii::log(
-					"Error saving Cart Shipping:\n" . print_r($objShipping->getErrors()),
+					"Error saving Cart Shipping:\n" . print_r($objShipping->getErrors(), true),
 					'error',
 					'application.'.__CLASS__.'.'.__FUNCTION__.'.'.__LINE__
 				);
@@ -2003,27 +2089,37 @@ class CheckoutController extends Controller
 				'application.'.__CLASS__.'.'.__FUNCTION__.'.'.__LINE__
 			);
 
-			$this->errors	+= $objShipping->getErrors();
+			$this->errors += $objShipping->getErrors();
 			return false;
 		}
 
 		Yii::app()->shoppingcart->shipping_id = $objShipping->id;
-		Yii::app()->shoppingcart->tax_code_id = $selectedCartScenario['shoppingCart']['tax_code_id'];
+		Yii::app()->shoppingcart->save();
+		return true;
+	}
 
-		if (Yii::app()->shoppingcart->save() === false)
+	/**
+	 * Update the shopping cart taxes based on the address in the checkout
+	 * form.
+	 *
+	 * @return void
+	 */
+	protected function updateTaxes()
+	{
+		// Store pickup should use the default tax rate.
+		// TODO: Factor out this and the similar logic in Shipping::getCartScenarios.
+		if ($this->checkoutForm->isStorePickupSelected())
 		{
-			Yii::log(
-				"Error saving Cart Cart:\n" . print_r(Yii::app()->shoppingcart->getErrors()),
-				'error',
-				'application.'.__CLASS__.'.'.__FUNCTION__.'.'.__LINE__
+			Yii::app()->shoppingcart->tax_code_id = TaxCode::getDefaultCode();
+		} else {
+			Yii::app()->shoppingcart->setTaxCodeFromAddress(
+				$this->checkoutForm->shippingCountry,
+				$this->checkoutForm->shippingState,
+				$this->checkoutForm->shippingPostal
 			);
-
-			$this->errors += Yii::app()->shoppingcart->getErrors();
-			return false;
 		}
 
 		Yii::app()->shoppingcart->Recalculate();
-		return true;
 	}
 
 
@@ -2461,7 +2557,6 @@ class CheckoutController extends Controller
 
 	private function checkValidDestination()
 	{
-
 		$objDestination = Destination::LoadMatching(
 			$this->checkoutForm->shippingCountry,
 			$this->checkoutForm->shippingState,

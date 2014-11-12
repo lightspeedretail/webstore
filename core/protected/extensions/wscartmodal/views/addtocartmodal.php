@@ -10,16 +10,16 @@
 					<?php echo CHtml::image($this->objCartItem->Prod->AddToCartImage); ?>
 					<div class="product-data">
 					<h3 id="product-title"><?php echo _xls_truncate($this->objCartItem->description, 50); ?></h3>
-					<p class="sku"><?php echo $this->objCartItem->code; ?></p>
-					<p class="quantity"><?php echo Yii::t('cart', 'Quantity').': '.$this->objCartItem->qty; ?></p>
-					<p class="price"><?php echo _xls_currency($this->objCartItem->sell_total); ?></p>
+					<p id="addtocart-sku" class="sku"><?php echo $this->objCartItem->code; ?></p>
+					<p id ="addtocart-quantity" class="quantity"><?php echo Yii::t('cart', 'Quantity').': '.$this->objCartItem->qty; ?></p>
+					<p id="addtocart-price" class="price"><?php echo _xls_currency($this->objCartItem->sell_total); ?></p>
 					<?php
 						echo CHtml::htmlButton(
 							Yii::t(
 								'cart',
 								'Change'
 							),
-							array('class' => 'webstore-change-item')
+							array('class' => 'webstore-change-item', 'id'=>'change-item-btn')
 						);
 					?>
 					</div>
@@ -85,7 +85,7 @@
 				<footer class="cf">
 					<div class="button" onclick="window.location.href='<?php echo Yii::app()->controller->createUrl('/checkout'); ?>'">
 						<div><?php
-							echo CHtml::link(Yii::t('cart', 'Checkout'), array('/checkout'), array('class' => 'checkout')); ?>
+							echo CHtml::link(Yii::t('cart', 'Checkout'), array('/checkout'), array('class' => 'checkout', 'id' => 'checkout-btn')); ?>
 						</div>
 					</div>
 					<button id="continue-shopping-btn" class="continue-shopping exit">

@@ -37,6 +37,7 @@ class WsShippingEstimator extends CWidget
 
 		// We may wish to update the shipping options right away if we know the
 		// cart has changed.
+		$updateOnLoad = false;
 		if ($this->updateShippingOptions)
 		{
 			// This check for shippingCountry being null is a workaround to fix
@@ -47,15 +48,12 @@ class WsShippingEstimator extends CWidget
 			// shippingCountry may be null when in-store pickup has been
 			// chosen.
 			// TODO: Fix this in WsShippingEstimator and remove this workaround.
-			if ($checkoutForm->shippingCountry === null)
+			if (empty($checkoutForm->shippingCountry) || empty($checkoutForm->shippingPostal))
 			{
 				Shipping::updateCartScenariosInSession();
-				$updateOnLoad = false;
 			} else {
 				$updateOnLoad = true;
 			}
-		} else {
-			$updateOnLoad = false;
 		}
 
 		// Use the shipping scenarios and shipping address in the session.

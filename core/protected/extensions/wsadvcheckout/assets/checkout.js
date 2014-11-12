@@ -399,8 +399,8 @@ function OrderSummary(options) {
  * @param {DOMElement} DOMElement A DOM element.
  */
 OrderSummary.prototype.optionSelected = function(DOMElement) {
-	this.providerId = $(DOMElement).data('provider-id') || null;
-	this.priorityLabel = $(DOMElement).data('priority-label') || null;
+	this.providerId = $(DOMElement).attr('data-provider-id') || null;
+	this.priorityLabel = $(DOMElement).attr('data-priority-label') || null;
 
 	if (this.providerId === null || this.priorityLabel === null) {
 		throw new Error('Selected option does not have providerId and priorityLabel data- attributes.');
@@ -484,6 +484,9 @@ function PromoCodeInput (options) {
 	// On pages which have a promo code input but don't feature a built-in
 	// shipping estimator (for example, the checkout pages), we have to request
 	// the server for a respond which includes completely updated shopping cart totals.
+	//
+	// On pages with a shipping estimator, the totals are updated after applying
+	// a promo code anyway.
 	this.updateCartTotals = options.updateCartTotals || false;
 
 	// This option exists to support the /checkout/shippingoptions page which
@@ -595,7 +598,7 @@ function WsEditCartModal(options) {
  */
 WsEditCartModal.prototype.updateCart = function(DOMInput) {
 	this.updateCartItemQty(
-		$(DOMInput).data('pk'),
+		$(DOMInput).attr('data-pk'),
 		DOMInput.value
 	).done(function(updateResponse) {
 		if (updateResponse.updateResult.errorId === 'invalidQuantity') {
@@ -652,7 +655,7 @@ WsEditCartModal.prototype.updateCartItemQty = function(cartItemId, qty) {
 				// being rejected); we allow the user to progress to the
 				// checkout in that case.
 				this.wsShippingEstimator
-				.calculateShippingEstimates()
+				.updateShippingEstimates()
 				.done(function (shippingRatesResponse) {
 
 					// Check whether to cancel the pendingRequestsComplete

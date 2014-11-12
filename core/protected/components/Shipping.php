@@ -164,8 +164,10 @@ class Shipping
 	}
 
 	/**
-	 * Returns an indexed array of cart scenarios ordered by the shipping price
-	 * of the scenario from lowest to highest.
+	 * Returns an indexed array of hypothetical cart scenarios ordered by the
+	 * shipping price of the scenario from lowest to highest.
+	 *
+	 * TODO: Refactor this to use Cart instead of ShoppingCart.
 	 *
 	 * @return array Indexed array of cart scenarios where each cart scenario
 	 * is an associative array with the following keys:
@@ -297,6 +299,7 @@ class Shipping
 
 				$shoppingCart = Yii::app()->shoppingcart->getModel();
 
+				// TODO: Do the _xls_currency() in the formatter rather than doing it when saving to session.
 				$arrCartScenario[] = array(
 					'formattedCartSubtotal' => _xls_currency(Yii::app()->shoppingcart->subtotal),
 					'formattedCartTax' => _xls_currency(Yii::app()->shoppingcart->TaxTotal),
@@ -306,6 +309,11 @@ class Shipping
 					'formattedCartTax4' => _xls_currency(Yii::app()->shoppingcart->tax4),
 					'formattedCartTax5' => _xls_currency(Yii::app()->shoppingcart->tax5),
 					'formattedCartTotal' => _xls_currency(Yii::app()->shoppingcart->precalculateTotal($priority['price'])),
+					'cartTax1' => Yii::app()->shoppingcart->tax1,
+					'cartTax2' => Yii::app()->shoppingcart->tax2,
+					'cartTax3' => Yii::app()->shoppingcart->tax3,
+					'cartTax4' => Yii::app()->shoppingcart->tax4,
+					'cartTax5' => Yii::app()->shoppingcart->tax5,
 					'formattedShippingPrice' => _xls_currency($priority['price']),
 					'module' => $shippingProvider['module']->module,
 					'priorityIndex' => $priorityIndex,
@@ -326,6 +334,10 @@ class Shipping
 				}
 			}
 		}
+
+		// Restore the original tax code on the cart.
+		Yii::app()->shoppingcart->tax_code_id = $savedTaxId;
+		Yii::app()->shoppingcart->UpdateCart();
 
 		// Sort the shipping options based on the price key.
 		usort(
@@ -358,6 +370,7 @@ class Shipping
 	 * Load a Shipping object from the user's session. Used for retrieving
 	 * previously calculated cart scenarios.
 	 * TODO: Should probably be renamed to getCartScenariosFromSession().
+	 * TODO: Default to an empty array.
 	 * @return Shipping|null The Shipping object stored in the session.
 	 */
 	public static function loadCartScenariosFromSession()
@@ -421,6 +434,11 @@ class Shipping
 			'formattedCartTax4' => $sc->formattedCartTax4,
 			'formattedCartTax5' => $sc->formattedCartTax5,
 			'formattedCartTotal' => $sc->totalFormatted,
+			'cartTax1' => $sc->tax1,
+			'cartTax2' => $sc->tax2,
+			'cartTax3' => $sc->tax3,
+			'cartTax4' => $sc->tax4,
+			'cartTax5' => $sc->tax5,
 			'formattedShippingPrice' => $sc->formattedShippingCharge,
 			'module' => null,
 			'priorityIndex' => null,
@@ -448,21 +466,26 @@ class Shipping
 		$checkoutForm = MultiCheckoutForm::loadFromSession();
 		if ($checkoutForm === null)
 		{
-			return null;
-		}
+			$arrCartScenario = null;
+		} else {
+			// Save shipping options and rates to session.
+			try {
+				$arrCartScenario = Shipping::getCartScenarios($checkoutForm);
+			} catch (Exception $e) {
+				// TODO: We should probably execute this block if $arrCartScenario is an empty array as well.
+				Yii::log('Unable to get cart scenarios: ' . $e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 
-		// Save shipping options and rates to session.
-		try {
-			$arrCartScenario = Shipping::getCartScenarios($checkoutForm);
-		} catch (Exception $e) {
-			Yii::log('Unable to get cart scenarios: ' . $e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				// If there are no valid cart scenarios we can deselect whatever
+				// was previously selected.
+				// TODO: We should possibly do this if the newly update cart
+				// scenarios don't include the previously selected one.
+				$checkoutForm->shippingProvider = null;
+				$checkoutForm->shippingPriority = null;
+				MultiCheckoutForm::saveToSession($checkoutForm);
 
-			// If there are no valid cart scenarios we can deselect whatever
-			// was previously selected.
-			$checkoutForm->shippingProvider = null;
-			$checkoutForm->shippingPriority = null;
-			MultiCheckoutForm::saveToSession($checkoutForm);
-			return null;
+				// Remove any previously stored cart scenarios.
+				$arrCartScenario = null;
+			}
 		}
 
 		// Save the updated rates back to the session.

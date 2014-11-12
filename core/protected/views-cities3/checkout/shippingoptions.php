@@ -129,9 +129,16 @@
 	<?php
 		$partialPromoCodeInput = $this->renderPartial(
 			'ext.wscartmodal.views._promocodeinput',
+			// The shippingoptions page does not send a request to update the
+			// cart totals, so we need to ensure that's done as part of
+			// applying the promo code.
+			//
+			// Since we aren't currently redrawing the shipping options when a
+			// promo code is applied, the safest thing to do here is to reload
+			// the page.
 			array(
 				'modelId' => 'Checkout',
-				'updateCartTotals' => false,
+				'updateCartTotals' => true,
 				'reloadPageOnSuccess' => true
 			),
 			true

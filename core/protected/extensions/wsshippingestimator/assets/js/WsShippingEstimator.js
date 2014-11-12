@@ -158,7 +158,7 @@ function WsShippingEstimator(options) {
 	this.setCityStateLinkValue(this.shippingCity, this.shippingState);
 
 	if (this.updateOnLoad === true) {
-		this.calculateShippingEstimates();
+		this.updateShippingEstimates();
 	}
 }
 
@@ -236,6 +236,9 @@ WsShippingEstimator.prototype.addShippingOption = function(shippingOption) {
 			.append(shippingOption.shippingLabel)
 			.append(
 				$('<small>').append(shippingOption.formattedShippingPrice)
+			        .attr({
+                        class: 'estimator-shipping-option',
+                    })
 			)
 			.change(function (e) {
 				this.selectedShippingOption(e.target);
@@ -261,8 +264,8 @@ WsShippingEstimator.prototype.toggleShowShippingOptions = function() {
  * Web Store of the choice.
  */
 WsShippingEstimator.prototype.selectedShippingOption = function(selectedOption) {
-	this.selectedProviderId = $(selectedOption).data('provider-id');
-	this.selectedPriorityLabel = $(selectedOption).data('priority-label');
+	this.selectedProviderId = $(selectedOption).attr('data-provider-id');
+	this.selectedPriorityLabel = $(selectedOption).attr('data-priority-label');
 
 	this.selectShippingOption(this.selectedProviderId, this.selectedPriorityLabel);
 	this.updateEstimates();
@@ -271,8 +274,8 @@ WsShippingEstimator.prototype.selectedShippingOption = function(selectedOption) 
 	$.post(
 		this.setShippingOptionEndpoint,
 		{
-			'CheckoutForm[shippingProviderId]': $(selectedOption).data('provider-id'),
-			'CheckoutForm[shippingPriorityLabel]': $(selectedOption).data('priority-label')
+			'CheckoutForm[shippingProviderId]': $(selectedOption).attr('data-provider-id'),
+			'CheckoutForm[shippingPriorityLabel]': $(selectedOption).attr('data-priority-label')
 		}
 	);
 };
@@ -296,8 +299,16 @@ WsShippingEstimator.prototype.selectShippingOption = function(providerId, priori
 
 	var didSelectSomething = false;
 	this.$shippingOptions.find('input').each(function (inputIdx, input) {
-		if ($(input).data('provider-id') === providerId.toString() &&
-			$(input).data('priority-label') === priorityLabel.toString()
+		// Ensure the input is actually a shipping option.
+		// TODO: Investigate why the "Done" button requires an input.
+		if (typeof $(input).attr('data-provider-id') === 'undefined' ||
+			typeof $(input).attr('data-priority-label') === 'undefined'
+		) {
+			return;
+		}
+
+		if ($(input).attr('data-provider-id').toString() === providerId.toString() &&
+			$(input).attr('data-priority-label').toString() === priorityLabel.toString()
 		) {
 			didSelectSomething = true;
 			$(input).prop('checked', true);
@@ -344,11 +355,9 @@ WsShippingEstimator.prototype.updateEstimates = function() {
 		return;
 	}
 
-	var selectionData = this.getSelectedShippingOption().data();
-
-	this.$shippingEstimate.html(selectionData.formattedShippingPrice);
-	this.$taxEstimate.html(selectionData.formattedCartTax);
-	this.$totalEstimate.html(selectionData.formattedCartTotal);
+	this.$shippingEstimate.html(selectedShippingOption.attr('data-formatted-shipping-price'));
+	this.$taxEstimate.html(selectedShippingOption.attr('data-formatted-cart-tax'));
+	this.$totalEstimate.html(selectedShippingOption.attr('data-formatted-cart-total'));
 };
 
 /**
@@ -436,6 +445,8 @@ WsShippingEstimator.prototype.getPostal = function() {
 
 /**
  * Retrieve shipping estimates and show them in a panel.
+ * This method immediately rejects the returned deferred if the user has not
+ * entered a valid postal code.
  * @return {jQuery promise} Returns a promise that is resolved when the
  * estimates come back from Web Store.
  */
@@ -451,6 +462,23 @@ WsShippingEstimator.prototype.calculateShippingEstimates = function () {
 		return deferred.reject();
 	}
 
+  return this.updateShippingEstimates();
+};
+
+/**
+ * Update shipping estimates based on the selected country and entered postal
+ * code. If no postal code has been entered, then an attempt will still be made
+ * to update the estimates. This is valid since in-store pickup does not
+ * require a shipping address.
+ *
+ * @return {jQuery promise} Returns a promise that is resolved when the
+ * estimates come back from Web Store.
+ */
+WsShippingEstimator.prototype.updateShippingEstimates = function() {
+	// This deferred is what's returned by this function.
+	var deferred = $.Deferred();
+	var zippoPostal = this.getPostal();
+
 	// TODO: This was copied from wsadvcheckout/assets/shipping.js and should be
 	// moved into a shared JavaScript file.
 	switch (this.selectedCountryCode) {
@@ -463,19 +491,25 @@ WsShippingEstimator.prototype.calculateShippingEstimates = function () {
 	}
 	// TODO End copied block.
 
+	// Done() called once we have a city and state lookup.
+	var addressLookup = $.Deferred();
 
-	// TODO: Show "Calculating" in Order Total, Shipping and Tax estimates - WS-2745
+	if (this.selectedCountryCode === '' || zippoPostal === '') {
+		this.setCityStateLinkValue(null, null);
+		addressLookup.resolve();
+	} else {
+		var uri = this.selectedCountryCode + '/' + zippoPostal;
 
-	var uri = this.selectedCountryCode + '/' + zippoPostal;
-	$.ajax({
-		url: 'http://api.zippopotam.us/' + uri,
-		type: 'GET',
-		datatype: 'json',
-		crossDomain: true
-	}).always(function (placeData) {
+		$.ajax({
+			url: 'http://api.zippopotam.us/' + uri,
+			type: 'GET',
+			datatype: 'json',
+			crossDomain: true
+		}).always(function (placeData) {
 			$('.estimator-zip-error').addClass('hide');
 			var city = null,
 				stateCode = null;
+
 			if (placeData.places !== undefined) {
 				// Just use the first place in the response.
 				// TODO this doesn't work too well for all countries. For England, the
@@ -484,6 +518,7 @@ WsShippingEstimator.prototype.calculateShippingEstimates = function () {
 				city = placeData.places[0]['place name'];
 				stateCode = placeData.places[0]['state abbreviation'];
 				this.setCityStateLinkValue(city, stateCode);
+				addressLookup.resolve(city, stateCode);
 			} else {
 				// An error occurred in the hippo lookup.
 				// Probably a "404 not found" because the postcode and country
@@ -496,39 +531,45 @@ WsShippingEstimator.prototype.calculateShippingEstimates = function () {
 					this.$estimatorZipErrorText.html(zippoUnhandledError);
 				}
 
-				return deferred.reject();
+				addressLookup.reject();
 			}
-			this.toggleShowCalculatingOnFields();
-
-			$.post(
-				this.getShippingRatesEndpoint,
-				{
-					'CheckoutForm[shippingCountryCode]': this.selectedCountryCode,
-					'CheckoutForm[shippingCity]': city,
-					'CheckoutForm[shippingState]': stateCode,
-					'CheckoutForm[shippingPostal]': this.getPostal()
-				}).done(function (shippingRatesResponse) {
-					if (typeof shippingRatesResponse.result === 'undefined' ||
-						shippingRatesResponse.result !== 'success'
-						) {
-						// TODO: We have no way to handle an error here. See WS-2076 for a
-						// question aimed at Luke about how to display errors.
-						this.$totalEstimate.html(this.$cartSubtotal.html());
-						this.$estimatorZipErrorText.html(zipCodeError);
-						return deferred.reject();
-					}
-
-					var options = shippingRatesResponse.wsShippingEstimatorOptions;
-					this.redrawShippingOptions(options.shippingOptions);
-					this.handleMessages(options.messages);
-					this.selectedProviderId = options.selectedProviderId || null;
-					this.selectedPriorityLabel = options.selectedPriorityLabel || null;
-					this.selectShippingOption(this.selectedProviderId, this.selectedPriorityLabel);
-					this.updateEstimates();
-					deferred.resolve(shippingRatesResponse);
-
-				}.bind(this));
 		}.bind(this));
+	}
+
+	addressLookup.done(function (city, stateCode) {
+		this.toggleShowCalculatingOnFields();
+		$.post(
+			this.getShippingRatesEndpoint,
+			{
+				'CheckoutForm[shippingCountryCode]': this.selectedCountryCode,
+				'CheckoutForm[shippingCity]': city,
+				'CheckoutForm[shippingState]': stateCode,
+				'CheckoutForm[shippingPostal]': this.getPostal()
+			}).done(function (shippingRatesResponse) {
+				if (typeof shippingRatesResponse.result === 'undefined' ||
+					shippingRatesResponse.result !== 'success'
+					) {
+					// TODO: We have no way to handle an error here. See WS-2076 for a
+					// question aimed at Luke about how to display errors.
+					this.$totalEstimate.html(this.$cartSubtotal.html());
+					this.$estimatorZipErrorText.html(zipCodeError);
+					return deferred.reject();
+				}
+
+				var options = shippingRatesResponse.wsShippingEstimatorOptions;
+				this.redrawShippingOptions(options.shippingOptions);
+				this.handleMessages(options.messages);
+				this.selectedProviderId = options.selectedProviderId || null;
+				this.selectedPriorityLabel = options.selectedPriorityLabel || null;
+				this.selectShippingOption(this.selectedProviderId, this.selectedPriorityLabel);
+				this.updateEstimates();
+				deferred.resolve(shippingRatesResponse);
+
+		}.bind(this));
+	}.bind(this)).fail(function () {
+		// Address lookup failed.
+		deferred.reject();
+	}.bind(this));
 
 	return deferred.promise();
 };
@@ -575,5 +616,20 @@ WsShippingEstimator.prototype.toggleShowCalculatingOnFields = function() {
  */
 WsShippingEstimator.prototype.promoCodeChange = function (result) {
 	/* jshint unused: false */
-	this.calculateShippingEstimates();
+
+	// Only update the shipping estimates if we have previously selected one.
+	// If in-store pickup has been selected, we want to update the shipping
+	// estimates since the tax is relevant.
+	//
+	// If we haven't already made a shipping choice then we'd better not get
+	// shipping rates since sending an empty country will only return in store
+	// pickup.
+	//
+	// TODO: Consider moving this into updateShippingEstimates and creating a
+	// function that returns whether updates are allowed based on a combination
+	// of selectedProviderId, selectedPriorityLabel, and whether country and
+	// postal have been entered.
+	if (this.selectedProviderId !== null && this.selectedPriorityLabel !== null) {
+		this.updateShippingEstimates();
+	}
 };

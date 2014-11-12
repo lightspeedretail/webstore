@@ -122,6 +122,8 @@ class Checkout
 
 		unset(Yii::app()->session['checkout.cache']);
 
+		self::runPreFinalizeHooks($objCart->id_str);
+
 		// Mark as successful order, ready to download.
 		Yii::log("Marking as ".OrderStatus::AwaitingProcessing, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 		$objCart->cart_type = CartType::order;
@@ -140,6 +142,8 @@ class Checkout
 		$strLinkId = $objCart->linkid;
 
 		$objCart->payment->markCompleted();
+
+		self::runPostFinalizeHooks($objCart->id_str);
 
 		if (!$blnBehindTheScenes)
 		{
@@ -289,6 +293,11 @@ class Checkout
 			'formattedCartTax3' => $cartScenario['formattedCartTax3'],
 			'formattedCartTax4' => $cartScenario['formattedCartTax4'],
 			'formattedCartTax5' => $cartScenario['formattedCartTax5'],
+			'cartTax1' => $cartScenario['cartTax1'],
+			'cartTax2' => $cartScenario['cartTax2'],
+			'cartTax3' => $cartScenario['cartTax3'],
+			'cartTax4' => $cartScenario['cartTax4'],
+			'cartTax5' => $cartScenario['cartTax5'],
 			'module' => $cartScenario['module'],
 			'priorityIndex' => $cartScenario['priorityIndex'],
 			'priorityLabel' => $cartScenario['priorityLabel'],
@@ -301,33 +310,29 @@ class Checkout
 		);
 	}
 
+	/**
+	 * If any custom functions have been defined to run before completion process, attempt to run here
+	 *
+	 * @param $strOrderId   WO-xxxxxx ID of an order
+	 */
+	protected static function runPreFinalizeHooks($strOrderId)
+	{
+		$objEvent = new CEventOrder('CartController','onBeforeCreateOrder',$strOrderId);
+		_xls_raise_events('CEventOrder',$objEvent);
+
+		return;
+	}
 
 	/**
-	 * Some SIM methods render the return/relay url (cart/payment/module) on their domain.
-	 * We specify the behaviour for those methods and others default to that handled
-	 * between advanced and legacy checkout
+	 * If any custom functions have been defined to run after completion process, attempt to run here
 	 *
-	 * TODO Refactor payment modules such that we assign a boolean
-	 * variable to each to handle this instead
-	 *
-	 *
-	 * @param $strModule - name of the payment module
-	 * @return bool
+	 * @param $strOrderId   WO-xxxxxx ID of an order
 	 */
-	public static function behindTheScenes($strModule)
+	protected static function runPostFinalizeHooks($strOrderId)
 	{
-		switch ($strModule)
-		{
-			case 'paypal':
-				return false;
+		$objEvent = new CEventOrder('CartController','onCreateOrder',$strOrderId);
+		_xls_raise_events('CEventOrder',$objEvent);
 
-			case 'authorizedotnetsim':
-				return true;
-
-			default:
-				break;
-		}
-
-		return !Yii::app()->theme->info->advancedCheckout;
+		return;
 	}
 }
