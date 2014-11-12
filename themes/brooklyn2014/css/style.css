@@ -70,7 +70,7 @@ a:hover {  text-decoration: none;   }
 #nav_products { font-weight: 600; height: 47px; text-decoration: none; z-index: 2000; border-bottom: 0px; text-align: left; cursor: pointer; margin-left: 9px; margin-top: 3px;}
 #nav_products .productstab { height: 45px; margin-top: 2px;}
 #nav_products #menutree, #nav_products .dropspace { margin-top: 10px; } /* push dropdown menu down from underneath PRODUCTS tab */
- /* all this to create dropdown and popout menu effects */
+/* all this to create dropdown and popout menu effects */
 #nav_products a { display: block; margin-right: 3px; padding: 0 0 0 0 ; text-decoration: none;  z-index: 2000;}
 #nav_products ul { border: none; line-height: 1; list-style: none; list-style-type: none; margin: 0px 0 0px 0px; padding-bottom: 20px;z-index: 2000;}
 #nav_products ul a {  border-bottom: 1px dotted #cccccc; z-index: 2000;}
@@ -152,16 +152,16 @@ a:hover {  text-decoration: none;   }
 #shoppingcartbottom .cart_label  { padding-bottom: 2px; float:left; font-size: 0.95em; text-align: right; font-weight: 500;}
 #shoppingcartbottom .cart_price { padding-bottom: 2px;float:left; font-size: 1.1em; text-align: right; font-weight: 500;}
 #shoppingcartbottom .subtotallabel { font-weight: 600; }
-    /* checkout button */
+/* checkout button */
 #shoppingcartcheckout {  clear:both;  height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
 #shoppingcartcheckout .checkoutlink {  margin: auto;  text-align: center; }
 #shoppingcartcheckout .checkoutlink a { margin-top: 20px;  text-decoration: none;}
 #shoppingcartcheckout .checkoutarrow { margin-right: 15px; position: relative; text-align: right; top: -17px; }
-    /* edit cart button */
+/* edit cart button */
 #shoppingcarteditcart {  clear:both;  height: 24px; padding-top: 12px; padding-bottom: 10px; text-align: center;margin-bottom: 10px; cursor: pointer;  text-transform: uppercase; }
 #shoppingcarteditcart .editlink {  margin: auto;  text-align: center; }
 #shoppingcarteditcart .editlink a { margin-top: 20px;  text-decoration: none;}
-    /* continue shopping button */
+/* continue shopping button */
 #shoppingcartcontinue {  height: 45px; padding-top: 12px; padding-bottom: 10px; text-align: center;margin-bottom: 10px; cursor: pointer;  text-transform: uppercase; }
 #shoppingcartcontinue .editlink {  margin: auto;  text-align: center; }
 #shoppingcartcontinue .editlink a { margin-top: 20px;  text-decoration: none;}
@@ -179,7 +179,6 @@ a:hover {  text-decoration: none;   }
 #genericcart .centeritem { text-align: center; }
 #genericcart .rightitem { text-align: right; }
 #genericcart .promoCode { font-size: 0.9em; text-align: right;  }
-table#cartTaxes { width: 100%; }
 /* when editing cart */
 #genericcart input[type="text"],#genericcart input[type="text"]:focus { font-size: 1.1em; margin-bottom: 7px; border: 3px; border-bottom: 1px solid black; text-align: center; padding: 2px; height: 15px; width: 80px; }
 
@@ -238,17 +237,17 @@ table#cartTaxes { width: 100%; }
 
 
 /***** Checkout page and Registration Page *****/
-#checkout .row-fluid { padding-bottom: 10px; }
 #checkout label { margin-bottom: 0px;}
 #checkout legend, #contact-form legend, #orderdisplay legend  { margin-bottom: 4px; text-transform: uppercase;  font-size: 1em; }
-#checkout label, #contact-form label { text-transform: uppercase; font-size: 0.9em; font-weight: normal;}
+
+
 #checkout .warning, #checkout .errorMessage, #contact-form .warning, #contact-form .errorMessage {  text-transform: uppercase; font-size: 0.8em; line-height: 14px;}
-#checkout input[type="text"], #checkout input[type="password"], #checkout input[type="email"], #checkout input[type="select"],#checkout input[type="text"]:focus,#checkout input[type="password"]:focus, #checkout input[type="email"]:focus, #checkout input[type="select"]:focus { font-size: 1.2em; border: 7px solid #E5E5E5; text-transform: none; padding: 2px; margin: 0; }
+
 #contact-form input[type="text"], #contact-form input[type="password"], #contact-form input[type="email"], #contact-form input[type="select"],#contact-form input[type="text"]:focus,#contact-form input[type="password"]:focus, #contact-form input[type="email"]:focus, #contact-form input[type="select"]:focus { font-size: 1.2em; border: 7px solid #E5E5E5; text-transform: none; padding: 2px; margin: 0; }
 #checkout .red,#contact-form .red, .customer_reg_err_msg {  font-size: 1.1em;text-transform: uppercase; }
 #checkout fieldset { border-bottom: 2px dotted #e7e7e7; margin-bottom: 20px; padding-bottom: 10px; }
 #checkout #Payforms fieldset { border-bottom: none; }
-  /* tweaks for specific fields. They all have IDs so it makes it easy */
+/* tweaks for specific fields. They all have IDs so it makes it easy */
 #checkout label[for=CheckoutForm_receiveNewsletter], #checkout label[for=CheckoutForm_billingSameAsShipping],
 #checkout label[for=CheckoutForm_acceptTerms],#checkout label[for=CustomerAddress_active] ,
 #checkout label[for=CustomerAddress_residential], #checkout label[for=Customer_newsletter_subscribe] { display: inline; vertical-align: bottom; }
@@ -289,7 +288,7 @@ table#cartTaxes { width: 100%; }
 
 
 .forgotpassword, .forgotpassword a { text-transform: uppercase; font-size: 13px; font-weight: normal; font-family: "Dosis","HelveticaNeue","Helvetica Neue",Helvetica,Arial,sans-serif; margin-left: 15px; }
-
+#create-account{margin-top:4px;text-decoration: underline;}
 /***** Sitemap *****/
 #sitemap ul {  margin-left:20px; list-style-type: square; line-height: 20px;}
 
@@ -432,7 +431,7 @@ table#cartTaxes { width: 100%; }
     h1, h2, h3 { font-size: 1.3em; }
     select, input[type="text"], input[type="password"], input[type="email"], input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus  { max-width: 150px; }
     #product_details img { max-width: 90%;}s
-    #product_details #SelectSize { float: left; margin-right: 2px;}
+                                           #product_details #SelectSize { float: left; margin-right: 2px;}
     #checkout #CustomerContactBillingAddressState { width: 75px;}
     #checkout #CustomerContactBillingAddressZip { width: 75px; }
     #checkout #CustomerContactShippingAddressState { width: 75px;}
@@ -471,7 +470,6 @@ table#cartTaxes { width: 100%; }
 @media (min-width: 768px) {
     .visible1-mobile { color:rgba(0,0,0,0); }
     .hidden1-mobile { min-width: 70px; }
-    #cartTaxes .tax-mobile { padding-right: 14px; }
 }
 
 @media only screen and (max-width: 767px) {/* iPhone */
@@ -629,4 +627,25 @@ table#cartTaxes { width: 100%; }
     #genericcart .table td.visible1-mobile { min-width: 45px; }
     #contact-page #custom-page-content,
     #contact-page textarea#ContactForm_contactBody { max-width: 270px; }
+}
+
+
+
+@media only screen and (max-width: 979px) {/* iPad */
+    .hidden-md { display: none; visibility: hidden; }
+    .visible-md { display: block; visibility: visible; }
+    #menubar { border-bottom: 0px;}
+    #menubar-md { text-align: center; margin: 10px 0px; }
+    #menubar-md a.btn.btn-navbar {
+        width: 100%;
+        font-weight: 600;
+        text-transform: uppercase;
+        text-shadow: none;
+        padding: 8px 0px;
+        border: 0px;
+        border-radius: 0px;
+        background-image: none;
+    }
+    #menubar-md .nav-collapse ul.nav li { padding: 2px 0px; margin: 0px; }
+
 }

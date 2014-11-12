@@ -61,7 +61,7 @@ class Controller extends CController
 	 */
 	public static function initParams()
 	{
-		defined('DEFAULT_THEME') or define('DEFAULT_THEME', 'brooklyn');
+		defined('DEFAULT_THEME') or define('DEFAULT_THEME', 'brooklyn2014');
 
 		$Params = CHtml::listData(Configuration::model()->findAll(),'key_name','key_value');
 

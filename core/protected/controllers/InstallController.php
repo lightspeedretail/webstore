@@ -34,7 +34,7 @@ class InstallController extends Controller
 	public function beforeAction($action)
 	{
 
-		defined('DEFAULT_THEME') or define('DEFAULT_THEME', 'brooklyn');
+		defined('DEFAULT_THEME') or define('DEFAULT_THEME', 'brooklyn2014');
 
 		if (strlen(Yii::app()->params['LSKEY']) > 0 &&
 			$action->id != "install" &&
@@ -194,9 +194,7 @@ class InstallController extends Controller
 	 */
 	protected function actionConvertStart()
 	{
-		Yii::log('before downloadtheme', 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
 		$this->downloadTheme();
-		Yii::log('after downloadtheme', 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
 		_runMigrationTool('set'); //mark db as m140411_120957_load_misc before google and amazon
 		return array('result' => "success", 'makeline' => 2, 'tag' => 'Converting cart addresses', 'total' => 50);
 
@@ -217,7 +215,6 @@ class InstallController extends Controller
 
 		//And download brooklyn as a default
 		$filename = Yii::getPathOfAlias('webroot.themes').DIRECTORY_SEPARATOR.DEFAULT_THEME;
-		Yii::log('Default theme path: ' . $filename, 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
 		if(!file_exists($filename))
 			downloadTheme(DEFAULT_THEME);
 

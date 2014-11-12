@@ -64,7 +64,6 @@ body {
     background: #fff;
     font: 14px/21px "Ropa Sans", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #444;
-    -webkit-font-smoothing: antialiased; /* Fix for webkit rendering */
     -webkit-text-size-adjust: 100%;
 }
 
@@ -435,12 +434,12 @@ legend span {
 
 /* Image Zoomer */
 .magnifyarea { /* CSS to add shadow to magnified image. Optional */
-box-shadow: 5px 5px 7px #ffffff;
--webkit-box-shadow: 5px 5px 7px #ffffff;
--moz-box-shadow: 5px 5px 7px #ffffff;
-filter: progid:DXImageTransform.Microsoft.dropShadow(color=#ffffff, offX=5, offY=5, positive=true);
-background: white;
-    }
+    box-shadow: 5px 5px 7px #ffffff;
+    -webkit-box-shadow: 5px 5px 7px #ffffff;
+    -moz-box-shadow: 5px 5px 7px #ffffff;
+    filter: progid:DXImageTransform.Microsoft.dropShadow(color=#ffffff, offX=5, offY=5, positive=true);
+    background: white;
+}
 
 .targetarea { /* CSS for container div(s) of the zoomable image */
     width: 265px; /* wide or wider than the widest zoomable image */
@@ -460,3 +459,28 @@ background: white;
     border:0px;
 
 }
+
+
+
+.langmenu{
+    margin-top: 40px;
+    margin-left: -3px;
+}
+
+.langmenu a{
+    color: #666;
+    font-size: 0.875em;
+    text-decoration: none;
+
+}
+
+.langmenu a:hover{
+    text-decoration: underline;
+}
+
+.langmenu a img{
+    margin-right:6px;
+    margin-left: 1px;
+}
+
+

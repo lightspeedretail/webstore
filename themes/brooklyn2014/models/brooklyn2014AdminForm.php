@@ -1,6 +1,6 @@
 <?php
 
-class brooklynAdminForm extends ThemeForm
+class brooklyn2014AdminForm extends ThemeForm
 {
 
 	/*
@@ -11,16 +11,17 @@ class brooklynAdminForm extends ThemeForm
 	 *
 	 * for example: echo Yii::app()->theme->info->version
 	 */
-	protected $name = "Brooklyn";
-	protected $thumbnail = "brooklyn.png";
-	protected $version = 5;
-	protected $description = "Our default template, suitable for any type of business.";
+	protected $name = "Brooklyn 2014";
+	protected $thumbnail = "brooklyn2014.png";
+	protected $version = 1;
+	protected $description = "Our new default template, suitable for any type of business.";
 	protected $credit = "Designed by Lightspeed";
 	protected $parent; //Used when a theme is a copy of another theme to control inheritance
 	protected $bootstrap = null;
-	protected $viewset = "cities";
-	protected $cssfiles = "base,style";
+	protected $viewset = "cities3";
+	protected $cssfiles = "base,style,light,_2014";
 	protected $GoogleFonts = "Dosis:700,500,400|Ropa+Sans"; // use this value to load Google Fonts for your design, i.e. $GoogleFonts = "Tangerine|Inconsolata|Droid+Sans"
+	protected $advancedCheckout = true;
 
 	/*
 	 * IMAGE SIZES
@@ -54,7 +55,7 @@ class brooklynAdminForm extends ThemeForm
 	 *
 	 */
 
-	public $activecss = array('base','style','light'); //Required for fresh installations
+	public $activecss = array('base','style','light', '_2014'); //Required for fresh installations
 	public $CHILD_THEME = "light"; //Required, to be backwards compatible with CHILD_THEME key
 	public $PRODUCTS_PER_PAGE = 12;
 
@@ -73,7 +74,6 @@ class brooklynAdminForm extends ThemeForm
 	{
 		return array(
 			array('CHILD_THEME','required'),
-			//array('testvar','required'), //you can also stack items i.e. array('CHILD_THEME,testvar','required'),
 		);
 	}
 
@@ -98,21 +98,14 @@ class brooklynAdminForm extends ThemeForm
 	 */
 	public function getAdminForm()
 	{
-
 		return array(
-			//'title' => 'Set your funky options for this theme!',
+			'title' => '',
 
 			'elements'=>array(
 				'CHILD_THEME'=>array(
 					'type'=>'dropdownlist',
-					'items'=>array('light'=>'Light','dark'=>'Dark', 'blue'=>'Blue'),
+					'items'=>array('light'=>'Light'),
 				),
-
-//				'testvar'=>array(
-//					'type'=>'text',
-//					'maxlength'=>64,
-//				),
-
 			),
 		);
 	}
