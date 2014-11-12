@@ -141,6 +141,7 @@ else {
 		echo runInstall($db,preg_replace('/[^0-9]/', '', $_POST['sqlline']));
 		exit();
 	}
+	Yii::log('right before the switch, line: '.__LINE__, 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
 	switch ($step)
 	{
 		case 2:displayFormTwo(); break;
@@ -1266,6 +1267,7 @@ function runInstall($db,$sqlline = 0)
 					$tag = "Downloading default template...";
 			}
 
+			Yii::log('we get to here, line: '.__LINE__."\nSqlline= ".$sqlline, 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
 	}
 
 
