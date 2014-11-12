@@ -141,6 +141,17 @@ else {
 		echo runInstall($db,preg_replace('/[^0-9]/', '', $_POST['sqlline']));
 		exit();
 	}
+
+	$db->query(
+		sprintf(
+			'INSERT INTO `xlsws_log` (`level`, `category`, `created`, `message`) VALUES (%s, %s, %s, %s);',
+			'info',
+			'install.'.__FUNCTION__,
+			date('Y-m-d H:i:s'),
+			'we get to line: '.__LINE__
+		)
+	);
+
 	switch ($step)
 	{
 		case 2:displayFormTwo(); break;
@@ -1153,6 +1164,15 @@ function runInstall($db,$sqlline = 0)
 		$lineDeduct=0;
 	}
 
+	$db->query(
+		sprintf(
+			'INSERT INTO `xlsws_log` (`level`, `category`, `created`, `message`) VALUES (%s, %s, %s, %s);',
+			'info',
+			'install.'.__FUNCTION__,
+			date('Y-m-d H:i:s'),
+			'we get to line: '.__LINE__."\nSqline: ".$sqlline
+		)
+	);
 
 	switch ($sqlline)
 	{
