@@ -189,11 +189,11 @@ class m140411_120957_load_misc extends CDbMigration
 
 		$this->insert('xlsws_modules',array(
 				'active' => '1',
-				'module' => 'brooklyn2014',
+				'module' => 'brooklyn',
 				'category' => 'theme',
-				'version' => '1',
-				'name' => 'Brooklyn 2014',
-				'configuration' => 'a:6:{s:9:"activecss";a:4:{i:0;s:4:"base";i:1;s:5:"style";i:2;s:5:"light";i:3;s:5:"_2014";}s:11:"CHILD_THEME";s:5:"light";s:17:"PRODUCTS_PER_PAGE";i:12;s:18:"disableGridRowDivs";b:1;s:12:"menuposition";s:4:"left";s:11:"column2file";s:7:"column2";}'
+				'version' => '3',
+				'name' => 'Brooklyn',
+				'configuration' => 'a:5:{s:17:"PRODUCTS_PER_PAGE";s:2:"12";s:11:"CHILD_THEME";s:5:"light";s:16:"IMAGE_BACKGROUND";s:0:"";s:9:"activecss";a:3:{i:0;s:4:"base";i:1;s:5:"style";i:2;s:5:"light";}s:20:"LISTING_IMAGE_HEIGHT";s:3:"100";}'
 			));
 
 		$this->insert('xlsws_modules',array(

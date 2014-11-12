@@ -757,7 +757,7 @@ class m140411_024204_initial_configuration extends CDbMigration
 			'xlsws_configuration', array(
 				'title' => 'Site Theme',
 				'key_name' => 'THEME',
-				'key_value' => 'brooklyn2014',
+				'key_value' => 'brooklyn',
 				'helper_text' => 'The default template from templates directory to be used for Web Store',
 				'configuration_type_id' => 0,
 				'sort_order' => 2,

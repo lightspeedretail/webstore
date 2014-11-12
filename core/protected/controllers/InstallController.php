@@ -34,7 +34,7 @@ class InstallController extends Controller
 	public function beforeAction($action)
 	{
 
-		defined('DEFAULT_THEME') or define('DEFAULT_THEME', 'brooklyn2014');
+		defined('DEFAULT_THEME') or define('DEFAULT_THEME', 'brooklyn');
 
 		if (strlen(Yii::app()->params['LSKEY']) > 0 &&
 			$action->id != "install" &&
