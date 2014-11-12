@@ -141,6 +141,15 @@ else {
 		echo runInstall($db,preg_replace('/[^0-9]/', '', $_POST['sqlline']));
 		exit();
 	}
+	_dbx(
+		sprintf(
+			'INSERT INTO `xlsws_log` (`level`, `category`, `created`, `message`) VALUES (%s,%s,%s,%s);',
+			'info',
+			__CLASS__.'.'.__FUNCTION__,
+			date('Y-m-d H:i:s'),
+			'right before the switch, line: '.__LINE__
+		)
+	);
 	switch ($step)
 	{
 		case 2:displayFormTwo(); break;
@@ -1265,6 +1274,16 @@ function runInstall($db,$sqlline = 0)
 				if(!isset($arg['hosted']))
 					$tag = "Downloading default template...";
 			}
+
+			_dbx(
+				sprintf(
+					'INSERT INTO `xlsws_log` (`level`, `category`, `created`, `message`) VALUES (%s,%s,%s,%s);',
+					'info',
+					__CLASS__.'.'.__FUNCTION__,
+					date('Y-m-d H:i:s'),
+					'we get to here, line: '.__LINE__
+				)
+			);
 
 	}
 
