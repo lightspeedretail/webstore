@@ -1181,6 +1181,17 @@ function runInstall($db,$sqlline = 0)
 		$lineDeduct=0;
 	}
 
+	$db->changedb('new');
+	$db->query(
+		sprintf(
+			'INSERT INTO `xlsws_log` (`level`,`category`,`created`,`message`) VALUES ("%s","%s","%s","%s");',
+			'info',
+			'install.php'.__FUNCTION__,
+			date('Y-m-d H:i:s'),
+			'code line: '.__LINE__."\nsqlline: ".$sqlline
+		)
+	);
+
 
 	switch ($sqlline)
 	{
