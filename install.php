@@ -154,16 +154,20 @@ else {
 		exit();
 	}
 
-	$db->changedb('new');
-	$db->query(
-		sprintf(
-			'INSERT INTO `xlsws_log` (`level`,`category`,`created`,`message`) VALUES ("%s","%s","%s","%s");',
-			'info',
-			'install.php'.__FUNCTION__,
-			date('Y-m-d H:i:s'),
-			'we get to line: '.__LINE__
-		)
-	);
+	if (isset($db))
+	{
+		$db->changedb('new');
+		$db->query(
+			sprintf(
+				'INSERT INTO `xlsws_log` (`level`,`category`,`created`,`message`) VALUES ("%s","%s","%s","%s");',
+				'info',
+				'install.php'.__FUNCTION__,
+				date('Y-m-d H:i:s'),
+				'we get to line: '.__LINE__
+			)
+		);
+	}
+
 
 	switch ($step)
 	{
