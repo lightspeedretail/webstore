@@ -138,15 +138,28 @@ else {
 	if (isset($_POST['sqlline']))
 	{
 		$db = createDbConnection();
+		$db->changedb('new');
+		$sql = 'create table if not exists `xlsws_log`
+	(
+	  id       INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
+		level    VARCHAR(128),
+		category VARCHAR(128),
+		logtime  INTEGER,
+		message  LONGTEXT,
+		created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		KEY `createdidx` (`created`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
+		$db->query($sql);
 		echo runInstall($db,preg_replace('/[^0-9]/', '', $_POST['sqlline']));
 		exit();
 	}
 
+	$db->changedb('new');
 	$db->query(
 		sprintf(
-			'INSERT INTO `xlsws_log` (`level`, `category`, `created`, `message`) VALUES (%s, %s, %s, %s);',
+			'INSERT INTO `xlsws_log` (`level`,`category`,`created`,`message`) VALUES ("%s","%s","%s","%s");',
 			'info',
-			'install.'.__FUNCTION__,
+			'install.php'.__FUNCTION__,
 			date('Y-m-d H:i:s'),
 			'we get to line: '.__LINE__
 		)
@@ -1164,15 +1177,6 @@ function runInstall($db,$sqlline = 0)
 		$lineDeduct=0;
 	}
 
-	$db->query(
-		sprintf(
-			'INSERT INTO `xlsws_log` (`level`, `category`, `created`, `message`) VALUES (%s, %s, %s, %s);',
-			'info',
-			'install.'.__FUNCTION__,
-			date('Y-m-d H:i:s'),
-			'we get to line: '.__LINE__."\nSqline: ".$sqlline
-		)
-	);
 
 	switch ($sqlline)
 	{
@@ -1285,6 +1289,18 @@ function runInstall($db,$sqlline = 0)
 				if(!isset($arg['hosted']))
 					$tag = "Downloading default template...";
 			}
+
+
+			$db->changedb('new');
+			$db->query(
+				sprintf(
+					'INSERT INTO `xlsws_log` (`level`,`category`,`created`,`message`) VALUES ("%s","%s","%s","%s");',
+					'info',
+					'install.php'.__FUNCTION__,
+					date('Y-m-d H:i:s'),
+					'we get to line: '.__LINE__."\nsqlline: ".$sqlline
+				)
+			);
 
 	}
 
