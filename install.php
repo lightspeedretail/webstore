@@ -163,32 +163,6 @@ else {
 		exit();
 	}
 
-	if (!isset($db))
-	{
-		$db = createDbConnection();
-		$db->changedb('new');
-		$sql = 'create table if not exists `xlsws_log`
-	(
-	  id       INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
-		level    VARCHAR(128),
-		category VARCHAR(128),
-		logtime  INTEGER,
-		message  LONGTEXT,
-		created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-		KEY `createdidx` (`created`)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
-		$db->query($sql);
-		$db->query(
-			sprintf(
-				'INSERT INTO `xlsws_log` (`level`,`category`,`created`,`message`) VALUES ("%s","%s","%s","%s");',
-				'info',
-				'install.php'.__FUNCTION__,
-				date('Y-m-d H:i:s'),
-				'we get to line: '.__LINE__."\nstep = ".$step
-			)
-		);
-	}
-
 	switch ($step)
 	{
 		case 2:displayFormTwo(); break;
