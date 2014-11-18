@@ -18,6 +18,14 @@ class WsPayment extends WsExtension
 	 */
 	public $cloudCompatible = false;
 
+
+	/**
+	 * If we use this method, do we need to perform some
+	 * additional steps to finalize the order?
+	 * @var bool
+	 */
+	public $performInternalFinalizeSteps = true;
+
 	/**
 	 * The run() function is called from Web Store to actually do the process. It returns an array of the service
 	 * levels and prices available to the customer (as keys and values in the array, respectively).

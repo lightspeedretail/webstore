@@ -66,39 +66,8 @@ $this->renderPartial('_paypalbuttonsim', array('paypal' => $paypal, 'count' => $
 	</div>
 	<p class="large"><?php echo Yii::t('checkout', "Review and confirm your order. You'll be forwarded to our secure payment partner to enter your credit cart details.")?></p>
 
-<!------------------------------------------------------------------------------------------------------------	Layout Markup -------------------------------------------------------------------------------------------------->
-	<label class="shippingasbilling">
-		<?php
-		if (Yii::app()->shoppingcart->shipping->isStorePickup === false):
-		echo $form->checkBox(
-			$model,
-			'billingSameAsShipping',
-			$htmlOptions = array(
-				'boolean',
-				'trueValue' => 'on',
-				'onclick' => '$(".address-form").fadeToggle();',
-				'checked' => "checked",
-				'disabled' => _xls_get_conf('SHIP_SAME_BILLSHIP') == 1 ? true : false,
-			)
-		);
-		?>
-		<span class="text" id="payment">
-			<?php
-			echo Yii::t('checkout', "Use my shipping address as my billing address")
-			?>
-			<br>
-			<span class="address-abbr">
-				<?php
-				echo $model->strShippingAddress;
-				?>
-			</span>
-		</span>
-		<?php endif; ?>
-	</label>
+	<?php $this->renderPartial('_shippingasbillingguest', array('model' => $model, 'form' => $form)); ?>
 
-
-
-<!------------------------------------------------------------------------------------------------------------	Layout Markup -------------------------------------------------------------------------------------------------->
 	<?php $this->renderPartial('_billingaddress',array('model' => $model, 'form' => $form) ); ?>
 </div>
 

@@ -4,15 +4,15 @@
   overflow-y:scroll;
 
   .webstore-estimator-form,.shipping-postal-entry {
-    background: none;
-    display:none;
+	background: none;
+	display:none;
   }
   .shipping-postal-entry {
-    margin-top: 16px;
+	margin-top: 16px;
   }
 
   .shipping-city-state-link{
-    font-size:11px;
+	font-size:11px;
   }
 	.lines-container, .totals, .submit {
 
@@ -48,18 +48,18 @@
 		}
 	}
   .cart-footer {
-    clear: both;
-    @extend %clearfix;
+	clear: both;
+	@extend %clearfix;
   }
 
   table {
 		border-collapse: collapse;
 
-      td, th {
-        text-align: left;
-        vertical-align: middle;
-        padding: 0;
-      }
+	  td, th {
+		text-align: left;
+		vertical-align: middle;
+		padding: 0;
+	  }
 
 		&.lines {
 			a { color: #555; }
@@ -82,7 +82,7 @@
 
 		a {
 			font-weight: bold;
-            border-bottom: 1px solid #bbb;
+			border-bottom: 1px solid #bbb;
 		}
 
 		td.image {
@@ -95,18 +95,19 @@
 				margin-right: -62px;
 				padding: 6px 6px 6px 0;
 
-              @media(min-width:640px) { display: block; }
+			  @media(min-width:640px) { display: block; }
 			}
 		}
 
 		td.description {
 			height: 62px;
+			padding-right:5px;
 
 			strong, img { float: left; }
 			strong {
 				line-height: 1.4;
 
-              @media(min-width:640px) {
+			  @media(min-width:640px) {
 					font-size: 1.125rem;
 				}
 			}
@@ -116,7 +117,7 @@
 				width: 56px;
 				padding: 6px 6px 6px 0;
 
-                @media(min-width:640px) { display: block; }
+				@media(min-width:640px) { display: block; }
 			}
 		}
 
@@ -143,13 +144,13 @@
 		.quantity {
 			text-align: center;
 			width: 3rem;
-            @media(min-width:640px) { width: 7rem; }
+			@media(min-width:640px) { width: 7rem; }
 		}
 
 		.subtotal {
 			width: 5rem;
 			padding-right: 12px;
-            padding-left: 5px;
+			padding-left: 5px;
 		}
 
 		@include media(mobile) {
@@ -171,15 +172,15 @@
 					}
 				}
 				th.remove { border-bottom: 1px solid #ccc; }
-                //MO removing this is breaking the cart when edited on mobile and then screen is resized
-                //tr:last-child td:last-child { border-bottom: 1px solid #ccc; }
+				//MO removing this is breaking the cart when edited on mobile and then screen is resized
+				//tr:last-child td:last-child { border-bottom: 1px solid #ccc; }
 			}
 		}
 
 		.price, .remove {
 			display: none;
 		}
-        @media(min-width:640px) {
+		@media(min-width:640px) {
 			.price, .remove { display: table-cell; }
 			.price { width: 5rem; }
 		}
@@ -203,7 +204,7 @@
 			color: #999;
 			font-size: .875rem;
 			padding-bottom: 3px;
-            font-weight: bold;
+			font-weight: bold;
 		}
 	}
 
@@ -220,7 +221,7 @@
 			border: 2px solid #eee;
 			color: #ccc;
 			background-color: #fff;
-            @include border-radius(20px);
+			@include border-radius(20px);
 			height: 28px;
 			width: 28px;
 			line-height: 22px;
@@ -244,8 +245,8 @@
 
 	input[type="number"] {
 		width: 3rem;
-        //webstore montreal override
-        height:2rem;
+		//webstore montreal override
+		height:2rem;
 		text-align: center;
 		padding: 2px 4px;
 
@@ -253,36 +254,38 @@
 			-webkit-appearance: none;
 			margin: 0;
 		}
-        //MO remove spinner in mozilla number inputs
-        -moz-appearance:textfield;
+		//MO remove spinner in mozilla number inputs
+		-moz-appearance:textfield;
 
 	}
 
-    .submit button{
-      &.continue {
-        border-bottom: 1px solid #ddd;
-      }
-    }
-	button, .button {
-        @media(min-width:640px) {
+	.submit button{
+	  &.continue {
+		border-bottom: 1px solid #ddd;
+	  }
+	}
+	.cart-footer button, .cart-footer .button {
+	   @include media(small) {
 			width: auto;
-			padding-right: 24px;
-			padding-left: 24px;
 		}
 
 		&.checkout, &.continue { float: right; }
 		&.checkout {
 			margin: 0 0 0 1em;
-            @media(min-width:640px) {
+			@media(min-width:640px) {
 				width: 18rem;
 			}
 		}
 
 		&.continue {
+			display:none;
 			color: #999;
 			background: none;
+			@include media(small) {
+			  display: block;
+			}
 
-            @media(min-width:640px) {
+			@media(min-width:640px) {
 				margin: 20px;
 				padding: 0 0 2px;
 			}
@@ -302,7 +305,7 @@
 		clear: both;
 		overflow: hidden;
 
-        @media(min-width:640px) { margin: 0 15px 0 0; }
+		@media(min-width:640px) { margin: 0 15px 0 0; }
 	}
 
 	.webstore-estimator {
@@ -335,9 +338,9 @@
 		input {
 			border: $input-border;
 			padding: 9px 8px;
-            &:focus{
-              padding: 9px 8px;
-            }
+			&:focus{
+			  padding: 9px 8px;
+			}
 		}
 
 		select.webstore-estimator-country-form {
@@ -393,7 +396,7 @@
 			color: #888;
 			padding: 4px 8px;
 
-            @media(min-width:640px){
+			@media(min-width:640px){
 				padding: 4px 12px;
 			}
 		}
@@ -402,7 +405,7 @@
 		}
 		td {
 			@include transition(color 1s)
-        }
+		}
 
 		.active a {
 			text-decoration: none;
@@ -417,7 +420,7 @@
 				color: #444;
 				font-size: 1.25rem;
 
-                @media(min-width:640px) {
+				@media(min-width:640px) {
 					padding-right: 12px;
 					padding-left: 12px;
 				}
@@ -434,56 +437,27 @@
 
 .editcartmodal{
   .promo input{
-    min-width: 16rem;
-  }
-}
-.editcartmodal{
-  @media (max-width: 640px){
-    button.continue{
-      display: none;
-    }
-  }
-}
-
-.editcartmodal{
-  footer button.continue{
-    display:none;
-  }
-  @media (max-width: 640px){
-    footer button.continue{
-      display: block;
-      background: none;
-      border: 1px solid #999;
-      color: #999;
-      margin-botom:0;
-      @include transition-property(border);
-      @include transition-duration(0.3s);
-      margin-top: 25px;
-      margin-bottom: 30px;
-    }
-    section>footer{
-      padding: 15px 20px 20px!important;
-    }
+	min-width: 16rem;
   }
 }
 
 @media (max-width: 640px){
   .webstore-overlay-cart table.edit{
-      th.remove, tr:last-child td:last-child {
-        border-bottom: 1px solid #ccc;
-      }
-    td.remove a {
-      color: #fff;
-      border-color: #a44039;
-      background-color: #a44039;
-    }
+	  th.remove, tr:last-child td:last-child {
+		border-bottom: 1px solid #ccc;
+	  }
+	td.remove a {
+	  color: #fff;
+	  border-color: #a44039;
+	  background-color: #a44039;
+	}
   }
 }
 //MO override against bootstrap background
 .editcartmodal {
   @include media(medium) {
-    &:before {
-      height:0;
-    }
+	&:before {
+	  height:0;
+	}
   }
 }

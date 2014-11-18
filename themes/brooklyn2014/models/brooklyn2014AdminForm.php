@@ -13,7 +13,7 @@ class brooklyn2014AdminForm extends ThemeForm
 	 */
 	protected $name = "Brooklyn 2014";
 	protected $thumbnail = "brooklyn2014.png";
-	protected $version = 1;
+	protected $version = 2;
 	protected $description = "Our new default template, suitable for any type of business.";
 	protected $credit = "Designed by Lightspeed";
 	protected $parent; //Used when a theme is a copy of another theme to control inheritance

@@ -119,28 +119,50 @@ class WsShippingEstimator extends CWidget
 		$arrShippingOption = array();
 		foreach ($arrCartScenario as $cartScenario)
 		{
-			$arrShippingOption[] = array_intersect_key(
-				$cartScenario,
-				array_flip(
-					// Keep these keys.
-					array(
-						'providerId',
-						'priorityLabel',
-						'shippingLabel',
-						'formattedShippingPrice',
-						'formattedCartTax',
-						'formattedCartTax1',
-						'formattedCartTax2',
-						'formattedCartTax3',
-						'formattedCartTax4',
-						'formattedCartTax5',
-						'formattedCartTotal',
-					)
-				)
-			);
+			$arrShippingOption[] = static::formartCartScenarioAsShippingOption($cartScenario);
 		}
 
 		return $arrShippingOption;
+	}
+
+	/**
+	 * Formats one array of cart scenario as required by the front-end shipping
+	 * estimator code.
+	 *
+	 * @param array $cartScenario A cart scenario
+	 * @see Shipping::getCartScenarios.
+	 * @return Array An indexed array of shipping options. Each shipping option is an
+	 * associative array with the following keys:
+	 *     providerId - The shipping module id (xlsws_module.id),
+	 *     priorityLabel - A label for the shipping priority (e.g. Next Day Delivery),
+	 *     shippingLabel - A label for the shipping option encompassing the
+	 *         provider and priority (e.g. Fedex Next Day Delivery),
+	 *     formattedShippingPrice - The formatted price of the shipping option,
+	 *     formattedCartTax - The formatted price of the tax on the cart when
+	 *         the shipping option is applied,
+	 *     formattedCartTotal - The formatted total price of the cart when the
+	 *         shipping option is applied,
+	 */
+	protected static function formartCartScenarioAsShippingOption($cartScenario)
+	{
+		return array_intersect_key(
+			$cartScenario,
+			array_flip(
+				array(
+					'providerId',
+					'priorityLabel',
+					'shippingLabel',
+					'formattedShippingPrice',
+					'formattedCartTax',
+					'formattedCartTax1',
+					'formattedCartTax2',
+					'formattedCartTax3',
+					'formattedCartTax4',
+					'formattedCartTax5',
+					'formattedCartTotal',
+				)
+			)
+		);
 	}
 
 	/**
@@ -190,7 +212,7 @@ class WsShippingEstimator extends CWidget
 
 		$shippingEstimatorOptions['shippingCountryName'] = $shippingCountryName;
 		$shippingEstimatorOptions['shippingCountryCode'] = $shippingCountryCode;
-
+		$shippingEstimatorOptions['selectedShippingOption'] = null;
 		// With a set of shipping scenarios available and a previously selected
 		// option, we can try to find a match.
 		if ($arrCartScenario !== null)
@@ -211,6 +233,10 @@ class WsShippingEstimator extends CWidget
 					// The selected scenario is available.
 					$shippingEstimatorOptions['selectedProviderId'] = $selectedShippingProviderId;
 					$shippingEstimatorOptions['selectedPriorityLabel'] = $selectedShippingPriorityLabel;
+					// Currently if we get back too many shipping options, the selected one might
+					// not be part of the returned options on the view since we limit our results to 8
+					// For now, a selected shipping option will be added as a key to the $shippingEstimatorOptions
+					$shippingEstimatorOptions['selectedShippingOption'] = static::formartCartScenarioAsShippingOption($selectedCartScenario);
 				} else {
 					// The selected shipping option is not available.
 					array_push(

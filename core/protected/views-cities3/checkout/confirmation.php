@@ -36,8 +36,7 @@
 					'receiveNewsletter',
 					$htmlOptions = array('checked' => Yii::app()->params['DISABLE_ALLOW_NEWSLETTER'] ? '' : 'checked')
 				);
-
-				echo Yii::t('checkout', "I'd like to receive special offers and product information by email");
+				echo '<p>'.Yii::t('checkout', "I'd like to receive special offers and product information by email").'</p>';
 			?>
 		</label>
 		<div class="comments">
@@ -124,8 +123,8 @@
 							'value' => '
 								CHtml::image($data->product->SliderImage) .
 								CHtml::tag("td",array("class" => "description"),
-								CHtml::link("<strong>".$data -> product->title." "."</strong>" .
-								Yii::app()->getController()->renderPartial(\'_formattedCartItemSellPriceWithDiscount\', array(\'cartItem\' => $data), true), $data -> product->Link, array())
+								CHtml::link("<strong>".$data->product->title." "."</strong>" .
+								Yii::app()->getController()->renderPartial(\'_formattedCartItemSellPriceWithDiscount\', array(\'cartItem\' => $data), true), $data->product->Link, array())
 								)',
 							'htmlOptions' => array(
 								'class' => 'image'
@@ -134,7 +133,6 @@
 						array(
 							'type' => 'raw',
 							'value' => 'CHtml::link("Edit","#",array(
-								//"data-pk"=>$data->id,"class"=>"edit", "onclick"=>"$(this).closest(\'tr\').addClass(\'active\'); $(this).closest(\'input\').focus();  return false;")
 								"data-pk"=>$data->id,"class"=>"edit", "onclick"=>"$(this).closest(\'tr\').addClass(\'active\'); $(this).closest(\'input\').focus(); return false;")
 								).CHtml::link("&times;","#",array("data-pk"=>$data->id,"class"=>"remove", "onclick"=>"wsEditCartModal.removeItem(this); return false;"))',
 							'htmlOptions' => array(

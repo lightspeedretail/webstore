@@ -54,7 +54,7 @@
 					echo $form->textField(
 						$model,
 						'pickupFirstName',
-						$htmlOptions = array('placeholder' => Yii::t('checkout', "First Name"),'required' => "required", 'autofocus' => "autofocus")
+						$htmlOptions = array('placeholder' => Yii::t('checkout', "First Name"),'required' => "required", 'autofocus' => "")
 					);
 					?>
 				</li>
@@ -68,7 +68,7 @@
 					echo $form->textField(
 						$model,
 						'pickupLastName',
-						$htmlOptions = array('placeholder' => Yii::t('checkout', "Last Name"),'required' => "required", 'autofocus' => "autofocus")
+						$htmlOptions = array('placeholder' => Yii::t('checkout', "Last Name"),'required' => "required")
 					);
 					?>
 				</li>

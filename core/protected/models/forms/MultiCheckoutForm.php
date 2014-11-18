@@ -89,6 +89,11 @@ class MultiCheckoutForm extends CheckoutForm
 				'validateCardCVV',
 				'on' => 'Payment, PaymentStorePickupCC, Confirmation'
 			),
+			array(
+				'cardExpiryDate',
+				'validateCardExpiryDate',
+				'on' => 'Payment, PaymentStorePickupCC, Confirmation'
+			),
 
 			array('contactPhone', 'length', 'min' => 7, 'max' => 32),
 
@@ -296,6 +301,43 @@ class MultiCheckoutForm extends CheckoutForm
 	}
 
 	/**
+	 * Check the credit card expiry date.
+	 * @param $attribute The attribute name.
+	 * @param $params Additional paremeters defined in the rules.
+	 * @return void
+	 */
+	public function validateCardExpiryDate($attribute, $params)
+	{
+		$validator = static::getCardValidator();
+		if ($validator === null)
+		{
+			Yii::log(
+				'Unable to validate card expiry date.',
+				'info',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
+			return;
+		}
+
+		if ($validator->validateDate($this->cardExpiryMonth, $this->cardExpiryYear) === false)
+		{
+			$this->addError(
+				$attribute,
+				Yii::t(
+					'checkout',
+					'Invalid expiry date.'
+				)
+			);
+		} else {
+			Yii::log(
+				sprintf('Validated cardExpiryDate as %s', $this->cardType),
+				'info',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
+		}
+	}
+
+	/**
 	 * Return shipping address as one line string
 	 *
 	 * @return string
@@ -311,7 +353,7 @@ class MultiCheckoutForm extends CheckoutForm
 		$str = '';
 
 		$str .= $this->shippingAddress1 . ', ';
-		$str .= $this->shippingAddress2 ? $this->shippingAddress2 : '';
+		$str .= $this->shippingAddress2 ? $this->shippingAddress2.' ': '';
 		$str .= $this->shippingCity . ', ';
 		$str .= $this->shippingState ? $this->shippingState . ', ' : '';
 		$str .= Country::CodeById($this->shippingCountry) . ' ';
@@ -335,7 +377,7 @@ class MultiCheckoutForm extends CheckoutForm
 		$str = '';
 
 		$str .= $this->billingAddress1 . ', ';
-		$str .= $this->billingAddress2 ? $this->billingAddress2 : '';
+		$str .= $this->billingAddress2 ? $this->billingAddress2.' ': '';
 		$str .= $this->billingCity . ', ';
 		$str .= $this->billingState ? $this->billingState . ', ' : '';
 		$str .= Country::CodeById($this->billingCountry) . ' ';
@@ -355,7 +397,7 @@ class MultiCheckoutForm extends CheckoutForm
 	{
 		$str = '';
 		$str .= $this->shippingAddress1 . '<br>';
-		$str .= $this->shippingAddress2 ? $this->shippingAddress2 . '<br>' : '';
+		$str .= $this->shippingAddress2 ? $this->shippingAddress2 . '<br>' : ' ';
 		$str .= $this->shippingCity. ', ';
 		$str .= $this->shippingState ? $this->shippingState . ', ' : '';
 		$str .= $this->shippingPostal ? $this->shippingPostal . '<br>' : '';
@@ -445,6 +487,7 @@ class MultiCheckoutForm extends CheckoutForm
 				$this->shippingPostal = $objAddress->postal;
 				$this->shippingCountry = $objAddress->country_id;
 				$this->contactPhone = $objAddress->phone;
+				$this->shippingResidential = $objAddress->residential;
 				break;
 		}
 	}

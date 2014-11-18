@@ -98,14 +98,6 @@
 						?>
 						<div class="cart-footer">
 							<form class="promo">
-								<div style="position:relative;">
-									<?php
-										$this->controller->renderPartial(
-											'ext.wscartmodal.views._promocodeinput',
-											array('modelId' => 'EditCart', 'updateCartTotals' => false, 'reloadPageOnSuccess' => false)
-										);
-									?>
-								</div>
 								<?php
 								echo CHtml::tag(
 									'div',
@@ -117,6 +109,14 @@
 									'<p>&nbsp;</p>'
 								);
 								?>
+								<div style="position:relative;">
+									<?php
+										$this->controller->renderPartial(
+											'ext.wscartmodal.views._promocodeinput',
+											array('modelId' => 'EditCart', 'updateCartTotals' => false, 'reloadPageOnSuccess' => false)
+										);
+									?>
+								</div>
 								<p class="description"><?php echo Yii::t('cart', 'Specials, promotional offers and discounts') ?></p>
 							</form>
 							<div class="totals">

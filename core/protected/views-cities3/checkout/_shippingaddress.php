@@ -14,7 +14,7 @@
 		echo $form->textField(
 			$model,
 			'shippingFirstName',
-			$htmlOptions = array('placeholder' => Yii::t('checkout', "First Name"),'required' => "required", 'autofocus' => "autofocus")
+			$htmlOptions = array('placeholder' => Yii::t('checkout', "First Name"),'required' => "required", 'autofocus' => "")
 		);
 		?>
 	</li>
@@ -28,7 +28,7 @@
 		echo $form->textField(
 			$model,
 			'shippingLastName',
-			$htmlOptions = array('placeholder' => Yii::t('checkout', "Last Name"),'required' => "required", 'autofocus' => "autofocus")
+			$htmlOptions = array('placeholder' => Yii::t('checkout', "Last Name"),'required' => "required")
 		);
 		?>
 	</li>
@@ -170,3 +170,18 @@
 	</li>
 </ol>
 <p class="tip"><?php echo Yii::t('checkout', "May be printed on label to assist delivery.") ?></p>
+<ol class="field-containers-small">
+	<label class="checkbox">
+		<?php
+		echo $form->checkBox(
+			$model,
+			'shippingResidential',
+			$htmlOptions = array(
+				'class' => 'residential-toggle',
+				'value' => 1,
+				'uncheckValue' => 0)
+		);
+		?>
+		<?php echo Yii::t('checkout','This is a residential address.'); ?>
+	</label>
+</ol>

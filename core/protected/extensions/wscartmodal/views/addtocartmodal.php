@@ -83,10 +83,19 @@
 					</div>
 				</form>
 				<footer class="cf">
-					<div class="button" onclick="window.location.href='<?php echo Yii::app()->controller->createUrl('/checkout'); ?>'">
-						<div><?php
-							echo CHtml::link(Yii::t('cart', 'Checkout'), array('/checkout'), array('class' => 'checkout', 'id' => 'checkout-btn')); ?>
-						</div>
+					<div class="button checkout" onclick="window.location.href='<?php echo Yii::app()->createUrl('/checkout/index'); ?>'">
+							<?php
+								echo CHtml::link(
+									Yii::t(
+										'cart',
+										'Checkout'
+									),
+									Yii::app()->createUrl('/checkout/index'),
+									array(
+										'id' => 'checkout-btn'
+									)
+								);
+							?>
 					</div>
 					<button id="continue-shopping-btn" class="continue-shopping exit">
 						<?= Yii::t('cart', 'Continue Shopping'); ?>
@@ -115,6 +124,6 @@
 				</ul>
 			</aside>
 		<?php endif; ?>
-		<?php echo CHtml::htmlButton(Yii::t('cart', 'Close'), array('class' => 'webstore-modal-close')); ?>
+		<?php echo CHtml::htmlButton(Yii::t('cart', 'Close and continue shopping'), array('class' => 'webstore-modal-close')); ?>
 	</section>
 </div>

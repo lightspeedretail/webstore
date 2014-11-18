@@ -102,8 +102,15 @@ class WsWebApplication extends CWebApplication
 	 */
 	public function createUrl($route, $params = array(), $ampersand = '&', $schema = '')
 	{
-		//Get the URL without the host first
+		// Get the URL without the host first.
 		$url = parent::createUrl($route, $params, $ampersand);
+
+		// Does this system support regular SSL or Common SSL?
+		if (Yii::app()->params['ENABLE_SSL'] == false && Yii::app()->hasCommonSSL == false)
+		{
+			// For systems with no SSL, function normally
+			return $url;
+		}
 
 		if (isset($route) && $route !== '')
 		{
@@ -112,30 +119,24 @@ class WsWebApplication extends CWebApplication
 			$route = _xls_remove_leading_slash($route);
 		}
 
-		//Does this system support regular SSL or Common SSL?
-		if (Yii::app()->params['ENABLE_SSL'] || Yii::app()->hasCommonSSL)
+		if (Yii::app()->hasCommonSSL === true && Yii::app()->isCommonSSL === false)
 		{
-			//If we're trying to get the cart/checkout, and on custom not common url, build intercept here
-			if ($route == "cart/checkout" && Yii::app()->hasCommonSSL && !Yii::app()->isCommonSSL)
+			// When SSL is available on the web store there are certain routes
+			// which use CommonsslController to hand over from the HTTP to
+			// HTTPS domain. The commonssl routes should be generated on the
+			// same domain as this request, since they require access to the
+			// user session for the handover.
+			if ($route == "cart/checkout")
 			{
 				$route = "commonssl/cartcheckout";
-				$url = $this->getUrlManager()->createUrl($route, $params, $ampersand);
+				return $this->getUrlManager()->createUrl($route, $params, $ampersand);
 			}
-
 			elseif (in_array($route, $this->_arrNeverSecureRoutes) === false &&
-				in_array($strController, $this->_arrCommonSSLControllers) === true &&
-				Yii::app()->hasCommonSSL === true &&
-				Yii::app()->isCommonSSL === false
-			)
-			{
+				in_array($strController, $this->_arrCommonSSLControllers) === true
+			) {
 				$route = 'commonssl/' . $strController;
-				$url = $this->getUrlManager()->createUrl($route, $params + array('action' => $strAction), $ampersand);
+				return $this->getUrlManager()->createUrl($route, $params + array('action' => $strAction), $ampersand);
 			}
-		}
-		else
-		{
-			//for systems with no SSL, function normally
-			return $url;
 		}
 
 		if (Yii::app()->HasCommonSSL)
@@ -158,12 +159,8 @@ class WsWebApplication extends CWebApplication
 		// For specific routes, we always use HTTP.
 		if (in_array($route, $this->_arrNeverSecureRoutes))
 		{
-			//Force a switch to original URL without SSL
-			$host = str_replace(
-				$strLightSpeedUrl,
-				$strCustomUrl,
-				$this->getRequest()->getHostInfo('http')
-			);
+			// Force a switch to original URL without SSL
+			$host = $httpHost;
 		}
 
 		elseif (in_array($route, $this->_arrNeedToSecureRoutes) || in_array($strController, $this->_arrNeedToSecureControllers))
@@ -185,18 +182,13 @@ class WsWebApplication extends CWebApplication
 
 		else
 		{
-			//Force a switch to original URL without SSL
-			$host = str_replace(
-				$strLightSpeedUrl,
-				$strCustomUrl,
-				$this->getRequest()->getHostInfo('http')
-			);
+			// Force a switch to original URL without SSL.
+			$host = $httpHost;
 		}
 
 		Yii::log("URL built as ".$host.$url, 'trace', 'application.'.__CLASS__.".".__FUNCTION__);
 
 		return $host.$url;
-
 	}
 
 
@@ -238,14 +230,14 @@ class WsWebApplication extends CWebApplication
 	 * Separate each part of the route into an array
 	 *
 	 * @param $route
-	 * @return string|array
+	 * @return array
 	 */
 
 	protected function parseRoute($route)
 	{
 		if (stripos($route, '/') === false)
 		{
-			return $route;
+			return array($route);
 		}
 
 		$arrRoute = explode('/', $route);

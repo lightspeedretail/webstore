@@ -367,6 +367,8 @@ class CheckoutController extends Controller
 	 */
 	public function actionEditAddress()
 	{
+		$this->loadForm();
+
 		$strType = Yii::app()->getRequest()->getQuery('type');
 		if ($strType !== 'billing' && $strType !== 'shipping')
 		{
@@ -566,6 +568,7 @@ class CheckoutController extends Controller
 		}
 
 		$this->checkoutForm->objAddresses = array_values($arrFirst + $arrObjAddresses);
+		$this->saveForm();
 
 		// populate our form with some default values in case the user
 		// was logged in already and bypassed checkout login
@@ -1320,6 +1323,7 @@ class CheckoutController extends Controller
 				}
 
 				$this->checkoutForm->objAddresses = array_merge($arrFirst, $arrAddresses);
+				$this->saveForm();
 				$this->render('paymentaddress', array('model' => $this->checkoutForm, 'checkbox' => $arrCheckbox, 'error' => $error));
 			}
 
@@ -2303,7 +2307,7 @@ class CheckoutController extends Controller
 			$objCart->printed_notes .= $this->checkoutForm->orderNotes;
 			$objCart->completeUpdatePromoCode();
 			Checkout::emailReceipts($objCart);
-			Checkout::finalizeCheckout($objCart, false, true);
+			Checkout::finalizeCheckout($objCart, true, true);
 			return true;
 		}
 		else
@@ -2359,6 +2363,8 @@ class CheckoutController extends Controller
 		$this->checkoutForm->intShippingAddress = $selectedAddress->id;
 		$this->checkoutForm->intBillingAddress = $selectedAddress->id;
 		$this->checkoutForm->fillAddressFields($selectedAddress->id, 'shipping');
+		$this->checkoutForm->shippingResidential = $selectedAddress->residential;
+
 		if (isset($this->checkoutForm->shippingFirstName))
 		{
 			$this->checkoutForm->contactFirstName = $this->checkoutForm->shippingFirstName;
@@ -2529,7 +2535,14 @@ class CheckoutController extends Controller
 			case 'PaymentSimCC':
 			case 'ShippingOptions':
 			case 'Shipping':
-				if ($this->checkoutForm->validate())
+				// If in store pickup is selected after we went through using a different
+				// shipping option, redirect the user to the shipping page.
+				if ($this->checkoutForm->isStorePickupSelected())
+				{
+					$route = '/checkout/shipping';
+				}
+				elseif ($this->checkoutForm->validate() &&
+					$this->checkoutForm->isStorePickupSelected() === false)
 				{
 					$this->updateAddressId('shipping');
 					$route = '/checkout/shippingoptions';

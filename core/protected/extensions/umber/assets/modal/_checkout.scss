@@ -56,6 +56,11 @@
     font-size: 1.125rem;
     padding: 20px 0;
     border: none;
+    &#login-button, &#login-button:focus,
+    &#guest-button, &#guest-button:focus{
+      height: 64px;
+      font-size: 1.125rem;
+    }
     @include transition-property(border,background);
     @include transition-duration(.5s);
 
@@ -83,7 +88,7 @@
     overflow: hidden;
 
     button, .button {
-      width: 50%;
+      width: 100%;
       font-size: .9375rem;
       float: left;
       background: #eee;
@@ -94,8 +99,11 @@
       //override light.css
       height: 46px;
 
-      &:last-child {
-        border-left: none;
+      @include media(verysmall) {
+        width: 50%;
+        &:last-child {
+          border-left: none;
+        }
       }
 
       &:hover {
@@ -105,27 +113,6 @@
         color: #fff;
       }
     }
-  }
-
-  button.continue{
-      display: none;
-  }
-
-  @media (max-width: 560px){
-      button.continue{
-        display: block;
-        background: none;
-        border: 1px solid #999;
-        color: #999;
-        margin-botom:0;
-        @include transition-property(border);
-        @include transition-duration(0.3s);
-        margin-top: 25px;
-        margin-bottom: 30px;
-      }
-      section>footer{
-          padding: 15px 20px 20px!important;
-      }
   }
 }
 
@@ -218,6 +205,15 @@ p.tip {
     display: inline-block;
     float: none;
     margin: 0 .5em;
+  }
+}
+
+#checkout section > header {
+  @include media(medium) {
+    padding: 0;
+    a.exit{
+      margin-right: 0!important;
+    }
   }
 }
 

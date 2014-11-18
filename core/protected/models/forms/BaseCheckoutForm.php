@@ -174,6 +174,8 @@ class BaseCheckoutForm extends CFormModel
 			array('createPassword', 'compare', 'on' => 'formSubmitCreatingAccount'),
 			array('createPassword_repeat', 'safe'),
 			array('createPassword, createPassword_repeat', 'PasswordLengthValidator', 'on' => 'formSubmitCreatingAccount'),
+
+			array('shippingResidential', 'numerical', 'integerOnly' => true),
 		);
 	}
 

@@ -8,6 +8,7 @@ class authorizedotnetsim extends WsPayment
 	protected $uses_jumper = true;
 	protected $apiVersion = 1;
 	public $cloudCompatible = true;
+	public $performInternalFinalizeSteps = false;
 	protected $uses_credit_card = true;
 
 	const x_delim_char = "|";
@@ -33,6 +34,27 @@ class authorizedotnetsim extends WsPayment
 		else
 			$auth_net_url	= "https://secure.authorize.net/gateway/transact.dll";
 
+		// the following is the temporary fix for WS-3300
+		// ToDo: Will be refactored by WS-3118
+
+		if (is_numeric($this->CheckoutForm->billingCountry) === true)
+		{
+			$billingCountry = $this->CheckoutForm->billingCountryCode;
+		}
+		else
+		{
+			$billingCountry = $this->CheckoutForm->billingCountry;
+		}
+
+		if (is_numeric($this->CheckoutForm->shippingCountry) === true)
+		{
+			$shippingCountry = $this->CheckoutForm->shippingCountryCode;
+		}
+		else
+		{
+			$shippingCountry = $this->CheckoutForm->shippingCountry;
+		}
+
 		$str = "";
 
 		$str .= "<FORM action=\"$auth_net_url\" method=\"POST\">";
@@ -47,7 +69,7 @@ class authorizedotnetsim extends WsPayment
 		$str .= _xls_make_hidden('x_city', $this->CheckoutForm->billingCity);
 		$str .= _xls_make_hidden('x_state', $this->CheckoutForm->billingState);
 		$str .= _xls_make_hidden('x_zip', $this->CheckoutForm->billingPostal);
-		$str .= _xls_make_hidden('x_country', $this->CheckoutForm->billingCountry);
+		$str .= _xls_make_hidden('x_country', $billingCountry);
 		$str .= _xls_make_hidden('x_phone', _xls_number_only($this->CheckoutForm->contactPhone));
 
 		$str .= _xls_make_hidden('x_email', $this->CheckoutForm->contactEmail);
@@ -60,7 +82,7 @@ class authorizedotnetsim extends WsPayment
 		$str .= _xls_make_hidden('x_ship_to_city',   $this->CheckoutForm->shippingCity);
 		$str .= _xls_make_hidden('x_ship_to_state',   $this->CheckoutForm->shippingState);
 		$str .= _xls_make_hidden('x_ship_to_zip',   $this->CheckoutForm->shippingPostal);
-		$str .= _xls_make_hidden('x_ship_to_country',   $this->CheckoutForm->shippingCountry);
+		$str .= _xls_make_hidden('x_ship_to_country',   $shippingCountry);
 
 		$str .= _xls_make_hidden('x_description',  _xls_get_conf( 'STORE_NAME'  , "Online") . " Order");
 

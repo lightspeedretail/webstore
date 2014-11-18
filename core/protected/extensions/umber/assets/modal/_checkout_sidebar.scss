@@ -65,7 +65,7 @@
   }
 
   .summary {
-    width: inherit; //MO fix for IE10 order summary.
+    max-width: 100%;  //MO fix for IE10 order summary.
     padding: 30px 15px 15px;
   }
 

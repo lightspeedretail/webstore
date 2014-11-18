@@ -9,6 +9,15 @@
 
 
 #start {
+  //MO to avoid text overlapping
+  //and too narrow inputs on login page.
+  .section-inner{
+    padding: 15px 10px 20px;
+    @include media(verysmall){
+      padding: 15px 20px 20px;
+    }
+  }
+
 	footer.submit {
 		text-align: center;
 		height: 91px;

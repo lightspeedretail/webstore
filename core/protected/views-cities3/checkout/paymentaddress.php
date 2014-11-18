@@ -26,33 +26,9 @@ $this->renderPartial('_paypalbuttonaim');
 <div class="creditcard">
 	<div class="error-holder"><?= $error ?></div>
 
-	<!------------------------------------------------------------------------------------------------------------	CREDIT CARD FORM -------------------------------------------------------------------------------------------------->
-
 	<?php $this->widget('ext.wscreditcardform.wscreditcardform', array('model' => $model, 'form' => $form)); ?>
 
-	<!------------------------------------------------------------------------------------------------------------	CREDIT CARD FORM  ------------------------------------------------------------------------------------------------>
-
-	<!------------------------------------------------------------------------------------------------------------	Layout Markup -------------------------------------------------------------------------------------------------->
-	<label class="shippingasbilling">
-			<input type="checkbox"
-			       checked="checked"
-			       value="<?= $checkbox['id'] ?>"
-			       onclick="$('.address-form').fadeToggle();$('footer input').fadeToggle();"
-			       name="<?= $checkbox['name'] ?>"
-				<?= _xls_get_conf('SHIP_SAME_BILLSHIP') == 1 ? 'disabled' : '' ?>
-			/>
-			<span class="text">
-				<?php
-				echo Yii::t('checkout', $checkbox['label'])
-				?>
-				<br>
-				<span class="address-abbr">
-					<?php
-					echo $checkbox['address'];
-					?>
-				</span>
-			</span>
-	</label>
+	<?php $this->renderPartial('_shippingasbillingexisting', array('checkbox' => $checkbox)); ?>
 
 	<div class="address-form invisible">
 		<h4><?php echo Yii::t('checkout', 'Billing Address'); ?></h4>
@@ -65,7 +41,19 @@ $this->renderPartial('_paypalbuttonaim');
 							echo $objAddress->formattedblockcountry;
 							?>
 							<span class="controls">
-								<a href="/checkout/editaddress?id=<?= $objAddress->id ?>&type=billing"><?php echo Yii::t('checkout','Edit Address'); ?></a>
+								<?php
+									echo CHtml::link(
+										Yii::t('checkout', 'Edit Address'),
+										Yii::app()->createUrl(
+											'/checkout/editaddress',
+											array(
+												'id' => $objAddress->id,
+												'type' => 'billing'
+											)
+										)
+									);
+								?>
+
 								<?php echo Yii::t('checkout', 'or'); ?>
 								<?php
 								echo CHtml::ajaxLink(
@@ -106,7 +94,16 @@ $this->renderPartial('_paypalbuttonaim');
 				<?php endforeach; ?>
 			<?php endif; ?>
 			<li class="add">
-				<?php echo CHtml::link(Yii::t('checkout', 'Add New Address'), '/checkout/newaddress?type=billing', array('class' => 'small button')); ?>
+				<?php
+					echo CHtml::link(
+						Yii::t('checkout', 'Add New Address'),
+						Yii::app()->createUrl(
+							'/checkout/newaddress',
+							array('type' => 'billing')
+						),
+						array('class' => 'small button')
+					);
+				?>
 			</li>
 		</ol>
 	</div>

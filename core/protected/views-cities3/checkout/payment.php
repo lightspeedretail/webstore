@@ -31,44 +31,12 @@ $this->renderPartial('_paypalbuttonaim');
 <div class="creditcard">
 <div class="error-holder"><?= $error ?></div>
 
-<!------------------------------------------------------------------------------------------------------------	CREDIT CARD FORM -------------------------------------------------------------------------------------------------->
-
 	<?php $this->widget('ext.wscreditcardform.wscreditcardform', array('model' => $model, 'form' => $form)); ?>
 
-<!------------------------------------------------------------------------------------------------------------	CREDIT CARD FORM  -------------------------------------------------------------------------------------------------->
+	<?php $this->renderPartial('_shippingasbillingguest', array('model' => $model, 'form' => $form)); ?>
 
-	<label class="shippingasbilling">
-		<?php if (Yii::app()->shoppingcart->shipping->isStorePickup === false): ?>
-			<?php
-			echo $form->checkBox(
-				$model,
-				'billingSameAsShipping',
-				$htmlOptions = array(
-					'boolean',
-					'trueValue' => 'on',
-					'onclick' => '$(".address-form").fadeToggle();',
-					'checked' => "checked",
-					'disabled' => _xls_get_conf('SHIP_SAME_BILLSHIP') == 1 ? true : false,
-				)
-			);
-			?>
-
-			<span class="text" id="payment">
-			<?php
-			echo Yii::t('checkout', "Use my shipping address as my billing address")
-			?>
-			<br>
-			<span class="address-abbr">
-				<?php
-				echo $model->strShippingAddress;
-				?>
-			</span>
-		</span>
-		<?php endif; ?>
-	</label>
-
-	<!------------------------------------------------------------------------------------------------------------	Layout Markup -------------------------------------------------------------------------------------------------->
 	<?php $this->renderPartial('_billingaddress', array('model' => $model, 'form' => $form)); ?>
+
 </div>
 
 <?php

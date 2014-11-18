@@ -111,19 +111,26 @@
 					'columns' => array(
 						array(
 							'type' => 'raw',
-							'value' => '"<strong>$data->qty</strong>".CHtml::numberField("CartItem_qty[$data->id]",$data->qty,array(
-	                                        "data-pk"=>$data->id,
-	                                        "size" => "2",
-//	                                        "onblur" =>"updateCart(this, $data->qty)",
-	                                        "onchange" =>"updateCart(this)",
-	                                    ))',
+							'value' =>
+								'"<strong>$data->qty</strong>" .
+								CHtml::numberField(
+									"CartItem_qty[$data->id]",
+									$data->qty,
+									array("data-pk" => $data->id, "size" => "2",)
+									)
+								',
 							'htmlOptions' => array(
 								'class' => 'quantity',
 							),
 						),
 						array(
 							'type' => 'raw',
-							'value' => 'CHtml::image(Images::GetLink($data -> product -> image_id,ImagesType::slider)).CHtml::tag("td",array("class" => "description"),CHtml::link("<strong>".$data -> product->title."</strong>" ."<span class=\'price\'> ".$data->sellFormatted."ea</span>", $data -> product->Link, array()))',
+							'value' =>
+								'CHtml::image(Images::GetLink($data->product->image_id, ImagesType::slider)).
+								CHtml::tag("td", array("class" => "description"),
+								CHtml::link("<strong>" . $data->product->title . "</strong>" .
+								Yii::app()->getController()->renderPartial(\'_formattedCartItemSellPriceWithDiscount\', array(\'cartItem\' => $data), true), $data->product->Link, array())
+								)',
 							'htmlOptions' => array(
 								'class' => 'image'
 							),
@@ -145,6 +152,14 @@
 
 				<table class="totals">
 					<tbody>
+					<tr id="PromoCodeLine" class="<?= $cart->promoCode ? 'webstore-promo-line' : 'webstore-promo-line hide-me';?>" >
+						<th colspan='3'>
+							<?= Yii::t('cart', 'Promo & Discounts'); ?>
+							<td id="PromoCodeStr" class="promo-code-str">
+								<?= _xls_currency($cart->totalDiscount); ?>
+							</td>
+						</th>
+					</tr>
 					<tr>
 						<th colspan='3'>
 							<?php
@@ -156,7 +171,7 @@
 								?>
 							</small>
 						</th>
-						<td>
+						<td class="shipping-estimate">
 							<?php
 							echo _xls_currency($cart->shipping_sell);
 							?>
@@ -171,7 +186,7 @@
 							echo Yii::t('cart','Total');
 							?>
 						</th>
-						<td>
+						<td id="totalCart">
 							<?php
 							echo _xls_currency($cart->total);
 							?>

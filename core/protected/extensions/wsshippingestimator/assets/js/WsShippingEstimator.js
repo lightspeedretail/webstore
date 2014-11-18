@@ -13,6 +13,7 @@ function WsShippingEstimator(options) {
 	options = options || {};
 	this.class = options.class || null;
 	this.shippingOptions = options.shippingOptions || null;
+	this.currentlySelectedShippingOption = options.selectedShippingOption || null;
 	this.selectedProviderId = options.selectedProviderId || null;
 	this.selectedPriorityLabel = options.selectedPriorityLabel || null;
 	this.selectedCountryName = options.shippingCountryName || null;
@@ -216,36 +217,36 @@ WsShippingEstimator.prototype.setSelectedCountry = function(option) {
  * @param {boolean} checked Whether the shippingOption should be checked.
  */
 WsShippingEstimator.prototype.addShippingOption = function(shippingOption) {
-	var li = $('<li>').append(
-		$('<label>')
-			.addClass('radio')
-			.append(
-				$('<input>')
-					.attr({
-						type: 'radio',
-						name: 'shipping_option',
-						value: shippingOption.speedId,
-						'data-formatted-shipping-price': shippingOption.formattedShippingPrice,
-						'data-formatted-cart-tax': shippingOption.formattedCartTax,
-						'data-formatted-cart-total': shippingOption.formattedCartTotal,
-						'data-provider-id': shippingOption.providerId,
-						'data-priority-id': shippingOption.priorityId,
-						'data-priority-label': shippingOption.priorityLabel
-					})
-			)
-			.append(shippingOption.shippingLabel)
-			.append(
-				$('<small>').append(shippingOption.formattedShippingPrice)
-			        .attr({
-                        class: 'estimator-shipping-option',
-                    })
-			)
-			.change(function (e) {
-				this.selectedShippingOption(e.target);
-			}.bind(this))
-	);
+    var li = $('<li>').append(
+        $('<label>')
+            .addClass('radio')
+            .append(
+            $('<input>')
+                .attr({
+                    type: 'radio',
+                    name: 'shipping_option',
+                    value: shippingOption.speedId,
+                    'data-formatted-shipping-price': shippingOption.formattedShippingPrice,
+                    'data-formatted-cart-tax': shippingOption.formattedCartTax,
+                    'data-formatted-cart-total': shippingOption.formattedCartTotal,
+                    'data-provider-id': shippingOption.providerId,
+                    'data-priority-id': shippingOption.priorityId,
+                    'data-priority-label': shippingOption.priorityLabel
+                })
+        )
+            .append(shippingOption.shippingLabel)
+            .append(
+            $('<small>').append(shippingOption.formattedShippingPrice)
+                .attr({
+                    class: 'estimator-shipping-option',
+                })
+        )
+            .change(function (e) {
+                this.selectedShippingOption(e.target);
+            }.bind(this))
+    );
 
-	this.$shippingOptions.find('ol').append(li);
+    this.$shippingOptions.find('ol').append(li);
 };
 
 /**
@@ -268,7 +269,7 @@ WsShippingEstimator.prototype.selectedShippingOption = function(selectedOption) 
 	this.selectedPriorityLabel = $(selectedOption).attr('data-priority-label');
 
 	this.selectShippingOption(this.selectedProviderId, this.selectedPriorityLabel);
-	this.updateEstimates();
+	this.updateEstimatesFromOptions(this.getSelectedShippingOption());
 
 	// Tell Web Store that this shipping option has been selected.
 	$.post(
@@ -335,7 +336,7 @@ WsShippingEstimator.prototype.redrawShippingOptions = function(shippingOptions) 
 
 	this.selectShippingOption(this.selectedProviderId, this.selectedPriorityLabel);
 
-	this.updateEstimates();
+	this.updateEstimatesFromResponse(this.currentlySelectedShippingOption);
 };
 
 /**
@@ -347,17 +348,61 @@ WsShippingEstimator.prototype.getSelectedShippingOption = function() {
 };
 
 /**
+ * Returns the estimates if the come from the options on the tooltip
+ * @param selectedShippingOption
+ * @returns {{shippingEstimate: *, taxEstimate: *, totalEstimate: *}}
+ */
+WsShippingEstimator.prototype.getEstimatesFromOptions = function(selectedShippingOption) {
+	return {
+		shippingEstimate: selectedShippingOption.attr('data-formatted-shipping-price'),
+		taxEstimate: selectedShippingOption.attr('data-formatted-cart-tax'),
+		totalEstimate: selectedShippingOption.attr('data-formatted-cart-total')
+	};
+};
+
+/**
+ * Update the estimates based on the selected options.
+ * @param selectedShippingOption
+ */
+WsShippingEstimator.prototype.updateEstimatesFromOptions = function(selectedShippingOption) {
+	if (selectedShippingOption.length !== 0) {
+		this.updateEstimates(
+			this.getEstimatesFromOptions(selectedShippingOption)
+		);
+	}
+};
+
+/**
+ * Returns the estimates if the come from an Ajax request
+ * @returns {{shippingEstimate: *, taxEstimate: *, totalEstimate: *}}
+ */
+WsShippingEstimator.prototype.getEstimatesFromResponse = function(currentlySelectedShippingOption) {
+	return {
+		shippingEstimate: currentlySelectedShippingOption.formattedShippingPrice,
+		taxEstimate: currentlySelectedShippingOption.formattedCartTax,
+		totalEstimate: currentlySelectedShippingOption.formattedCartTotal
+	};
+};
+
+/**
+ * Update the estimates based on a response we get from the server
+ * @param currentlySelectedShippingOption
+ */
+WsShippingEstimator.prototype.updateEstimatesFromResponse = function(currentlySelectedShippingOption) {
+	if (currentlySelectedShippingOption !== null) {
+		this.updateEstimates(
+			this.getEstimatesFromResponse(currentlySelectedShippingOption)
+		);
+	}
+};
+
+/**
  * Update the estimate lines based on the selected shipping option.
  */
-WsShippingEstimator.prototype.updateEstimates = function() {
-	var selectedShippingOption = this.getSelectedShippingOption();
-	if (selectedShippingOption.length === 0) {
-		return;
-	}
-
-	this.$shippingEstimate.html(selectedShippingOption.attr('data-formatted-shipping-price'));
-	this.$taxEstimate.html(selectedShippingOption.attr('data-formatted-cart-tax'));
-	this.$totalEstimate.html(selectedShippingOption.attr('data-formatted-cart-total'));
+WsShippingEstimator.prototype.updateEstimates = function(estimates) {
+	this.$shippingEstimate.html(estimates.shippingEstimate);
+	this.$taxEstimate.html(estimates.taxEstimate);
+	this.$totalEstimate.html(estimates.totalEstimate);
 };
 
 /**
@@ -482,8 +527,9 @@ WsShippingEstimator.prototype.updateShippingEstimates = function() {
 	// TODO: This was copied from wsadvcheckout/assets/shipping.js and should be
 	// moved into a shared JavaScript file.
 	switch (this.selectedCountryCode) {
-		// for Great Britain and Canada, Zippopotam only uses the first 3 characters in the
-		// query URL. In case someone pastes in the full postal, we account for it here
+		// for Great Britain and Canada, Zippopotam only uses the first 3
+		// characters in the query URL. Since the user is likely to enter their
+		// full postal code, we'll trim it for what's required by zippo.
 		case 'GB':
 		case 'CA':
 			zippoPostal = zippoPostal.substring(0, 3);
@@ -491,12 +537,27 @@ WsShippingEstimator.prototype.updateShippingEstimates = function() {
 	}
 	// TODO End copied block.
 
-	// Done() called once we have a city and state lookup.
+	// Make a deferred for the zippopotam.us lookup. The resolve() method is
+	// called once the zippo lookup returns successfully.
 	var addressLookup = $.Deferred();
 
 	if (this.selectedCountryCode === '' || zippoPostal === '') {
-		this.setCityStateLinkValue(null, null);
-		addressLookup.resolve();
+		// When the user has selected in-store shipping and clicked "continue
+		// shopping", the entered country and postal code may be empty but we
+		// still need to update the shipping rates. In this case,
+		// shippingOptions will not be null since estimates will have already
+		// been made.
+		if (this.shippingOptions === null) {
+			// No pre-existing shipping options and no entered postal or
+			// zipcode. There's no sense in trying to get updated shipping
+			// options at this point.
+			deferred.reject();
+			return deferred;
+		} else {
+			// Presumably in-store pickup.
+			this.setCityStateLinkValue(null, null);
+			addressLookup.resolve();
+		}
 	} else {
 		var uri = this.selectedCountryCode + '/' + zippoPostal;
 
@@ -562,9 +623,17 @@ WsShippingEstimator.prototype.updateShippingEstimates = function() {
 				this.selectedProviderId = options.selectedProviderId || null;
 				this.selectedPriorityLabel = options.selectedPriorityLabel || null;
 				this.selectShippingOption(this.selectedProviderId, this.selectedPriorityLabel);
-				this.updateEstimates();
-				deferred.resolve(shippingRatesResponse);
+				this.currentlySelectedShippingOption = options.selectedShippingOption || null;
 
+				// If it's the first time loading the page the currently selected option will be empty
+				// So we fall back to what's passed in the options as the default shipping provider.
+				if (this.currentlySelectedShippingOption === null) {
+					this.updateEstimatesFromOptions(this.getSelectedShippingOption());
+				} else {
+					this.updateEstimatesFromResponse(this.currentlySelectedShippingOption);
+				}
+
+				deferred.resolve(shippingRatesResponse);
 		}.bind(this));
 	}.bind(this)).fail(function () {
 		// Address lookup failed.

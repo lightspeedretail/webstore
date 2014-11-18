@@ -194,7 +194,6 @@ class InstallController extends Controller
 	 */
 	protected function actionConvertStart()
 	{
-		Yii::log('just before we call downloadtheme', 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
 		$this->downloadTheme();
 		_runMigrationTool('set'); //mark db as m140411_120957_load_misc before google and amazon
 		return array('result' => "success", 'makeline' => 2, 'tag' => 'Converting cart addresses', 'total' => 50);
@@ -218,8 +217,6 @@ class InstallController extends Controller
 		$filename = Yii::getPathOfAlias('webroot.themes').DIRECTORY_SEPARATOR.DEFAULT_THEME;
 		if(!file_exists($filename))
 			downloadTheme(DEFAULT_THEME);
-		else
-			Yii::log('we already have: ' . DEFAULT_THEME, 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
 
 	}
 	/**

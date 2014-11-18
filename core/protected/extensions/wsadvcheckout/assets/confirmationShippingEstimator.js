@@ -258,8 +258,15 @@ ConfirmationShippingEstimator.prototype.updateEstimates = function() {
 
 	var selectionData = this.getShippingOption();
 
-	if (typeof(this.getShippingOption()) === 'undefined') {
-		return;
+	if (typeof(selectionData) === 'undefined') {
+		// Let's try to figure out if there was a selected option that we
+		// can get back
+		if (this.shippingOptions.selectedShippingOption !== null)	{
+			selectionData = this.shippingOptions.selectedShippingOption;
+		}	else	{
+			return;
+		}
+
 	}
 
 	this.$shippingEstimate.html(selectionData.formattedShippingPrice);
@@ -333,9 +340,6 @@ ConfirmationShippingEstimator.prototype.handleMessages = function(messages) {
 		switch (message.code) {
 			case 'WARN':
 				window.location = this.redirectToShippingOptionsUrl;
-				break;
-			case 'INFO':
-				this.addShippingOptionsBottomMessage(message.message);
 				break;
 		}
 	}
@@ -453,7 +457,7 @@ ConfirmationShippingEstimator.prototype.toggleShowCalculatingOnFields = function
 ConfirmationShippingEstimator.prototype.promoCodeChange = function (result) {
 	// TODO: If we could redraw the shipping method name in JavaScript then we
 	// could change this to only redirect on removal of promo code instead of
-	// both remove and appy.
+	// both remove and apply.
 	if (result === 'triggerCalc') {
 		window.location = this.redirectToShippingOptionsUrl;
 	}

@@ -98,21 +98,30 @@ class Checkout
 	}
 
 	/**
+	 * TODO: Verify if the ecp variable is still necessary
+	 *
 	 * Final steps in completing cart and recalculating inventory numbers.
 	 *
-	 * If blnBehindTheScenes is true, it's an IPN-like transaction instead
-	 * of the user session, so we don't do things like logout
+	 * @param null ShoppingCart $objCart
 	 *
+	 * @param bool $performInternalFinalizeSteps
+	 * if true, it's either an IPN-like transaction, an AIM payment, or
+	 * an alternative payment method (ex. cash on delivery). So we can
+	 * handle the final steps within Web Store. If false, it's a SIM credit
+	 * card transaction and we ignore those steps which will allow for
+	 * the calling action to echo an html meta refresh which redirects the
+	 * customer to Web Store's receipt page. We have to do this since some
+	 * processors try to render the receipt page on their own domain and
+	 * we don't want that since the necessary CSS won't be available.
+	 *
+	 * @param bool $ecp
 	 * If ecp (executeCheckoutProcess, a function from the Checkout controller)
 	 * is true, do not redirect to receipt.
 	 *
-	 * @param null ShoppingCart $objCart
-	 * @param bool $blnBehindTheScenes
-	 * @param bool $ecp
 	 * @return void
 	 */
 
-	public static function finalizeCheckout($objCart = null, $blnBehindTheScenes = false, $ecp = false)
+	public static function finalizeCheckout($objCart = null, $performInternalFinalizeSteps = true, $ecp = false)
 	{
 		Yii::log("Finalizing checkout", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 		if (!$objCart)
@@ -145,12 +154,19 @@ class Checkout
 
 		self::runPostFinalizeHooks($objCart->id_str);
 
-		if (!$blnBehindTheScenes)
+		if ($performInternalFinalizeSteps === true)
 		{
 			//If we're behind a common SSL and we want to stay logged in
 			if (Yii::app()->isCommonSSL && $objCart->customer->record_type != Customer::GUEST)
 			{
 				Yii::app()->user->setState('sharedssl', 1);
+			}
+
+			// If we are on legacy checkout, then logout, else stay logged in to offer
+			// end user the opportunity to create an account
+			if ($objCart->customer->record_type == Customer::GUEST && Yii::app()->theme->info->advancedCheckout === false)
+			{
+				Yii::app()->user->logout();
 			}
 
 			//Redirect to our receipt, we're done

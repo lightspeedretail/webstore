@@ -70,13 +70,13 @@
 						echo $form->emailField(
 							$model,
 							'email',
-							$htmlOptions = array('placeholder' => Yii::t('cart', "Email Address"),'required' => 'required', 'autofocus' => 'autofocus')
+							$htmlOptions = array('placeholder' => Yii::t('cart', "Email Address"),'required' => 'required', 'autofocus' => '')
 						); ?>
 					</li>
 					<li class="flippable password-block field-container field-container-password">
 						<!-- Default state -->
 						<div class="side front step1">
-							<p><?php echo Yii::t('checkout',"<strong>"."Why? "."</strong>". "We use your email to send shipping confirmations, updates and to allow easy order lookup."); ?></p>
+							<p><?= Yii::t('checkout', "We use your email to send shipping confirmation, updates and for easy order lookup."); ?></p>
 						</div>
 						<!-- User wants to login with password -->
 						<div class="side back step2">
@@ -97,11 +97,7 @@
 						</div>
 						<!-- User wants to lookup password -->
 						<div class="side reset hint step3">
-							<p>
-								<?php
-								echo Yii::t('checkout',"Enter your email address and we'll send you a link to reset your password.");
-								?>
-							</p>
+							<p><?= Yii::t('checkout',"Enter your email address and we'll send a password reset link.");?></p>
 							<?php
 							echo CHtml::linkButton(
 								Yii::t('global', 'Cancel'),
@@ -126,9 +122,11 @@
 								)
 							);
 						?>
+						<p>
 						<?php
 							echo "-".Yii::t('checkout',"or")."- "."<a href='' class='alternate guest_checkout'>".Yii::t('checkout',"Checkout as Guest")."</a>"
 						?>
+						</p>
 					</div>
 					<div class="choices">
 						<?php
@@ -177,6 +175,7 @@
 						echo CHtml::submitButton(
 							'Submit',
 							array(
+								'id' => 'guest-button',
 								'type' => 'button',
 								'class' => 'button',
 								'value' => Yii::t('checkout', "Guest Checkout"),

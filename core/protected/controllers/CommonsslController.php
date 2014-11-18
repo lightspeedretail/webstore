@@ -231,7 +231,6 @@ class CommonsslController extends Controller
 
 		//Finally, onward to the page
 		$this->redirect($url);
-
 	}
 }
 

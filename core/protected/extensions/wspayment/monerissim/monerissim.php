@@ -10,6 +10,7 @@ class monerissim extends WsPayment
 	protected $uses_credit_card = true;
 	protected $apiVersion = 1;
 	public $cloudCompatible = true;
+	public $performInternalFinalizeSteps = false;
 
 	protected function formatCurrencyValue($amount)
 	{

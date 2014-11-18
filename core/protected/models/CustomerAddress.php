@@ -201,6 +201,7 @@ class CustomerAddress extends BaseCustomerAddress
 				$obj->country_id = $checkoutForm->shippingCountry;
 				$obj->postal = $checkoutForm->shippingPostal;
 				$obj->phone = $checkoutForm->contactPhone;
+				$obj->residential = $checkoutForm->shippingResidential;
 				break;
 
 			case 'billing':

@@ -54,10 +54,6 @@ class beanstreamaim extends WsPayment
 		{
 			$strShipState="--";
 		}
-		else
-		{
-			$strShipState = null;
-		}
 
 		$beanstream_values = array (
 			"requestType"		=> "BACKEND",

@@ -97,7 +97,15 @@
 			<h3><?= Yii::t('checkout', "Save time")?></h3>
 			<p>
 				<?= Yii::t('checkout', "Shopped with us before?")?><br>
-				<?= CHtml::link(Yii::t('checkout', 'Login to your Account'), '/checkout?showLogin=true'); ?>
+				<?=
+					CHtml::link(
+						Yii::t(
+							'checkout',
+							'Login to your Account'
+						),
+						Yii::app()->createUrl('/checkout/index', array('showLogin' => 'true'))
+					);
+				?>
 			</p>
 			<p class="hint"><?= Yii::t('checkout', "Don't have an account? You can create one after checkout.")?></p>
 		</div>

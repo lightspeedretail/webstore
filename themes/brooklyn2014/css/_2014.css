@@ -110,7 +110,6 @@
     margin: 0;
     width: 200px;
     padding: 10px 15px;
-    line-height: 28px;
 
     border-radius: 0;
 
@@ -118,7 +117,6 @@
     border-left: 1px solid #ddd;
     border-right: 1px solid #ddd;
     box-shadow: none;
-    height: auto;
 }
 
 #menubar form input:focus { background-color: #f8f8f8; }
@@ -505,6 +503,10 @@
     .row-fluid .span9{
         width:100%;
     }
+    #menubar form input{
+        line-height: initial;
+        height: 50px;
+    }
 }
 
 
@@ -513,5 +515,11 @@
   #viewport{
       min-height:500px;
   }
+@media only screen and (min-width: 979px){
+    #menubar form input{
+        line-height: initial;
+        height: 28px;
+    }
+}
 
 

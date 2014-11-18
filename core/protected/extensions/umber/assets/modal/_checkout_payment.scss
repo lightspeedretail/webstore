@@ -37,8 +37,8 @@
 		.buttons {
 			@extend %clearfix;
 
-            @include flexbox();
-            @include justify-content(center);
+			@include flexbox();
+			@include justify-content(center);
 		}
 
 
@@ -48,7 +48,7 @@
 			font-size: .875rem;
 			width: 10rem;
 			padding: 10px;
-            @include border-radius(2px);
+			@include border-radius(2px);
 			margin: 0 7px;
 
 			&.paypal {
@@ -66,7 +66,7 @@
 
 			}
 		}
-        //MO
+		//MO
 		.or-block {
 			position: absolute;
 			left: 0;
@@ -74,41 +74,41 @@
 			bottom: 0;
 		}
 
-        .spacer {
-          margin: 12px 0;
-        }
+		.spacer {
+		  margin: 12px 0;
+		}
 
-      //MO alternate paypal buttons classes
-      .paypal-alt {
-        background-size: 175px 35px;
-        background-repeat: no-repeat;
-        background-color: transparent;
-        color: transparent;
-        cursor: pointer;
-        padding: 6px 0;
-        outline: 0;
-        border: 0px;
-        width: 175px;
-        height: 35px;
-      }
+	  //MO alternate paypal buttons classes
+	  .paypal-alt {
+		background-size: 175px 35px;
+		background-repeat: no-repeat;
+		background-color: transparent;
+		color: transparent;
+		cursor: pointer;
+		padding: 6px 0;
+		outline: 0;
+		border: 0px;
+		width: 175px;
+		height: 35px;
+	  }
 
-      //MO
-      .paypal-orig {
-        background-image: url('/images/altpayments/paypal.png');
-        background-size: 100px 38px;
-        width: 100px;
-        height: 38px;
-      }
+	  //MO
+	  .paypal-orig {
+		background-image: url('/images/altpayments/paypal.png');
+		background-size: 100px 38px;
+		width: 100px;
+		height: 38px;
+	  }
 
-      //MO
-      .paypal-blue {
-        background-image: url('/images/paypal-blue.png');
-      }
+	  //MO
+	  .paypal-blue {
+		background-image: url('/images/paypal-blue.png');
+	  }
 
-      //MO
-      .paypal-white {
-        background-image: url('/images/paypal-white.png');
-      }
+	  //MO
+	  .paypal-white {
+		background-image: url('/images/paypal-white.png');
+	  }
 
 	}
 
@@ -120,114 +120,114 @@
 		@extend %clearfix;
 		margin-bottom: 15px;
 
-        //MO
-        h4 { margin-top: 20px; }
+		//MO
+		h4 { margin-top: 20px; }
 	}
 
-    //MO
-    .address-form.invisible {
-        display: none;
-        visibility: visible; // override bootstrap
-        .fieldgroup .field-container input, .fieldgroup .field-container select {
-          height: 2.375rem;
-          font-size: .75rem;
-        }
-    }
+	//MO
+	.address-form.invisible {
+		display: none;
+		visibility: visible; // override bootstrap
+		.fieldgroup .field-container input, .fieldgroup .field-container select {
+		  height: 2.375rem;
+		  font-size: .75rem;
+		}
+	}
 
   .payment-methods {
-    input[type=radio] {
-      vertical-align: baseline;
-      margin: 4px 5px 0.5em 0;
-      width: 13px;
-      height: 13px;
+	input[type=radio] {
+	  vertical-align: baseline;
+	  margin: 4px 5px 0.5em 0;
+	  width: 13px;
+	  height: 13px;
 
-      &:checked + label {
-        color: #333;
-      }
-    }
+	  &:checked + label {
+		color: #333;
+	  }
+	}
 
-    label {
-      color: #777;
-      font-size: 0.875rem;
-      padding-left: 10px;
-      margin-bottom: 0.5rem;
-    }
+	label {
+	  color: #777;
+	  font-size: 0.875rem;
+	  padding-left: 10px;
+	  margin-bottom: 0.5rem;
+	}
 
-    //MO payment-simple page cc label
-    .sim-cc {
-      font-size: 19px;
-      font-weight: bold;
-      margin-left: 10px;
-    }
+	//MO payment-simple page cc label
+	.sim-cc {
+	  font-size: 19px;
+	  font-weight: bold;
+	  margin-left: 10px;
+	}
 
-    //MO payment-simple page cc radio
-    input.sim-cc-radio {
-      margin-top: 8px;
-    }
+	//MO payment-simple page cc radio
+	input.sim-cc-radio {
+	  margin-top: 8px;
+	}
   }
 
   .checkset {
-    input[type=radio], input[type=checkbox] {
-      display: none;
+	input[type=radio], input[type=checkbox] {
+	  display: none;
 
-      &:checked + label.checklabel {
-        color: #333;
+	  &:checked + label.checklabel {
+		color: #333;
 
-        &:before {
-          border-color: #ccc;
-          @extend %icon-check-mark;
-        }
-      }
-    }
+		&:before {
+		  border-color: #ccc;
+		  @extend %icon-check-mark;
+		}
+	  }
+	}
   }
 
   label.checklabel {
-    display: block;
-    margin: 0 0 .5em;
-    color: #999;
-    @include transition(all .4s);
+	display: block;
+	margin: 0 0 .5em;
+	color: #999;
+	@include transition(all .4s);
 
-    &:before {
-      @extend %icon-prereqs;
-      margin: 0 8px -4px 0;
-      @include border-radius(16px);
-      content: "";
-      display: inline-block;
-      width: 20px;
+	&:before {
+	  @extend %icon-prereqs;
+	  margin: 0 8px -4px 0;
+	  @include border-radius(16px);
+	  content: "";
+	  display: inline-block;
+	  width: 20px;
 
-      height: 20px;
-      border: 2px solid #ccc;
-      font-size: 24px;
-      color: #444;
-      text-align: center;
-      line-height: 15px;
-      text-indent: -2px;
-      float: left;
-    }
+	  height: 20px;
+	  border: 2px solid #ccc;
+	  font-size: 24px;
+	  color: #444;
+	  text-align: center;
+	  line-height: 15px;
+	  text-indent: -2px;
+	  float: left;
+	}
 
-    &:hover {
-      color: #444;
-      &:before { border-color: #999; }
-    }
+	&:hover {
+	  color: #444;
+	  &:before { border-color: #999; }
+	}
 
-    &.error { color: #999; }
+	&.error { color: #999; }
   }
 
   .alt-payment-methods {
-    padding: 15px 30px 10px;
-    border: 1px solid #ccc;
+	padding: 15px 30px 10px;
+	border: 1px solid #ccc;
 
-    h4 {
-      text-transform: uppercase;
-      color: #444;
-      font-size: .8125rem;
-      margin: 0 0 1em;
-    }
+	h4 {
+	  text-transform: uppercase;
+	  color: #444;
+	  font-size: .8125rem;
+	  margin: 0 0 1em;
+	}
   }
 
   //MO
   .alt-payment-methods.borderclose {
-    border-top: 0;
+	border-top: 0;
   }
 
   }
@@ -250,9 +250,12 @@
 
 		border: 1px solid #ccc;
 		border-bottom: none;
-
-		padding: 30px 30px 0;
+		padding: 30px 15px 0;
 		margin: 0;
+
+		@include media(verysmall){
+		  padding: 30px 30px 0;
+		}
 
 		&.creditcard-nosubmit {
 			border-bottom: 1px solid #ccc;
@@ -269,7 +272,6 @@
 		}
 
 		input.creditcard-number {
-			font-family: "ocraregular","OCR A Std","OCR A",Courier,"Courier New",monospace;
 			padding-left: 10px;
 			padding-right: 10px;
 			font-size: 1.325rem;
@@ -292,17 +294,22 @@
 		}
 
 		.card-details {
-            input, input#MultiCheckoutForm_cardExpiry:focus, input#MultiCheckoutForm_cardNumber:focus, input#MultiCheckoutForm_cardCVV:focus {
-              background-color: #fff;
-            }
-            input#MultiCheckoutForm_cardNumber:focus{
-              font-size: 1.325rem;
-            }
-			background-color: #f8f8f8;
-			border: 1px solid #ddd;
-			padding: 20px 20px 15px;
-            margin-top: 20px;
-            @include border-radius(10px);
+			input, input#MultiCheckoutForm_cardExpiry:focus, input#MultiCheckoutForm_cardNumber:focus, input#MultiCheckoutForm_cardCVV:focus {
+			  background-color: #fff;
+			}
+			input#MultiCheckoutForm_cardNumber:focus{
+			  font-size: 1.325rem;
+			}
+			@include media(verysmall){
+			  background-color: #f8f8f8;
+			  border: 1px solid #ddd;
+			  padding: 20px 20px 15px;
+			  $height: 204px;
+			  height: $height;
+			  max-width:($height*1.76)
+			}
+			margin-top: 20px;
+			@include border-radius(10px);
 
 			ol.field-container-gap {
 				margin-bottom: 1rem;
@@ -317,7 +324,6 @@
 			}
 
 			p.cardholder {
-				font-family: "ocraregular","OCR A Std","OCR A",Courier,"Courier New",monospace;
 				margin: .65em 0 0;
 				text-transform: uppercase;
 				font-size: 1.125rem;
@@ -359,7 +365,7 @@
 					max-height: 44px;
 					position: relative;
 					top: 50%;
-                    @include transform(translateY(-50%));
+					@include transform(translateY(-50%));
 
 					&.active {
 						display: block;
@@ -372,11 +378,21 @@
 	.shippingasbilling {
 		display: inline-block;
 		font-size: .8375rem;
-		padding: 20px 10px 15px;
 		color: #999;
 		font-weight: bold;
-        width: 100%;
-        margin: 15px 0 20px;
+		width: 100%;
+		margin: 15px 0 20px;
+		padding: 20px 15px 15px 0;
+		@include media(verysmall){
+		  padding: 20px 10px 15px;
+		}
+
+		//MO
+		div.text{
+		  font-size: .8rem;
+		  font-weight: normal;
+		  margin-top: 0.40em;
+		}
 
 		:checked + .text {
 			color: #444;
@@ -386,6 +402,7 @@
 			color: #999;
 			font-weight: normal;
 			font-size: .75rem;
+			margin: .125em 0 .75em 30px;
 		}
 
 		input {
@@ -394,18 +411,12 @@
 			margin: .45em .5em 1em 0;
 			font-size: 1.25rem;
 		}
-        //MO
-        span{
-            display: inline-block;
-            float: left;
-            width: 300px;
-        }
 	}
 
 //temporary fix, confirm exact styling with Kevin and Luke
 input#MultiCheckoutForm_cardNumber {
   &:focus{
-    padding-left: 10px;
-    padding-right: 10px;
+	padding-left: 10px;
+	padding-right: 10px;
   }
 }

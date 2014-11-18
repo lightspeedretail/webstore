@@ -41,8 +41,18 @@ $this->renderPartial("_storepickup", array(
 						echo $objAddress->formattedblockcountry;
 						?>
 						<span class="controls">
-							<a href="/checkout/editaddress?id=<?= $objAddress->id ?>&type=shipping"><?php echo Yii::t('checkout', 'Edit Address'); ?></a>
-							<?php echo Yii::t('checkout', 'or'); ?>
+							<?php
+								echo CHtml::link(
+									Yii::t('checkout', 'Edit Address'),
+									Yii::app()->createUrl(
+										'/checkout/editaddress',
+										array(
+											'id' => $objAddress->id,
+											'type' => 'shipping'
+										)
+									)
+								);
+							?>
 							<?php
 							echo CHtml::ajaxLink(
 								Yii::t('checkout', 'Hide'),
@@ -76,7 +86,10 @@ $this->renderPartial("_storepickup", array(
 			<?php
 				echo CHtml::link(
 					Yii::t('checkout', 'Add New Address'),
-					'/checkout/newaddress?type=shipping',
+					Yii::app()->createUrl(
+						'/checkout/newaddress',
+						array('type' => 'shipping')
+					),
 					array('class' => 'small button')
 				);
 			?>

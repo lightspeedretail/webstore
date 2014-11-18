@@ -103,4 +103,17 @@ else
 	}
 }
 
-echo $isReceipt ? null : '<span class="controls">'.CHtml::link(Yii::t('checkout', 'Change'), array('/checkout/final'), array('class' => 'hasborder')).'</span>';
+if ($isReceipt === false)
+{
+	echo '<span class="controls">' .
+		CHtml::link(
+			Yii::t(
+				'checkout',
+				'Change'
+			),
+			Yii::app()->createUrl('/checkout/final'),
+			array('class' => 'hasborder')
+		) .
+		'</span>';
+}
+

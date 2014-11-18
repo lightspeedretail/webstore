@@ -7,37 +7,37 @@ $cart-confirmation-image-width: 140px;
   //D--.webstore-estimator-form P--shipping-postal-entry
 	.webstore-estimator-form,.shipping-postal-entry {
 		background: none;
-        display:none;
+		display:none;
 
 	}
   table a, table a:hover {
-    font-weight: bold;
+	font-weight: bold;
   }
   table a{
-    border-bottom: 1px solid #bbb;
+	border-bottom: 1px solid #bbb;
   }
 
   .totals {
-    small a {
-      color: #999;
-      border-bottom: 1px dotted #ccc;
-      text-decoration: none;
+	small a {
+	  color: #999;
+	  border-bottom: 1px dotted #ccc;
+	  text-decoration: none;
 
-      //
-      font-size:0.9167em;
-    }
+	  //
+	  font-size:0.9167em;
+	}
 
-    td{
-      color: #888;
-    }
-    th{
-      text-align: left;
-    }
+	td{
+	  color: #888;
+	}
+	th{
+	  text-align: left;
+	}
 
-    .active a {
-      text-decoration: none;
-      color: #888;
-    }
+	.active a {
+	  text-decoration: none;
+	  color: #888;
+	}
   }
 }
 
@@ -125,8 +125,8 @@ aside.related-products {
 
 	.webstore-promo-form {
 		position: relative;
-        //MO
-        line-height:normal;
+		//MO
+		line-height:normal;
 
 		input {
 			border: none;
@@ -135,15 +135,15 @@ aside.related-products {
 			font-size: .9375rem;
 			padding: 12px 20px 13px;
 			width: 100%;
-            //MO
-            min-height: 46px;
-            margin-bottom: 0;
-            &:focus{
-              //MO
-              border:0;
-              width:100%;
-              padding:12px 20px 13px;
-            }
+			//MO
+			min-height: 46px;
+			margin-bottom: 0;
+			&:focus{
+			  //MO
+			  border:0;
+			  width:100%;
+			  padding:12px 20px 13px;
+			}
 		}
 		button {
 			@include transition-property(opacity);
@@ -154,9 +154,9 @@ aside.related-products {
 			top: auto;
 			right:20px;
 			background: none;
-            //MO
-            bottom: 9.5px;
-            height:27px;
+			//MO
+			bottom: 9.5px;
+			height:27px;
 		}
 
 		&:hover button {
@@ -183,13 +183,13 @@ aside.related-products {
 			color: #999;
 			border-bottom: 1px dotted #ccc;
 
-          //MO
+		  //MO
 			text-decoration: none;
 		}
 	}
 
 	footer {
-		button {
+		button, .button, .button:focus{
 			width: 100%;
 
 			@include media(medium) {
@@ -197,7 +197,6 @@ aside.related-products {
 			}
 
 			float: left;
-			padding: 0;
 			height: 60px;
 			font-size: 1rem;
 
@@ -210,10 +209,19 @@ aside.related-products {
 					color: #fff;
 				}
 			}
+
+		  &.continue-shopping{
+			display: none;
+			@include media(small) {
+			  display: block;
+			}
+		  }
+
 		}
 	}
 
-	button.checkout {
+	button.checkout, .button.checkout,
+	.button.checkout:focus{
 		float: right;
 	}
 }
@@ -243,6 +251,8 @@ aside.related-products {
 
 	&.column .content {
 		padding: 0px 30px 15px;
+		//MO added clearfix to fix change button coming out of its parent div.
+		@include clearfix();
 	}
 
 	.webstore-change-item {
@@ -267,13 +277,13 @@ aside.related-products {
 	img { //MO
 		float: left;
 		margin-bottom: 20px;
-        position: absolute;
+		position: absolute;
 	}
 
-    .product-data {//MO
-      padding-left: 100px;
-      margin-left: 20px;
-    }
+	.product-data {//MO
+	  padding-left: 100px;
+	  margin-left: 20px;
+	}
 
 	h3 {
 		margin-top: 0;
@@ -292,7 +302,7 @@ aside.related-products {
 @media (min-width: 720px) {
   /* line 173, /app/source/stylesheets/webstore/_cartadd.scss */
   .item-confirm header {
-    padding: 5px 30px; } }
+	padding: 5px 30px; } }
 
 .webstore-modal-cart-confirm h1{
   color: #777;
@@ -333,14 +343,7 @@ aside.related-products {
 .webstore-modal .cart-summary table td,
 .webstore-modal .cart-summary footer .button,
 .webstore-modal .cart-summary footer button { text-transform: none; }
-.webstore-modal .cart-summary footer .button {
-  /*text-align: center;*/
-  width: 50%;
-  float: right;
-  height: 60px;
-  font-size: 1rem;
-}
-.webstore-modal .cart-summary footer a.checkout {
+.webstore-modal .cart-summary footer a{
   color: #FFF;
   text-shadow: none;
 }
@@ -357,11 +360,6 @@ aside.related-products {
 .webstore-modal aside.related-products h3 { line-height: 18px; text-transform: none; font-weight: bold; }
 .webstore-modal aside.related-products img { max-height: 80px; width: auto; }
 .webstore-modal aside.related-products p.price { position: static; }
-
-@media (max-width: 767px) {
-  .webstore-modal .cart-summary footer .button,
-  .webstore-modal .cart-summary footer button { width: 100%; }
-}
 
 @media (max-width: 640px) {
   .webstore-modal .promo input[type="text"]:focus { max-width: 100%; }
@@ -418,8 +416,8 @@ form.webstore-promo-form.promo{
   background-color: #ccc;
   color: #888;
   &:hover{
-    background-color: #999;
-    color: #fff;
+	background-color: #999;
+	color: #fff;
   }
 
 }

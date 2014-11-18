@@ -9,6 +9,7 @@ class beanstreamsim extends WsPayment
 	protected $version = 1.0;
 	protected $apiVersion = 1;
 	public $cloudCompatible = true;
+	public $performInternalFinalizeSteps = false;
 	protected $uses_credit_card = true;
 
 	/**

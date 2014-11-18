@@ -219,18 +219,16 @@ class CartController extends Controller
 
 		Yii::app()->clientScript->registerScript('sendemail', $jsScript, CClientScript::POS_READY);
 
-		if (Yii::app()->theme->info->advancedCheckout)
+		if (Yii::app()->theme->info->advancedCheckout === true)
 		{
-			//If we were still logged in as guest at this point, log out
-			if ($objCart->customer->record_type == Customer::GUEST)
-			{
-				Yii::app()->user->logout();
-			}
-
-			$this->redirect('/checkout/thankyou/'.$strLink);
+			// For the thankyou page, we don't want to go through createUrl
+			// since generally speaking /checkout routes are passed through
+			// commonssl. We don't want to do that here. See WS-3285.
+			$this->redirect('/checkout/thankyou/' . $strLink);
 		}
 
-		//If we have a document that supersedes our cart, then let's copy some key display fields (just make sure we don't save it!)
+		// If we have a document that supersedes our cart, then let's copy some
+		// key display fields (just make sure we don't save it!).
 		if ($objCart->document_id > 0)
 		{
 			$objCart->status = $objCart->document->status;
@@ -1286,13 +1284,31 @@ class CartController extends Controller
 
 
 	/**
-	 * Final steps in completing cart and recalculating inventory numbers. if BehindTheScenes is true, it's
-	 * an IPN-like transaction instead of the user session, so we don't do things like logout
 	 *
-	 * @param null $objCart
-	 * @param bool $blnBehindTheScenes
+	 * TODO: Remove this function and incorporate the one in the Checkout Component instead.
+	 * Also verify if the ecp variable is still necessary
+	 *
+	 * Final steps in completing cart and recalculating inventory numbers.
+	 *
+	 * @param null ShoppingCart $objCart
+	 *
+	 * @param bool $performInternalFinalizeSteps
+	 * if true, it's either an IPN-like transaction, an AIM payment, or a
+	 * an alternative payment method (ex. cash on delivery). So we can
+	 * handle the final steps within Web Store. If false, it's a SIM credit
+	 * card transaction and we ignore those steps which will allow for
+	 * the calling action to echo an html meta refresh which redirects the
+	 * customer to Web Store's receipt page. We have to do this since some
+	 * processors try to render the receipt page on their own domain and
+	 * we don't want that since the necessary CSS won't be available.
+	 *
+	 * @param bool $ecp
+	 * If ecp (executeCheckoutProcess, a function from the Checkout controller)
+	 * is true, do not redirect to receipt.
+	 *
+	 * @return void
 	 */
-	public static function FinalizeCheckout($objCart = null, $blnBehindTheScenes = false, $ecp = false)
+	public static function FinalizeCheckout($objCart = null, $performInternalFinalizeSteps = true, $ecp = false)
 	{
 		Yii::log("Finalizing checkout", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 		if (!$objCart)
@@ -1328,16 +1344,16 @@ class CartController extends Controller
 
 		self::PostFinalizeHooks($objCart);
 
-		if (!$blnBehindTheScenes)
+		if ($performInternalFinalizeSteps === true)
 		{
 			//If we're behind a common SSL and we want to stay logged in
 			if (Yii::app()->isCommonSSL && $objCart->customer->record_type != Customer::GUEST)
 			{
-				Yii::app()->user->setState('sharedssl',1);
+				Yii::app()->user->setState('sharedssl', 1);
 			}
 
 			//If we were in as guest, immediately log out of guest account
-			if ($objCart->customer->record_type == Customer::GUEST)
+			if ($objCart->customer->record_type == Customer::GUEST && Yii::app()->theme->info->advancedCheckout === false)
 			{
 				Yii::app()->user->logout();
 			}
@@ -1369,7 +1385,7 @@ class CartController extends Controller
 		try {
 			$retVal = Yii::app()->getComponent($strModule)->gateway_response_process();
 
-			Yii::log("Gateway response $strModule:\n" . print_r($retVal,true), 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
+			Yii::log("Gateway response $strModule:\n" . print_r($retVal, true), 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
 
 			if (is_array($retVal))
 			{
@@ -1394,10 +1410,10 @@ class CartController extends Controller
 						$objPayment->payment_amount = isset($retVal['amount']) ? $retVal['amount'] : 0;
 						$objPayment->payment_data = $retVal['data'];
 						$objPayment->datetime_posted = isset($retVal['payment_date']) ?
-							date("Y-m-d H:i:s",strtotime($retVal['payment_date'])) : new CDbExpression('NOW()');
+							date("Y-m-d H:i:s", strtotime($retVal['payment_date'])) : new CDbExpression('NOW()');
 						$objPayment->save();
 
-						self::FinalizeCheckout($objCart, !Yii::app()->theme->info->advancedCheckout);
+						self::FinalizeCheckout($objCart, Yii::app()->getComponent($strModule)->performInternalFinalizeSteps);
 
 						Yii::log('Checkout Finalized', 'info', __CLASS__.'.'.__FUNCTION__);
 
@@ -1412,7 +1428,6 @@ class CartController extends Controller
 							);
 						}
 					}
-
 				}
 
 				if (isset($retVal['output']))

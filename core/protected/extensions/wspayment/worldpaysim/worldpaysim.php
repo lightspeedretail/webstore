@@ -9,6 +9,7 @@ class worldpaysim extends WsPayment
 	protected $apiVersion = 1;
 	public $cloudCompatible = true;
 	protected $uses_credit_card = true;
+	public $performInternalFinalizeSteps = false;
 
 	/**
 	 * Run the payment process

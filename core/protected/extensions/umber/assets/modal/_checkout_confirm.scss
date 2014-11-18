@@ -14,8 +14,8 @@
 	}
 
 	.final-confirmation {
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 30px;
+		border-bottom: 1px solid #ddd;
+		padding-bottom: 30px;
 
 		label {
 			margin-top: .5em;
@@ -44,15 +44,15 @@
 
 		a, textarea { font-size: .875rem; }
 
-        a:before {
-          @extend %icon-prereqs;
-          @extend %icon-chat-bubble;
+		a:before {
+		  @extend %icon-prereqs;
+		  @extend %icon-chat-bubble;
 
-          float: left;
-          margin-top: 4px;
-          margin-right: 5px;
-          border-bottom: none;
-        }
+		  float: left;
+		  margin-top: 4px;
+		  margin-right: 5px;
+		  border-bottom: none;
+		}
 
 		textarea {
 			display: none;
@@ -69,10 +69,20 @@
 		@extend %clearfix;
 
 		.column {
-			width: 48%;
-			float: left;
+		  width: 96%;
+		  float: left;
+		  margin-left: 2%;
 
-			&:first-child { margin-right: 4%; }
+		  @include media(verysmall) {
+			width: 48%;
+		  }
+
+		  @include media(small) {
+			margin-left: 0;
+			&:first-child {
+			  margin-right: 4%;
+			}
+		  }
 		}
 	}
 
@@ -85,11 +95,15 @@
 		}
 	}
 
-	.shipping {}
+	.shipping {
+	  p{
+		a {  display: block;  }
+	  }
+	}
 
 	.payment {
 		p {
-            font-size: 0.75rem;
+			font-size: 0.75rem;
 			margin: 0 0 1.25em;
 			border: 1px solid #ddd;
 			padding: 15px 5px 15px 75px;
@@ -101,19 +115,19 @@
 
 		}
 
-        //MO
-        p.sim {
-          padding: 7px 5px 8px 15px;
+		//MO
+		p.sim {
+		  padding: 7px 5px 8px 15px;
 
-          .instructions {
-            font-size: 0.6rem;
-          }
-        }
+		  .instructions {
+			font-size: 0.6rem;
+		  }
+		}
 
 		.payment-note {
 			margin-bottom: 10px;
 			display: inline-block;
-            font-size: 0.75rem;
+			font-size: 0.75rem;
 		}
 
 		.card-tiny {
@@ -130,9 +144,6 @@
 			width: 45px;
 			float: left;
 		}
-
-
-
 	}
 
 	.lines {
@@ -145,10 +156,10 @@
 			line-height: 40px;
 		}
 
-        //MO override bootstrap
-        td.controls {
-          vertical-align: middle;
-        }
+		//MO override bootstrap
+		td.controls {
+		  vertical-align: middle;
+		}
 
 		.quantity {
 			font-weight: bold;
@@ -168,15 +179,19 @@
 					-webkit-appearance: none;
 					margin: 0;
 				}
-                //MO remove spinner from number inputs mozilla
-                -moz-appearance:textfield;
+				//MO remove spinner from number inputs mozilla
+				-moz-appearance:textfield;
 			}
 		}
 
 		.image {
+			display: none;
 			white-space: nowrap;
 			width: 65px;
-            vertical-align: middle; //MO bootstrap override
+			vertical-align: middle; //MO bootstrap override
+			@include media(small) {
+			  display: table-cell;
+			}
 
 			&:before {
 				display: inline-block;
@@ -217,7 +232,7 @@
 		}
 
 		.controls {
-			padding-left: 1em;
+			padding: 0 1em;
 			text-transform: uppercase;
 			font-size: .75rem;
 			width: 2.5rem;
@@ -259,11 +274,11 @@
 	.totals {
 		margin-top: .5rem;
 		float: right;
-        width: 100%;
-        @media(min-width:640px) {
-          float: right;
-          width: 16rem;
-        }
+		width: 100%;
+		@media(min-width:640px) {
+		  float: right;
+		  width: 16rem;
+		}
 
 		td, th {
 			color: #666;
@@ -271,11 +286,16 @@
 			font-size: 1rem;
 		}
 
-	small {
+		small {
 			font-size: .75rem;
 			color: #999;
 			font-weight: normal;
 		}
+
+		th{
+			text-align:left;
+		}
+
 		td {
 			text-align: right;
 			border-top: none;
@@ -301,9 +321,10 @@
   width: 48%;
   float: right;
   margin-left: 4%;
+  margin-bottom: 25px;
   text-shadow: 0 0;
   &:focus{
-    font-size: 1.125rem;
+	font-size: 1.125rem;
   }
 }
 #checkout .quantity input{
@@ -315,7 +336,7 @@
   text-decoration: none;
   //MO override base.css line 183.
   &:focus{
-    outline:none;
+	outline:none;
   }
 
 }
@@ -339,7 +360,13 @@
 
 .webstore-overlay #confirm form.promo{
   p{
-    line-height: 1.3;
-    font-size: 0.6875rem;
+	line-height: 1.3;
+	font-size: 0.6875rem;
   }
+}
+p.webstore-label.confirmation span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
 }
