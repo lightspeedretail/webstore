@@ -449,7 +449,7 @@ function displayNotAcceptable($checkenv)
 }
 function displayFormTwo()
 {
-	$sanitized = preg_replace('/[^a-zA-Z0-9\.\,\(\)@#!?]/', '', $_POST);
+	$sanitized = preg_replace('/[^a-zA-Z0-9\.\,\(\)@#!?_]/', '', $_POST);
 	writeDB($sanitized['dbhost'],$sanitized['dbuser'],$sanitized['dbpass'],$sanitized['dbname']);
 
 
