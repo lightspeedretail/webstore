@@ -17,7 +17,7 @@
     <h3>Pending to Download Orders</h3>
     <div class="span8">
         <div class="editinstructions">
-			<?php echo Yii::t('admin','These orders are ready to be downloaded into LightSpeed. Editing provided for troubleshooting purposes only. Please use caution when using these options, and consult our online documentation and technical support resources for assistance. <strong>Note: missing tax codes will prevent an order from downloading.</strong>'); ?>
+			<?php echo Yii::t('admin','These orders are ready to be downloaded into Lightspeed. Editing provided for troubleshooting purposes only. Please use caution when using these options, and consult our online documentation and technical support resources for assistance. <strong>Note: missing tax codes will prevent an order from downloading.</strong>'); ?>
         </div>
     </div>
     <div class="clearfix search">

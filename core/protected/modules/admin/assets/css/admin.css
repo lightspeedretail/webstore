@@ -114,6 +114,8 @@ h3 { margin-top: 2px; }
 .themeicon.selected {  border: 8px solid #c6d0e5; }
 .themeicon label { padding: 0px; margin: 0px; width: 200px; height: 160px; text-align: left; }
 .themeoptions { font-size: 0.8em; min-height: 60px; }
+.themeoptions button { border: 0; font-weight: 200; font-size: 1em; color: #08C; background-color: transparent; }
+.themeoptions button:hover { color: #005580; text-decoration: underline; }
 .themeoptions select { margin-left: 13px; margin-top: 8px; width: 180px; }
 .themeselect { display: none; }
 .themeinstaller {  margin-left: 13px; font-size: 0.8em; font-weight: 600; }
@@ -158,15 +160,16 @@ h3 { margin-top: 2px; }
 
 .lslogo {
     float: left;
-    background: url("/images/logo_white.png") no-repeat scroll 12px 8px rgb(61,137,209);
-    background-size: auto 20px;
-    width: 110px; height: 35px;
-    margin-left: -20px;
+    margin-left: -10px;
+    margin-top:5px;
     margin-right: 20px;
-    transition-property: background;
-    transition-duration: 0.4s;
+    background-size: 100px 23px;
+    background-repeat: no-repeat;
+    display: block;
+    width: 100px;
+    height: 23px;
 }
-.lslogo:hover { background-color: #155183; }
+
 .backToSite {
     background-color: #428bca;
     color: #fff;
@@ -229,7 +232,7 @@ textarea.narrow {
 	max-width: 240px;
 }
 
-@media only screen and (max-width: 1001px) { /* through LightSpeed */
+@media only screen and (max-width: 1001px) { /* through Lightspeed */
     body { font-size: 13px;}
     input[type="text"] {  width: 200px; }
     #xlsSearch { width: 100px; }

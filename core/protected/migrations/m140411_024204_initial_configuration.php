@@ -128,7 +128,7 @@ class m140411_024204_initial_configuration extends CDbMigration
 			'xlsws_configuration', array(
 				'title' => 'Store Name',
 				'key_name' => 'STORE_NAME',
-				'key_value' => 'LightSpeed Web Store',
+				'key_value' => 'Lightspeed Web Store',
 				'helper_text' => '',
 				'configuration_type_id' => 2,
 				'sort_order' => 1,
@@ -299,7 +299,7 @@ class m140411_024204_initial_configuration extends CDbMigration
 				'title' => 'Require account creation',
 				'key_name' => 'REQUIRE_ACCOUNT',
 				'key_value' => '1',
-				'helper_text' => 'Force customers to sign up with an account before shopping? Note this some customers will abandon a forced-signup process. Customer cards are created in LightSpeed based on all orders, not dependent on customer registrations.',
+				'helper_text' => 'Force customers to sign up with an account before shopping? Note this some customers will abandon a forced-signup process. Customer cards are created in Lightspeed based on all orders, not dependent on customer registrations.',
 				'configuration_type_id' => 3,
 				'sort_order' => 2,
 				'modified' => '2013-11-05 13:30:35',
@@ -537,7 +537,7 @@ class m140411_024204_initial_configuration extends CDbMigration
 				'title' => 'Product Size Label',
 				'key_name' => 'PRODUCT_SIZE_LABEL',
 				'key_value' => 'Size',
-				'helper_text' => 'Rename Size Option of LightSpeed to this',
+				'helper_text' => 'Rename Size Option of Lightspeed to this',
 				'configuration_type_id' => 8,
 				'sort_order' => 2,
 				'modified' => '2013-11-05 13:30:35',
@@ -554,7 +554,7 @@ class m140411_024204_initial_configuration extends CDbMigration
 				'title' => 'Product {color} Label',
 				'key_name' => 'PRODUCT_COLOR_LABEL',
 				'key_value' => 'Color',
-				'helper_text' => 'Rename {color} Option of LightSpeed to this',
+				'helper_text' => 'Rename {color} Option of Lightspeed to this',
 				'configuration_type_id' => 8,
 				'sort_order' => 1,
 				'modified' => '2013-11-05 13:30:35',
@@ -757,7 +757,7 @@ class m140411_024204_initial_configuration extends CDbMigration
 			'xlsws_configuration', array(
 				'title' => 'Site Theme',
 				'key_name' => 'THEME',
-				'key_value' => 'brooklyn',
+				'key_value' => 'brooklyn2014',
 				'helper_text' => 'The default template from templates directory to be used for Web Store',
 				'configuration_type_id' => 0,
 				'sort_order' => 2,
@@ -857,7 +857,7 @@ class m140411_024204_initial_configuration extends CDbMigration
 
 		$this->insert(
 			'xlsws_configuration', array(
-				'title' => 'LightSpeed Secure Key',
+				'title' => 'Lightspeed secure Key',
 				'key_name' => 'LSKEY',
 				'key_value' => '426399176d016388608b6a3b021f8ab9',
 				'helper_text' => 'The secure key or password for administrative access to your lightspeed web store',
@@ -1251,7 +1251,7 @@ class m140411_024204_initial_configuration extends CDbMigration
 				'title' => 'Deduct Pending Orders from Available Inventory',
 				'key_name' => 'INVENTORY_RESERVED',
 				'key_value' => '1',
-				'helper_text' => 'This option will calculate Qty Available minus Pending Orders. Turning on Upload Orders in LightSpeed Tools->eCommerce->Documents is required to make this feature work properly.',
+				'helper_text' => 'This option will calculate Qty Available minus Pending Orders. Turning on Upload Orders in Lightspeed Tools->eCommerce->Documents is required to make this feature work properly.',
 				'configuration_type_id' => 11,
 				'sort_order' => 4,
 				'modified' => '2013-11-05 13:30:35',
@@ -1265,10 +1265,10 @@ class m140411_024204_initial_configuration extends CDbMigration
 
 		$this->insert(
 			'xlsws_configuration', array(
-				'title' => 'LightSpeed Hosting',
+				'title' => 'Lightspeed Hosting',
 				'key_name' => 'LIGHTSPEED_HOSTING',
 				'key_value' => '0',
-				'helper_text' => 'Flag which indicates site is hosted by LightSpeed',
+				'helper_text' => 'Flag which indicates site is hosted by Lightspeed',
 				'configuration_type_id' => 0,
 				'sort_order' => 0,
 				'modified' => '2013-11-05 13:30:35',
@@ -1792,9 +1792,9 @@ class m140411_024204_initial_configuration extends CDbMigration
 
 		$this->insert(
 			'xlsws_configuration', array(
-				'title' => 'Store City, State, Postal',
+				'title' => 'Store Address 2',
 				'key_name' => 'STORE_ADDRESS2',
-				'key_value' => 'Anytown, NY 12345',
+				'key_value' => '',
 				'helper_text' => 'Address line 2',
 				'configuration_type_id' => 2,
 				'sort_order' => 6,

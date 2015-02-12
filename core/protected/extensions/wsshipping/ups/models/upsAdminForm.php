@@ -75,7 +75,7 @@ class upsAdminForm extends CFormModel
 			'offerservices'=>'Offer these services',
 			'restrictcountry'=>'Only allow this carrier to',
 			'markup'=>'Mark up ($)',
-			'product'=>'LightSpeed Product Code (case sensitive)',
+			'product'=>'Lightspeed Product Code (case sensitive)',
 		);
 	}
 

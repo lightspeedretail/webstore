@@ -20,7 +20,7 @@
  * @property string $datetime_cre
  * @property string $datetime_due
  * @property string $printed_notes
- * @property string $tax_code_id
+ * @property integer $tax_code_id
  * @property integer $tax_inclusive
  * @property double $subtotal
  * @property double $tax1
@@ -74,18 +74,17 @@ abstract class BaseCart extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('cart_type, tax_inclusive, item_count, downloaded, fk_promo_id', 'numerical', 'integerOnly'=>true),
+			array('cart_type, tax_inclusive, tax_code_id, item_count, downloaded, fk_promo_id', 'numerical', 'integerOnly' => true),
 			array('currency_rate, subtotal, tax1, tax2, tax3, tax4, tax5, total', 'numerical'),
-			array('id_str, po, linkid', 'length', 'max'=>64),
-			array('customer_id, shipaddress_id, billaddress_id, shipping_id, payment_id, document_id, gift_registry', 'length', 'max'=>20),
-			array('status, lightspeed_user', 'length', 'max'=>32),
-			array('currency', 'length', 'max'=>3),
-			array('tax_code_id', 'length', 'max'=>11),
-			array('origin, send_to', 'length', 'max'=>255),
+			array('id_str, po, linkid', 'length', 'max' => 64),
+			array('customer_id, shipaddress_id, billaddress_id, shipping_id, payment_id, document_id, gift_registry', 'length', 'max' => 20),
+			array('status, lightspeed_user', 'length', 'max' => 32),
+			array('currency', 'length', 'max' => 3),
+			array('origin, send_to', 'length', 'max' => 255),
 			array('datetime_cre, datetime_due, printed_notes, submitted, modified', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, id_str, customer_id, shipaddress_id, billaddress_id, shipping_id, payment_id, document_id, po, cart_type, status, currency, currency_rate, datetime_cre, datetime_due, printed_notes, tax_code_id, tax_inclusive, subtotal, tax1, tax2, tax3, tax4, tax5, total, item_count, downloaded, lightspeed_user, origin, gift_registry, send_to, submitted, modified, linkid, fk_promo_id', 'safe', 'on'=>'search'),
+			array('id, id_str, customer_id, shipaddress_id, billaddress_id, shipping_id, payment_id, document_id, po, cart_type, status, currency, currency_rate, datetime_cre, datetime_due, printed_notes, tax_code_id, tax_inclusive, subtotal, tax1, tax2, tax3, tax4, tax5, total, item_count, downloaded, lightspeed_user, origin, gift_registry, send_to, submitted, modified, linkid, fk_promo_id', 'safe', 'on' => 'search'),
 		);
 	}
 

@@ -1,0 +1,177 @@
+.address-blocks {
+  @include transition(opacity .5s);
+  height: auto;
+  opacity: 1;
+  &.flipped {
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+  }
+}
+
+.address-new {
+  position: relative;
+  footer {
+    max-width: 200px;
+    .button {
+      padding: 10px 0;
+    }
+  }
+  .select-options {
+    font-size: .9rem;
+    color: #888;
+    label.checkbox {
+      padding-bottom: 5px;
+      display: block;
+      padding-right: 10px;
+      @include media(medium) {
+        display: inline-block;
+        padding-bottom: 0;
+      }
+      &:last-child {
+        padding-right: 0;
+      }
+    }
+  }
+  .address-form {
+    max-width: 420px;
+    .submit-small .button {
+      font-size: .9rem;
+    }
+    ol {
+      padding-left: 0;
+      li {
+        list-style: none;
+      }
+    }
+  }
+  @include transition(opacity .5s);
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  &.flipped {
+    height: auto;
+    opacity: 1;
+  }
+}
+.account-address {
+  .address-block {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 30px;
+    display: inline-block;
+    vertical-align: top;
+    p:before {
+      display: none;
+    }
+    @include media(medium) {
+      width: 47%;
+      margin-right: 4%;
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+}
+
+.order-history {
+  table {
+    border-collapse: collapse;
+    color: #444;
+
+    th, td {
+      text-align: left;
+    }
+    tr {
+      @include transition(color .1s, border .1s, background .1s);
+      &:hover {
+        cursor: pointer;
+        background-color: #f8f8f8;
+      }
+    }
+
+    &.lines {
+      a { color: #555; }
+      td {
+        padding: 10px 0;
+        font-size: 0.875rem;
+        &.date {
+          color: $blue;
+          font-weight: bold;
+        }
+        &.num {
+          font-weight: bold;
+        }
+      }
+      tr td:first-child, tr th:first-child {
+        padding-left: 8px;
+        @include media(small) {
+          padding-left: 10px;
+        }
+      }
+      tr td:last-child, tr th:last-child {
+        padding-right: 8px;
+        @include media(small) {
+          padding-right: 10px;
+        }
+      }
+      tbody {
+        border-top: 1px solid #eee;
+      }
+      td { border-bottom: 1px solid #eee; }
+    }
+
+
+  }
+  .subtotal {
+    text-align: right;
+  }
+
+}
+
+//MO added the .add .small class to support links with button like look-n-feel
+button.small, .add .small {
+  float: none;
+  padding: 9px 12px;
+  margin-bottom: 30px;
+  width: auto;
+  display: inline-block;
+  vertical-align: top;
+  font-size: .8rem;
+}
+
+.modify {
+  font-size: .8rem;
+  padding-left: 0;
+  list-style: none;
+  li {
+    display: inline;
+    margin-right: 20px;
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+  a {
+    text-decoration: none;
+    border-bottom: 1px solid #fff;
+    padding-bottom: 1px;
+
+    &:hover {
+      border-bottom-color: $blue;
+    }
+  }
+}
+
+.customer p {
+  font-size: 1.1em;
+  strong {
+    font-size: 1.2em;
+  }
+}
+
+.customerorder p {
+  font-size: .75em;
+  strong {
+    font-size: 1.2em;
+  }
+}

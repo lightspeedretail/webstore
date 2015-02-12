@@ -25,7 +25,7 @@ class Family extends BaseFamily
 
 	public static function LoadByRequestUrl($strName) {
 
-		return Family::model()->findByAttributes(array('request_url'=>urldecode($strName)));
+		return Family::model()->findByAttributes(array('request_url' => urldecode($strName)));
 	}
 
 	public static function LoadByFamily($strName) {
@@ -35,16 +35,8 @@ class Family extends BaseFamily
 	}
 
 	public static function GetTree() {
-
-		$criteria = new CDbCriteria();
-		$criteria->alias = 'Family';
-
-		$criteria->order = 'family';
-
-		$objRet = Family::model()->findAll($criteria);
-
-		return Family::getDataFormatted(Family::parseTree($objRet,0));
-
+		$parsedTree = Family::parseTree(Family::getDisplayableFamilies(), 0);
+		return Family::getDataFormatted($parsedTree);
 	}
 
 	protected static function formatData($person) {
@@ -106,6 +98,63 @@ class Family extends BaseFamily
 			$objFamily->save();
 		}
 
+	}
+
+	/**
+	 * Based on various configuration on Web Store some Families (Manufacturers)
+	 * can or cannot be shown. This method will look at the DISPLAY_EMPTY_CATEGORY
+	 * config and the INVENTORY_OUT_ALLOW_ADD config to verify which Families should
+	 * get displayed.
+	 *
+	 * @return Family[] an array containing family records that can be displayed
+	 */
+	public static function getDisplayableFamilies()
+	{
+		if (CPropertyValue::ensureBoolean(_xls_get_conf('DISPLAY_EMPTY_CATEGORY')) === false)
+		{
+			$families = Family::model()->withProducts()->findAll();
+		}
+		else
+		{
+			$families = Family::model()->findAll(array('order' => 'family'));
+		}
+
+		if (CPropertyValue::ensureInteger(_xls_get_conf('INVENTORY_OUT_ALLOW_ADD')) === 0)
+		{
+			$families = static::_hideFamiliesWithEmptyStock($families);
+		}
+
+		return $families;
+	}
+
+	/**
+	 * Goes through each of the families and checks if the sum of the available inventories
+	 * in it is greater than 0.
+	 *
+	 * @param $families A pre-fetched array of acceptable families to be displayed based on
+	 * @return Family[] an array containing family records that can be displayed
+	 */
+	private static function _hideFamiliesWithEmptyStock($families)
+	{
+		$indexes = array();
+		for($i = 0; $i < count($families); $i++)
+		{
+			$family = $families[$i];
+			$products = $family->products();
+
+			$availQty = Product::sumInventoryInProducts($products);
+			if($availQty <= 0)
+			{
+				array_push($indexes, $i);
+			}
+		}
+
+		foreach($indexes as $i)
+		{
+			unset($families[$i]);
+		}
+
+		return $families;
 	}
 
 	protected function GetPageMeta($strConf = 'SEO_CUSTOMPAGE_TITLE') {
@@ -193,6 +242,19 @@ class Family extends BaseFamily
 		default:
 			return parent::__get($strName);
 		}
+	}
+
+	/**
+	 * Define some specialized query scopes to make searching for specific db
+	 * info easier
+	 */
+	public function scopes() {
+		return array(
+			'withProducts' => array(
+				'condition' => 'child_count > 0',
+				'order' => 'family'
+			)
+		);
 	}
 
 }

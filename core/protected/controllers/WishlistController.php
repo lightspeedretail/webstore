@@ -545,12 +545,12 @@ class WishlistController extends Controller
 				$objEmail->subject = $strSubject;
 				$objEmail->to = $model->toEmail;
 
-//				$objHtml = new HtmlToText;
-//
-//				//If we get back false, it means conversion failed which 99.9% of the time means improper HTML.
-//				$strPlain = $objHtml->convert_html_to_text($strHtmlBody);
-//				if ($strPlain !== false)
-//					$objEmail->plainbody = $strPlain;
+				$objHtml = new HtmlToText;
+
+				//If we get back false, it means conversion failed which 99.9% of the time means improper HTML.
+				$strPlain = $objHtml->convert_html_to_text($strHtmlBody);
+				if ($strPlain !== false)
+					$objEmail->plainbody = $strPlain;
 
 				$objEmail->save();
 

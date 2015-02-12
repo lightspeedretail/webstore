@@ -27,27 +27,33 @@ class Theme extends CTheme
 	{
 		//Just in case someone passed the .css as part of the $cssFile
 		if (substr($cssFile, strlen($cssFile) - 4, 4) == ".css")
+		{
 			$cssFile = substr($cssFile, 0, -4);
+		}
 
 		// new install?
 		if (!is_array(Yii::app()->theme->config->activecss))
+		{
 			return parent::getBaseUrl()."/css/".$cssFile.".css";
+		}
 
 		$arrActiveCss = Yii::app()->theme->config->activecss;
 
 		if ($this->hasAdminForm(Yii::app()->theme->name))
 		{
-			if(in_array($cssFile,$arrActiveCss))
+			if(in_array($cssFile, $arrActiveCss))
+			{
 				if ($cssFile !== 'custom')
+				{
 					return parent::getBaseUrl()."/css/".$cssFile.".css";
-				else
-					return str_replace("http:","",_xls_custom_css_folder()).
+				} else {
+					return str_replace("http:", "", _xls_custom_css_folder()).
 					"_customcss/".Yii::app()->theme->name."/".$cssFile.".css";
-		}
-		else
+				}
+			}
+		} else {
 			return parent::getBaseUrl()."/css/".$cssFile.".css";
-
-
+		}
 	}
 
 	/**

@@ -6,6 +6,13 @@
 	    <meta name="description" content="">
 	    <meta name="author" content="">
 
+		<link rel="shortcut icon" href="<?=Yii::app()->baseUrl.'/images/favicon-32x32.png' ?>"/>
+
+		<?php
+		// we prefix with baseUrl to handle instances where Web Store is installed in a sub folder
+		$strLogoUrl = Yii::app()->baseUrl . '/images/ls-logo1002x.png';
+		?>
+
 	    <!-- Le styles -->
 	    <style type="text/css">
 	        body {
@@ -14,6 +21,9 @@
 	        }
 	        .sidebar-nav {
 	            padding: 9px 0;
+	        }
+	        .lslogo {
+		        background-image: url('<?= $strLogoUrl ?>');
 	        }
 
 	    </style>

@@ -8,6 +8,8 @@ class authorizedotnetsim extends WsPayment
 	protected $uses_jumper = true;
 	protected $apiVersion = 1;
 	public $cloudCompatible = true;
+	public $performInternalFinalizeSteps = false;
+	protected $uses_credit_card = true;
 
 	const x_delim_char = "|";
 
@@ -28,85 +30,107 @@ class authorizedotnetsim extends WsPayment
 		 *
 		 */
 		if($this->config['live'] == 'test')
+		{
 			$auth_net_url	= "https://test.authorize.net/gateway/transact.dll";
+		}
 		else
+		{
 			$auth_net_url	= "https://secure.authorize.net/gateway/transact.dll";
+		}
 
 		$str = "";
 
-		$str .= "<FORM action=\"$auth_net_url\" method=\"POST\">";
+		$str .= sprintf('<FORM action="%s" method="POST">', $auth_net_url);
 		$str .= $this->InsertFP($auth_net_login_id, $auth_net_tran_key, round($this->objCart->Total,2), $this->objCart->currency);
 
-		$str .= _xls_make_hidden('x_invoice_num', $this->objCart->id_str);
-		$str .= _xls_make_hidden('x_first_name', $this->CheckoutForm->contactFirstName);
-		$str .= _xls_make_hidden('x_last_name', $this->CheckoutForm->contactLastName);
-		$str .= _xls_make_hidden('x_company', $this->CheckoutForm->contactCompany);
-		$str .= _xls_make_hidden('x_address', ($this->CheckoutForm->billingAddress2 != '' ?
-			$this->CheckoutForm->billingAddress1 . " " . $this->CheckoutForm->billingAddress2 : $this->CheckoutForm->billingAddress1));
-		$str .= _xls_make_hidden('x_city', $this->CheckoutForm->billingCity);
-		$str .= _xls_make_hidden('x_state', $this->CheckoutForm->billingState);
-		$str .= _xls_make_hidden('x_zip', $this->CheckoutForm->billingPostal);
-		$str .= _xls_make_hidden('x_country', $this->CheckoutForm->billingCountry);
-		$str .= _xls_make_hidden('x_phone', _xls_number_only($this->CheckoutForm->contactPhone));
+		$str .= _xls_make_hidden('x_invoice_num',           $this->objCart->id_str);
+		$str .= _xls_make_hidden('x_first_name',            $this->CheckoutForm->contactFirstName);
+		$str .= _xls_make_hidden('x_last_name',             $this->CheckoutForm->contactLastName);
+		$str .= _xls_make_hidden('x_company',               $this->CheckoutForm->contactCompany);
+		$str .= _xls_make_hidden('x_address',               $this->CheckoutForm->billingAddress1 . " " . $this->CheckoutForm->billingAddress2);
+		$str .= _xls_make_hidden('x_city',                  $this->CheckoutForm->billingCity);
+		$str .= _xls_make_hidden('x_state',                 $this->CheckoutForm->billingStateCode);
+		$str .= _xls_make_hidden('x_zip',                   $this->CheckoutForm->billingPostal);
+		$str .= _xls_make_hidden('x_country',               $this->CheckoutForm->billingCountryCode);
+		$str .= _xls_make_hidden('x_phone',                 _xls_number_only($this->CheckoutForm->contactPhone));
+		$str .= _xls_make_hidden('x_email',                 $this->CheckoutForm->contactEmail);
+		$str .= _xls_make_hidden('x_cust_id',               "WC-" . $this->objCart->customer_id);
+		$str .= _xls_make_hidden('x_ship_to_first_name',    $this->CheckoutForm->shippingFirstName);
+		$str .= _xls_make_hidden('x_ship_to_last_name',     $this->CheckoutForm->shippingLastName);
+		$str .= _xls_make_hidden('x_ship_to_company',       $this->CheckoutForm->shippingCompany);
+		$str .= _xls_make_hidden('x_ship_to_address',       $this->CheckoutForm->shippingAddress1 . " " . $this->CheckoutForm->shippingAddress2);
+		$str .= _xls_make_hidden('x_ship_to_city',          $this->CheckoutForm->shippingCity);
+		$str .= _xls_make_hidden('x_ship_to_state',         $this->CheckoutForm->shippingStateCode);
+		$str .= _xls_make_hidden('x_ship_to_zip',           $this->CheckoutForm->shippingPostal);
+		$str .= _xls_make_hidden('x_ship_to_country',       $this->CheckoutForm->shippingCountryCode);
+		$str .= _xls_make_hidden('x_description',           _xls_get_conf('STORE_NAME', "Online") . " Order");
+		$str .= _xls_make_hidden('x_login',                 $auth_net_login_id);
+		$str .= _xls_make_hidden('x_solution_id',           'A1000010');
+		$str .= _xls_make_hidden('x_type',                  'AUTH_CAPTURE');
+		$str .= _xls_make_hidden('x_currency_code',         $this->objCart->currency);  //trying to get currency code to submit
+		$str .= _xls_make_hidden('x_amount',                round($this->objCart->Total,2));
+		$str .= _xls_make_hidden('x_show_form',             'PAYMENT_FORM');
+		$str .= _xls_make_hidden('x_relay_response',        'TRUE');
 
-		$str .= _xls_make_hidden('x_email', $this->CheckoutForm->contactEmail);
-		$str .= _xls_make_hidden('x_cust_id', "WC-" . $this->objCart->customer_id);
+		$str .= _xls_make_hidden(
+			'x_relay_url',
+			Yii::app()->controller->createAbsoluteUrl('cart/payment', array(), 'http').'/'.$this->modulename
+		);
 
-		$str .= _xls_make_hidden('x_ship_to_first_name',   $this->CheckoutForm->shippingFirstName);
-		$str .= _xls_make_hidden('x_ship_to_last_name',   $this->CheckoutForm->shippingLastName);
-		$str .= _xls_make_hidden('x_ship_to_company',   $this->CheckoutForm->shippingCompany);
-		$str .= _xls_make_hidden('x_ship_to_address',   $this->CheckoutForm->shippingAddress1 . " " . $this->CheckoutForm->shippingAddress2);
-		$str .= _xls_make_hidden('x_ship_to_city',   $this->CheckoutForm->shippingCity);
-		$str .= _xls_make_hidden('x_ship_to_state',   $this->CheckoutForm->shippingState);
-		$str .= _xls_make_hidden('x_ship_to_zip',   $this->CheckoutForm->shippingPostal);
-		$str .= _xls_make_hidden('x_ship_to_country',   $this->CheckoutForm->shippingCountry);
+		$str .= _xls_make_hidden(
+			'x_cancel_url',
+			Yii::app()->controller->createAbsoluteUrl('cart/restore', array('getuid' => $this->objCart->linkid), 'http')
+		);
 
-		$str .= _xls_make_hidden('x_description',  _xls_get_conf( 'STORE_NAME'  , "Online") . " Order");
-
-		$str .= _xls_make_hidden('x_login',   $auth_net_login_id);
-		$str .= _xls_make_hidden('x_solution_id', 'A1000010');
-		$str .= _xls_make_hidden('x_type',   'AUTH_CAPTURE');
-		$str .= _xls_make_hidden('x_currency_code',   $this->objCart->currency);  //trying to get currency code to submit
-		$str .= _xls_make_hidden('x_amount',  round($this->objCart->Total,2));
-		$str .= _xls_make_hidden('x_show_form',   'PAYMENT_FORM');
-
-
-		$str .= _xls_make_hidden('x_relay_url',
-			Yii::app()->controller->createAbsoluteUrl('cart/payment',array(),'http').'/'.$this->modulename);
-		$str .= _xls_make_hidden('x_relay_response',   'TRUE');
-		$str .= _xls_make_hidden('x_cancel_url',
-			Yii::app()->controller->createAbsoluteUrl('cart/restore', array('getuid'=>$this->objCart->linkid),'http'));
-
-		if(Yii::app()->params['LIGHTSPEED_MT']>0)
+		if (Yii::app()->params['LIGHTSPEED_MT'] > 0)
+		{
 			$str .= _xls_make_hidden('x_header_html_payment_form', str_replace("\"","'",
 				CHtml::image("https:".Yii::app()->params['HEADER_IMAGE'],
 					Yii::app()->params['STORE_NAME'],
 					array('style'=>'max-width:580px'))
 			));
+		}
 		else
-			$str .= _xls_make_hidden('x_header_html_payment_form', str_replace("\"","'",
-				CHtml::image(Yii::app()->controller->createAbsoluteUrl(Yii::app()->params['HEADER_IMAGE'],array(),'https'),
-					Yii::app()->params['STORE_NAME'],
-					array('style'=>'max-width:580px'))
-			));
-
-		//if($this->config['live'] == 'test')
-			//$str .= _xls_make_hidden('x_test_request',   'TRUE');
+		{
+			$str .= _xls_make_hidden(
+				'x_header_html_payment_form',
+				str_replace(
+					"\"",
+					"'",
+					CHtml::image(
+						Yii::app()->controller->createAbsoluteUrl(Yii::app()->params['HEADER_IMAGE'], array(), 'https'),
+						Yii::app()->params['STORE_NAME'],
+						array('style' => 'max-width:580px')
+					)
+				)
+			);
+		}
 
 		$str .= ('</FORM>');
 
-		if(_xls_get_conf('DEBUG_PAYMENTS' , false)=="1")
-			_xls_log(get_class($this) . " sending ".$this->objCart->id_str." in ".$this->config['live']." mode ".$str,true);
+		Yii::log(
+			sprintf(
+				"%s sending %s in %s mode\nRequest %s",
+				__CLASS__,
+				$this->objCart->id_str,
+				$this->objCart->id_str,
+				$str
+			),
+			$this->logLevel,
+			'application.'.__CLASS__.'.'.__FUNCTION__
+		);
 
 		$arrReturn['api'] = $this->apiVersion;
 		$arrReturn['jump_form']=$str;
 		return $arrReturn;
 	}
 
+
 	/**
-	 * hmac
 	 * Computes hash, then converts to hex format, used as part of "fingerprint" for Auth.net simple
-	 * @param $key (transaction key), $data[]
+	 *
+	 * @param $key string - transaction key
+	 * @param $data array
 	 * @return string
 	 */
 	public function hmac ($key, $data) {
@@ -119,7 +143,7 @@ class authorizedotnetsim extends WsPayment
 	 * Use when you need control on the HTML output
 	 * @param $loginid string
 	 * @param $x_tran_key string
-	 * @param $amount decimal
+	 * @param $amount float
 	 * @param $sequence int
 	 * @param $tstamp int (time)
 	 * @param $currency string (optional)
@@ -129,17 +153,12 @@ class authorizedotnetsim extends WsPayment
 		return ($this->hmac ($x_tran_key, $loginid . "^" . $sequence . "^" . $tstamp . "^" . $amount . "^" . $currency));
 	}
 
-	// Inserts the hidden variables in the HTML FORM required for SIM
-	// Invokes hmac function to calculate fingerprint.
-
-	// public function InsertFP ($loginid, $x_tran_key, $amount, $sequence, $currency = "")
 	/**
-	 * InsertFP
-	 * Creates hidden fields for Auth.net simple access
-	 * inclued as part of FORM submitted
+	 * Inserts the hidden variables in the HTML FORM required for SIM
+	 * and invokes hmac function to calculate fingerprint.
 	 * @param $loginid string
 	 * @param $x_tran_key string
-	 * @param $amount decimal
+	 * @param $amount float
 	 * @param $currency string
 	 * @return string
 	 */
@@ -166,10 +185,9 @@ class authorizedotnetsim extends WsPayment
 	 * Processes processor gateway response
 	 * Processes returned $_GET or $_POST variables from the third party website
 	 */
-	public function gateway_response_process() {
-
-		Yii::log("Response Transaction ".print_r($_POST,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-
+	public function gateway_response_process()
+	{
+		Yii::log("Response Transaction ".print_r($_POST, true), $this->logLevel, 'application.'.__CLASS__.".".__FUNCTION__);
 
 		$x_response_code = Yii::app()->getRequest()->getPost('x_response_code');
 		$x_invoice_num = Yii::app()->getRequest()->getPost('x_invoice_num');
@@ -177,26 +195,30 @@ class authorizedotnetsim extends WsPayment
 		$x_amount = Yii::app()->getRequest()->getPost('x_amount');
 		$x_trans_id = Yii::app()->getRequest()->getPost('x_trans_id');
 
-
-		if(empty($x_response_code) || empty($x_invoice_num))
-			return false;
-
-		if($x_response_code != 1){
-			// failed order
-			Yii::log(get_class($this) . " failed order payment received ".print_r($_POST,true), CLogger::LEVEL_ERROR, get_class($this));
+		if (empty($x_response_code) || empty($x_invoice_num))
+		{
 			return false;
 		}
 
-		if(isset($this->config['md5hash'])  && ($this->config['md5hash']) && !empty($x_MD5_Hash)) {
+		if ($x_response_code != 1)
+		{
+			// failed order
+			Yii::log(__CLASS__ . " failed order payment received ".print_r($_POST,true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			return false;
+		}
+
+		if (isset($this->config['md5hash'])  && ($this->config['md5hash']) && !empty($x_MD5_Hash))
+		{
 			$md5 = strtolower(md5($this->config['md5hash'] . $this->config['login'] . Yii::app()->getRequest()->getPost('x_trans_id') . $x_amount));
-			if(strtolower($x_MD5_Hash) != $md5) {
+			if(strtolower($x_MD5_Hash) != $md5)
+			{
 				Yii::log("authorize.net.sim failed md5 hash", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				return false;
 			}
 		}
 		
 		$objCart = Cart::LoadByIdStr($x_invoice_num);
-		$url = Yii::app()->createAbsoluteUrl('cart/receipt',array('getuid'=>$objCart->linkid));
+		$url = Yii::app()->createAbsoluteUrl('cart/receipt', array('getuid' => $objCart->linkid));
 
 		return array(
 			'order_id' => $x_invoice_num,
@@ -207,7 +229,6 @@ class authorizedotnetsim extends WsPayment
 				Yii::t('global','Redirecting to your receipt')."...</a></body></html>"
 
 		);
-
 	}
 
 

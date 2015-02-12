@@ -1,0 +1,36 @@
+<!-- This configuration runs all the tests. -->
+<phpunit
+	bootstrap="core/protected/tests/phpunit/bootstrap.php"
+	colors="true"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+	stopOnFailure="false"
+	stderr="true"
+>
+	<php>
+		<server name="SERVER_NAME" value="www.copper.site" />
+		<server name="SERVER_ADDR" value="127.0.0.1" />
+		<server name="SERVER_PORT" value="80" />
+		<server name="HTTP_HOST" value="www.copper.site" />
+		<server name="REMOTE_ADDR" value="209.85.223.176" />
+		<server name="HTTP_USER_AGENT" value="Mozilla/5.0 (Windows NT 5.1; rv:15.0) Gecko/20100101 Firefox/15.0" />
+	</php>
+
+	<testsuites>
+		<testsuite name="Unit Tests">
+			<directory suffix=".php">core/protected/tests/phpunit/tests</directory>
+		</testsuite>
+	</testsuites>
+
+	<!--
+		The admin tests modify the user component which causes
+		login-related behaviour to fail for regular users. These must
+		be ran separately. For more detail, see AdminTest.
+	-->
+	<groups>
+		<exclude>
+			<group>admin</group>
+		</exclude>
+	</groups>
+</phpunit>

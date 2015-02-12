@@ -133,7 +133,7 @@
 							<?php endforeach; ?>
 					<div class="clearfix"></div>
 					<?php echo $form->radioButton($model,'intShippingAddress',array('value'=>0,'uncheckValue'=>null,
-								'onclick'=> 'js:$("#CustomerContactShippingAddress").show(); updateShippingAuto();')); ?>
+								'onclick'=> 'js:$("#CustomerContactShippingAddress").show(); singlePageCheckout.updateShippingAuto();')); ?>
 		            <div class="addresslabel"><?= Yii::t('checkout','Or enter a new address'); ?></div>
 
 	            </fieldset>
@@ -219,7 +219,7 @@
 				                            'type'=>'POST',
 			                                'dataType'=>'json',
 				                            'url'=>CController::createUrl('cart/settax'),
-				                            'success'=>'js:function(data){ updateTax(data) }',
+				                            'success'=>'js:function(data){ singlePageCheckout.updateTax(data) }',
 				                            'data' => 'js:{"'.'state_id'.'": $("#'.CHtml::activeId($model,'shippingState').
 					                            ' option:selected").val(),
 				                                "'.'postal'.'": $("#'.CHtml::activeId($model,'shippingPostal').'").val()}',
@@ -234,7 +234,7 @@
 				                            'type'=>'POST',
 				                            'dataType'=>'json',
 				                            'url'=>CController::createUrl('cart/settax'),
-				                            'success'=>'js:function(data){ updateTax(data) }',
+				                            'success'=>'js:function(data){ singlePageCheckout.updateTax(data) }',
 				                            'data' => 'js:{"'.'state_id'.'": $("#'.CHtml::activeId($model,'shippingState').
 					                            ' option:selected").val(),
 					                            "'.'postal'.'": $("#'.CHtml::activeId($model,'shippingPostal').'").val()}',
@@ -427,7 +427,7 @@
 									savedCartScenarios = data.cartitems;
 									$("#' . CHtml::activeId($model,'promoCode') .'_em_").html(data.errormsg).show();
 									alert(data.errormsg);
-									updateShippingAuto();
+									singlePageCheckout.updateShippingAuto();
 								}
 			                }'),
 	                    array('id' => 'CheckoutForm_btnPromoCode')); ?>
@@ -448,7 +448,7 @@
 				<?php echo $form->labelEx($model,'shippingProvider'); ?>
                 <div id="shippingProviderRadio">
 				<?php echo $form->radioButtonList($model,'shippingProvider',$model->getProviders(),
-						array(  'onclick' => 'updateShippingPriority(this.value)',
+						array(  'onclick' => 'singlePageCheckout.pickShippingProvider(this.value)',
 								'separator'=>'')); ?>
                 </div>
 				<?php echo $form->error($model,'shippingProvider',null,false,false); ?>
@@ -460,39 +460,21 @@
 		        <?php echo $form->labelEx($model,'shippingPriority'); ?>
                 <div id='shippingPriorityRadio'>
 		        <?php echo $form->radioButtonList($model,'shippingPriority', $model->getPriorities($model->shippingProvider),
-	                array(  'onclick' => 'updateCart(this.value)',
+	                array(  'onclick' => 'singlePageCheckout.updateCart(this.value)',
 	                        'separator'=>'')); ?>
 	             </div>
 		        <?php echo $form->error($model,'shippingPriority',null,false,false); ?>
             </div>
 
             <div class="col-sm-3" >
-	            <?php echo CHtml::ajaxButton (
-		            Yii::t('checkout','Calculate Shipping'),
-		                array('cart/ajaxcalculateshipping'),
-		            array('type'=>"POST",
-			            'dataType'=>'json',
-			            'data'=>'js:jQuery($("#checkout")).serialize()',
-			            'onclick'=>'js:jQuery($("#shippingSpinner")).show(),
-			                        js:jQuery($("#' . CHtml::activeId( $model, 'shippingProvider') .'")).html(\'\'),
-			                        js:jQuery($("#' . CHtml::activeId( $model, 'shippingPriority') .'")).html(\'\')',
-			            'success' => 'js:function(data){
-			                            if (data.result=="error") alert(data.errormsg);
-										savedShippingProviders = data.provider;
-										savedShippingPrices = data.prices;
-										savedTaxes = data.taxes;
-										savedTotalScenarios = data.totals;
-										savedShippingPriorities = data.priority;
-										savedCartScenarios = data.cartitems;
-										$("#' . CHtml::activeId( $model, 'shippingProvider') .'").html(data.provider);
-	                                    $("#' . CHtml::activeId( $model, 'shippingPriority') .'").html(data.priority);
-	                                    $("#' . CHtml::activeId( $model, 'paymentProvider') .'").html(data.paymentmodules);
-										$("#shippingSpinner").hide();
-	                                    $("#shippingProvider_0").click();
-	                                    }',
-		            ), array('id'=>'btnCalculate'));
-	            ?>
-
+				<input type="button" id="btnCalculate" value="<?= CHtml::encode(Yii::t('checkout', 'Calculate Shipping')); ?>">
+				<?php
+					Yii::app()->clientScript->registerScript(
+						'btnCalculate-script',
+						'$("#btnCalculate").click(singlePageCheckout.calculateShipping.bind(singlePageCheckout))',
+						CClientScript::POS_LOAD
+					);
+				?>
             </div>
         </fieldset>
     </div>
@@ -514,7 +496,7 @@
 	        <div class="col-sm-9">
 		        <?php echo $form->labelEx($model,'paymentProvider'); ?>
 		        <?php echo $form->dropDownList($model,'paymentProvider',$model->GetPaymentModules(),array(
-				        'onchange'=>'changePayment(this.value)'
+				        'onchange'=>'singlePageCheckout.changePayment(this.value)'
 			        )); ?>
 		        <?php echo $form->error($model,'paymentProvider'); ?>
 	        </div>
@@ -615,8 +597,12 @@
 
 </div>
 
-<?php $this->endWidget();
+<?php
+	$this->endWidget();
 
-//Render javascript
-echo $this->renderPartial('/cart/_cartjs',array('model'=>$model),true);
-
+	$this->renderPartial(
+		'ext.wssinglepagecheckout.views.instantiate',
+		array(
+			'model' => $model
+		)
+	);

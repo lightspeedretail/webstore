@@ -8,8 +8,6 @@ class freeshipping extends WsShipping
 
 
 	public function run() {
-
-
 		$arrReturn = array();
 		//cause it's free
 		$desc = isset($this->config['offerservices']) ? $this->config['offerservices'] : Yii::t('global','Standard 3-5 Business Days');

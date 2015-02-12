@@ -77,7 +77,7 @@ class UserIdentity extends CUserIdentity
 		$this->_id = $user->id;
 		$this->setState('fullname', $user->first_name.' '.$user->last_name);
 		$this->setState('firstname', $user->first_name);
-		$this->setState('profilephoto',Yii::app()->theme->baseUrl."/css/images/loginhead.png");
+		$this->setState('profilephoto', Yii::app()->theme->baseUrl."/css/images/loginhead.png");
 
 		if ($user->allow_login == Customer::ADMIN_USER)
 			$this->setState('role', 'admin');

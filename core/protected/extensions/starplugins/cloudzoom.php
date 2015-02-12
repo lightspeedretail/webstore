@@ -4,7 +4,7 @@
  * Starplugins Cloudzoom
  * http://www.starplugins.com
  *
- * Package license purchased by LightSpeed Retail for distribution purposes
+ * Package license purchased by Lightspeed Retail for distribution purposes
  * 
  */
 class cloudzoom extends CWidget

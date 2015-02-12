@@ -243,16 +243,33 @@ class MyaccountController extends Controller
 				$model->customer_id = $objCustomer->id;
 
 				if (!$model->save())
+				{
 					Yii::log("Error creating new customer address ".print_r($model->getErrors(),true),
 						'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				}
 
 				if ($model->makeDefaultBilling)
+				{
 					$objCustomer->default_billing_id=$model->id;
+				}
 				if ($model->makeDefaultShipping)
+				{
 					$objCustomer->default_shipping_id=$model->id;
+				}
+
 				$objCustomer->save();
 
-				Yii::app()->shoppingcart->UpdateCartCustomer();
+				ShoppingCart::displayNoTaxMessage();
+
+				try
+				{
+					Yii::app()->shoppingcart->setTaxCodeByDefaultShippingAddress();
+				}
+				catch(Exception $e)
+				{
+					Yii::log("Error updating customer cart ".$e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				}
+
 				Yii::app()->shoppingcart->save();
 				$this->redirect($this->createUrl("/myaccount"));
 
@@ -334,6 +351,27 @@ class MyaccountController extends Controller
 
 		//No matter what happens, we always go home.
 		$this->redirect($url);
+	}
+
+	public function actionRemoveAddress()
+	{
+		$deactived = false;
+		$data = array("status" => "error");
+		$customer_address_id = $_POST['CustomerAddressId'];
+		if(isset($customer_address_id))
+		{
+			$deactived = CustomerAddress::deactivateCustomerShippingAddress($customer_address_id, Yii::app()->user->id);
+		}
+
+		if(Yii::app()->request->isAjaxRequest)
+		{
+			if($deactived) $data["status"] = "success";
+			$this->renderJSON($data);
+		}
+		else
+		{
+			$this->redirect(Yii::app()->request->urlReferrer);
+		}
 	}
 
 	protected function triggerEmailCampaign($objCustomer,$strTrigger)

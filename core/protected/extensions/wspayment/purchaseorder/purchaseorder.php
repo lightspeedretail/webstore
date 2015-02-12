@@ -19,11 +19,10 @@ class purchaseorder extends WsPayment
 	 */
 	public function run()
 	{
-
-		$arrReturn['success']=true;
-		$arrReturn['amount_paid']=0;
-		$arrReturn['result']=$this->subformModel->po; //for this module, use the entered PO number
-		$arrReturn['jump_url']=false;
+		$arrReturn['success'] = true;
+		$arrReturn['amount_paid'] = 0;
+		$arrReturn['result'] = $this->subformModel->po; //for this module, use the entered PO number
+		$arrReturn['jump_url'] = false;
 		$arrReturn['api'] = 1;
 
 		return $arrReturn;

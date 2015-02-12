@@ -9,21 +9,21 @@
  */
 class Cart extends BaseCart
 {
+	public $blnStorePickup = false;
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return Cart the static model class
 	 */
-	public static function model($className=__CLASS__)
+	public static function model($className = __CLASS__)
 	{
 		return parent::model($className);
 	}
 
-	public $blnStorePickup = false;
-
 	// String representation of the object
 	public function __toString()
 	{
-		return sprintf('Cart Object %s',  $this->id);
+		return sprintf('Cart Object %s', $this->id);
 	}
 
 	/* Define some specialized query scopes to make searching for specific db info easier */
@@ -36,14 +36,6 @@ class Cart extends BaseCart
 			),
 		);
 	}
-
-//	public function __construct($config=null)
-//	{
-//		if(is_array($config))
-//			foreach ($config as $key=>$value)
-//					$this->$key = $value;
-//
-//	}
 
 	/**
 	 * @return array validation rules for model attributes.
@@ -67,28 +59,21 @@ class Cart extends BaseCart
 		// Warning: Please modify the following code to remove attributes that
 		// should not be searched.
 
-		$criteria=new CDbCriteria;
-		$criteria->compare('id_str',$this->id_str,true,'OR');
-		$criteria->compare('datetime_cre',$this->datetime_cre,true,'OR');
-		$criteria->compare('downloaded',$this->downloaded,false,'AND');
-		$criteria->compare('cart_type',$this->cart_type);
-
-//		$criteria->with=array(
-//			'customer.first_name',
-//			'customer.last_name',
-//		);
+		$criteria = new CDbCriteria;
+		$criteria->compare('id_str', $this->id_str, true, 'OR');
+		$criteria->compare('datetime_cre', $this->datetime_cre, true, 'OR');
+		$criteria->compare('downloaded', $this->downloaded, false, 'AND');
+		$criteria->compare('cart_type', $this->cart_type);
 
 		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-			'sort'=>array(
-				'defaultOrder'=>'id_str DESC',
+			'criteria' => $criteria,
+			'sort' => array(
+				'defaultOrder' => 'id_str DESC',
 			),
 			'pagination' => array(
 				'pageSize' => 20,
 			),
 		));
-
-
 	}
 
 
@@ -96,19 +81,41 @@ class Cart extends BaseCart
 	 * @return Cart
 	 */
 	public static function InitializeCart() {
+		$objCart = new Cart();
+		$objCart->cart_type = CartType::cart;
 
-			$objCart = new Cart();
-			$objCart->cart_type = CartType::cart;
+		$objCart->datetime_cre = new CDbExpression('NOW()');;
+		$objCart->datetime_due = new CDbExpression('now() + INTERVAL '._xls_get_conf('CART_LIFE', 7).' DAY');
+		$objCart->ResetTaxIncFlag();
+		$objCart->setTaxCodeByDefaultShippingAddress();
+		if(!$objCart->save())
+		{
+			Yii::log("Error initializing cart ".print_r($objCart->getErrors(), true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		}
 
-			$objCart->datetime_cre = new CDbExpression('NOW()');;
-			$objCart->datetime_due = new CDbExpression('now() + INTERVAL '._xls_get_conf('CART_LIFE', 7).' DAY');
-			$objCart->ResetTaxIncFlag();
-			if(!$objCart->save())
-				Yii::log("Error initializing cart ".print_r($objCart->getErrors(),true),
-					'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		return $objCart;
+	}
 
-			return $objCart;
+	public function getDataProvider()
+	{
+		// Warning: Please modify the following code to remove attributes that
+		// should not be searched.
 
+		if ($this->id === null)
+		{
+			return new CArrayDataProvider(array());     // WS-2265 - The Edit Cart modal may display products when the cart is empty
+		}
+
+		$criteria = new CDbCriteria;
+		$criteria->compare('cart_id',$this->id);
+
+		return new CActiveDataProvider(new CartItem(), array(
+			'criteria' => $criteria,
+			'sort' => array(
+				'defaultOrder' => 'id ASC',
+			),
+			'pagination' => false,
+		));
 	}
 
 	/**
@@ -118,26 +125,25 @@ class Cart extends BaseCart
 	 * @return
 	 */
 	public static function GetCart() {
-		if(is_null(Yii::app()->user->getState('cartid'))) {
+		if(is_null(Yii::app()->user->getState('cartid')))
+		{
 			$objCart = Cart::InitializeCart();
-			Yii::app()->user->setState('cartid',$objCart->id);
-			//Cart::UpdateCartCustomer();
+			Yii::app()->user->setState('cartid', $objCart->id);
 			return $objCart;
 		} else {
-
 			$objCart = Cart::model()->findByPk(Yii::app()->user->getState('cartid'));
-			if (!$objCart) {
+
+			if ($objCart === null)
+			{
 				//something has happened to the database object
 				Yii::log("Could not find cart ".Yii::app()->user->getState('cartid').", creating new one.", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-				Yii::app()->user->setState('cartid',null);
+				Yii::app()->user->setState('cartid', null);
 				$objCart = Cart::InitializeCart();
-				Yii::app()->user->setState('cartid',$objCart->id);
+				Yii::app()->user->setState('cartid', $objCart->id);
 			}
 
 			return $objCart;
-
 		}
-
 	}
 
 	/**
@@ -178,57 +184,56 @@ class Cart extends BaseCart
 		}
 
 		return $objNewCart;
-
-
 	}
 
-
 	/**
-	 * Update the customer in the cart
-	 * Used to update if you log in with a cart in progress
-	 * @return
+	 * Update the cart's taxcode based on the current customer's
+	 * default shipping destination, or on the ANY/ANY destination
+	 * if the customer doesn't have a default shipping address
+	 * configured.
+	 *
+	 * @throws CHttpException From @see TaxCode::getTaxCodeByAddress when Web
+	 * Store is not configured correctly.
 	 */
-	public function UpdateCartCustomer() {
-		if(is_null($this->customer_id))
-			return false;
+	public function setTaxCodeByDefaultShippingAddress()
+	{
 
+		if(is_null($this->customer_id))
+		{
+			return;
+		}
 
 		$objCustomer = $this->customer;
 
-		if ($objCustomer instanceof Customer) {
-			if(isset($objCustomer->defaultShipping))
-			{
-				$objDestination = Destination::LoadMatching(
-					$objCustomer->defaultShipping->country,
-					$objCustomer->defaultShipping->state,
-					$objCustomer->defaultShipping->postal);
-
-				if(!$objDestination)
-					$objDestination = Destination::LoadDefault();
-
-				if(!$objDestination)
-					throw new CHttpException(500,'Web Store missing destination setup. Cannot continue.');
-
-				$this->tax_code_id = $objDestination->taxcode;
-
-				if(!isset($objDestination->taxcode0))
-					throw new CHttpException(500,'Web Store error, destination has invalid tax code. Cannot continue.');
-
-				if ($objDestination->taxcode0->IsNoTax() && Yii::app()->params['TAX_INCLUSIVE_PRICING'])
-					Yii::app()->user->setFlash('warning',Yii::t('global','Note: Because of your default shipping address, prices will be displayed without tax.'));
-
-
-			} else {
-				$objTax = TaxCode::GetDefault();
-				if($objTax instanceof TaxCode)
-					$this->tax_code_id = $objTax->lsid;
-			}
+		if ($objCustomer instanceof Customer === false)
+		{
+			return;
 		}
 
-		if ($this->item_count > 0)
-			$this->UpdateCart();
-	}
+		$country = null;
+		$state = null;
+		$postal = null;
 
+		if(isset($objCustomer->defaultShipping))
+		{
+			$country = $objCustomer->defaultShipping->country;
+			$state = $objCustomer->defaultShipping->state;
+			$postal = $objCustomer->defaultShipping->postal;
+		}
+
+		$taxcode = TaxCode::getTaxCodeByAddress(
+			$country,
+			$state,
+			$postal
+		);
+
+		$this->tax_code_id = $taxcode->lsid;
+
+		if ($this->item_count > 0)
+		{
+			$this->recalculateAndSave();
+		}
+	}
 
 	public static function GetCartLastIdStr() {
 		// Since id_str is a text field, we have to read in and strip out nonnumeric
@@ -309,7 +314,7 @@ class Cart extends BaseCart
 		}
 
 		$objConf = Configuration::LoadByKey('NEXT_ORDER_ID');
-		$objConf->key_value = intval(preg_replace("/[^0-9]/", "", $this->id_str))+1;
+		$objConf->key_value = intval(preg_replace("/[^0-9]/", "", $this->id_str)) + 1;
 		$objConf->save();
 	}
 
@@ -318,45 +323,72 @@ class Cart extends BaseCart
 	 * Then force recalculation of Cart values
 	 * @param int $intItemId
 	 * @param int $intQuantity
-	 * @return
+	 * @return string[]|true|void|CartItem
 	 */
-	public function UpdateItemQuantity($objItem, $intQuantity) {
+	public function UpdateItemQuantity($objItem, $intQuantity)
+	{
+		if ($intQuantity <= 0)
+		{
+			if($objItem->wishlist_item > 0)
+			{
+				WishlistItem::model()->updateByPk($objItem->wishlist_item, array('cart_item_id' => null));
+			}
 
-		if ($intQuantity <= 0) {
-			if($objItem->wishlist_item>0)
-				WishlistItem::model()->updateByPk($objItem->wishlist_item,array('cart_item_id'=>null));
 			$objItem->delete();
 			return true;
 		}
 
 		if ($intQuantity == $objItem->qty)
+		{
 			return;
-
-		if (_xls_get_conf('PRICE_REQUIRE_LOGIN',0) == 1 && Yii::app()->user->isGuest) {
-			return Yii::t('cart','You must log in before Adding to Cart.');
 		}
 
-		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) < Product::InventoryAllowBackorders &&
+		if (_xls_get_conf('PRICE_REQUIRE_LOGIN', 0) == 1 && Yii::app()->user->isGuest)
+		{
+			return array(
+				'errorId' => 'notLoggedIn',
+				'errorMessage' => Yii::t('cart', 'You must log in before Adding to Cart.')
+			);
+		}
+
+		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0) < Product::InventoryAllowBackorders &&
 			$intQuantity > $objItem->qty &&
 			$objItem->product->inventoried &&
-			$objItem->product->inventory_avail < $intQuantity) {
-				return Yii::t('cart','Your chosen quantity is not available for ordering. Please come back and order later.');
+			$objItem->product->inventory_avail < $intQuantity)
+		{
+			if (_xls_get_conf('INVENTORY_DISPLAY', 0) == 0)
+			{
+				$availQty = null;
+			} else {
+				$availQty = $objItem->product->inventory_avail;
+			}
+
+			return array(
+				'errorId' => 'invalidQuantity',
+				'errorMessage' => Yii::t('cart', 'Your chosen quantity is not available for ordering. Please come back and order later.'),
+				'availQty' => $availQty
+			);
 		}
 
+		// qty discount?
+		$arrtmp = ProductQtyPricing::model()->findAllByAttributes(
+			array('product_id' => $objItem->product_id, 'pricing_level' => 1),
+			array('order' => 'qty ASC')
+		);
 
-        // qty discount?
-        $arrtmp = ProductQtyPricing::model()->findAllByAttributes(array('product_id'=>$objItem->product_id, 'pricing_level'=>1));
-        $tmpprice = 0;
+		$tmpprice = 0;
 
-        foreach ($arrtmp as $tmp)
-            $tmpprice = ($intQuantity>=$tmp->qty ? $tmp->price : $tmpprice);
+		foreach ($arrtmp as $tmp)
+		{
+			$tmpprice = ($intQuantity >= $tmp->qty ? $tmp->price : $tmpprice);
+		}
 
-        $objItem->discount = ($tmpprice>0 ? $objItem->sell_base - $tmpprice : 0);
+		$objItem->discount = ($tmpprice > 0 ? $objItem->sell_base - $tmpprice : 0);
 
-        $objItem->qty = $intQuantity;
+		$objItem->qty = $intQuantity;
 		$objItem->save();
 
-		$this->UpdateCart();
+		$this->recalculateAndSave();
 		return $objItem;
 	}
 
@@ -375,15 +407,18 @@ class Cart extends BaseCart
 	}
 
 	/**
-	 * Update Cart by removing discounts if the Cart is expired
+	 * Remove discounts from all items in the cart.
 	 */
-	public function ResetDiscounts() {
-		foreach ($this->cartItems as $obj) {
+	public function removeDiscounts()
+	{
+		foreach ($this->cartItems as $obj)
+		{
 			$objItem = CartItem::model()->findByPk($obj->id);
-			if ($objItem->Discounted) {
+			if ($objItem->Discounted)
+			{
 				$objItem->discount = 0;
 				$objItem->sell_discount = 0;
-				$objItem->sell_total = $objItem->sell_base*$objItem->qty;
+				$objItem->sell_total = $objItem->sell_base * $objItem->qty;
 				$objItem->save();
 			}
 		}
@@ -432,66 +467,126 @@ class Cart extends BaseCart
 
 
 		}
-		if ($blnResult) $this->UpdateCart();
+
+		if ($blnResult)
+		{
+			$this->recalculateAndSave();
+		}
+
 		return $blnResult;
 	}
 
+
 	/**
-	 * Update Cart by applying a Promo Code
-	 * dryRun is deprecated, we shouldn't run this as a validation test
+	 * Perform all Cart Update mechanisms
+	 * This is used to ensure that the Cart data remains consistent after
+	 * additions and modifications of Products, updates to the Customer
+	 * record and Tax Code.
 	 */
-	public function UpdatePromoCode($dryRun = false) {
+	public function recalculateAndSave()
+	{
+		// TODO: Investigate why we save() and refresh() here. This is
+		// possibly related to the models/Cart.php beforeValidate magic
+		// that we're doing to set things like tax_code_id.
+		$this->save();
+		$this->refresh();
+
+		$this->updatePromoCode();
+		$this->updateTaxInclusive();
+		$this->updateTaxExclusive();
+		$this->updateTaxShipping();
+		$this->updateCountAndSubtotal();
+		$this->updateTotal();
+
+		$this->save();
+		$this->refresh();
+	}
+
+	/**
+	 * Update cart by applying promo code
+	 *
+	 * @return bool
+	 */
+	public function updatePromoCode() {
 		if (!$this->fk_promo_id)
-			return;
+		{
+			return false;
+		}
 
 		$objPromoCode = PromoCode::model()->findByPk($this->fk_promo_id);
 
-		if (!($objPromoCode instanceof PromoCode))
-			return;
+		if (!($objPromoCode instanceof PromoCode) || !$objPromoCode->enabled)
+		{
+			return false;
+		}
 
-		if (!$objPromoCode->enabled)
-			return;
-
+		// In dollar amount discount, exit if there are
+		// any item with sell_discount value set
+		if ($objPromoCode->type == PromoCodeType::Flat)
+		{
+			foreach ($this->cartItems as $objItem)
+			{
+				if ($objItem->sell_discount > 0)
+				{
+					return false;
+				}
+			}
+		}
 
 		// Sort array by High Price to Low Price, reset discount to 0 to evaluate from the beginning
 		$arrSorted = array();
-		$intOriginalSubTotal=0;
-		foreach ($this->cartItems as $objItem) {
-			if (!$dryRun)
-				$objItem->discount = 0;
+		$intOriginalSubTotal = 0;
+		foreach ($this->cartItems as $objItem)
+		{
+			$objItem->discount = 0;
 			$arrSorted[] = $objItem;
-			$intOriginalSubTotal += $objItem->qty*$objItem->sell;
+			$intOriginalSubTotal += $objItem->qty * $objItem->sell;
 		}
 
-		if (is_null($objPromoCode->threshold)) $objPromoCode->threshold=0; //for calculation purposes
+		if (is_null($objPromoCode->threshold))
+		{
+			$objPromoCode->threshold = 0; //for calculation purposes
+		}
 
-		if ($objPromoCode->threshold > $intOriginalSubTotal && $this->fk_promo_id != NULL) {
+		if ($objPromoCode->threshold > $intOriginalSubTotal && $this->fk_promo_id != NULL)
+		{
 			$this->fk_promo_id = NULL;
-			Yii::app()->user->setFlash('error',
-				Yii::t('cart','Promo Code {promocode} no longer applies to your cart and has been removed.',
-					array('{promocode}'=>"<strong>".$objPromoCode->code."</strong>")));
-			$this->ResetDiscounts();
-			return;
+			Yii::app()->user->setFlash(
+				'error',
+				Yii::t(
+					'cart',
+					'Promo Code {promocode} no longer applies to your cart and has been removed.',
+					array('{promocode}' => "<strong > ".$objPromoCode->code."</strong > ")
+				)
+			);
+			$this->removeDiscounts();
+			return false;
 		}
-
 
 		if ($objPromoCode->type == PromoCodeType::Flat)
+		{
 			$intDiscount = $objPromoCode->amount;
+		}
 		else if ($objPromoCode->type == PromoCodeType::Percent)
+		{
 			$intDiscount = $objPromoCode->amount/100;
-		else {
+		}
+		else
+		{
 			Yii::log('Invalid PromoCode type ' . $objPromoCode->type, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-			return;
+			return false;
 		}
 
-		$bolApplied = false;
+		$blnApplied = false;
 
 		usort($arrSorted, array(get_class($this), 'CompareByPrice'));
 
-
-		foreach ($arrSorted as $objItem) {
+		foreach ($arrSorted as $objItem)
+		{
 			if (!$objPromoCode->IsProductAffected($objItem))
+			{
 				continue;
+			}
 
 			$intItemDiscount = 0;
 
@@ -517,23 +612,105 @@ class Cart extends BaseCart
 				$intItemDiscount = $intDiscount * $objItem->sell;
 			}
 
-			if (!$dryRun) {
+			if ($intItemDiscount > 0)
+			{
 				$objItem->discount = $intItemDiscount;
 				$objItem->save();
+				$blnApplied = true;
 			}
-
-			$bolApplied = true;
 		}
 
-		return $bolApplied;
+		return $blnApplied;
 	}
 
 	/**
-	 * Update Cart by setting taxes when in Tax Exclusive
+	 * Update tax values on the cart and cart items for tax inclusive stores.
 	 */
-	public function UpdateTaxExclusive() {
-		if (_xls_get_conf('TAX_INCLUSIVE_PRICING', '0') == '1')
+	protected function updateTaxInclusive() {
+		if (_xls_get_conf('TAX_INCLUSIVE_PRICING', '0') != '1')
+		{
 			return;
+		}
+
+		$taxDecimal = _xls_get_conf('TAX_DECIMAL', 2);
+
+		// Reset taxes
+		$this->tax1 = 0;
+		$this->tax2 = 0;
+		$this->tax3 = 0;
+		$this->tax4 = 0;
+		$this->tax5 = 0;
+
+		// If we are in tax inclusive mode, the only case when we don't
+		//  want tax inclusive prices is:
+		//   1. Our tax code is NOTAX AND
+		//   2. We did NOT select in-store-pickup.
+		if ($this->taxCode->IsNoTax() && $this->blnStorePickup === false)
+		{
+			foreach ($this->cartItems as $objItem)
+			{
+				// For quote to cart, we have to remove prices manually
+				if ($objItem->cart_type == CartType::quote && $objItem->tax_in)
+				{
+					$taxes = $objItem->product->CalculateTax(
+						TaxCode::GetDefault(),
+						$objItem->sell
+					);
+
+					// Taxes are deducted from cart for Lightspeed
+					$this->tax1 -= $taxes[1];
+					$this->tax2 -= $taxes[2];
+					$this->tax3 -= $taxes[3];
+					$this->tax4 -= $taxes[4];
+					$this->tax5 -= $taxes[5];
+
+					$objItem->sell -= round(array_sum($taxes), $taxDecimal);
+					$objItem->sell_base = $objItem->sell;
+					$objItem->sell_total = $objItem->sell * $objItem->qty;
+					$objItem->tax_in = 0;
+					$objItem->save();
+				}
+				elseif ($objItem->cart_type == CartType::cart && $objItem->tax_in)
+				{
+					// Set Tax Exclusive price
+					$qty = 1;
+					$taxIn = 0;
+					$objItem->sell = $objItem->sell_base = $objItem->product->getPriceValue($qty, $taxIn);
+					$objItem->sell_total = $objItem->sell_base * $objItem->qty;
+					$objItem->tax_in = 0;
+					$objItem->save();
+				}
+			}
+		}
+		else
+		{
+			// Tax Inclusive && Want taxes, so set prices back to
+			// inclusive if needed
+			foreach ($this->cartItems as $objItem)
+			{
+				// Set back tax inclusive prices
+				if ($objItem->tax_in == 0)
+				{
+					$qty = 1;
+					$taxIn = 1;
+					$objItem->sell = $objItem->product->getPriceValue($qty, $taxIn);
+				   	$objItem->sell_base = $objItem->sell;
+					$objItem->sell_total = $objItem->sell_base * $objItem->qty;
+					$objItem->tax_in = 1;
+					$objItem->save();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Update tax values on the cart and cart items for tax exclusive stores.
+	 */
+	protected function updateTaxExclusive() {
+		if (_xls_get_conf('TAX_INCLUSIVE_PRICING', '0') == '1')
+		{
+			return;
+		}
 
 		// Reset taxes
 		$this->tax1 = 0;
@@ -545,11 +722,15 @@ class Cart extends BaseCart
 		// Get the rowid for "No Tax"
 		$objNoTax = TaxCode::GetNoTaxCode();
 		$intNoTax = 999;
-		if ($objNoTax) $intNoTax = $objNoTax->lsid;
+		if ($objNoTax) {
+			$intNoTax = $objNoTax->lsid;
+		}
 
 		// Dont want taxes, so return
 		if (is_null($this->tax_code_id) || $this->tax_code_id == $intNoTax)
+		{
 			return;
+		}
 
 		foreach($this->cartItems as $objItem) {
 			$taxes = $objItem->product->CalculateTax($this->tax_code_id, $objItem->sell_total);
@@ -563,85 +744,16 @@ class Cart extends BaseCart
 	}
 
 	/**
-	 * Update Cart by setting taxes when in Tax Inclusive
+	 * Update shipping price and shipping tax price on the cart.
 	 */
-	public function UpdateTaxInclusive() {
-		if (_xls_get_conf('TAX_INCLUSIVE_PRICING', '0') != '1')
-			return;
+	protected function updateTaxShipping() {
 
-		$TAX_DECIMAL = _xls_get_conf('TAX_DECIMAL', 2);
-
-		// Reset taxes
-		$this->tax1 = 0;
-		$this->tax2 = 0;
-		$this->tax3 = 0;
-		$this->tax4 = 0;
-		$this->tax5 = 0;
-
-		// Tax Inclusive && Don't want taxes
-		if ($this->taxCode->IsNoTax()) {
-
-			foreach ($this->cartItems as $obj) {
-				$objItem = CartItem::model()->findByPk($obj->id);
-
-				// For quote to cart, we have to remove prices manually
-				if ($objItem->cart_type == CartType::quote && $objItem->tax_in) {
-					$taxes = $objItem->product->CalculateTax(
-						TaxCode::GetDefault(), $objItem->sell);
-
-					// Taxes are deducted from cart for LightSpeed
-					$this->tax1 -= $taxes[1];
-					$this->tax2 -= $taxes[2];
-					$this->tax3 -= $taxes[3];
-					$this->tax4 -= $taxes[4];
-					$this->tax5 -= $taxes[5];
-
-					$objItem->sell -= round(array_sum($taxes), $TAX_DECIMAL);
-					$objItem->sell_base = $objItem->sell;
-					$objItem->sell_total =  $objItem->sell * $objItem->qty;
-					$objItem->tax_in=0;
-					$objItem->save();
-				}
-				elseif ($objItem->cart_type == CartType::cart && $objItem->tax_in)
-				{
-					// Set Tax Exclusive price
-					$objItem->sell = $objItem->sell_base = $objItem->product->PriceValue;
-					$objItem->sell_total = $objItem->sell_base*$objItem->qty;
-					$objItem->tax_in = 0;
-					$objItem->save();
-				}
-			}
-		}
-		else
+		if (isset($this->shipping->shipping_sell) === false)
 		{
-			//Tax Inclusive && Want taxes, so return and set prices back to inclusive if needed
-			foreach ($this->cartItems as $obj) {
-				$objItem = CartItem::model()->findByPk($obj->id);
-
-				// Set back tax inclusive prices
-				if ($objItem->tax_in ==0)
-				{
-					$objItem->sell = $objItem->sell_base = $objItem->product->PriceValue;
-					$objItem->sell_total = $objItem->sell_base*$objItem->qty; //$objItem->product->getPriceValue($objItem->qty,true);
-					$objItem->tax_in=1;
-					$objItem->save();
-				}
-			}
-
+			return;
 		}
 
-		$this->refresh();
-	}
-
-	/**
-	 * Update Cart by setting taxes for Shipping if applicable
-	 */
-	public function UpdateTaxShipping() {
-
-		if (!isset($this->shipping->shipping_sell))
-			return;
-
-		if(Yii::app()->params['SHIPPING_TAXABLE'] != '1')
+		if (Yii::app()->params['SHIPPING_TAXABLE'] != '1')
 		{
 			$this->shipping->shipping_sell_taxed = $this->shipping->shipping_sell;
 			$this->shipping->shipping_taxable = 0;
@@ -654,10 +766,12 @@ class Cart extends BaseCart
 
 		$objNoTax = TaxCode::GetNoTaxCode();
 		$intNoTax = 999;
-		if ($objNoTax) $intNoTax = $objNoTax->lsid;
+		if ($objNoTax instanceof TaxCode)
+		{
+			$intNoTax = $objNoTax->lsid;
+		}
 
-		if (Yii::app()->params['TAX_INCLUSIVE_PRICING'] == '0' &&
-			$this->tax_code_id == $intNoTax)
+		if (Yii::app()->params['TAX_INCLUSIVE_PRICING'] == '0' && $this->tax_code_id == $intNoTax)
 		{
 			$this->shipping->shipping_sell_taxed = $this->shipping->shipping_sell;
 			$this->shipping->save();
@@ -668,43 +782,39 @@ class Cart extends BaseCart
 
 		$intTaxStatus = 0;
 		if ($objShipProduct)
+		{
 			$intTaxStatus = $objShipProduct->taxStatus->lsid;
+		}
 
-		//
 		// Check if the tax status is set to no tax for it, if so, make it
 		// default, otherwise leave it alone.
-		//
-		if (Yii::app()->getComponent('storepickup')->IsStorePickup && $intTaxStatus) {
+		if (Yii::app()->getComponent('storepickup')->IsStorePickup && $intTaxStatus)
+		{
 			$objTaxStatus = $objShipProduct->taxStatus;
 
 			if ($objTaxStatus && $objTaxStatus->IsNoTax())
+			{
 				$intTaxStatus = 0;
+			}
 		}
 
+		// ToDO: WS-3525 Refactor Tax::CalculatePricesWithTax to return an associative array
 		$nprice_taxes = Tax::CalculatePricesWithTax($this->shipping->shipping_sell, $this->tax_code_id, $intTaxStatus);
 
 		$taxes = $nprice_taxes[1];
 
 		if ($this->tax_code_id == $intNoTax)
+		{
 			$this->shipping->shipping_sell_taxed = $this->shipping->shipping_sell;
+		}
 
 		else
 		{
-			if (Yii::app()->params['TAX_INCLUSIVE_PRICING'] == '1')
-			{
-				/*
-				 * Legacy behavior assumes that the ShippingSell price does
-				 * not already contain taxes and that they must be added.
-				 * Cloud mode also expects taxes to already be included.
-				 */
+			// ToDO: WS-3525 Refactor Tax::CalculatePricesWithTax to return an associative array
+			$this->shipping->shipping_sell_taxed = $nprice_taxes[0];
 
-				$this->shipping->shipping_sell += round(array_sum($taxes), 2);
-				$this->shipping->shipping_sell_taxed = $this->shipping->shipping_sell;
-			}
-
-			else
+			if (Yii::app()->params['TAX_INCLUSIVE_PRICING'] != '1')
 			{
-				$this->shipping->shipping_sell_taxed = $this->shipping->shipping_sell + round(array_sum($taxes),2);
 				$this->tax1 += $taxes[1];
 				$this->tax2 += $taxes[2];
 				$this->tax3 += $taxes[3];
@@ -713,17 +823,21 @@ class Cart extends BaseCart
 			}
 		}
 
-
-
 		$this->shipping->shipping_taxable = 1;
 		$this->shipping->save();
-
 	}
 
 	/**
-	 * Update Cart by counting products and setting the Subtotal
+	 * Update the cart total.
 	 */
-	public function UpdateCountAndSubtotal() {
+	protected function updateTotal() {
+		$this->total = $this->getTotalWithShipping($this->shipping_sell);
+	}
+
+	/**
+	 * Update item count and subtotal on the cart.
+	 */
+	public function updateCountAndSubtotal() {
 
 		$this->item_count = 0;
 		$this->subtotal = 0;
@@ -736,57 +850,12 @@ class Cart extends BaseCart
 	}
 
 	/**
-	 * Update Cart by setting the cart Total
-	 */
-	public function UpdateTotal() {
-		$TAX_DECIMAL = _xls_get_conf('TAX_DECIMAL', 2);
-
-		if (_xls_get_conf('TAX_INCLUSIVE_PRICING', '0') == '1')
-			$this->total = round($this->subtotal, $TAX_DECIMAL) +
-				round($this->shipping_sell, $TAX_DECIMAL);
-		else
-			$this->total = round($this->subtotal, $TAX_DECIMAL) +
-				round($this->tax1, $TAX_DECIMAL) +
-				round($this->tax2, $TAX_DECIMAL) +
-				round($this->tax3, $TAX_DECIMAL) +
-				round($this->tax4, $TAX_DECIMAL) +
-				round($this->tax5, $TAX_DECIMAL) +
-				round($this->shipping_sell, $TAX_DECIMAL);
-	}
-
-	/**
 	 * Iterate through the Cart Items and Save those that are Updated
 	 */
 	public function SaveUpdatedCartItems() {
 		foreach ($this->cartItems as $objItem)
 			$objItem->save();
 	}
-
-	/**
-	 * Perform all Cart Update mechanisms
-	 * This is used to ensure that the Cart data remains consistent after
-	 * additions and modifications of Products, updates to the Customer
-	 * record and Tax Code.
-	 */
-	public function UpdateCart()
-	{ 
-		$this->save();
-		$this->refresh();
-
-		$this->UpdatePromoCode();
-		$this->UpdateCountAndSubtotal();
-
-		$this->UpdateTaxInclusive();
-		$this->UpdateTaxExclusive();
-		$this->UpdateTaxShipping();
-
-		$this->UpdateCountAndSubtotal();
-		$this->UpdateTotal();
-
-		$this->save();
-		$this->refresh();
-	}
-
 
 	/**
 	 * Attempt to add product to cart. If product cannot be added, the error string is returned. Otherwise, the row id is returned.
@@ -882,15 +951,19 @@ class Cart extends BaseCart
 
 		$objItem->qty = ($objItem->qty ? $objItem->qty : 0);
         $objItem->sell_total = $objItem->sell_base * $objItem->qty;
-		if (!$objItem->save())
-			print_r($objItem->getErrors());
 
-		if (!$retVal = $this->UpdateItemQuantity($objItem, $intQuantity + $objItem->qty))
+		if ($objItem->save() === false)
+		{
+			throw new Exception('Unable to save item: ' . print_r($objItem->getErrors(), true));
+		}
+
+		$retVal = $this->UpdateItemQuantity($objItem, $intQuantity + $objItem->qty);
+		if (!($retVal instanceof CartItem))
 			return $retVal;
 
 		$objItem->cart_id = $this->id;
 
-		$this->UpdateCart();
+		$this->recalculateAndSave();
 
 		//Todo change to CEvent
 		if(function_exists('_custom_after_add_to_cart'))
@@ -910,6 +983,14 @@ class Cart extends BaseCart
 			$objTaxCode = TaxCode::GetDefault();
 			if ($objTaxCode instanceof TaxCode)
 			{
+				Yii::log(
+					sprintf(
+						'ResetTaxIncFlag $objTaxCode->lsid = %s',
+						$objTaxCode->lsid
+					),
+					'error',
+					'application.'.__CLASS__.".".__FUNCTION__
+				);
 				$this->tax_code_id = $objTaxCode->lsid;
 				$this->tax_inclusive = 1;
 			}
@@ -923,17 +1004,21 @@ class Cart extends BaseCart
 	}
 
 	/**
-	 * Return link for current cart
-	 * @return string
+	 * Return a unique identifier for this cart, if this cart
+	 * doesn't already have a unique identifier, then generate one, save it
+	 * to the db, and return it to the caller.
+	 *
+	 * @return string a unique identifier for this cart
 	 */
 	public function GenerateLink() {
-		if (empty($this->linkid)) {
-			$this->linkid = _xls_seo_url(_xls_truncate(_xls_encrypt(md5(date("YmdHis"))),31,''));
+		if (empty($this->linkid))
+		{
+			$this->linkid = _xls_seo_url(_xls_truncate(_xls_encrypt(md5(date("YmdHis"))), 31, ''));
 			$this->save();
 			return $this->linkid;
 		}
-		else
-			return $this->linkid;
+
+		return $this->linkid;
 	}
 
 	public function getLink() {
@@ -1053,7 +1138,7 @@ class Cart extends BaseCart
 			throw new Exception(_sp("Cart not found!"));
 
 		$cart = current($carts);
-		$cart->UpdateCart();
+		$cart->recalculateAndSave();
 
 		// TODO Carts that have been disabled or expired
 		//Cart::SaveCart($cart);
@@ -1163,6 +1248,71 @@ class Cart extends BaseCart
 
 	}
 
+	/**
+	 * During the Cart completion process, update (decrement) the usage quantity remaining
+	 * and add the promo code information to the order notes.
+	 *
+	 * @return void
+	 */
+
+	public function completeUpdatePromoCode()
+	{
+		$objPromo = null;
+
+		if ($this->fk_promo_id > 0)
+		{
+			$objPromo = PromoCode::model()->findByPk($this->fk_promo_id);
+
+			$this->printed_notes = implode("\n\n", array(
+				$this->printed_notes,
+				sprintf("%s: %s", _sp('Promo Code'), $objPromo->code)
+			));
+
+			foreach ($this->cartItems as $objItem)
+			{
+				if ($objItem->discount > 0)
+				{
+					$this->printed_notes = implode("\n", array(
+						$this->printed_notes,
+						sprintf(
+							"%s discount: %.2f",
+							$objItem->code,
+							$objItem->discount
+						)
+					));
+				}
+			}
+
+			if ($objPromo->qty_remaining > 0)
+			{
+				$objPromo->qty_remaining--;
+				$objPromo->save();
+			}
+		}
+
+		$this->save();
+	}
+
+	public function getTotalDiscount()
+	{
+		$total=0;
+		foreach($this->cartItems as $item)
+		{
+			$total += $item->discount * $item->qty;
+		}
+		return $total;
+	}
+
+	/**
+	 * Format the totalDiscount string by adding the relevant
+	 * currency to it.
+	 * @return string
+	 */
+	public function getTotalDiscountFormatted()
+	{
+		return _xls_currency($this->totalDiscount);
+	}
+
 	public function getTotalItemCount()
 	{
 		$total=0;
@@ -1182,6 +1332,16 @@ class Cart extends BaseCart
 			return "unknown";
 		}
 		return null;
+	}
+
+	public function getHasPromoCode()
+	{
+		if ($this->fk_promo_id === null)
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -1254,30 +1414,68 @@ class Cart extends BaseCart
 
 	}
 
+	/**
+	 * Determine if the current cart has a tax code
+	 * @return boolean true if the cart has a tax code
+	 */
+	public function hasTaxCode() {
+		return isset($this->taxCode);
+	}
 
 	/**
-	 * Since Validate tests to make sure certain fields have values, populate requirements here such as the modified timestamp
+	 * Determine if the current cart is taxable based on it's taxcode
+	 * @return boolean true if the carts tax code is taxable
+	 * @throws Exception
+	 * @see Customer::defaultShippingIsTaxIn The logic is very similar.
+	 */
+	public function getIsTaxIn() {
+
+		if ($this->hasTaxCode() === false)
+		{
+			throw new Exception("No tax code.");
+		}
+
+		// Tax-exclusive stores never have tax inclusive carts.
+		if (CPropertyValue::ensureBoolean(_xls_get_conf('TAX_INCLUSIVE_PRICING', 0)) === false)
+		{
+			return false;
+		}
+
+		// Tax-inclusive stores only have 2 tax codes: their tax inclusive tax
+		// code and a no-tax tax code.
+		if ($this->taxCode->IsNoTax() === true)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Since Validate tests to make sure certain fields have values, populate
+	 * requirements here such as the modified timestamp
 	 * @return boolean from parent
 	 */
 	protected function beforeValidate() {
 		if ($this->isNewRecord)
+		{
 			$this->datetime_cre = new CDbExpression('NOW()');
+		}
+
 		$this->modified = new CDbExpression('NOW()');
 
 		if (empty($this->tax_inclusive))
-				$this->tax_inclusive = _xls_get_conf('TAX_INCLUSIVE_PRICING',0);
-
-		if (empty($this->cart_type))
-				$this->cart_type = CartType::cart;
-
-		if (is_null($this->tax_code_id))
 		{
-			$objTax = TaxCode::GetNoTaxCode();
-			if ($objTax instanceof TaxCode)
-				$this->tax_code_id = $objTax->lsid;
+			$this->tax_inclusive = _xls_get_conf('TAX_INCLUSIVE_PRICING', 0);
 		}
 
-		if (empty($this->linkid)) {
+		if (empty($this->cart_type))
+		{
+			$this->cart_type = CartType::cart;
+		}
+
+		if (empty($this->linkid))
+		{
 			$this->linkid = $this->GenerateLink();
 		}
 
@@ -1292,8 +1490,7 @@ class Cart extends BaseCart
 
 	protected function afterSave() {
 
-
-		Yii::app()->user->setState('cartid',$this->id);
+		Yii::app()->user->setState('cartid', $this->id);
 
 		return parent::afterSave();
 	}
@@ -1333,6 +1530,26 @@ class Cart extends BaseCart
 			case 'SubTotalTaxIncIfSet':
 				QApplication::Log(E_USER_NOTICE, 'legacy', $strName);
 				return $this->Subtotal;
+
+			case 'tax1name':
+			case 'tax1Name':
+				return Tax::TaxByLsid(1);
+
+			case 'tax2name':
+			case 'tax2Name':
+				return Tax::TaxByLsid(2);
+
+			case 'tax3name':
+			case 'tax3Name':
+				return Tax::TaxByLsid(3);
+
+			case 'tax4name':
+			case 'tax4Name':
+				return Tax::TaxByLsid(4);
+
+			case 'tax5name':
+			case 'tax5Name':
+				return Tax::TaxByLsid(5);
 
 			case 'tax_total':
 			case 'TaxTotal':
@@ -1400,8 +1617,113 @@ class Cart extends BaseCart
 		$returnOrders = array();
 
 		foreach ($pendingOrders as $order)
+		{
 			array_push($returnOrders, array('id_str' => $order['id_str'], 'datetime_cre' => $order['datetime_cre']));
+		}
 
 		return $returnOrders;
+	}
+
+	/**
+	 * Check to see if the cart contains items that have quantity discounts
+	 * applied to them. If there is one element that those this method will
+	 * return true.
+	 *
+	 * @return bool If the cart has a discount it returns true
+	 * false otherwise.
+	 */
+	public function hasQtyDiscount()
+	{
+		foreach ($this->cartItems as $item)
+		{
+			if ($item->discount > 0)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check that the promo code applied to the cart is still valid.
+	 * If the promo code is no longer valid, remove it and return an error
+	 * message.
+	 *
+	 * @return array|null Null if the promo code is still valid. If the promo
+	 * code is invalid an array with the following keys will be returned:
+	 *	code => The promo code.
+	 *	reason => The reason that the promo code is invalid.
+	 */
+	public function revalidatePromoCode()
+	{
+		if ($this->fk_promo_id === null)
+		{
+			// No promo code applied.
+			return null;
+		}
+
+		$hasInvalidPromoCode = false;
+
+		$objPromoCode = PromoCode::model()->findByPk($this->fk_promo_id);
+		if ($objPromoCode === null)
+		{
+			// The promo code has been deleted from Web Store.
+			$hasInvalidPromoCode = true;
+		} else {
+			$objPromoCode->validatePromocode('code', null);
+			$arrErrors = $objPromoCode->getErrors();
+
+			if (count($arrErrors) > 0)
+			{
+				// After validating the promo code, there were errors.
+				$hasInvalidPromoCode = true;
+			}
+		}
+
+		if ($hasInvalidPromoCode === false)
+		{
+			return null;
+		}
+
+		if ($objPromoCode === null)
+		{
+			$promoCodeCode = '';
+			$reason = 'This Promo Code has been disabled.';
+		} else {
+			$promoCodeCode = $objPromoCode->code;
+			$reason = _xls_convert_errors_display(_xls_convert_errors($arrErrors));
+		}
+
+		return array(
+			'code' => $promoCodeCode,
+			'reason' => $reason
+		);
+	}
+
+	/**
+	 * Given a specific shipping price, calculate the total of the cart and return
+	 * the value. Because this is a precalculation, we don't actually save this
+	 * information.
+	 * @param double $fltShipping The price of the shipping.
+	 * @return double The total price of the cart.
+	 */
+	public function getTotalWithShipping($fltShipping)
+	{
+		$taxDecimal = _xls_get_conf('TAX_DECIMAL', 2);
+
+		if (_xls_get_conf('TAX_INCLUSIVE_PRICING', '0') == '1')
+		{
+			return round($this->subtotal, $taxDecimal) +
+				round($fltShipping, $taxDecimal);
+		}
+
+		return round($this->subtotal, $taxDecimal) +
+			round($this->tax1, $taxDecimal) +
+			round($this->tax2, $taxDecimal) +
+			round($this->tax3, $taxDecimal) +
+			round($this->tax4, $taxDecimal) +
+			round($this->tax5, $taxDecimal) +
+			round($fltShipping, $taxDecimal);
 	}
 }

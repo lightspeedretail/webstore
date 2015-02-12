@@ -89,35 +89,56 @@ class Destination extends BaseDestination
 			else return array('order'=>'country DESC, state DESC, zipcode1 DESC');
 	}
 
-	public static function LoadDefault() {
-
-		return Destination::model()->findByAttributes(array('country'=>null,'state'=>null));
-
+	/**
+	 * Get the TaxCode for the default shipping destination
+	 * 
+	 * @return integer taxmode
+	 */
+	public static function getDefaultDestinationTaxCode()
+	{
+		$defaultDestination = Destination::model()->findByAttributes(array('country' => null,'state' => null));
+		return $defaultDestination->taxcode;
 	}
 
-	public static function LoadByCountry($strCountry, $blnRestrict = false) {
-		$objCountry = Country::LoadByCode($strCountry);
-		if ($blnRestrict) {
-			if (count(Destination::model()->countByAttributes(
-					array('country'=>$objCountry->id,'state'=>null))))
-			{
+	/**
+	 * Get the 'catch-all' shipping/tax destination, (ANY/ANY).
+	 *
+	 *
+	 * @return Destination
+	 */
+	public static function getAnyAny()
+	{
+		return Destination::model()->findByAttributes(array('country' => null, 'state' => null));
+	}
 
+	public static function LoadByCountry($strCountry, $blnRestrict = false)
+	{
+		$objCountry = Country::LoadByCode($strCountry);
+		if ($blnRestrict)
+		{
+			if (count(
+				Destination::model()
+					->countByAttributes(
+						array('country' => $objCountry->id, 'state' => null)
+					)
+			)
+			)
+			{
 				$arrStates = State::model()->findAllByAttributes(
-					array('country_id'=>$objCountry->id,'active'=>1),
+					array('country_id' => $objCountry->id, 'active' => 1),
 					State::GetDefaultOrdering()
 				);
 
-				return Destination::ConvertStatesToDestinations(
-					$objCountry->id, $arrStates
-				);
+				return Destination::ConvertStatesToDestinations($objCountry->id, $arrStates);
 			}
 		}
 
-		return Destination::model()->findAll('country IS NULL OR country=:t1 '.Destination::GetDefaultOrdering(true), array(':t1'=>$objCountry->id));
+		return Destination::model()->findAll('country IS NULL OR country=:t1 '.Destination::GetDefaultOrdering(true), array(':t1' => $objCountry->id));
 
 	}
 
-	public static function ConvertStatesToDestinations($intCountry,$arrStates) {
+	public static function ConvertStatesToDestinations($intCountry, $arrStates)
+	{
 		$arrDestinations = array();
 		foreach($arrStates as $state)
 		{
@@ -130,6 +151,7 @@ class Destination extends BaseDestination
 			$objDestination->taxcode = 0;
 			$arrDestinations[] = $objDestination;
 		}
+
 		return $arrDestinations;
 	}
 
@@ -146,25 +168,33 @@ class Destination extends BaseDestination
 		if (is_numeric($state)) $state = State::CodeById($state);
 
 		$arrDestinations = Destination::LoadByCountry($country);
+		if (is_array($arrDestinations) === false && $arrDestinations instanceof Traversable === false)
+		{
+			return null;
+		}
 
 		$objState = State::LoadByCode($state,$country);
 		$zip = preg_replace('/[^A-Z0-9]/', '',strtoupper($zip));
 
-		foreach ($arrDestinations as $objDestination) {
-			if ($objDestination->state == null || $objDestination->state == $objState->id)
+		foreach ($arrDestinations as $objDestination)
+		{
+			if ($objDestination->state == null ||
+				($objState !== null && $objState->id == $objDestination->state))
 			{
 
 				$zipStart = $objDestination->Zipcode1;
 				$zipEnd = $objDestination->Zipcode2;
 
 				if (($zipStart <= $zip && $zipEnd >= $zip) ||
-					$zipStart=='' ||
-					$zipStart=='*' ||
-					$zip=='')
+					$zipStart == '' ||
+					$zipStart == '*' ||
+					$zip == '')
+				{
 					return $objDestination;
+				}
 			}
 		}
-		return false;
+		return null;
 	}
 
 	protected function beforeValidate() {

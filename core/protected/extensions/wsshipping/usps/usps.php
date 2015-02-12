@@ -2,7 +2,7 @@
 
 /**
  * UPS Module
- * created by LightSpeed
+ * created by Lightspeed
  */
 class usps extends WsShipping
 {
@@ -343,6 +343,12 @@ class usps extends WsShipping
 
 		// Parse xml for response values
 		$oXML = new SimpleXMLElement($this->response);
+
+		if(!$oXML->Package) {
+			//What we have is ... failure to communicate
+			Yii::log('Could not get shipping for USPS: '.$oXML->Description, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			return false;
+		}
 
 		if($oXML->Package->Error) {
 			//What we have is ... failure to communicate

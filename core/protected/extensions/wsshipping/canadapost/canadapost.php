@@ -63,8 +63,8 @@ class canadapost extends WsShipping
 					</item>
 				</lineItems>
 				" .  "<city>" . $this->CheckoutForm['shippingCity'] . "</city>\n" .
-				"<provOrState>" . $this->CheckoutForm['shippingState'] . "</provOrState>\n" .
-				"<country>" . $this->CheckoutForm['shippingCountry']. "</country>\n".
+				"<provOrState>" . $this->CheckoutForm['shippingStateCode'] . "</provOrState>\n" .
+				"<country>" . $this->CheckoutForm['shippingCountryCode']. "</country>\n".
 				"<postalCode>" . $this->CheckoutForm['shippingPostal'] . "</postalCode>\n".
 				"</ratesAndServicesRequest>
 		</eparcel>

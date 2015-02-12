@@ -60,20 +60,27 @@ class CustompageController extends AdminBaseController
 
 	}
 
+	/*
+	 * Add Action
+	 * The action for adding a new custom page.
+	 *
+	 * @return null
+	*/
 	public function actionAdd()
 	{
-
-
 		$model = new CustomPage();
 		$this->editSectionName = "Add a new custom page";
 
 		if(isset($_POST['CustomPage']))
 		{
+			$model->setPageData($_POST);
 			$model->attributes = $_POST['CustomPage'];
 			if ($model->validate())
 			{
 				if (!$model->save())
-					Yii::app()->user->setFlash('error',print_r($model->getErrors(),true));
+				{
+					Yii::app()->user->setFlash('error', print_r($model->getErrors(), true));
+				}
 				else
 				{
 					Yii::app()->user->setFlash(
@@ -91,61 +98,63 @@ class CustompageController extends AdminBaseController
 							array('id' => $model->id)
 						)
 					);
-
 				}
 			}
-
 		}
-		$this->render('edit',array('model' => $model));
+
+		$this->render('edit', array('model' => $model));
 
 	}
+
+	/*
+	 * Edit Action
+	 * The action for editing an existing custom page.
+	 *
+	 * @return null
+	*/
 	public function actionEdit()
 	{
-
+		// Retrieve the pageid we're looking to edit
 		$id = Yii::app()->getRequest()->getQuery('id');
-
 		$model = CustomPage::model()->findByPk($id);
+
 		if (!($model instanceof CustomPage))
 		{
-			Yii::app()->user->setFlash('error',"Invalid Custom Page");
+			Yii::app()->user->setFlash('error', "Invalid Custom Page");
 			$this->redirect($this->createUrl("custompage/index"));
-
 		}
 
-
-
-		Yii::log('POST: ' . print_r($_POST,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+		Yii::log('POST: ' . print_r($_POST, true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 		if (_xls_get_conf('LANG_MENU'))
+		{
 			$langs = _xls_comma_to_array(_xls_get_conf('LANG_OPTIONS'));
-		else $langs = array("en:English");
-
-
+		}
+		else
+		{
+			$langs = array("en:English");
+		}
 
 		if(isset($_POST['CustomPage']))
 		{
-			$arrLangText = array();
-			foreach($langs as $lang)
-			{
-				$langa = explode(":",$lang);
-				$def = $langa[0];
-				$arrLangText[$def] = isset($_POST['content-'.$def]) ? $_POST['content-'.$def] : '';
-
-			}
-			$_POST['CustomPage']['page'] = serialize($arrLangText);
+			$model->setPageData($_POST);
+			$_POST['CustomPage']['page_data'] = $model->page_data;
 			$model->attributes = $_POST['CustomPage'];
 			if ($model->validate())
 			{
 				if ($model->deleteMe)
 				{
 					$model->delete();
-					Yii::app()->user->setFlash('info',"Custom page has been deleted");
+					Yii::app()->user->setFlash('info', "Custom page has been deleted");
 					$this->redirect($this->createUrl("custompage/index"));
 				}
-				else {
+				else
+				{
 					$model->request_url = _xls_seo_url($model->title);
 					if (!$model->save())
-						Yii::app()->user->setFlash('error',print_r($model->getErrors(),true));
+					{
+						Yii::app()->user->setFlash('error', print_r($model->getErrors(), true));
+					}
 					else
 					{
 						Yii::app()->user->setFlash(
@@ -158,16 +167,11 @@ class CustompageController extends AdminBaseController
 							)
 						);
 						$this->beforeAction('edit'); //In case we renamed one and we want to update menu
-
 					}
 				}
 			}
-
 		}
-		$this->render('edit',array('model' => $model));
 
+		$this->render('edit', array('model' => $model));
 	}
-
-
-
 }

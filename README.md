@@ -1,7 +1,7 @@
 webstore
 ========
 
-Web Store eCommerce solution for LightSpeed
+Web Store eCommerce solution for Lightspeed
 
 Please note that this is a public repo designed to aid developers on what has changed from version to version.
 

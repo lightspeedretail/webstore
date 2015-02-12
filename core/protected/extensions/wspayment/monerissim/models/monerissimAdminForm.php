@@ -17,7 +17,7 @@ class monerissimAdminForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('label,ps_store_id,hpp_key,live,restrictcountry,ls_payment_method','required'),
+			array('label, ps_store_id, hpp_key, live, restrictcountry, ls_payment_method', 'required'),
 		);
 	}
 
@@ -29,65 +29,61 @@ class monerissimAdminForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'label'=>'Label',
-			'ps_store_id'=>'Store ID',
-			'hpp_key'=>'HPP Key',
-			'live'=>'Deployment Mode',
-			'restrictcountry'=>'Only allow this processor',
-			'ls_payment_method'=>'LightSpeed Payment Method',
+			'label' => 'Label',
+			'ps_store_id' => 'Store ID',
+			'hpp_key' => 'HPP Key',
+			'live' => 'Deployment Mode',
+			'restrictcountry' => 'Only allow this processor',
+			'ls_payment_method' => 'Lightspeed Payment Method',
 		);
 	}
 
 	public function getAdminForm()
 	{
-		$strClass = str_replace("AdminForm","",get_class($this));
+		$strClass = str_replace("AdminForm", "", get_class($this));
 		return array(
-			'title'=>Yii::t('global',
-				'To use this module, you will need to edit your account settings within Moneris with the following values:'.
-				'<ul><li>The Response Method should be "Sent to your server as a POST"'.
-				'<li>Under Security Features, set the Approved URL as {approvedurl}'.
-				'<li>Set the Declined URL as {declinedurl}</ul>',
+			'title' => Yii::t(
+					'global',
+					'To use this module, you will need to edit your account settings within Moneris with the following values:'.
+					'<ul><li>The Response Method should be "Sent to your server as a POST"'.
+					'<li>Under Security Features, set the Approved URL as {approvedurl}'.
+					'<li>Set the Declined URL as {declinedurl}</ul>',
 					array(
-						'{approvedurl}'=>Yii::app()->createAbsoluteUrl('cart/payment',array('id'=>$strClass),'http'),
-						'{declinedurl}'=>Yii::app()->createAbsoluteUrl('cart/payment',array('id'=>$strClass),'http'),
+						'{approvedurl}' => Yii::app()->createAbsoluteUrl('cart/payment', array('id' => $strClass), 'http'),
+						'{declinedurl}' => Yii::app()->createAbsoluteUrl('cart/payment', array('id' => $strClass), 'http'),
 					)
 				),
 
-
-			'elements'=>array(
-				'label'=>array(
-					'type'=>'text',
-					'maxlength'=>64,
+			'elements' => array(
+				'label' => array(
+					'type' => 'text',
+					'maxlength' => 64,
 				),
-				'ps_store_id'=>array(
-					'type'=>'text',
-					'maxlength'=>64,
-					'title'=>"Store ID - provided by Moneris"
+				'ps_store_id' => array(
+					'type' => 'text',
+					'maxlength' => 64,
+					'title' => "Store ID - provided by Moneris"
 				),
-				'hpp_key'=>array(
-					'type'=>'text',
-					'maxlength'=>64,
-					'title'=>"Hosted Pay Page Key - provided by Moneris"
+				'hpp_key' => array(
+					'type' => 'text',
+					'maxlength' => 64,
+					'title' => "Hosted Pay Page Key - provided by Moneris"
 				),
-				'live'=>array(
-					'type'=>'dropdownlist',
-					'items'=>array('live'=>'Live','test'=>'Sandbox'),
-					'title'=>"To use TEST MODE set to Sandbox.",
-					'hint'=>"Hover over field for instructions",
+				'live' => array(
+					'type' => 'dropdownlist',
+					'items' => array('live' => 'Live','test' => 'Sandbox'),
+					'title' => "To use TEST MODE set to Sandbox.",
+					'hint' => "Hover over field for instructions",
 				),
-				'restrictcountry'=>array(
-					'type'=>'dropdownlist',
-					'items'=>Country::getAdminRestrictionList(),
+				'restrictcountry' => array(
+					'type' => 'dropdownlist',
+					'items' => Country::getAdminRestrictionList(),
 				),
-				'ls_payment_method'=>array(
-					'type'=>'text',
-					'maxlength'=>64,
+				'ls_payment_method' => array(
+					'type' => 'text',
+					'maxlength' => 64,
 				),
 			),
 		);
 	}
-
-
-
-
 }

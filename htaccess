@@ -40,3 +40,18 @@ RedirectMatch 404 /\\.(svn|git|gitignore|gitmodules|idea|hg|bzr|cvs)(/|$)
 
 # block runtime folder
 RedirectMatch 404 /runtime/
+
+<ifModule mod_headers.c>
+  <filesMatch "\\.(ico|pdf|flv|jpg|jpeg|png|gif|swf)$">
+    Header set Cache-Control "max-age=300, public"
+  </filesMatch>
+  <filesMatch "\\.(css)$">
+    Header set Cache-Control "max-age=604800, public"
+  </filesMatch>
+  <filesMatch "\\.(js)$">
+    Header set Cache-Control "max-age=216000, private"
+  </filesMatch>
+  <filesMatch "\\.(html|htm|php)$">
+    Header set Cache-Control "max-age=1, private, must-revalidate"
+  </filesMatch>
+</ifModule>

@@ -10,6 +10,7 @@
 class CustomPage extends BaseCustomPage
 {
 	public $deleteMe;
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return CustomPage the static model class
@@ -307,16 +308,66 @@ class CustomPage extends BaseCustomPage
 		return parent::beforeValidate();
 	}
 
-	protected function afterFind()
+	/**
+	 * Set Page Data
+	 * Page data for each language is sent in a content-{lang} element. We need to
+	 *  take each of these elements, and serialize them for storage in the db. The
+	 *  data array elements look like 'en:English' => 'page content here'.
+	 * @param string[] $data  An array of content-{lang} keys and their values.
+	 * @return void
+	 */
+	public function setPageData($data)
 	{
-		$pageValues =  _xls_parse_language_serialized($this->page);
-		//If we are in multilanguage mode, parse the description and display only the local language.
-		if (array_key_exists(Yii::app()->language, $pageValues))
-			$this->page = $pageValues[Yii::app()->language];
+		$langs = $this->_getPageLanguages();
+		$arrLangText = array();
+		foreach($langs as $lang)
+		{
+			$langa = explode(":", $lang);
+			$def = $langa[0];
+			$arrLangText[$def] = $data['content-'. $def];
+		}
+
+		$serializedPage = serialize($arrLangText);
+		$this->page_data = $serializedPage;
+	}
+
+	/**
+	 * Get the supported language(s) for the custom page
+	 * @return array The code:description array of supported languages
+	 */
+	private function _getPageLanguages()
+	{
+		if (_xls_get_conf('LANG_MENU'))
+		{
+			$langs = _xls_comma_to_array(_xls_get_conf('LANG_OPTIONS'));
+		}
 		else
-			$this->page = '';
+		{
+			$langs = array("en:English");
+		}
 
+		return $langs;
+	}
 
+	/**
+	 * Get the page contents for the current language.
+	 *
+	 * @return string The custom page's contents
+	 */
+	public function getPage()
+	{
+		$pageValues = _xls_parse_language_serialized($this->page_data);
+		// If was have custom page in the current language, use it.
+		if (array_key_exists(Yii::app()->language, $pageValues))
+		{
+			$page = $pageValues[Yii::app()->language];
+		}
+		else
+		{
+			$page = '';
+		}
+
+		return $page;
 	}
 
 	public function __get($strName) {
@@ -325,7 +376,7 @@ class CustomPage extends BaseCustomPage
 				return $this->GetLink(); //Yii::app()->createUrl($this->request_url);
 
 			case 'CanonicalUrl':
-				return Yii::app()->createAbsoluteUrl("custompage/index",array('id'=>$this->request_url));
+				return Yii::app()->createAbsoluteUrl("custompage/index", array('id' => $this->request_url));
 
 			case 'RequestUrl':
 				return $this->request_url;
@@ -337,11 +388,10 @@ class CustomPage extends BaseCustomPage
 				return $this->GetSliderCriteria();
 
 			case 'PageTitle':
-				return _xls_truncate($this->GetPageMeta('SEO_CUSTOMPAGE_TITLE'),70);
+				return _xls_truncate($this->GetPageMeta('SEO_CUSTOMPAGE_TITLE'), 70);
 
 			default:
 				return parent::__get($strName);
 		}
 	}
-
 }

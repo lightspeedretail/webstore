@@ -465,7 +465,17 @@ class wscloud extends ApplicationComponent {
 		return $msgId;
 	}
 
-	public function getCloudImage($objCloudImage,$intWidth,$intHeight)
+	/**
+	 * Generate cloudinary image url for a cloud image
+	 * @param ImagesCloud [$objCloudImage] A cloud image object
+	 * @param integer [$intWidth] Image width
+	 * @param integer [$intHeight] Image height
+	 * @param bool [$limitSize] True to get image by its original dimension if
+	 * it is smaller than the requested dimension
+	 * @return string Cloudinary image url
+	 */
+	public function getCloudImage($objCloudImage, $intWidth, $intHeight,
+		$limitSize = false)
 	{
 		$this->init();
 
@@ -475,24 +485,56 @@ class wscloud extends ApplicationComponent {
 			"api_secret" => ""
 		));
 		$arrOptions = array();
-		if($intWidth>0 && $intHeight >0) $arrOptions = array("width" => $intWidth, "height" => $intHeight, "crop" => "pad");
+		if ($limitSize)
+		{
+			/* The limit mode is used for creating an image that does not exceed
+			the given width or height. If the original image is smaller than
+			the given limits, the generated image is identical to the original
+			one. If the original is bigger than the given limits, it will be
+			resized while retaining original proportions
+			*/
+			$crop = "limit";
+		}
+		else
+		{
+			/* Resize the image to fill the given width & height while retaining
+			original proportions.
+			*/
+			$crop = "pad";
+		}
+
+		if($intWidth > 0 && $intHeight > 0)
+		{
+			$arrOptions = array("width" => $intWidth,
+								"height" => $intHeight,
+								"crop" => $crop);
+		}
 
 		if(!empty(Yii::app()->params['IMAGE_BACKGROUND']))
-			$arrOptions['background']="rgb:".str_replace("#","",Yii::app()->params['IMAGE_BACKGROUND']);
+		{
+			$arrOptions['background'] = "rgb:".str_replace("#", "", Yii::app()->params['IMAGE_BACKGROUND']);
+		}
 
 		if(!empty(Yii::app()->params['IMAGE_SHARPEN']))
-			$arrOptions['sharpen']=Yii::app()->params['IMAGE_SHARPEN'];
+		{
+			$arrOptions['sharpen'] = Yii::app()->params['IMAGE_SHARPEN'];
+		}
 
 		if(!empty(Yii::app()->params['IMAGE_QUALITY']))
-			$arrOptions['quality']=Yii::app()->params['IMAGE_QUALITY'];
+		{
+			$arrOptions['quality'] = Yii::app()->params['IMAGE_QUALITY'];
+		}
 
-		$url = cloudinary_url($objCloudImage->cloudinary_public_id.".".Yii::app()->params['IMAGE_FORMAT'],
-			$arrOptions);
+		$url = cloudinary_url(
+			$objCloudImage->cloudinary_public_id.
+			".".
+			Yii::app()->params['IMAGE_FORMAT'],
+			$arrOptions
+		);
 
 		//we remove schema so either http or httpd will work
-		$url = str_replace("http:","",str_replace("https:","",$url));
+		$url = str_replace("http:", "", str_replace("https:", "", $url));
 		return $url;
 
 	}
-
 }

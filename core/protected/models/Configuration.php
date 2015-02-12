@@ -186,6 +186,15 @@ return array(
 
 			case 'COUNTRY':
 				return CHtml::listData(Country::model()->findAllByAttributes(array('active'=>1),array('order'=>'sort_order,country')), 'id', 'country');
+			case 'STATE':
+				return array(0 => '') + CHtml::listData(
+					State::model()->findAllByAttributes(
+						array('active' => 1),
+						array('order' => 'sort_order, state')
+					),
+				'id',
+				'state'
+				);
 			case 'WEIGHT':
 				return array('lb'=>'Pound' , 'kg'=>'Kilogram');
 			case 'DIMENSION':

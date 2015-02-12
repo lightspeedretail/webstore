@@ -72,17 +72,12 @@ class CustompageController extends Controller
 	 */
 	public function actionContact()
 	{
-
 		$model = CustomPage::LoadByRequestUrl('contact-us');
 		$this->pageTitle=$model->PageTitle;
 		$this->pageDescription=$model->meta_description;
 		$this->breadcrumbs = array(
 			$model->title=>$model->RequestUrl,
 		);
-
-        $pageValues =  _xls_parse_language_serialized($model->page);
-        //If we are in multilanguage mode, parse the description and display only the local language.
-        $model->page =$pageValues[Yii::app()->language];
 
 		$this->layout = "//layouts/column".$model->column_template;
 

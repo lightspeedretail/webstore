@@ -24,7 +24,7 @@ class SystemController extends AdminBaseController
 	{
 		return array(
 			array('allow',
-				'actions'=>array('index','edit','erasecarts','resynccloud','log','purge','info'),
+				'actions'=>array('index','edit','erasecarts','log','purge','info'),
 				'roles'=>array('admin'),
 			),
 		);
@@ -48,10 +48,6 @@ class SystemController extends AdminBaseController
 					array('label'=>'Purge Deleted Categories/Families', 'url'=>array('system/purge')),
 					array('label'=>'Erase abandoned carts &gt; '.intval(_xls_get_conf('CART_LIFE' , 30)).' days',
 						'url'=>array('system/erasecarts')
-					),
-					array('label'=>'Resync Cloud Account',
-						'url'=>array('system/resynccloud'),
-						'visible'=>Yii::app()->params['LIGHTSPEED_CLOUD']>0
 					),
 				array('label'=>'Database', 'linkOptions'=>array('class'=>'nav-header')),
 					array('label'=>'Database Admin', 'url'=>array('/admin/databaseadmin')),
@@ -191,7 +187,7 @@ class SystemController extends AdminBaseController
 		}
 
 		if ($success)
-			Yii::app()->user->setFlash('success',Yii::t('admin','Done. This option has removed any categories and families you deleted in LightSpeed that may have been left on Web Store. {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
+			Yii::app()->user->setFlash('success',Yii::t('admin','Done. This option has removed any categories and families you deleted in Lightspeed that may have been left on Web Store. {time}.',array('{time}'=>date("d F, Y  h:i:sa"))));
 
 		$this->render("purge");
 
@@ -250,20 +246,6 @@ class SystemController extends AdminBaseController
 			Yii::app()->user->setFlash('error','ERROR -- YOUR TEST EMAIL ATTEMPT FAILED');
 			$objEmail->delete();
 		}
-
-	}
-
-
-	public function actionResynccloud()
-	{
-
-		$objComponent=Yii::createComponent('ext.wscloud.wscloud');
-		$sync = Yii::app()->getRequest()->getPost('buttonResync');
-
-		if($sync)
-			$objComponent->Resynccloud();
-
-		$this->render("resync",array('sync'=>$sync));
 
 	}
 

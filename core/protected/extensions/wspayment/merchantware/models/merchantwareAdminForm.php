@@ -33,7 +33,7 @@ class merchantwareAdminForm extends CFormModel
 			'site_id'=>'Account Site ID',
 			'trans_key'=>'Account Key',
 			'restrictcountry'=>'Only allow this processor',
-			'ls_payment_method'=>'LightSpeed Payment Method',
+			'ls_payment_method'=>'Lightspeed Payment Method',
 		);
 	}
 

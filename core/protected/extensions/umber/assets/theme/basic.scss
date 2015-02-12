@@ -1,0 +1,59 @@
+@import "normalize";
+@import "config";
+
+@font-face {
+  font-family: 'FontAwesome';
+  src: url('#{$fa-font-path}/fontawesome-webfont.eot?v=#{$fa-version}');
+  src: url('#{$fa-font-path}/fontawesome-webfont.eot?#iefix&v=#{$fa-version}') format('embedded-opentype'),
+    url('#{$fa-font-path}/fontawesome-webfont.woff?v=#{$fa-version}') format('woff'),
+    url('#{$fa-font-path}/fontawesome-webfont.ttf?v=#{$fa-version}') format('truetype'),
+    url('#{$fa-font-path}/fontawesome-webfont.svg?v=#{$fa-version}#fontawesomeregular') format('svg');
+  //src: url('#{$fa-font-path}/FontAwesome.otf') format('opentype'); // used when developing fonts
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+	font-family: $default-font-family;
+}
+
+.features {
+    height: 640px;
+    background-image: url(/images/backgrounds/trail.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+
+}
+
+
+a {
+	text-decoration: none;
+	color: $link-color;
+}
+
+.header, .footer, .wrapper {
+	// flex: 1 100%;
+    .inner {
+        max-width: 1024px;
+        padding: 0 30px;
+        margin: 0 auto;
+
+    }
+}
+
+
+.icon:after {
+    font-family: 'FontAwesome';
+    content: '';
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+
+@import 'header';
+@import 'footer';
+@import 'search';
+@import 'products';

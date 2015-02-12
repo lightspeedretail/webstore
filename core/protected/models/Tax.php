@@ -181,6 +181,27 @@ class Tax extends BaseTax
 		return Tax::model()->findByAttributes(array('lsid'=>$intId));
 	}
 
+
+	/**
+	 * Return the name of the tax given its lsid
+	 *
+	 * @param $intLsId
+	 * @return mixed|null
+	 */
+	public static function TaxByLsid($intLsId)
+	{
+		$obj = Tax::LoadByLS($intLsId);
+		if ($obj instanceof Tax === true)
+		{
+			return $obj->tax;
+		}
+		else
+		{
+			Yii::log(sprintf('Tax with lsid: %s not found', $intLsId), 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
+			return null;
+		}
+	}
+
 	public function __get($strName) {
 		switch ($strName) {
 		case 'Tax':

@@ -59,7 +59,7 @@ class Product extends BaseProduct
 				'TitleTag'=>'',
 				'Title'=>'Product',
 				'sell'=>'Price',
-				'intQty'=>'Qty'
+				'intQty'=>'Qty:'
 				)
 		);
 	}
@@ -406,7 +406,8 @@ class Product extends BaseProduct
 
 
 	/**
-	 * Should a product be displayed, not necessarily the same if it an actually be ordered
+	 * Should a product be displayed, not necessarily the same as whether it can be ordered
+	 *
 	 * @return bool
 	 */
 	public function getIsDisplayable() {
@@ -835,52 +836,61 @@ class Product extends BaseProduct
 	 * that it will optionally return a message for Master products.
 	 * @param integer defaults to 1
 	 * @return float or string
-	 */
+	*/
 	public function getPrice($intQuantity = 1) {
+		$taxInclusive = Yii::app()->shoppingcart->IsTaxIn;
 
-		if (Customer::GetCurrent() == false)
+		if (_xls_get_conf('PRICE_REQUIRE_LOGIN', 0) == 1 && Yii::app()->user->isGuest)
 		{
-			$taxInclusive = Yii::app()->params['TAX_INCLUSIVE_PRICING'];
-		}
-		else
-		{
-			$taxInclusive = Yii::app()->shoppingcart->IsTaxIn;
-		}
-
-
-		if (_xls_get_conf('PRICE_REQUIRE_LOGIN',0) == 1 && Yii::app()->user->isGuest)
 			return _sp("Log in for prices");
+		}
 
-		if ($this->IsMaster()) {
-
+		if ($this->IsMaster())
+		{
 			$criteria = new CDbCriteria();
 
-			if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) == Product::InventoryMakeDisappear)
+			if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0) == Product::InventoryMakeDisappear)
+			{
 				$criteria->condition = 'web=1 AND parent=:id AND (inventory_avail>0 OR inventoried=0)';
+			}
 			else
+			{
 				$criteria->condition = 'web=1 AND parent=:id';
-			$criteria->params = array (':id'=>$this->id);
+			}
+
+			$criteria->params = array (':id' => $this->id);
 
 			$criteria->order = "sell_web";
 			$arrMaster = Product::model()->findAll($criteria);
 
-			if (count($arrMaster)==0) return _sp("Missing Child Products?");
+			if (count($arrMaster) == 0)
+			{
+				return _sp("Missing Child Products?");
+			}
 
-			switch (_xls_get_conf('MATRIX_PRICE')) {
-
+			switch (_xls_get_conf('MATRIX_PRICE'))
+			{
 				case Product::HIGHEST_PRICE:
-					return _xls_currency($arrMaster[count($arrMaster)-1]->getPriceValue($intQuantity, $taxInclusive));
+					return _xls_currency(
+						$arrMaster[count($arrMaster) - 1] ->getPriceValue($intQuantity, $taxInclusive)
+					);
 
 				case Product::PRICE_RANGE:
 					$high = $arrMaster[0]->getPriceValue($intQuantity, $taxInclusive);
-					$low = $arrMaster[count($arrMaster)-1]->getPriceValue($intQuantity, $taxInclusive);
-						if ( $high != $low) return _xls_currency($high)." - "._xls_currency($low);
-					else return _xls_currency($high);
+					$low = $arrMaster[count($arrMaster) - 1]->getPriceValue($intQuantity, $taxInclusive);
+					if ($high != $low)
+					{
+						return _xls_currency($high)." - "._xls_currency($low);
+					}
+					return _xls_currency($high);
 
 				case Product::CLICK_FOR_PRICING:
-					if ($arrMaster[0]->getPriceValue($intQuantity, $taxInclusive) != $arrMaster[count($arrMaster)-1]->getPriceValue($intQuantity, $taxInclusive))
+					if ($arrMaster[0]->getPriceValue($intQuantity, $taxInclusive) !=
+						$arrMaster[count($arrMaster) - 1]->getPriceValue($intQuantity, $taxInclusive))
+					{
 						return _sp("Click for pricing");
-					else return $this->getPriceValue($intQuantity, $taxInclusive);
+					}
+					return $this->getPriceValue($intQuantity, $taxInclusive);
 
 				case Product::LOWEST_PRICE:
 					return _xls_currency($arrMaster[0]->getPriceValue($intQuantity, $taxInclusive));
@@ -888,12 +898,12 @@ class Product extends BaseProduct
 				case Product::MASTER_PRICE:
 				default:
 					return _xls_currency($this->getPriceValue($intQuantity, $taxInclusive));
-
-
 			}
-
 		}
-		else return _xls_currency($this->getPriceValue($intQuantity, $taxInclusive));
+		else
+		{
+			return _xls_currency($this->getPriceValue($intQuantity, $taxInclusive));
+		}
 	}
 
 	/**
@@ -904,22 +914,29 @@ class Product extends BaseProduct
 	 */
 	public function getPriceValue($intQuantity = 1, $taxInclusive = -1) {
 
-		if ($taxInclusive==-1)
+		if ($taxInclusive === -1)
+		{
 			$taxInclusive = Yii::app()->shoppingcart->IsTaxIn;
+		}
 
 		$strPriceField = $this->getPriceField($taxInclusive);
 		$intPrice = $this->$strPriceField;
 
-
 		if ($intQuantity == 1)
+		{
 			return $intPrice;
+		}
 
-		$intQtyPrice = $this->getQuantityPrice($intQuantity,$taxInclusive);
+		$intQtyPrice = $this->getQuantityPrice($intQuantity, $taxInclusive);
 
 		if ($intPrice < $intQtyPrice)
+		{
 			return $intPrice;
+		}
 		else
+		{
 			return $intQtyPrice;
+		}
 	}
 
 	/**
@@ -1003,7 +1020,7 @@ class Product extends BaseProduct
 		if (empty($intReservedA))
 			$intReservedA=0;
 
-		//Unattached orders (made independently in LightSpeed)
+		//Unattached orders (made independently in Lightspeed)
 		$intReservedB = $this->getDbConnection()->createCommand(
 					"SELECT SUM(qty) from ".DocumentItem::model()->tableName()." AS a
 					LEFT JOIN ".Document::model()->tableName()." AS b ON a.document_id=b.id
@@ -1395,7 +1412,23 @@ class Product extends BaseProduct
 
 	}
 
+	/**
+	 * Calculates the sum of the quantities of a given
+	 * array of Products
+	 *
+	 * @param $products Array of Product records
+	 * @return int The sum of the available quantities
+	 */
+	public static function sumInventoryInProducts($products)
+	{
+		$availQty = 0;
+		foreach($products as $product)
+		{
+			$availQty += $product->getInventory();
+		}
 
+		return $availQty;
+	}
 
 	public function __get($strName) {
 		switch ($strName) {
@@ -1449,6 +1482,8 @@ class Product extends BaseProduct
 			case 'CanonicalUrl':
 			case 'AbsoluteUrl':
 				return $this->GetAbsoluteUrl();
+			case 'AddToCartImage':
+				return $this->GetImageLink(ImagesType::addtocartmodal);
 
 			case 'ListingImage':
 				return $this->GetImageLink(ImagesType::listing);

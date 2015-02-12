@@ -51,6 +51,7 @@ class TaxCode extends BaseTaxCode
 		$objTax = TaxCode::model()->default_tax()->find();
 		return $objTax;
 	}
+
 	/**
 	 * Get the default tax code (always appears first sequentially)
 	 * @return $objTax the tax object
@@ -59,7 +60,6 @@ class TaxCode extends BaseTaxCode
 		$objTax = TaxCode::model()->default_tax()->find();
 		return $objTax->lsid;
 	}
-
 
 	/**
 	 * Get the tax code defined as NoTax code (evaluated by all zeroes)
@@ -117,7 +117,79 @@ class TaxCode extends BaseTaxCode
 				$objNewAny->save();
 			}
 		}
+	}
 
+	/**
+	 * Find the tax code associated with the provided address
+	 *
+	 * When the shipping country is empty, the Store Default tax code is used.
+	 * This is generally used before an address is entered and for store
+	 * pickup.
+	 *
+	 * If the provided address is not matched to any destination, the tax code
+	 * for ANY/ANY is used.
+	 *
+	 * @param mixed $shippingCountry The 2-letter country code for the country or the country ID.
+	 * @param mixed $shippingState The 2-letter code for the state or the state ID.
+	 * @param string $shippingPostal The postal code with all spaces removed.
+	 * @return TaxCode|null  The taxcode object, or null if no corresponding tax code.
+	 * @throws CException If tax destinations are not configured.
+	 */
+	public static function getTaxCodeByAddress(
+		$shippingCountry,
+		$shippingState,
+		$shippingPostal
+	)
+	{
+		if (empty($shippingCountry))
+		{
+			// Without a shipping country, we use the default tax code.
+			// This is only likely to occur for store pickup.
+			return static::getDefault();
+		}
 
+		// Calculate tax since that may change depending on shipping address.
+		Yii::log(
+			sprintf(
+				"Attempting to match with a defined Destination to Country/State/Postal %s/%s/%s",
+				$shippingCountry,
+				$shippingState,
+				$shippingPostal
+			),
+			'info',
+			'application.'.__CLASS__.".".__FUNCTION__
+		);
+
+		$objDestination = Destination::LoadMatching(
+			$shippingCountry,
+			$shippingState,
+			$shippingPostal
+		);
+
+		if ($objDestination === null)
+		{
+			Yii::log('Destination not matched, going with default (Any/Any)', 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+			$objDestination = Destination::getAnyAny();
+		}
+
+		if ($objDestination === null)
+		{
+			// TODO: We shoudn't need to check for this here, since it should be a
+			// configuration error to not have a tax destination configured.
+			throw new CException(
+				Yii::t(
+					'checkout',
+					'Website configuration error. No tax destinations have been defined by the Store Administrator. Cannot continue.'
+				)
+			);
+		}
+
+		Yii::log(
+			'Matched Destination destination.id='.$objDestination->id.' to tax code destination.taxcode='.$objDestination->taxcode,
+			'info',
+			'application.'.__CLASS__.'.'.__FUNCTION__
+		);
+
+		return static::LoadByLS($objDestination->taxcode);
 	}
 }

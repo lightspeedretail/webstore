@@ -16,11 +16,10 @@ class wscartanimate extends CWidget
 			throw new Exception(get_class($this).' error: Couldn\'t publish assets.');
 
 		$jsCode = <<<SETUP
-
 function animateAddToCart() {}
 SETUP;
 
-		if(Yii::app()->theme->config->animateAddToCart=="1")
+		if (Yii::app()->theme->config->animateAddToCart == "1")
 			$clientScript->registerScriptFile($baseurl.'/cartanimate.js',CClientScript::POS_HEAD);
 		else
 			$clientScript->registerScript(get_class($this), $jsCode, CClientScript::POS_HEAD);

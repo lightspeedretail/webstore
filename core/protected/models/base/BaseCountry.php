@@ -102,4 +102,15 @@ abstract class BaseCountry extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+
+	public function scopes()
+	{
+		return array(
+			// countries with a regular expression pattern defined
+			// in the db for their expected zip / postal codes
+			'withpostal' => array(
+				'condition' => 'zip_validate_preg IS NOT NULL'
+			),
+		);
+	}
 }

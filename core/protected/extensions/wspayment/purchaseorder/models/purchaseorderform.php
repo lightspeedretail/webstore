@@ -30,23 +30,44 @@ class purchaseorderform extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'po'=>Yii::t('CheckoutForm','Purchase Order'),
+			'po' => Yii::t('CheckoutForm', $this->moduleLabel),
 		);
 	}
 
 
 	public function getSubform()
 	{
-		return array(
-			'title'=>Yii::t(get_class($this),'Enter PO Number'),
+		$strPlaceholder = '';
+		if (Yii::app()->theme->info->advancedCheckout === true)
+		{
+			$strPlaceholder = $this->moduleLabel . ' #';
+		}
 
-			'elements'=>array(
-				'po'=>array(
-					'type'=>'text',
-					'maxlength'=>64,
+		return array(
+			'title' => Yii::t(get_class($this), 'Enter Number'),
+
+			'elements' => array(
+				'po' => array(
+					'type' => 'text',
+					'maxlength' => 64,
+					'placeholder' => $strPlaceholder
 				),
 			),
 		);
+	}
+
+
+	/**
+	 * Return the store owner defined label for the
+	 * payment method associated with this form
+	 *
+	 * @return string
+	 */
+	public function getModuleLabel()
+	{
+		$strModuleName = substr(__CLASS__, 0, -4); // minus 'form'
+
+		return Modules::GetModuleConfig($strModuleName, 'label');
 	}
 
 }

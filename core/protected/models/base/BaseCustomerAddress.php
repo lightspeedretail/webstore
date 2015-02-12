@@ -10,6 +10,7 @@
  * @property integer $active
  * @property string $first_name
  * @property string $last_name
+ * @property string $store_pickup_email
  * @property string $company
  * @property string $address1
  * @property string $address2
@@ -59,10 +60,13 @@ abstract class BaseCustomerAddress extends CActiveRecord
 			array('address_label, first_name, last_name, company, address1, address2, city', 'length', 'max'=>255),
 			array('state_id, country_id', 'length', 'max'=>11),
 			array('postal, phone', 'length', 'max'=>64),
+			// meant to handle an end user wanting to use an email address
+			// for store pickup that is different from login/guest email
+			array('store_pickup_email', 'email'),
 			array('modified, created', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, customer_id, address_label, active, first_name, last_name, company, address1, address2, city, state_id, postal, country_id, phone, residential, modified, created', 'safe', 'on'=>'search'),
+			array('id, customer_id, address_label, active, first_name, last_name, store_pickup_email, company, address1, address2, city, state_id, postal, country_id, phone, residential, modified, created', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -98,6 +102,7 @@ abstract class BaseCustomerAddress extends CActiveRecord
 			'active' => 'Active',
 			'first_name' => 'First Name',
 			'last_name' => 'Last Name',
+			'store_pickup_email' => 'Store Pickup Email',
 			'company' => 'Company',
 			'address1' => 'Address1',
 			'address2' => 'Address2',
@@ -123,23 +128,24 @@ abstract class BaseCustomerAddress extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('id',$this->id,true);
-		$criteria->compare('customer_id',$this->customer_id,true);
-		$criteria->compare('address_label',$this->address_label,true);
-		$criteria->compare('active',$this->active);
-		$criteria->compare('first_name',$this->first_name,true);
-		$criteria->compare('last_name',$this->last_name,true);
-		$criteria->compare('company',$this->company,true);
-		$criteria->compare('address1',$this->address1,true);
-		$criteria->compare('address2',$this->address2,true);
-		$criteria->compare('city',$this->city,true);
-		$criteria->compare('state_id',$this->state_id,true);
-		$criteria->compare('postal',$this->postal,true);
-		$criteria->compare('country_id',$this->country_id,true);
-		$criteria->compare('phone',$this->phone,true);
-		$criteria->compare('residential',$this->residential);
-		$criteria->compare('modified',$this->modified,true);
-		$criteria->compare('created',$this->created,true);
+		$criteria->compare('id', $this->id, true);
+		$criteria->compare('customer_id', $this->customer_id, true);
+		$criteria->compare('address_label', $this->address_label, true);
+		$criteria->compare('active', $this->active);
+		$criteria->compare('first_name', $this->first_name, true);
+		$criteria->compare('last_name', $this->last_name, true);
+		$criteria->compare('store_pickup_email', $this->store_pickup_email, true);
+		$criteria->compare('company', $this->company, true);
+		$criteria->compare('address1', $this->address1, true);
+		$criteria->compare('address2', $this->address2, true);
+		$criteria->compare('city', $this->city, true);
+		$criteria->compare('state_id', $this->state_id, true);
+		$criteria->compare('postal', $this->postal, true);
+		$criteria->compare('country_id', $this->country_id, true);
+		$criteria->compare('phone', $this->phone, true);
+		$criteria->compare('residential', $this->residential);
+		$criteria->compare('modified', $this->modified, true);
+		$criteria->compare('created', $this->created, true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

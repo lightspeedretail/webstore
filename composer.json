@@ -1,0 +1,19 @@
+{
+    "require-dev": {
+        "phploc/phploc": "*",
+        "phpmd/phpmd" : "@stable",
+        "phpunit/phpunit": "4.4.*",
+        "phpunit/phpunit-selenium": ">=1.2",
+        "phpunit/dbunit": ">=1.2",
+        "phpunit/phpunit-story": "*",
+        "phpunit/php-invoker": "*",
+        "squizlabs/php_codesniffer": "2.*",
+        "theseer/phpdox": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {"": "src"}
+    },
+    "config": {
+        "bin-dir": "bin/"
+    }
+}

@@ -192,9 +192,7 @@ class AdminBaseController extends CController
 		else
 			$this->setMenuHighlight();
 
-
-
-		$baseUrl = str_replace("/admin","/",Yii::app()->createAbsoluteUrl("admin"));
+		$baseUrl = '//' . $_SERVER['HTTP_HOST'] . '/';
 
 		Yii::app()->clientScript->registerScript(
 			'helpers',
@@ -365,8 +363,10 @@ class AdminBaseController extends CController
 	{
 		$id = Yii::app()->getRequest()->getQuery('id');
 
-		if(Yii::app()->controller->id == "theme" && Yii::app()->controller->action->id == "module")
+		if (Yii::app()->controller->id == "theme" && Yii::app()->controller->action->id == "module")
+		{
 			$id = "wstheme";
+		}
 
 		$objComponent = Yii::app()->getComponent($id);
 

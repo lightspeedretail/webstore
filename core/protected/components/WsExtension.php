@@ -12,30 +12,35 @@ class WsExtension extends CComponent
 	const THEME = 'theme';
 
 	/**
-	 * shipping or billing extension
+	 * shipping or billing (payment) extension
 	 * @var string
 	 */
 	protected $moduleType = 'shipping';
+
 	/**
 	 * Name that appears to the shopper
 	 * @var string
 	 */
 	protected $strModuleName = "Web Store Module";
+
 	/**
 	 * Extension version number (note whole numbers only)
 	 * @var int
 	 */
 	protected $version = 1;
+
 	/**
-	 * For billing extensions, does it redirect offsite (Simple Integration a la Paypal)
+	 * For billing extensions, does it redirect offsite (SIM ex. Paypal)
 	 * @var bool
 	 */
 	protected $uses_jumper = false;
+
 	/**
-	 * For billing extensions, we we display credit card number field (Advanced Integration)
+	 * For billing extensions, where credit card details are involved (SIM or AIM)
 	 * @var bool
 	 */
 	protected $uses_credit_card = false;
+
 	/**
 	 * Internal Web Store API version number, to determine compatibility
 	 * @var int
@@ -44,28 +49,37 @@ class WsExtension extends CComponent
 
 	protected $active;
 
-
 	protected $config;
 
 	protected $objCart;
 	protected $CheckoutForm;
 
-	//If we have a subform (model file)
+	/**
+	 * If we have a subform (model file)
+	 * @var null
+	 */
 	public $subform = null;
 
 	public function init()
 	{
 		$this->objCart = Yii::app()->shoppingcart;
 		$this->config = $this->getConfigValues(get_class($this));
+
 		if (!isset($this->config['markup']))
-			$this->config['markup']=0;
+		{
+			$this->config['markup'] = 0;
+		}
+
 		$objModule = Modules::LoadByName(get_class($this));
+
 		if ($objModule instanceof Modules)
+		{
 			$this->active = $objModule->active;
+		}
 		else
+		{
 			$this->active = false;
-
-
+		}
 	}
 
 	/**
@@ -77,33 +91,23 @@ class WsExtension extends CComponent
 	 */
 	public function run()
 	{
-		//This is where do what we're going to do to calculate the cost
-		//if we're using this as a shipping module
-		/* $arrReturn['price']=0;
-		 *
-		 * $arrReturn['level']='Service Level Appears Here';
-			$arrReturn['label'] = $arrReturn['level'] . " (" ._xls_currency($arrReturn['price']). ")";
-
-			$arrReturn2['price']=2;
-			$arrReturn2['level']='Higher Service Level you pay more for';
-			$arrReturn2['label'] = $arrReturn2['level'] . " (" ._xls_currency($arrReturn2['price']). ")";
-
-			//Return an array of arrays, each subarray is the service level with the price, the level and a display label that combines the two
-			return array($arrReturn);
-		 *
-		 *
-		 *
-		 *
-		 *
-		 */
-
-
-		//If we're using this as a payment module
 		/*
+		 * This is what we're going to do to calculate the cost
+		 * if we're using this as a shipping module
 		 *
+		 * $arrReturn['price']  = 0;
+		 * $arrReturn['level']  = 'Service Level Appears Here';
+		 * $arrReturn['label']  = $arrReturn['level'] . " (" ._xls_currency($arrReturn['price']). ")";
+		 *
+		 * $arrReturn2['price'] = 2;
+		 * $arrReturn2['level'] = 'Higher Service Level you pay more for';
+		 * $arrReturn2['label'] = $arrReturn2['level'] . " (" ._xls_currency($arrReturn2['price']). ")";\
+		 *
+		 * Return an array of arrays, where each subarray is the service level
+		 * with the price, the level and a display label which is a combination the
+		 * of the level and the currency formatted price
 		 *
 		 */
-
 	}
 
 	public function setCheckoutForm($mixForm = null)
@@ -112,13 +116,12 @@ class WsExtension extends CComponent
 		if ($mixForm instanceof CheckoutForm)
 		{
 			$this->CheckoutForm = $mixForm;
-
-
-
 			return $this;
 		}
-		else throw new CException('CheckoutForm not passed to module');
-
+		else
+		{
+			throw new CException('CheckoutForm not passed to module');
+		}
 	}
 
 
@@ -128,17 +131,26 @@ class WsExtension extends CComponent
 	 *
 	 *
 	 */
-	public function name() {
-
-
+	public function name()
+	{
 		$config = $this->getConfigValues(get_class($this));
 
-		if(isset($config['label']))
+		if (isset($config['label']))
+		{
 			$strName = $config['label'];
-		else $strName =  $this->strModuleName;
+		}
+		else
+		{
+			$strName = $this->strModuleName;
+		}
 
-		if(isset($config['live']))
-			if ($config['live']=="test") $strName .= " (TEST MODE)";
+		if (isset($config['live']))
+		{
+			if ($config['live'] == "test")
+			{
+				$strName .= " (TEST MODE)";
+			}
+		}
 
 		return $strName;
 	}
@@ -147,10 +159,11 @@ class WsExtension extends CComponent
 		return Customer::GetCurrent();
 	}
 
- 	/**
+	/**
 	 * Return the administrative name of the module for WS Admin Panel.
 	 * It is different than the module name returned in front of the
 	 * customer.
+	 *
 	 * @return string
 	 */
 	public function admin_name() {
@@ -165,16 +178,22 @@ class WsExtension extends CComponent
 		return _sp("This module provides a simple cash on delivery payment method.");
 	}
 
+
 	/**
-	 * Returns the Payment Method used within LightSpeed. This must match
-	 * the value within LightSpeed exactly.
+	 * Returns the Payment Method used within Lightspeed. This must match
+	 * the value within Lightspeed exactly.
+	 *
+	 * @param Cart $cart
 	 * @return string
 	 */
-	public function payment_method(Cart $cart) {
+	public function payment_method(Cart $cart)
+	{
 		$config = $this->Config;
 
-		if(isset($config['ls_payment_method']))
+		if (isset($config['ls_payment_method']))
+		{
 			return $config['ls_payment_method'];
+		}
 
 		return "Cash";
 	}
@@ -183,17 +202,19 @@ class WsExtension extends CComponent
 
 	public function getAdminModel()
 	{
-
 		$className = $this->getAdminModelName();
 		$reflector = new ReflectionClass(get_class($this));
 		$classPath = $reflector->getFileName();
-		$adminFile = str_replace(get_class($this).".php","models/".$className,$classPath.".php");
+		$adminFile = str_replace(get_class($this).".php", "models/".$className, $classPath.".php");
 
-		if(file_exists($adminFile))
+		if (file_exists($adminFile))
+		{
 			return new $className;
+		}
 		else
+		{
 			return null;
-
+		}
 	}
 
 	/**
@@ -223,13 +244,12 @@ class WsExtension extends CComponent
 		if (is_null($strClass)) $strClass = get_class($this);
 		$arr = array();
 
-		$objModule = Modules::model()->findByAttributes(array('module'=>$strClass));
-		if ($objModule instanceof Modules) {
-
-			try
-			{
+		$objModule = Modules::model()->findByAttributes(array('module' => $strClass));
+		if ($objModule instanceof Modules)
+		{
+			try {
 				$arr = unserialize($objModule->configuration);
-			}catch(Exception $e){
+			} catch(Exception $e) {
 				Yii::log("Could not unserialize " . $strClass. " . Error : " . $e, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				return array();
 			}
@@ -238,27 +258,25 @@ class WsExtension extends CComponent
 		return $arr;
 	}
 
+
 	/**
-	 * getConfigValues
-	 *
 	 * Returns initial configuration for selected payment type (class)
 	 *
-	 * @param $classname
-	 * @return $values[]
-	 *
+	 * @param $arr
+	 * @return array
 	 */
 	public function setConfigValues($arr) {
 
 		$strClass = get_class($this);
 
-
-		$objModule = Modules::model()->findByAttributes(array('module'=>$strClass));
-		if ($objModule instanceof Modules) {
-			Yii::log("Writing config " . print_r($arr,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-			try{
+		$objModule = Modules::model()->findByAttributes(array('module' => $strClass));
+		if ($objModule instanceof Modules)
+		{
+			Yii::log("Writing config " . print_r($arr, true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+			try {
 				$objModule->configuration = serialize($arr);
 				$objModule->save();
-			}catch(Exception $e){
+			} catch(Exception $e) {
 				Yii::log("Could not save " . $strClass. " . Error : " . $e, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				return array();
 			}
@@ -275,10 +293,12 @@ class WsExtension extends CComponent
 	{
 		return $this->version;
 	}
+
 	public function getAdminNameNormal()
 	{
-		return str_replace("&nbsp;","",strip_tags($this->AdminName));
+		return str_replace("&nbsp;", "", strip_tags($this->AdminName));
 	}
+
 	public function install() {
 		return;
 	}
@@ -294,51 +314,69 @@ class WsExtension extends CComponent
 	 *
 	 * @return boolean
 	 */
-	public function check() {
-		
-
+	public function check()
+	{
 		// if nothing has been configured, return null
-		if(!$this->config || count($this->config) == 0)
+		if (!$this->config || count($this->config) == 0)
+		{
 			return false;
+		}
 
 		//Remove possible "null" string which should be same as not set
 		if (isset($this->config['restrictcountry']) && $this->config['restrictcountry']=="null")
+		{
 			unset($this->config['restrictcountry']);
+		}
 
 		//Check possible scenarios why we would not offer this type of shipping
 		if (isset($this->config['restrictcountry'])) //we have a country restriction
 		{
-
 			switch($this->config['restrictcountry']) {
 				case 'CUS':
-					if ($this->CheckoutForm->shippingCountry=="US")
+					if ($this->CheckoutForm->shippingCountryCode == "US")
 					{
-						if($this->CheckoutForm->shippingState =="AK" || $this->CheckoutForm->shippingState=="HI")
-						return false;
-						else return true;
+						if ($this->CheckoutForm->shippingStateCode == "AK" || $this->CheckoutForm->shippingStateCode == "HI")
+						{
+							return false;
+						} else {
+							return true;
+						}
 					}
+
 					return false;
 					break;
 
 				case 'NORAM':
-					if ($this->CheckoutForm->shippingCountry != "US" && $this->CheckoutForm->shippingCountry != "CA")
+					if ($this->CheckoutForm->shippingCountryCode != "US" && $this->CheckoutForm->shippingCountryCode != "CA")
+					{
 						return false;
+					}
+
 					break;
 
 				case 'AUNZ':
-					if ($this->CheckoutForm->shippingCountry != "AU" && $this->CheckoutForm->shippingCountry != "NZ")
+					if ($this->CheckoutForm->shippingCountryCode != "AU" && $this->CheckoutForm->shippingCountryCode != "NZ")
+					{
 						return false;
+					}
+
 					break;
 
 				case 'OUTSIDE':
-					if (Country::CodeById(_xls_get_conf('DEFAULT_COUNTRY'))==$this->CheckoutForm->shippingCountry) return false;
+					if (_xls_get_conf('DEFAULT_COUNTRY') == $this->CheckoutForm->shippingCountry)
+					{
+						return false;
+					}
+
 					break;
 
 				default:
-					if ($this->config['restrictcountry']!=$this->CheckoutForm->shippingCountry) return false;
+					if ($this->config['restrictcountry'] != $this->CheckoutForm->shippingCountryCode)
+					{
+						return false;
+					}
 			}
 		}
-
 
 		return true;
 	}
@@ -348,12 +386,18 @@ class WsExtension extends CComponent
 		return $this->check();
 	}
 
-	public function getModuleName($strClass = null) {
+	public function getModuleName($strClass = null)
+	{
 
-		if (is_null($strClass)) $strClass = get_class($this);
+		if (is_null($strClass))
+		{
+			$strClass = get_class($this);
+		}
 
-		if (substr($strClass,-6)=="Module")
-			$strClass = substr($strClass,0,-6);
+		if (substr($strClass, -6) == "Module")
+		{
+			$strClass = substr($strClass, 0, -6);
+		}
 
 		return strtolower($strClass);
 	}
@@ -366,11 +410,16 @@ class WsExtension extends CComponent
 	 * @return string
 	 *
 	 */
-	public function message($cart) {
+	public function message($cart)
+	{
 		if (($cart->PaymentData == $this->name()) || (!$cart->PaymentData))
+		{
 			return $this->name();
+		}
 		else
+		{
 			return $this->name() . " - " . $cart->PaymentData;
+		}
 	}
 
 	/**
@@ -390,7 +439,6 @@ class WsExtension extends CComponent
 	 * Return false if processing has failed. Error can be returned as part
 	 * of the $errortext variable (ByRef)
 	 *
-	 * @param $cart
 	 * @return string|boolean
 	 */
 	public function process() {
@@ -399,16 +447,21 @@ class WsExtension extends CComponent
 
 	/**
 	 * Return the paid amount that is actually going to come to store.
-	 * Returned value here will go into paid amount/deposit of LightSpeed.
+	 * Returned value here will go into paid amount/deposit of Lightspeed.
 	 *
 	 * @param Cart $cart
 	 * @return unknown_type
 	 */
-	public function paid_amount(Cart $cart) {
+	public function paid_amount(Cart $cart)
+	{
 		if ($this->admin_name() == "Cash On Delivery")
+		{
 			return 0.00;
+		}
 		else
+		{
 			return $cart->Total;
+		}
 	}
 
 	/**
@@ -437,7 +490,6 @@ class WsExtension extends CComponent
 	 * 		- output =>
 	 */
 	public function gateway_response_process() {
-
 		return false;
 	}
 
@@ -467,26 +519,22 @@ class WsExtension extends CComponent
 
 			default:
 				return parent::__get($strName);
-
 		}
 	}
 
 	public function __set($strName, $mixValue) {
 		switch ($strName) {
 			case 'objCart':
-				$this->objCart=$mixValue;
+				$this->objCart = $mixValue;
 				return;
 
 			case 'CheckoutForm':
-				$this->CheckoutForm=$mixValue;
+				$this->CheckoutForm = $mixValue;
 				return;
 
 			default:
-				return parent::__set($strName,$mixValue);
-
+				return parent::__set($strName, $mixValue);
 		}
 
 	}
-
-
 }

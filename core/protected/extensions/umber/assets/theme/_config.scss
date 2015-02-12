@@ -1,0 +1,76 @@
+@charset "utf-8";
+
+$break-mobile: 0px; // This is used in limited situations, generally styles layer-up, not down.
+$break-narrow-modal: 360px;
+$break-verysmall: 450px;
+$break-small: 560px;
+$break-medium: 720px;
+$break-large: 1025px;
+$break-verylarge: 1240px;
+
+@import 'compass';
+@import '../mixins/html5-input-types';
+
+@mixin media($media) {
+	@if $media == 'mobile' {
+		@media (max-width: $break-small) { @content; }
+	}
+	@if $media == 'narrow-modal' {
+		@media (min-width: $break-narrow-modal) { @content; }
+	}
+	@else if $media == 'verysmall' {
+		@media (min-width: $break-verysmall)  { @content; }
+	}
+	@else if $media == 'small' {
+		@media (min-width: $break-small)  { @content; }
+	}
+	@else if $media == 'medium' {
+		@media (min-width: $break-medium) { @content; }
+	}
+	@else if $media == 'large' {
+		@media (min-width: $break-large) { @content; }
+	}
+	@else if $media == 'short' {
+		@media (max-height: $break-short) { @content; }
+	}
+	@else {
+		@content;
+	}
+}
+
+* {
+	@include box-sizing(border-box);
+}
+
+// Colors
+$font-color: #000;
+
+$blue: #3287CC;
+
+// Link colors
+$link-color:		 $blue;
+$link-hover-color:   darken($blue,10%);
+$link-active-color:  darken($blue,20%);
+//$link-focus-color:   false;
+//$link-visited-color: false;
+
+a {
+	color: $link-color;
+	&:active { color: $link-active-color; }
+	a:hover { color: $link-hover-color; }
+}
+
+$modal-padding: 20px;
+
+$modal-width: 720px;
+$modal-width-narrow: 540px;
+
+$error-color: #B4282E;
+
+$calltoaction-color: $blue;
+
+$default-font-family: 'Open Sans', 'Helvetica Neue', Helvetica, sans-serif;
+
+$fa-font-path:        "/fonts" !default;
+$fa-css-prefix:       fa !default;
+$fa-version:          "4.1.0" !default;

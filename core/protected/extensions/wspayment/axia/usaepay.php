@@ -6,8 +6,10 @@
 //	For assistance please contact devsupport@usaepay.com
 //
 
-define("USAEPAY_VERSION", "1.6.8");
-
+if (defined('USAEPAY_VERSION') === false)
+{
+	define('USAEPAY_VERSION', '1.6.8');
+}
 
 /**
  * USAePay Transaction Class

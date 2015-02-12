@@ -69,50 +69,31 @@
          </fieldset>
        </div>
      </div>
-
-	<?php if ($model->scenario == "update") { ?>
-		<div class="row">
-			<div id="changepassword">
-				<?php
-				echo CHtml::link(Yii::t('account', "Click here to change your password"), Yii::app()->createUrl('myaccount/updatepassword'));
-				?>
-			</div>
-		</div>
-	<?php } ?>
-
-	<?php if ($model->scenario == "insert") { ?>
-		<div id="createaccount">
-			<fieldset class="span12">
-				<legend>
-					<?php
-					echo Yii::t('global','Choose a password');
-					?>
-				</legend>      <!-- legend for W3C validation -->
-				<div class="row">
-					<div class="col-sm-5">
-						<?php echo $form->labelEx($model,'password'); ?>
-						<?php echo $form->passwordField($model,'password', array('placeholder'=>"", 'autocomplete'=>"off")); ?>
-						<?php echo $form->error($model,'password'); ?>
-					</div>
-					<div id="password_repeat" class="col-sm-5">
-						<?php echo $form->labelEx($model,'password_repeat'); ?>
-						<?php echo $form->passwordField($model,'password_repeat',array('placeholder'=>"", 'autocomplete'=>"off")); ?>
-						<?php echo $form->error($model,'password_repeat'); ?>
-					</div>
+	<div id="createaccount">
+		<legend>
+			<?php
+				echo (Yii::app()->user->isGuest ?  Yii::t('global','Choose a password') :
+					Yii::t('global','Enter a new password here to change your password'));
+			?>
+		</legend>
+		<fieldset>
+			<div class="row">
+				<div class="col-sm-5">
+					<?php echo $form->labelEx($model,'password'); ?>
+					<?php echo $form->passwordField($model,'password', array('placeholder'=>"", 'autocomplete'=>"off")); ?>
+					<?php echo $form->error($model,'password'); ?>
 				</div>
-			</fieldset>
-		</div>
-	<?php } // if create ?>
-
-	<div>
-		<fieldset class="span12">
-			<legend class="hideme">Subscribe to newsletter</legend>     <!-- legend for W3C validation -->
+				<div class="col-sm-5">
+					<?php echo $form->labelEx($model,'password_repeat'); ?>
+					<?php echo $form->passwordField($model,'password_repeat',array('placeholder'=>"", 'autocomplete'=>"off")); ?>
+					<?php echo $form->error($model,'password_repeat'); ?>
+				</div>
+			</div>
 			<div class="row-fluid">
 				<?php echo $form->checkBox($model,'newsletter_subscribe'); ?>
 				<?php echo $form->label($model,'newsletter_subscribe'); ?>
 				<?php echo $form->error($model,'newsletter_subscribe'); ?>
             </div>
-
         </fieldset>
     </div>
 

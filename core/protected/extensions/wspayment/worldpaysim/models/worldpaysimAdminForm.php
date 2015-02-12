@@ -30,7 +30,7 @@ class worldpaysimAdminForm extends CFormModel
 			'login'=>'Installation ID',
 			'live'=>'Deployment Mode',
 			'restrictcountry'=>'Only allow this processor',
-			'ls_payment_method'=>'LightSpeed Payment Method',
+			'ls_payment_method'=>'Lightspeed Payment Method',
 		);
 	}
 

@@ -14,6 +14,10 @@ class InstallForm extends CFormModel
 	public $EMAIL_FROM;
 	public $STORE_ADDRESS1;
 	public $STORE_ADDRESS2;
+	public $STORE_CITY;
+	public $STORE_STATE;
+	public $STORE_COUNTRY;
+	public $STORE_ZIP;
 	public $STORE_HOURS;
 	public $STORE_PHONE;
 
@@ -49,12 +53,12 @@ class InstallForm extends CFormModel
 
 			array('loginpassword','checkForemail'),
 
-			array('STORE_NAME,EMAIL_FROM,STORE_ADDRESS1,STORE_ADDRESS2,STORE_HOURS,STORE_PHONE','required',
+			array('STORE_NAME,EMAIL_FROM,STORE_ADDRESS1,STORE_CITY,STORE_COUNTRY,STORE_HOURS,STORE_PHONE','required',
 				'on'=>'page3,page3-mt,page3-cld'),
 			array('EMAIL_SMTP_SERVER,EMAIL_SMTP_PORT,EMAIL_SMTP_USERNAME,EMAIL_SMTP_PASSWORD,EMAIL_SMTP_SECURITY_MODE',
 				'required', 'on'=>'page4,page4-mt,page4-cld'),
-			array('STORE_NAME,EMAIL_FROM,STORE_ADDRESS1,STORE_ADDRESS2,STORE_HOURS,STORE_PHONE,LSKEY,encryptionKey,encryptionSalt,TIMEZONE','safe'),
-            array('EMAIL_FROM,loginemail','email'),
+			array('STORE_NAME,EMAIL_FROM,STORE_ADDRESS1,STORE_ADDRESS2,STORE_CITY,STORE_STATE,STORE_ZIP,STORE_COUNTRY,STORE_HOURS,STORE_PHONE,LSKEY,encryptionKey,encryptionSalt,TIMEZONE','safe'),
+			array('EMAIL_FROM,loginemail','email'),
 			array('page','safe'),
 		);
 	}
@@ -71,10 +75,13 @@ class InstallForm extends CFormModel
 			'STORE_NAME'=>'Store Name',
 			'EMAIL_FROM'=>'Store Email',
 			'STORE_ADDRESS1'=>'Store Address',
-			'STORE_ADDRESS2'=>'Store City, State, Postal',
+			'STORE_ADDRESS2'=>'Store Address 2',
+			'STORE_CITY'=>'Store City',
+			'STORE_STATE'=>'Store State/Province',
+			'STORE_ZIP'=>'Zip/Postal Code',
+			'STORE_COUNTRY'=>'Store Country',
 			'STORE_HOURS'=>'Store Hours',
 			'STORE_PHONE'=>'Store Phone Number',
-
 			'LSKEY'=>'Store Password',
 			'TIMEZONE'=>'Server timezone',
 			'encryptionKey'=>'Encryption Key 1',
@@ -134,6 +141,26 @@ class InstallForm extends CFormModel
 					'maxlength'=>64,
 				),
 
+				'STORE_CITY'=>array(
+					'type'=>'text',
+					'maxlength'=>64,
+				),
+
+				'STORE_STATE'=>array(
+					'type'=>'dropdownlist',
+					'items'=>Configuration::getAdminDropdownOptions('STATE'),
+				),
+
+				'STORE_COUNTRY'=>array(
+					'type'=>'dropdownlist',
+					'items'=>Configuration::getAdminDropdownOptions('COUNTRY'),
+				),
+
+				'STORE_ZIP'=>array(
+					'type'=>'text',
+					'maxlength'=>10,
+				),
+
 				'STORE_HOURS'=>array(
 					'type'=>'text',
 					'maxlength'=>64,
@@ -156,8 +183,8 @@ class InstallForm extends CFormModel
 	{
 		return array(
 			'title'=>_xls_get_conf('LIGHTSPEED_CLOUD',0)>0 ? '<p>Please verify the server timezone.</p><p>You must also enter an email address and password which will be granted admin access when logging into <strong>'.Yii::app()->createAbsoluteUrl('admin').'</strong> in any web browser. If this email already exists in Web Store, the password will be updated and admin access granted.</p></b>'
-				: (_xls_get_conf('LIGHTSPEED_MT',0)>0 ? '<p>Enter a store password and verify the server timezone. <strong>You must type in your store password even if this is an upgrade. Your new store password will be reset to what is entered here.</strong></p><p>You can enter an email address and password which will be granted admin access when logging into <strong>'.Yii::app()->createAbsoluteUrl('admin').'</strong> in any web browser. If this email already exists in Web Store, the password will be updated and admin access granted.</p></b>'
-					: '<p>Enter a store password and verify the server timezone. The encryption keys are used to encrypt all passwords, you can generally accept the randomly generated ones below. <strong>Type in your store password even if this is an upgrade. Your new store password will be reset to what is entered here.</strong></p><p>You can enter an email address and password which will be granted admin access when logging into <strong>'.Yii::app()->createAbsoluteUrl('admin').'</strong> in any web browser. If this email already exists in Web Store, the password will be updated and admin access granted.</p></b>'),
+					: (_xls_get_conf('LIGHTSPEED_MT',0)>0 ? '<p>Enter a store password and verify the server timezone. <strong>You must type in your store password even if this is an upgrade. Your new store password will be reset to what is entered here.</strong></p><p>You can enter an email address and password which will be granted admin access when logging into <strong>'.Yii::app()->createAbsoluteUrl('admin').'</strong> in any web browser. If this email already exists in Web Store, the password will be updated and admin access granted.</p></b>'
+						: '<p>Enter a store password and verify the server timezone. The encryption keys are used to encrypt all passwords, you can generally accept the randomly generated ones below. <strong>Type in your store password even if this is an upgrade. Your new store password will be reset to what is entered here.</strong></p><p>You can enter an email address and password which will be granted admin access when logging into <strong>'.Yii::app()->createAbsoluteUrl('admin').'</strong> in any web browser. If this email already exists in Web Store, the password will be updated and admin access granted.</p></b>'),
 
 			'elements'=>array(
 				'LSKEY'=>array(
@@ -202,10 +229,10 @@ class InstallForm extends CFormModel
 	public function getPage4()
 	{
 		return array(
-            'title'=> Yii::t('admin','Finally, enter your email server settings. {LightSpeed} Click for standard settings for: <a href=\'javascript:setupMail("smtp");\'>Standard SMTP</a>, <a href=\'javascript:setupMail("gmail");\'>Gmail</a>, <a href=\'javascript:setupMail("godaddy");\'>Godaddy</a>',
-                        array('{LightSpeed}'=>_xls_get_conf('LIGHTSPEED_CLOUD',0)>0 ? '' : "These are generally identical to LightSpeed's setup in Tools->Setup->Advanced->Email." )),
+			'title'=> Yii::t('admin','Finally, enter your email server settings. {Lightspeed} Click for standard settings for: <a href=\'javascript:setupMail("smtp");\'>Standard SMTP</a>, <a href=\'javascript:setupMail("gmail");\'>Gmail</a>, <a href=\'javascript:setupMail("godaddy");\'>Godaddy</a>',
+					array('{Lightspeed}'=>_xls_get_conf('LIGHTSPEED_CLOUD',0)>0 ? '' : "These are generally identical to Lightspeed's setup in Tools->Setup->Advanced->Email." )),
 
-            'elements'=>array(
+			'elements'=>array(
 				'EMAIL_SMTP_SERVER'=>array(
 					'type'=>'text',
 					'maxlength'=>64,
@@ -271,6 +298,10 @@ class InstallForm extends CFormModel
 					'EMAIL_FROM'=>_xls_get_conf('EMAIL_FROM'),
 					'STORE_ADDRESS1'=>_xls_get_conf('STORE_ADDRESS1'),
 					'STORE_ADDRESS2'=>_xls_get_conf('STORE_ADDRESS2'),
+					'STORE_CITY'=>_xls_get_conf('STORE_CITY'),
+					'STORE_STATE'=>_xls_get_conf('STORE_STATE'),
+					'STORE_COUNTRY'=>_xls_get_conf('STORE_COUNTRY'),
+					'STORE_ZIP'=>_xls_get_conf('STORE_ZIP'),
 					'STORE_HOURS'=>_xls_get_conf('STORE_HOURS'),
 					'STORE_PHONE'=>_xls_get_conf('STORE_PHONE'),
 				);
@@ -323,13 +354,17 @@ class InstallForm extends CFormModel
 					$objCustomer->allow_login=2;
 					$objCustomer->save();
 				}
-			break;
+				break;
 
 			case 3:
 				_xls_set_conf('STORE_NAME',$this->STORE_NAME);
 				_xls_set_conf('EMAIL_FROM',$this->EMAIL_FROM);
 				_xls_set_conf('STORE_ADDRESS1',$this->STORE_ADDRESS1);
 				_xls_set_conf('STORE_ADDRESS2',$this->STORE_ADDRESS2);
+				_xls_set_conf('STORE_CITY',$this->STORE_CITY);
+				_xls_set_conf('STORE_STATE',$this->STORE_STATE);
+				_xls_set_conf('STORE_COUNTRY',$this->STORE_COUNTRY);
+				_xls_set_conf('STORE_ZIP',$this->STORE_ZIP);
 				_xls_set_conf('STORE_HOURS',$this->STORE_HOURS);
 				_xls_set_conf('STORE_PHONE',$this->STORE_PHONE);
 				break;

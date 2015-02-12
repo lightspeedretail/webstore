@@ -16,9 +16,9 @@ class cashondelivery extends WsPayment
 	public function run()
 	{
 
-		$arrReturn['success']=true;
-		$arrReturn['amount_paid']=0;
-		$arrReturn['result']=$this->defaultName; //transaction ID or error string
+		$arrReturn['success'] = true;
+		$arrReturn['amount_paid'] = 0;
+		$arrReturn['result'] = $this->defaultName; //transaction ID or error string
 		$arrReturn['api'] = 1;
 
 		//This module just returns a success

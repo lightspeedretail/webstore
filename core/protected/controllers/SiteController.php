@@ -6,37 +6,13 @@
  * @category   Controller
  * @package    Site
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @copyright  Copyright &copy; 2013 LightSpeed Retail, Inc. http://www.lightspeedretail.com
+ * @copyright  Copyright &copy; 2013 Lightspeed Retail, Inc. http://www.lightspeedretail.com
  * @version    3.0
  * @since      2013-05-14
  */
 class SiteController extends Controller
 {
 	public $layout = '//layouts/column2';
-
-	//	public function beforeAction($action)
-	//	{
-	//
-	//		if ($action->Id=="login" && _xls_get_conf('ENABLE_SSL')==1)
-	//		{
-	//			if(Yii::app()->params['LIGHTSPEED_HOSTING_COMMON_SSL'])
-	//				$this->verifyCommonSSL();
-	//
-	//			if(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on') {
-	//				$this->redirect(Yii::app()->createAbsoluteUrl('site/'.$action->Id,array(),'https'));
-	//				Yii::app()->end();
-	//			}
-	//		} else if(
-	//			$action->Id != "login" &&
-	//			$action->Id != "forgotpassword" &&
-	//			$action->Id != "sendemail" &&
-	//			Yii::app()->params['LIGHTSPEED_HOSTING_COMMON_SSL']
-	//		)
-	//			$this->verifyNoSharedSSL();
-	//
-	//		return parent::beforeAction($action);
-	//
-	//	}
 
 	/**
 	 * Default action.
@@ -48,8 +24,8 @@ class SiteController extends Controller
 	 */
 	public function actionIndex()
 	{
-
 		$homePage = _xls_get_conf('HOME_PAGE', '*products');
+
 		switch ($homePage)
 		{
 			case "*index":
@@ -126,13 +102,6 @@ class SiteController extends Controller
 
 		if ($error = Yii::app()->errorHandler->error)
 		{
-			if (stripos(Yii::app()->request->userAgent, "curl/") !== false)
-			{
-				echo $error['code'] . " " . $error['type'] . " " . $error['message'] . "\n";
-				echo $error['trace'];
-				die();
-			}
-
 			if (Yii::app()->request->isAjaxRequest)
 			{
 				echo $error['message'];
@@ -160,6 +129,7 @@ class SiteController extends Controller
 		}
 
 		$model = new LoginForm();
+		$model->setScenario('Existing');
 
 		$response_array = array();
 
@@ -171,6 +141,8 @@ class SiteController extends Controller
 			// validate user input and redirect to the previous page if valid
 			if ($model->validate() && $model->login())
 			{
+				// remove any existing form information in cache
+				unset(Yii::app()->session[MultiCheckoutForm::$sessionKey]);
 
 				//If we're doing this as a shared login, redirect
 				if (Yii::app()->isCommonSSL)

@@ -49,7 +49,7 @@ class wsamazonAdminForm extends CFormModel
 
 		$retVal = "<P>NOTE: For a product to be uploaded to Amazon Marketplace, it must have a UPC code, it must be assigned to Web Categories in the product card, and those Web Categories must be matched to Amazon Categories. Any product that does not meet all these conditions will not be uploaded. To further restrict which items get sent to Amazon, you can specify a tag here (blank means sending all qualifying items.) ALSO NOTE: You will need to mark orders as shipped through Seller Central manually to receive your funds.</p>";
 		if (Yii::app()->params['LIGHTSPEED_HOSTING'])
-			$retVal .= "<p>To enable integration, please contact LightSpeed technical support and let them know you are using Amazon Seller Central with your web store. Our support department will need to activate a service that pushes information from Web Store to your Amazon Account.</p>";
+			$retVal .= "<p>To enable integration, please contact Lightspeed technical support and let them know you are using Amazon Seller Central with your web store. Our support department will need to activate a service that pushes information from Web Store to your Amazon Account.</p>";
 		 else
 		    $retVal .= "<p>To enable uploading, your web administrator needs to set up a Cron job which contains the command: <pre>* * * * * curl ".Yii::app()->createAbsoluteUrl('/',array(),'http')."/integration/cron &gt; /dev/null 2>&amp;1 </pre></p>";
 

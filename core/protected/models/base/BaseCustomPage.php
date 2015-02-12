@@ -7,7 +7,7 @@
  * @property string $id
  * @property string $page_key
  * @property string $title
- * @property string $page
+ * @property string $page_data
  * @property string $request_url
  * @property string $meta_keywords
  * @property string $meta_description
@@ -47,10 +47,10 @@ abstract class BaseCustomPage extends CActiveRecord
 			array('page_key', 'length', 'max'=>32),
 			array('title', 'length', 'max'=>64),
 			array('request_url, meta_keywords, meta_description, product_tag', 'length', 'max'=>255),
-			array('page, modified, created', 'safe'),
+			array('page_data, modified, created', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, page_key, title, page, request_url, meta_keywords, meta_description, modified, created, product_tag, tab_position, column_template, product_display', 'safe', 'on'=>'search'),
+			array('id, page_key, title, page_data, request_url, meta_keywords, meta_description, modified, created, product_tag, tab_position, column_template, product_display', 'safe', 'on' => 'search'),
 		);
 	}
 
@@ -75,7 +75,7 @@ abstract class BaseCustomPage extends CActiveRecord
 			'id' => 'ID',
 			'page_key' => 'Page Key',
 			'title' => 'Title',
-			'page' => 'Page',
+			'page_data' => 'Page Data',
 			'request_url' => 'Request Url',
 			'meta_keywords' => 'Meta Keywords',
 			'meta_description' => 'Meta Description',
@@ -102,7 +102,7 @@ abstract class BaseCustomPage extends CActiveRecord
 		$criteria->compare('id',$this->id,true);
 		$criteria->compare('page_key',$this->page_key,true);
 		$criteria->compare('title',$this->title,true);
-		$criteria->compare('page',$this->page,true);
+		$criteria->compare('page_data',$this->page_data,true);
 		$criteria->compare('request_url',$this->request_url,true);
 		$criteria->compare('meta_keywords',$this->meta_keywords,true);
 		$criteria->compare('meta_description',$this->meta_description,true);

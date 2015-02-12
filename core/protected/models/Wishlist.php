@@ -175,21 +175,29 @@ class Wishlist extends BaseWishlist
 	/**
 	 * @return array
 	 */
-	public function getShipOptions()
+	public function getShippingOptions()
 	{
 
 		$arrReturn = array(
 			'0'=> Yii::t('wishlist','None')
 		);
 
-		$objAddresses = CustomerAddress::model()->findAllByAttributes(
-			array('customer_id'=>Yii::app()->user->id,
-				  'active'=>1));
+		$objAddresses = CustomerAddress::getActiveAddresses();
+
 		foreach ($objAddresses as $objAddress)
-			$arrReturn[$objAddress->id] =
+		{
+			$str =
 				$objAddress->fullname.", ".
 				$objAddress->address1.($objAddress->address2 != '' ? " " : "").$objAddress->address2.", ".
-				$objAddress->city." ".$objAddress->state." ".$objAddress->postal;
+				$objAddress->city;
+
+			$str .= empty($objAddress->state) ? '' : ", ".$objAddress->state;
+			$str .= empty($objAddress->postal) ? '' : ", ".$objAddress->postal;;
+			$str .= ', ' . $objAddress->country;
+
+			$arrReturn[$objAddress->id] = $str;
+		}
+
 
 		return $arrReturn;
 	}
@@ -253,8 +261,8 @@ class Wishlist extends BaseWishlist
 							$item->delete();
 
 							$objCart->refresh();
-							$objCart->UpdateCountAndSubtotal();
-							$objCart->UpdateTotal();
+							$objCart->updateCountAndSubtotal();
+							$objCart->updateTotal();
 							$objCart->save();
 						}
 

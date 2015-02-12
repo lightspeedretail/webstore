@@ -7,7 +7,7 @@ class paypalpro extends WsPayment
 	protected $version = 1.0;
 	protected $uses_credit_card = true;
 	protected $apiVersion = 1;
-	public $advancedMode=true;
+	public $advancedMode = true;
 
 
 	/**
@@ -21,31 +21,32 @@ class paypalpro extends WsPayment
 
 		$strCardType = $this->CheckoutForm->cardType;
 
-		if ($strCardType=="AMERICAN_EXPRESS") $strCardType="Amex";
+		if ($strCardType == "AMERICAN_EXPRESS" || $strCardType == "American Express")
+		{
+				$strCardType = "Amex";
+		}
 
-//ITEMAMT=2&SHIPPINGAMT=15.62&AMT=2&TAXAMT=0
-
-		$str  = "&PAYMENTACTION="	.'Sale';
-		$str .= "&ITEMAMT="			.$this->objCart->subtotal;
-		$str .= "&SHIPPINGAMT="		.$this->objCart->shipping->shipping_sell;
-		$str .= "&AMT="				.round($this->objCart->total,2);
-		$str .= "&TAXAMT="			.$this->objCart->TaxTotal;
-		$str .= "&INVNUM="			.$this->objCart->id_str;
-		$str .= "&CREDITCARDTYPE="	.$strCardType;
-		$str .= "&ACCT="			._xls_number_only($this->CheckoutForm->cardNumber); //AAAABBBBCCCCDDDD
-		$str .= "&EXPDATE="			.$this->CheckoutForm->cardExpiryMonth.$this->CheckoutForm->cardExpiryYear; //MMYYYY
-		$str .= "&CVV2="			.$this->CheckoutForm->cardCVV;
-		$str .= "&FIRSTNAME="		.urlencode($this->CheckoutForm->contactFirstName);
-		$str .= "&LASTNAME="		.urlencode($this->CheckoutForm->contactLastName);
-		$str .= "&STREET="			.urlencode(($this->CheckoutForm->billingAddress2 != '' ?
-			$this->CheckoutForm->billingAddress1 . " " . $this->CheckoutForm->billingAddress2 : $this->CheckoutForm->billingAddress1));
-		$str .= "&CITY="				.urlencode($this->CheckoutForm->billingCity);
-		$str .= "&STATE="			.strtoupper($this->CheckoutForm->billingState);
-		$str .= "&ZIP="				.str_replace(" ","",$this->CheckoutForm->billingPostal);
-		$str .= "&COUNTRYCODE="		.strtoupper($this->CheckoutForm->billingCountry);
-		$str .= "&EMAIL="			.$this->CheckoutForm->contactEmail;
-		$str .= "&CURRENCYCODE="		.strtoupper(_xls_get_conf('CURRENCY_DEFAULT' , 'USD')); //CAD or USD
-		$str .= "&IPADDRESS="		.$_SERVER['REMOTE_ADDR'];
+		$str  = "&PAYMENTACTION="   .'Sale';
+		$str .= "&ITEMAMT="         .$this->objCart->subtotal;
+		$str .= "&SHIPPINGAMT="     .$this->objCart->shipping->shipping_sell;
+		$str .= "&AMT="             .round($this->objCart->total,2);
+		$str .= "&TAXAMT="          .$this->objCart->TaxTotal;
+		$str .= "&INVNUM="          .$this->objCart->id_str . date('YmdHis'); // append the datetime to prevent duplicate id error if payment must be re-tried
+		$str .= "&CREDITCARDTYPE="  .$strCardType;
+		$str .= "&ACCT="            ._xls_number_only($this->CheckoutForm->cardNumber); //AAAABBBBCCCCDDDD
+		$str .= "&EXPDATE="         ._xls_number_only($this->CheckoutForm->cardExpiryMonth.$this->CheckoutForm->cardExpiryYear); //MMYYYY
+		$str .= "&CVV2="            .$this->CheckoutForm->cardCVV;
+		$str .= "&FIRSTNAME="       .urlencode($this->CheckoutForm->contactFirstName);
+		$str .= "&LASTNAME="        .urlencode($this->CheckoutForm->contactLastName);
+		$str .= "&STREET="          .urlencode(($this->CheckoutForm->billingAddress2 != '' ?
+				$this->CheckoutForm->billingAddress1 . " " . $this->CheckoutForm->billingAddress2 : $this->CheckoutForm->billingAddress1));
+		$str .= "&CITY="            .urlencode($this->CheckoutForm->billingCity);
+		$str .= "&STATE="           .strtoupper($this->CheckoutForm->billingStateCode);
+		$str .= "&ZIP="             .str_replace(" ","",$this->CheckoutForm->billingPostal);
+		$str .= "&COUNTRYCODE="     .strtoupper($this->CheckoutForm->billingCountryCode);
+		$str .= "&EMAIL="           .$this->CheckoutForm->contactEmail;
+		$str .= "&CURRENCYCODE="    .strtoupper(_xls_get_conf('CURRENCY_DEFAULT' , 'USD')); //CAD or USD
+		$str .= "&IPADDRESS="       .$_SERVER['REMOTE_ADDR'];
 
 		if($this->config['live'] == 'test')
 		{
@@ -60,9 +61,7 @@ class paypalpro extends WsPayment
 			$API_UserName = $this->config['api_username'];
 			$API_Password = $this->config['api_password'];
 			$API_Signature = $this->config['api_signature'];
-
 		}
-
 
 		$version = '57.0';
 
@@ -70,11 +69,17 @@ class paypalpro extends WsPayment
 		curl_setopt($ch, CURLOPT_URL, $API_Endpoint);
 		curl_setopt($ch, CURLOPT_VERBOSE, 1);
 
+		// Force the use of TLS instead of SSLv3.
+		//  https://ppmts.custhelp.com/app/answers/detail/a_id/1182/session/L3RpbWUvMTQxNjg0NzY2Mi9zaWQvb0t6Y3llOG0%3D
+		curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+
+		// TODO - Verify if this is still the recommended way to connect to paypal (WS-3516)
 		// Turn off the server and peer verification (TrustManager Concept).
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-
+		// Return response data instead of true(1).
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		// Do a regular HTTP POST
 		curl_setopt($ch, CURLOPT_POST, 1);
 
 		// Set the API operation, version, and API signature in the request.
@@ -82,7 +87,9 @@ class paypalpro extends WsPayment
 			"&USER=".urlencode($API_UserName)."&SIGNATURE=".urlencode($API_Signature).$str;
 
 		if (isset($this->CheckoutForm->debug) && $this->CheckoutForm->debug)
+		{
 			return $strPaypalPost;
+		}
 
 		// Set the request as a POST FIELD for curl.
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $strPaypalPost);
@@ -92,23 +99,28 @@ class paypalpro extends WsPayment
 		$nvpResArray=$this->deformatNVP($resp);
 		$strPaypalPost=$this->obfuscateStr($strPaypalPost);
 
-		if(_xls_get_conf('DEBUG_PAYMENTS' , false) == "1")
-		{
-			_xls_log(get_class($this) . " sending ".$this->objCart->id_str." for amt ".$this->objCart->total, true);
-			_xls_log(get_class($this) . " string ".$strPaypalPost, true);
-			_xls_log(get_class($this) . " receiving ".print_r($nvpResArray,true), true);
-		}
+		Yii::log(
+			sprintf(
+				"%s sending %s for amt %s\nString %s",
+				__CLASS__,
+				$this->objCart->id_str,
+				$this->objCart->total,
+				$strPaypalPost
+			),
+			$this->logLevel,
+			'application.'.__CLASS__.'.'.__FUNCTION__
+		);
 
-		// in case troubleshooting logging is on and debug payments is off
-		Yii::log(" sending ".$this->objCart->id_str." for amt ".$this->objCart->total, 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
-		Yii::log(" string ".$strPaypalPost, 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
-		Yii::log(" receiving ".print_r($nvpResArray,true), 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
-
+		Yii::log(
+			sprintf('%s receiving %s', __CLASS__, print_r($nvpResArray, true)),
+			$this->logLevel,
+			'application.'.__CLASS__.'.'.__FUNCTION__
+		);
 
 		if (curl_errno($ch)) {
 			// moving to display page to display curl errors
-			Yii::log("curl_error ".curl_errno($ch), 'error', get_class($this));
-			Yii::log("curl_error_msg ".curl_error($ch), 'error', get_class($this));
+			Yii::log("curl_error ".curl_errno($ch), 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
+			Yii::log("curl_error_msg ".curl_error($ch), 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
 			$errortext = _sp("There was a PayPal system error. Check error logs.");
 			curl_close($ch);
 			return FALSE;
@@ -143,21 +155,19 @@ class paypalpro extends WsPayment
 			[L_SEVERITYCODE0] => Error
 			[AMT] => 52.49
 			[CURRENCYCODE] => USD
-			*/
+		*/
 
-
-
-		$arrReturn['jump_url']=false;
+		$arrReturn['jump_url'] = false;
 		$arrReturn['api'] = $this->apiVersion;
-		$arrReturn['jump_form']=null;
+		$arrReturn['jump_form'] = null;
 
-		if($nvpResArray['ACK'] != 'SUCCESS' ) {
+		if ($nvpResArray['ACK'] != 'SUCCESS' ) {
 
-			$arrReturn['success']=false;
+			$arrReturn['success'] = false;
 			$arrReturn['amount_paid']=0;
 			$errortext = _sp($nvpResArray['L_SHORTMESSAGE0'].": ".$nvpResArray['L_LONGMESSAGE0']);
 			$arrReturn['result']=$errortext;
-			Yii::log($errortext, 'error', get_class($this));
+			Yii::log($errortext, 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
 
 		} else {
 

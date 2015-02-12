@@ -497,15 +497,16 @@ class wsamazon extends ApplicationComponent {
 									$objState->country_code,
 									$objState->code,
 									$shippingAddress->getPostalCode());
-								if (!$objDestination)
+
+								if ($objDestination === null)
 								{
 									Yii::log("Did not find destination, using default in Web Store ",
 										'info', 'application.'.__CLASS__.".".__FUNCTION__);
-									$objDestination = Destination::LoadDefault();
+									$objDestination = Destination::getAnyAny();
 								}
 
 								$objCart->tax_code_id = $objDestination->taxcode;
-								$objCart->UpdateCart();
+								$objCart->recalculateAndSave();
 
 							}
 
@@ -697,7 +698,7 @@ class wsamazon extends ApplicationComponent {
 				$objShipping->shipping_cost=$shippingCost;
 				$objShipping->shipping_sell=$shippingCost;
 				$objShipping->save();
-				$objCart->UpdateCart();
+				$objCart->recalculateAndSave();
 
 				$objCart->RecalculateInventoryOnCartItems();
 

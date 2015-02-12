@@ -33,6 +33,27 @@ class Modules extends BaseModules
 
 	}
 
+	/**
+	 * A straightforward way to get the value of a known
+	 * configuration item of a Module given the module name
+	 * and item name
+	 *
+	 * @param $strModuleName
+	 * @param $strItem
+	 * @return null|string
+	 */
+	public static function GetModuleConfig($strModuleName, $strItem)
+	{
+		$obj = self::LoadByName($strModuleName);
+		$config = unserialize($obj->configuration);
+		if (isset($config[$strItem]))
+		{
+			return $config[$strItem];
+		}
+
+		return null;
+	}
+
 	public function getConfig($item)
 	{
 
@@ -92,25 +113,56 @@ class Modules extends BaseModules
 
 	}
 
-	public static function Active($str)
+	public static function isActive($str, $category)
 	{
-		foreach(self::getSidebars(true) as $obj)
-			if($obj->module==$str) return true;
+		foreach(self::getModulesByCategory(true, $category) as $obj)
+		{
+			if($obj->module == $str)
+			{
+				return true;
+			}
+		}
 
 		return false;
-
 	}
 
-	public static function getSidebars($active=true)
+	public static function getModulesByCategory($active = true, $category = WsExtension::SIDEBAR)
 	{
 		$criteria = new CDbCriteria();
 		if ($active)
-			$criteria->condition = "active=1 AND category='".WsExtension::SIDEBAR."'";
+		{
+			$criteria->condition = "active=1 AND category='".$category."'";
+		}
 		else
-			$criteria->condition = "category='".WsExtension::SIDEBAR."'";
+		{
+			$criteria->condition = "category='" . $category . "'";
+		}
+
 		$criteria->order = 'sort_order';
 		return Modules::model()->findAll($criteria);
 
+	}
+
+	/**
+	 * Checks if payment method is the only active payment method, if so returns true
+	 * otherwise returns false
+	 * @return bool true if only active payment method
+	 * false otherwise.
+	 */
+	public function isOnlyActivePaymentMethod()
+	{
+		$activePaymentMethods = Modules::model()->payment()->findAll();
+
+		if (count($activePaymentMethods) === 1)
+		{
+			$currentPaymentMethod = current($activePaymentMethods);
+			if ($currentPaymentMethod->module === $this->module)
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 
@@ -153,7 +205,6 @@ class Modules extends BaseModules
 			case 'markup':
 				return $this->GetMarkup();
 
-
 			case 'payment_method':
 				return $this->GetPaymentMethod();
 
@@ -165,4 +216,26 @@ class Modules extends BaseModules
 		}
 	}
 
+	/**
+	 * Define some specialized query scopes to make searching for specific db
+	 * info easier
+	 */
+	public function scopes() {
+		return array(
+			'shipping' => array(
+				'condition' => 'active = 1 AND category = "shipping"',
+				'order' => 'sort_order'
+			),
+			'notStorePickup' => array(
+				'condition' => 'module != "storepickup"'
+			),
+			'freeshipping' => array(
+				'condition' => 'active = 1 AND module = "freeshipping"'
+			),
+			'payment' => array(
+				'condition' => 'active = 1 AND category = "payment"',
+				'order' => 'sort_order'
+			)
+		);
+	}
 }

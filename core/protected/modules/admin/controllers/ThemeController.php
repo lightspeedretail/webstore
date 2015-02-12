@@ -17,9 +17,9 @@ class ThemeController extends AdminBaseController
 	{
 		return array(
 			array('allow',
-				'actions'=>array('index','edit','gallery','image','header',
-					'editcss','favicon','manage','upload','upgrade','module'),
-				'roles'=>array('admin'),
+				'actions' => array('index','edit','gallery','image','header','editcss',
+					'favicon','manage','upload','upgrade','module'),
+				'roles' => array('admin'),
 			),
 		);
 	}
@@ -67,8 +67,7 @@ class ThemeController extends AdminBaseController
 				array('label' => 'Upload FavIcon',
 					'url' => array('theme/favicon'),
 					'visible' => !(Yii::app()->params['LIGHTSPEED_MT'] > 0)
-				)
-
+				),
 
 			);
 
@@ -83,7 +82,7 @@ class ThemeController extends AdminBaseController
 		switch($id)
 		{
 			case self::THEME_PHOTOS:
-				return "Note that these settings are used as photos are uploaded from LightSpeed. These sizes are saved for each theme.";
+				return "Note that these settings are used as photos are uploaded from Lightspeed. These sizes are saved for each theme.";
 		}
 	}
 
@@ -137,7 +136,7 @@ class ThemeController extends AdminBaseController
 							'error',
 							Yii::t(
 								'admin',
-								'{file} is a default theme. Default LightSpeed Web Store themes cannot be trashed.',
+								'{file} is a default theme. Default Lightspeed Web Store themes cannot be trashed.',
 								array('{file}'=>"<strong>".$themename."</strong>"
 								)
 							)
@@ -833,7 +832,6 @@ class ThemeController extends AdminBaseController
 	 */
 	protected function copyThemeForCustomization($post)
 	{
-
 		//To create a complete copy, we need to copy our viewset first, and then the theme in use over it so we get it all
 		//Later on, the cleanup will strip out anything unused
 		$strOriginalThemeFolder = Yii::app()->theme->name;
@@ -856,7 +854,6 @@ class ThemeController extends AdminBaseController
 			array('{theme}'=>$strPrettyThemeCopyName,'{time}'=>date("d F, Y  h:i:sa"))));
 
 		return $this->changeTheme($post);
-
 	}
 
 
@@ -961,50 +958,64 @@ class ThemeController extends AdminBaseController
 		return array($strCopyThemeFolder,$strPrettyThemeCopyName);
 
 	}
+
 	protected function copyCoreThemeFiles($strOriginalThemeFolder,$strCopyThemeFolder)
 	{
 		$viewset = Yii::app()->theme->info->viewset;
-		if(empty($viewset)) $viewset="cities";
+		if (empty($viewset))
+		{
+			$viewset="cities";
+		}
+
 		$viewset = "/views-".$viewset;
 		$path = Yii::getPathOfAlias('application').$viewset;
-		recurse_copy("themes/$strOriginalThemeFolder","themes/$strCopyThemeFolder");
-		recurse_copy($path,"themes/$strCopyThemeFolder/views");
-		recurse_copy("themes/$strOriginalThemeFolder","themes/$strCopyThemeFolder");
+		recurse_copy("themes/$strOriginalThemeFolder", "themes/$strCopyThemeFolder");
+		recurse_copy($path, "themes/$strCopyThemeFolder/views");
+		recurse_copy("themes/$strOriginalThemeFolder", "themes/$strCopyThemeFolder");
+
+		// WS-2804 remove checkout views folder until further notice
+		if (Yii::app()->theme->info->advancedCheckout === true)
+		{
+			rrmdir("themes/$strCopyThemeFolder/views/checkout");
+		}
 	}
 
-	protected function renameAdminForm($strOriginalThemeFolder,$strCopyThemeFolder,$strPrettyThemeCopyName)
+	/**
+	 * Rename the <themename>AdminForm.php file that is copied into the theme copy.
+	 * This file will be renamed to match the name of the copied theme, for example
+	 * if the original theme is named brooklyn, the copied theme will be brooklyncopy
+	 * and the admin form will be changed to brooklyncopyAdminForm.php
+	 *
+	 * @param strOriginalThemeFolder The folder of the original theme
+	 * @param strCopyThemeFolder The folder of the copied theme
+	 * @param strPrettyThemeCopyName The name of the copied theme
+	 * @return void
+	*/
+	protected function renameAdminForm($strOriginalThemeFolder, $strCopyThemeFolder, $strPrettyThemeCopyName)
 	{
 		if(Theme::hasAdminForm($strOriginalThemeFolder))
 		{
-
-			$strXml = file_get_contents("themes/$strCopyThemeFolder/models/{$strOriginalThemeFolder}AdminForm.php");
-			$strXml = preg_replace('/class (.*)AdminForm extends/', 'class '.$strCopyThemeFolder."AdminForm extends", $strXml);
-			$strXml = preg_replace('/\$name = \"(.*)\";/', '$name = "'.$strPrettyThemeCopyName.'";', $strXml);
-
-			$strXmlnew = preg_replace('/\$useCustomFolderForCustomcss = true;/', '$useCustomFolderForCustomcss = false;', $strXml);
-			//this setting wasn't found in our file, so we need to add it
-			if($strXmlnew==$strXml)
-				$strXml = preg_replace('/protected \$parent/', 'protected $useCustomFolderForCustomcss = false;
-	protected $parent', $strXml);
-			else
-				$strXml = $strXmlnew;
-
-			$strXml = preg_replace('/\$parent;/', '$parent = "'.$strOriginalThemeFolder.'";', $strXml);
-
-			file_put_contents("themes/$strCopyThemeFolder/models/".$strCopyThemeFolder."AdminForm.php",$strXml);
-			unlink("themes/$strCopyThemeFolder/models/".$strOriginalThemeFolder."AdminForm.php");
-
+			// Load the new AdminForm, rename the important bits, write it to a new file and delete the old one.
+			$adminForm = file_get_contents('themes/' . $strCopyThemeFolder . '/models/' . $strOriginalThemeFolder . 'AdminForm.php');
+			$adminForm = preg_replace(
+				'/class (.*)AdminForm extends/',
+				'class ' . $strCopyThemeFolder . 'AdminForm extends',
+				$adminForm
+			);
+			$adminForm = preg_replace('/\$name = \"(.*)\";/', '$name = "' . $strPrettyThemeCopyName . '";', $adminForm);
+			$adminForm = preg_replace('/\$parent;/', '$parent = "' . $strOriginalThemeFolder . '";', $adminForm);
+			file_put_contents('themes/' . $strCopyThemeFolder . '/models/' . $strCopyThemeFolder . 'AdminForm.php', $adminForm);
+			unlink('themes/' . $strCopyThemeFolder . '/models/' . $strOriginalThemeFolder . 'AdminForm.php');
 		} else {
-
+			// Handle legacy config.xml files
 			$fnOptions = self::getConfigFile($strCopyThemeFolder);
-
-			if (file_exists($fnOptions)) {
+			if (file_exists($fnOptions))
+			{
 				$strXml = file_get_contents($fnOptions);
 				$oXML = new SimpleXMLElement($strXml);
-				$strXml = str_replace("<name>{$oXML->name}</name>","<name>$strCopyThemeFolder</name>",$strXml);
-				file_put_contents($fnOptions,$strXml);
+				$strXml = str_replace('<name>' . $oXML->name . '</name>', '<name>' . $strCopyThemeFolder . '</name>', $strXml);
+				file_put_contents($fnOptions, $strXml);
 			}
-
 		}
 	}
 

@@ -187,14 +187,13 @@ class m140411_120957_load_misc extends CDbMigration
 				'configuration' => 'a:2:{s:7:"api_key";s:0:"";s:4:"list";s:9:"Web Store";}'
 			));
 
-
 		$this->insert('xlsws_modules',array(
-				'active' =>'1',
-				'module' => 'brooklyn',
+				'active' => '1',
+				'module' => 'brooklyn2014',
 				'category' => 'theme',
-				'version' => '3',
-				'name' => 'Brooklyn',
-				'configuration' => 'a:18:{s:11:"CHILD_THEME";s:5:"light";s:21:"CATEGORY_IMAGE_HEIGHT";i:180;s:20:"CATEGORY_IMAGE_WIDTH";i:180;s:19:"DETAIL_IMAGE_HEIGHT";i:256;s:18:"DETAIL_IMAGE_WIDTH";i:256;s:20:"LISTING_IMAGE_HEIGHT";i:190;s:19:"LISTING_IMAGE_WIDTH";i:190;s:17:"MINI_IMAGE_HEIGHT";i:30;s:16:"MINI_IMAGE_WIDTH";i:30;s:20:"PREVIEW_IMAGE_HEIGHT";i:30;s:19:"PREVIEW_IMAGE_WIDTH";i:30;s:19:"SLIDER_IMAGE_HEIGHT";i:90;s:18:"SLIDER_IMAGE_WIDTH";i:90;s:17:"PRODUCTS_PER_PAGE";i:12;s:18:"disableGridRowDivs";b:1;s:12:"menuposition";s:4:"left";s:11:"column2file";s:7:"column2";s:9:"customcss";a:1:{i:0;s:6:"custom";}}'
+				'version' => '1',
+				'name' => 'Brooklyn 2014',
+				'configuration' => 'a:6:{s:9:"activecss";a:4:{i:0;s:4:"base";i:1;s:5:"style";i:2;s:5:"light";i:3;s:5:"_2014";}s:11:"CHILD_THEME";s:5:"light";s:17:"PRODUCTS_PER_PAGE";i:12;s:18:"disableGridRowDivs";b:1;s:12:"menuposition";s:4:"left";s:11:"column2file";s:7:"column2";}'
 			));
 
 		$this->insert('xlsws_modules',array(
@@ -274,6 +273,5 @@ class m140411_120957_load_misc extends CDbMigration
 		$this->delete('xlsws_custom_page');
 		$this->delete('xlsws_modules');
 		$this->delete('xlsws_pricing_levels');
-
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 	/*
-* LightSpeed Web Store
+* Lightspeed Web Store
 *
 * NOTICE OF LICENSE
 *

@@ -55,7 +55,7 @@ class australiapost extends WsShipping
 		$ret = array();
 
 
-		if ($this->CheckoutForm['shippingCountry']=="AU")
+		if ($this->CheckoutForm['shippingCountryCode'] == "AU")
 			$url = "https://auspost.com.au/api/postage/parcel/domestic/service.xml".
 			"?from_postcode=".$this->config['originpostcode'].
 			"&to_postcode=".$this->CheckoutForm['shippingPostal'].
@@ -65,7 +65,7 @@ class australiapost extends WsShipping
 			"&weight=".$weight;
 		else
 			$url = "https://auspost.com.au//api/postage/parcel/international/service.xml".
-				"?country_code=".$this->CheckoutForm['shippingCountry'].
+				"?country_code=".$this->CheckoutForm['shippingCountryCode'].
 				"&weight=".$weight;
 
 		if(_xls_get_conf('DEBUG_SHIPPING' , false)=="1")

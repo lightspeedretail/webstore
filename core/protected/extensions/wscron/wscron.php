@@ -9,7 +9,6 @@ class wscron extends CApplicationComponent {
 	*/
 	public function run()
 	{
-
 		//Garbage collection
 		Log::GarbageCollect();
 		Wishlist::GarbageCollect();
@@ -22,20 +21,27 @@ class wscron extends CApplicationComponent {
 	}
 
 
+	/**
+	 * Try sending e-mails in the queue.
+	 *
+	 * @throws CDbException
+	 */
 	public function sendQueueEmails()
 	{
-
-		$objMails = EmailQueue::model()->findAll("`sent_attempts` < 20 and `sent_attempts` > 0  and `to` IS NOT NULL LIMIT 10");
+		$objMails = EmailQueue::model()->findAll("`sent_attempts` < 20 and `sent_attempts` > 0 and `to` IS NOT NULL LIMIT 10");
 
 		foreach ($objMails as $objMail)
 		{
 			$blnResult = _xls_send_email($objMail->id,true);
 
 			if (!$blnResult)
+			{
 				EmailQueue::model()->updateByPk($objMail->id,array('sent_attempts'=>($objMail->sent_attempts)+1));
+			}
 			else
+			{
 				$objMail->delete();
+			}
 		}
-
 	}
 }

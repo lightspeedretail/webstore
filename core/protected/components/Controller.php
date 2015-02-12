@@ -61,7 +61,7 @@ class Controller extends CController
 	 */
 	public static function initParams()
 	{
-		defined('DEFAULT_THEME') or define('DEFAULT_THEME','brooklyn');
+		defined('DEFAULT_THEME') or define('DEFAULT_THEME', 'brooklyn2014');
 
 		$Params = CHtml::listData(Configuration::model()->findAll(),'key_name','key_value');
 
@@ -137,10 +137,10 @@ class Controller extends CController
 		}
 		if(!Yii::app()->theme)
 		{
-			if(_xls_get_conf('theme'))
+			if(_xls_get_conf('THEME'))
 			{
 				//We can't find our theme for some reason, switch back to default
-				_xls_set_conf('theme',DEFAULT_THEME);
+				_xls_set_conf('THEME', DEFAULT_THEME);
 				_xls_set_conf('CHILD_THEME','light');
 				Yii::log(
 					"Couldn't find our theme, switched back to " . DEFAULT_THEME . " for emergency",
@@ -171,15 +171,12 @@ class Controller extends CController
 					'application.' . __CLASS__ . "." . __FUNCTION__
 				);
 			}
-
 		}
-
-
 
 		$this->buildBootstrap();
 		if(_xls_facebook_login())
 			$this->getFacebookLogin();
-		
+
 		if (Yii::app()->params['STORE_OFFLINE'] != '0' || Yii::app()->params['INSTALLED'] != '1')
 		{
 			if (isset($_GET['offline']))
@@ -231,7 +228,8 @@ class Controller extends CController
 			if (substr($pageHeaderImage,0,2) != "//")
 			{
 				$this->pageAbsoluteHeaderImage = Yii::app()->createAbsoluteUrl($pageHeaderImage, array(), Yii::app()->params['ENABLE_SSL'] ? 'https' : 'http');
-				$this->pageHeaderImage = $pageHeaderImage;
+				// we prefix with baseUrl to handle instances where Web Store is installed in a sub folder
+				$this->pageHeaderImage = Yii::app()->baseUrl . $pageHeaderImage;
 			}
 
 			else
@@ -248,7 +246,7 @@ class Controller extends CController
 		}
 
 		Yii::app()->shoppingcart->UpdateMissingProducts();
-		Yii::app()->shoppingcart->RevalidatePromoCode();
+		Yii::app()->shoppingcart->revalidatePromoCode();
 
 		//Run other functions to create some data we always need
 		$this->buildGoogle();
@@ -263,7 +261,7 @@ class Controller extends CController
 
 
 		Yii::app()->clientScript->registerMetaTag(
-			"LightSpeed Web Store " . XLSWS_VERSION,
+			"Lightspeed Web Store " . XLSWS_VERSION,
 			'generator',
 			null,
 			array(),
@@ -311,7 +309,7 @@ class Controller extends CController
 			$app->language = $_GET['_lang'];
 			$app->session['_lang'] = $app->language;
 		}
-		else if (isset($app->session['_lang']))
+		elseif (isset($app->session['_lang']))
 		{
 			$app->language = $app->session['_lang'];
 		}
@@ -347,7 +345,7 @@ class Controller extends CController
 	 */
 	protected function buildSidebars() {
 
-		$this->arrSidebars = Modules::getSidebars();
+		$this->arrSidebars = Modules::getModulesByCategory();
 
 	}
 
@@ -621,7 +619,7 @@ class Controller extends CController
 	 */
 	public function getIsCloud()
 	{
-		if(Yii::app()->params['LIGHTSPEED_CLOUD']>0)
+		if (Yii::app()->params['LIGHTSPEED_CLOUD'] > 0)
 			return true;
 		return false;
 	}
@@ -632,7 +630,7 @@ class Controller extends CController
 	 */
 	public function getIsMT()
 	{
-		if(Yii::app()->params['LIGHTSPEED_MT']>0)
+		if (Yii::app()->params['LIGHTSPEED_MT'] > 0)
 			return true;
 		return false;
 	}
@@ -665,5 +663,20 @@ class Controller extends CController
 
 	}
 
+	/**
+	 * Renders JSON response.
+	 *
+	 * @param $data array containing the values that should be returned.
+	 * @return string The JSON encode data.
+	 */
+	public function renderJSON($data)
+	{
+		ob_clean();
+		header('Content-type: application/json');
+		$encodedData = CJSON::encode($data);
+		echo $encodedData;
+		Yii::app()->end(0, false);
 
+		return $encodedData;
+	}
 }

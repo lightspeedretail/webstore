@@ -14,9 +14,9 @@
 
 		<hr>
 			<div class="row-fluid editinstructions">
-				<?php if(Yii::app()->user->fullname=="LightSpeed")
+				<?php if(Yii::app()->user->fullname=="Lightspeed")
 					 ?>
-				<?php  if(Yii::app()->user->fullname=="LightSpeed")
+				<?php  if(Yii::app()->user->fullname=="Lightspeed")
 					echo "<p><strong>".Yii::t('admin','To upload a new icon, drag and drop a file on top of the Choose File button, then click Upload. NOTE: You can also log into Admin Panel externally at {url} to use the Choose File button normally.',array('{url}'=>$this->createAbsoluteUrl("/admin")))."</strong></p>";
 				else
 					echo Yii::t('admin','To upload a new icon, click Choose File and select your file, then click Upload.');

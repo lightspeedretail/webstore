@@ -58,21 +58,38 @@ class Images extends BaseImages
 
 	public static function getCloudLink($objImage, $intType)
 	{
+		$limitSize = false;
 		list($intWidth, $intHeight) = ImagesType::GetSize($intType);
-		if (!is_null($objImage) && isset($objImage->imagesClouds) && isset($objImage->imagesClouds[0]))
+		if (!is_null($objImage) && isset($objImage->imagesClouds) &&
+			isset($objImage->imagesClouds[0]))
 		{
-			$objComponent=Yii::createComponent('ext.wscloud.wscloud');
-			if ($intWidth==0)
-				$intWidth = $intHeight=max($objImage->width,$objImage->height);
-			return $objComponent->getCloudImage($objImage->imagesClouds[0],$intWidth, $intHeight);
+			$objComponent = Yii::createComponent('ext.wscloud.wscloud');
+			if ($intWidth == 0)
+			{
+				$intWidth = $intHeight = max($objImage->width, $objImage->height);
+				/* If use given image size (passed from Bronze)
+				set cloudinary to create an image of original size if it is
+				smaller then the give size. Otherwise, cloudinary will scale
+				the image to a larger size which is a waste.
+				*/
+				$limitSize = true;
+			}
+
+			return $objComponent->getCloudImage(
+				$objImage->imagesClouds[0],
+				$intWidth,
+				$intHeight,
+				$limitSize
+			);
 		}
 		else
+		{
 			return
 				"http://res.cloudinary.com/lightspeed-retail/image/upload/c_fit,h_".
-				$intHeight.",w_".$intWidth."/v1389476545/no_product.png";
-
-
-
+				$intHeight.
+				",w_".$intWidth.
+				"/v1389476545/no_product.png";
+		}
 	}
 
 	public static function getLocalLink($objImage, $intType = ImagesType::normal, $AbsoluteUrl = false)
@@ -244,7 +261,7 @@ class Images extends BaseImages
 		}
 		return true;
 	}
-	/* Is this the original graphic provided by LightSpeed */
+	/* Is this the original graphic provided by Lightspeed */
 	public function IsPrimary() {
 		if ($this->id && ($this->id == $this->parent))
 			return true;
@@ -359,7 +376,7 @@ class Images extends BaseImages
 
 	/**
 	 * ToDo: need to update and make photo processors use a more condensed version of this
-	 * Create Thumbnail from LightSpeed original file. Technically to Web Store, any resized copy of the original
+	 * Create Thumbnail from Lightspeed original file. Technically to Web Store, any resized copy of the original
 	 * whether larger or smaller is considered a "thumbnail".
 	 * @param $intNewWidth
 	 * @param $intNewHeight
@@ -374,7 +391,7 @@ class Images extends BaseImages
 				$objImage->Delete();
 		}
 
-		//Get our original file from LightSpeed
+		//Get our original file from Lightspeed
 		$strOriginalFile=$this->image_path;
 		$strTempThumbnail = Images::GetImageName($strOriginalFile, $intNewWidth, $intNewHeight,'temp');
 		$strNewThumbnail = Images::GetImageName($strOriginalFile, $intNewWidth, $intNewHeight);

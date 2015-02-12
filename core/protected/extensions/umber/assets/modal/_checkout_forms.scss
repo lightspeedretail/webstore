@@ -1,0 +1,174 @@
+.field-containers-small {
+	@extend %clearfix;
+
+	.field-container {
+		input, select {
+			height: 2.75rem;
+			font-size: .875rem;
+			padding: .25em 8px;
+		}
+		select {
+			font-size: .875rem;
+			color: #444;
+		}
+		p.hint {
+			color: #999;
+			top: 0px;
+			right: 10px;
+			font-size: .8375rem;
+			line-height: 1rem;
+		}
+	}
+}
+
+
+.fieldgroup {
+	@extend %clearfix;
+
+	border: 1px solid #ddd;
+	border-top: none;
+	overflow: hidden;
+
+	//MO
+	&.city-fieldgroup ol li:nth-child(1){
+	  width: 25%;
+	  @include media(verysmall){
+		width: 20%;
+	  }
+	  input{
+		width:100%;
+		&:focus{
+		  width: 100%!important;
+		}
+	  }
+	}
+	&.city-fieldgroup ol li:nth-child(2){
+	  width: 50%;
+	  @include media(verysmall){
+		width: 65%;
+	  }
+	  input{
+		width: 100%;
+		&:focus{
+		  width: 100%!important;
+		}
+	  }
+	}
+  &.city-fieldgroup ol li:nth-child(3){
+	width: 25%;
+	@include media(verysmall){
+	  width: 15%;
+	}
+	input{
+	  width: 100%;
+	  &:focus{
+		width: 100%!important;
+	  }
+	}
+  }
+	.field-container {
+		float: left;
+		border-right: 1px solid #ddd;
+
+		input, select {
+			width: auto;
+			border: none;
+			margin: 0;
+		}
+	}
+
+	.field-container:last-child {
+		border-right: none;
+	}
+
+}
+
+.field-container.field-container-select {
+	select {
+		padding-right: 1.75rem;
+
+		&:hover, &:focus {
+			background: none;
+			cursor: pointer;
+		}
+	}
+
+	&:after {
+		font-family: FontAwesome;
+		display: inline-block;
+		content: "\f0d7";
+		font-size: 21px;
+		color: #bbb;
+		position: absolute;
+		right: .5rem;
+		top: 0;
+		pointer-events:none;
+		line-height: 2.75rem;
+	}
+
+	&.field-container-select-no-handle {
+		select { padding-right: 0; }
+		&:after {
+			content: ' ';
+		}
+	}
+}
+
+.fieldgroup .field-container.country {
+	float: right;
+	select { max-width: 7rem; }
+}
+
+ //TODO:MO temporary until no-handle style is fully implemented on country inputs.
+.country-container{
+  border: 1px solid #ddd;
+  border-top: none;
+}
+
+.field-container select.modal-accent-color { color: $blue; }
+
+ol.field-container-gap {
+	margin-bottom: 1rem;
+}
+
+.field-container-split {
+  width: 50%;
+  float: left;
+}
+.field-container-split-latter {
+//  MO removed this, company input is misaligned with
+//  names input with this
+//  margin-left: -1px;
+}
+.field-container-toggle {
+  font-size: .8125rem;
+
+  a {
+	display: inline-block;
+	padding: 9px 9px 3px;
+  }
+}
+
+.company-container {
+  clear: both;
+}
+
+.field-container-select {
+  height: 2.75rem;
+  line-height: 2.75rem;
+
+  select { font-size: .875rem; }
+}
+
+.field-container-narrowed {
+  width: 75%;
+  float: left;
+}
+
+.webstore-modal-overlay .address-form .fieldgroup .field-container input:focus,
+.webstore-modal-overlay .address-form .fieldgroup .field-container input:focus:required:invalid:focus{
+  width: auto;
+  border: none;
+  margin: 0;
+}
+

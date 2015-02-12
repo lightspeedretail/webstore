@@ -85,7 +85,7 @@
 			<div class="tab-content">
 				<?php
 				$origLang = Yii::app()->language;
-				$values = _xls_parse_language_serialized($model->page);
+				$values = _xls_parse_language_serialized($model->page_data);
 
 				foreach($langs as $lang)
 				{

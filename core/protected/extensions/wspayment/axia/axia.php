@@ -7,7 +7,7 @@ class axia extends WsPayment
 	protected $version = 1.0;
 	protected $uses_credit_card = true;
 	protected $apiVersion = 1;
-	public $advancedMode=true;
+	public $advancedMode = true;
 
 
 	/**
@@ -54,9 +54,9 @@ class axia extends WsPayment
 		$tran->billstreet = $this->CheckoutForm->billingAddress1;
 		$tran->billstreet2 = $this->CheckoutForm->billingAddress2;
 		$tran->billcity = $this->CheckoutForm->billingCity;
-		$tran->billstate = $this->CheckoutForm->billingState;
+		$tran->billstate = $this->CheckoutForm->billingStateCode;
 		$tran->billzip = $this->CheckoutForm->billingPostal;
-		$tran->billcountry = $this->CheckoutForm->billingCountry;
+		$tran->billcountry = $this->CheckoutForm->billingCountryCode;
 		$tran->billphone = $this->CheckoutForm->contactPhone;
 		$tran->email = $this->CheckoutForm->contactEmail;
 
@@ -65,24 +65,35 @@ class axia extends WsPayment
 		$tran->shipstreet = $this->CheckoutForm->shippingAddress1;
 		$tran->shipstreet2 = $this->CheckoutForm->shippingAddress2;
 		$tran->shipcity = $this->CheckoutForm->shippingCity;
-		$tran->shipstate = $this->CheckoutForm->shippingState;
+		$tran->shipstate = $this->CheckoutForm->shippingStateCode;
 		$tran->shipzip = $this->CheckoutForm->shippingPostal;
-		$tran->shipcountry = $this->CheckoutForm->shippingCountry;
+		$tran->shipcountry = $this->CheckoutForm->shippingCountryCode;
 
 		$tran->custid = Yii::app()->user->id;
 
-		if(_xls_get_conf('DEBUG_PAYMENTS' , false)=="1")
-			Yii::log(get_class($this) . " sending ".$this->objCart->id_str." for amt ".$this->objCart->total, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		$tranTemp = clone $tran;
+
+		Yii::log(
+			sprintf(
+				"%s sending %s for amt %s\nRequest %s",
+				__CLASS__,
+				$this->objCart->id_str,
+				$this->objCart->total,
+				print_r($this->obfuscateRequestArray($tranTemp), true)
+			),
+			$this->logLevel,
+			'application.'.__CLASS__.".".__FUNCTION__
+		);
 
 		if ($tran->Process()) {
 			//We have success
-			$arrReturn['success']=true;
-			$arrReturn['amount_paid']=  $this->objCart->total;
-			$arrReturn['result']=$tran->refnum;
+			$arrReturn['success'] = true;
+			$arrReturn['amount_paid'] =  $this->objCart->total;
+			$arrReturn['result'] = $tran->refnum;
 		} else {
 
-			$arrReturn['success']=false;
-			$arrReturn['amount_paid']=0;
+			$arrReturn['success'] = false;
+			$arrReturn['amount_paid'] = 0;
 			$errortext = Yii::t('global',$tran->error);
 			$arrReturn['result'] = Yii::t('global',$errortext);
 			Yii::log("Declined: ".$errortext, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
@@ -90,18 +101,58 @@ class axia extends WsPayment
 
 		}
 
-		if(_xls_get_conf('DEBUG_PAYMENTS' , false)=="1")
-		{
-			unset($tran->card);
-			unset($tran->exp);
-			unset($tran->key);
-			unset($tran->pin);
-			Yii::log(get_class($this) . " receiving ".print_r($tran,true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-		}
+		unset($tran->card);
+		unset($tran->exp);
+		unset($tran->key);
+		unset($tran->pin);
+
+		Yii::log(
+			sprintf(
+				"%s receiving %s",
+				__CLASS__,
+				print_r($tran, true)
+			),
+			$this->logLevel,
+			'application.'.__CLASS__.".".__FUNCTION__
+		);
 
 		return $arrReturn;
+	}
 
 
+	/**
+	 * Obfuscate sensitive information for logging purposes
+	 *
+	 * @param umTransaction $tran
+	 * @return umTransaction
+	 */
+	private static function obfuscateRequestArray($tran)
+	{
+		if (empty($tran->card) === false)
+		{
+			// cc number
+			$tran->card =
+				substr_replace(
+					$tran->card,
+					str_repeat('*', strlen($tran->card) - 4),
+					0,
+					strlen($tran->card)-4
+				);
+		}
+
+		if (empty($tran->cvv2) === false)
+		{
+			// cc cvv
+			$tran->cvv2 =
+				substr_replace(
+					$tran->cvv2,
+					str_repeat('*', strlen($tran->cvv2)),
+					0,
+					strlen($tran->cvv2)
+				);
+		}
+
+		return $tran;
 	}
 
 

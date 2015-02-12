@@ -2,7 +2,7 @@
 
 /**
  * UPS Module
- * created by LightSpeed
+ * created by Lightspeed
  */
 class ups extends WsShipping
 {
@@ -177,8 +177,11 @@ class ups extends WsShipping
 		$arrServices = array();
 
 		$zipcode=str_replace(" ","",$this->CheckoutForm->shippingPostal); //Remove spaces i.e. canada Z1Z 1Z1 to Z1Z1Z1
-		if (strtoupper($this->CheckoutForm->shippingCountry)=="US")
-			$zipcode=substr($zipcode,0,5); //UPS module doesn't support Zip+4 in US
+		if (strtoupper($this->CheckoutForm->shippingCountryCode) == "US")
+		{
+			//UPS module doesn't support Zip+4 in US
+			$zipcode=substr($zipcode, 0, 5);
+		}
 
 
 
@@ -197,7 +200,7 @@ class ups extends WsShipping
 					"14_origCountry=".Country::CodeById($this->config['origincountry']),
 					"15_origPostal=".substr($this->config['originpostcode'],0,5),
 					"19_destPostal=".$zipcode,
-					"22_destCountry=".$this->CheckoutForm->shippingCountry,
+					"22_destCountry=".$this->CheckoutForm->shippingCountryCode,
 					"23_weight=" . $weight,
 					"24_value=" . $this->objCart->Total,
 					"25_length=" . $length,
@@ -244,7 +247,7 @@ class ups extends WsShipping
 		}
 
 		if($found <=0) {
-			Yii::log("UPS: Could not get ups rate ".$this->CheckoutForm->shippingCountry." ".$zipcode, 'warning', 'application.'.__CLASS__.".".__FUNCTION__);
+			Yii::log("UPS: Could not get ups rate ".$this->CheckoutForm->shippingCountryCode." ".$zipcode, 'warning', 'application.'.__CLASS__.".".__FUNCTION__);
 			return false;
 		}
 
@@ -296,8 +299,8 @@ class ups extends WsShipping
 		if(count($ret)==0)
 		{
 			Yii::log('Could not get shipping information for '.
-				$this->CheckoutForm->shippingState." ".$this->CheckoutForm->shippingPostal." ".
-				$this->CheckoutForm->shippingCountry, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				$this->CheckoutForm->shippingStateCode." ".$this->CheckoutForm->shippingPostal." ".
+				$this->CheckoutForm->shippingCountryCode, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return false;
 
 		}
@@ -425,8 +428,8 @@ class ups extends WsShipping
 
 		$this->service = 'shop';
 		$this->t_zip = $this->CheckoutForm->shippingPostal;
-		$this->t_state= $this->CheckoutForm->shippingState;
-		$this->t_country = $this->CheckoutForm->shippingCountry;
+		$this->t_state= $this->CheckoutForm->shippingStateCode;
+		$this->t_country = $this->CheckoutForm->shippingCountryCode;
 		$this->weight = $this->objCart->Weight;
 		$this->l = $this->objCart->Length;
 		$this->w = $this->objCart->Width;

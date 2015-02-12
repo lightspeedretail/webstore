@@ -32,7 +32,7 @@ class paypalAdminForm extends CFormModel
 			'address'=>'Prompt for shipping address again on PayPal',
 			'live'=>'Deployment Mode',
 			'restrictcountry'=>'Only allow this processor',
-			'ls_payment_method'=>'LightSpeed Payment Method',
+			'ls_payment_method'=>'Lightspeed Payment Method',
 		);
 	}
 

@@ -19,7 +19,7 @@
 		<div class="clearfix spaceafter"></div>
 		
 		<div class="row-fluid">
-			<?php foreach($model->customerAddresses as $objAddress): ?>
+			<?php foreach(CustomerAddress::getAllAddresses() as $objAddress): ?>
 				<div class="span4 myaddress">
 					<?= CHtml::link("<strong>".$objAddress->address_label."</strong><br>".$objAddress->address1."<br>".$objAddress->city." ".$objAddress->state." ".$objAddress->postal.
 						($objAddress->id==$model->default_billing_id ? "<br><span class='default'>".Yii::t('global','Default Billing Address')."</span>" : "").

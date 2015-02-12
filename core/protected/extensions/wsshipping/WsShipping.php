@@ -236,4 +236,19 @@ class WsShipping extends WsExtension
 	{
 		return $arrRestrictions;
 	}
+
+	/**
+	 * Return the appropriate logging level string
+	 *
+	 * @return string
+	 */
+	public function getLogLevel()
+	{
+		if(_xls_get_conf('DEBUG_SHIPPING', false) == 1)
+		{
+			return CLogger::LEVEL_ERROR;
+		}
+
+		return CLogger::LEVEL_INFO;
+	}
 }

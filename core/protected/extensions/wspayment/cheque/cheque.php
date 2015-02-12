@@ -19,10 +19,10 @@ class cheque extends WsPayment
 	public function run()
 	{
 
-		$arrReturn['success']=true;
-		$arrReturn['amount_paid']=0;
-		$arrReturn['result']=$this->defaultName; //transaction ID or error string
-		$arrReturn['jump_url']=false;
+		$arrReturn['success'] = true;
+		$arrReturn['amount_paid'] = 0;
+		$arrReturn['result'] = $this->defaultName; //transaction ID or error string
+		$arrReturn['jump_url'] = false;
 		$arrReturn['api'] = 1;
 
 		//This module just marks as paid
@@ -33,9 +33,11 @@ class cheque extends WsPayment
 	{
 		parent::init();
 
-		//US spelling for US stores
-		if(_xls_get_conf('DEFAULT_COUNTRY')=='224')
+		// US spelling for US stores
+		if (_xls_get_conf('DEFAULT_COUNTRY') == '224')
+		{
 			$this->defaultName = "Check";
+		}
 
 
 	}

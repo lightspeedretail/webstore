@@ -61,15 +61,14 @@ class Customer extends BaseCustomer
 			array('company, email, password', 'length', 'max'=>255),
 			array('currency', 'length', 'max'=>3),
 			array('preferred_language, mainphonetype', 'length', 'max'=>8),
-			array('mainphone', 'length', 'max'=>32),
+			array('mainphone', 'length','min'=>7, 'max'=>32),
 			array('last_login', 'safe'),
 
 
 			array('email', 'required','on'=>'create,createfb,myaccountupdate'),
 			array('first_name,last_name', 'required','on'=>'create,createfb,myaccountupdate,update,updatepassword'),
-			array('mainphone', 'required','on'=>'create,myaccountupdate,update,updatepassword'),
-			array('mainphone', 'length','min'=>7, 'max'=>32),
 			array('password,password_repeat', 'required','on'=>'create,updatepassword'),
+			array('mainphone', 'required','on'=>'create,myaccountupdate,update,updatepassword'),
 
 			// email has to be a valid email address
 			array('email', 'email'),
@@ -86,7 +85,7 @@ class Customer extends BaseCustomer
 			array('password_repeat', 'length', 'max'=>255),
 			array('password', 'compare', 'on'=>'create,formSubmitWithAccount,updatepassword,resetpassword'),
 			array('password_repeat', 'safe'),
-			array('password,password_repeat', 'validatePasswordStrength', 'on'=>'create,formSubmitWithAccount,updatepassword,resetpassword'),
+			array('password,password_repeat', 'PasswordLengthValidator', 'on'=>'create,formSubmitWithAccount,updatepassword,resetpassword'),
 
 			array('token', 'length', 'max'=>Customer::RESET_PASSWORD_TOKEN_LENGTH),
 			array('token', 'required', 'on'=>'resetpassword'),
@@ -172,30 +171,6 @@ class Customer extends BaseCustomer
 	}
 
 	/**
-	 * Ensure that a password meets our requirements
-	 * Return an error message detailing the failure if applicable.
-	 * @param string $password
-	 * @return string | false
-	 */
-	public function validatePasswordStrength($attribute, $params) {
-		if ($this->scenario == Customer::SCENARIO_GUEST && !$this->$attribute)
-			return;
-
-		$min_length = _xls_get_conf('MIN_PASSWORD_LEN',0);
-
-		if (strlen($this->$attribute) < $min_length)
-		{
-			$this->addError($attribute, Yii::t('customer',
-				'{attribute} too short. Must be a minimum of {length} characters.',
-				array(
-					'{attribute}'=>$this->getAttributeLabel($attribute),
-					'{length}'=>$min_length
-				)
-			));
-		}
-	}
-
-	/**
 	 * Validates the token necessary for a password reset (in the case of a
 	 * forgotten password.)
 	 * @param $attribute
@@ -241,7 +216,7 @@ class Customer extends BaseCustomer
 		$obj->password_repeat = $checkoutForm->createPassword_repeat;
 		$obj->newsletter_subscribe = $checkoutForm->receiveNewsletter;
 		$obj->record_type = Customer::NORMAL_USER;
-		$obj->currency = _xls_get_conf('DEFAULT_CURRENCY');
+		$obj->currency = _xls_get_conf('CURRENCY_DEFAULT');
 		$obj->pricing_level=1;
 		$obj->allow_login = Customer::NORMAL_USER;
 		$obj->scenario = Customer::SCENARIO_INSERT;
@@ -305,12 +280,10 @@ class Customer extends BaseCustomer
 	 */
 	public static function GetCurrent()
 	{
-
 		if (Yii::app()->user->isGuest)
 			return null;
 		else
 			return Customer::model()->findByPk(Yii::app()->user->id);
-
 	}
 
 	/**
@@ -360,6 +333,58 @@ class Customer extends BaseCustomer
 	public function getFullname()
 	{
 		return $this->first_name." ".$this->last_name;
+	}
+
+	/**
+	 * Check if a customer's default shipping address is tax inclusive.
+	 *
+	 * @return bool true if the current customer's default shipping address is tax inclusive.
+	 * @see Cart::getIsTaxIn The logic is very similar.
+	 */
+	public function defaultShippingIsTaxIn()
+	{
+		// Tax-exclusive stores never have tax inclusive customers.
+		if (CPropertyValue::ensureBoolean(_xls_get_conf('TAX_INCLUSIVE_PRICING', 0)) === false)
+		{
+			return false;
+		}
+
+		// Tax-inclusive stores only have 2 tax codes: their tax inclusive tax
+		// code and a no-tax tax code.
+		if ($this->defaultShippingIsNoTax() === true)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Check if a customer's default shipping address is no-tax destination.
+	 *
+	 * @return bool true if the current customer's default shipping address is in no-tax destination.
+	 */
+	public function defaultShippingIsNoTax()
+	{
+		if (isset($this->defaultShipping) === false)
+		{
+			// TODO: Should we return store default here instead?
+			return false;
+		}
+
+		$objDestination = Destination::LoadMatching(
+			$this->defaultShipping->country,
+			$this->defaultShipping->state,
+			$this->defaultShipping->postal
+		);
+
+		if ($objDestination === null)
+		{
+			// TODO: Should we return store default here instead?
+			return false;
+		}
+
+		return $objDestination->taxcode0->IsNoTax();
 	}
 
 	/**

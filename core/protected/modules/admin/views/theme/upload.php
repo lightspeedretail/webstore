@@ -3,9 +3,9 @@
 
 		<h3>Upload a Theme</h3>
 		<div class="editinstructions"><p>
-				<?php echo Yii::t('admin','This form allows you to upload a .zip file containing a Web Store theme. This process will automatically extract and place the files into your /themes folder. After uploading, you can go to {link} to use this theme.',array('{link}'=>CHtml::link('Options',$this->createUrl('default/edit',array('id'=>19))))); ?></p>
+				<?php echo Yii::t('admin','This form allows you to upload a .zip file containing a Web Store theme. This process will automatically extract and place the files into your /themes folder. After uploading, you can go to {link} to use this theme.',array('{link}'=>CHtml::link('Manage My Themes',$this->createUrl('theme/manage')))); ?></p>
 
-			<?php if(Yii::app()->user->fullname=="LightSpeed")
+			<?php if(Yii::app()->user->fullname=="Lightspeed")
 			echo "<p>".Yii::t('admin','To upload a new theme, drag and drop the .zip on top of the Choose File button, then click Upload. NOTE: You can also log into Admin Panel externally at {url} to use the Choose File button normally.',array('{url}'=>$this->createAbsoluteUrl("/admin")))."</p>"; ?>
 
 		</div>

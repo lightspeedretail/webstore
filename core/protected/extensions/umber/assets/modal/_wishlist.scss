@@ -1,0 +1,228 @@
+.webstore-modal-wishlist {
+  .search-results {
+    display: none;
+  }
+
+  .list {
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+    li {
+      border-bottom: 1px solid #ccc;
+      padding: $modal-padding*.75 $modal-padding;
+      background-color: #fff;
+      @include transition(background-color .3s,color .3s);
+    }
+
+    a {
+      text-decoration: none;
+      &:hover {
+        li {
+          background-color: #f8f8f8;
+        }
+        h3 {
+          color: darken($calltoaction-color,10%);
+        }
+      }
+    }
+    h3 {
+      @include transition-property(color);
+      @include transition-duration(.3s);
+
+      color: $calltoaction-color;
+      margin: 0;
+      font-weight: bold;
+      font-size: 1rem;
+
+      small {
+        color: #999;
+        background-color: #eee;
+        padding: 2px 4px;
+
+        margin: -3px 0 0 3px;
+        display: inline-block;
+      }
+    }
+    p {
+      line-height: 1.5;
+      font-size: .875rem;
+      color: #999;
+      margin: 0;
+    }
+  }
+}
+
+
+.wishlist-block {
+  p {
+    @include transition(color .1s, border .1s, background .1s);
+    position: relative;
+    margin: 0;
+    padding: 10px 2px 10px 10px;
+    border: 1px solid #ddd;
+    color: #999;
+    font-size: .75rem;
+    min-height: 80px;
+    line-height: 1.5;
+    span.title {
+      color: $blue;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+    span.date {
+      display: block;
+      color: #aaa;
+      font-size: .7rem;
+    }
+    a {
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    &:hover {
+      color: #FFF;
+      cursor: pointer;
+      span {
+        color: #FFF;
+      }
+      p {
+        color: #FFF;
+        a {
+          color: #FFF;
+        }
+      }
+      border-color: $blue;
+      background-color: $blue;
+    }
+
+    &.private, &.public, &.personal {
+      &:after {
+        font-size: .75rem;
+        color: #888;
+        border: 1px solid #ccc;
+        background-color: #eee;
+        position: absolute;
+        top: 10px;
+        padding: 3px 6px 2px;
+        right: -10px;
+        text-transform: uppercase;
+
+      }
+    }
+    &.private {
+      &:after {
+        content: "Private";
+      }
+    }
+    &.public {
+      &:after {
+        content: "Public";
+      }
+    }
+    &.personal {
+      &:after {
+        content: "Personal";
+      }
+    }
+  }
+}
+
+.lines-footer {
+  &.purchased {
+    @include transition(opacity .3s);
+    opacity: 0;
+    overflow: hidden;
+    height: 0;
+    clear: both;
+    &.active {
+      opacity: 1;
+      height: auto;
+    }
+    .lines {
+      opacity: .4;
+    }
+  }
+}
+
+.field-container {
+  &.optional:after {
+    content: 'Optional';
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    @include border-radius(0);
+    color: #bbb;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1;
+    padding: 7px 6px;
+    position: absolute;
+    right: 18px;
+    text-transform: uppercase;
+    top: 21px;
+    transition-duration: 0.3s;
+    transition-property: background-color, color, border-color;
+    width: auto;
+  }
+  button{
+    color: #999;
+  }
+}
+
+
+.webstore-modal .radio-box {
+  border-bottom: 1px solid #ddd;
+  li {
+    label {
+      float:left;
+      width: 32.75%;
+      border-left: 1px solid #DDD;
+      border-right: 1px solid #DDD;
+      display: inline-block;
+      margin-bottom: 0;
+      @include transition-property(background-color,color);
+      @include transition-duration(.2s);
+
+      &:first-child {
+        border-right: 0;
+      }
+      &:last-child {
+        border-left: 0;
+      }
+      &.active {
+        background-color: #e8e8e8;
+        border-color: #DDD;
+      }
+      &:first-child {
+        border-left: 0;
+      }
+      &:last-child {
+        width: 34.25%;
+        border-right: 0;
+      }
+      &:hover {
+        box-shadow: inset 0 10px 20px -20px rgba(0, 0, 0, 0.9);
+        background-color: #DDD;
+        border-color: #DDD;
+      }
+      color: #666;
+      font-size: 1rem;
+      font-weight: bold;
+      span {
+        font-weight: normal;
+        color: #888;
+        font-size: .75rem;
+        display: block;
+      }
+      &:hover {
+        color: $calltoaction-color;
+        cursor: pointer;
+      }
+    }
+  }
+}

@@ -1,0 +1,224 @@
+$accent-background-color: #3287cc !default;
+$accent-color: white !default;
+
+$overlay-background-color: #eee !default;
+$overlay-color: #555 !default;
+
+$heading-font-weight: bold !default;
+$heading-font-family: 'Open Sans', 'Helvetica Neue', Helvetica, sans-serif !default;
+
+$confirmation-color: green !default;
+
+// Font faces
+$body-font-family: 'Open Sans', 'Helvetica Neue', Helvetica, sans-serif !default;
+
+
+body.overlay, .editcartmodal.webstore-modal.show {
+  background-color: $overlay-background-color;
+}
+
+
+.webstore-overlay {
+  font-family: $body-font-family;
+
+  h1 {
+    font-weight: $heading-font-weight;
+    font-family: $heading-font-family;
+  }
+
+  section footer p {
+    $overlay-color-adjusted: $overlay-color;
+    @if(lightness($overlay-background-color) > 50) {
+      $overlay-color-adjusted: lighten($overlay-color, 25%);
+    } @else {
+      $overlay-color-adjusted: darken($overlay-color, 25%);
+    }
+
+    color: $overlay-color-adjusted;
+    strong { color: $overlay-color-adjusted; }
+    a { color: $overlay-color-adjusted; }
+  }
+
+  a {
+    color: $accent-background-color;
+    &:hover { border-bottom-color: $accent-background-color; }
+
+    &.hasborder {
+      border-bottom-color: lighten($accent-background-color, 25%);
+      &:hover { border-bottom-color: $accent-background-color; }
+    }
+  }
+
+  @if(lightness($overlay-background-color) < 20) {
+    .section-inner { border-color: #fff; }
+  }
+
+  header.overlay {
+    #addcart .exit, h1 a { color: $overlay-color; }
+    #addcart .exit:hover { border-bottom-color: $overlay-color; }
+  }
+
+  button, .button {
+    background-color: $calltoaction-color;
+    color: $accent-color;
+
+    &:hover { background-color: darken($accent-background-color,10%); }
+
+    &.inset:hover {
+      border-color: $accent-background-color;
+      background: $accent-background-color;
+      color: $accent-color;
+    }
+
+    &.continue, &.share {
+      &:hover {
+        background: none;
+        border-color: $accent-background-color;
+        color: $accent-background-color;
+        &:before { color: $accent-background-color; }
+      }
+    }
+  }
+
+  .choices {
+    button, .button {
+      &:hover {
+        background: $accent-background-color;
+        border-color: $accent-background-color;
+        color: $accent-color;
+      }
+    }
+  }
+
+  .field-container select.modal-accent-color { color: $accent-background-color; }
+
+  .thankyou a.print:hover, .thankyou a.print:active {
+    color: $accent-background-color;
+    border-color: $accent-background-color;
+  }
+
+  .address-blocks {
+    p .controls {
+      a:hover {
+        border-color: $accent-background-color;
+      }
+    }
+    button:hover {
+      background-color: $accent-background-color;
+      border-color: $accent-background-color;
+      color: lighten($accent-background-color, 100%);
+    }
+  }
+
+  .wishlists {
+    button:hover {
+      background-color: $accent-background-color;
+      border-color: $accent-background-color;
+      color: lighten($accent-background-color, 100%);
+    }
+    .wishlist-block {
+      span.title {
+        color: $accent-background-color;
+      }
+      p:hover {
+        background-color: $accent-background-color;
+        border-color: $accent-background-color;
+        span.title {
+          color: lighten($accent-background-color, 100%);
+        }
+      }
+    }
+  }
+
+  .order-history {
+    table.lines td.date {
+      color: $accent-background-color;
+    }
+  }
+}
+
+
+
+.wishlist-lines {
+  .save, .add-to-cart {
+    background: $accent-background-color;
+    border-color: $accent-background-color;
+
+    &:hover {
+      background: darken($accent-background-color,10%);
+      border-color: darken($accent-background-color,10%)
+    }
+  }
+  a.edit:hover {
+    border-color: $accent-background-color;
+    color: $accent-background-color;
+  }
+}
+
+.wishlist-share a.service {
+  color: $accent-background-color;
+  &:hover { color: darken($accent-background-color,10%); }
+}
+
+.wishlist-buttons {
+  button {
+    background: none;
+    color: #888;
+
+    &:hover {
+      border-color: $accent-background-color;
+      color: $accent-background-color;
+      background: none;
+    }
+  }
+}
+
+//MO - Prevent text selection
+button, .button, .no-selection {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.webstore-modal-overlay,
+//MO added second line to include add to cart.
+.webstore-modal-overlay .cart-summary footer{
+  button, .button, input[type="button"] {
+    background-color: $accent-background-color;
+    color: $accent-color;
+
+    &:hover { background-color: darken($accent-background-color,10%); }
+
+    &.inset:hover {
+      border-color: $accent-background-color;
+      background: $accent-background-color;
+      color: $accent-color;
+    }
+
+    &.continue, &.share, &.webstore-change-item {
+      &:hover {
+        background: none;
+        border-color: $accent-background-color;
+        color: $accent-background-color;
+        &:before { color: $accent-background-color; }
+      }
+    }
+
+    //added by MO to target the exit button in the add to cart.
+    #addcart .continue-shopping.exit {
+      background-color: #ccc;
+      color: #888;
+      &:hover {
+        background-color: #999;
+        color: #fff;
+      }
+    }
+  }
+}
+
+
+
+.webstore-modal-overlay .shipping-estimate-line th > a:first-child{
+  font-weight: bold;
+}

@@ -598,9 +598,6 @@ class Category extends BaseCategory
 
 	public function UpdateChildCount()
 	{
-
-
-
 		$criteria = new CDbCriteria();
 		$criteria->alias = 'Product';
 		$criteria->join='LEFT JOIN xlsws_product_category_assn as ProductAssn ON ProductAssn.product_id=Product.id';
@@ -620,8 +617,6 @@ class Category extends BaseCategory
 		if (!$this->save())
 			Yii::log("Error saving category ".$this->label." ". print_r($this->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 
-
-
 		if(!$this->IsPrimary() && $this->ParentObject)
 			$this->ParentObject->UpdateChildCount();
 	}
@@ -634,36 +629,6 @@ class Category extends BaseCategory
 		return Category::model()->findByAttributes(array('request_url'=>urldecode($strName)));
 	}
 
-
-	public function CascadeDelete($objCategories = null) {
-
-
-		$intTop = 0;
-		if (is_null($objCategories)) {
-			$intTop = 1;
-			$objCategories=$this;
-		}
-		//We have to remove associations first
-		ProductCategoryAssn::model()->deleteAllByAttributes(array('category_id'=>$objCategories->id));
-
-		if ($objCategories->categories)
-			foreach ($objCategories->categories as $objCategory) {
-
-			echo $objCategory->label."\n";
-
-			if ($objCategory->categories)
-				$this->CascadeDelete($objCategory);
-			else ProductCategoryAssn::model()->deleteAllByAttributes(array('category_id'=>$objCategory->id));
-
-		}
-
-
-		//Since we're self-referential in the delete process, only actually delete the category when we're on the initial loop
-		if ($intTop) parent::delete();
-	}
-
-
-
 	public static function ConvertSEO() {
 
 		$arrCats= Category::model()->findAll();
@@ -673,7 +638,6 @@ class Category extends BaseCategory
 		}
 
 	}
-
 
 	public function GetSEOPath() {
 

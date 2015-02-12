@@ -22,8 +22,24 @@
 require_once ('MarketplaceWebService/Interface.php');
 require_once ('RequestType.php');
 
-define('CONVERTED_PARAMETERS_KEY', 'PARAMETERS');
-define('CONVERTED_HEADERS_KEY', 'HEADERS');
+
+/**
+ * Modifed by the Lightspeed Web Store team to facilitate unit testing.
+ * For reference, see https://github.com/sebastianbergmann/phpunit/issues/314
+ */
+if (defined('CONVERTED_PARAMETERS_KEY') === false)
+{
+	define('CONVERTED_PARAMETERS_KEY', 'PARAMETERS');
+}
+
+if (defined('CONVERTED_HEADERS_KEY') === false)
+{
+	define('CONVERTED_HEADERS_KEY', 'HEADERS');
+}
+/**
+ * End Lightspeed Web Store modification.
+ */
+
 
 /**
  * The Amazon Marketplace Web Service contain APIs for inventory and order management.
@@ -89,9 +105,15 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
    */
   public function __construct(
   $awsAccessKeyId, $awsSecretAccessKey, $config, $applicationName, $applicationVersion, $attributes = null) {
-	iconv_set_encoding('output_encoding', 'UTF-8');
-    iconv_set_encoding('input_encoding', 'UTF-8');
-    iconv_set_encoding('internal_encoding', 'UTF-8');
+
+    if (function_exists('iconv') && PHP_VERSION_ID < 50600)
+    {
+      iconv_set_encoding('output_encoding', 'UTF-8');
+      iconv_set_encoding('input_encoding', 'UTF-8');
+      iconv_set_encoding('internal_encoding', 'UTF-8');
+    } elseif (PHP_VERSION_ID >= 50600) {
+      ini_set('default_charset', 'UTF-8');
+    }
 
     $this->awsAccessKeyId = $awsAccessKeyId;
     $this->awsSecretAccessKey = $awsSecretAccessKey;

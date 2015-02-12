@@ -9,6 +9,8 @@ class beanstreamsim extends WsPayment
 	protected $version = 1.0;
 	protected $apiVersion = 1;
 	public $cloudCompatible = true;
+	public $performInternalFinalizeSteps = false;
+	protected $uses_credit_card = true;
 
 	/**
 	 * Run the payment process
@@ -20,20 +22,20 @@ class beanstreamsim extends WsPayment
 		$strBeanstreamUrl	= "https://www.beanstream.com/scripts/payment/payment.asp";
 
 		$arrBeanStreamValues = array (
-			"merchant_id"		=> $this->config['login'],
-			"trnOrderNumber"	=> $this->objCart->id_str,
-			"trnAmount"			=> $this->objCart->total,
-			"ordName"			=> $this->CheckoutForm->contactFirstName . " " . $this->CheckoutForm->contactLastName,
-			"ordEmailAddress"	=> $this->CheckoutForm->contactEmail,
-			"ordPhoneNumber"	=> $this->CheckoutForm->contactPhone,
-			"ordAddress1"		=> $this->CheckoutForm->billingAddress1,
-			"ordAddress2"		=> $this->CheckoutForm->billingAddress2,
-			"ordCity"			=> $this->CheckoutForm->billingCity,
-			"ordProvince"		=> $this->CheckoutForm->billingState,
-			"ordCountry"		=> $this->CheckoutForm->billingCountry,
-			"ordPostalCode"		=> $this->CheckoutForm->billingPostal,
-			"approvedPage"		=> Yii::app()->controller->createAbsoluteUrl('/cart/payment/'.$this->modulename),
-			"declinedPage"		=> Yii::app()->controller->createAbsoluteUrl('/cart/payment/'.$this->modulename),
+			"merchant_id"       => $this->config['login'],
+			"trnOrderNumber"    => $this->objCart->id_str,
+			"trnAmount"         => $this->objCart->total,
+			"ordName"           => $this->CheckoutForm->contactFirstName . " " . $this->CheckoutForm->contactLastName,
+			"ordEmailAddress"   => $this->CheckoutForm->contactEmail,
+			"ordPhoneNumber"    => $this->CheckoutForm->contactPhone,
+			"ordAddress1"       => $this->CheckoutForm->billingAddress1,
+			"ordAddress2"       => $this->CheckoutForm->billingAddress2,
+			"ordCity"           => $this->CheckoutForm->billingCity,
+			"ordProvince"       => $this->CheckoutForm->billingStateCode,
+			"ordCountry"        => $this->CheckoutForm->billingCountryCode,
+			"ordPostalCode"     => $this->CheckoutForm->billingPostal,
+			"approvedPage"      => Yii::app()->controller->createAbsoluteUrl('/cart/payment/'.$this->modulename),
+			"declinedPage"      => Yii::app()->controller->createAbsoluteUrl('/cart/payment/'.$this->modulename),
 		);
 
 		$strQueryParams = http_build_query($arrBeanStreamValues);
@@ -44,7 +46,17 @@ class beanstreamsim extends WsPayment
 			$strQueryParams .= '&' . 'hashValue=' . $strHashValue;
 		}
 
-		Yii::log("Attempting payment on cart " . $this->objCart->id_str, 'info', 'application.' . __CLASS__ . "." . __FUNCTION__);
+		Yii::log(
+			sprintf(
+				"%s attempting payment on cart %s\nRequest %s",
+				__CLASS__,
+				$this->objCart->id_str,
+				print_r($arrBeanStreamValues, true)
+			),
+			$this->logLevel,
+			'application.' . __CLASS__ . "." . __FUNCTION__
+		);
+
 		$strJumpUrl =  $strBeanstreamUrl . '?' . $strQueryParams;
 
 		$arrReturn['api'] = $this->apiVersion;

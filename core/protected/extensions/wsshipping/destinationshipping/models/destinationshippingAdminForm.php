@@ -31,7 +31,7 @@ class destinationshippingAdminForm extends CFormModel
 			'per'=>'Calculate cost as Rate multiplied by each',
 			'offerservices'=>'Delivery Speed',
 			'restrictcountry'=>'Only allow this carrier to',
-			'product'=>'LightSpeed Product Code (case sensitive)',
+			'product'=>'Lightspeed Product Code (case sensitive)',
 		);
 	}
 

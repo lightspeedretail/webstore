@@ -43,7 +43,7 @@
 			$m = ($this->isMT ? "M" : "S");?>
 			<div class="row">
 			<div class="span3" style="text-align: right">
-				<span class="label">LightSpeed Hosting Mode</span>
+				<span class="label">Lightspeed Hosting Mode</span>
 			</div>
 			<div class="span3">
 				<span class="editinstructions"><?= $m ?></span>
@@ -55,7 +55,7 @@
 			if($this->isCloud): ?>
 			<div class="row">
 			<div class="span3" style="text-align: right">
-				<span class="label">LightSpeed Cloud</span>
+				<span class="label">Lightspeed Retail</span>
 			</div>
 			<div class="span3">
 				<span class="editinstructions"><?= Yii::app()->params['LIGHTSPEED_CLOUD']?></span>

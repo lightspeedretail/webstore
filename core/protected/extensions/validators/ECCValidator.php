@@ -63,7 +63,7 @@ class ECCValidator extends CValidator{
 
 	/**
 	 * @var array holds regex patterns to check for valid CVV number
-	 * added by Kevin Ottley, LightSpeed Retail (7-MAR-2014)
+	 * added by Kevin Ottley, Lightspeed Retail (7-MAR-2014)
 	 */
 	protected $cvvpatterns = array(
 		self::AMERICAN_EXPRESS=>'/^[0-9]{4}$/',
@@ -125,12 +125,14 @@ class ECCValidator extends CValidator{
 	public function validateDate($creditCardExpiredMonth, $creditCardExpiredYear){
 		
 		$currentYear = intval(date('Y'));
+		$currentMonth = intval(date('m'));
 		
 		if(is_scalar($creditCardExpiredMonth)) $creditCardExpiredMonth = intval($creditCardExpiredMonth);
 		if(is_scalar($creditCardExpiredYear)) $creditCardExpiredYear = intval($creditCardExpiredYear);
 		
-		return 	is_integer($creditCardExpiredMonth) && $creditCardExpiredMonth >= 1 && $creditCardExpiredMonth <= 12 && 
-				is_integer( $creditCardExpiredYear ) && $creditCardExpiredYear > $currentYear && $creditCardExpiredYear < $currentYear+10;
+		return is_integer($creditCardExpiredMonth) && is_integer($creditCardExpiredYear) && $creditCardExpiredMonth <= 12
+		 && ($creditCardExpiredMonth >= 1  && $creditCardExpiredYear > $currentYear
+		 && $creditCardExpiredYear < $currentYear + 10) || ($creditCardExpiredYear == $currentYear && $creditCardExpiredMonth >= $currentMonth);
 	}
 	/**
 	 * 
@@ -146,7 +148,7 @@ class ECCValidator extends CValidator{
 	 *
 	 * Validates Credit Card CVV number
 	 * @param integer $creditCardCVV
-	 * created for use with LightSpeed Web Store (7-MAR-2014)
+	 * created for use with Lightspeed Web Store (7-MAR-2014)
 	 */
 	public function validateCVV($creditCardCVV){
 
@@ -173,7 +175,7 @@ class ECCValidator extends CValidator{
 	 * @param string $creditCardNumber
 	 * @param integer $creditCardExpiredMonth
 	 * @param integer $creditCardExpiredYear
-	 * updated for use with LightSpeed Web Store (7-MAR-2014)
+	 * updated for use with Lightspeed Web Store (7-MAR-2014)
 	 */
 	public function validateAll($creditCardHolder, $creditCardNumber, $creditCardExpiredMonth, $creditCardExpiredYear, $creditCardCVV){
 		

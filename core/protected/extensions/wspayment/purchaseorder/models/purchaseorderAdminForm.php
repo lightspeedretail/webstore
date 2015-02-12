@@ -11,7 +11,7 @@ class purchaseorderAdminForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('label,restrictcountry','required'),
+			array('label,restrictcountry', 'required'),
 		);
 	}
 
@@ -23,30 +23,27 @@ class purchaseorderAdminForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'label'=>'Label',
-			'restrictcountry'=>'Only allow this processor',
+			'label' => 'Label',
+			'restrictcountry' => 'Only allow this processor',
 		);
 	}
 
 	public function getAdminForm()
 	{
 		return array(
-			'title'=>'This method will collect a PO number on checkout.',
+			'title' => 'This method will collect a PO number on checkout.',
 
-			'elements'=>array(
-				'label'=>array(
-					'type'=>'text',
-					'maxlength'=>64,
+			'elements' => array(
+				'label' => array(
+					'type' => 'text',
+					'maxlength' => 64,
 				),
-				'restrictcountry'=>array(
-					'type'=>'dropdownlist',
-					'items'=>Country::getAdminRestrictionList(),
+				'restrictcountry' => array(
+					'type' => 'dropdownlist',
+					'items' => Country::getAdminRestrictionList(),
 				),
 			),
 		);
 	}
-
-
-
 
 }

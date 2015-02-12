@@ -24,7 +24,7 @@ class m140429_224114_update_configuration extends CDbMigration
 
 		$this->update(
 			'xlsws_configuration',
-			array('key_name' => 'THEME', 'key_value' => 'brooklyn', 'title'=> 'Site Theme','options'=> 'THEME','configuration_type_id'=> 0,'sort_order'=> 2,'param'=>0),
+			array('key_name' => 'THEME', 'key_value' => 'brooklyn2014', 'title'=> 'Site Theme','options'=> 'THEME','configuration_type_id'=> 0,'sort_order'=> 2,'param'=>0),
 			'key_name = :key',
 			array(':key' => 'DEFAULT_TEMPLATE')
 		);
@@ -185,7 +185,7 @@ class m140429_224114_update_configuration extends CDbMigration
 			));
 
 		$this->insert('xlsws_configuration',array(
-				'title' =>'LightSpeed Hosting Shared SSL',
+				'title' =>'Lightspeed Hosting Shared SSL',
 				'key_name' => 'LIGHTSPEED_HOSTING_COMMON_SSL',
 				'key_value' => '0',
 				'helper_text' => 'Flag which indicates site is using Shared SSL',
@@ -198,7 +198,7 @@ class m140429_224114_update_configuration extends CDbMigration
 			));
 
 		$this->insert('xlsws_configuration',array(
-				'title' =>'LightSpeed Hosting Shared URL',
+				'title' =>'Lightspeed Hosting Shared URL',
 				'key_name' => 'LIGHTSPEED_HOSTING_LIGHTSPEED_URL',
 				'key_value' => '',
 				'helper_text' => '',
@@ -211,7 +211,7 @@ class m140429_224114_update_configuration extends CDbMigration
 			));
 
 		$this->insert('xlsws_configuration',array(
-				'title' =>'LightSpeed Hosting Original URL',
+				'title' =>'Lightspeed Hosting Original URL',
 				'key_name' => 'LIGHTSPEED_HOSTING_CUSTOM_URL',
 				'key_value' => '',
 				'helper_text' => '',
@@ -237,7 +237,7 @@ class m140429_224114_update_configuration extends CDbMigration
 			));
 
 		$this->insert('xlsws_configuration',array(
-				'title' =>'LightSpeed Hosting Shared SSL Time',
+				'title' =>'Lightspeed Hosting Shared SSL Time',
 				'key_name' => 'LIGHTSPEED_HOSTING_SHARED_TIME',
 				'key_value' => '1500',
 				'helper_text' => 'Milliseconds for forward notice',
@@ -341,10 +341,10 @@ class m140429_224114_update_configuration extends CDbMigration
 			));
 
 		$this->insert('xlsws_configuration',array(
-				'title' =>'LightSpeed Cloud Account',
+				'title' =>'Lightspeed Cloud Account',
 				'key_name' => 'LIGHTSPEED_CLOUD',
 				'key_value' => '0',
-				'helper_text' => 'The Account number for LightSpeed Cloud',
+				'helper_text' => 'The Account number for Lightspeed Cloud',
 				'configuration_type_id' => 0,
 				'sort_order' => 0,
 				'options' => '',
@@ -354,7 +354,7 @@ class m140429_224114_update_configuration extends CDbMigration
 			));
 
 		$this->insert('xlsws_configuration',array(
-				'title' =>'LightSpeed Multitenant Mode',
+				'title' =>'Lightspeed Multitenant Mode',
 				'key_name' => 'LIGHTSPEED_MT',
 				'key_value' => '0',
 				'helper_text' => 'Flag for MT',
@@ -367,7 +367,7 @@ class m140429_224114_update_configuration extends CDbMigration
 			));
 
 		$this->insert('xlsws_configuration',array(
-				'title' =>'LightSpeed Updater URL',
+				'title' =>'Lightspeed Updater URL',
 				'key_name' => 'LIGHTSPEED_UPDATER',
 				'key_value' => 'updater.lightspeedretail.com',
 				'helper_text' => 'Updater URL',
@@ -380,7 +380,7 @@ class m140429_224114_update_configuration extends CDbMigration
 			));
 
 		$this->insert('xlsws_configuration',array(
-				'title' =>'LightSpeed Show Release Notes',
+				'title' =>'Lightspeed Show Release Notes',
 				'key_name' => 'LIGHTSPEED_SHOW_RELEASENOTES',
 				'key_value' => '0',
 				'helper_text' => 'Display release notes',
@@ -393,7 +393,7 @@ class m140429_224114_update_configuration extends CDbMigration
 			));
 
 		$this->insert('xlsws_configuration',array(
-				'title' =>'LightSpeed Customer ID',
+				'title' =>'Lightspeed Customer ID',
 				'key_name' => 'LIGHTSPEED_CID',
 				'key_value' => '0',
 				'helper_text' => 'First 5 chars of LS License',
