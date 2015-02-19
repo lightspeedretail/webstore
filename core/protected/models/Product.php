@@ -1412,23 +1412,7 @@ class Product extends BaseProduct
 
 	}
 
-	/**
-	 * Calculates the sum of the quantities of a given
-	 * array of Products
-	 *
-	 * @param $products Array of Product records
-	 * @return int The sum of the available quantities
-	 */
-	public static function sumInventoryInProducts($products)
-	{
-		$availQty = 0;
-		foreach($products as $product)
-		{
-			$availQty += $product->getInventory();
-		}
 
-		return $availQty;
-	}
 
 	public function __get($strName) {
 		switch ($strName) {

@@ -31,12 +31,6 @@ class m140919_173004_WS_2076_shipping_estimator extends CDbMigration
 				$count
 			);
 
-			echo sprintf(
-				"Made %d %s.\n",
-				$count,
-				ngettext('replacement', 'replacements', $count)
-			);
-
 			file_put_contents(
 				self::_pathToMain(),
 				$strMain

@@ -18,7 +18,7 @@ class SearchController extends Controller
 	/**
 	 * @var string
 	 */
-	public $layout = '//layouts/column2';
+	public $layout='//layouts/column2';
 	/**
 	 * @var
 	 */
@@ -77,25 +77,24 @@ class SearchController extends Controller
 		$strB = Yii::app()->getRequest()->getQuery('brand');
 		$strS = Yii::app()->getRequest()->getQuery('class_name');
 
-		$strInv = '';
+		$strInv='';
 
 		//If we haven't passed any criteria, we just query the database
 		$criteria = new CDbCriteria();
 		$criteria->alias = 'Product';
 
-		if (empty($strC) === false)
-		{
+		if (!empty($strC)) {
 
 			$objCategory = Category::LoadByRequestUrl($strC);
 			if($objCategory)
 			{
-				$criteria->join = 'LEFT JOIN xlsws_product_category_assn as ProductAssn ON ProductAssn.product_id=Product.id';
+				$criteria->join='LEFT JOIN xlsws_product_category_assn as ProductAssn ON ProductAssn.product_id=Product.id';
 				$intIdArray = array($objCategory->id);
 				$intIdArray = array_merge($intIdArray, $objCategory->GetBranchPath());
 				$criteria->addInCondition('category_id', $intIdArray);
 
-				$this->pageTitle = $objCategory->PageTitle;
-				$this->pageDescription = $objCategory->PageDescription;
+				$this->pageTitle=$objCategory->PageTitle;
+				$this->pageDescription=$objCategory->PageDescription;
 				$this->pageImageUrl = $objCategory->CategoryImage;
 				$this->breadcrumbs = $objCategory->Breadcrumbs;
 				$this->pageHeader = Yii::t('category', $objCategory->label);
@@ -103,27 +102,28 @@ class SearchController extends Controller
 				$this->subcategories = $objCategory->getSubcategoryTree($this->MenuTree);
 
 				if ($objCategory->custom_page)
-				{
 					$this->custom_page_content = $objCategory->customPage->page;
-				}
 
 				$this->CanonicalUrl = $this->createAbsoluteUrl($objCategory->Link);
 			}
+
+
+
 		}
 
-		if (empty($strB) === false)
-		{
+		if (!empty($strB)) {
 
 			$objFamily = Family::LoadByRequestUrl($strB);
 			if($objFamily)
 			{
 				$criteria->addCondition('family_id = :id');
-				$criteria->params = array (':id' => $objFamily->id);
+				$criteria->params = array (':id'=>$objFamily->id);
 
-				$this->pageTitle = $objFamily->PageTitle;
+				$this->pageTitle=$objFamily->PageTitle;
 				//$this->pageDescription=$objFamily->PageDescription;
 				//$this->breadcrumbs = $objCategory->Breadcrumbs;
 				$this->pageHeader = $objFamily->family;
+
 
 				$this->CanonicalUrl = $objFamily->Link;
 			}
@@ -131,33 +131,32 @@ class SearchController extends Controller
 
 		}
 
-		if (empty($strS) === false)
-		{
+		if (!empty($strS)) {
 
 			$objClasses = Classes::LoadByRequestUrl($strS);
 			if($objClasses)
 			{
 				$criteria->addCondition('class_id = :id');
-				$criteria->params = array (':id' => $objClasses->id);
+				$criteria->params = array (':id'=>$objClasses->id);
 
 				//$this->pageTitle=$objClasses->PageTitle;
 				//$this->pageDescription=$objFamily->PageDescription;
 				//$this->breadcrumbs = $objClasses->class_name;
 				$this->pageHeader = $objClasses->class_name;
 				$this->CanonicalUrl = $this->createAbsoluteUrl($objClasses->Link);
+
+
 			}
+
+
 		}
 
 
 		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD') == Product::InventoryMakeDisappear)
-		{
 			$criteria->addCondition('(inventory_avail>0 OR inventoried=0)');
-		}
 
 		if (!_xls_get_conf('CHILD_SEARCH') || empty($strQ))
-		{
 			$criteria->addCondition('Product.parent IS NULL');
-		}
 
 		if (Product::HasFeatured() && empty($strS) && empty($strB) && empty($strC))
 		{
@@ -168,6 +167,7 @@ class SearchController extends Controller
 		$criteria->addCondition('web=1');
 		$criteria->addCondition('current=1');
 		$criteria->order = 'Product.'._xls_get_sort_order();
+
 
 		$numberOfRecords = Product::model()->count($criteria);
 
@@ -181,24 +181,19 @@ class SearchController extends Controller
 		$this->returnUrl = $this->CanonicalUrl;
 		$this->pageImageUrl = "";
 
-		if($strB == '*')
-		{
-			$families = Family::getDisplayableFamilies();
-			$this->render('brands', array('model' => $families));
-		}
-		else
-		{
-			$this->render(
-				'grid',
-				array(
-					'model' => $model,
-					'item_count' => $numberOfRecords,
-					'page_size' => Yii::app()->params['PRODUCTS_PER_PAGE'],
-					'items_count' => $numberOfRecords,
-					'pages' => $pages,
-				)
-			);
-		}
+        if ($strB=='*')
+        {
+            $families = Family::model()->findAll(array('order'=>'family'));
+            $this->render('brands',array('model'=>$families));
+        }
+        else
+		$this->render('grid',array(
+		'model'=> $model,
+		'item_count'=>$numberOfRecords,
+		'page_size'=>Yii::app()->params['PRODUCTS_PER_PAGE'],
+		'items_count'=>$numberOfRecords,
+		'pages'=>$pages,
+		));
 
 	}
 
