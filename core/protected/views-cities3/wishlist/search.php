@@ -67,9 +67,9 @@
 			</div>
 			<div class="forgotpassword inline">
 				<?php if(Yii::app()->user->isGuest):
-					echo CHtml::link(Yii::t('global', 'View my Wish Lists'), array("../site/login"));
+					echo CHtml::link(Yii::t('global', 'View my Wish Lists'), Yii::app()->createUrl('site/login'));
 				else:
-					echo CHtml::link(Yii::t('global', 'View my Wish Lists'), array("/wishlist"));
+					echo CHtml::link(Yii::t('global', 'View my Wish Lists'), Yii::app()->createUrl('/wishlist'));
 				endif; ?>
 			</div>
 

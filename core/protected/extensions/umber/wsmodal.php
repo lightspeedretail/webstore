@@ -11,7 +11,7 @@ class wsmodal extends CWidget
 		Yii::app()->params['umber_assets'] = Yii::app()->assetManager->publish(Yii::getPathOfAlias($umberAssetsAlias));
 
 		// This does the scss conversion to css and returns the path to the compiled css path
-		Yii::app()->params['modal_css'] = Yii::app()->sass->publish(dirname(__FILE__) . '/assets/modal/modal.scss', $umberAssetsAlias);
+		Yii::app()->params['modal_css'] = Yii::app()->sass->publish(dirname(__FILE__) . '/assetsToCompile/modal/modal.scss', $umberAssetsAlias);
 
 		static::_createSprites();
 

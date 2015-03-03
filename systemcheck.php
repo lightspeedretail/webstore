@@ -24,7 +24,7 @@ function displayHeader()
 				z-index: 999;
 			}
 			.header-inner {margin: 0 auto; width: 960px; }
-			.header-new .logo { float: left; padding: 14px 0 0 10px; width: 268px;}
+			.header-new .logo { float: left; padding: 5px 0 0; width: 268px;}
 			.header-new .welcome { float: left; padding: 30px 20px 20px 10px; margin-left: 470px; font-size: 28px; }
 			.table { width: 700px; margin: 0 auto; }
 			.hero-unit { padding: 20px; }
@@ -39,7 +39,7 @@ function displayHeader()
 
 	<div class="header-new">
 		<div class="header-inner">
-			<div class="logo"><img src="/images/webstore-logo2x.png" alt="Lightspeed"></div>
+			<div class="logo"><img src="//www.lightspeedpos.com/wp-content/themes/lightspeed/sharedmenu/imgs/logo-red-bl.png" alt="Lightspeed"></div>
 		</div>
 	</div>
 	<div class="container">

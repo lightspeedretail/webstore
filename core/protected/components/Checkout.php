@@ -258,7 +258,10 @@ class Checkout
 	{
 		return CJSON::encode(array(
 			'applyButtonLabel' => Yii::t('checkout', 'Apply'),
-			'removeButtonLabel' => Yii::t('checkout', 'Remove')
+			'removeButtonLabel' => Yii::t('checkout', 'Remove'),
+			'applyPromoCodeEndpoint' => Yii::app()->createUrl('cart/applypromocodemodal'),
+			'removePromoCodeEndpoint' => Yii::app()->createUrl('cart/removepromocodemodal'),
+			'clearCartEndpoint' => Yii::app()->createUrl('cart/clearcart')
 		));
 	}
 

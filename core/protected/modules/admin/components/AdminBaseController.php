@@ -192,7 +192,7 @@ class AdminBaseController extends CController
 		else
 			$this->setMenuHighlight();
 
-		$baseUrl = '//' . $_SERVER['HTTP_HOST'] . '/';
+		$baseUrl = '//' . $_SERVER['HTTP_HOST'] . Yii::app()->getBaseUrl();
 
 		Yii::app()->clientScript->registerScript(
 			'helpers',
@@ -757,7 +757,9 @@ class AdminBaseController extends CController
 		else
 			$this->assetUrl = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.admin.assets'));
 
+		Yii::app()->params['admin_assets'] = $this->assetUrl;
 		$path = $this->assetUrl . '/' . $file;
+
 		if(strpos($file, 'js') !== false)
 			return Yii::app()->clientScript->registerScriptFile($path);
 		elseif(strpos($file, 'css') !== false)

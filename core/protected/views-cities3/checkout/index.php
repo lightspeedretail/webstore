@@ -205,7 +205,7 @@
 					{
 						echo
 							CHtml::image(
-								'/images/lock.png',
+								Yii::app()->params['umber_assets'] . '/images/lock.png',
 								'lock image ',
 								array(
 									'height'=> 14

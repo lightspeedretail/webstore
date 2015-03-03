@@ -28,7 +28,7 @@ class paypalpro extends WsPayment
 
 		$str  = "&PAYMENTACTION="   .'Sale';
 		$str .= "&ITEMAMT="         .$this->objCart->subtotal;
-		$str .= "&SHIPPINGAMT="     .$this->objCart->shipping->shipping_sell;
+		$str .= "&SHIPPINGAMT="     .$this->objCart->shippingCharge;
 		$str .= "&AMT="             .round($this->objCart->total,2);
 		$str .= "&TAXAMT="          .$this->objCart->TaxTotal;
 		$str .= "&INVNUM="          .$this->objCart->id_str . date('YmdHis'); // append the datetime to prevent duplicate id error if payment must be re-tried

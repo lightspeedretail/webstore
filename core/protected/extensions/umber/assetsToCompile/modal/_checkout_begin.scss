@@ -1,0 +1,70 @@
+@include media(medium) {
+	#start {
+		& > footer p {
+			margin-right: -60px;
+			margin-left: -60px;
+		}
+	}
+}
+
+
+#start {
+  //MO to avoid text overlapping
+  //and too narrow inputs on login page.
+  .section-inner{
+    padding: 15px 10px 20px;
+    @include media(verysmall){
+      padding: 15px 20px 20px;
+    }
+  }
+
+	footer.submit {
+		text-align: center;
+		height: 91px;
+
+		p {
+			color: #999;
+			font-size: .9375rem;
+			margin: 0 0;
+		}
+		a.alternate {
+			text-align: center;
+			background: #fff;
+			color: #999;
+			margin: 12px auto 0;
+			display: inline-block;
+			border-bottom: 1px dotted #ccc;
+		}
+
+		opacity: 1;
+
+		& > div {
+			@include transition(opacity .5s);
+
+		}
+
+		.invisible {
+			overflow: hidden;
+			height: 0;
+			visibility: none;
+			opacity: 0;
+		}
+
+	}
+
+	li.password-block {
+		margin-top: -1px;
+		input { border-bottom: none; }
+
+		.reset {
+			.inset { right: 0; }
+			p { margin-right: 5em; }
+		}
+	}
+
+   //MO
+   .form-error{
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+}

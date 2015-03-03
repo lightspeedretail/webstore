@@ -1,0 +1,379 @@
+@import 'lib/normalize';
+
+@charset "utf-8";
+
+$break-mobile: 0px; // This is used in limited situations, generally styles layer-up, not down.
+$break-small: 560px;
+$break-medium: 720px;
+$break-large: 1025px;
+
+$break-short: 500px;
+
+@import 'mixins/html5-input-types';
+
+@mixin media($media) {
+	@if $media == 'mobile' {
+		@media (max-width: $break-mobile) { @content; }
+	}
+	@else if $media == 'small' {
+		@media (min-width: $break-small)  { @content; }
+	}
+	@else if $media == 'medium' {
+		@media (min-width: $break-medium) { @content; }
+	}
+	@else if $media == 'large' {
+		@media (min-width: $break-large) { @content; }
+	}
+	@else if $media == 'short' {
+		@media (max-height: $break-short) { @content; }
+	}
+	@else {
+		@content;
+	}
+}
+
+* {
+	@include box-sizing(border-box);
+}
+
+// Colors
+$font-color:  #000;
+$highlight: #ffc;
+
+$grey-medium: #666;
+
+$blue: #3d89d1;
+$green: #95BE64;
+
+// Navigation
+
+
+$header-bg-color: $blue;
+
+// Link colors
+$link-color:		 $blue;
+$link-hover-color:   darken($blue,10%);
+$link-active-color:  darken($blue,20%);
+//$link-focus-color:   false;
+//$link-visited-color: false;
+
+a {
+	color: $link-color;
+	&:active { color: $link-active-color; }
+	a:hover { color: $link-hover-color; }
+}
+
+// Font Sets
+$font-family: 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, Verdana, Arial, sans-serif;
+$font-family-enhanced: 'Open Sans', 'Helvetica Neue', Helvetica, Verdana, Arial, sans-serif;
+$font-family-helvetica: 'Helvetica Neue', Helvetica, Verdana, Arial, sans-serif;
+
+body {
+	font-family: $font-family;
+	color: #444;
+    //MO boostrap override
+    font-size:16px;
+}
+
+#{headings()} {
+	font-family: $font-family-enhanced;
+	font-weight: 600;
+	margin: 0 0 .25em;
+
+	small {
+		color: $grey-medium;
+		font-weight: normal;
+	}
+
+	a {
+		text-decoration: none;
+		border-bottom: 2px solid lighten($blue, 40%);
+		padding: 0;
+		color: $blue;
+
+		&:hover {
+			border-bottom: 2px solid $blue;
+		}
+	}
+}
+
+h1 {
+	font-family: $font-family-helvetica;
+	font-size: 6em;
+	font-weight: 100;
+	margin: 1em 0 .25em;
+	color: #999;
+}
+h2 {
+	font-size: 1.5em;
+	font-weight: 600;
+	margin: 1.5em 0 .25em;
+	color: #666;
+}
+h3 {
+	font-size: 1.25em;
+}
+h4 {
+	font-size: 1.125em;
+}
+
+ol, ul {
+
+}
+li {
+	font: .9em/1.6 $font-family;
+
+}
+
+p {
+	font: .9em/1.6 $font-family;
+	margin: 0 0 1em;
+
+	&.large, &.medium {
+		font-family: $font-family-enhanced;
+		line-height: 1.5;
+		font-size: 1.1em;
+	}
+
+	&.large {
+		font-size: 1.5em;
+		margin-bottom: .5em;
+	}
+}
+
+
+ol.products {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	border: 1px solid #ccc;
+	@include clearfix();
+
+	li {
+		width: 50%;
+		display: inline-block;
+		float: left;
+		padding: 1.25rem 1rem 1rem;
+
+	}
+
+	:first-child > li { border-right: 1px solid #ccc; }
+	:last-child > li {
+		margin-left: -1px;
+		border-left: 1px solid #ccc;
+	}
+
+	a {
+		color: #888;
+
+		&:hover li { background-color: #f8f8f8; }
+	}
+
+	h2 {
+		color: $blue;
+		margin: 0 0 .125em;
+		font-weight: 400;
+		font-size: 2.5rem;
+		line-height: 1;
+	}
+	p {
+		margin: 0;
+
+	}
+}
+
+
+
+body {
+	margin-top: 68px;
+
+	& > header {
+		h1 {
+			border-top: none;
+			margin: 0;
+			font: bold 1.25rem $font-family-enhanced;
+
+			padding: 1em 5%;
+			color: #888;
+			font-weight: 600;
+			background-color: rgba(255,255,255,.9);
+			border-bottom: 1px solid #eee;
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+		}
+	}
+}
+
+#page {
+	margin: 5em 5%;
+}
+
+img {
+	&.diagram {
+		border: 1px solid #ccc;
+		padding: 20px;
+		margin-bottom: 1em
+	}
+}
+
+ol.images, ol.colors {
+	padding: 0;
+	list-style: none;
+
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+
+	-webkit-flex-flow: row wrap;
+    flex-flow: row wrap;
+
+	li {
+		margin: 0 1em 1em 0;
+	}
+}
+
+ol.colors {
+	& > li {
+		width: 11em;
+		overflow: hidden;
+
+		padding: 10px 10px 0 10px;
+		border: 1px solid #ccc;
+
+		.swatch {
+			display: block;
+			width: 100%;
+			height: 150px;
+			margin: 0 0 .25em;
+			padding: 100px 0 0 0;
+			text-align: center;
+			font: 2em $font-family-enhanced;
+			text-transform: uppercase;
+		}
+
+		h3 {
+			font-weight: 600;
+			font-size: 1.25em;
+		}
+	}
+
+	p {
+		font-size: .7em;
+	}
+
+	ul {
+		list-style: none;
+		padding: 0;
+
+		li {
+			float: left;
+			width: 5em;
+
+		}
+	}
+}
+
+
+.note, .pro, .future, .deprecated, .todo {
+	&:before {
+		text-transform: uppercase;
+		font-weight: 300;
+		font-size: .95em;
+		padding: 2px 4px;
+		margin: 0 5px 0 -2px;
+	}
+}
+
+.deprecated {
+	color: #999;
+	background-color: #eee;
+	padding: 5px;
+	margin-top: -5px;
+
+	&:before {
+		content: "Deprecated";
+		font-weight: 300;
+		color: #999;
+		border: 1px dotted #999;
+	}
+}
+.future {
+	color: #777;
+
+	&:before {
+		content: "Future";
+		font-weight: 300;
+		background-color: #999;
+		color: #fff;
+	}
+}
+.pro {
+	color: #777;
+
+	&:before {
+		content: "Pro";
+		background-color: #84B745;
+		color: #fff;
+	}
+}
+.todo {
+	&:before {
+		font-weight: 600;
+		content: 'To Do';
+		background-color: #ffc;
+		border: 1px dotted #ccc;
+		color: #666;
+	}
+}
+
+.note {
+	// background-color: #ffc;
+	color: #777;
+
+	&:before {
+		content: "Note";
+		background-color: #ffc;
+		color: #999;
+		border: 1px dotted #ccc;
+	}
+}
+
+
+dl {
+	overflow: hidden;
+	border-bottom: 1px solid #eee;
+
+	dd, dt {
+		border-top: 1px solid #eee;
+
+		margin: 0;
+		padding: 10px 0;
+		font: normal .8em $font-family;
+	}
+
+	dt {
+		font: 1.25em $font-family-enhanced;
+		width: 150px;
+		float: left;
+		margin: 0;
+		font-weight: bold;
+	}
+
+	dd {
+		margin-left: 150px;
+		min-height: 5em;
+
+		*:last-child {
+			margin-bottom: 0;
+		}
+
+		p {
+			margin: 0 0 .5em;
+		}
+	}
+
+}

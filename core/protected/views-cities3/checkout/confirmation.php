@@ -153,7 +153,7 @@ Yii::app()->clientScript->registerScript(
 			});',
 			CJSON::encode(
 				array(
-					'updateCartUrl' => Yii::app()->createUrl('/cart/updatecartitem'),
+					'updateCartItemEndpoint' => Yii::app()->createUrl('cart/updatecartitem'),
 					'csrfToken' => Yii::app()->request->csrfToken,
 					'cartId' => CHtml::activeId($modelId, 'promoCode'),
 					'invalidQtyMessage' => Yii::t(

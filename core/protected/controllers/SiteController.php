@@ -359,7 +359,7 @@ class SiteController extends Controller
 	 */
 	public function actionContact()
 	{
-		$this->redirect("/custompage/contact");
+		$this->redirect(Yii::app()->createUrl("custompage/contact"));
 	}
 
 	/**
@@ -382,6 +382,6 @@ EOF;
 
 	public function actionSystemcheck()
 	{
-		$this->redirect("/systemcheck.php");
+		$this->redirect(Yii::app()->createUrl("/systemcheck.php"));
 	}
 }

@@ -41,10 +41,10 @@
 						<tr>
 							<td>
 					<![endif]-->
-					<table align="center" border="0" cellpadding="0" cellspacing="0" width="80%" class="main" style="border-collapse:collapse;margin:0px auto;" bgcolor="#ffffff">
+					<td align="left" bgcolor="#eeeeee" style="padding-top: 20px;padding-bottom: 20px;color:#111111;font-family:'Lucida Grande','Lucida Sans', Verdana, sans-serif;font-size: 21px;">
 						<tbody>
 							<tr>
-								<td align="left" height="54" bgcolor="#eeeeee" style="padding-top: 20px;padding-bottom: 20px;">
+								<td align="left" bgcolor="#eeeeee" style="padding-top: 20px;padding-bottom: 20px;">
 									<?=
 										CHtml::link(
 											CHtml::image(
@@ -54,8 +54,6 @@
 													)
 												),
 												array(
-													'width' => '300',
-													'height' => '54',
 													'style' => 'display:block;'
 												)
 											), $this->createUrl("site/index"));

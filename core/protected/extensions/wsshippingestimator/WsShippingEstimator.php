@@ -194,6 +194,8 @@ class WsShippingEstimator extends CWidget
 		// Build up an associative array of the options required for the shipping estimator.
 		$shippingEstimatorOptions = array(
 			'class' => self::CSS_CLASS,
+			'getShippingRatesEndpoint' => Yii::app()->createUrl('cart/getshippingrates'),
+			'setShippingOptionEndpoint' => Yii::app()->createUrl('cart/chooseshippingoption'),
 			'updateOnLoad' => CPropertyValue::ensureBoolean($updateOnLoad),
 			'shippingCity' => $shippingCity,
 			'shippingState' => $shippingStateCode,

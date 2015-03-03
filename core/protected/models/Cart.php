@@ -238,11 +238,11 @@ class Cart extends BaseCart
 	public static function GetCartLastIdStr() {
 		// Since id_str is a text field, we have to read in and strip out nonnumeric
 		$intIdStr = Yii::app()->db->createCommand('SELECT SUBSTRING(id_str, 4)
-                AS id_num
-                FROM xlsws_cart
-                WHERE id_str LIKE "WO-%"
-                ORDER BY (id_num + 0) DESC
-                LIMIT 1;')->queryScalar();
+				AS id_num
+				FROM xlsws_cart
+				WHERE id_str LIKE "WO-%"
+				ORDER BY (id_num + 0) DESC
+				LIMIT 1;')->queryScalar();
 
 
 		if (empty($intIdStr))
@@ -548,7 +548,18 @@ class Cart extends BaseCart
 			$objPromoCode->threshold = 0; //for calculation purposes
 		}
 
-		if ($objPromoCode->threshold > $intOriginalSubTotal && $this->fk_promo_id != NULL)
+		// If none of the products are affected by the promo code anymore, remove it
+		$isAnyProductAffected = false;
+		foreach ($arrSorted as $objItem)
+		{
+			if ($objPromoCode->IsProductAffected($objItem))
+			{
+				$isAnyProductAffected = true;
+				break;
+			}
+		}
+
+		if (($objPromoCode->threshold > $intOriginalSubTotal && $this->fk_promo_id !== NULL) || $isAnyProductAffected === false)
 		{
 			$this->fk_promo_id = NULL;
 			Yii::app()->user->setFlash(
@@ -694,7 +705,7 @@ class Cart extends BaseCart
 					$qty = 1;
 					$taxIn = 1;
 					$objItem->sell = $objItem->product->getPriceValue($qty, $taxIn);
-				   	$objItem->sell_base = $objItem->sell;
+					$objItem->sell_base = $objItem->sell;
 					$objItem->sell_total = $objItem->sell_base * $objItem->qty;
 					$objItem->tax_in = 1;
 					$objItem->save();
@@ -950,7 +961,7 @@ class Cart extends BaseCart
 		}
 
 		$objItem->qty = ($objItem->qty ? $objItem->qty : 0);
-        $objItem->sell_total = $objItem->sell_base * $objItem->qty;
+		$objItem->sell_total = $objItem->sell_base * $objItem->qty;
 
 		if ($objItem->save() === false)
 		{
@@ -972,7 +983,7 @@ class Cart extends BaseCart
 		return $objItem->id;
 	}
 
-  	/**
+	/**
 	 * Checks if current taxcode should be tax inclusive or not..
 	 * @return
 	 */

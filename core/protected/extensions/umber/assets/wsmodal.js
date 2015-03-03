@@ -1,5 +1,6 @@
 'use strict';
 /* globals $:false, History:false */
+/* exported showEditCartModal */
 function sleep(millis, callback) {
     setTimeout(function()
         { callback(); },
@@ -56,19 +57,48 @@ function hideModal() {
     $('#viewport, .btn-navbar, #menubar, #topbar, #footer').removeClass('mobile-hide');
 }
 
-
-function showEditCartModal(isPoppingState) {
+/**
+ * Show the edit cart modal.
+ * @param {string} [editCartUrl] The URL to add to the browser history. If no
+ * URL is provided, then no URL is added to the history.
+ */
+function showEditCartModalAndPushState(editCartUrl) {
     // Remove the body's scrollbar when opening a modal
     $('body').css('overflow', 'hidden');
 
     $('.webstore-modal-cart:first').addClass('show');
     setTimeout(function() { $('.webstore-modal-cart').find('input[autofocus]').focus(); }, 500);
 
-    if (typeof History !== 'undefined' && typeof isPoppingState === 'undefined' || isPoppingState === false) {
-        History.pushState({key:'editcart'}, null,'/editcart');
+    if (typeof History !== 'undefined' && typeof editCartUrl === 'string') {
+        History.pushState({key:'editcart'}, null, editCartUrl);
     }
+
     $('#viewport, .btn-navbar, #menubar, #topbar, #footer').addClass('mobile-hide');
 }
+
+/**
+ * Show the edit cart modal.
+ * @param {boolean} maintainPushState Set this to true to leave the browser
+ * history state unmodified. Defaults to false.
+ * @deprecated This is left in for compatibility with Brooklyn2014 3.2.2
+ * themes. Use showEditCartModalAndPushState instead. This was deprecated in
+ * Web Store 3.2.4 because it uses a hard-coded URL instead of going through
+ * Yii::app()->createUrl.
+ */
+function showEditCartModal(maintainPushState) {
+    // This warning is on purpose: we want to store owners to update their
+    // theme copies.
+    /* globals console:false */
+    console.warn('showEditCartModal is deprecated. Use showEditCartModalAndPushState instead.');
+    var editCartUrl = '/editcart';
+
+    if (maintainPushState === true) {
+        showEditCartModalAndPushState();
+    } else {
+        showEditCartModalAndPushState(editCartUrl);
+    }
+}
+
 
 function showModal() {
     // Remove the body's scrollbar when opening a modal
@@ -132,8 +162,9 @@ $(document).on('click', ".webstore-modal-close, .continue-shopping", function() 
 
 $(document).on('click', ".webstore-change-item", function()  {
     hideModal();
+    var editCartUrl = $(this).data('editcarturl');
     setTimeout(function(){
-        showEditCartModal();
+        showEditCartModalAndPushState(editCartUrl);
     }, 1125);
 });
 
@@ -141,11 +172,19 @@ $(document).on('click', ".webstore-change-item", function()  {
 $(function() {
     if (typeof History !== 'undefined' && typeof History.pushState !== 'undefined') {
 
-        History.Adapter.bind(window, 'statechange', function() {
+        History.Adapter.bind(window, 'statechange', function(e) {
             var State = History.getState();
 
+            // When a user clicks "forward" to the edit cart page, we want to
+            // show the edit cart modal but we do not need to add to the push
+            // state since forward already does that.
+            //
+            // Note that showEditCartModal is actually called twice when the
+            // user clicks on the "Cart" link. The first time with
+            // doPushSate=true, and the second time in this callback when the
+            // push state changes.
             if(State.data.key === 'editcart'){
-                showEditCartModal(true);
+                showEditCartModalAndPushState();
             }
             else {
                 hideModal();

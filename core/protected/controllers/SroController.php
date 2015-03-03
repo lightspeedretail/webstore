@@ -44,7 +44,7 @@ class SroController extends Controller
 
 		$strLink = Yii::app()->getRequest()->getQuery('code');
 		if (empty($strLink))
-			Yii::app()->controller->redirect(_xls_site_url());
+			Yii::app()->controller->redirect(Yii::app()->createUrl('site/index'));
 
 		//Use our class variable which is accessible from the view
 		$model = Sro::model()->findByAttributes(array('linkid'=>$strLink));

@@ -72,7 +72,7 @@ $this->renderPartial('_paypalpayment', array('isPaypalValid' => $model->isPaymen
 								<?=
 								CHtml::ajaxLink(
 									Yii::t('checkout', 'Hide'),
-									'/myaccount/removeaddress',
+									Yii::app()->createUrl('myaccount/removeaddress'),
 									array(
 										'type' => 'POST',
 										'data' => array(

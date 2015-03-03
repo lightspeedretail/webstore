@@ -10,6 +10,10 @@
 function Checkout (options) {
 	this.applyButtonLabel = options.applyButtonLabel || null;
 	this.removeButtonLabel = options.removeButtonLabel || null;
+		
+	this.applyPromoCodeEndpoint = options.applyPromoCodeEndpoint;
+	this.removePromoCodeEndpoint = options.removePromoCodeEndpoint;
+	this.clearCartEndpoint = options.ClearCartEndpoint;
 
 	if (this.applyButtonLabel === null || this.removeButtonLabel === null)	{
 		throw new Error('Translation missing for promo code button');
@@ -68,7 +72,7 @@ Checkout.prototype.ajaxApplyPromoCode = function (cartId, updateCartTotals) {
 	}.bind(this);
 
 	$.ajax({
-		url: '/cart/applypromocodemodal',
+		url: this.applyPromoCodeEndpoint,
 		data: {
 			promoCode: promoCodeValue,
 			updateCartTotals: updateCartTotals
@@ -120,7 +124,7 @@ Checkout.prototype.ajaxRemovePromoCode = function (cartId, updateCartTotals) {
 
 	$.ajax({
 		type: 'POST',
-		url: '/cart/removepromocodemodal',
+		url: this.removePromoCodeEndpoint,
 		dataType: 'json',
 		data: {
 			updateCartTotals: updateCartTotals
@@ -251,7 +255,8 @@ Checkout.prototype.redrawCart = function(shoppingCart, cartId) {
 		$('.promo-code-str').html(shoppingCart.totalDiscountFormatted);
 	}
 
-	// if purchase is below the minimum amount and promo code was applied, clear the promo code
+	// If purchase is below the minimum amount or the last item to which the promo can be applied
+	// has been removed from cart, then clear the promo code.
 	if (shoppingCart.promoCode === null && $('.promocode-apply').hasClass('promocode-applied')) {
 		this.removePromoCode(cartId);
 		$('#' + cartId + '_em_')
@@ -271,7 +276,7 @@ Checkout.prototype.ajaxClearCart = function () {
 	$.ajax({
 		data: null,
 		type: 'POST',
-		url: '/cart/clearcart',
+		url: this.clearCartEndpoint,
 		dataType: 'json',
 		success: function(data) {
 			if (data.action === 'alert') {
@@ -366,7 +371,7 @@ Checkout.prototype.adjustPosition = function() {
  * @param {object[]} options.rates An array of shipping rates.
  */
 function OrderSummary(options) {
-	this.setShippingOptionEndpoint = '/cart/chooseshippingoption';
+	this.setShippingOptionEndpoint = options.setShippingOptionEndpoint;
 	this.$root = $(options.class);
 	this.$shippingProviderId = $('.shipping-provider-id');
 	this.$shippingPriorityLabel = $('.shipping-priority-label');
@@ -562,7 +567,7 @@ PromoCodeInput.prototype.handlePromoCodeChange = function(promoCodeChangePromise
  * Provides JavaScript required to make the edit cart functionality work.
  * @param {object} options The class options.
  * @param {string} options.checkoutUrl The url to go to for the checkout.
- * @param {string} options.updateCartUrl The url to post to for updating the cart.
+ * @param {string} options.updateCartItemEndpoint The url to post to for updating the cart.
  * @param {string} options.csrfToken The Yii cross-site request forgery token.
  * @param {string} options.cartId The ID of cart section in the DOM.
  * @param {string} options.invalidQtyMessage The message to display when the quantity is invalid.
@@ -572,7 +577,7 @@ PromoCodeInput.prototype.handlePromoCodeChange = function(promoCodeChangePromise
  */
 function WsEditCartModal(options) {
 	this.checkoutUrl = options.checkoutUrl || null;
-	this.updateCartUrl = options.updateCartUrl || null;
+	this.updateCartItemEndpoint = options.updateCartItemEndpoint || '';
 	this.csrfToken = options.csrfToken || null;
 	this.cartId = options.cartId || null;
 	this.invalidQtyMessage = options.invalidQtyMessage || null;
@@ -581,7 +586,7 @@ function WsEditCartModal(options) {
 
 	// These options are required.
 	var requiredOptions = [
-		'updateCartUrl', 'csrfToken', 'cartId', 'invalidQtyMessage'
+		'updateCartItemEndpoint', 'csrfToken', 'cartId', 'invalidQtyMessage'
 	];
 
 	requiredOptions.forEach(function (option) {
@@ -638,7 +643,7 @@ WsEditCartModal.prototype.updateCartItemQty = function(cartItemId, qty) {
 	}
 	this.incrementPendingRequests();
 	var returnValue = $.ajax({
-		url: this.updateCartUrl,
+		url: this.updateCartItemEndpoint,
 		type: 'POST',
 		dataType: 'json',
 		data: {

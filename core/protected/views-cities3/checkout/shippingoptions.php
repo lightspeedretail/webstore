@@ -29,9 +29,13 @@
 		echo $model->shippingFirstName . ' ' . $model->shippingLastName . '<br>' . $model->getHtmlShippingAddress();
 		?>
 	</p>
-	<button type="button" class="small" onclick="window.location='<?= Yii::app()->user->IsGuest ? '/checkout/shipping/' : '/checkout/shippingaddress' ?>'">
+	<button type="button" class="small" onclick="window.location='<?= Yii::app()->user->IsGuest ? Yii::app()->createUrl('/checkout/shipping/') : Yii::app()->createUrl('/checkout/shippingaddress')?>'">
+
 		<?php
-			echo CHtml::link(Yii::t('cart','Change Address'), Yii::app()->user->IsGuest ? '/checkout/shipping/' : '/checkout/shippingaddress');
+		echo CHtml::link(
+			Yii::t('cart', 'Change Address'),
+			Yii::app()->user->IsGuest ? Yii::app()->createUrl('checkout/shipping/') : Yii::app()->createUrl('/checkout/shippingaddress')
+		);
 		?>
 	</button>
 </div>
@@ -68,7 +72,8 @@
 
 		$orderSummaryOptions = array(
 			'class' => '.summary',
-			'cartScenarios' => $formattedCartScenarios
+			'cartScenarios' => $formattedCartScenarios,
+			'setShippingOptionsEndpoint' => Yii::app()->createUrl('cart/chooseshippingoption')
 		);
 
 		Yii::app()->clientScript->registerScript(

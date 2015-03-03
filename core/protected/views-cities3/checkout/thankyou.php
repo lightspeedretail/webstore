@@ -5,11 +5,11 @@
 
 		<p class="large">
 			<strong>
-				<?= Yii::t('checkout', 'Order number is:') .' '. $cart->id_str; ?>
+				<?= Yii::t('checkout', 'Order number is:') . ' ' . $cart->id_str; ?>
 			</strong>
 		</p>
 		<p>
-			<?= Yii::t('checkout', 'Your will receive an email confirmation shortly at') .' '.$cart->customer->email ?>
+			<?= Yii::t('checkout', 'You will receive an email confirmation shortly at') . ' ' . $cart->customer->email ?>
 		</p>
 		<p>
 			<?=

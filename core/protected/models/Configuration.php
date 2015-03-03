@@ -400,6 +400,8 @@ return array(
 	 */
 	protected function updateLanguages($lang)
 	{
+		// Remove extraneous spaces from the language string.
+		$lang = str_replace(" ", "", $lang);
 		$arr = explode(",",$lang);
 
 		//If we didn't include our default language as part of our array, add it (first)

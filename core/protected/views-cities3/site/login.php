@@ -42,7 +42,7 @@ if(_xls_facebook_login()): ?>
 			<?php echo $form->error($model,'rememberMe'); ?>
 		</div>
 		<div class="span4" id="create-account" >
-			<a href="/myaccount/edit">Create an Account</a>
+		<a href="<?= Yii::app()->createUrl('/myaccount/edit'); ?>">Create an Account</a>
 		</div>
 	</div>
 

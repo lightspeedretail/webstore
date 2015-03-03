@@ -4,7 +4,7 @@
 	'zii.widgets.CBreadcrumbs',
 	array(
 		'links'=>$this->breadcrumbs,
-		'homeLink'=>CHtml::link(CHtml::image('/images/breadcrumbs_home.png'), array('/site/index')),
+		'homeLink'=>CHtml::link(CHtml::image(Yii::app()->theme->baseUrl . '/css/images/breadcrumbs_home.png'), array('/site/index')),
 		'separator'=>' / ',
 	)
 );	?>

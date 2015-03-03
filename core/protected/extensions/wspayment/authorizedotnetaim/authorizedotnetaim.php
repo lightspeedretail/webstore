@@ -65,7 +65,7 @@ class authorizedotnetaim extends WsPayment
 			"x_invoice_num"         => $this->objCart->id_str,
 			"x_solution_id"         => 'A1000010',
 			"x_cust_id"             => $this->objCart->customer_id,
-			"x_freight"             => $this->objCart->shipping_sell,
+			"x_freight"             => $this->objCart->shippingCharge,
 		);
 
 		if($this->config['ccv'] == '1')

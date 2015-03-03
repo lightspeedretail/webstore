@@ -13,6 +13,7 @@
 			});',
 			CJSON::encode(
 				array(
+					'calculateShippingEndpoint' => Yii::app()->createUrl('cart/ajaxcalculateshipping'),
 					'paymentModulesThatUseCard' => array_keys($model->getAimPaymentMethods()),
 					'paymentModulesThatUseForms' => array_keys($model->getAlternativePaymentMethodsThatUseSubForms()),
 					'shippingProviderId' => CHtml::activeId($model, 'shippingProvider'),

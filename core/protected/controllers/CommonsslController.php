@@ -43,6 +43,7 @@ class CommonsslController extends Controller
 
 		$identity = new SharedIdentity(null, null);
 		$identity->sharedId = $arrItems[0];
+
 		if ($identity->authenticate() && $identity->errorCode === UserIdentity::ERROR_NONE)
 		{
 			Yii::log("Login authentication passed ", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
@@ -51,12 +52,8 @@ class CommonsslController extends Controller
 			Yii::app()->user->setState('cartid', $arrItems[1]);
 			$this->redirect($this->createUrl("/site"));
 		}
-		else
-		{
-			die("error transferring");
-		}
 
-		$this->redirect("http://www.copper.site");
+		die("error transferring");
 	}
 
 
@@ -92,7 +89,7 @@ class CommonsslController extends Controller
 	/**
 	 * Checkout actions land here instead, before progressing
 	 * Still under normal URL at this point
-	 * Pass along cartID, UserID
+	 * Pass along cartID, UserID, linkID
 	 */
 
 	public function actionCheckout()
@@ -103,6 +100,7 @@ class CommonsslController extends Controller
 		$action = Yii::app()->getRequest()->getQuery('action');
 		$orderID = Yii::app()->getRequest()->getQuery('orderId');
 		$errorNote = Yii::app()->getRequest()->getQuery('errorNote');
+		$linkid = Yii::app()->getRequest()->getQuery('linkid');
 
 		if (empty($userID))
 		{
@@ -114,7 +112,7 @@ class CommonsslController extends Controller
 			$action = 'index';
 		}
 
-		$strIdentity = $userID . ',' . $cartID . ',' . $controller . ',' . $action;
+		$strIdentity = $userID . ',' . $cartID . ',' . $controller . ',' . $action . ',' . $linkid;
 		if (isset($orderID) && isset($errorNote))
 		{
 			$strIdentity .= ',' . $orderID . ',' . $errorNote;
@@ -158,15 +156,15 @@ class CommonsslController extends Controller
 		$cartID = $arrItems[1];
 		$controller = $arrItems[2];
 		$action = $arrItems[3];
-		if (isset($arrItems[5]))
+		if (isset($arrItems[6]))
 		{
-			$arrParams['orderId'] = $arrItems[4];
-			$arrParams['errorNote'] = $arrItems[5];
+			$arrParams['orderId'] = $arrItems[5];
+			$arrParams['errorNote'] = $arrItems[6];
 		}
 
 		elseif (isset($arrItems[4]))
 		{
-			$arrParams['getuid'] = $arrItems[4];
+			$arrParams['linkid'] = $arrItems[4];
 		}
 
 		//If our session was previously logged in on this side of SSL, we overwrite, otherwise log out

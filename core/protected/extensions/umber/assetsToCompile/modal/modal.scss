@@ -1,0 +1,108 @@
+@import "../mixins/arrows";
+@import "../mixins/borders";
+@import "../mixins/flexbox";
+@import "../mixins/transitions";
+@import "../mixins/animations";
+@import "../lib/normalize";
+@import "override_legacy";
+@import "browsers_unistyle";
+@import "config";
+@import 'icons';
+
+#modal-trigger {
+  position: absolute;
+  right: 30px;
+  top: 20px;
+  padding: 10px 20px;
+  color: #fff;
+  font: .875rem $webstore-modal-font;
+  z-index: 1;
+
+  background-color: #999;
+  text-transform: uppercase;
+  &:hover { cursor: pointer; }
+}
+
+#wrapper {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+@import 'basic_modal';
+@import 'modal_overlay_shared';
+@import 'overlay';
+@import 'cart';
+@import 'cartadd';
+@import 'wishlist';
+@import 'promo';
+@import '_tooltip';
+@import 'estimator';
+@import 'animations';
+@import 'spinner';
+@import 'checkout';
+@import 'overview';
+@import 'lines';
+@import 'wishlist_view';
+
+@import 'print';
+
+main.verification {
+  padding: 1px $modal-padding;
+
+  p {
+	font-size: 1.125rem;
+	line-height: 1.5;
+	color: #666;
+  }
+  strong {
+	color: $calltoaction-color;
+  }
+}
+.webstore-overlay{
+  @media (max-width: 640px){
+	//MO hack for input zoom bug ios. http://www.ampedupdesigns.com/blog/show?bid=53
+	//Do not override without finding an alternate solution.
+	input[type="text"], input[type="password"], input[type="phone"], input[type="email"],
+	input[type="tel"], textarea, .field-container-toggle a, .field-container-select select{
+	  font-size: 16px !important;  }
+	}
+}
+
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Open Sans Light'), local('OpenSans-Light'), url('//themes.googleusercontent.com/static/fonts/opensans/v6/DXI1ORHCpsQm3Vp6mXoaTXhCUOGz7vYGh680lGh-uXM.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans'), local('OpenSans'), url('//themes.googleusercontent.com/static/fonts/opensans/v8/cJZKeOuBrn4kERxqtaUH3bO3LdcAZYWl9Si6vvxL-qU.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Open Sans Semibold'), local('OpenSans-Semibold'), url('//themes.googleusercontent.com/static/fonts/opensans/v8/MTP_ySUJH_bn48VBG8sNSqRDOzjiPcYnFooOUGCOsRk.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans'), local('OpenSans'), url('//themes.googleusercontent.com/static/fonts/opensans/v6/cJZKeOuBrn4kERxqtaUH3T8E0i7KZn-EPnyo3HZu7kw.woff') format('woff');
+}
+
+
+th{
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, sans-serif;
+  font-weight: bold;
+}
+
+//MO temporary
+@import '../customized/brooklyn2014';

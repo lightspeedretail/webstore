@@ -10,12 +10,12 @@
  * estimator and tooltip showing the shipping options.
  */
 function ConfirmationShippingEstimator(options) {
-	this.getShippingRatesEndpoint = '/cart/getshippingrates';
-	this.setShippingOptionEndpoint = '/cart/chooseshippingoption';
 
 	// Options from the invoking code.
 	options = options || {};
 	this.class = options.class || null;
+	this.getShippingRatesEndpoint = options.getShippingRatesEndpoint || '';
+	this.setShippingOptionEndpoint = options.setShippingOptionsEndpoint || '';
 	this.shippingOptions = options.shippingOptions || null;
 	this.selectedProviderId = options.selectedProviderId || null;
 	this.selectedPriorityLabel = options.selectedPriorityLabel || null;

@@ -79,7 +79,7 @@ $count = count($simModules);
 								<?php
 								echo CHtml::ajaxLink(
 									Yii::t('checkout', 'Hide'),
-									'/myaccount/removeaddress',
+									Yii::app()->createUrl('myaccount/removeaddress'),
 									array(
 										'type' => 'POST',
 										'data' => array(

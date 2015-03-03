@@ -182,7 +182,7 @@
 							if (Yii::app()->params['ENABLE_SSL'] == 1)
 							{
 								echo CHtml::image(
-									'/images/lock.png',
+									Yii::app()->params['umber_assets'] . '/images/lock.png',
 									'lock image ',
 									array(
 										'height' => 14

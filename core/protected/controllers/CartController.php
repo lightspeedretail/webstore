@@ -166,7 +166,7 @@ class CartController extends Controller
 			);
 		}
 
-		$this->redirect(array('/cart'));
+		$this->redirect(Yii::app()->createUrl('cart'));
 	}
 
 	/**
@@ -195,7 +195,7 @@ class CartController extends Controller
 		$strLink = Yii::app()->getRequest()->getQuery('getuid');
 		if (empty($strLink))
 		{
-			Yii::app()->controller->redirect(_xls_site_url());
+			Yii::app()->controller->redirect(Yii::app()->createUrl('site/index'));
 		}
 
 		//Use our class variable which is accessible from the view
@@ -211,10 +211,8 @@ class CartController extends Controller
 
 		if (Yii::app()->theme->info->advancedCheckout === true)
 		{
-			// For the thankyou page, we don't want to go through createUrl
-			// since generally speaking /checkout routes are passed through
-			// commonssl. We don't want to do that here. See WS-3285.
-			$this->redirect('/checkout/thankyou/' . $strLink);
+			$url = Yii::app()->createUrl('checkout/thankyou', array('linkid' => $strLink));
+			$this->redirect($url);
 		}
 
 		// If we have a document that supersedes our cart, then let's copy some
@@ -260,7 +258,7 @@ class CartController extends Controller
 		$strLink = Yii::app()->getRequest()->getQuery('code');
 		if (empty($strLink))
 		{
-			Yii::app()->controller->redirect(_xls_site_url());
+			Yii::app()->controller->redirect(Yii::app()->createUrl('site/index'));
 		}
 
 		//Use our class variable which is accessible from the view
@@ -277,11 +275,11 @@ class CartController extends Controller
 
 			Yii::app()->user->setFlash('success', Yii::t('cart', 'The shared cart items have been added to your cart.'));
 			//And go to cart view
-			Yii::app()->controller->redirect(array('/cart'));
+			Yii::app()->controller->redirect(Yii::app()->createUrl('cart'));
 		} else {
 			Yii::app()->user->setFlash('error', Yii::t('cart', 'Cart not found or has already been checked out.'));
 			//Go to home page
-			Yii::app()->controller->redirect(_xls_site_url());
+			Yii::app()->controller->redirect(Yii::app()->createUrl('site/index'));
 		}
 	}
 
@@ -293,13 +291,13 @@ class CartController extends Controller
 		$strLink = Yii::app()->getRequest()->getQuery('code');
 		if (empty($strLink))
 		{
-			Yii::app()->controller->redirect(_xls_site_url());
+			Yii::app()->controller->redirect(Yii::app()->createUrl('site/index'));
 		}
 
 		if (Yii::app()->shoppingcart->totalItemCount > 0)
 		{
 			Yii::app()->user->setFlash('error', Yii::t('cart', 'You have items in your cart already. A quote cannot be merged with an existing shopping cart. Please complete your checkout or clear your cart and try again.'));
-			Yii::app()->controller->redirect(_xls_site_url());
+			Yii::app()->controller->redirect(Yii::app()->createUrl('site/index'));
 			return;
 		}
 
@@ -334,11 +332,11 @@ class CartController extends Controller
 			}
 
 			//And go to cart view
-			Yii::app()->controller->redirect(array('/cart'));
+			Yii::app()->controller->redirect(Yii::app()->createUrl('cart'));
 		} else {
 			Yii::app()->user->setFlash('error', Yii::t('cart', 'Quote not found.'));
 			//Go to home page
-			Yii::app()->controller->redirect(_xls_site_url());
+			Yii::app()->controller->redirect(Yii::app()->createUrl('site/index'));
 		}
 	}
 
@@ -381,7 +379,8 @@ class CartController extends Controller
 
 		if (empty($strLink))
 		{
-			Yii::app()->controller->redirect(_xls_site_url());
+		    $url = Yii::app()->createAbsoluteUrl('site/index');
+			Yii::app()->controller->redirect($url);
 		}
 
 		//Use our class variable which is accessible from the view
@@ -446,11 +445,11 @@ class CartController extends Controller
 				}
 
 				//And go back to checkout
-				Yii::app()->controller->redirect(array('cart/checkout'));
+				Yii::app()->controller->redirect(Yii::app()->createUrl('cart/checkout'));
 			}
 
 			//In all other cases, just go home
-			Yii::app()->controller->redirect(array('/site'));
+			Yii::app()->controller->redirect(Yii::app()->createUrl('site/index'));
 		} else {
 			self::redirectToReceipt($strLink);
 		}
@@ -1108,9 +1107,10 @@ class CartController extends Controller
 					{
 						//somehow we're logged in without a valid Customer object
 						Yii::app()->user->logout();
-						$this->redirect(array("/site"));
-
+						$url = Yii::app()->createUrl('site/index');
+						$this->redirect($url);
 					}
+
 					$model->contactFirstName = $objCustomer->first_name;
 					$model->contactLastName = $objCustomer->last_name;
 					$model->contactPhone = $objCustomer->mainphone;
@@ -2062,6 +2062,10 @@ class CartController extends Controller
 		// Save to session.
 		Shipping::saveCartScenariosToSession($arrCartScenario);
 		MultiCheckoutForm::saveToSession($checkoutForm);
+
+		// Save to the database.
+		$objShipping = CartShipping::getOrCreateCartShipping();
+		$objShipping->updateShipping();
 
 		return $this->renderJSON(
 			array(

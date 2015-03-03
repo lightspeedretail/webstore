@@ -1,0 +1,153 @@
+.footer {
+	background-color: #eee;
+	color: #777;
+	font-size: .875rem;
+
+	h3 {
+		text-transform: uppercase;
+		color: #888;
+		font-size: .875rem;
+		margin: 0;
+		font-weight: 600;
+		margin-bottom: .5rem;
+	}
+	p, ol, ul {
+		margin: 0;
+	}
+}
+.footer-section {
+	@include clearfix();
+}
+
+.footer-primary {
+	padding: 30px 0;
+
+	article {
+		width: 20.6%;
+		margin: 1% 0 1% 2.6%;
+		float: left;
+		word-wrap: break-word;
+
+		p { margin-bottom: 1.25rem;}
+		&:first-child {
+			margin-left: 0;
+		}
+		&.about {
+			width: 34%;
+		}
+		&.nav {
+			width: 17%;
+		}
+		&.vcard {
+			table.hours {
+					th {
+						text-align: right;
+						padding-right: .5rem;
+					}
+			}
+		}
+		&.contact {
+			.phone {
+				font-size: 1.9rem;
+				margin-bottom: 0;
+				}
+			.email {
+					margin-bottom: 0;
+			}
+		}
+	}
+	&:last-child {
+		margin-right: 0;
+	}
+}
+.footer-secondary {
+	border-top: 1px solid #ccc;
+	margin-top: 30px;
+	padding: 15px 0;
+	color: #999;
+	font-size: .75rem;
+
+	p, .paymentmethods { float: left; }
+
+	.paymentmethods {
+		padding: 0;
+		float: right;
+
+		li { display: inline-block; }
+	}
+}
+
+.footer {
+	.page-collection {
+		font-size: .75rem;
+
+		ul {
+			list-style: none;
+			padding: 0;
+		}
+	}
+
+	.newsletter {
+		form {
+			position: relative;
+			max-width: 300px;
+		}
+
+		input {
+			box-sizing: border-box;
+			width: 100%;
+			border: 1px solid #999;
+			background: #fff;
+			padding: 10px 95px 10px 10px;
+		}
+		button {
+			font-size: .75rem;
+			text-transform: uppercase;
+			height: 40px;
+			background-color: #555;
+			padding: 0 10px;
+			border: none;
+			color: #fff;
+			position: absolute;
+			top: 1px;
+			right: 0;
+
+			&:hover { background: #666; }
+		}
+	}
+
+	.social {
+		margin-top: .5rem;
+
+ 		a {
+			font-size: 0;
+
+			&:after {
+				font-size: 1.8rem;
+				margin-right: 2px;
+			}
+
+			&.facebook:after { content: '\f082'; }
+			&.twitter:after { content: '\f081'; }
+			&.googleplus:after { content: '\f0d4'; }
+			&.instagram:after { content: '\f16d'; }
+			&.pinterest:after { content: '\f0d3'; }
+			&.linkedin:after { content: '\f08c'; }
+		}
+	}
+
+	.paymentmethods {
+		margin-top: -10px;
+		position: relative;
+		li {
+			display: inline-block;
+			background-color: #333;
+			width: 45px;
+			height: 25px;
+    		/* Hide the text. */
+			text-indent: 100%;
+			white-space: nowrap;
+			overflow: hidden;
+		}
+	}
+}

@@ -96,7 +96,7 @@ class CartShipping extends BaseCartShipping
 		}
 
 		Yii::app()->shoppingcart->shipping_id = $this->id;
-		Yii::app()->shoppingcart->save();
+		Yii::app()->shoppingcart->recalculateAndSave();
 		return true;
 	}
 

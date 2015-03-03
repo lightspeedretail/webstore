@@ -16,7 +16,12 @@
 
 	// If we are coming from the EditcartController, then open the edit cart modal
 	if (isset($_GET['editcart']) && $_GET['editcart'] === 'true') {
-		Yii::app()->clientScript->registerScript('showEditCartModal', 'showEditCartModal();',CClientScript::POS_END);
+		$editCartUrl = CJSON::encode(Yii::app()->createUrl('editcart'));
+		Yii::app()->clientScript->registerScript(
+			'showEditCartModal',
+			'showEditCartModal(' . $editCartUrl . ');',
+			CClientScript::POS_END
+		);
 	}
 	?>
 

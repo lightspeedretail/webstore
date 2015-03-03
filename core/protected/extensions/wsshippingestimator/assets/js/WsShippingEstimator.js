@@ -6,8 +6,6 @@
  * estimator and tooltip showing the shipping options.
  */
 function WsShippingEstimator(options) {
-	this.getShippingRatesEndpoint = '/cart/getshippingrates';
-	this.setShippingOptionEndpoint = '/cart/chooseshippingoption';
 
 	// Options from the invoking code.
 	options = options || {};
@@ -22,6 +20,8 @@ function WsShippingEstimator(options) {
 	this.shippingStateCode = options.shippingStateCode || null;
 	this.messages = options.messages || null;
 	this.updateOnLoad = options.updateOnLoad || false;
+	this.getShippingRatesEndpoint = options.getShippingRatesEndpoint || '';
+	this.setShippingOptionEndpoint = options.setShippingOptionEndpoint || '';
 
 	if (typeof this.class !== 'string') {
 		throw new Error('Must provide a string value for the class option.');

@@ -1,0 +1,13 @@
+@mixin transition-property($val) {
+  -webkit-transition-property: $val;
+  -moz-transition-property: $val;
+  -o-transition-property: $val;
+  transition-property: $val;
+}
+
+@mixin transition-duration($val) {
+  -webkit-transition-duration: $val;
+  -moz-transition-duration: $val;
+  -o-transition-duration: $val;
+  transition-duration: $val;
+}

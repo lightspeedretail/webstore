@@ -6,7 +6,7 @@
 	<?php
 	$this->registerAsset('css/admin.css');
 	// we prefix with baseUrl to handle instances where Web Store is installed in a sub folder
-	$strHeaderImageUrl = Yii::app()->baseUrl . '/images/webstore-logo2x.png';
+	$strHeaderImageUrl = Yii::app()->params['admin_assets'] . '/img/webstore-logo2x.png';
 	?>
 	<style type="text/css">
 		.container { width: 338px; }

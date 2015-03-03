@@ -1,0 +1,40 @@
+.animated {
+  @include animation-duration(0.5s);
+  @include animation-fill-mode(both);
+}
+
+.animated.infinite {
+  @include animation-iteration-count(infinite);
+}
+
+@-webkit-keyframes shake {
+  0%, 100% {
+    @include transform(translateX(0));
+  }
+
+  20%, 60% {
+    @include transform(translateX(-5px));
+  }
+
+  40%, 80% {
+    @include transform(translateX(5px));
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    @include transform(translateX(0));
+  }
+
+  20%, 60%  {
+    @include transform(translateX(-5px));
+  }
+
+  40%, 80% {
+    @include transform(translateX(5px));
+  }
+}
+
+.shake {
+  @include animation-name(shake);
+}

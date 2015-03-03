@@ -39,8 +39,8 @@ class wseditcartmodal extends wsmodal
 				});',
 				CJSON::encode(
 					array(
-						'checkoutUrl' => Yii::app()->controller->createUrl('/checkout'),
-						'updateCartUrl' => Yii::app()->createUrl('/cart/updatecartitem'),
+						'checkoutUrl' => Yii::app()->createUrl('checkout'),
+						'updateCartItemEndpoint' => Yii::app()->createUrl('cart/updatecartitem'),
 						'csrfToken' => Yii::app()->request->csrfToken,
 						'cartId' => CHtml::activeId('EditCart', 'promoCode'),
 						'invalidQtyMessage' => Yii::t(

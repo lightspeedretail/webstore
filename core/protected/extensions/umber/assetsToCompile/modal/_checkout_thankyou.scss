@@ -1,0 +1,205 @@
+#thankyou {
+  .section-content {
+	width: inherit; //MO fix for IE10 order summary.
+	border-right: none;
+  }
+
+
+}
+$check-width: 3.25rem;
+
+.thankyou {
+  padding-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #ccc;
+
+  h1 {
+	font-size: 1.75rem;
+	margin: .25em 0 .75em;
+	@include media(small){
+	  font-size: 2.25rem;
+	}
+  }
+
+
+  h2, h3, p, .create-account ol {
+	margin-left: 0;
+  }
+
+  @include media(small){
+	h2, h3, p, .create-account ol{
+	  margin-left: $check-width;
+	}
+  }
+
+
+  h2 {
+	font-weight: normal;
+	font-size: 1.3rem;
+	color: $confirmation-color;
+	margin: -.25em 0 .25em;
+	@include media(small){
+	  font-size: 1.5rem;
+	}
+
+	&:before {
+	  margin-top: .35rem;
+	  padding-left: .25rem;
+	  margin-right: -.6rem;
+	  float: left;
+	  width: $check-width;
+	  font-size: 1.85rem;
+	  @include media(small){
+		margin-top: -.125rem;
+		padding-left: .25rem;
+		margin-right: -.25rem;
+		font-size: 2.5rem;
+	  }
+
+
+
+	  @extend %icon-prereqs;
+	  @extend %icon-check-mark;
+	}
+  }
+
+  h3 {
+	margin-bottom: .125em;
+	font-size: 1rem;
+	color: #444;
+	font-weight: normal;
+  }
+  p {
+	color: #999;
+	font-size: .8375rem;
+	margin-top: 0;
+	margin-bottom: .5em;
+
+	&.large {
+	  font-size: 1.125rem;
+	  color: #444;
+	  margin-bottom: .25rem;
+
+
+	}
+
+
+  }
+
+  a.print {
+	font-size: .8125rem;
+	margin-bottom: 1em;
+	margin-top: .5em;
+	border: 1px solid #ddd;
+	color: #888;
+	padding: 10px 12px;
+	display: inline-block;
+
+	&:before {
+	  @extend %icon-prereqs;
+	  @extend %icon-print;
+
+	  float: left;
+	  margin-top: 1px;
+	  font-size: 18px;
+	  margin-right: 6px;
+	}
+
+	&:hover, &:active {
+	  color: $calltoaction-color;
+	  border-color: $calltoaction-color;
+	}
+  }
+
+}
+.create-account {
+  @extend %clearfix;
+
+  li {
+	&:last-child{
+	  clear: both;
+	  margin-top: 0.75em;
+	  @include media(small){
+		clear: none;
+		margin-top: 0;
+	  }
+	}
+	@include media(verysmall){
+	  float: left;
+	  margin-right: .5rem;
+	}
+  }
+  input {
+	border: $input-border;
+	padding: 10px;
+	font-size: .8375rem;
+	width: 12em;
+	//MO to override style.css l.24.
+	&:focus{
+	  padding: 10px;
+	  font-size: .8375rem;
+	}
+  }
+  button {
+	font-size: .8375rem;
+	padding: 11px 10px;
+	color: #666;
+	background-color: #eee;
+	// border: 1px solid #ccc;
+
+	&:hover {
+	  color: #fff;
+	}
+  }
+  .hint {
+	margin: .5em 0 0;
+	font-size: .675rem;
+	color: #999;
+  }
+}
+.create-account-confirm {
+  margin-left: $check-width;
+  font-size: 1rem;
+  padding: 12px;
+  color: #999;
+  border: 1px solid #ccc;
+  max-width: 24rem;
+
+  h3, p { margin: 0; }
+  h3 { font-weight:bold; }
+}
+
+.receipt {
+  h2 {
+	font-size: 1.3rem;
+	margin: 0 0 -.5em;
+	@include media(small) {
+	  font-size: 1.5rem;
+	}
+
+	.order-id {
+	  border: 1px solid #ddd;
+	  float: right;
+	  padding: 6px 10px;
+	  margin-bottom: -1rem;
+	  font-size: 1rem;
+	  text-transform: uppercase;
+	  color: #bbb;
+	  font-weight: normal;
+	  line-height: normal; //MO override bootstrap
+
+	  strong { color: #555; }
+
+	  @include media(smallermobile) {
+		width: 100%;
+		text-align: center;
+		margin: 10px 0;
+	  }
+	}
+  }
+}
+
+//MO override
+.create-account p.form-error {
+  width: 20rem;
+}

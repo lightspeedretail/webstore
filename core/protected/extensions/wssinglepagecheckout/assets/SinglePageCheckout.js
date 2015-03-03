@@ -7,6 +7,8 @@
  * @class
  *
  * @param {Object} options
+ * @param {string} options.calculateShippingEndPoint The endpoint for the
+ *        calculate shipping ajax call
  * @param {number[]} options.paymentModulesThatUseCard An array of payment
  *        module IDs that require display of the credit card form.
  * @param {number[]} options.paymentModulesThatUseForms An array of payment
@@ -56,6 +58,7 @@
  *        chosen shipping priority.
  */
 var SinglePageCheckout = function (options) {
+	this.calculateShippingEndpoint = options.calculateShippingEndpoint;
 	this.paymentModulesThatUseCard = options.paymentModulesThatUseCard;
 	this.paymentModulesThatUseForms = options.paymentModulesThatUseForms;
 
@@ -131,7 +134,7 @@ SinglePageCheckout.prototype.calculateShipping = function () {
 		$(document).off('ajaxStop');
 
 		$.post(
-			'/cart/ajaxcalculateshipping',
+			this.calculateShippingEndpoint,
 			$('#checkout').serialize(),
 			this.handleCalculateShippingResponse.bind(this)
 		);

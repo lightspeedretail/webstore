@@ -109,7 +109,7 @@ class Controller extends CController
 			//We should never see this, this means our cloud cache file is bad
 			$strHostfile = realpath(dirname(__FILE__)).'/../../../config/cloud/'.$_SERVER['HTTP_HOST'].".php";
 			@unlink($strHostfile);
-			Yii::app()->request->redirect('/');
+			Yii::app()->request->redirect(Yii::app()->createUrl('site/index'));
 		}
 
 
@@ -133,7 +133,7 @@ class Controller extends CController
 			if(!downloadTheme(DEFAULT_THEME))
 				die("missing ".DEFAULT_THEME);
 			else
-				$this->redirect("/");
+				$this->redirect(Yii::app()->createUrl("site/index"));
 		}
 		if(!Yii::app()->theme)
 		{
@@ -147,7 +147,7 @@ class Controller extends CController
 					'error',
 					'application.' . __CLASS__ . "." . __FUNCTION__
 				);
-				$this->redirect("/");
+				$this->redirect(Yii::app()->createUrl('site/index'));
 
 			} else
 				die("you have no theme set");
@@ -456,14 +456,14 @@ class Controller extends CController
 				{
 					//we've lost our authentication, user may have revoked
 					Yii::app()->facebook->destroySession();
-					$this->redirect(array("/site"));
+					$this->redirect(Yii::app()->createUrl("site/index"));
 				}
 				$identity=new FBIdentity($results['email'],$userid); //we user userid in the password field
 				$identity->authenticate();
 				if($identity->errorCode===UserIdentity::ERROR_NONE)
 				{
 					Yii::app()->user->login($identity,0);
-					$this->redirect(array("/site"));
+					$this->redirect(Yii::app()->createUrl("site/index"));
 				}
 			}
 		}

@@ -1,7 +1,7 @@
 <script>
 	$(function() {
 		$("#topbar-cart-text").on('click', function(e) {
-			showEditCartModal();
+			showEditCartModal(<?= CJSON::encode(Yii::app()->createUrl('editcart')) ?>);
 			//prevents default link behavior that causes the cart modal to be called twice
 			e.preventDefault();
 		});
@@ -12,14 +12,14 @@
 	<div class="span9">
 	<!-- template header -->
 		<div id="headerimage" class="logo">
-			<?php echo CHtml::link(CHtml::image($this->pageHeaderImage, 'web store header image'),$this->createUrl("site/index")); ?>
+			<?php echo CHtml::link(CHtml::image($this->pageHeaderImage, 'web store header image'), $this->createUrl("site/index")); ?>
 		</div>
 
 		<ul>
 			<!-- Cart -->
 			<?php if (Yii::app()->params['DISABLE_CART'] == false): ?>
 			<li>
-				<a id="topbar-cart-text" href=""><em id="em"></em><?php echo Yii::t('cart','Cart'); ?></em></a>
+				<a id="topbar-cart-text" href=""><em id="em"></em><?php echo Yii::t('cart', 'Cart'); ?></em></a>
 				<small id="topbar-cart-number" >
 						<span id="cartItemsTotal">
 							<?php
@@ -55,7 +55,7 @@
 		</ul>
 </div>
 	<div class="span3">
-		<?php if(_xls_get_conf('LANG_MENU',0)): ?>
+		<?php if(_xls_get_conf('LANG_MENU', 0)): ?>
 			<div class="langmenu">
 				<?php $this->widget('application.extensions.'._xls_get_conf('PROCESSOR_LANGMENU').'.'._xls_get_conf('PROCESSOR_LANGMENU')); ?>
 				</div>

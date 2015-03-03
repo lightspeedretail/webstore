@@ -20,22 +20,6 @@ class MyaccountController extends Controller
 	public $giftRegistries;
 	public $repairs;
 
-	public function beforeAction($action)
-	{
-//		if (_xls_get_conf('ENABLE_SSL')==1)
-//		{
-//			if(Yii::app()->isCommonSSL)
-//				$this->verifyCommonSSL();
-//
-//			if(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on') {
-//				$this->redirect(Yii::app()->createAbsoluteUrl('myaccount/'.$action->Id,array(),'https'));
-//				Yii::app()->end();
-//			}
-//		}
-
-		return parent::beforeAction($action);
-	}
-
 	public function actionIndex()
 	{
 

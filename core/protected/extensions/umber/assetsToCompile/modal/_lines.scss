@@ -1,0 +1,143 @@
+.webstore-lines {
+	tbody {
+		border-bottom: 1px solid #ddd;
+	}
+
+	td {
+		border-top: 1px solid #ddd;
+		line-height: 40px;
+	}
+
+	.quantity {
+		font-weight: bold;
+		text-align: center;
+		padding: 0;
+		line-height: 4rem;
+		min-width: 1.75rem;
+
+		input {
+			display: none;
+			width: 1.75rem;
+			padding: 3px 3px;
+			text-align: center;
+			font-weight: bold;
+
+			&::-webkit-inner-spin-button, &::-webkit-outer-spin-button {
+				-webkit-appearance: none;
+				margin: 0;
+			}
+            -moz-appearance:textfield;
+		}
+	}
+
+	.image {
+		white-space: nowrap;
+		width: 65px;
+
+		&:before {
+			display: inline-block;
+			padding: 0 .5em 0 0;
+			height: 40px;
+			font-weight: normal;
+			font-size: 1.25rem;
+			content: '\d7';
+			float: left;
+		}
+
+		img {
+			float: left;
+			max-height: 40px;
+			max-width: 40px;
+		}
+	}
+
+	.description {
+		line-height: 1.3;
+		font-size: .875rem;
+		padding-right: .5em;
+		padding-left: .5em;
+		font-weight: bold;
+
+		.price {
+			font-weight: normal;
+			font-size: .8375em;
+			color: #888;
+		}
+	}
+
+	.subtotal {
+		text-align: right;
+		font-weight: bold;
+	}
+
+	.controls {
+		padding-left: 1em;
+		text-transform: uppercase;
+		font-size: .75rem;
+		width: 2.5rem;
+
+		a { float: right; }
+	}
+	a.edit {
+		line-height: 1;
+		padding: 6px 4px 5px;
+		border: 1px solid #ccc;
+		color: #aaa;
+
+		&:hover {
+			color: $blue;
+			border-color: $blue;
+		}
+	}
+	a.remove {
+		@extend %remove-icon;
+		display: none;
+	}
+
+
+	tr.active {
+		.quantity {
+			strong { display: none; }
+			input { display: inline-block; }
+		}
+		.controls {
+			a.edit { display: none; }
+			a.remove { display: block; }
+		}
+	}
+}
+
+.lines-footer { @extend %clearfix; }
+
+.webstore-lines-totals {
+	margin-top: .5rem;
+	float: right;
+	max-width: 16rem;
+
+	td, th {
+		color: #666;
+		line-height: 1.75rem;
+		font-size: 1rem;
+	}
+	small {
+		font-size: .75rem;
+		color: #999;
+		font-weight: normal;
+	}
+	td {
+		text-align: right;
+		border-top: none;
+		line-height: 1;
+	}
+
+	.total {
+		td, th {
+			color: #333;
+			font-size: 1.25rem;
+			line-height: 1.5em;
+
+		}
+		td { font-weight: bold;}
+
+	}
+}

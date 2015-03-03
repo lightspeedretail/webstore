@@ -19,7 +19,7 @@
 								'cart',
 								'Change'
 							),
-							array('class' => 'webstore-change-item', 'id'=>'change-item-btn')
+							array('class' => 'webstore-change-item', 'id' => 'change-item-btn', 'data-editcarturl' => Yii::app()->createUrl('editcart'))
 						);
 					?>
 					</div>
