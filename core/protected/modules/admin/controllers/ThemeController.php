@@ -106,11 +106,11 @@ class ThemeController extends AdminBaseController
 
 			}
 
-			if (isset($_POST['yt1']) && $_POST['yt1']=="btnCopy")
+			if ((isset($_POST['yt1']) && $_POST['yt1'] == "btnCopy") ||
+			(isset($_POST['task']) && $_POST['task'] === "btnCopy"))
 			{
 				$arrThemes = $this->changeTheme($_POST);
 				$arrThemes = $this->copyThemeForCustomization($_POST);
-
 			}
 
 			if (isset($_POST['yt0']) && $_POST['yt0']=="btnSet")

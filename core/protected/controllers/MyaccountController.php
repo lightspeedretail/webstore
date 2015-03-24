@@ -49,77 +49,87 @@ class MyaccountController extends Controller
 		{
 			//For current customers
 			$model = Customer::GetCurrent();
-
 		}
 
 		// collect user input data
-		if(isset($_POST['Customer']))
+		if (isset($_POST['Customer']))
 		{
 			if (is_null($model->id))
 			{
 				$model->scenario = Customer::SCENARIO_INSERT;
 			}
-			else $model->scenario = Customer::SCENARIO_UPDATE;
+			else
+			{
+				$model->scenario = Customer::SCENARIO_UPDATE;
+			}
 
 			$strPassword = $_POST['Customer']['password'];
+
 			if (empty($strPassword) && isset($_POST['Customer']['password']))
 			{
 				unset($_POST['Customer']['password']);
 				if (empty($strPassword) && isset($_POST['Customer']['password_repeat']))
+				{
 					unset($_POST['Customer']['password_repeat']);
+				}
 			}
-			elseif ($model->scenario == Customer::SCENARIO_UPDATE) $model->scenario = Customer::SCENARIO_UPDATEPASSWORD;
+			elseif ($model->scenario == Customer::SCENARIO_UPDATE)
+			{
+				$model->scenario = Customer::SCENARIO_UPDATEPASSWORD;
+			}
 
-			$model->attributes=$_POST['Customer'];
+			$model->attributes = $_POST['Customer'];
 
-			if($model->validate())
+			if ($model->validate())
 			{
 				//If we haven't created a new password, retain the old one -- need repeat to pass validation
-				if ($model->scenario== Customer::SCENARIO_INSERT || $model->scenario== Customer::SCENARIO_UPDATEPASSWORD)
+				if ($model->scenario == Customer::SCENARIO_INSERT || $model->scenario == Customer::SCENARIO_UPDATEPASSWORD)
 				{
-					//$model->password = _xls_encrypt($strPassword);
 					$model->password = $strPassword;
 					$model->password_repeat = $model->password;
 				}
 
-				if ($model->scenario== Customer::SCENARIO_INSERT && _xls_get_conf('MODERATE_REGISTRATION')==1)
+				if ($model->scenario == Customer::SCENARIO_INSERT && _xls_get_conf('MODERATE_REGISTRATION') == 1)
 				{
 					$model->allow_login = Customer::UNAPPROVED_USER;
 					$model->record_type = Customer::REGISTERED;
 				}
-				elseif ($model->scenario== Customer::SCENARIO_INSERT)
+				elseif ($model->scenario == Customer::SCENARIO_INSERT)
 				{
 					$model->allow_login = Customer::NORMAL_USER;
 					$model->record_type = Customer::REGISTERED;
 				}
+
 				if (!$model->save())
 				{
 					//Put plain text passwords back for form refresh
 					$model->password = $strPassword;
 					$model->password_repeat = $strPassword;
-					Yii::log("Error creating new user ".print_r($model->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+					Yii::log("Error creating new user ".print_r($model->getErrors(), true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				}
 				else
 				{
-
 					if (Yii::app()->user->isGuest)
-						$this->createAndLogin($model,$strPassword);
+					{
+						$this->createAndLogin($model, $strPassword);
+					}
 					else
-						$this->triggerEmailCampaign($model,'onUpdateCustomer');
+					{
+						$this->triggerEmailCampaign($model, 'onUpdateCustomer');
+					}
 
 					$this->redirect($this->createUrl("/myaccount"));
 				}
-
 			}
 		}
 
 		$this->breadcrumbs = array(
-			Yii::t('global','My Account')=>$this->createUrl("/myaccount"),
-			Yii::t('global','Edit Account')=>$this->createUrl("myaccount/edit"),
+			Yii::t('global', 'My Account') => $this->createUrl("/myaccount"),
+			Yii::t('global', 'Edit Account') => $this->createUrl("myaccount/edit"),
 		);
 
 		$model->password = null; //don't bother sending password to form
-		$this->render('edit',array('model'=>$model));
+		$this->render('edit', array('model' => $model));
 	}
 
 	/**
@@ -281,7 +291,7 @@ class MyaccountController extends Controller
 	 */
 	protected function createAndLogin($model,$strPassword)
 	{
-		if(Yii::app()->params['MODERATE_REGISTRATION']==1)
+		if (Yii::app()->params['MODERATE_REGISTRATION'] == 1)
 		{
 
 			$this->triggerEmailCampaign($model,'onAddCustomer');
@@ -292,34 +302,39 @@ class MyaccountController extends Controller
 		}
 
 		//We've successfully created the account, so just log in
-		$loginModel=new LoginForm;
-		$loginModel->email=$model->email;
-		$loginModel->password=$strPassword;
+		$loginModel = new LoginForm;
+		$loginModel->email = $model->email;
+		$loginModel->password = $strPassword;
 		// validate user input and redirect to the previous page if valid
-		if($loginModel->validate() && $loginModel->login())
+		if ($loginModel->validate() && $loginModel->login())
 		{
 			Yii::app()->user->setFlash('success',
 				Yii::t('customer','Your account has been created and you have been logged in automatically.'));
 		}
 		else
 		{
-			Yii::log("Error logging in our newly created user ".print_r($loginModel->getErrors(),true),
-				'error', 'application.'.__CLASS__.".".__FUNCTION__);
-			Yii::app()->user->setFlash('error',
-				Yii::t('customer','Your account has been created but we had an error logging you in.'));
+			Yii::log(
+				"Error logging in our newly created user " . print_r($loginModel->getErrors(), true),
+				'error',
+				'application.'.__CLASS__.".".__FUNCTION__
+			);
+
+			Yii::app()->user->setFlash(
+				'error',
+				Yii::t('customer','Your account has been created but we had an error logging you in.')
+			);
 		}
 
 		$this->triggerEmailCampaign($model,'onAddCustomer');
 
 		//Common SSL mode means we need to pass back to the original URL and log in again automatically
-		if(Yii::app()->isCommonSSL)
+		if (Yii::app()->isCommonSSL)
 		{
 			$strIdentity = Yii::app()->user->id.",".Yii::app()->shoppingcart->id.",site,index";
 			Yii::log("Log in ".$strIdentity, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			$redirString = _xls_encrypt($strIdentity);
 
-			$url = Yii::app()->controller->createAbsoluteUrl(
-				'commonssl/login',array('link'=>$redirString));
+			$url = Yii::app()->controller->createAbsoluteUrl('commonssl/login', array('link'=>$redirString));
 
 			$url = str_replace(
 				"https://".Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL'],

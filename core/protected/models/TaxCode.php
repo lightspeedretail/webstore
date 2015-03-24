@@ -66,10 +66,7 @@ class TaxCode extends BaseTaxCode
 	 * @return $objTax the tax object
 	*/
 	public static function GetNoTaxCode() {
-		$objTax = TaxCode::model()->tax_total()->notax()->find();
-			if ($objTax)
-				return $objTax;
-		return;
+		return TaxCode::model()->tax_total()->notax()->find();
 	}
 
 	/**

@@ -22,7 +22,7 @@ class Wishlist extends BaseWishlist
 	 * Returns the static model of the specified AR class.
 	 * @return Wishlist the static model class
 	 */
-	public static function model($className=__CLASS__)
+	public static function model($className = __CLASS__)
 	{
 		return parent::model($className);
 	}
@@ -68,10 +68,10 @@ class Wishlist extends BaseWishlist
 		// will receive user inputs.
 		return array(
 			array('registry_name,visibility,ship_option,after_purchase', 'required'),
-			array('visibility', 'numerical', 'integerOnly'=>true),
-			array('registry_name, ship_option, gift_code', 'length', 'max'=>100),
-			array('registry_name,registry_description,event_date','filter','filter'=>array($obj=new CHtmlPurifier(),'purify')),
-			array('customer_id', 'length', 'max'=>20),
+			array('visibility', 'numerical', 'integerOnly' => true),
+			array('registry_name, ship_option, gift_code', 'length', 'max' => 100),
+			array('registry_name,registry_description,event_date','filter','filter' => array($obj = new CHtmlPurifier(), 'purify')),
+			array('customer_id', 'length', 'max' => 20),
 			array('registry_description,event_date,deleteMe', 'safe'),
 		);
 	}
@@ -85,16 +85,16 @@ class Wishlist extends BaseWishlist
 		// Warning: Please modify the following code to remove attributes that
 		// should not be searched.
 
-		$criteria=new CDbCriteria;
+		$criteria = new CDbCriteria;
 
-		$criteria->compare('id',$this->id,true);
-		$criteria->compare('registry_name',$this->registry_name,false);
-		$criteria->compare('event_date',$this->event_date,false);
-		$criteria->compare('customer_id',$this->customer_id,false);
-		$criteria->compare('gift_code',$this->gift_code,false);
+		$criteria->compare('id', $this->id, true);
+		$criteria->compare('registry_name', $this->registry_name, false);
+		$criteria->compare('event_date', $this->event_date, false);
+		$criteria->compare('customer_id', $this->customer_id, false);
+		$criteria->compare('gift_code', $this->gift_code, false);
 
 		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
+			'criteria' => $criteria,
 		));
 	}
 
@@ -102,30 +102,30 @@ class Wishlist extends BaseWishlist
 	{
 		$objItems = new WishlistItem();
 		$objItems->registry_id = $this->id;
-
 		return $objItems->editSearch();
-
-
-
 	}
 
 	public static function LoadUserLists()
 	{
 		if (Yii::app()->user->isGuest)
+		{
 			return array();
+		}
 
-		return Wishlist::model()->findAllByAttributes(array('customer_id'=>Yii::app()->user->id));
-
-
-
+		return Wishlist::model()->findAllByAttributes(array('customer_id' => Yii::app()->user->id));
 	}
 
 	public static function LoadFirstCode()
 	{
 		$objLists = Wishlist::LoadUserLists();
-		if (count($objLists)==0) return null;
-		else return $objLists[0]->gift_code;
+		if (count($objLists) == 0)
+		{
+			return null;
+		}
+
+		return $objLists[0]->gift_code;
 	}
+
 	/**
 	 * Determine whether the current user should be able to see this wish list
 	 * @return bool
@@ -133,8 +133,11 @@ class Wishlist extends BaseWishlist
 	protected function getVisible()
 	{
 		if ($this->visibility == Wishlist::PRIVATELIST && $this->customer_id != Yii::app()->user->id)
+		{
 			return false;
-		else return true;
+		}
+
+		return true;
 	}
 
 	/**
@@ -144,8 +147,11 @@ class Wishlist extends BaseWishlist
 	protected function getSharable()
 	{
 		if ($this->visibility == Wishlist::PRIVATELIST)
+		{
 			return false;
-		else return true;
+		}
+
+		return true;
 	}
 
 	/**
@@ -155,8 +161,11 @@ class Wishlist extends BaseWishlist
 	protected function getIsMine()
 	{
 		if ($this->customer_id == Yii::app()->user->id)
+		{
 			return true;
-		else return false;
+		}
+
+		return false;
 	}
 
 	/**
@@ -166,9 +175,9 @@ class Wishlist extends BaseWishlist
 	{
 
 		return array(
-			Wishlist::PUBLICLIST=> Yii::t('wishlist','Public, searchable by my email address'),
-			Wishlist::PERSONALLIST=> Yii::t('wishlist','Personal, shared only by a special URL'),
-			Wishlist::PRIVATELIST=> Yii::t('wishlist','Private, only viewable with my login'),
+			Wishlist::PUBLICLIST => Yii::t('wishlist', 'Public, searchable by my email address'),
+			Wishlist::PERSONALLIST => Yii::t('wishlist', 'Personal, shared only by a special URL'),
+			Wishlist::PRIVATELIST => Yii::t('wishlist', 'Private, only viewable with my login'),
 		);
 
 	}
@@ -179,15 +188,14 @@ class Wishlist extends BaseWishlist
 	{
 
 		$arrReturn = array(
-			'0'=> Yii::t('wishlist','None')
+			'0' => Yii::t('wishlist', 'None')
 		);
 
 		$objAddresses = CustomerAddress::getActiveAddresses();
 
 		foreach ($objAddresses as $objAddress)
 		{
-			$str =
-				$objAddress->fullname.", ".
+			$str = $objAddress->fullname.", ".
 				$objAddress->address1.($objAddress->address2 != '' ? " " : "").$objAddress->address2.", ".
 				$objAddress->city;
 
@@ -198,9 +206,9 @@ class Wishlist extends BaseWishlist
 			$arrReturn[$objAddress->id] = $str;
 		}
 
-
 		return $arrReturn;
 	}
+
 	/**
 	 * @return array
 	 */
@@ -208,8 +216,8 @@ class Wishlist extends BaseWishlist
 	{
 
 		return array(
-			Wishlist::LEAVEINLIST=> Yii::t('wishlist','Leave the item in the Wish List, marked as Purchased'),
-			Wishlist::DELETEFROMLIST=> Yii::t('wishlist','Delete the item automatically from Wish List'),
+			Wishlist::LEAVEINLIST => Yii::t('wishlist', 'Leave the item in the Wish List, marked as Purchased'),
+			Wishlist::DELETEFROMLIST => Yii::t('wishlist', 'Delete the item automatically from Wish List'),
 		);
 
 	}
@@ -218,18 +226,22 @@ class Wishlist extends BaseWishlist
 	/**
 	 * Because visitor gift purchases are on a time limit to complete, remove any pending incomplete purchases
 	 */
-	public static function GarbageCollect() {
+	public static function garbageCollect() {
 
-		$intResetHours = _xls_get_conf('RESET_GIFT_REGISTRY_PURCHASE_STATUS',6);
-		if ($intResetHours<1) $intResetHours=1; //cannot set to 0
+		$intResetHours = _xls_get_conf('RESET_GIFT_REGISTRY_PURCHASE_STATUS', 6);
+		if ($intResetHours < 1)
+		{
+			// Cannot set to 0.
+			$intResetHours = 1;
+		}
+
 		$cutoffDate = date('YmdHis', strtotime("-".$intResetHours." hours"));
 
-
-		$arrProducts=Yii::app()->db->createCommand(
+		$arrProducts = Yii::app()->db->createCommand(
 			'SELECT * FROM '.Cart::model()->tableName().' WHERE cart_type='.CartType::cart.' ORDER BY id DESC'
 		)->query();
 
-		while(($arrItem=$arrProducts->read())!==false)
+		while(($arrItem = $arrProducts->read()) !== false)
 		{
 			$objCart = Cart::model()->findByPk($arrItem['id']);
 			//Go through outstanding carts and see if we have any expiring gift items
@@ -247,11 +259,13 @@ class Wishlist extends BaseWishlist
 						{
 							$objMessage = new CartMessages();
 							$objMessage->cart_id = $objCart->id;
-							$objMessage->message =
-								Yii::t('cart','You attempted to purchase the product {product} as a gift from the wish list for {wishname}. However, because wish list gift purchases must be completed within {hours} hour(s), the item has been removed from your cart. If it is still available on the wish list, it can be re-added.',
-								array('{wishname}'=>$item->wishlistItem->registry->customer->fullname,
-										'{product}'=>$item->product->Title,
-										'{hours}'=>$intResetHours));
+							$objMessage->message = Yii::t(
+								'cart',
+								'You attempted to purchase the product {product} as a gift from the wish list for {wishname}. However, because wish list gift purchases must be completed within {hours} hour(s), the item has been removed from your cart. If it is still available on the wish list, it can be re-added.',
+								array('{wishname}' => $item->wishlistItem->registry->customer->fullname,
+										'{product}' => $item->product->Title,
+										'{hours}' => $intResetHours)
+							);
 							$objMessage->save();
 
 							$item->wishlist_item = null;
@@ -265,39 +279,33 @@ class Wishlist extends BaseWishlist
 							$objCart->updateTotal();
 							$objCart->save();
 						}
-
-
-
 					}
-
 				}
 			}
-
-
 		}
-
 	}
+
 	/**
 	 * Since Validate tests to make sure certain fields have values, populate requirements here such as the modified timestamp
 	 * @return boolean from parent
 	 */
 	protected function beforeValidate() {
 		if ($this->isNewRecord)
+		{
 			$this->created = new CDbExpression('NOW()');
+		}
+
 		$this->modified = new CDbExpression('NOW()');
-
-
 		return parent::beforeValidate();
 	}
 
 	protected function beforeSave() {
-
-		if($this->event_date=='' || $this->event_date=='0000-00-00')
+		if($this->event_date == '' || $this->event_date == '0000-00-00')
+		{
 			$this->event_date = null;
-
+		}
 
 		return parent::beforeSave();
-
 	}
 
 	public function __get($strName) {
@@ -320,6 +328,4 @@ class Wishlist extends BaseWishlist
 				}
 		}
 	}
-
-
 }

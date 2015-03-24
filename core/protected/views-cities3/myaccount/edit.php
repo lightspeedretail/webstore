@@ -19,11 +19,11 @@
 		</div>
 	<?php endif; ?>
 
-	<?php $form=$this->beginWidget('CActiveForm', array(
-			'id'=>'myaccount',
-			'enableClientValidation'=>true,
-			'focus'=>array($model,'first_name'),
-		));
+	<?php
+		$form = $this->beginWidget('CActiveForm', array(
+				'id' => 'myaccount',
+				'enableClientValidation' => true
+			));
 	?>
 
 	<div id="customercontact">

@@ -16,11 +16,12 @@ if(_xls_facebook_login()): ?>
 	)); ?>
 <?php endif; ?>
 <div class="login">
-	<?php $form=$this->beginWidget('CActiveForm', array(
-		'id'=>'login-form',
-		'enableClientValidation'=>false,
-		'focus'=>array($model,'email'),
-	));   ?>
+	<?php
+		$form = $this->beginWidget('CActiveForm', array(
+			'id' => 'login-form',
+			'enableClientValidation' => false
+		));
+	?>
 	<div class="row-fluid midrow">
 		<div class="span4">
 			<?php echo $form->labelEx($model,'email'); ?>
@@ -52,24 +53,24 @@ if(_xls_facebook_login()): ?>
 			echo CHtml::SubmitButton(Yii::t('global','Login'),
 				array('id'=>'btnModalLogin','name'=>'btnModalLogin')); ?>
 		</div>
-        <div class="forgotpassword inline">
-            <?php echo CHtml::ajaxLink(Yii::t('global','Forgot Password?'),
-                $this->createUrl('site/forgotpassword'),
-                array(
-                    'type'=>"POST",
-                    'data'=>'js:jQuery($("#login-form")).serialize()',
-                    'dataType' => 'json',
-                    'success'=>'js:function(data) {
-			                if (data.status=="success") {
-			                    alert(data.message);
-			                    $.ajax({url:data.url});
-			                } else  alert(data.message);
+		<div class="forgotpassword inline">
+			<?php echo CHtml::ajaxLink(Yii::t('global','Forgot Password?'),
+				$this->createUrl('site/forgotpassword'),
+				array(
+					'type'=>"POST",
+					'data'=>'js:jQuery($("#login-form")).serialize()',
+					'dataType' => 'json',
+					'success'=>'js:function(data) {
+							if (data.status=="success") {
+								alert(data.message);
+								$.ajax({url:data.url});
+							} else  alert(data.message);
 						}'
 
-                ));
-            ?>
+				));
+			?>
 
-        </div>
+		</div>
 	</div>
 
 

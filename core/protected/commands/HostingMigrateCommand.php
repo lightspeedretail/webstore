@@ -45,37 +45,89 @@ class HostingMigrateCommand extends MigrateCommand
 	 */
 	public function beforeAction($action, $params)
 	{
-		if (empty($this->dbhost) ||
-			empty($this->dbuser) ||
-			empty($this->dbpass) ||
-			empty($this->dbname) ||
-			empty($this->hosting) ||
-			!$this->validHostingSwitch($this->hosting)
+		if ($this->validHostingSwitch($this->hosting) === false ||
+			$this->validateDbCliArgs($action) === false
 		)
 		{
-			echo "\n*error halting*\n\n usage: yiic hostingmigrate $action --dbhost=127.0.0.1 --dbuser=root --dbpass=mypass --dbname=webstore --hosting=M\n\n";
-			echo " Note, --hosting flag can take one of three values: M for Multi-tenant, S for Single tenant, and T for Multi-tenant staging\n";
-			echo " These flags will set configuration keys specific to those environments.\n";
-			echo "\n";
 			return false;
 		}
 
-		$this->setDbForMigration();
-		$this->connectionID = "dbmt";
 		$this->migrationTable = 'xlsws_migrations';
 
 		return parent::beforeAction($action, $params);
-
-	}
-
-	protected function validHostingSwitch($str)
-	{
-		$arrAllowed = array('M','T','S');
-		return in_array($str,$arrAllowed);
 	}
 
 	/**
-	 * Establish database component for multitenant.
+	 * Ensure the --hosting command line argument is present and valid.
+	 * If not, display an error message.
+	 *
+	 * @param $str
+	 * @return bool
+	 */
+	protected function validHostingSwitch($str)
+	{
+		$strError = "\n*error halting*\n";
+		$strError .= "\t--hosting flag takes one of three values:\n";
+		$strError .= "\tM for Multi-tenant (Retail), T for Multi-tenant staging (Retail), S for Single tenant (Onsite), and N for Non-Hosted (Onsite)\n";
+
+		if (empty($str))
+		{
+			$strError .= "\t--hosting flag MUST be present.\n\n";
+			echo $strError;
+			return false;
+		}
+
+		$arrAllowed = array('M','T','S','N');
+		if (in_array($str, $arrAllowed) === false)
+		{
+			echo $strError . "\n";
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Ensure the required database credentials are present if passed on the command line:
+	 * If not, display an error
+	 *
+	 * @param $action
+	 * @return bool
+	 */
+	protected function validateDbCliArgs($action)
+	{
+		// if any one of these is present...
+		if (!empty($this->dbhost) ||
+			!empty($this->dbuser) ||
+			!empty($this->dbpass) ||
+			!empty($this->dbname)
+		)
+		{
+			// ...then they must ALL be present
+			if (empty($this->dbhost) ||
+				empty($this->dbuser) ||
+				empty($this->dbpass) ||
+				empty($this->dbname)
+			)
+			{
+				echo "\n*error halting*\n";
+				echo "\tusage: yiic hostingmigrate $action --dbhost=127.0.0.1 --dbuser=root --dbpass=mypass --dbname=webstore --hosting=M\n";
+				echo "\t--hosting flag takes one of three values:\n";
+				echo "\tM for Multi-tenant (Retail), T for Multi-tenant staging (Retail), S for Single tenant (Onsite), and N for Non-Hosted (Onsite)\n\n";
+				echo "You must include all database credentials when passing them.\n";
+				echo "Or else,\n\n\tusage: yiic hostingmigrate $action --hosting=M --interactive=0\n\n";
+				return false;
+			}
+
+			$this->setDbForMigration();
+			$this->connectionID = "dbmt";
+		}
+
+		return true;
+	}
+	/**
+	 * Establish database component for passed in credentials.
 	 *
 	 * @return void
 	 */
@@ -103,36 +155,47 @@ class HostingMigrateCommand extends MigrateCommand
 	 */
 	public function actionUp($args)
 	{
+		$component = $this->connectionID;
+
 		switch ($this->hosting)
 		{
 			case 'S':
-				$intVer = Yii::app()->dbmt->createCommand("SELECT key_value FROM xlsws_configuration WHERE `key_name` = 'DATABASE_SCHEMA_VERSION'")->queryScalar();
+
+				$intVer = Yii::app()->$component->createCommand("SELECT key_value FROM xlsws_configuration WHERE `key_name` = 'DATABASE_SCHEMA_VERSION'")->queryScalar();
 				if($intVer !== false && (int)$intVer < 447)
-        {
-          // Override certain migrations to support legacy schema order
-          $this->migrationPath = Yii::getPathOfAlias('application.migrations.legacy');
-          // Execute yii migrations
-          parent::actionUp($args);
+				{
+					// Override certain migrations to support legacy schema order
+					$this->migrationPath = Yii::getPathOfAlias('application.migrations.legacy');
+					// Execute yii migrations
+					parent::actionUp($args);
 
-          // Point to standard migrations for next migration leg
-          $this->migrationPath = Yii::getPathOfAlias('application.migrations');
+					// Point to standard migrations for next migration leg
+					$this->migrationPath = Yii::getPathOfAlias('application.migrations');
 
-          // Reset migration position to non-legacy
-          Yii::app()->db->createCommand()->truncateTable('xlsws_migrations');
-          $this->actionMark(array('m140429_224114_update_configuration'));
+					// Reset migration position to non-legacy
+					Yii::app()->$component->createCommand()->truncateTable('xlsws_migrations');
+
+					$this->actionMark(array('m140429_224114_update_configuration'));
 				}
 
 				parent::actionUp($args);
-				Yii::app()->dbmt->createCommand("UPDATE xlsws_configuration SET `key_value` = 1 WHERE `key_name` = 'LIGHTSPEED_HOSTING'")->execute();
-				Yii::app()->dbmt->createCommand("UPDATE xlsws_configuration SET `key_value` = 1 WHERE `key_name` = 'ENABLE_SSL'")->execute();
+				Yii::app()->$component->createCommand("UPDATE xlsws_configuration SET `key_value` = 1 WHERE `key_name` = 'LIGHTSPEED_HOSTING'")->execute();
+				Yii::app()->$component->createCommand("UPDATE xlsws_configuration SET `key_value` = 1 WHERE `key_name` = 'ENABLE_SSL'")->execute();
 				break;
 
 			case 'M':
 			case 'T':
 				parent::actionUp($args);
-				Yii::app()->dbmt->createCommand("UPDATE xlsws_configuration SET `key_value` = 1 WHERE `key_name` = 'LIGHTSPEED_MT'")->execute();
-				Yii::app()->dbmt->createCommand("UPDATE xlsws_configuration SET `key_value` = 1 WHERE `key_name` = 'LIGHTSPEED_HOSTING'")->execute();
-				Yii::app()->dbmt->createCommand("UPDATE xlsws_configuration SET `key_value` = 1 WHERE `key_name` = 'ENABLE_SSL'")->execute();
+				Yii::app()->$component->createCommand("UPDATE xlsws_configuration SET `key_value` = 1 WHERE `key_name` = 'LIGHTSPEED_MT'")->execute();
+				Yii::app()->$component->createCommand("UPDATE xlsws_configuration SET `key_value` = 1 WHERE `key_name` = 'LIGHTSPEED_HOSTING'")->execute();
+				Yii::app()->$component->createCommand("UPDATE xlsws_configuration SET `key_value` = 1 WHERE `key_name` = 'ENABLE_SSL'")->execute();
+				break;
+
+			case 'N':
+				// yiic hostingmigrate up --hosted=N === yiic migrate up
+				// i.e. if no command line arguments defining a specific database
+				// are present, this does the same thing as yiic migrate up
+				parent::actionUp($args);
 				break;
 		}
 	}

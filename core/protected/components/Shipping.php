@@ -195,10 +195,10 @@ class Shipping
 	 */
 	public static function getCartScenarios($checkoutForm)
 	{
-		$logLevel = 'error';
+		$logLevel = 'info';
 		if (CPropertyValue::ensureBoolean(_xls_get_conf('DEBUG_SHIPPING', false)) === true)
 		{
-			$logLevel = 'info';
+			$logLevel = 'error';
 		}
 
 		// TODO: This, and the setting of hasTaxModeChanged, should be
@@ -210,6 +210,16 @@ class Shipping
 		// values so we need to save the current value.
 		$savedTaxId = Yii::app()->shoppingcart->tax_code_id;
 		$cart = Yii::app()->shoppingcart->getModel();
+
+		// The call to setTaxCodeByCheckoutForm() on the shopping cart will call
+		// recalculateAndSave(). That call is going to add taxes on shipping by
+		// calling updateTaxShipping(). The first run will have the correct values.
+		// On later runs, we will have taxes set in the shopping cart and add more
+		// when we call updateTaxShipping(). Plus, we used to also make a call to
+		// recalculateAndSave() while going through the shipping providers. Then we
+		// would call AddTaxes() which would add taxes on top of taxes.
+		$cart->updateTaxExclusive();
+
 		$savedStorePickup = $cart->blnStorePickup;
 
 		// Get the list of shipping modules.
@@ -242,8 +252,6 @@ class Shipping
 				$cart->blnStorePickup = false;
 			}
 
-			$cart->recalculateAndSave();
-
 			// Get the "shipping" product, which may vary from module to module.
 			$strShippingProduct = $shippingProvider['component']->LsProduct;
 			Yii::log(
@@ -271,18 +279,19 @@ class Shipping
 			{
 				$priorityPrice = $priority['price'];
 				$includeTaxInShippingPrice = false;
+				$shippingTaxValues = array();
 
 				if (Yii::app()->params['SHIPPING_TAXABLE'] == '1')
 				{
-					$taxes = Tax::CalculatePricesWithTax(
+					$shippingTaxPrices = Tax::calculatePricesWithTax(
 						$priority['price'],
 						Yii::app()->shoppingcart->tax_code_id,
 						$intShipProductLsid
 					);
-					Yii::log("Shipping Taxes retrieved " . print_r($taxes, true), $logLevel, 'application.'.__CLASS__.".".__FUNCTION__);
 
-					// TODO: WS-3525 Refactor Tax::CalculatePricesWithTax to return an associative array.
-					$taxOnShipping = $taxes[1];
+					Yii::log("Shipping Taxes retrieved " . print_r($shippingTaxPrices, true), $logLevel, 'application.'.__CLASS__.".".__FUNCTION__);
+
+					$shippingTaxValues = $shippingTaxPrices['arrTaxValues'];
 					if (Yii::app()->params['TAX_INCLUSIVE_PRICING'] == '1')
 					{
 						$includeTaxInShippingPrice = true;
@@ -290,9 +299,11 @@ class Shipping
 
 					if ($includeTaxInShippingPrice === true)
 					{
-						$priorityPrice = $taxes[0];
-					} else {
-						Yii::app()->shoppingcart->AddTaxes($taxOnShipping);
+						$priorityPrice = $shippingTaxPrices['fltSellTotalWithTax'];
+					}
+					else
+					{
+						Yii::app()->shoppingcart->AddTaxes($shippingTaxValues);
 					}
 				}
 
@@ -339,7 +350,7 @@ class Shipping
 				// Remove shipping taxes to accommodate the next shipping priority in the loop.
 				if (Yii::app()->params['SHIPPING_TAXABLE'] == '1' && $includeTaxInShippingPrice === false)
 				{
-					Yii::app()->shoppingcart->SubtractTaxes($taxOnShipping);
+					Yii::app()->shoppingcart->SubtractTaxes($shippingTaxValues);
 				}
 			}
 		}

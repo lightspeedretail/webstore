@@ -1,6 +1,7 @@
 'use strict';
 /* globals $:false, History:false */
 /* exported showEditCartModal */
+
 function sleep(millis, callback) {
     setTimeout(function()
         { callback(); },
@@ -62,7 +63,7 @@ function hideModal() {
  * @param {string} [editCartUrl] The URL to add to the browser history. If no
  * URL is provided, then no URL is added to the history.
  */
-function showEditCartModalAndPushState(editCartUrl) {
+function showEditCartModal(editCartUrl) {
     // Remove the body's scrollbar when opening a modal
     $('body').css('overflow', 'hidden');
 
@@ -75,30 +76,6 @@ function showEditCartModalAndPushState(editCartUrl) {
 
     $('#viewport, .btn-navbar, #menubar, #topbar, #footer').addClass('mobile-hide');
 }
-
-/**
- * Show the edit cart modal.
- * @param {boolean} maintainPushState Set this to true to leave the browser
- * history state unmodified. Defaults to false.
- * @deprecated This is left in for compatibility with Brooklyn2014 3.2.2
- * themes. Use showEditCartModalAndPushState instead. This was deprecated in
- * Web Store 3.2.4 because it uses a hard-coded URL instead of going through
- * Yii::app()->createUrl.
- */
-function showEditCartModal(maintainPushState) {
-    // This warning is on purpose: we want to store owners to update their
-    // theme copies.
-    /* globals console:false */
-    console.warn('showEditCartModal is deprecated. Use showEditCartModalAndPushState instead.');
-    var editCartUrl = '/editcart';
-
-    if (maintainPushState === true) {
-        showEditCartModalAndPushState();
-    } else {
-        showEditCartModalAndPushState(editCartUrl);
-    }
-}
-
 
 function showModal() {
     // Remove the body's scrollbar when opening a modal
@@ -164,7 +141,7 @@ $(document).on('click', ".webstore-change-item", function()  {
     hideModal();
     var editCartUrl = $(this).data('editcarturl');
     setTimeout(function(){
-        showEditCartModalAndPushState(editCartUrl);
+        showEditCartModal(editCartUrl);
     }, 1125);
 });
 
@@ -184,7 +161,7 @@ $(function() {
             // doPushSate=true, and the second time in this callback when the
             // push state changes.
             if(State.data.key === 'editcart'){
-                showEditCartModalAndPushState();
+                showEditCartModal();
             }
             else {
                 hideModal();

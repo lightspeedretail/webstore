@@ -82,7 +82,7 @@ class Checkout
 			$objEmail->htmlbody = $strHtmlBody;
 			$objEmail->cart_id = $objCart->id;
 			$objEmail->subject = $strSubject;
-			$orderEmail = _xls_get_conf('ORDER_FROM','');
+			$orderEmail = _xls_get_conf('ORDER_FROM', '');
 			$objEmail->to = empty($orderEmail) ? _xls_get_conf('EMAIL_FROM') : $orderEmail;
 
 			// If we get back false, it means conversion failed which 99.9% of

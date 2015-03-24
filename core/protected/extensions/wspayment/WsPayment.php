@@ -64,7 +64,7 @@ class WsPayment extends WsExtension
 	 * The name of the payment module that will be displayed in Web Admin payments
 	 * @return string
 	 */
-	public function admin_name()
+	public function adminName()
 	{
 
 		if ($this->active)

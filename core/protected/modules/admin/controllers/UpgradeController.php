@@ -378,8 +378,6 @@ class UpgradeController extends CController
 
 
 		}
-		if(is_numeric($oXML->schema))
-			_xls_set_conf('DATABASE_SCHEMA_VERSION',$oXML->schema);
 
 		$oXML = $this->isDatabaseCurrent(true);
 
@@ -417,12 +415,15 @@ class UpgradeController extends CController
 		$storeurl = str_replace("https://","",$storeurl);
 
 		$data['wdb'] = array(
-			'schema'      => _xls_get_conf('DATABASE_SCHEMA_VERSION'),
+			// Despite the DATABASE_SCHEMA_VERSION config key no longer existing, we must
+			// include the schema index key in the array since Updater is expecting it.
+			'schema'      => _xls_get_conf('DATABASE_SCHEMA_VERSION', 447),
 			'version'      => XLSWS_VERSIONBUILD,
 			'customer'    => $storeurl,
-			'type'       => (_xls_get_conf('LIGHTSPEED_HOSTING')==1 ? "hosted" : "self")
+			'type'       => (_xls_get_conf('LIGHTSPEED_HOSTING') == 1 ? "hosted" : "self")
 		);
-		if(Yii::app()->params['LIGHTSPEED_MT']=='1')
+
+		if (Yii::app()->params['LIGHTSPEED_MT'] == '1')
 		{
 			//Since we could have two urls on multitenant, just grab the original one
 			$data['customer']=Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL'];
@@ -431,6 +432,7 @@ class UpgradeController extends CController
 				$data['type']="mt-cloud";
 
 		}
+
 		$json = json_encode($data);
 
 		$ch = curl_init($url);
@@ -454,7 +456,9 @@ class UpgradeController extends CController
 		$mixSchema = $oXML->wsdb->schema;
 
 		if ($mixSchema != 'current')
+		{
 			return $oXML->wsdb;
+		}
 
 		$oXML->wsdb->changetype = "yii";
 		$oXML->wsdb->schema = Yii::t('admin','Updating Database'); //Just because this is displayed during an update
@@ -469,11 +473,13 @@ class UpgradeController extends CController
 		 * New db update routine, this will become the only item in this function later
 		 * That's why we're just adding instead of calling another function
 		 */
-		if(!$blnCheckOnly)
+		if (!$blnCheckOnly)
 		{
 			$strMigrationResults = _runMigrationTool(1);
 			if (stripos($strMigrationResults, "No new migration found") > 0 )
+			{
 				$oXML->wsdb->schema = 'current';
+			}
 
 		}
 

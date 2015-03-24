@@ -1101,12 +1101,16 @@ class Product extends BaseProduct
 	 * @param float [$fltPrice]     :: Price to calculate on
 	 * @return array([1] => .... [5]=>))  all the tax components
 	 */
-	public function CalculateTax($taxCode, $fltPrice = false) {
+	public function CalculateTax($intTaxCode, $fltPrice = false)
+	{
 		if ($fltPrice === false)
+		{
 			$fltPrice = $this->getPriceValue();
+		}
 
-		list($fltTaxedPrice, $arrTaxes) =
-			Tax::CalculatePricesWithTax($fltPrice, $taxCode, $this->tax_status_id);
+		$arr = Tax::calculatePricesWithTax($fltPrice, $intTaxCode, $this->tax_status_id);
+		$fltTaxedPrice = $arr['fltSellTotalWithTax'];
+		$arrTaxes = $arr['arrTaxValues'];
 
 		return $arrTaxes;
 	}
@@ -1270,21 +1274,23 @@ class Product extends BaseProduct
 		return Product::model()->findByAttributes(array('request_url'=>$strName));
 	}
 
-	public function DeleteImages() {
-		if (is_null($this->id)) {
+	/**
+	 * Delete all the images associated with this product.
+	 * @return void
+	 */
+	public function deleteImages() {
+		if (is_null($this->id))
+		{
 			return;
 		}
 
-		$intImageID = $this->image_id; //save it in a variable
-		$this->image_id = null;
-		$this->save();
+		$arrImage = Images::model()->findAllByAttributes(
+			array('product_id' => $this->id)
+		);
 
-		if ($intImageID) {
-			$objImage = Images::model()->findByPk($intImageID);
-			if ($objImage) {
-				@unlink($objImage->image_path);
-				$objImage->delete();
-			}
+		foreach ($arrImage as $objImage)
+		{
+			$objImage->delete();
 		}
 	}
 

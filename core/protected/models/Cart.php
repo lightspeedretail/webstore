@@ -77,17 +77,34 @@ class Cart extends BaseCart
 	}
 
 
-	/** Create a new cart object and prepopulate some values
+	/**
+	 * Create and return a cart object with some prepopulated values.
+	 * We pass in and set the customerId to facilitate setting the tax code
+	 *
+	 * @param Customer $objCustomer
 	 * @return Cart
 	 */
-	public static function InitializeCart() {
+	public static function initialize(Customer $objCustomer = null)
+	{
 		$objCart = new Cart();
 		$objCart->cart_type = CartType::cart;
+
+		if ($objCustomer instanceof Customer)
+		{
+			$objCart->customer_id = $objCustomer->id;
+		}
 
 		$objCart->datetime_cre = new CDbExpression('NOW()');;
 		$objCart->datetime_due = new CDbExpression('now() + INTERVAL '._xls_get_conf('CART_LIFE', 7).' DAY');
 		$objCart->ResetTaxIncFlag();
 		$objCart->setTaxCodeByDefaultShippingAddress();
+
+		return $objCart;
+	}
+
+	public static function initializeAndSave()
+	{
+		$objCart = self::initialize();
 		if(!$objCart->save())
 		{
 			Yii::log("Error initializing cart ".print_r($objCart->getErrors(), true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
@@ -122,15 +139,17 @@ class Cart extends BaseCart
 	 * Initialize if needed and return the current Cart
 	 * This is used by unit tests to get a cart to work with for testing
 	 * Normal use will use the Cart component
-	 * @return
+	 * @return Cart
 	 */
-	public static function GetCart() {
-		if(is_null(Yii::app()->user->getState('cartid')))
+	public static function GetCart()
+	{
+		if (is_null(Yii::app()->user->getState('cartid')))
 		{
-			$objCart = Cart::InitializeCart();
-			Yii::app()->user->setState('cartid', $objCart->id);
+			$objCart = Cart::initialize();
 			return $objCart;
-		} else {
+		}
+		else
+		{
 			$objCart = Cart::model()->findByPk(Yii::app()->user->getState('cartid'));
 
 			if ($objCart === null)
@@ -138,8 +157,7 @@ class Cart extends BaseCart
 				//something has happened to the database object
 				Yii::log("Could not find cart ".Yii::app()->user->getState('cartid').", creating new one.", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				Yii::app()->user->setState('cartid', null);
-				$objCart = Cart::InitializeCart();
-				Yii::app()->user->setState('cartid', $objCart->id);
+				$objCart = Cart::initialize();
 			}
 
 			return $objCart;
@@ -198,7 +216,7 @@ class Cart extends BaseCart
 	public function setTaxCodeByDefaultShippingAddress()
 	{
 
-		if(is_null($this->customer_id))
+		if (is_null($this->customer_id))
 		{
 			return;
 		}
@@ -660,11 +678,13 @@ class Cart extends BaseCart
 		{
 			foreach ($this->cartItems as $objItem)
 			{
+				$objTaxCode = TaxCode::GetDefault();
+
 				// For quote to cart, we have to remove prices manually
 				if ($objItem->cart_type == CartType::quote && $objItem->tax_in)
 				{
 					$taxes = $objItem->product->CalculateTax(
-						TaxCode::GetDefault(),
+						$objTaxCode->id,
 						$objItem->sell
 					);
 
@@ -717,7 +737,7 @@ class Cart extends BaseCart
 	/**
 	 * Update tax values on the cart and cart items for tax exclusive stores.
 	 */
-	protected function updateTaxExclusive() {
+	public function updateTaxExclusive() {
 		if (_xls_get_conf('TAX_INCLUSIVE_PRICING', '0') == '1')
 		{
 			return;
@@ -809,10 +829,9 @@ class Cart extends BaseCart
 			}
 		}
 
-		// ToDO: WS-3525 Refactor Tax::CalculatePricesWithTax to return an associative array
-		$nprice_taxes = Tax::CalculatePricesWithTax($this->shipping->shipping_sell, $this->tax_code_id, $intTaxStatus);
+		$nprice_taxes = Tax::calculatePricesWithTax($this->shipping->shipping_sell, $this->tax_code_id, $intTaxStatus);
 
-		$taxes = $nprice_taxes[1];
+		$taxes = $nprice_taxes['arrTaxValues'];
 
 		if ($this->tax_code_id == $intNoTax)
 		{
@@ -821,8 +840,7 @@ class Cart extends BaseCart
 
 		else
 		{
-			// ToDO: WS-3525 Refactor Tax::CalculatePricesWithTax to return an associative array
-			$this->shipping->shipping_sell_taxed = $nprice_taxes[0];
+			$this->shipping->shipping_sell_taxed = $nprice_taxes['fltSellTotalWithTax'];
 
 			if (Yii::app()->params['TAX_INCLUSIVE_PRICING'] != '1')
 			{
@@ -937,6 +955,23 @@ class Cart extends BaseCart
 				$objItem = $item;
 				break;
 			}
+		}
+
+		// If our Cart isn't saved to the db at this point, save it
+		if (is_null($this->id))
+		{
+			if (!$this->save())
+			{
+				throw new Exception(
+					sprintf(
+						"Unable to save cart before adding this first product: %s\n%s",
+						$objProduct->code,
+						print_r($this->getErrors(), true)
+					)
+				);
+			}
+
+			Yii::app()->user->setState('cartid', $this->id);
 		}
 
 		if (!$objItem) {
@@ -1168,24 +1203,44 @@ class Cart extends BaseCart
 	 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 	 * @return Cart[]
 	 */
-	public static function LoadLastCartInProgress($intCustomerId, $intBelowCart = 0) {
-		// Call Cart::QueryArray to perform the LoadArrayByCustomerId query
-		try {
+	public static function LoadLastCartInProgress($intCustomerId, $intBelowCart = 0)
+	{
+		// if $intBelowCart is null it means the active cart hasn't been saved to the db yet.
+		// This most likely means it is empty i.e. no products have been added.
+		// However, in order for the db query to work as intended, we need to set it to an integer.
+		if (is_null($intBelowCart))
+		{
+			$intBelowCart = 0;
+		}
 
-			$arrCarts=Cart::model()->findAll(array(
-				'condition'=>'customer_id=:id AND cart_type=:type AND item_count > 0 '.
-					($intBelowCart>0 ? 'AND id<:currentcart' : 'AND id>:currentcart'),
-				'params'=>array(':id'=>$intCustomerId, ':type'=>CartType::cart, ':currentcart'=>$intBelowCart),
-				'order'=>'id DESC',
-				'limit'=>1,
-			));
+		$strConditionCurrentCart = 'id > :currentcart';
+		if ($intBelowCart > 0)
+		{
+			$strConditionCurrentCart = 'id < :currentcart';
+		}
 
-			if(count($arrCarts)>0) {
+		$criteria = new CDbCriteria();
+		$criteria->condition =
+			'customer_id = :id AND '.
+			'cart_type = :type AND '.
+			'item_count > 0 AND '.
+			$strConditionCurrentCart;
+		$criteria->order = 'id DESC';
+		$criteria->limit = 1;
+		$criteria->params = array(
+			'id' => $intCustomerId,
+			'type' => CartType::cart,
+			'currentcart' => $intBelowCart
+		);
 
-				return $arrCarts[0];
-			}
-			else return null;
-		} catch (Exception $objExc) {
+		$arrCarts = Cart::model()->findAll($criteria);
+
+		if (count($arrCarts) > 0)
+		{
+			return $arrCarts[0];
+		}
+		else
+		{
 			return null;
 		}
 	}
@@ -1356,20 +1411,19 @@ class Cart extends BaseCart
 	}
 
 	/**
-	 * Called by session management to periodically sweep away old carts, based on config cart life
+	 * Erases all carts and cart items that are older than CART_LIFE days and
+	 * have no customer_id assocaited with them.
+	 *
+	 * Called by legacySoapController when doing a document_flush(),
+	 * document_flush() is called by onsite when the user initiates a
+	 * "Reset Carts and Documents" from the Tools->eCommerce->Documents tab
+	 *
+	 * @return int The number of carts + items deleted by the
+	 * query
 	 */
-	public static function GarbageCollect() {
-		//Delete any carts older than our timeout that don't have a customer ID attached (since those can always be restored)
-		$objCarts = Cart::model()->findAll("cart_type = :type AND customer_id IS NULL AND modified<:date",
-			array(':type'=>CartType::cart,
-				':date'=>date("Y-m-d H:i:s",strtotime("-"._xls_get_conf('CART_LIFE',30)."days"))
-			));
-		foreach ($objCarts as $objCart)
-		{
-			foreach ($objCart->cartItems as $item)
-				$item->delete();
-			$objCart->delete();
-		}
+	public static function garbageCollect()
+	{
+		return ShoppingCart::eraseExpired();
 	}
 
 

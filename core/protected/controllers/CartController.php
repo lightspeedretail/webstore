@@ -685,7 +685,7 @@ class CartController extends Controller
 							//Oops, email is already in system but not with that password
 							Yii::app()->user->setFlash(
 								'error',
-								Yii::t('global','This email address already exists but that is not the correct password so we cannot log you in.')
+								Yii::t('global', 'This email address already exists but that is not the correct password so we cannot log you in.')
 							);
 							Yii::log(
 								$model->contactEmail." login from checkout with invalid password",
@@ -694,7 +694,7 @@ class CartController extends Controller
 							);
 							$this->refresh();
 							return;
-							break;
+
 						case UserIdentity::ERROR_USERNAME_INVALID:
 							$objCustomer = Customer::CreateFromCheckoutForm($model);
 							$identity = new UserIdentity($model->contactEmail, $model->createPassword);
@@ -711,16 +711,17 @@ class CartController extends Controller
 
 								Yii::app()->user->setFlash(
 									'error',
-									Yii::t('global','Error logging in after creating account. Cannot continue.')
+									Yii::t('global', 'Error logging in after creating account. Cannot continue.')
 								);
 
 								$this->refresh();
 								return;
 							}
-
 							break;
+
 						case UserIdentity::ERROR_NONE:
 							break;
+
 						default:
 							Yii::log(
 								"Error: Unhandled errorCode " . $identity->errorCode,

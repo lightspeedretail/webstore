@@ -27,7 +27,6 @@ class Customer extends BaseCustomer
 	const ADMIN_USER = 2;
 	const EXTERNAL_SHELL_ACCOUNT = -1; //for third party integration
 
-
 	public $email_repeat;
 	public $password_repeat;
 	public $token; //Security token for resetting password
@@ -36,7 +35,7 @@ class Customer extends BaseCustomer
 	 * Returns the static model of the specified AR class.
 	 * @return Customer the static model class
 	 */
-	public static function model($className=__CLASS__)
+	public static function model($className = __CLASS__)
 	{
 		return parent::model($className);
 	}
@@ -55,41 +54,39 @@ class Customer extends BaseCustomer
 		// will receive user inputs.
 		return array(
 			array('created, modified', 'required'),
-			array('newsletter_subscribe', 'numerical', 'integerOnly'=>true),
-			array('allow_login', 'safe', 'on'=>'update'), //Note this update is Admin Panel, we use a different scenario for front-end update
-			array('first_name, last_name', 'length', 'max'=>64),
-			array('company, email, password', 'length', 'max'=>255),
-			array('currency', 'length', 'max'=>3),
-			array('preferred_language, mainphonetype', 'length', 'max'=>8),
-			array('mainphone', 'length','min'=>7, 'max'=>32),
+			array('newsletter_subscribe', 'numerical', 'integerOnly' => true),
+			array('allow_login', 'safe', 'on' => 'update'), //Note this update is Admin Panel, we use a different scenario for front-end update
+			array('first_name,last_name', 'length', 'max' => 64),
+			array('company,email,password', 'length', 'max' => 255),
+			array('currency', 'length', 'max' => 3),
+			array('preferred_language,mainphonetype', 'length', 'max' => 8),
+			array('mainphone', 'length', 'min' => 7, 'max' => 32),
 			array('last_login', 'safe'),
 
-
-			array('email', 'required','on'=>'create,createfb,myaccountupdate'),
-			array('first_name,last_name', 'required','on'=>'create,createfb,myaccountupdate,update,updatepassword'),
-			array('password,password_repeat', 'required','on'=>'create,updatepassword'),
-			array('mainphone', 'required','on'=>'create,myaccountupdate,update,updatepassword'),
+			array('email', 'required', 'on' => 'create,createfb,myaccountupdate'),
+			array('first_name,last_name', 'required','on' => 'create,createfb,myaccountupdate,update,updatepassword'),
+			array('password,password_repeat', 'required','on' => 'create,updatepassword'),
+			array('mainphone', 'required','on' => 'create,myaccountupdate,update,updatepassword'),
 
 			// email has to be a valid email address
 			array('email', 'email'),
 			array('email,email_repeat', 'safe'),
-			array('email', 'validateEmailUnique','on'=>'create,createfb'),
-			array('email_repeat', 'validateEmailRepeat','on'=>'create,createfb'),
+			array('email', 'validateEmailUnique','on' => 'create,createfb'),
+			array('email_repeat', 'validateEmailRepeat','on' => 'create,createfb'),
 
-
-			array('email', 'length', 'max'=>50),
-			array('email', 'compare', 'on'=>'create'),
+			array('email', 'length', 'max' => 50),
+			array('email', 'compare', 'on' => 'create'),
 			array('email_repeat', 'safe'),
 
-			array('password', 'length', 'max'=>255),
-			array('password_repeat', 'length', 'max'=>255),
-			array('password', 'compare', 'on'=>'create,formSubmitWithAccount,updatepassword,resetpassword'),
+			array('password', 'length', 'max' => 255),
+			array('password_repeat', 'length', 'max' => 255),
+			array('password', 'compare', 'on' => 'create,formSubmitWithAccount,updatepassword,resetpassword'),
 			array('password_repeat', 'safe'),
-			array('password,password_repeat', 'PasswordLengthValidator', 'on'=>'create,formSubmitWithAccount,updatepassword,resetpassword'),
+			array('password,password_repeat', 'PasswordLengthValidator', 'on' => 'create,formSubmitWithAccount,updatepassword,resetpassword'),
 
-			array('token', 'length', 'max'=>Customer::RESET_PASSWORD_TOKEN_LENGTH),
-			array('token', 'required', 'on'=>'resetpassword'),
-			array('token', 'validateToken', 'on'=>'resetpassword'),
+			array('token', 'length', 'max' => Customer::RESET_PASSWORD_TOKEN_LENGTH),
+			array('token', 'required', 'on' => 'resetpassword'),
+			array('token', 'validateToken', 'on' => 'resetpassword'),
 		);
 	}
 
@@ -103,11 +100,11 @@ class Customer extends BaseCustomer
 		return array_merge(
 			parent::attributeLabels(),
 			array(
-				'active'=>'This is an active address',
-				'email_repeat'=>'Email Address (confirm)',
-				'password_repeat'=>'Password (confirm)',
-				'newsletter_subscribe'=> 'Allow us to send you emails about our products',
-				'mainphone'=>'Phone Number')
+				'active' => 'This is an active address',
+				'email_repeat' => 'Email Address (confirm)',
+				'password_repeat' => 'Password (confirm)',
+				'newsletter_subscribe' => 'Allow us to send you emails about our products',
+				'mainphone' => 'Phone Number')
 		);
 	}
 
@@ -123,36 +120,56 @@ class Customer extends BaseCustomer
 		);
 	}
 
+
+	/**
+	 * Confirms whether or not the passed email address
+	 * belongs to a registered user.
+	 *
+	 * @param $strEmail
+	 * @return bool
+	 */
+	public static function isEmailRegistered($strEmail)
+	{
+
+		$obj = self::model()->findByAttributes(
+			array(
+				'email' => $strEmail,
+				'record_type' => Customer::REGISTERED
+			)
+		);
+
+		if (is_null($obj))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	/**
 	 * @param $attribute
 	 * @param $params
 	 */
 	public function validateEmailUnique($attribute, $params)
 	{
-		if (Yii::app()->user->isGuest && $this->email != '')
+		if ($this->email == '')
 		{
-			$objCustomer = Customer::LoadByEmail($this->email);
-
-			if ($objCustomer instanceof Customer)
-			{
-				$this->addError('email',
-					Yii::t('checkout', 'Email address already exists in system. Please log in.')
-				);
-			}
+			return;
 		}
-		elseif ($this->email != '')
+
+		if (Yii::app()->user->isGuest === false)
 		{
-
-			$objCustomer = Customer::GetCurrent();
-			$obj = Customer::model()->findAll('email = :email AND id <> :id',array(':email'=>$this->email,':id'=>$objCustomer->id));
-			if (count($obj)>0)
-			{
-				$this->addError('email',
-					Yii::t('checkout','This email address already exists in our system for another account.')
-				);
-			}
-
+			return;
 		}
+
+		if (self::isEmailRegistered($this->email) === true)
+		{
+			$this->addError(
+				'email',
+				Yii::t('checkout', 'Email address already exists in system. Please log in.')
+			);
+		}
+
 	}
 
 	/**
@@ -164,8 +181,9 @@ class Customer extends BaseCustomer
 		if (Yii::app()->user->isGuest &&
 			$this->email != $this->email_repeat)
 		{
-			$this->addError('email_repeat',
-				Yii::t('checkout','Email address does not match')
+			$this->addError(
+				'email_repeat',
+				Yii::t('checkout', 'Email address does not match')
 			);
 		}
 	}
@@ -185,15 +203,21 @@ class Customer extends BaseCustomer
 		{
 			$url = CHtml::link(
 				Yii::t('customer', 'password reset'),
-				Yii::app()->createUrl("site/login"));
+				Yii::app()->createUrl("site/login")
+			);
 
-			$this->addError($attribute, Yii::t('yii',
-				'Security {attribute} is invalid.  Please try clicking again' .
-				' on the link in the email, or request another {loginurl}.',
-				array(
-					'{attribute}'=>$this->getAttributeLabel($attribute),
-					'{loginurl}'=>$url
-				)));
+			$this->addError(
+				$attribute,
+				Yii::t(
+					'yii',
+					'Security {attribute} is invalid.  Please try clicking again' .
+					' on the link in the email, or request another {loginurl}.',
+					array(
+						'{attribute}' => $this->getAttributeLabel($attribute),
+						'{loginurl}' => $url
+					)
+				)
+			);
 		}
 		else
 		{
@@ -217,37 +241,53 @@ class Customer extends BaseCustomer
 		$obj->newsletter_subscribe = $checkoutForm->receiveNewsletter;
 		$obj->record_type = Customer::NORMAL_USER;
 		$obj->currency = _xls_get_conf('CURRENCY_DEFAULT');
-		$obj->pricing_level=1;
+		$obj->pricing_level = 1;
 		$obj->allow_login = Customer::NORMAL_USER;
 		$obj->scenario = Customer::SCENARIO_INSERT;
 		if (!$obj->save())
-			Yii::log("Error creating user ".print_r($obj->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		{
+			Yii::log("Error creating user " . print_r($obj->getErrors(), true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		}
 		else
-			Yii::log("Created user from checkout ".$obj->first_name." ".$obj->last_name." ".$obj->id,
-				'info', 'application.'.__CLASS__.".".__FUNCTION__);
+		{
+			Yii::log(
+				sprintf(
+					"Created user from checkout %s %s id# %d ",
+					$obj->first_name,
+					$obj->last_name,
+					$obj->id
+				),
+				'info',
+				'application.'.__CLASS__.".".__FUNCTION__
+			);
+		}
+
 		return $obj;
 	}
 
-	public static function LoadByEmail($strEmail) {
-
-		$objCustomer = Customer::model()->findByAttributes(array('email'=>$strEmail));
+	public static function LoadByEmail($strEmail)
+	{
+		$objCustomer = Customer::model()->findByAttributes(array('email' => $strEmail));
 		if ($objCustomer instanceof Customer)
+		{
 			return $objCustomer;
-		else return false;
+		}
 
+		return false;
 	}
 
 	public static function ClearRecord($id)
 	{
-
 		$objCustomer = Customer::model()->findByPk($id);
 		$objCustomer->default_billing_id = null;
 		$objCustomer->default_shipping_id = null;
 		$objCustomer->save();
 		foreach ($objCustomer->customerAddresses as $objAddress)
+		{
 			$objAddress->delete();
-		$objCustomer->delete();
+		}
 
+		$objCustomer->delete();
 	}
 
 	/**
@@ -281,9 +321,11 @@ class Customer extends BaseCustomer
 	public static function GetCurrent()
 	{
 		if (Yii::app()->user->isGuest)
+		{
 			return null;
-		else
-			return Customer::model()->findByPk(Yii::app()->user->id);
+		}
+
+		return Customer::model()->findByPk(Yii::app()->user->id);
 	}
 
 	/**
@@ -293,11 +335,12 @@ class Customer extends BaseCustomer
 	 */
 	public function GenerateTempPassword()
 	{
-		$this->token = Yii::app()->getSecurityManager()->
-		generateRandomString(Customer::RESET_PASSWORD_TOKEN_LENGTH);
+		$this->token = Yii::app()->getSecurityManager()->generateRandomString(Customer::RESET_PASSWORD_TOKEN_LENGTH);
 
 		if (!$this->token)
+		{
 			return false;
+		}
 
 		$this->temp_password = CPasswordHelper::hashPassword($this->token);
 		return $this->save(false);
@@ -309,25 +352,21 @@ class Customer extends BaseCustomer
 	 */
 	public function searchAdmin()
 	{
-
-		$criteria=new CDbCriteria;
-		$criteria->compare('first_name',$this->email,true,'OR');
-		$criteria->compare('last_name',$this->email,true,'OR');
-		$criteria->compare('email',$this->email,true,'OR');
-		$criteria->compare("CONCAT(first_name, ' ', last_name)",$this->email,true,'OR');
+		$criteria = new CDbCriteria;
+		$criteria->compare('first_name', $this->email, true, 'OR');
+		$criteria->compare('last_name', $this->email, true, 'OR');
+		$criteria->compare('email', $this->email, true, 'OR');
+		$criteria->compare("CONCAT(first_name, ' ', last_name)", $this->email, true, 'OR');
 		$criteria->addCondition("record_type>=0");
 
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-			'sort'=>array(
-				'defaultOrder'=>'last_name ASC',
-			),
-			'pagination' => array(
-				'pageSize' => 80,
-			),
-		));
-
-
+		return new CActiveDataProvider(
+			$this,
+			array(
+				'criteria' => $criteria,
+				'sort' => array('defaultOrder' => 'last_name ASC'),
+				'pagination' => array('pageSize' => 80),
+				)
+		);
 	}
 
 	public function getFullname()
@@ -394,22 +433,30 @@ class Customer extends BaseCustomer
 	protected function beforeValidate()
 	{
 		if ($this->isNewRecord)
+		{
 			$this->created = new CDbExpression('NOW()');
+		}
+
 		//When resetting a password, we are using the modified
 		//timestamp to determine if a reset token is still valid,
 		//so don't update the timestamp in that scenario.
 		if ($this->scenario != self::SCENARIO_RESETPASSWORD)
+		{
 			$this->modified = new CDbExpression('NOW()');
+		}
 
 		if (empty($this->preferred_language))
-			$this->preferred_language =  Yii::app()->language;
+		{
+			$this->preferred_language = Yii::app()->language;
+		}
 
 		if (empty($this->currency))
-			$this->currency = _xls_get_conf('CURRENCY_DEFAULT','USD');
+		{
+			$this->currency = _xls_get_conf('CURRENCY_DEFAULT', 'USD');
+		}
 
 		$this->email = strtolower($this->email);
 		$this->email_repeat = strtolower($this->email_repeat);
-
 
 		return parent::beforeValidate();
 	}
@@ -424,8 +471,7 @@ class Customer extends BaseCustomer
 					Customer::SCENARIO_UPDATEPASSWORD,
 					Customer::SCENARIO_RESETPASSWORD
 				)
-			)
-			&&
+			) &&
 			$this->record_type == Customer::REGISTERED &&
 			$this->password
 		)
@@ -433,22 +479,28 @@ class Customer extends BaseCustomer
 			$hashCostParam = _xls_get_conf('PASSWORD_HASH_COST_PARAM');
 
 			if ($hashCostParam)
+			{
 				$this->password = CPasswordHelper::hashPassword($this->password, $hashCostParam);
+			}
 			else
+			{
 				$this->password = CPasswordHelper::hashPassword($this->password);
+			}
 		}
 
 		// If token is set it means a temp_password has just been created,
 		// in all other situations erase the temp_password on save
 		if (!$this->token)
+		{
 			$this->temp_password = null;
+		}
 
 		return parent::beforeSave();
 	}
 
 	protected function afterConstruct()
 	{
-		$this->newsletter_subscribe = _xls_get_conf('DISABLE_ALLOW_NEWSLETTER',1) == 1 ? 0 : 1;
+		$this->newsletter_subscribe = _xls_get_conf('DISABLE_ALLOW_NEWSLETTER', 1) == 1 ? 0 : 1;
 		$this->preferred_language = _xls_get_conf('LANG_CODE', 'en');
 		$this->currency = _xls_get_conf('CURRENCY_DEFAULT', 'USD');
 	}

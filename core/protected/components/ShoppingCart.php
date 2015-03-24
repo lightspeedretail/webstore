@@ -84,22 +84,13 @@ class ShoppingCart extends CApplicationComponent
 				if (is_null($objCart))
 				{
 					// TODO: We should probably fix this behaviour:
-					// If we don't use InitializeCart() here, then we end up with a tax_code_id=NULL,
+					// If we don't use initialize() here, then we end up with a tax_code_id=NULL,
 					// which is fine, except that in models/Cart.php beforeValidate() we explicitly set
 					// the tax_code_id to use the NOTAX tax code if tax_code_id is null.  In the case
 					// of TAX_INCLUSIVE stores, this is definitely not what we want.
-					$objCart = Cart::InitializeCart();
-					if ($intCustomerId !== null)
-					{
-						//Set the customer_id here so that setTaxCodeByDefaultShippingAddress()
-						//will pick it up later on and load the cart with customer info.
-						$objCart->customer_id = $intCustomerId;
-						Yii::app()->user->setState('cartid', $objCart->id);
-					}
+					$objCart = Cart::initialize($objCustomer);
 				}
-			}
-			else
-			{
+			} else {
 				$objCart = Cart::model()->findByPk($intSessionCartId);
 
 				//We don't want to create a new cart if the cart is currently active in session
@@ -118,17 +109,20 @@ class ShoppingCart extends CApplicationComponent
 							$objCart->cart_type
 						),
 						'error',
-						'application.' . __CLASS__ . "." . __FUNCTION__
+						'application.'.__CLASS__.".".__FUNCTION__
 					);
 
-					$objCart = Cart::InitializeCart();
-					Yii::app()->user->setState('cartid', $objCart->id);
+					$objCart = Cart::initialize($objCustomer);
 				}
 			}
 
 			if ($intCustomerId !== null)
 			{
-				$objCart->customer_id = $intCustomerId; //Need this for recalulateAndSave()
+				$objCart->customer_id = $intCustomerId;
+			}
+
+			if ($objCart->item_count > 0)
+			{
 				$objCart->recalculateAndSave();
 			}
 
@@ -138,6 +132,7 @@ class ShoppingCart extends CApplicationComponent
 		return $this->_model;
 	}
 
+
 	/**
 	 * Since calling our model doesn't necessarily really create a db record (to avoid blank carts all over the place),
 	 * this function purposely creates a record when we need one (i.e. when adding a product to the cart)
@@ -145,11 +140,10 @@ class ShoppingCart extends CApplicationComponent
 	protected function createCart()
 	{
 		$intCartId = Yii::app()->user->getState('cartid');
-		Yii::log("Creating cart, existing id is " . $intCartId, 'info', 'application.' . __CLASS__ . "." . __FUNCTION__);
+		Yii::log("Creating cart, existing id is " . $intCartId, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 		if (empty($intCartId) && !Yii::app()->isCommonSSL)
 		{
-
 			$objCustomer = Customer::GetCurrent();
 			$intCustomerid = null;
 
@@ -163,9 +157,10 @@ class ShoppingCart extends CApplicationComponent
 			{
 				$objCart = Cart::LoadLastCartInProgress($intCustomerid);
 			}
+
 			if (is_null($objCart))
 			{
-				$objCart = Cart::InitializeCart();
+				$objCart = Cart::initializeAndSave();
 			}
 
 			$this->_model = $objCart;
@@ -179,8 +174,8 @@ class ShoppingCart extends CApplicationComponent
 		{
 			return false;
 		}
-		else return true;
 
+		return true;
 	}
 
 	/**
@@ -193,23 +188,19 @@ class ShoppingCart extends CApplicationComponent
 		if (is_null($objCartToMerge) === false)
 		{
 			$objCartInProgress = $objCartToMerge;
-		}
-		else
-		{
+		} else {
 			$objCartInProgress = Cart::LoadLastCartInProgress(Yii::app()->user->id, $this->id);
 		}
 
-		if ($objCartInProgress)
+		if ($objCartInProgress instanceof Cart)
 		{
-			Yii::log("Found prior cart " . $objCartInProgress->id, 'info', 'application.' . __CLASS__ . "." . __FUNCTION__);
+			Yii::log("Found prior cart " . $objCartInProgress->id, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
 			if (count($this->cartItems) == 0)
 			{
 				$this->_model = $objCartInProgress;
 				$arrPastItems = array();
-			}
-			else
-			{
+			} else {
 				$arrPastItems = $objCartInProgress->cartItems;
 			}
 
@@ -220,7 +211,7 @@ class ShoppingCart extends CApplicationComponent
 				{
 					$objProduct = Product::model()->findbyPk($objItem->product_id);
 
-					//we strip any discount from another cart usu. promo code
+					// We strip any discount from another cart usu. promo code.
 					$retVal = $this->model->AddProduct(
 						$objProduct,
 						$objItem->qty,
@@ -242,7 +233,8 @@ class ShoppingCart extends CApplicationComponent
 					}
 				}
 
-				//If we aren't being passed a cart from a share (that we don't want to delete), then remove the old cart in progress
+				// If we aren't being passed a cart from a share (that we don't
+				// want to delete), then remove the old cart in progress.
 				if (is_null($objCartToMerge))
 				{
 					Yii::app()->user->setFlash('success', Yii::t('cart', 'Your prior cart has been restored.'));
@@ -251,19 +243,21 @@ class ShoppingCart extends CApplicationComponent
 
 				$this->model->UpdateMissingProducts();
 			}
+
+			$this->model->customer_id = Yii::app()->user->id;
+			$this->model->datetime_cre = new CDbExpression('NOW()'); //Reset time to current time
+			if (!$this->model->save())
+			{
+				Yii::log("Error saving cart " . print_r($this->model->getErrors(), true), 'error', 'application.' . __CLASS__ . "." . __FUNCTION__);
+			}
+
+			$this->recalculateAndSave();
+			$this->_model = Cart::model()->findByPk($this->id);
+			Yii::app()->user->setState('cartid', $this->id);
+			return true;
 		}
 
-		$this->model->customer_id = Yii::app()->user->id;
-		$this->model->datetime_cre = new CDbExpression('NOW()'); //Reset time to current time
-		if (!$this->model->save())
-		{
-			Yii::log("Error saving cart " . print_r($this->model->getErrors(), true), 'error', 'application.' . __CLASS__ . "." . __FUNCTION__);
-		}
-
-		$this->recalculateAndSave();
-		$this->_model = Cart::model()->findByPk($this->id);
-		Yii::app()->user->setState('cartid', $this->id);
-		return true;
+		return false;
 	}
 
 	/**
@@ -289,7 +283,7 @@ class ShoppingCart extends CApplicationComponent
 		// Merge in items from our quote to the cart.
 		if (count($arrPastItems) > 0)
 		{
-			foreach ($arrPastItems as $objItem)
+			foreach($arrPastItems as $objItem)
 			{
 				$objProduct = Product::model()->findbyPk($objItem->product_id);
 				$retVal = $this->model->AddProduct(
@@ -314,7 +308,11 @@ class ShoppingCart extends CApplicationComponent
 		$this->model->datetime_cre = new CDbExpression('NOW()'); //Reset time to current time
 		if (!$this->model->save())
 		{
-			Yii::log("Error saving cart " . print_r($this->model->getErrors(), true), 'error', 'application.' . __CLASS__ . "." . __FUNCTION__);
+			Yii::log(
+				"Error saving cart ".print_r($this->model->getErrors(), true),
+				'error',
+				'application.'.__CLASS__.".".__FUNCTION__
+			);
 		}
 
 		$this->recalculateAndSave();
@@ -340,20 +338,20 @@ class ShoppingCart extends CApplicationComponent
 
 		foreach ($this->cartItems as $item)
 		{
-			//Make sure our object is current and not cached through our relations
+			// Make sure our object is current and not cached through our relations.
 			$objProduct = Product::model()->findByPk($item->product_id);
 
 			if ($item->sell_base != $objProduct->PriceValue)
 			{
 				$strFlash .= Yii::t(
-						'cart',
-						'The item {item} in your cart has {updown} in price to {price}.',
-						array(
-							'{item}' => $item->description,
-							'{updown}' => ($item->sell_base > $objProduct->PriceValue ? Yii::t('cart', 'decreased') : Yii::t('cart', 'increased')),
-							'{price}' => $objProduct->getPrice(1, $this->IsTaxIn)
-						)
-					) . '<br>';
+					'cart',
+					'The item {item} in your cart has {updown} in price to {price}.',
+					array(
+						'{item}' => $item->description,
+						'{updown}' => ($item->sell_base > $objProduct->PriceValue ? Yii::t('cart', 'decreased') : Yii::t('cart', 'increased')),
+						'{price}' => $objProduct->getPrice(1, $this->IsTaxIn)
+					)
+				) . '<br>';
 
 				$arrItem['product'] = $objProduct;
 				$arrItem['qty'] = $item->qty;
@@ -393,6 +391,7 @@ class ShoppingCart extends CApplicationComponent
 		return $this->model->name;
 	}
 
+
 	public function getCartQty()
 	{
 
@@ -423,7 +422,6 @@ class ShoppingCart extends CApplicationComponent
 		Yii::app()->user->setState('cartid', $id);
 		$this->setModelById($id);
 	}
-
 	/**
 	 * Add a product to the cart. Defaults to qty 1 unless specified
 	 * @param $mixProduct
@@ -435,7 +433,8 @@ class ShoppingCart extends CApplicationComponent
 	public function addProduct($mixProduct, $intQuantity = 1, $intGiftItemId = null, $auto = null)
 	{
 		$cartid = Yii::app()->user->getState('cartid');
-		if (empty($cartid))
+
+		if (empty($cartid) && is_null($this->model))
 		{
 			$this->createCart();
 		}
@@ -443,9 +442,7 @@ class ShoppingCart extends CApplicationComponent
 		if ($mixProduct instanceof Product)
 		{
 			$objProduct = $mixProduct;
-		}
-		else
-		{
+		} else {
 			$objProduct = Product::model()->findByPk($mixProduct);
 		}
 
@@ -466,23 +463,22 @@ class ShoppingCart extends CApplicationComponent
 
 			if (is_numeric($retVal) && is_null($auto)) //prevent circular logic adding
 			{
-				foreach ($objProduct->productRelateds as $objProductAdditional)
+				foreach($objProduct->productRelateds as $objProductAdditional)
 				{
 					if (isset($objProductAdditional->related) &&
 						$objProductAdditional->related->IsAddable &&
 						$objProductAdditional->autoadd == 1 &&
-						$objProductAdditional->related->master_model == 0
-					)
+						$objProductAdditional->related->master_model == 0)
 					{
 						$this->addProduct($objProductAdditional->related, $objProductAdditional->qty, null, true);
 					}
 				}
 			}
+
 			return $retVal;
-
 		}
-		else return false;
 
+		return false;
 	}
 
 	/**
@@ -509,8 +505,9 @@ class ShoppingCart extends CApplicationComponent
 		$retVal = $this->model->save();
 		if (!$retVal)
 		{
-			Yii::log("Error saving cart " . print_r($this->model->getErrors()), 'error', 'application.' . __CLASS__ . "." . __FUNCTION__);
+			Yii::log("Error saving cart " . print_r($this->model->getErrors()), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		}
+
 		return $retVal;
 	}
 
@@ -518,12 +515,13 @@ class ShoppingCart extends CApplicationComponent
 	{
 		return $this->model->getErrors();
 	}
-
 	/**
 	 * Create a Link to view the cart after checkout. Used for receipt viewing.
 	 * @return mixed
 	 */
+	// @codingStandardsIgnoreStart
 	public function GenerateLink()
+	// @codingStandardsIgnoreEnd
 	{
 		return $this->model->GenerateLink();
 	}
@@ -550,8 +548,10 @@ class ShoppingCart extends CApplicationComponent
 			{
 				WishlistItem::model()->updateByPk($item->wishlist_item, array('cart_item_id' => null));
 			}
+
 			$item->delete();
 		}
+
 		$this->model->fk_promo_id = null;
 		$this->model->save();
 		$this->model->refresh();
@@ -561,7 +561,9 @@ class ShoppingCart extends CApplicationComponent
 		return true;
 	}
 
+	// @codingStandardsIgnoreStart
 	public function UpdateMissingProducts()
+	// @codingStandardsIgnoreEnd
 	{
 		if (Yii::app()->user->getState('cartid') > 0 && isset($this->_model))
 		{
@@ -589,9 +591,16 @@ class ShoppingCart extends CApplicationComponent
 	 */
 	public function revalidatePromoCode()
 	{
+		if (is_null($this->id))
+		{
+			// If id is null then the cart has yet to be saved, which means it contains
+			// no products and therefore there is no promocode to be revalidated.
+			return;
+		}
+
 		if (isset($this->model) === false)
 		{
-			// No Cart object, cannot revalidate.
+			// If model isn't set then there is no Cart object, cannot revalidate.
 			return;
 		}
 
@@ -627,7 +636,9 @@ class ShoppingCart extends CApplicationComponent
 		$this->_model = null;
 	}
 
+	// @codingStandardsIgnoreStart
 	public function UpdateItemQuantity($objItem, $qty)
+	// @codingStandardsIgnoreEnd
 	{
 		$this->clearCachedShipping();
 		return $this->model->UpdateItemQuantity($objItem, _xls_number_only($qty));
@@ -639,9 +650,7 @@ class ShoppingCart extends CApplicationComponent
 		if ($mixCode instanceof PromoCode)
 		{
 			$objPromoCode = $mixCode;
-		}
-		else
-		{
+		} else {
 			$objPromoCode = PromoCode::LoadByCode($mixCode);
 		}
 
@@ -652,7 +661,7 @@ class ShoppingCart extends CApplicationComponent
 		}
 	}
 
-	//These are pass-through functions which go currently to our cart object
+	// These are pass-through functions which go currently to our cart object.
 
 	/**
 	 * True - cart should display tax inclusive prices
@@ -688,7 +697,9 @@ class ShoppingCart extends CApplicationComponent
 		$this->model->completeUpdatePromoCode();
 	}
 
+	// @codingStandardsIgnoreStart
 	public function SetIdStr()
+	// @codingStandardsIgnoreEnd
 	{
 		$this->model->SetIdStr();
 	}
@@ -708,17 +719,14 @@ class ShoppingCart extends CApplicationComponent
 		if (is_numeric($mixCustomer))
 		{
 			$objCustomer = Customer::model()->findByPk($mixCustomer);
-		}
-		else
-		{
+		} else {
 			$objCustomer = $mixCustomer;
 		}
 
 		if ($objCustomer instanceof Customer)
 		{
-			Yii::log("Assigning customer id #" . $objCustomer->id, 'info', 'application.' . __CLASS__ . "." . __FUNCTION__);
+			Yii::log("Assigning customer id #" . $objCustomer->id, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 			$this->model->customer_id = $objCustomer->id;
-			$this->model->save();
 			return true;
 		}
 
@@ -735,12 +743,16 @@ class ShoppingCart extends CApplicationComponent
 		$this->model->recalculateAndSave();
 	}
 
+	// @codingStandardsIgnoreStart
 	public function RecalculateInventoryOnCartItems()
+	// @codingStandardsIgnoreEnd
 	{
 		$this->model->RecalculateInventoryOnCartItems();
 	}
 
+	// @codingStandardsIgnoreStart
 	public function UpdateWishList()
+	// @codingStandardsIgnoreEnd
 	{
 		$this->model->UpdateWishList();
 	}
@@ -801,6 +813,77 @@ class ShoppingCart extends CApplicationComponent
 	}
 
 	/**
+	 * Erase expired carts and their associated items.
+	 * A cart is considered expired if
+	 *	1. it was last modified over CART_LIFE days ago AND
+	 *	2. it has no id_str associated with it AND
+	 *	3. it is of type cart, giftregistry or awaitpayment AND
+	 *	4. it has no items in it OR
+	 *	5. it has no customer_id associated with it
+	 *
+	 *	1. AND 2. AND 3. AND (4. OR 5.)
+	 *
+	 * @return int The number of carts + items that were erased.
+	 */
+	public static function eraseExpired() {
+		// Erase carts older than CART_LIFE days.
+		$cartLife = CPropertyValue::ensureInteger(_xls_get_conf('CART_LIFE', 30));
+
+		// We can't use the class constants directly in the call to
+		// bindParam(), put them in variables first.
+		$cartType = CPropertyValue::ensureInteger(CartType::cart);
+		$giftRegistryType = CPropertyValue::ensureInteger(CartType::giftregistry);
+		$awaitPaymentType = CPropertyValue::ensureInteger(CartType::awaitpayment);
+
+		$deleteSql = "
+			DELETE c, ci
+			FROM xlsws_cart c
+			LEFT JOIN xlsws_cart_item ci
+			ON c.id = ci.cart_id
+			WHERE
+				(c.customer_id IS NULL OR ci.id IS NULL) AND
+				(c.cart_type IN (:cart, :giftregistry, :awaitpayment) AND
+				c.modified < CURDATE() - INTERVAL :cartlife DAY AND
+				c.id_str IS NULL)";
+		$deleteCommand = Yii::app()->db->createcommand($deleteSql);
+		$deleteCommand->bindparam(":cart", $cartType, PDO::PARAM_INT);
+		$deleteCommand->bindparam(":giftregistry", $giftRegistryType, PDO::PARAM_INT);
+		$deleteCommand->bindparam(":awaitpayment", $awaitPaymentType, PDO::PARAM_INT);
+		$deleteCommand->bindparam(":cartlife", $cartLife, PDO::PARAM_INT);
+
+		$transaction = Yii::app()->db->beginTransaction();
+		try
+		{
+			Yii::app()->db->createCommand("set foreign_key_checks = 0")->execute();
+			$numErased = $deleteCommand->execute();
+			Yii::app()->db->createCommand("set foreign_key_checks = 1")->execute();
+			$transaction->commit();
+		} catch(Exception $e) {
+			$transaction->rollback();
+		}
+
+		return $numErased;
+	}
+
+	/**
+	 * Optimize the tables related to the shopping cart.
+	 * This is an administrative function and should be called with care.
+	 *
+	 * @return void
+	 */
+	public static function optimizeTables() {
+		Yii::app()->db->createCommand("OPTIMIZE table xlsws_cart")->execute();
+		Yii::app()->db->createCommand("OPTIMIZE table xlsws_cart_item")->execute();
+		Yii::app()->db->createCommand("OPTIMIZE table xlsws_customer")->execute();
+		Yii::app()->db->createCommand("OPTIMIZE table xlsws_wish_list")->execute();
+		Yii::app()->db->createCommand("OPTIMIZE table xlsws_wish_list_items")->execute();
+		Yii::app()->db->createCommand("OPTIMIZE table xlsws_product")->execute();
+		Yii::app()->db->createCommand("OPTIMIZE table xlsws_product_related")->execute();
+		Yii::app()->db->createCommand("OPTIMIZE table xlsws_category")->execute();
+		Yii::app()->db->createCommand("OPTIMIZE table xlsws_product_category_assn")->execute();
+	}
+
+	/**
 	 * Check to see if the cart contains items that have quantity discounts
 	 * applied to them. If there is one element that those this method will
 	 * return true.
@@ -832,8 +915,10 @@ class ShoppingCart extends CApplicationComponent
 	 * @param string $strName
 	 * @return int|mixed
 	 */
-	public function __get($strName) {
-		switch ($strName) {
+	public function __get($strName)
+	{
+		switch ($strName)
+		{
 			case 'attributes':
 				return $this->model->attributes;
 
@@ -850,7 +935,7 @@ class ShoppingCart extends CApplicationComponent
 
 			case 'TotalItemCount':
 			case 'totalItemCount':
-				return $this->model->totalItemCount;
+				return $this->model->TotalItemCount;
 
 			case 'tax1name':
 			case 'tax1Name':
@@ -891,9 +976,6 @@ class ShoppingCart extends CApplicationComponent
 			case 'TaxTotal':
 				return $this->model->TaxTotal;
 
-			case 'IsTaxIn':
-				return $this->getIsTaxIn();
-
 			case 'taxTotalFormatted':
 				return _xls_currency($this->model->TaxTotal);
 			case 'subtotal':
@@ -914,8 +996,7 @@ class ShoppingCart extends CApplicationComponent
 				return $this->model->Taxes;
 
 			case 'Total':
-			case 'total':
-				return $this->model->total;
+				return $this->total;
 
 			case 'TotalFormatted':
 			case 'totalFormatted':
@@ -1006,7 +1087,7 @@ class ShoppingCart extends CApplicationComponent
 				return self::calculateOriginalSubtotal();
 
 			default:
-				//As a clever trick to get to our model through the component,
+				// As a clever trick to get to our model through the component.
 				if (isset($this->model) && $strName != "model" && $this->model->hasAttribute($strName))
 				{
 					return $this->model->$strName;
@@ -1016,7 +1097,9 @@ class ShoppingCart extends CApplicationComponent
 
 	}
 
+	// @codingStandardsIgnoreStart
 	private function calculateOriginalSubtotal()
+	// @codingStandardsIgnoreEnd
 	{
 		$originalSubTotal = 0;
 		if ($this->model->cartItems)
@@ -1035,19 +1118,20 @@ class ShoppingCart extends CApplicationComponent
 	 * @param mixed $mixValue
 	 * @return mixed
 	 */
-	public function __set($strName, $mixValue) {
-		switch ($strName) {
-
+	public function __set($strName, $mixValue)
+	{
+		switch ($strName)
+		{
 			case 'cartItems':
 				return $this->model->cartItems;
 
 			default:
-				//As a clever trick to get to our model through the component,
+				// As a clever trick to get to our model through the component,
 				if ($strName != "model" && $this->model->hasAttribute($strName))
 				{
-					$this->model->__set($strName,$mixValue);
+					$this->model->__set($strName, $mixValue);
 				} else {
-					return parent::__set($strName,$mixValue);
+					return parent::__set($strName, $mixValue);
 				}
 		}
 	}

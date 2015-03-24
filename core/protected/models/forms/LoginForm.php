@@ -12,12 +12,10 @@ class LoginForm extends CFormModel
 	public $rememberMe  = true;
 	public $sharedLogin = false;
 
-
 	/**
 	 * Used in the new checkout to set the validation scenario
 	 * @var bool
 	 */
-
 	public $guest = false;
 
 	private $_identity;
@@ -50,8 +48,8 @@ class LoginForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'email' => Yii::t('CheckoutForm','Email Address'),
-			'password' => Yii::t('CheckoutForm','Password'),
+			'email' => Yii::t('CheckoutForm', 'Email Address'),
+			'password' => Yii::t('CheckoutForm', 'Password'),
 			'rememberMe' => 'Remember me next time',
 		);
 	}
@@ -62,40 +60,37 @@ class LoginForm extends CFormModel
 	 */
 	public function authenticate($attribute, $params)
 	{
-		if(!$this->hasErrors())
+		if (!$this->hasErrors())
 		{
-			$this->_identity=new UserIdentity($this->email,$this->password);
-			if(!$this->_identity->authenticate())
+			$this->_identity = new UserIdentity($this->email, $this->password);
+			if (!$this->_identity->authenticate())
 			{
 				switch ($this->_identity->errorCode)
 				{
 					case UserIdentity::ERROR_NOT_APPROVED:
-						$this->addError('password',Yii::t('global','Your account has not yet been approved.'));
+						$this->addError('password', Yii::t('global', 'Your account has not yet been approved.'));
 						Yii::log("Denied: Unapproved user ".$this->email." attempted login", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 						break;
 
 					case UserIdentity::ERROR_PASSWORD_FACEBOOK:
-						$this->addError('password',Yii::t('global','Use Facebook Login.'));
+						$this->addError('password', Yii::t('global', 'Use Facebook Login.'));
 						break;
 
 					case UserIdentity::ERROR_PASSWORD_INVALID:
-						$this->addError('password',Yii::t('global','Incorrect password.'));
+						$this->addError('password', Yii::t('global', 'Incorrect password.'));
 						Yii::log("Login denied: Incorrect password for ".$this->email." attempted login", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 						break;
 
 					case UserIdentity::ERROR_USERNAME_INVALID:
-						$this->addError('password',Yii::t('global','Unknown email address.'));
+						$this->addError('password', Yii::t('global', 'Unknown email address.'));
 						Yii::log("Login denied: Unknown email address ".$this->email." attempted login", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 						break;
 
 					default:
-						$this->addError('password',Yii::t('global','Incorrect username or password.'));
+						$this->addError('password', Yii::t('global', 'Incorrect username or password.'));
 						Yii::log("Login denied: Incorrect username or password for ".$this->email." attempted login", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				}
-
-
 			}
-
 		}
 	}
 
@@ -105,27 +100,26 @@ class LoginForm extends CFormModel
 	 */
 	public function login()
 	{
-		if($this->_identity===null)
+		if ($this->_identity === null)
 		{
-			$this->_identity=new UserIdentity($this->email,$this->password);
+			$this->_identity = new UserIdentity($this->email, $this->password);
 			$this->_identity->authenticate();
 		}
 
-		if($this->_identity->errorCode===UserIdentity::ERROR_NONE)
+		if ($this->_identity->errorCode === UserIdentity::ERROR_NONE)
 		{
 			Yii::log("Login authentication passed ", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-			$duration=$this->rememberMe ? 3600*24*30  : 0 ; // true = 30 days, false=until browser close
-			Yii::app()->user->login($this->_identity,$duration);
+			$duration = $this->rememberMe ? 3600 * 24 * 30 : 0; // true = 30 days, false=until browser close
+			Yii::app()->user->login($this->_identity, $duration);
 
 			//afterLogin() in WebUser class will restore prior cart if necessary
 
 			return true;
 		}
 		else
+		{
 			return false;
-
-
-
+		}
 	}
 
 	/**
@@ -134,63 +128,62 @@ class LoginForm extends CFormModel
 	 */
 	public function loginadmin()
 	{
-		if($this->_identity===null)
+		if($this->_identity === null)
 		{
-			$this->_identity=new UserIdentity($this->email,$this->password);
+			$this->_identity = new UserIdentity($this->email, $this->password);
 			$this->_identity->authenticate();
 		}
-		if($this->_identity->errorCode===UserIdentity::ERROR_NONE && $this->_identity->isAdmin)
+
+		if($this->_identity->errorCode === UserIdentity::ERROR_NONE && $this->_identity->isAdmin)
 		{
-			$duration=$this->rememberMe ? 3600*24*30  : 0 ; // true = 30 days, false=until browser close
-			Yii::app()->user->login($this->_identity,$duration);
+			$duration = $this->rememberMe ? 3600 * 24 * 30 : 0; // true = 30 days, false=until browser close
+			Yii::app()->user->login($this->_identity, $duration);
 
 			return true;
 		}
 		else
+		{
 			return false;
-
-
-
+		}
 	}
 
 	/**
 	 * Logs in the user using the given username and password in the model.
 	 * @return boolean whether login is successful
 	 */
-	public function loginLightspeed($username,$password)
+	public function loginLightspeed($username, $password)
 	{
-		if($this->_identity===null)
+		if ($this->_identity === null)
 		{
-			$this->_identity=new LSIdentity($username,$password);
+			$this->_identity = new LSIdentity($username, $password);
 			$this->_identity->authenticate();
 		}
-		if($this->_identity->errorCode===UserIdentity::ERROR_NONE)
+
+		if ($this->_identity->errorCode === UserIdentity::ERROR_NONE)
 		{
-			Yii::app()->user->login($this->_identity,1800);
-
-
+			Yii::app()->user->login($this->_identity, 1800);
 			return true;
 		}
 		else
+		{
 			return false;
-
-
-
+		}
 	}
 
-    /**
-     * Since Validate tests to make sure certain fields have values, populate requirements here such as the modified timestamp
-     * @return boolean from parent
-     */
+	/**
+	 * Since Validate tests to make sure certain fields have values, populate requirements here such as the modified timestamp
+	 * @return boolean from parent
+	 */
+	protected function beforeValidate()
+	{
+	    $this->email = strtolower($this->email);
 
-    protected function beforeValidate() {
+		if ($this->getScenario() === '')
+		{
+			$this->setScenario('Existing');
+		}
 
-        $this->email = strtolower($this->email);
-
-	    if ($this->getScenario() === '')
-		    $this->setScenario('Existing');
-
-        return parent::beforeValidate();
-    }
+		return parent::beforeValidate();
+	}
 
 }

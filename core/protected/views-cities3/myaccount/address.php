@@ -9,11 +9,10 @@
 /* Create a new wish list form. We use the Checkout ID to reuse our CSS formatting */
 ?><div id="checkout">
 	<?php
-		$form=$this->beginWidget(
+		$form = $this->beginWidget(
 			'CActiveForm', array(
-				'id'=>'wishlistdisplay',
-				'enableClientValidation'=>true,
-				'focus'=>array($model,'registry_name'),
+				'id' => 'wishlistdisplay',
+				'enableClientValidation' => true
 			)
 		);
 	if ($model->id > 0) {

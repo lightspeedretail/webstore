@@ -82,8 +82,7 @@ class ImagesType
 
 
 	public static function GetSize($intImageTypeId) {
-		list($intDefWidth, $intDefHeight) =
-			ImagesType::$SizeArray[$intImageTypeId];
+		list($intDefWidth, $intDefHeight) = ImagesType::$SizeArray[$intImageTypeId];
 
 		$strCfg = ImagesType::GetConfigKey($intImageTypeId);
 
@@ -96,7 +95,6 @@ class ImagesType
 		//If our theme doesn't have the config there, see if we have a 3.0 style config.xml
 		if(empty($intWidth) || empty($intHeight))
 		{
-
 			$fnOptions = YiiBase::getPathOfAlias('webroot')."/themes/".Yii::app()->theme->name."/config.xml";
 
 			if (file_exists($fnOptions))
@@ -105,20 +103,22 @@ class ImagesType
 
 				// Parse xml for response values
 				$oXML = new SimpleXMLElement($strXml);
-				Yii::log("Found config.xml values ".print_r($oXML,true), 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 				if(isset($oXML->defaults->configuration))
 				{
 					foreach ($oXML->defaults->configuration as $item)
 					{
-						if((string)$item->key_name==$strCfgWidth)
+						if((string)$item->key_name == $strCfgWidth)
+						{
 							$intWidth = (string)$item->key_value;
+						}
 
-						if((string)$item->key_name==$strCfgHeight)
+						if((string)$item->key_name == $strCfgHeight)
+						{
 							$intHeight = (string)$item->key_value;
+						}
 					}
 				}
 			}
-
 		}
 
 		//if all else STILL fails, go old school and get them from the config (And even more so, use defaults)

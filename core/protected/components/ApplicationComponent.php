@@ -2,11 +2,9 @@
 /*
  * Empty event handlers so we can extend without causing errors
  */
-class ApplicationComponent extends CApplicationComponent {
-
-
-
-	//For CEventProduct,CEventPhoto,CEventOrder
+class ApplicationComponent extends CApplicationComponent
+{
+	// For CEventProduct,CEventPhoto,CEventOrder.
 	public function onSaveProduct($event) {}
 	public function onUpdateInventory($event) {}
 	public function onActionProductView($event) {}
@@ -24,6 +22,4 @@ class ApplicationComponent extends CApplicationComponent {
 	public function onActionListOrders($event) {}
 
 	public function onFlushTable($event) {}
-
-
 }

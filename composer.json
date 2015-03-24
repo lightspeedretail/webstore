@@ -2,7 +2,7 @@
     "require-dev": {
         "phploc/phploc": "*",
         "phpmd/phpmd" : "@stable",
-        "phpunit/phpunit": "4.4.*",
+        "phpunit/phpunit": "4.4.1",
         "phpunit/phpunit-selenium": ">=1.2",
         "phpunit/dbunit": ">=1.2",
         "phpunit/phpunit-story": "*",

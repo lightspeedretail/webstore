@@ -29,80 +29,119 @@ class Tax extends BaseTax
 
 
 	/**
-	 * Calculate a price of a product against a provided Tax Code. This will return the total price as well
-	 * as a 5-item array of tax1_rate through tax5_rate
+	 * Calculate taxes given a pre-tax price, the lsid of the TaxCode and the lsid of the TaxStatus.
+	 * The returned array looks like this:
+	 * Array(
+	 *   [fltSellTotalWithTax] => <float>
+	 *   [arrTaxValues] => Array(
+	 *            [1] => <float>
+	 *            [2] => <float>
+	 *            [3] => <float>
+	 *            [4] => <float>
+	 *            [5] => <float>
+	 *   )
+	 *   [arrTaxRates] => Array(
+	 *            [1] => <float>
+	 *            [2] => <float>
+	 *            [3] => <float>
+	 *            [4] => <float>
+	 *            [5] => <float>
+	 *   )
+	 * )
+	 *
+	 * fltSellTotalWithTax is the sum of the pre-tax value and all members of arrTaxValues
+	 * arrTaxValues is an array of values for each tax calculated according to its corresponding rate and the pre-tax value
+	 * arrTaxRate is an array of tax rates which are defined by the TaxCode
+	 *
 	 * @param $fltSellTotal
 	 * @param $intTaxCodeId
 	 * @param $intTaxStatusId
 	 * @return array
 	 */
-	public static function CalculatePricesWithTax($fltSellTotal , $intTaxCodeId , $intTaxStatusId) {
-
+	public static function calculatePricesWithTax($fltSellTotal, $intTaxCodeId, $intTaxStatusId)
+	{
 		static $objTaxes; // Cached for better performance
 
 		$fltSellTotalTaxed = $fltSellTotal;
-		$arrTaxAmount = array(1=>0 , 2=>0 , 3=>0 , 4=> 0 , 5=>0);
-		$arrTaxRates = array(1=>0 , 2=>0 , 3=>0 , 4=> 0 , 5=>0);
+		$arrTaxAmount = array(1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0);
+		$arrTaxRates = array(1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0);
+		$objTaxCode = TaxCode::model()->findByAttributes(array('lsid' => $intTaxCodeId));
 
-		if($intTaxCodeId instanceof TaxCode )
-			$objTaxCode = $intTaxCodeId;
-		else
-			$objTaxCode = TaxCode::model()->findByAttributes(array('lsid'=>$intTaxCodeId));
-
-		if(!$objTaxCode) {
-			if(!is_null($intTaxCodeId)) //Ignore null at this stage
+		if (is_null($objTaxCode))
+		{
+			if (!is_null($intTaxCodeId)) //Ignore null at this stage
+			{
 				Yii::log("Unknown tax code passed: $intTaxCodeId", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			}
 
-			return array($fltSellTotalTaxed , $arrTaxAmount, $arrTaxRates);
+			return array(
+				'fltSellTotalWithTax' => $fltSellTotalTaxed,
+				'arrTaxValues' => $arrTaxAmount,
+				'arrTaxRates' => $arrTaxRates
+			);
 		}
 
-		if($intTaxStatusId instanceof TaxStatus)
-			$objTaxStatus = $intTaxStatusId;
-		elseif($intTaxStatusId >= 0)
-			$objTaxStatus = TaxStatus::model()->findByAttributes(array('lsid'=>$intTaxStatusId));
-		else
-			$objTaxStatus = false;
+		$objTaxStatus = TaxStatus::model()->findByAttributes(array('lsid' => $intTaxStatusId));
 
 		//For LS Cloud integration, see if we can find the default Tax Status
-		if($objTaxStatus === false && Yii::app()->params['LIGHTSPEED_CLOUD']>0)
+		if (is_null($objTaxStatus) && Yii::app()->params['LIGHTSPEED_CLOUD'] > 0)
+		{
 			$objTaxStatus = TaxStatus::getCloudDefault();
+		}
 
-		if(!$objTaxes)
+		if (is_null($objTaxes))
+		{
 			$objTaxes = Tax::model()->findAll();
+		}
 
 		$taxtypes = 5; // Number of taxes in LS
 
-		// for each exempt, reset the code to 0
-		if($objTaxStatus) {
-			if($objTaxStatus->tax1_status) $objTaxCode->tax1_rate = 0;
-			if($objTaxStatus->tax2_status) $objTaxCode->tax2_rate = 0;
-			if($objTaxStatus->tax3_status) $objTaxCode->tax3_rate = 0;
-			if($objTaxStatus->tax4_status) $objTaxCode->tax4_rate = 0;
-			if($objTaxStatus->tax5_status) $objTaxCode->tax5_rate = 0;
+		// for each exempt, reset the corresponding rate to 0
+		if ($objTaxStatus instanceof TaxStatus)
+		{
+			if ($objTaxStatus->tax1_status == 1) $objTaxCode->tax1_rate = 0;
+			if ($objTaxStatus->tax2_status == 1) $objTaxCode->tax2_rate = 0;
+			if ($objTaxStatus->tax3_status == 1) $objTaxCode->tax3_rate = 0;
+			if ($objTaxStatus->tax4_status == 1) $objTaxCode->tax4_rate = 0;
+			if ($objTaxStatus->tax5_status == 1) $objTaxCode->tax5_rate = 0;
 		}
 
 		$i = 0;
-		foreach($objTaxes as $objTax) {
-			$strRate = "tax" . ($i+1) . "_rate";
+		foreach ($objTaxes as $objTax)
+		{
+			$strRate = "tax" . ($i + 1) . "_rate";
 
-			if($objTax->compounded)
-				$fltTaxAmount = $fltSellTotalTaxed * ($objTaxCode->$strRate/100);
+			if ($objTax->compounded)
+			{
+				$fltTaxAmount = $fltSellTotalTaxed * ($objTaxCode->$strRate / 100);
+			}
 			else
-				$fltTaxAmount = $fltSellTotal * ($objTaxCode->$strRate/100);
+			{
+				$fltTaxAmount = $fltSellTotal * ($objTaxCode->$strRate / 100);
+			}
 
-			if(($objTax->max_tax > 0) && ($fltTaxAmount >= $objTax->max_tax))
+			if (($objTax->max_tax > 0) && ($fltTaxAmount >= $objTax->max_tax))
+			{
 				$fltTaxAmount = $objTax->max_tax;
+			}
 
-			$arrTaxAmount[$i+1] = $fltTaxAmount;
-			$arrTaxRates[$i+1] = $objTaxCode->$strRate;
+			$arrTaxAmount[$i + 1] = $fltTaxAmount;
+			$arrTaxRates[$i + 1] = $objTaxCode->$strRate;
 
 			$fltSellTotalTaxed = $fltSellTotalTaxed + $fltTaxAmount;
 
 			$i++;
-			if($i >= $taxtypes) $i = $taxtypes;
+			if ($i >= $taxtypes)
+			{
+				$i = $taxtypes;
+			}
 		}
 
-		return array(round($fltSellTotalTaxed,2,PHP_ROUND_HALF_UP) , $arrTaxAmount, $arrTaxRates);
+		return array(
+			'fltSellTotalWithTax' => round($fltSellTotalTaxed, 2, PHP_ROUND_HALF_UP),
+			'arrTaxValues' => $arrTaxAmount,
+			'arrTaxRates' => $arrTaxRates
+		);
 	}
 
 	/**

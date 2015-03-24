@@ -193,38 +193,27 @@ class SystemController extends AdminBaseController
 
 	}
 
+	/**
+	 * Erase carts that are over 30 days old, and don't have a customer_id
+	 * associated with them, then optimize the tables related to the shopping
+	 * cart experience.
+	 */
 	public function actionErasecarts()
 	{
-
-		$sql = "
-		FROM xlsws_cart P, xlsws_cart_item C
-		WHERE
-			P.customer_id IS NULL AND
-			P.id = C.cart_id AND
-			P.cart_type IN (" . CartType::cart . "," . CartType::giftregistry . "," . CartType::awaitpayment . ") AND
-			P.modified < '".date("Y-m-d", strtotime("-".intval(_xls_get_conf('CART_LIFE' , 30))." DAYS"))."' AND
-			id_str IS NULL";
-
-
-		$intIdStr = Yii::app()->db->createCommand("select count(*) ".$sql)->queryScalar();
-		_dbx("set foreign_key_checks=0;");
-		_dbx("DELETE P, C ".$sql);
-
-
-		_dbx("OPTIMIZE table xlsws_cart");
-		_dbx("OPTIMIZE table xlsws_cart_item");
-		_dbx("OPTIMIZE table xlsws_customer");
-		_dbx("OPTIMIZE table xlsws_wish_list");
-		_dbx("OPTIMIZE table xlsws_wish_list_items");
-		_dbx("OPTIMIZE table xlsws_product");
-		_dbx("OPTIMIZE table xlsws_product_related");
-		_dbx("OPTIMIZE table xlsws_category");
-		_dbx("OPTIMIZE table xlsws_product_category_assn");
-		_dbx("set foreign_key_checks=1;");
-		Yii::app()->user->setFlash('success',Yii::t('admin','{qty} old carts removed {time}.',array('{qty}'=>$intIdStr, '{time}'=>date("d F, Y  h:i:sa"))));
-
+		$numErased = ShoppingCart::eraseExpired();
+		ShoppingCart::optimizeTables();
+		Yii::app()->user->setFlash(
+			'success',
+			Yii::t(
+				'admin',
+				'{qty} old carts and cart items removed. {time}',
+				array(
+					'{qty}' => $numErased,
+					'{time}' => date("d F, Y  h:i:sa")
+				)
+			)
+		);
 		$this->render("erasecarts");
-
 	}
 
 	public function sendEmailTest()

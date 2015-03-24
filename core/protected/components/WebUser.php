@@ -41,9 +41,9 @@ class WebUser extends CWebUser
 
 	protected function afterLogin($fromCookie)
 	{
-		if(!$fromCookie)
+		if (!$fromCookie)
 		{
-			//Assign the user to the cart, if logged in
+			// Assign the user to the cart, if logged in
 			Yii::app()->shoppingcart->assignCustomer(Yii::app()->user->id);
 
 			// If the user is not a guest user, then update the tax destination
@@ -57,18 +57,25 @@ class WebUser extends CWebUser
 				Yii::app()->shoppingcart->setTaxCodeByDefaultShippingAddress();
 			}
 
-			//Since we have successfully logged in, see if we have a cart in progress
-			Yii::app()->shoppingcart->loginMerge();
+			// Since we have successfully logged in, see if we have a cart in progress
+			$cartInProgressFound = Yii::app()->shoppingcart->loginMerge();
 
-			//Verify prices haven't changed
-			Yii::app()->shoppingcart->verifyPrices();
+			// Recalculate and update the cart if prices of any cart items have changed
+			if ($cartInProgressFound === true)
+			{
+				Yii::app()->shoppingcart->verifyPrices();
+				Yii::log("Cart ID is ".Yii::app()->shoppingcart->id, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+			}
 
-			Yii::log("Cart ID is ".Yii::app()->shoppingcart->id, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
-
-			//Display no-tax message if the customer's default shipping address is
-			//in no-tax destination in tax-inclusive mode
-			ShoppingCart::displayNoTaxMessage();
-		} else {
+			// Display no-tax message if the customer's default shipping address is
+			// in no-tax destination in tax-inclusive mode
+			if (Yii::app()->params['TAX_INCLUSIVE_PRICING'] == 1)
+			{
+				ShoppingCart::displayNoTaxMessage();
+			}
+		}
+		else
+		{
 			Yii::log("User Login using cookie", 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 		}
 	}
@@ -94,8 +101,7 @@ class WebUser extends CWebUser
 
 					try {
 						$objCart->save();
-					}
-					catch (Exception $objExc) {
+					} catch (Exception $objExc) {
 						Yii::log('Failed to save cart with : ' . $objExc, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 					}
 				}

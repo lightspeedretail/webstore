@@ -1,4 +1,6 @@
 <?php
+// @codingStandardsIgnoreFile - do not check third party libraries.
+
 /**
  * This method unzips a directory within a zip-archive
  *

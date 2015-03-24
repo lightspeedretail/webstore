@@ -25,7 +25,7 @@ class HttpRequest extends CHttpRequest
 
 			foreach($this->enableCsrfValidationRoutes as $route)
 			{
-				if(strpos($url,$route) === 0)
+				if(strpos($url, $route) === 0)
 				{
 					$enableValidation = true;
 					break;
@@ -34,7 +34,7 @@ class HttpRequest extends CHttpRequest
 
 			if (!$enableValidation)
 			{
-				Yii::app()->detachEventHandler('onBeginRequest',array($this,'validateCsrfToken'));
+				Yii::app()->detachEventHandler('onBeginRequest', array($this,'validateCsrfToken'));
 			}
 		}
 	}
@@ -52,9 +52,10 @@ class HttpRequest extends CHttpRequest
 			$csrfToken = $session->itemAt($this->csrfTokenName);
 			if($csrfToken === null)
 			{
-				$csrfToken = sha1(uniqid(mt_rand(),true));
+				$csrfToken = sha1(uniqid(mt_rand(), true));
 				$session->add($this->csrfTokenName, $csrfToken);
 			}
+
 			$this->_csrfToken = $csrfToken;
 		}
 
@@ -77,7 +78,7 @@ class HttpRequest extends CHttpRequest
 			{
 				$tokenFromSession = $session->itemAt($this->csrfTokenName);
 				$tokenFromPost = $_POST[$this->csrfTokenName];
-				$valid=$tokenFromSession === $tokenFromPost;
+				$valid = $tokenFromSession === $tokenFromPost;
 			}
 			else
 			{

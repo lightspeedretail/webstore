@@ -1,8 +1,7 @@
 <?php
-
-
 /**
- * Used as a base for Payment and Shipping modules (we colloquially call them modules but they're not "Yii modules", they're extensions)
+ * Used as a base for Payment and Shipping modules (we colloquially call them
+ * modules but they're not "Yii modules", they're extensions)
  */
 class WsExtension extends CComponent
 {
@@ -12,47 +11,63 @@ class WsExtension extends CComponent
 	const THEME = 'theme';
 
 	/**
-	 * shipping or billing (payment) extension
-	 * @var string
-	 */
-	protected $moduleType = 'shipping';
-
-	/**
 	 * Name that appears to the shopper
 	 * @var string
 	 */
-	protected $strModuleName = "Web Store Module";
+	protected $_strModuleName = "Web Store Module";
 
 	/**
 	 * Extension version number (note whole numbers only)
 	 * @var int
 	 */
-	protected $version = 1;
+	protected $_version = 1;
 
 	/**
 	 * For billing extensions, does it redirect offsite (SIM ex. Paypal)
 	 * @var bool
 	 */
+	// @codingStandardsIgnoreStart
+	// Renaming this to respect coding standards could break custom payment integrations.
 	protected $uses_jumper = false;
+	// @codingStandardsIgnoreEnd
 
 	/**
 	 * For billing extensions, where credit card details are involved (SIM or AIM)
 	 * @var bool
 	 */
+	// @codingStandardsIgnoreStart
+	// Renaming this to respect coding standards could break custom payment integrations.
 	protected $uses_credit_card = false;
+	// @codingStandardsIgnoreEnd
 
 	/**
 	 * Internal Web Store API version number, to determine compatibility
 	 * @var int
 	 */
+	// @codingStandardsIgnoreStart
+	// Renaming this to respect coding standards could break custom payment integrations.
 	protected $apiVersion = 1;
+	// @codingStandardsIgnoreEnd
 
+	// @codingStandardsIgnoreStart
+	// Renaming this to respect coding standards could break custom payment integrations.
 	protected $active;
+	// @codingStandardsIgnoreEnd
 
+	// @codingStandardsIgnoreStart
+	// Renaming this to respect coding standards could break custom payment integrations.
 	protected $config;
+	// @codingStandardsIgnoreEnd
 
+	// @codingStandardsIgnoreStart
+	// Renaming this to respect coding standards could break custom payment integrations.
 	protected $objCart;
+	// @codingStandardsIgnoreEnd
+
+	// @codingStandardsIgnoreStart
+	// Renaming this to respect coding standards could break custom payment integrations.
 	protected $CheckoutForm;
+	// @codingStandardsIgnoreEnd
 
 	/**
 	 * If we have a subform (model file)
@@ -112,7 +127,7 @@ class WsExtension extends CComponent
 
 	public function setCheckoutForm($mixForm = null)
 	{
-		//Pass the checkout form and put it in our object
+		// Pass the checkout form and put it in our object
 		if ($mixForm instanceof CheckoutForm)
 		{
 			$this->CheckoutForm = $mixForm;
@@ -141,7 +156,7 @@ class WsExtension extends CComponent
 		}
 		else
 		{
-			$strName = $this->strModuleName;
+			$strName = $this->_strModuleName;
 		}
 
 		if (isset($config['live']))
@@ -166,7 +181,7 @@ class WsExtension extends CComponent
 	 *
 	 * @return string
 	 */
-	public function admin_name() {
+	public function adminName() {
 		return $this->defaultName;
 	}
 
@@ -186,8 +201,12 @@ class WsExtension extends CComponent
 	 * @param Cart $cart
 	 * @return string
 	 */
+	// @codingStandardsIgnoreStart
+	// Renaming this could break custom payment methods.
+	// TODO: This method does not appear to be called anywhere, remove it.
 	public function payment_method(Cart $cart)
 	{
+		// @codingStandardsIgnoreEnd
 		$config = $this->Config;
 
 		if (isset($config['ls_payment_method']))
@@ -240,8 +259,11 @@ class WsExtension extends CComponent
 	 *
 	 */
 	public function getConfigValues($strClass = null) {
+		if (is_null($strClass))
+		{
+			$strClass = get_class($this);
+		}
 
-		if (is_null($strClass)) $strClass = get_class($this);
 		$arr = array();
 
 		$objModule = Modules::model()->findByAttributes(array('module' => $strClass));
@@ -291,7 +313,7 @@ class WsExtension extends CComponent
 
 	public function getVersion()
 	{
-		return $this->version;
+		return $this->_version;
 	}
 
 	public function getAdminNameNormal()
@@ -322,13 +344,13 @@ class WsExtension extends CComponent
 			return false;
 		}
 
-		//Remove possible "null" string which should be same as not set
-		if (isset($this->config['restrictcountry']) && $this->config['restrictcountry']=="null")
+		// Remove possible "null" string which should be same as not set
+		if (isset($this->config['restrictcountry']) && $this->config['restrictcountry'] == "null")
 		{
 			unset($this->config['restrictcountry']);
 		}
 
-		//Check possible scenarios why we would not offer this type of shipping
+		// Check possible scenarios why we would not offer this type of shipping
 		if (isset($this->config['restrictcountry'])) //we have a country restriction
 		{
 			switch($this->config['restrictcountry']) {
@@ -342,7 +364,6 @@ class WsExtension extends CComponent
 							return true;
 						}
 					}
-
 					return false;
 					break;
 
@@ -351,7 +372,6 @@ class WsExtension extends CComponent
 					{
 						return false;
 					}
-
 					break;
 
 				case 'AUNZ':
@@ -359,7 +379,6 @@ class WsExtension extends CComponent
 					{
 						return false;
 					}
-
 					break;
 
 				case 'OUTSIDE':
@@ -367,7 +386,6 @@ class WsExtension extends CComponent
 					{
 						return false;
 					}
-
 					break;
 
 				default:
@@ -452,9 +470,13 @@ class WsExtension extends CComponent
 	 * @param Cart $cart
 	 * @return unknown_type
 	 */
+	// @codingStandardsIgnoreStart
+	// Renaming this could break custom payment methods.
+	// TODO: This does not appear to be used anywhere, remove it.
 	public function paid_amount(Cart $cart)
 	{
-		if ($this->admin_name() == "Cash On Delivery")
+		// @codingStandardsIgnoreEnd
+		if ($this->adminName() == "Cash On Delivery")
 		{
 			return 0.00;
 		}
@@ -471,7 +493,11 @@ class WsExtension extends CComponent
 	 *
 	 * @return bool
 	 */
+	// @codingStandardsIgnoreStart
+	// Renaming this could break custom payment methods.
+	// TODO: This does not appear to be used anywhere, remove it.
 	public function uses_jumper() {
+		// @codingStandardsIgnoreEnd
 		return false;
 	}
 
@@ -489,10 +515,12 @@ class WsExtension extends CComponent
 	 * 		- success => true| false
 	 * 		- output =>
 	 */
+	// @codingStandardsIgnoreStart
+	// Renaming this to respect coding standards could break custom payment integrations.
 	public function gateway_response_process() {
+		// @codingStandardsIgnoreEnd
 		return false;
 	}
-
 
 	public function __get($strName) {
 		switch ($strName) {
@@ -500,7 +528,7 @@ class WsExtension extends CComponent
 				return $this->name();
 
 			case 'AdminName':
-				return $this->admin_name();
+				return $this->adminName();
 
 			case 'DefaultName':
 				return $this->defaultName;

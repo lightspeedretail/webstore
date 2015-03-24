@@ -503,18 +503,20 @@ class Images extends BaseImages
 	 */
 	public function DeleteImage() {
 		if ($this->image_path && file_exists(Images::GetImagePath($this->image_path)))
+		{
 			@unlink($this->GetPath());
+		}
 
-
-		$objEvent = new CEventPhoto('Images','onDeletePhoto',null,null,null);
+		$objEvent = new CEventPhoto('Images', 'onDeletePhoto', null, null, null);
 
 		if(isset($this->ImagesCloud) && isset($this->ImagesCloud[0]))
+		{
 			$objEvent->cloudinary_public_id = $this->ImagesCloud[0]->cloudinary_public_id;
+		}
 
 		$objEvent->s3_path = $this->image_path;
-		_xls_raise_events('CEventPhoto',$objEvent);
+		_xls_raise_events('CEventPhoto', $objEvent);
 	}
-
 
 	public static function LoadByRowidSize($id, $intSize) {
 		if ($intSize == ImagesType::normal)
@@ -571,15 +573,47 @@ class Images extends BaseImages
 	 */
 	public function beforeDelete()
 	{
+		// Null all FK references from Product to this Image.
+		Product::model()->updateAll(
+			array('image_id' => null),
+			'image_id = :image_id',
+			array(':image_id' => $this->id)
+		);
 
-		//In case this delete is pointed to by a product, get rid of that first
-		Product::model()->updateAll(array('image_id'=>null),'image_id ='.$this->id);
-		if ($this->IsPrimary())
-			foreach (Images::model()->findAllByAttributes(array('parent' => $this->id)) as $objImage)
-				if (!$objImage->IsPrimary())
-					$objImage->delete();
+		// Delete images where this image is the parent.
+		if ($this->IsPrimary() === true)
+		{
+			$arrChildImages = Images::model()->findAllByAttributes(
+				array('parent' => $this->id)
+			);
 
+			foreach ($arrChildImages as $objImage)
+			{
+				if ($objImage->id === $this->id)
+				{
+					// For primary images, they are actually their own parent.
+					// Without this check, we'd have an infinite loop.
+					continue;
+				}
+
+				$objImage->delete();
+			}
+		}
+
+		// Delete all ImagesCloud rows that reference this Image to satisfy
+		// foreign key constraints.
+		$arrImagesCloud = ImagesCloud::model()->findAllByAttributes(
+			array('image_id' => $this->id)
+		);
+
+		foreach ($arrImagesCloud as $objImagesCloud)
+		{
+			$objImagesCloud->delete();
+		}
+
+		// Delete the image from the file system.
 		$this->DeleteImage();
+
 		return parent::beforeDelete();
 	}
 

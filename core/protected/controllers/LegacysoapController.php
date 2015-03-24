@@ -911,7 +911,7 @@ class LegacySoapController extends Controller
 			return self::OK;
 
 		try {
-			$objProduct->DeleteImages();
+			$objProduct->deleteImages();
 		}
 		catch(Exception $e) {
 			Yii::log('Error deleting product images for ' . $intRowid .
@@ -1635,15 +1635,26 @@ class LegacySoapController extends Controller
 		if (empty($strDescription))
 			$strDescription=$objProduct->title;
 
-		if(_xls_get_conf('TAX_INCLUSIVE_PRICING') == '1')
-			list($fltTaxedPrice, $arrTaxes) =
-				Tax::CalculatePricesWithTax($fltSell, $objDocument->fk_tax_code_id, $objProduct->tax_status_id);
-		else $fltTaxedPrice = $fltSell;
+		if (_xls_get_conf('TAX_INCLUSIVE_PRICING') == '1')
+		{
+			$arr = Tax::calculatePricesWithTax($fltSell, $objDocument->fk_tax_code_id, $objProduct->tax_status_id);
 
-		$retVal = $objDocument->AddSoapProduct($objDocument->id,
+			$fltTaxedPrice = $arr['fltSellTotalWithTax'];
+		}
+		else
+		{
+			$fltTaxedPrice = $fltSell;
+		}
+
+		$retVal = $objDocument->AddSoapProduct(
+			$objDocument->id,
 			$objProduct,
-			$fltQty, $strDescription,
-			$fltTaxedPrice, $fltDiscount, CartType::quote);
+			$fltQty,
+			$strDescription,
+			$fltTaxedPrice,
+			$fltDiscount,
+			CartType::quote
+		);
 
 		if (!$retVal)
 			return self::UNKNOWN_ERROR;

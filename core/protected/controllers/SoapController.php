@@ -594,7 +594,7 @@ class SoapController extends CController
 		return self::OK;
 
 		try {
-			$objProduct->DeleteImages();
+			$objProduct->deleteImages();
 		}
 		catch(Exception $e) {
 			$strMsg = "Error deleting product image for $intRowid";
@@ -1534,7 +1534,9 @@ class SoapController extends CController
 
 		foreach ($arrItems as $itemKey => $objItem)
 		{
-			list($taxCharged,$taxesIndividual,$taxRates) = Tax::CalculatePricesWithTax($objItem->sell_total,$order->tax_code_id,$objItem->product->tax_status_id);
+			$arr = Tax::calculatePricesWithTax($objItem->sell_total, $order->tax_code_id, $objItem->product->tax_status_id);
+			$taxRates = $arr['arrTaxRates'];
+
 			$arrTaxRatesForItem = array();
 			foreach ($taxRates as $key => $value) {
 				if ($value > 0) {

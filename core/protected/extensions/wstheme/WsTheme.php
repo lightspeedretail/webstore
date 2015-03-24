@@ -1,16 +1,15 @@
 <?php
 
-	/* Theme module */
+/* Theme module */
 class WsTheme extends WsExtension
 {
 	public $subformModel;
-	public $moduleType = 'theme';
 
 	/**
 	 * The name of the payment module that will be displayed in Web Admin payments
 	 * @return string
 	 */
-	public function admin_name()
+	public function adminName()
 	{
 		return Yii::app()->theme->name;
 	}

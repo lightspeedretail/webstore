@@ -28,10 +28,10 @@ class usps extends WsShipping
 		//'First-Class Mail Postcards',
 		'Priority Mail{0}',
 		//'Priority Mail Express{0} Hold For Pickup',
-        'Priority Mail Express{0}',
+		'Priority Mail Express{0}',
 		'Standard Post',
 		'Media Mail',
-		'Library Mail'=>'Library Mail',
+		'Library Mail' => 'Library Mail',
 		'Priority Mail Express{0} Flat Rate Envelope',
 		'First-Class Mail Large Postcards',
 		'Priority Mail{0} Flat Rate Envelope',
@@ -50,13 +50,13 @@ class usps extends WsShipping
 		//'Priority Mail{0} Medium Flat Rate Box Hold For Pickup',
 		//'Priority Mail{0} Small Flat Rate Box Hold For Pickup',
 		//'Priority Mail{0} Flat Rate Envelope Hold For Pickup',
-  		'Priority Mail{0} Gift Card Flat Rate Envelope',
+		'Priority Mail{0} Gift Card Flat Rate Envelope',
 		//'Priority Mail{0} Gift Card Flat Rate Envelope Hold For Pickup',
 		'Priority Mail{0} Window Flat Rate Envelope',
 		//'Priority Mail{0} Window Flat Rate Envelope Hold For Pickup',
-        'Priority Mail{0} Small Flat Rate Envelope',
+		'Priority Mail{0} Small Flat Rate Envelope',
 		//'Priority Mail{0} Small Flat Rate Envelope Hold For Pickup',
-        'Priority Mail{0} Legal Flat Rate Envelope',
+		'Priority Mail{0} Legal Flat Rate Envelope',
 		//'Priority Mail{0} Legal Flat Rate Envelope Hold For Pickup',
 		//'Priority Mail{0} Padded Flat Rate Envelope Hold For Pickup',
 		'Priority Mail{0} Regional Rate Box A',
@@ -110,121 +110,59 @@ class usps extends WsShipping
 	public function run()
 	{
 
-		if(!isset($this->config['offerservices'])) return false;
+		if (!isset($this->config['offerservices']))
+		{
+			return false;
+		}
 
 		$weight = $this->objCart->Weight;
-		if(_xls_get_conf('WEIGHT_UNIT' , 'lb') != 'lb')
-			$weight = $weight * 2.2;   // one KG is 2.2 pounds
+
+		if(_xls_get_conf('WEIGHT_UNIT', 'lb') != 'lb')
+		{
+			// one KG is 2.2 pounds
+			$weight = $weight * 2.2;
+		}
 
 		//USPS wants a full country name
-		$countryObj = Country::LoadByCode($this->CheckoutForm->shippingCountry);
-		if($countryObj)
-			$country = $countryObj->country;
+		$objCountry = Country::Load($this->CheckoutForm->shippingCountry);
+		if($objCountry instanceof Country)
+		{
+			$country = $objCountry->country;
+		}
 		else
+		{
 			$country = "US";
+		}
 
-		if (empty($country)) $country = "US";
-
-		if(empty($this->config['username']) || empty($this->config['originpostcode']))
+		if (empty($this->config['username']) || empty($this->config['originpostcode']))
+		{
 			return false;
+		}
 
 		$this->init_vars(
 			$this->config['username'],
 			$this->config['originpostcode'],
 			$this->CheckoutForm->shippingPostal,
 			$country,
-			$this->config['markup']);
-		$this->addItem(intval($weight) , round(($weight - intval($weight)) *16  , 0) , $this->objCart->total);
+			$this->config['markup']
+		);
+		$this->addItem(intval($weight), round(($weight - intval($weight)) * 16, 0), $this->objCart->total);
 
 		$rates = $this->getRate();
 
-		if(($rates === FALSE) || (count($rates) == 0 )) {
-			Yii::log("USPS: Could not get rates. " . print_r($this , true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		if (($rates === FALSE) || (count($rates) == 0 ))
+		{
+			Yii::log("USPS: Could not get rates. " . print_r($this, true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return false;
 		}
 
 		return $this->convertRetToDisplay($rates);
 	}
 
-
-
-
-	/**
-	 * total
-	 *
-	 * Based on passed address information, calculates the total shipping cost
-	 *
-	 * @param $fields &array
-	 * @param Cart $cart
-	 * @param $country optional
-	 * @param $zipcode optional
-	 * @param $state optional
-	 * @param $city optional
-	 * @param $address2 optional
-	 * @param $address1 optional
-	 * @param $company optional
-	 * @param $lname optional
-	 * @param $fname optional
-	 *
-	 * @return array
-	 */
-	public function total($fields, $cart, $country = '', $zipcode = '', $state = '',
-	   $city = '', $address2 = '', $address1 = '', $company = '', $lname = '', $fname = '') {
-
-//		$config = $this->config;
-//
-//		$weight = $cart->Weight;
-
-		if(_xls_get_conf('WEIGHT_UNIT' , 'lb') != 'lb')
-			$weight = $this->objCart->Weight * 2.2;   // one KG is 2.2 pounds
-
-		//USPS wants a full country name
-		$countryObj = Country::LoadByCode($this->CheckoutForm->shippingCountry);
-		if($countryObj)
-			$country = $countryObj->country;
-		else
-			$country = "US";
-
-		if (empty($country)) $country = "US";
-
-		if(empty($this->config['username']) || empty($this->config['originpostcode']))
-			return false;
-
-		$this->init_vars(
-			$this->config['username'],
-			$this->config['originpostcode'],
-			$this->CheckoutForm->shippingPostal,
-			$country,
-			$this->config['markup']);
-		$this->addItem(intval($weight) , round(($weight - intval($weight)) *16  , 0) , $this->objCart->total);
-
-		$rates = $this->getRate();
-
-		if(($rates === FALSE) || (count($rates) == 0 )) {
-			Yii::log("USPS: Could not get rates. " . print_r($this , true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-			return false;
-		}
-
-		return $this->convertRetToDisplay($rates);
-
-//		asort($rates);
-//		$arrServices = array();
-//		foreach($rates as $desc=>$returnval) {
-//			$arrReturn['price']=floatval($returnval);
-//			$arrReturn['level']=$desc;
-//			$arrReturn['label'] = $desc;
-//
-//			$arrServices[] = $arrReturn;
-//
-//		}
-//
-//
-//		return $arrServices;
-	}
 
 	/**
 	 * init_vars
-	 * called by total(), sets initial values for calculation
+	 * called by run(), sets initial values for calculation
 	 *
 	 * @param $usps_account string
 	 * @param $usps_zip_origin string
@@ -233,7 +171,8 @@ class usps extends WsShipping
 	 * @param $usps_markup string
 	 * @return none, populates local scope $this->config
 	 */
-	function init_vars($usps_account, $usps_zip_origin, $destination, $country, $usps_markup) {
+	function init_vars($usps_account, $usps_zip_origin, $destination, $country, $usps_markup)
+	{
 		$config = $this->config;
 
 		$this->uspsID = $usps_account;
@@ -249,36 +188,6 @@ class usps extends WsShipping
 	}
 
 	/**
-	 * init_admin_vars
-	 * called by total(), sets initial values for calculation
-	 *
-	 * @param $usps_account string
-	 * @param $usps_zip_origin string
-	 * @param $destination string
-	 * @param $country string
-	 * @param $usps_markup string
-	 * @return none, populates local scope $this->config
-	 */
-	function init_admin_vars($usps_account, $usps_zip_origin, $destination, $country) {
-		$this->uspsID = $usps_account;
-		$this->zipOrigination = $usps_zip_origin;
-		$this->zipDestination = $destination;
-		$this->country = $country;
-
-		if ($country == "US") {
-			$this->pounds = 0;
-			$this->ounces = 10;
-			$this->value = 5;
-		} else {
-			$this->pounds = 1;
-			$this->ounces = 0;
-			$this->value = 20;
-		}
-
-		$this->markup = 0;
-	}
-
-	/**
 	 * addItem
 	 *
 	 * adds an item to the package
@@ -289,8 +198,8 @@ class usps extends WsShipping
 	 * @return array
 	 */
 	public function addItem($p, $o, $v) {
-		$p = (''==$p) ? 0 : $p;
-		$o = (''==$o) ? 0 : $o;
+		$p = ('' == $p) ? 0 : $p;
+		$o = ('' == $o) ? 0 : $o;
 		$this->pounds += $p;
 		$this->ounces += $o;
 		$this->value += $v;
@@ -329,28 +238,41 @@ class usps extends WsShipping
 	 * param bool - true will return all values (used by Admin panel)
 	 * @return array
 	 */
-	public function getRate($showall=false) {
+	public function getRate($showall = false)
+	{
 		if (($this->ounces + $this->pounds) == 0)
-			$this->pounds=1;
+		{
+			$this->pounds = 1;
+		}
+
 		$config = $this->getConfigValues(get_class($this));
-		$request = ($this->isDomestic()) ? $this->buildDomesticRateRequest() : $this->buildInternationalRateRequest() ;
+		$request = ($this->isDomestic()) ? $this->buildDomesticRateRequest() : $this->buildInternationalRateRequest();
 		$this->response = $this->sendUSPSRateRequest($request);
 
-		if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
-			_xls_log(get_class($this) . " sending ".print_r($request,true),true);
-			_xls_log(get_class($this) . " receiving ".$this->response,true);
-		}
+		Yii::log(
+			sprintf("%s sending %s ", __CLASS__, print_r($request, true)),
+			$this->loglevel,
+			'application.'.__CLASS__.'.'.__FUNCTION__
+		);
+
+		Yii::log(
+			sprintf("%s receiving %s ", __CLASS__, print_r($this->response, true)),
+			$this->loglevel,
+			'application.'.__CLASS__.'.'.__FUNCTION__
+		);
 
 		// Parse xml for response values
 		$oXML = new SimpleXMLElement($this->response);
 
-		if(!$oXML->Package) {
+		if(!$oXML->Package)
+		{
 			//What we have is ... failure to communicate
 			Yii::log('Could not get shipping for USPS: '.$oXML->Description, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return false;
 		}
 
-		if($oXML->Package->Error) {
+		if($oXML->Package->Error)
+		{
 			//What we have is ... failure to communicate
 			Yii::log('Could not get shipping for USPS: '.$oXML->Package->Error->Description, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return false;
@@ -358,15 +280,18 @@ class usps extends WsShipping
 
 		$retval = array();
 
-		if($this->isDomestic()) {
-			foreach($oXML->Package->Postage as $key=>$val) {
+		if($this->isDomestic())
+		{
+			foreach($oXML->Package->Postage as $key => $val)
+			{
 				$strKey = $val->MailService;
 				$strRate = $val->Rate;
 				$strKey = $this->cleanMethodName($strKey);
 				$retval[$strKey] = floatval($strRate);
 			}
 		} else {
-			foreach($oXML->Package->Service as $key=>$val) {
+			foreach($oXML->Package->Service as $key => $val)
+			{
 				$strKey = $val->SvcDescription;
 				$strRate = $val->Postage;
 				$strKey = $this->cleanMethodName($strKey);
@@ -375,22 +300,30 @@ class usps extends WsShipping
 		}
 
 		return $retval;
-
-
 	}
 
 	/**
-	 * isDomestic
+	 * Is shipping address within or outside the US
 	 *
-	 * Is shipping address in our outside the US
 	 * @return bool
 	 */
-	private function isDomestic() {
+	private function isDomestic()
+	{
 		$c = strtoupper($this->country);
-		if($c == '' or $c == 'US' or $c == 'USA' or $c == 'AMERICA' or $c == 'US OF A'or $c == 'UNITED STATES')
-			return true;
 
-		return false;
+		switch ($c)
+		{
+			case '':
+			case 'US':
+			case 'USA':
+			case 'AMERICA':
+			case 'US OF A':
+			case 'UNITED STATES':
+				return true;
+
+			default:
+				return false;
+		}
 	}
 
 	/**
@@ -399,21 +332,21 @@ class usps extends WsShipping
 	 * Build XML request for US shipping
 	 * @return string
 	 */
-	private function buildDomesticRateRequest() {
-		$r ='API=RateV4&XML=<?xml version="1.0"?>';
-		$r.= '<RateV4Request USERID="'.urlencode($this->uspsID).'">';
-		$r.='<Package ID="0">';
-		$r.='<Service>ALL</Service>';
-		$r.='<ZipOrigination>'.substr($this->zipOrigination,0,5).'</ZipOrigination>';
-		$r.='<ZipDestination>'.substr($this->zipDestination,0,5).'</ZipDestination>';
-		$r.='<Pounds>'.$this->pounds.'</Pounds>';
-		$r.='<Ounces>'.$this->ounces.'</Ounces>';
-		$r.='<Container></Container>';
-		$r.='<Size>Regular</Size>';
-		$r.='<Machinable>true</Machinable>';
-		$r.='</Package>';
-		$r.='</RateV4Request>';
-
+	private function buildDomesticRateRequest()
+	{
+		$r = 'API=RateV4&XML=<?xml version="1.0"?>';
+		$r .= '<RateV4Request USERID="'.urlencode($this->uspsID).'">';
+		$r .= '<Package ID="0">';
+		$r .= '<Service>ALL</Service>';
+		$r .= '<ZipOrigination>'.substr($this->zipOrigination, 0, 5).'</ZipOrigination>';
+		$r .= '<ZipDestination>'.substr($this->zipDestination, 0, 5).'</ZipDestination>';
+		$r .= '<Pounds>'.$this->pounds.'</Pounds>';
+		$r .= '<Ounces>'.$this->ounces.'</Ounces>';
+		$r .= '<Container></Container>';
+		$r .= '<Size>Regular</Size>';
+		$r .= '<Machinable>true</Machinable>';
+		$r .= '</Package>';
+		$r .= '</RateV4Request>';
 
 		return $r;
 	}
@@ -424,23 +357,24 @@ class usps extends WsShipping
 	 * Build XML request for US shipping
 	 * @return string
 	 */
-	private function buildInternationalRateRequest() {
-		$r ='API=IntlRateV2&XML=<?xml version="1.0"?>';
-		$r.= '<IntlRateV2Request USERID="'.urlencode($this->uspsID).'">';
-		$r.='<Package ID="0">';
-		$r.='<Pounds>'.$this->pounds.'</Pounds>';
-		$r.='<Ounces>'.$this->ounces.'</Ounces>';
-		$r.='<MailType>Package</MailType>';
-		$r.='<ValueOfContents>'.$this->value.'</ValueOfContents>';
-		$r.='<Country>'.$this->country.'</Country>';
-		$r.='<Container>RECTANGULAR</Container>';
-		$r.='<Size>Regular</Size>';
-		$r.='<Width></Width>';
-		$r.='<Length></Length>';
-		$r.='<Height></Height>';
-		$r.='<Girth></Girth>';
-		$r.='</Package>';
-		$r.='</IntlRateV2Request>';
+	private function buildInternationalRateRequest()
+	{
+		$r = 'API=IntlRateV2&XML=<?xml version="1.0"?>';
+		$r .= '<IntlRateV2Request USERID="'.urlencode($this->uspsID).'">';
+		$r .= '<Package ID="0">';
+		$r .= '<Pounds>'.$this->pounds.'</Pounds>';
+		$r .= '<Ounces>'.$this->ounces.'</Ounces>';
+		$r .= '<MailType>Package</MailType>';
+		$r .= '<ValueOfContents>'.$this->value.'</ValueOfContents>';
+		$r .= '<Country>'.$this->country.'</Country>';
+		$r .= '<Container>RECTANGULAR</Container>';
+		$r .= '<Size>Regular</Size>';
+		$r .= '<Width></Width>';
+		$r .= '<Length></Length>';
+		$r .= '<Height></Height>';
+		$r .= '<Girth></Girth>';
+		$r .= '</Package>';
+		$r .= '</IntlRateV2Request>';
 
 		return $r;
 	}
@@ -451,7 +385,8 @@ class usps extends WsShipping
 	 * cURL string to actually send request
 	 * @return string
 	 */
-	private function sendUSPSRateRequest($req) {
+	private function sendUSPSRateRequest($req)
+	{
 		$url = 'http://Production.ShippingAPIs.com/ShippingAPI.dll';
 		$c = curl_init($url);
 		curl_setopt($c, CURLOPT_POST, true);
@@ -463,41 +398,50 @@ class usps extends WsShipping
 	}
 
 
-	public static function getServiceTypes($class_name,$process_days=true)
+	public static function getServiceTypes($class_name, $process_days = true)
 	{
-		if($process_days)
+		if ($process_days)
 		{
 			$arr = array();
 
-			foreach(self::$service_types as $value)
+			foreach (self::$service_types as $value)
 			{
-				if(stripos($value,"{0}") !== false)
+				if (stripos($value, "{0}") !== false)
 				{
-					for($x=1; $x<=5; $x++)
-						$arr[] = Yii::t('usps',$value,array('{0}'=>$x."-Day"));
-				} else $arr[] = $value;
+					for ($x = 1; $x <= 5; $x++)
+					{
+						$arr[] = Yii::t('usps', $value, array('{0}' => $x."-Day"));
+					}
+				} else {
+					$arr[] = $value;
+				}
 			}
 
-			return array_combine($arr,$arr);
+			return array_combine($arr, $arr);
 		}
 
 		else
-			return array_combine(self::$service_types,self::$service_types);
+		{
+			return array_combine(self::$service_types, self::$service_types);
+		}
 
 	}
 
 	public static function expandRestrictions($arrRestrictions)
 	{
-
 		$arr = array();
 
-		foreach($arrRestrictions as $key=>$value)
+		foreach ($arrRestrictions as $key => $value)
 		{
-			if(stripos($value,"{0}") !== false)
+			if (stripos($value, "{0}") !== false)
 			{
-				for($x=1; $x<=5; $x++)
-					$arr[] = Yii::t('usps',$value,array('{0}'=>" ".$x."-Day"));
-			} else $arr[] = $value;
+				for($x = 1; $x <= 5; $x++)
+				{
+					$arr[] = Yii::t('usps', $value, array('{0}' => " " . $x . "-Day"));
+				}
+			} else {
+				$arr[] = $value;
+			}
 		}
 
 		return $arr;

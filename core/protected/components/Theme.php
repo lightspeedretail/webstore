@@ -12,10 +12,11 @@ class Theme extends CTheme
 	{
 		$model = Yii::app()->getComponent('wstheme')->getAdminModel($strThemeName);
 		if($model)
+		{
 			return true;
-		else
+		} else {
 			return false;
-
+		}
 	}
 
 	/**
@@ -25,7 +26,7 @@ class Theme extends CTheme
 	 */
 	public function getCssUrl($cssFile)
 	{
-		//Just in case someone passed the .css as part of the $cssFile
+		// Just in case someone passed the .css as part of the $cssFile
 		if (substr($cssFile, strlen($cssFile) - 4, 4) == ".css")
 		{
 			$cssFile = substr($cssFile, 0, -4);
@@ -48,7 +49,7 @@ class Theme extends CTheme
 					return parent::getBaseUrl()."/css/".$cssFile.".css";
 				} else {
 					return str_replace("http:", "", _xls_custom_css_folder()).
-					"_customcss/".Yii::app()->theme->name."/".$cssFile.".css";
+						"_customcss/" . Yii::app()->theme->name . "/" . $cssFile . ".css";
 				}
 			}
 		} else {
@@ -67,7 +68,6 @@ class Theme extends CTheme
 		return $this->getCssUrl($cssFile);
 
 	}
-
 
 	/**
 	 * Pass along theme config from the xlsws_modules table
@@ -97,11 +97,11 @@ class Theme extends CTheme
 	{
 		return new ThemeInfo();
 	}
-
-
 }
 
+// @codingStandardsIgnoreStart
 class ThemeConfig
+// @codingStandardsIgnoreEnd
 {
 
 	/*
@@ -115,11 +115,11 @@ class ThemeConfig
 			default:
 				$arrConfig = Yii::app()->getComponent('wstheme')->getConfigValues(Yii::app()->theme->name);
 				if(isset($arrConfig[$name]))
+				{
 					return $arrConfig[$name];
-				else return (_xls_get_conf($name,null));
+				}
+				return (_xls_get_conf($name, null));
 		}
-
-
 	}
 
 	/*
@@ -129,45 +129,48 @@ class ThemeConfig
 	{
 
 		$arrConfig = Yii::app()->getComponent('wstheme')->getConfigValues(Yii::app()->theme->name);
-		$arrConfig[$name]=$mixValue;
+		$arrConfig[$name] = $mixValue;
 		Yii::app()->getComponent('wstheme')->setConfigValues($arrConfig);
 
 		return true;
-
 	}
-
-
 }
-class ThemeInfo
-{
 
+// @codingStandardsIgnoreStart
+class ThemeInfo
+// @codingStandardsIgnoreEnd
+{
 	/*
-	 * Get a key from the module. If it's not defined, use the xlsws_configuration as a backup
+	 * Get a key from the module. If it's not defined, use the
+	 * xlsws_configuration as a backup
 	 */
 	public function __get($name)
 	{
 		switch($name)
 		{
-
 			case 'cssfiles':
 				$model = Yii::app()->getComponent('wstheme')->getAdminModel(Yii::app()->theme->name);
 				if(!$model)
+				{
 					return array('base','style');
+				}
+
 				$form = new $model;
 				$strCss = $form->cssfiles;
-				return explode(",",$strCss);
+				return explode(",", $strCss);
 			break;
 
 			default:
 				$model = Yii::app()->getComponent('wstheme')->getAdminModel(Yii::app()->theme->name);
-				if(!$model) return null;
-				$form = new $model;
-				return $form->$name;
+				if(!$model)
+				{
+					return null;
+				}
 
+				$form = new $model();
+				return $form->$name;
 		}
 
-
 	}
-
 }
 

@@ -70,12 +70,27 @@
 	<?php if (!_xls_get_conf('LIGHTSPEED_MT',0)>0): ?>
 	<p>
 		<div>
+			<?php
+				$copyThemeWarningMsg = "<strong>Warning:</strong> This functionality is intended for web developers only. " .
+				"Copying a theme for customization may require occasional updates to the custom theme files " .
+				"as Web Store updates are released. If you are not comfortable with updating CSS or PHP files " .
+				"as required, we highly recommend that you do not copy a theme.";
+			?>
+
 			<?php $this->widget('bootstrap.widgets.TbButton', array(
-				'buttonType'=>'submit',
-				'label'=>'Copy selected theme for customization',
-				'type'=>'inverse',
-				'size'=>'mini',
-				'htmlOptions'=>array('id'=>'btnCopy','value'=>'btnCopy'),
+				'label' => 'Copy selected theme for customization',
+				'type' => 'inverse',
+				'size' => 'mini',
+				'htmlOptions' => array(
+					'id' => 'btnCopy',
+					'value' => 'btnCopy',
+					'onclick' => 'js:bootbox.confirm("'. $copyThemeWarningMsg . '", "Cancel", "Continue", function(confirmed) {
+						if(confirmed)
+						{
+							$("#task").val("btnCopy");
+							$("#manage").submit();
+						}
+					})'),
 			)); ?>
 			<?php $this->widget('bootstrap.widgets.TbButton', array(
 				'buttonType'=>'submit',

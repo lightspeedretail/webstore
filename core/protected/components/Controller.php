@@ -9,23 +9,23 @@ class Controller extends CController
 	 * @var string the default layout for the controller view. Defaults to '//layouts/column1',
 	 * meaning using a single column layout. See 'protected/views/layouts/column1.php'.
 	 */
-	public $layout='//layouts/column2';
+	public $layout = '//layouts/column2';
+
 	/**
 	 * @var array context menu items. This property will be assigned to {@link CMenu::items}.
 	 */
-	public $menu=array();
+	public $menu = array();
+
 	/**
 	 * @var array the breadcrumbs of the current page. The value of this property will
 	 * be assigned to {@link CBreadcrumbs::links}. Please refer to {@link CBreadcrumbs::links}
 	 * for more details on how to specify this property.
 	 */
-	public $breadcrumbs=array();
+	public $breadcrumbs = array();
 
 	public $menuwidget;
 
 	protected $_canonicalUrl;
-
-	public $LoadSharing=0;
 
 	/* These are public variables that are used in our layout, so we have to define them.
 	*/
@@ -49,11 +49,15 @@ class Controller extends CController
 
 	public $gridProductsPerRow = 3;
 	public $gridProductsRows;
+
+	// @codingStandardsIgnoreStart - this variable is used in view files,
+	// cannot easily be changed.
 	public $custom_page_content;
+	// @codingStandardsIgnoreEnd
 
 	/* Support lightweight repeated calls to getMenuTree by caching the result
 	 * for the lifetime of the component object. */
-	private $objFullTree = null;
+	private $_objFullTree = null;
 
 	/**
 	 * Dynamically load the configuration settings for the client and
@@ -63,25 +67,32 @@ class Controller extends CController
 	{
 		defined('DEFAULT_THEME') or define('DEFAULT_THEME', 'brooklyn2014');
 
-		$Params = CHtml::listData(Configuration::model()->findAll(),'key_name','key_value');
+		$params = CHtml::listData(Configuration::model()->findAll(), 'key_name', 'key_value');
 
-		foreach ($Params as $key => $value)
+		foreach ($params as $key => $value)
 		{
 			Yii::app()->params->add($key, $value);
 		}
 
 		if(isset(Yii::app()->params['THEME']))
-			Yii::app()->theme=Yii::app()->params['THEME'];
-		else Yii::app()->theme=DEFAULT_THEME;
+		{
+			Yii::app()->theme = Yii::app()->params['THEME'];
+		} else {
+			Yii::app()->theme = DEFAULT_THEME;
+		}
+
 		if(isset(Yii::app()->params['LANG_CODE']))
-			Yii::app()->language=Yii::app()->params['LANG_CODE'];
-		else Yii::app()->language = "en";
-		Yii::app()->params->add('listPerPage',Yii::app()->params['PRODUCTS_PER_PAGE']);
+		{
+			Yii::app()->language = Yii::app()->params['LANG_CODE'];
+		} else {
+			Yii::app()->language = "en";
+		}
+
+		Yii::app()->params->add('listPerPage', Yii::app()->params['PRODUCTS_PER_PAGE']);
 
 		//Based on logging setting, set log level dynamically and possibly turn on debug mode
 		switch (Yii::app()->params['DEBUG_LOGGING'])
 		{
-
 			case 'info':
 				$logLevel = "error,warning,info";
 				break;
@@ -94,24 +105,24 @@ class Controller extends CController
 			default:
 				$logLevel = "error,warning";
 				break;
-
 		}
 
 		foreach(Yii::app()->getComponent('log')->routes as $route)
+		{
 			$route->levels = $logLevel;
+		}
 
 		Yii::app()->setViewPath(Yii::getPathOfAlias('application')."/views-cities");
 
-		Yii::app()->name =  Yii::app()->params['STORE_NAME'];
+		Yii::app()->name = Yii::app()->params['STORE_NAME'];
 
-		if(Yii::app()->params['LIGHTSPEED_CLOUD']=='-1')
+		if(Yii::app()->params['LIGHTSPEED_CLOUD'] == '-1')
 		{
 			//We should never see this, this means our cloud cache file is bad
 			$strHostfile = realpath(dirname(__FILE__)).'/../../../config/cloud/'.$_SERVER['HTTP_HOST'].".php";
 			@unlink($strHostfile);
 			Yii::app()->request->redirect(Yii::app()->createUrl('site/index'));
 		}
-
 
 	}
 	/**
@@ -125,32 +136,41 @@ class Controller extends CController
 		self::initParams();
 
 		if(isset($_GET['nosni']))
-			Yii::app()->user->setFlash('warning',Yii::t('global','NOTE: Your older operating system does not support certain security features this site uses. You have been redirected to {link} for your session which will ensure your information is properly protected.',array('{link}'=>"<b>".Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL']."</b>")));
+		{
+			Yii::app()->user->setFlash('warning', Yii::t('global', 'NOTE: Your older operating system does not support certain security features this site uses. You have been redirected to {link} for your session which will ensure your information is properly protected.', array('{link}' => "<b>".Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL']."</b>")));
+		}
 
 		$filename = Yii::getPathOfAlias('webroot.themes').DIRECTORY_SEPARATOR.DEFAULT_THEME;
-		if(!file_exists($filename) && _xls_get_conf('LIGHTSPEED_MT',0)=='0')
+		if(!file_exists($filename) && _xls_get_conf('LIGHTSPEED_MT', 0) == '0')
 		{
 			if(!downloadTheme(DEFAULT_THEME))
+			{
 				die("missing ".DEFAULT_THEME);
+			}
 			else
+			{
 				$this->redirect(Yii::app()->createUrl("site/index"));
+			}
 		}
+
 		if(!Yii::app()->theme)
 		{
 			if(_xls_get_conf('THEME'))
 			{
 				//We can't find our theme for some reason, switch back to default
 				_xls_set_conf('THEME', DEFAULT_THEME);
-				_xls_set_conf('CHILD_THEME','light');
+				_xls_set_conf('CHILD_THEME', 'light');
 				Yii::log(
 					"Couldn't find our theme, switched back to " . DEFAULT_THEME . " for emergency",
 					'error',
 					'application.' . __CLASS__ . "." . __FUNCTION__
 				);
 				$this->redirect(Yii::app()->createUrl('site/index'));
-
-			} else
+			}
+			else
+			{
 				die("you have no theme set");
+			}
 		}
 
 		if (isset($_GET['theme']) && isset($_GET['themekey']))
@@ -175,19 +195,23 @@ class Controller extends CController
 
 		$this->buildBootstrap();
 		if(_xls_facebook_login())
+		{
 			$this->getFacebookLogin();
+		}
 
 		if (Yii::app()->params['STORE_OFFLINE'] != '0' || Yii::app()->params['INSTALLED'] != '1')
 		{
 			if (isset($_GET['offline']))
+			{
 				Yii::app()->session['STORE_OFFLINE'] = _xls_number_only($_GET['offline']);
+			}
 
 			//If uninstalled on a new Multitenant store, direct to license acceptance to get going
 			if (Yii::app()->params['INSTALLED'] != '1' && Yii::app()->params['LIGHTSPEED_MT'] == '1')
 			{
 				$url = Yii::app()->createUrl("admin/license");
-				$url = str_replace("https:","http:",$url);
-				$this->redirect($url,true);
+				$url = str_replace("https:", "http:", $url);
+				$this->redirect($url, true);
 			}
 
 			if (Yii::app()->session['STORE_OFFLINE'] != Yii::app()->params['STORE_OFFLINE'] ||
@@ -202,16 +226,22 @@ class Controller extends CController
 
 		$strViewset = Yii::app()->theme->info->viewset;
 		if(!empty($strViewset))
+		{
 			Yii::app()->setViewPath(Yii::getPathOfAlias('application')."/views-".$strViewset);
+		}
 
 		$strLayoutFile = Yii::app()->theme->config->layoutFile;
 		if(empty($strLayoutFile))
+		{
 			$strLayoutFile = "column2"; //This is for backwards compatibility only
+		}
 
 		if(Yii::app()->theme && file_exists('webroot.themes.'.Yii::app()->theme->name.'.layouts.'.$strLayoutFile))
-			$this->layout='webroot.themes.'.Yii::app()->theme->name.'.layouts.'.$strLayoutFile;
-		else
+		{
+			$this->layout = 'webroot.themes.'.Yii::app()->theme->name.'.layouts.'.$strLayoutFile;
+		} else {
 			$this->layout = $strLayoutFile;
+		}
 
 		//Set defaults
 		$this->getUserLanguage();
@@ -223,9 +253,9 @@ class Controller extends CController
 
 		$pageHeaderImage = Yii::app()->params['HEADER_IMAGE'];
 
-		if (substr($pageHeaderImage,0,4) != "http")
+		if (substr($pageHeaderImage, 0, 4) != "http")
 		{
-			if (substr($pageHeaderImage,0,2) != "//")
+			if (substr($pageHeaderImage, 0, 2) != "//")
 			{
 				$this->pageAbsoluteHeaderImage = Yii::app()->createAbsoluteUrl($pageHeaderImage, array(), Yii::app()->params['ENABLE_SSL'] ? 'https' : 'http');
 				// we prefix with baseUrl to handle instances where Web Store is installed in a sub folder
@@ -237,10 +267,7 @@ class Controller extends CController
 				$this->pageAbsoluteHeaderImage = Yii::app()->params['ENABLE_SSL'] ? 'https:' . $pageHeaderImage : 'http:' . $pageHeaderImage;
 				$this->pageHeaderImage = $pageHeaderImage;
 			}
-		}
-
-		else
-		{
+		} else {
 			$this->pageAbsoluteHeaderImage = $pageHeaderImage;
 			$this->pageHeaderImage = $pageHeaderImage;
 		}
@@ -251,14 +278,14 @@ class Controller extends CController
 		//Run other functions to create some data we always need
 		$this->buildGoogle();
 		$this->buildSidebars();
-		if (_xls_get_conf('SHOW_SHARING',0))
+		if (_xls_get_conf('SHOW_SHARING', 0))
+		{
 			$this->buildSharing();
+		}
 
 		$this->buildAccessWarning();
 
-		$this->gridProductsPerRow = _xls_get_conf('PRODUCTS_PER_ROW',3);
-
-
+		$this->gridProductsPerRow = _xls_get_conf('PRODUCTS_PER_ROW', 3);
 
 		Yii::app()->clientScript->registerMetaTag(
 			"Lightspeed Web Store " . XLSWS_VERSION,
@@ -273,18 +300,22 @@ class Controller extends CController
 	 * Default canonical url generator, will remove all get params beside 'id' and generates an absolute url.
 	 * If the canonical url was already set in a child controller, it will be taken instead.
 	 */
-	public function getCanonicalUrl() {
-		if ($this->_canonicalUrl === null) {
+	public function getCanonicalUrl()
+	{
+		if ($this->_canonicalUrl === null)
+		{
 			$params = array();
-			if (isset($_GET['id'])) {
+			if (isset($_GET['id']))
+			{
 				//just keep the id, because it identifies our model pages
 				$params = array('id' => $_GET['id']);
 			}
+
 			$this->_canonicalUrl = Yii::app()->createAbsoluteUrl($this->route, $params);
 		}
+
 		return $this->_canonicalUrl;
 	}
-
 
 	/**
 	 * Override URL if needed
@@ -293,10 +324,8 @@ class Controller extends CController
 		$this->_canonicalUrl = $strUrl;
 	}
 
-
 	protected function getUserLanguage()
 	{
-
 		$app = Yii::app();
 
 		if (isset($_POST['_lang']))
@@ -316,8 +345,8 @@ class Controller extends CController
 		else
 		{
 			// 'fr_FR' becomes 'fr'
-			$app->language = substr(Yii::app()->getRequest()->getPreferredLanguage(),0,2);
-			$app->session['_lang'] = substr(Yii::app()->getRequest()->getPreferredLanguage(),0,2);
+			$app->language = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+			$app->session['_lang'] = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
 		}
 	}
 
@@ -331,11 +360,14 @@ class Controller extends CController
 
 		$this->pageGoogleVerify = _xls_get_conf('GOOGLE_VERIFY');
 		$this->pageGoogleFonts = _xls_get_conf('GOOGLE_FONTS_LINK');
+
 		if (Yii::app()->theme->info->GoogleFonts)
+		{
 			$this->pageGoogleFonts .= '<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family='.
 				Yii::app()->theme->info->GoogleFonts.'">';
+		}
 
-		$this->pageGoogleFonts = str_replace("http://","//",$this->pageGoogleFonts);
+		$this->pageGoogleFonts = str_replace("http://", "//", $this->pageGoogleFonts);
 	}
 
 	/**
@@ -350,23 +382,21 @@ class Controller extends CController
 	}
 
 	protected function buildSharing() {
-		$this->sharingHeader = $this->renderPartial('/site/_sharing_header',null,true);
-		$this->sharingFooter = $this->renderPartial('/site/_sharing_footer',null,true);
-
-
+		$this->sharingHeader = $this->renderPartial('/site/_sharing_header', null, true);
+		$this->sharingFooter = $this->renderPartial('/site/_sharing_footer', null, true);
 	}
 
 	protected function buildBootstrap()
 	{
 
-		Yii::setPathOfAlias('bootstrap',null);
+		Yii::setPathOfAlias('bootstrap', null);
 		$strBootstrap = Yii::app()->theme->info->bootstrap;
 
 		if(!isset($strBootstrap))
 		{
-			Yii::app()->setComponent('bootstrap',array(
-				'class'=>'ext.bootstrap.components.Bootstrap',
-				'responsiveCss'=>true,
+			Yii::app()->setComponent('bootstrap', array(
+				'class' => 'ext.bootstrap.components.Bootstrap',
+				'responsiveCss' => true,
 			));
 			Yii::setPathOfAlias('bootstrap', dirname(__FILE__).DIRECTORY_SEPARATOR.'../extensions/bootstrap');
 			Yii::app()->bootstrap->init();
@@ -381,12 +411,11 @@ class Controller extends CController
 				'bootstrap',
 				dirname(__FILE__).DIRECTORY_SEPARATOR.'../extensions/'.Yii::app()->theme->info->bootstrap
 			);
-			Yii::app()->setComponent('bootstrap',array(
-				'class'=>'ext.'.Yii::app()->theme->info->bootstrap.'.components.Bootstrap'
+			Yii::app()->setComponent('bootstrap', array(
+				'class' => 'ext.'.Yii::app()->theme->info->bootstrap.'.components.Bootstrap'
 			));
 			Yii::app()->bootstrap->init();
 		}
-
 
 	}
 
@@ -394,12 +423,13 @@ class Controller extends CController
 	{
 		try
 		{
-			Yii::app()->setComponent('wsaccesswarning' ,array(
-				'class'=>'ext.wsaccesswarning.wsaccesswarning'
+			Yii::app()->setComponent('wsaccesswarning', array(
+				'class' => 'ext.wsaccesswarning.wsaccesswarning'
 			));
 
 			Yii::app()->wsaccesswarning->displayAccessWarning();
 		}
+
 		catch(Exception $ex)
 		{
 			Yii::log("Failed to load wsaccesswarning extension", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
@@ -413,18 +443,18 @@ class Controller extends CController
 		/* This is our modal login dialog box */
 		if (Yii::app()->user->isGuest)
 		{
-			$this->beginWidget('zii.widgets.jui.CJuiDialog',array(
-				'id'=>'LoginForm',
-				'options'=>array(
-					'title'=>Yii::t('global','Redirecting to Login...'),
-					'autoOpen'=>false,
-					'modal'=>'true',
-					'width'=>'300',
-					'height'=>'0',
-					'resizable'=>false,
-					'position'=>'center',
-					'draggable'=>false,
-					'open'=>'js:function(){window.location.href="'.$this->createUrl("site/login").'";}',
+			$this->beginWidget('zii.widgets.jui.CJuiDialog', array(
+				'id' => 'LoginForm',
+				'options' => array(
+					'title' => Yii::t('global', 'Redirecting to Login...'),
+					'autoOpen' => false,
+					'modal' => 'true',
+					'width' => '300',
+					'height' => '0',
+					'resizable' => false,
+					'position' => 'center',
+					'draggable' => false,
+					'open' => 'js:function(){window.location.href="'.$this->createUrl("site/login").'";}',
 
 				),
 			));
@@ -440,16 +470,15 @@ class Controller extends CController
 
 		//Facebook integration
 		$fbArray = require(YiiBase::getPathOfAlias('application.config').'/_wsfacebook.php');
-		$fbArray['appId']=Yii::app()->params['FACEBOOK_APPID'];
-		$fbArray['secret']=Yii::app()->params['FACEBOOK_SECRET'];
-		Yii::app()->setComponent('facebook',$fbArray);
-
+		$fbArray['appId'] = Yii::app()->params['FACEBOOK_APPID'];
+		$fbArray['secret'] = Yii::app()->params['FACEBOOK_SECRET'];
+		Yii::app()->setComponent('facebook', $fbArray);
 
 		if (Yii::app()->user->isGuest)
 		{
 			$userid = Yii::app()->facebook->getUser();
 
-			if ($userid>0)
+			if ($userid > 0)
 			{
 				$results = Yii::app()->facebook->api('/'.$userid);
 				if(!isset($results['email']))
@@ -458,26 +487,31 @@ class Controller extends CController
 					Yii::app()->facebook->destroySession();
 					$this->redirect(Yii::app()->createUrl("site/index"));
 				}
-				$identity=new FBIdentity($results['email'],$userid); //we user userid in the password field
+
+				$identity = new FBIdentity($results['email'], $userid); //we user userid in the password field
 				$identity->authenticate();
-				if($identity->errorCode===UserIdentity::ERROR_NONE)
+				if($identity->errorCode === UserIdentity::ERROR_NONE)
 				{
-					Yii::app()->user->login($identity,0);
+					Yii::app()->user->login($identity, 0);
 					$this->redirect(Yii::app()->createUrl("site/index"));
 				}
 			}
 		}
 
 		if(isset(Yii::app()->user->facebook))
+		{
 			if(Yii::app()->user->facebook)
-				$this->logoutUrl =  Yii::app()->facebook->getLogoutUrl();
-
+			{
+				$this->logoutUrl = Yii::app()->facebook->getLogoutUrl();
+			}
+		}
 	}
 
 	public function setReturnUrl()
 	{
 		Yii::app()->session['returnUrl'] = $this->CanonicalUrl;
 	}
+
 	public function getReturnUrl()
 	{
 		return Yii::app()->session['returnUrl'];
@@ -494,7 +528,9 @@ class Controller extends CController
 	protected function createBookends($model)
 	{
 		if (count($model) == 0 || Yii::app()->theme->config->disableGridRowDivs)
+		{
 			return $model;
+		}
 
 		$ct = -1;
 		$next = 0;
@@ -502,31 +538,37 @@ class Controller extends CController
 		{
 			$ct++;
 			if ($ct == 0)
+			{
 				$model[$ct]->rowBookendFront = true;
+			}
+
 			if ($next == 1)
 			{
 				$model[$ct]->rowBookendFront = true;
 				$next = 0;
 			}
+
 			if ((1 + $ct) % $this->gridProductsPerRow == 0)
 			{
 				$model[$ct]->rowBookendBack = true;
 				$next = 1;
 			}
 		}
+
 		$model[count($model) - 1]->rowBookendBack = true; //Last item must always close div
 		return $model;
 	}
 
 
 	protected function afterRender($view, &$output) {
-		parent::afterRender($view,$output);
+		parent::afterRender($view, $output);
 		//Yii::app()->facebook->addJsCallback($js); // use this if you are registering any $js code you want to run asyc
 
-
 		if (_xls_facebook_login())
+		{
 			Yii::app()->facebook->initJs($output); // this initializes the Facebook JS SDK on all pages
-		//Yii::app()->facebook->renderOGMetaTags(); //we don't need this because it was already in our _main.php
+		}
+
 		return true;
 	}
 
@@ -540,25 +582,23 @@ class Controller extends CController
 		$objTree = Category::GetTree() + CustomPage::GetTree();
 		ksort($objTree);
 
-		if(_xls_get_conf('ENABLE_FAMILIES', 0)>0)
+		if(_xls_get_conf('ENABLE_FAMILIES', 0) > 0)
 		{
-
 			$families = Family::GetTree();
 			$familyMenu['families_brands_menu'] = array(
-				'text'=>CHtml::link(Yii::app()->params['ENABLE_FAMILIES_MENU_LABEL'],$this->createUrl("search/browse",array('brand'=>'*'))),
-				'label'=>Yii::app()->params['ENABLE_FAMILIES_MENU_LABEL'],
-				'link'=>$this->createUrl("search/browse",array('brand'=>'*')),
-				'url'=>$this->createUrl("search/browse",array('brand'=>'*')),
-				'id'=>0,
-				'child_count'=>count($families),
-				'hasChildren'=>1,
-				'children'=>$families,
-				'items'=>$families
+				'text' => CHtml::link(Yii::app()->params['ENABLE_FAMILIES_MENU_LABEL'], $this->createUrl("search/browse", array('brand' => '*'))),
+				'label' => Yii::app()->params['ENABLE_FAMILIES_MENU_LABEL'],
+				'link' => $this->createUrl("search/browse", array('brand' => '*')),
+				'url' => $this->createUrl("search/browse", array('brand' => '*')),
+				'id' => 0,
+				'child_count' => count($families),
+				'hasChildren' => 1,
+				'children' => $families,
+				'items' => $families
 			);
 
 			switch (_xls_get_conf('ENABLE_FAMILIES', 0))
 			{
-
 				case 3:
 					$objFullTree = $families + $objTree;
 					ksort($objFullTree);
@@ -569,13 +609,13 @@ class Controller extends CController
 				case 1:
 					$objFullTree = $objTree + $familyMenu;
 					break; //onbottom
-
 			}
+		} else {
+			$objFullTree = $objTree;
+		}
 
-		} else $objFullTree = $objTree;
-
-		$this->objFullTree = $objFullTree;
-		return $this->objFullTree;
+		$this->_objFullTree = $objFullTree;
+		return $this->_objFullTree;
 	}
 
 	/**
@@ -585,18 +625,25 @@ class Controller extends CController
 	 */
 	public function getMenuTreeTop()
 	{
-		if ($this->objFullTree === null)
-			$this->objFullTree = $this->MenuTree;
-
-		foreach($this->objFullTree as $key => $menuItem)
+		if ($this->_objFullTree === null)
 		{
-			if(isset($menuItem['children']))
-				unset($this->objFullTree[$key]['children']);
-			if(isset($menuItem['items']))
-				unset($this->objFullTree[$key]['items']);
+			$this->_objFullTree = $this->MenuTree;
 		}
 
-		return $this->objFullTree;
+		foreach($this->_objFullTree as $key => $menuItem)
+		{
+			if(isset($menuItem['children']))
+			{
+				unset($this->_objFullTree[$key]['children']);
+			}
+
+			if(isset($menuItem['items']))
+			{
+				unset($this->_objFullTree[$key]['items']);
+			}
+		}
+
+		return $this->_objFullTree;
 	}
 
 	/**
@@ -608,9 +655,9 @@ class Controller extends CController
 	 * @param string $ampersand
 	 * @return string
 	 */
-	public function createAbsoluteUrl($route,$params=array(),$schema='',$ampersand='&')
+	public function createAbsoluteUrl($route, $params = array(), $schema = '', $ampersand = '&')
 	{
-		return Yii::app()->createAbsoluteUrl($route,$params,$schema,$ampersand);
+		return Yii::app()->createAbsoluteUrl($route, $params, $schema, $ampersand);
 	}
 
 	/**
@@ -620,7 +667,10 @@ class Controller extends CController
 	public function getIsCloud()
 	{
 		if (Yii::app()->params['LIGHTSPEED_CLOUD'] > 0)
+		{
 			return true;
+		}
+
 		return false;
 	}
 
@@ -631,7 +681,10 @@ class Controller extends CController
 	public function getIsMT()
 	{
 		if (Yii::app()->params['LIGHTSPEED_MT'] > 0)
+		{
 			return true;
+		}
+
 		return false;
 	}
 
@@ -641,14 +694,17 @@ class Controller extends CController
 	 */
 	public function getIsHosted()
 	{
-		if(Yii::app()->params['LIGHTSPEED_HOSTING']>0)
+		if(Yii::app()->params['LIGHTSPEED_HOSTING'] > 0)
+		{
 			return true;
+		}
+
 		return false;
 	}
 
 	protected function verifyPreviewThemeKey($strThemeName, $strKey)
 	{
-		return ($strKey === substr(md5($strThemeName.gmdate('d')),0,10));
+		return ($strKey === substr(md5($strThemeName.gmdate('d')), 0, 10));
 	}
 
 	protected function registerPreviewThemeScript($strThemeName, $strkey)
@@ -659,8 +715,7 @@ class Controller extends CController
 		$script .= "$('div.product_cell_label').each(function(elem) { $(this).attr('onclick', $(this).attr('onclick').substring(0,$(this).attr('onclick').length-1) + '?theme=$strThemeName&themekey=$strkey\"'); });";
 		$script .= "$('div.wishlistnew').each(function(elem) { $(this).attr('onclick', $(this).attr('onclick').substring(0,$(this).attr('onclick').length-1) + '?theme=$strThemeName&themekey=$strkey\"'); });";
 
-		Yii::app()->clientScript->registerScript('themepreview',$script,CClientScript::POS_END);
-
+		Yii::app()->clientScript->registerScript('themepreview', $script, CClientScript::POS_END);
 	}
 
 	/**

@@ -23,19 +23,22 @@ class ProductQtyPricing extends BaseProductQtyPricing
 		return sprintf('ProductQtyPricing Object %s',  $this->product_id." ".$this->pricing_level." ".$this->qty);
 	}
 
-	public function GetPrice($intTaxCode, $intTaxStatus,
-		$taxExclusive = false) {
-
+	public function GetPrice($objTaxCode, $intTaxStatus, $taxExclusive = false)
+	{
 		if ($taxExclusive)
+		{
 			return $this->price;
-		else if (_xls_get_conf('TAX_INCLUSIVE_PRICING', '') == '1') {
-			$arrPrice = Tax::CalculatePricesWithTax(
-				$this->price, $intTaxCode, $intTaxStatus);
-			$intPrice = round($arrPrice[0], 2);
-			return $intPrice;
+		}
+		elseif (_xls_get_conf('TAX_INCLUSIVE_PRICING', '') == '1')
+		{
+			$arrPrice = Tax::calculatePricesWithTax($this->price, $objTaxCode->id, $intTaxStatus);
+
+			return $arrPrice['fltSellTotalWithTax'];
 		}
 		else
+		{
 			return $this->price;
+		}
 	}
 
 	public function __get($strName) {

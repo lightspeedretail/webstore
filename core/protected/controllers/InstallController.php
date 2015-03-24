@@ -1134,7 +1134,6 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 		$objConfig->save();
 
 		//What we're gonna do right here is go back.... way back...
-		_xls_set_conf('DATABASE_SCHEMA_VERSION',447);
 		return array('result'=>"success",'makeline'=>50,'tag'=>'Migrating Database','total'=>50);
 	}
 

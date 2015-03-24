@@ -2,11 +2,11 @@
 
 <div id="checkout">
 
-	<?php $form=$this->beginWidget('CActiveForm', array(
-			'id'=>'myaccount',
-			'enableClientValidation'=>true,
-			'focus'=>array($model,'password')
-		));
+	<?php
+		$form = $this->beginWidget('CActiveForm', array(
+				'id' => 'myaccount',
+				'enableClientValidation' => true
+			));
 	?>
 
 	<div id="createaccount">

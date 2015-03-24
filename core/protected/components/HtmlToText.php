@@ -26,16 +26,18 @@ The original file can be sourced from http://journals.jevon.org/users/jevon-phd/
  * @param html the input HTML
  * @return the HTML converted, as best as possible, to text
  */
-class HtmlToText {
-
-
+class HtmlToText
+{
+	// @codingStandardsIgnoreStart
 	public function convert_html_to_text($html) {
+	// @codingStandardsIgnoreEnd
 		$html = $this->fix_newlines($html);
 
 		$doc = new DOMDocument();
 		try {
 			$doc->loadHTML($html);
 		}
+
 		catch (Exception $e)
 		{
 			Yii::log("Error creating plain text email from receipt ".$e, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
@@ -61,7 +63,9 @@ class HtmlToText {
 	 * @param text text with any number of \r, \r\n and \n combinations
 	 * @return the fixed text
 	 */
+	// @codingStandardsIgnoreStart
 	public function fix_newlines($text) {
+	// @codingStandardsIgnoreEnd
 		// replace \r\n to \n
 		$text = str_replace("\r\n", "\n", $text);
 		// remove \rs
@@ -70,44 +74,66 @@ class HtmlToText {
 		return $text;
 	}
 
+	// @codingStandardsIgnoreStart
 	public function next_child_name($node) {
+	// @codingStandardsIgnoreEnd
 		// get the next child
 		$nextNode = $node->nextSibling;
-		while ($nextNode != null) {
-			if ($nextNode instanceof DOMElement) {
+		while ($nextNode != null)
+		{
+			if ($nextNode instanceof DOMElement)
+			{
 				break;
 			}
+
 			$nextNode = $nextNode->nextSibling;
 		}
+
 		$nextName = null;
-		if ($nextNode instanceof DOMElement && $nextNode != null) {
+		if ($nextNode instanceof DOMElement && $nextNode != null)
+		{
 			$nextName = strtolower($nextNode->nodeName);
 		}
 
 		return $nextName;
 	}
-	public function prev_child_name($node) {
+
+	// @codingStandardsIgnoreStart
+	public function prev_child_name($node)
+	// @codingStandardsIgnoreEnd
+	{
 		// get the previous child
 		$nextNode = $node->previousSibling;
-		while ($nextNode != null) {
-			if ($nextNode instanceof DOMElement) {
+		while ($nextNode != null)
+		{
+			if ($nextNode instanceof DOMElement)
+			{
 				break;
 			}
+
 			$nextNode = $nextNode->previousSibling;
 		}
+
 		$nextName = null;
-		if ($nextNode instanceof DOMElement && $nextNode != null) {
+		if ($nextNode instanceof DOMElement && $nextNode != null)
+		{
 			$nextName = strtolower($nextNode->nodeName);
 		}
 
 		return $nextName;
 	}
 
-	public function iterate_over_node($node) {
-		if ($node instanceof DOMText) {
+	// @codingStandardsIgnoreStart
+	public function iterate_over_node($node)
+	// @codingStandardsIgnoreEnd
+	{
+		if ($node instanceof DOMText)
+		{
 			return preg_replace("/\\s+/im", " ", $node->wholeText);
 		}
-		if ($node instanceof DOMDocumentType) {
+
+		if ($node instanceof DOMDocumentType)
+		{
 			// ignore
 			return "";
 		}
@@ -118,7 +144,8 @@ class HtmlToText {
 		$name = strtolower($node->nodeName);
 
 		// start whitespace
-		switch ($name) {
+		switch ($name)
+		{
 			case "hr":
 				return "------\n";
 
@@ -156,16 +183,20 @@ class HtmlToText {
 		//$output .= "[$name,$nextName]";
 
 		if($node->childNodes)
-			for ($i = 0; $i < $node->childNodes->length; $i++) {
-			$n = $node->childNodes->item($i);
+		{
+			for ($i = 0; $i < $node->childNodes->length; $i++)
+			{
+				$n = $node->childNodes->item($i);
 
-			$text = $this->iterate_over_node($n);
+				$text = $this->iterate_over_node($n);
 
-			$output .= $text;
+				$output .= $text;
+			}
 		}
 
 		// end whitespace
-		switch ($name) {
+		switch ($name)
+		{
 			case "style":
 			case "head":
 			case "title":
@@ -187,25 +218,32 @@ class HtmlToText {
 			case "br":
 				// add one line
 				if ($nextName != "div")
+				{
 					$output .= "\n";
+				}
 				break;
 
 			case "div":
 				// add one line only if the next child isn't a div
 				if ($nextName != "div" && $nextName != null)
+				{
 					$output .= "\n";
+				}
 				break;
 
 			case "a":
 				// links are returned in [text](link) format
 				$href = $node->getAttribute("href");
-				if ($href == null) {
+				if ($href == null)
+				{
 					// it doesn't link anywhere
-					if ($node->getAttribute("name") != null) {
+					if ($node->getAttribute("name") != null)
+					{
 						$output = "[$output]";
 					}
 				} else {
-					if ($href == $output) {
+					if ($href == $output)
+					{
 						// link to the same address: just use link
 						$output;
 					} else {
@@ -215,7 +253,8 @@ class HtmlToText {
 				}
 
 				// does the next node require additional whitespace?
-				switch ($nextName) {
+				switch ($nextName)
+				{
 					case "h1": case "h2": case "h3": case "h4": case "h5": case "h6":
 					$output .= "\n";
 					break;

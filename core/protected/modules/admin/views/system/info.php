@@ -22,15 +22,6 @@
 		</div>
 		<div class="row">
 			<div class="span3" style="text-align: right">
-				<span class="label"><?php echo Yii::t('admin','Database Schema');?></span>
-			</div>
-			<div class="span3">
-				<span class="editinstructions"><?php echo Yii::app()->params['DATABASE_SCHEMA_VERSION']; ?></span>
-			</div>
-			<div class="span3">&nbsp;</div>
-		</div>
-		<div class="row">
-			<div class="span3" style="text-align: right">
 				<span class="label"><?php echo Yii::t('admin','PHP Version');?></span>
 			</div>
 			<div class="span3">
