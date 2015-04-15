@@ -68,7 +68,7 @@ class SiteController extends Controller
 
 				$dataProvider = $objCustomPage->taggedProducts();
 
-				$this->CanonicalUrl = $objCustomPage->CanonicalUrl;
+				$this->canonicalUrl = $objCustomPage->canonicalUrl;
 				$this->render('/custompage/index', array('model' => $objCustomPage, 'dataProvider' => $dataProvider));
 				break;
 		}

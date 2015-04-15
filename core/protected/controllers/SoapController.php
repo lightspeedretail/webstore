@@ -909,7 +909,7 @@ class SoapController extends CController
 		else
 			ProductCategoryAssn::model()->deleteAllByAttributes(array('product_id'=>$objProduct->id));
 
-		Product::ConvertSEO($intRowid); //Build request_url
+		Product::convertSEO($intRowid); //Build request_url
 
 		Yii::app()->db->createCommand('SET FOREIGN_KEY_CHECKS=1;')->execute();
 

@@ -25,7 +25,8 @@ class Controller extends CController
 
 	public $menuwidget;
 
-	protected $_canonicalUrl;
+	protected $_canonicalUrl = null;
+	protected $_returnUrl = null;
 
 	/* These are public variables that are used in our layout, so we have to define them.
 	*/
@@ -79,13 +80,6 @@ class Controller extends CController
 			Yii::app()->theme = Yii::app()->params['THEME'];
 		} else {
 			Yii::app()->theme = DEFAULT_THEME;
-		}
-
-		if(isset(Yii::app()->params['LANG_CODE']))
-		{
-			Yii::app()->language = Yii::app()->params['LANG_CODE'];
-		} else {
-			Yii::app()->language = "en";
 		}
 
 		Yii::app()->params->add('listPerPage', Yii::app()->params['PRODUCTS_PER_PAGE']);
@@ -272,7 +266,7 @@ class Controller extends CController
 			$this->pageHeaderImage = $pageHeaderImage;
 		}
 
-		Yii::app()->shoppingcart->UpdateMissingProducts();
+		Yii::app()->shoppingcart->updateMissingProducts();
 		Yii::app()->shoppingcart->revalidatePromoCode();
 
 		//Run other functions to create some data we always need
@@ -297,12 +291,89 @@ class Controller extends CController
 	}
 
 	/**
-	 * Default canonical url generator, will remove all get params beside 'id' and generates an absolute url.
-	 * If the canonical url was already set in a child controller, it will be taken instead.
+	 * Determine what the current Web Store's canonical hostname should be.
+	 * Since Lightspeed hosted Web Stores have multiple URLs, we want the one
+	 * that the customer *expects* to be the canonical url.  In our current
+	 * hosting environment that means what we call the 'primary url' in
+	 * sapphire, and the 'lightspeed hosting custom url' for retail stores.
+	 * Once we transition to the new infrastructure, all Lightspeed hosted
+	 * stores will have access to a single environment variable HTTP_PAYLOAD_URL
+	 * which will always map to the customers "primary url."  Until then, we
+	 * need to do a bit of checking to figure out the best hostname to use for
+	 * the customer's Web Store.  Any non-hosted Web Stores should default to
+	 * SERVER_NAME as this is what has been configured in the web server as the
+	 * official name of the Web Store.
+	 *
+	 * @return string
 	 */
-	public function getCanonicalUrl()
+	public function getCanonicalHostName() {
+		$hostName = null;
+
+		// HTTP_PAYLOAD_URL is set via the hosting infrastructure to always be
+		// the customer's primary Web Store URL.  This should always be used to
+		// determine a Lightspeed hosted Web Store's canonical url.
+		if (getenv('HTTP_PAYLOAD_URL') !== false)
+		{
+			$hostName = getenv('HTTP_PAYLOAD_URL');
+		}
+
+		// Legacy retail Web Stores use LIGHTSPEED_HOSTING_CUSTOM_URL.
+		// TODO: Once all Lightspeed hosted Web Stores are on the new
+		// infrastructure we can remove this check.
+		elseif (strlen(_xls_get_conf('LIGHTSPEED_HOSTING_CUSTOM_URL')) > 0)
+		{
+			$hostName = _xls_get_conf('LIGHTSPEED_HOSTING_CUSTOM_URL');
+		}
+
+		// Everyone else should use SERVER_NAME
+		else
+		{
+			$hostName = $_SERVER['SERVER_NAME'];
+		}
+
+		return $hostName;
+	}
+
+	/**
+	 * Default canonical url generator, will remove all get params beside 'id'
+	 * and generate an absolute url.
+	 * If the canonical url was already set in a child controller, it will be
+	 * taken instead.
+	 */
+	public function getCanonicalUrl() {
+		if ($this->_canonicalUrl !== null)
+		{
+			return $this->_canonicalUrl;
+		}
+
+		$params = array();
+		if (isset($_GET['id']))
+		{
+			//just keep the id, because it identifies our model pages
+			$params = array('id' => $_GET['id']);
+		}
+
+		$canonicalUrl = Yii::app()->createAbsoluteUrl($this->route, $params);
+		$parsedUrl = parse_url($canonicalUrl);
+		$host = $this->getCanonicalHostName();
+
+		if ($parsedUrl['host'] !== $host)
+		{
+			$canonicalUrl = str_replace($parsedUrl['host'], $host, $canonicalUrl);
+		}
+
+		return $canonicalUrl;
+	}
+
+	/**
+	 * Default return url generator, will remove all get params beside 'id'
+	 * and generate an absolute url.
+	 * If the return url was already set in a child controller, it will be
+	 * taken instead.
+	 */
+	public function generateReturnUrl()
 	{
-		if ($this->_canonicalUrl === null)
+		if ($this->_returnUrl === null)
 		{
 			$params = array();
 			if (isset($_GET['id']))
@@ -311,10 +382,10 @@ class Controller extends CController
 				$params = array('id' => $_GET['id']);
 			}
 
-			$this->_canonicalUrl = Yii::app()->createAbsoluteUrl($this->route, $params);
+			$this->_returnUrl = Yii::app()->createAbsoluteUrl($this->route, $params);
 		}
 
-		return $this->_canonicalUrl;
+		return $this->_returnUrl;
 	}
 
 	/**
@@ -344,9 +415,15 @@ class Controller extends CController
 		}
 		else
 		{
-			// 'fr_FR' becomes 'fr'
-			$app->language = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
-			$app->session['_lang'] = substr(Yii::app()->getRequest()->getPreferredLanguage(), 0, 2);
+			$preferredLanguage = Yii::app()->getRequest()->getPreferredLanguage();
+
+			if ($preferredLanguage)
+			{
+				// 'fr_FR' becomes 'fr'
+				$preferredLanguage = substr($preferredLanguage, 0, 2);
+				$app->language = $preferredLanguage;
+				$app->session['_lang'] = $preferredLanguage;
+			}
 		}
 	}
 
@@ -398,21 +475,23 @@ class Controller extends CController
 				'class' => 'ext.bootstrap.components.Bootstrap',
 				'responsiveCss' => true,
 			));
-			Yii::setPathOfAlias('bootstrap', dirname(__FILE__).DIRECTORY_SEPARATOR.'../extensions/bootstrap');
+			Yii::setPathOfAlias('bootstrap', dirname(__FILE__) . '/../extensions/bootstrap');
 			Yii::app()->bootstrap->init();
 		}
 		elseif($strBootstrap == 'none')
 		{
-			//don't load bootstrap at all
+			// Don't load bootstrap at all.
+			// Set the alias though, so the theme can use it for the widgets.
+			Yii::setPathOfAlias('bootstrap', dirname(__FILE__) . '/../extensions/bootstrap');
 		}
 		elseif(!empty($strBootstrap))
 		{
 			Yii::setPathOfAlias(
 				'bootstrap',
-				dirname(__FILE__).DIRECTORY_SEPARATOR.'../extensions/'.Yii::app()->theme->info->bootstrap
+				dirname(__FILE__) . '/../extensions/'.Yii::app()->theme->info->bootstrap
 			);
 			Yii::app()->setComponent('bootstrap', array(
-				'class' => 'ext.'.Yii::app()->theme->info->bootstrap.'.components.Bootstrap'
+				'class' => 'ext.' . Yii::app()->theme->info->bootstrap . '.components.Bootstrap'
 			));
 			Yii::app()->bootstrap->init();
 		}
@@ -509,7 +588,7 @@ class Controller extends CController
 
 	public function setReturnUrl()
 	{
-		Yii::app()->session['returnUrl'] = $this->CanonicalUrl;
+		Yii::app()->session['returnUrl'] = $this->generateReturnUrl();
 	}
 
 	public function getReturnUrl()
@@ -579,42 +658,74 @@ class Controller extends CController
 	 */
 	public function getMenuTree()
 	{
-		$objTree = Category::GetTree() + CustomPage::GetTree();
-		ksort($objTree);
+		$categoryTree = Category::GetTree();
+		$extraTopLevelItems = CustomPage::GetTree();
 
-		if(_xls_get_conf('ENABLE_FAMILIES', 0) > 0)
+		// Whether the families (aka. manufacturers) are displayed the product menu.
+		// ENABLE_FAMILIES:
+		//	0     => No families in the product menu.
+		//	1     => Separate menu item at bottom of product menu.
+		//	2     => Separate menu item at top of product menu.
+		//	3     => Blended into the top level of the menu.
+		//
+		if(CPropertyValue::ensureInteger(Yii::app()->params['ENABLE_FAMILIES']) > 0)
 		{
-			$families = Family::GetTree();
+			$familyTree = Family::GetTree();
+
+			if(CPropertyValue::ensureInteger(Yii::app()->params['ENABLE_FAMILIES']) === 3)
+			{
+				$extraTopLevelItems += $familyTree;
+			}
+		}
+
+		// The behaviour varies here because OnSite customers are able to
+		// configure the menu_position of their categories. A more thorough
+		// solution might modify the menu code to return the menu_position for
+		// each menu item for sorting, however Categories should already be
+		// sorted by menu_position.
+		if (CPropertyValue::ensureInteger(Yii::app()->params['LIGHTSPEED_CLOUD']) !== 0)
+		{
+			// Retail: Sort the entire menu alphabetically.
+			$objTree = $categoryTree + $extraTopLevelItems;
+			ksort($objTree);
+		} else {
+			// OnSite: Only sort the extras alphabetically (categories are
+			// already sorted by menu_position).
+			ksort($extraTopLevelItems);
+			$objTree = $categoryTree + $extraTopLevelItems;
+		}
+
+		if (CPropertyValue::ensureInteger(Yii::app()->params['ENABLE_FAMILIES']) === 1 ||
+			CPropertyValue::ensureInteger(Yii::app()->params['ENABLE_FAMILIES']) === 2)
+		{
 			$familyMenu['families_brands_menu'] = array(
-				'text' => CHtml::link(Yii::app()->params['ENABLE_FAMILIES_MENU_LABEL'], $this->createUrl("search/browse", array('brand' => '*'))),
+				'text' => CHtml::link(
+					Yii::app()->params['ENABLE_FAMILIES_MENU_LABEL'],
+					$this->createUrl("search/browse", array('brand' => '*'))
+				),
 				'label' => Yii::app()->params['ENABLE_FAMILIES_MENU_LABEL'],
 				'link' => $this->createUrl("search/browse", array('brand' => '*')),
 				'url' => $this->createUrl("search/browse", array('brand' => '*')),
 				'id' => 0,
-				'child_count' => count($families),
+				'child_count' => count($familyTree),
 				'hasChildren' => 1,
-				'children' => $families,
-				'items' => $families
+				'children' => $familyTree,
+				'items' => $familyTree
 			);
 
-			switch (_xls_get_conf('ENABLE_FAMILIES', 0))
+			if (CPropertyValue::ensureInteger(Yii::app()->params['ENABLE_FAMILIES']) === 1)
 			{
-				case 3:
-					$objFullTree = $families + $objTree;
-					ksort($objFullTree);
-					break; //blended
-				case 2:
-					$objFullTree = $familyMenu + $objTree;
-					break; //on top
-				case 1:
-					$objFullTree = $objTree + $familyMenu;
-					break; //onbottom
+				// The manufacturers menu is at the bottom.
+				$objTree = $objTree + $familyMenu;
 			}
-		} else {
-			$objFullTree = $objTree;
+			elseif (CPropertyValue::ensureInteger(Yii::app()->params['ENABLE_FAMILIES']) === 2)
+			{
+				// The manufacturers menu is at the top.
+				$objTree = $familyMenu + $objTree;
+			}
 		}
 
-		$this->_objFullTree = $objFullTree;
+		$this->_objFullTree = $objTree;
 		return $this->_objFullTree;
 	}
 

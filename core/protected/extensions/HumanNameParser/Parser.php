@@ -59,10 +59,18 @@ class HumanNameParser_Parser {
 			  $this->prefixes = array('bar','ben','bin','da','dal','de la', 'de', 'del','der','di',
 							'ibn','la','le','san','st','ste','van', 'van der', 'van den', 'vel','von');
 
-			  $this->parse();
+			  // We can only parse if there are spaces in the name
+			  if (strstr($name, " ") !== false)
+			  {
+				$this->parse();
+			  }
+			  else
+			  {
+				  $this->first = $this->getName()->getStr();
+			  }
 		  }
 	  }
-	  
+
 	  public function getleadingInit() {
 		  return $this->leadingInit;
 	  }
@@ -84,9 +92,10 @@ class HumanNameParser_Parser {
 	  public function getSuffix() {
 		  return $this->suffix;
 	  }
-          public function getName(){
-              return $this->name;
-          }
+
+      public function getName(){
+          return $this->name;
+      }
 
 	  /**
 	   * returns all the parts of the name as an array

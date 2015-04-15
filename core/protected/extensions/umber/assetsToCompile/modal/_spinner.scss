@@ -23,16 +23,7 @@ $base-color: #555;
 .csspinner {
   position: relative;
 }
-// .csspinner:before {
-// 	content: "";
-// 	z-index: 1;
-// 	position: absolute;
-// 	top: 0;
-// 	left: 0;
-// 	display: block;
-// 	height: 100%;
-// 	width: 100%;
-// }
+
 .csspinner:after {
   z-index: 2;
   content: "";

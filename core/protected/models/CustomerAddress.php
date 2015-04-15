@@ -324,7 +324,8 @@ class CustomerAddress extends BaseCustomerAddress
 					return $this->address1.chr(13).
 					$this->address2.chr(13).
 					$this->city.chr(13).
-					$this->state." ".$this->postal.chr(13).
+					$this->state.chr(13).
+					$this->postal.chr(13).
 					$this->country;
 
 			case 'htmlblock':

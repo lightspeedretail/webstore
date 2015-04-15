@@ -244,6 +244,7 @@ class wsmatrixselector extends CApplicationComponent
 						if (data.FormattedRegularPrice != null) $("#' . CHtml::activeId($model,'FormattedRegularPrice') . '_wrap").show();
 							else $("#' . CHtml::activeId($model,'FormattedRegularPrice') . '_wrap").hide();
 						$("#' . CHtml::activeId($model,'description_long') . '").html(data.description_long);
+						$("#' . CHtml::activeId($model,'description_short') . '").html(data.description_short);
 						$("#' . CHtml::activeId($model,'image_id') . '").html(data.image_id);
 						$("#' . CHtml::activeId($model,'InventoryDisplay') . '").html(data.InventoryDisplay);
 						$("#' . CHtml::activeId($model,'title') . '").html(data.title);

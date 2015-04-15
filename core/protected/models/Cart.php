@@ -444,54 +444,83 @@ class Cart extends BaseCart
 	/**
 	 * Update Cart by removing Products which no longer exist or are unavailable
 	 */
-	public function UpdateMissingProducts() {
+	public function updateMissingProducts()
+	{
+		$wasCartModified = false;
 
-		$blnResult=false;
-		foreach ($this->cartItems as $objItem) {
-
-			if (!$objItem->product || $objItem->product->web != 1) {
-				Yii::app()->user->setFlash('warning',
-					Yii::t('cart','The product {product} is no longer available on this site and has been removed from your cart.',
-						array('{product}'=>"<strong>".$objItem->description."</strong>")));
-				$objItem->delete();
-				$blnResult = true;
-			}
-
-			//This is a cart that has not originated as a document i.e quote
-			if(is_null($this->document_id))
+		foreach ($this->cartItems as $key => $objItem)
+		{
+			if (is_null($objItem->product) || $objItem->product->web != 1)
 			{
-
-				if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) != Product::InventoryAllowBackorders) { //IOW, unless we allow backordering
-					if ($objItem->product->inventoried) {
-						if ($objItem->product->Inventory==0) {
-							Yii::app()->user->setFlash('warning',
-								Yii::t('cart','The product {product} is now out of stock and has been removed from your cart.',
-									array('{product}'=>"<strong>".$objItem->description."</strong>")));
-							$objItem->delete();
-							$blnResult = true;
-
-						}
-						elseif ($objItem->qty > $objItem->product->Inventory) {
-							Yii::app()->user->setFlash('warning',
-								Yii::t('cart','The product {product} now has less stock available than the amount you requested. Your cart quantity has been reduced to match what is available.',
-									array('{product}'=>"<strong>".$objItem->description."</strong>")));
-							$objItem->qty=$objItem->product->Inventory;
-							$objItem->save();
-							$blnResult = true;
-						}
-					}
-				}
+				Yii::app()->user->addFlash(
+					'warning',
+					Yii::t(
+						'cart',
+						'The product {product} is no longer available on this site and has been removed from your cart.',
+						array('{product}' => "<strong>" . $objItem->description . "</strong>")
+					)
+				);
+				$objItem->delete();
+				$wasCartModified = true;
 			}
 
+			if (is_numeric($this->document_id))
+			{
+				// TODO: Figure out why we do this because it's not exactly WS-221 as the commit suggests
+				// TODO: Refactor this to go outside for loop if possible
+				// Ignore carts that originate from quotes
+				continue;
+			}
 
+			if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0) == Product::InventoryAllowBackorders)
+			{
+				// TODO: Refactor this to go outside for loop if possible
+				// Backorders are allowed.
+				// We continue in the loop to satisfy currently written unit test CartAndCartItemTest::testUpdateMissingProducts()
+				continue;
+			}
+
+			if ($objItem->product->inventoried != 1)
+			{
+				// Current item is non-inventoried
+				// Move on to the next item
+				continue;
+			}
+
+			if ($objItem->product->Inventory <= 0)
+			{
+				Yii::app()->user->addFlash(
+					'warning',
+					Yii::t(
+						'cart',
+						'The product {product} is now out of stock and has been removed from your cart.',
+						array('{product}' => "<strong>".$objItem->description."</strong>")
+					)
+				);
+				$objItem->delete();
+				$wasCartModified = true;
+			}
+			elseif ($objItem->qty > $objItem->product->Inventory)
+			{
+				Yii::app()->user->addFlash(
+					'warning',
+					Yii::t(
+						'cart',
+						'The product {product} now has less stock available than the amount you requested. Your cart quantity has been reduced to match what is available.',
+						array('{product}' => "<strong>".$objItem->description."</strong>")
+					)
+				);
+				$objItem->qty = $objItem->product->Inventory;
+				$objItem->save();
+				$wasCartModified = true;
+			}
 		}
 
-		if ($blnResult)
+		if ($wasCartModified)
 		{
 			$this->recalculateAndSave();
+			Yii::app()->shoppingcart->wasCartModified = $wasCartModified;
 		}
-
-		return $blnResult;
 	}
 
 

@@ -404,12 +404,29 @@ class Category extends BaseCategory
 			return $this->ParentObject->DirLink . $this->Slug . '/';
 	}
 
-	protected function GetLink() {
+	/**
+	 * getLink returns a relative link to the current category.
+	 * @return string The link
+	 */
+	public function getLink() {
 		return Yii::app()->createUrl('search/browse', array('cat' => urlencode($this->request_url)));
 	}
 
-	protected function GetAbsoluteUrl() {
+	/**
+	 * getAbsoluteUrl returns the absolute url to the current category.
+	 * @return string The absolute url
+	 */
+	public function getAbsoluteUrl() {
 		return Yii::app()->createAbsoluteUrl('search/browse', array('cat' => urlencode($this->request_url)));
+	}
+
+	/**
+	 * getCanonicalUrl returns the canonical url to the current category.
+	 * @return string The canonical url
+	 */
+	public function getCanonicalUrl()
+	{
+		return Yii::app()->createCanonicalUrl("search/browse", array('cat' => $this->request_url));
 	}
 
 
@@ -459,17 +476,19 @@ class Category extends BaseCategory
 	 *                 otherwise it's it's a full array of items
 	 * @return $arrPath[]
 	 */
-	public static function getBreadcrumbByProductId($intId,$strType = 'all') {
-
+	public static function getBreadcrumbByProductId($intId) {
 		$objProduct = Product::model()->findByPk($intId);
-		if (!($objProduct instanceof Product))
+		if ($objProduct instanceof Product === false)
+		{
 			return;
+		}
+
 		$objCategory = $objProduct->xlswsCategories;
 
 		if ($objCategory)
-			return $objCategory[0]->getBreadcrumbs($strType);
-		else return;
-
+		{
+			return $objCategory[0]->getBreadcrumbs();
+		}
 	}
 
 
@@ -528,51 +547,82 @@ class Category extends BaseCategory
 	}
 
 	/**
-	 * From current category, get trail back to top level category. By default, will include array with
-	 * id's and names and URLs. Passing strType as 'names' will provide array only with names
-	 * @param string $strType passing "names" will just get simple array of names, otherwise it's it's a full array of items
-	 * @return string
+	 * From the current category, get breadcrumb trail back to top level
+	 * category. By default, will include array with id's and names and URLs.
+	 * @return array
 	 */
-	public function getBreadcrumbs()
+	public function getBreadcrumbs($linkType = "absolute")
 	{
-		$arrPath=array();
+		$arrPath = array();
 		$objCategory = $this;
 
-		if(!is_null($objCategory->parent))
+		if(is_null($objCategory->parent) === false)
+		{
 			do {
 				if ($objCategory instanceof Category)
-					$arrPath[Yii::t('category', $objCategory->label)] = $objCategory->Link;
-				$objCategory = $objCategory->parent0;
+				{
+					$arrPath[Yii::t('category', $objCategory->label)] = $objCategory->getLinkByType($linkType);
+				}
 
-			} while (!is_null($objCategory->parent));
+				$objCategory = $objCategory->parent0;
+			} while (is_null($objCategory->parent) === false);
+		}
 
 		if ($objCategory instanceof Category)
-			$arrPath[Yii::t('category', $objCategory->label)] = $objCategory->Link;
+		{
+			$arrPath[Yii::t('category', $objCategory->label)] = $objCategory->getLinkByType($linkType);
+		}
 
 		$arrPath = array_reverse($arrPath);
 		return $arrPath;
 	}
 
-
-
-	/** Submit an array containing our trail to do a reverse lookup
-	 * and find the category id
+	/**
+	 * Returns the category link, either as a request_url or as a Web Strore
+	 * creteUrl() link.
+	 *
+	 * @param string $linkType The type of link to return
+	 * @return string The generated link
 	 */
-	public static function GetIdByTrail($arrPath = array())
+	public function getLinkByType($linkType)
+	{
+		if ($linkType === "absolute")
+		{
+			return $this->Link;
+		}
+		elseif ($linkType === "requestUrl")
+		{
+			return $this->request_url;
+		}
+
+		return '';
+	}
+
+	/**
+	 * Submit an array containing our trail to do a reverse lookup
+	 * and find the category id
+	 * @param array $arrPath Array of breadcrumbs
+	 * @return integer
+	 */
+	public static function getIdByTrail($arrPath = array())
 	{
 		$intCount = count($arrPath);
-		if ($intCount==0) return null;
+		if ($intCount == 0)
+		{
+			return null;
+		}
 
 		$intId = null;
 		foreach ($arrPath as $value)
 		{
-			$obj = Category::model()->findByAttributes(array('label'=>$value,'parent'=>$intId));
+			$obj = Category::model()->findByAttributes(array('label' => $value, 'parent' => $intId));
 			if ($obj instanceof Category)
+			{
 				$intId = $obj->id;
+			}
 		}
+
 		return $intId;
-
-
 	}
 
 
@@ -708,6 +758,7 @@ class Category extends BaseCategory
 		return parent::beforeValidate();
 	}
 
+
 	/**
 	 * Define getter / setter
 	 */
@@ -721,9 +772,7 @@ class Category extends BaseCategory
 				return $this->GetSlug();
 
 			case 'CanonicalUrl':
-				return Yii::app()->createAbsoluteUrl('search/browse', array('cat' => $this->request_url));
-			//return _xls_site_dir(false).'/'.$this->GetLink();
-
+				return $this->getCanonicalUrl();
 
 			case 'HasProducts':
 				return $this->HasProducts();
@@ -763,7 +812,7 @@ class Category extends BaseCategory
 
 			case 'Link':
 			case 'Url':
-				return $this->GetLink();
+				return $this->getLink();
 
 			case 'AbsoluteUrl':
 			case 'AbsoluteLink':

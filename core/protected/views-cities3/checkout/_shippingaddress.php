@@ -14,7 +14,7 @@
 		echo $form->textField(
 			$model,
 			'shippingFirstName',
-			$htmlOptions = array('placeholder' => Yii::t('checkout', "First Name"),'required' => "required", 'autofocus' => "")
+			$htmlOptions = array('placeholder' => Yii::t('checkout', "First Name"),'class' => 'no-right-border','required' => "required", 'autofocus' => "")
 		);
 		?>
 	</li>
@@ -34,7 +34,7 @@
 	</li>
 	<li class="field-container-toggle">
 		<a href="#" onclick="$(this).parent().remove();$('.company-container').fadeIn();$('.company-container').find('input').focus(); return false;">
-			<?php echo Yii::t('checkout', "Company")?>
+			<?php echo Yii::t('checkout', 'Company')?>
 		</a>
 	</li>
 	<li class="field-container company-container field-container-notopborder" style="display: none;">
@@ -43,7 +43,11 @@
 			echo $form->textField(
 				$model,
 				'shippingCompany',
-				$htmlOptions = array('placeholder' => Yii::t('checkout', "Company"),'required' => "required")
+				$htmlOptions = array(
+					'placeholder' => Yii::t('checkout', 'Company'),
+					'class' => 'no-top-border',
+					'required' => 'required'
+				)
 			);
 		?>
 	</li>
@@ -60,7 +64,11 @@
 		echo $form->textField(
 			$model,
 			'shippingAddress1',
-			$htmlOptions = array('placeholder' => Yii::t('checkout', "Mailing address"),'required' => "required")
+			$htmlOptions = array(
+				'placeholder' => Yii::t('checkout', "Mailing address"),
+				'required' => "required",
+				'class' => 'no-bottom-border'
+			)
 		);
 		?>
 	</li>

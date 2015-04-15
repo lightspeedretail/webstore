@@ -344,7 +344,7 @@
 			margin-top: 6px;
 			display: block;
 		}
-		input, button {
+		input[type="button"], button {
 			float: left;
 
 			&:focus {
@@ -451,12 +451,6 @@
 //MO
 .hide-me {
 	display: none; visibility: hidden;
-}
-
-.editcartmodal{
-	.promo input{
-		min-width: 16rem;
-	}
 }
 
 @media (max-width: 640px){

@@ -33,6 +33,13 @@ class ShoppingCart extends CApplicationComponent
 	 */
 	public $errors = array();
 
+
+	/**
+	 * Meant to track the result of UpdateCartItems()
+	 * @var bool
+	 */
+	public $wasCartModified = false;
+
 	/**
 	 * @param $id
 	 */
@@ -97,11 +104,12 @@ class ShoppingCart extends CApplicationComponent
 				//or waiting for payment transaction to be finished.
 				$requiresNewCart = (
 					$objCart === null ||
-					$objCart->cart_type != CartType::cart && $objCart->cart_type != CartType::awaitpayment
+					($objCart->cart_type != CartType::cart && $objCart->cart_type != CartType::awaitpayment)
 				);
 
 				if ($requiresNewCart === true)
 				{
+					$objCart = Cart::initialize($objCustomer);
 					Yii::log(
 						sprintf(
 							'User had cart %s in their session, but creating a new one (cart type is %s).',
@@ -111,8 +119,6 @@ class ShoppingCart extends CApplicationComponent
 						'error',
 						'application.'.__CLASS__.".".__FUNCTION__
 					);
-
-					$objCart = Cart::initialize($objCustomer);
 				}
 			}
 
@@ -241,7 +247,7 @@ class ShoppingCart extends CApplicationComponent
 					$objCartInProgress->delete();
 				}
 
-				$this->model->UpdateMissingProducts();
+				$this->model->updateMissingProducts();
 			}
 
 			$this->model->customer_id = Yii::app()->user->id;
@@ -561,13 +567,11 @@ class ShoppingCart extends CApplicationComponent
 		return true;
 	}
 
-	// @codingStandardsIgnoreStart
-	public function UpdateMissingProducts()
-	// @codingStandardsIgnoreEnd
+	public function updateMissingProducts()
 	{
-		if (Yii::app()->user->getState('cartid') > 0 && isset($this->_model))
+		if (Yii::app()->user->getState('cartid') > 0 && isset($this->model))
 		{
-			$this->model->UpdateMissingProducts();
+			$this->model->updateMissingProducts();
 		}
 	}
 

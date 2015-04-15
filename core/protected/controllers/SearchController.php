@@ -77,24 +77,24 @@ class SearchController extends Controller
 		$strB = Yii::app()->getRequest()->getQuery('brand');
 		$strS = Yii::app()->getRequest()->getQuery('class_name');
 
-		$strInv='';
+		$strInv = '';
 
 		//If we haven't passed any criteria, we just query the database
 		$criteria = new CDbCriteria();
 		$criteria->alias = 'Product';
 
-		if (!empty($strC)) {
-
+		if (!empty($strC))
+		{
 			$objCategory = Category::LoadByRequestUrl($strC);
 			if($objCategory)
 			{
-				$criteria->join='LEFT JOIN xlsws_product_category_assn as ProductAssn ON ProductAssn.product_id=Product.id';
+				$criteria->join = 'LEFT JOIN xlsws_product_category_assn as ProductAssn ON ProductAssn.product_id=Product.id';
 				$intIdArray = array($objCategory->id);
 				$intIdArray = array_merge($intIdArray, $objCategory->GetBranchPath());
 				$criteria->addInCondition('category_id', $intIdArray);
 
-				$this->pageTitle=$objCategory->PageTitle;
-				$this->pageDescription=$objCategory->PageDescription;
+				$this->pageTitle = $objCategory->PageTitle;
+				$this->pageDescription = $objCategory->PageDescription;
 				$this->pageImageUrl = $objCategory->CategoryImage;
 				$this->breadcrumbs = $objCategory->Breadcrumbs;
 				$this->pageHeader = Yii::t('category', $objCategory->label);
@@ -102,55 +102,38 @@ class SearchController extends Controller
 				$this->subcategories = $objCategory->getSubcategoryTree($this->MenuTree);
 
 				if ($objCategory->custom_page)
+				{
 					$this->custom_page_content = $objCategory->customPage->page;
+				}
 
-				$this->CanonicalUrl = $this->createAbsoluteUrl($objCategory->Link);
+				$this->canonicalUrl = $objCategory->getCanonicalUrl();
 			}
-
-
-
 		}
 
-		if (!empty($strB)) {
-
+		if (!empty($strB))
+		{
 			$objFamily = Family::LoadByRequestUrl($strB);
 			if($objFamily)
 			{
 				$criteria->addCondition('family_id = :id');
-				$criteria->params = array (':id'=>$objFamily->id);
-
-				$this->pageTitle=$objFamily->PageTitle;
-				//$this->pageDescription=$objFamily->PageDescription;
-				//$this->breadcrumbs = $objCategory->Breadcrumbs;
+				$criteria->params = array (':id' => $objFamily->id);
+				$this->pageTitle = $objFamily->PageTitle;
 				$this->pageHeader = $objFamily->family;
-
-
-				$this->CanonicalUrl = $objFamily->Link;
+				$this->canonicalUrl = $objFamily->getCanonicalUrl();
 			}
-
-
 		}
 
-		if (!empty($strS)) {
-
+		if (!empty($strS))
+		{
 			$objClasses = Classes::LoadByRequestUrl($strS);
 			if($objClasses)
 			{
 				$criteria->addCondition('class_id = :id');
-				$criteria->params = array (':id'=>$objClasses->id);
-
-				//$this->pageTitle=$objClasses->PageTitle;
-				//$this->pageDescription=$objFamily->PageDescription;
-				//$this->breadcrumbs = $objClasses->class_name;
+				$criteria->params = array (':id' => $objClasses->id);
 				$this->pageHeader = $objClasses->class_name;
-				$this->CanonicalUrl = $this->createAbsoluteUrl($objClasses->Link);
-
-
+				$this->canonicalUrl = $objClasses->getCanonicalUrl();
 			}
-
-
 		}
-
 
 		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD') == Product::InventoryMakeDisappear)
 			$criteria->addCondition('(inventory_avail>0 OR inventoried=0)');
@@ -178,7 +161,7 @@ class SearchController extends Controller
 		$model = Product::model()->findAll($criteria);
 		$model = $this->createBookends($model);
 
-		$this->returnUrl = $this->CanonicalUrl;
+		$this->returnUrl = $this->canonicalUrl;
 		$this->pageImageUrl = "";
 
         if ($strB=='*')
@@ -256,9 +239,15 @@ class SearchController extends Controller
 			}
 		}
 
-		$this->CanonicalUrl = $strCurrentUrl;
+		$this->returnUrl = $strCurrentUrl;
+		$this->canonicalUrl = $strCurrentUrl;
+		$host = Yii::app()->controller->getCanonicalHostName();
+		$parsedUrl = parse_url($this->canonicalUrl);
+		if ($parsedUrl['host'] !== $host)
+		{
+			$this->canonicalUrl = str_replace($parsedUrl['host'], $host, $this->canonicalUrl);
+		}
 
-		$this->returnUrl = $this->CanonicalUrl;
 		$this->pageImageUrl = "";
 
 		$model = $this->createBookends($model);

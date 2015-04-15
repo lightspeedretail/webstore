@@ -497,6 +497,85 @@ class BaseCheckoutForm extends CFormModel
 	}
 
 	/**
+	 * If the shopper has chosen an address from the address book, copy the values to the
+	 * relevant address fields since they're needed for shipping and payment calculations
+	 *
+	 * @return void
+	 */
+	public function fillFieldsFromPreselect()
+	{
+		$arrObjAddresses = CustomerAddress::getActiveAddresses();
+		$objCustomer = Customer::GetCurrent();
+
+		if ($this->intShippingAddress > 0)
+		{
+			// We've picked a preset to ship to, so grab that info from the db.
+			if (Yii::app()->shoppingcart->HasShippableGift)
+			{
+				$objAddresses = array_merge($arrObjAddresses, Yii::app()->shoppingcart->GiftAddress);
+			}
+
+			foreach ($arrObjAddresses as $objAddress)
+			{
+				if ($objAddress->id != $this->intShippingAddress)
+				{
+					continue;
+				}
+
+				$this->shippingFirstName = $objAddress->first_name;
+				$this->shippingLastName = $objAddress->last_name;
+				$this->shippingAddress1 = $objAddress->address1;
+				$this->shippingAddress2 = $objAddress->address2;
+				$this->shippingCity = $objAddress->city;
+				$this->shippingState = $objAddress->state_id;
+				$this->shippingPostal = $objAddress->postal;
+				$this->shippingCountry = $objAddress->country_id;
+				$this->shippingResidential = $objAddress->residential;
+				if (empty($objAddress->phone) === false)
+				{
+					$this->shippingPhone = $objAddress->phone;
+				}
+
+				break;
+			}
+		}
+
+		if ($this->billingSameAsShipping == 1)
+		{
+			$this->billingAddress1 = $this->shippingAddress1;
+			$this->billingAddress2 = $this->shippingAddress2;
+			$this->billingCity = $this->shippingCity;
+			$this->billingCountry = $this->shippingCountry;
+			$this->billingCountryCode = $this->shippingCountryCode;
+			$this->billingState = $this->shippingState;
+			$this->billingStateCode = $this->shippingStateCode;
+			$this->billingPostal = $this->shippingPostal;
+			$this->billingResidential = $this->shippingResidential;
+		}
+		elseif ($this->intBillingAddress > 0)
+		{
+			// end-user has selected an existing address
+			$objAddress = CustomerAddress::findCustomerAddress($objCustomer->id, $this->intBillingAddress);
+
+			$this->billingAddress1 = $objAddress->address1;
+			$this->billingAddress2 = $objAddress->address2;
+			$this->billingCity = $objAddress->city;
+			$this->billingState = $objAddress->state_id;
+			$this->billingPostal = $objAddress->postal;
+			$this->billingCountry = $objAddress->country_id;
+			$this->billingResidential = $objAddress->residential;
+		}
+
+		if ($objCustomer instanceof Customer)
+		{
+			$this->contactFirstName = $objCustomer->first_name;
+			$this->contactLastName = $objCustomer->last_name;
+			$this->contactPhone = $objCustomer->mainphone;
+			$this->contactEmail = $objCustomer->email;
+		}
+	}
+
+	/**
 	 * @param string $attribute
 	 * @return string
 	 */

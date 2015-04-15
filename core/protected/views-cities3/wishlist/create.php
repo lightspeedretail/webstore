@@ -54,8 +54,7 @@ if ($model->id > 0)
 					'dateFormat' => 'yy-mm-dd', // save to db format
 					'altField' => '#self_pointing_id',
 					'altFormat' => _xls_convert_date_to_js(_xls_get_conf('DATE_FORMAT', 'Y-m-d')), // show to user format
-				),
-				'htmlOptions' => array('style' => 'height:20px;'),
+				)
 			)
 		);
 		?>
@@ -78,7 +77,7 @@ if ($model->id > 0)
 	</div>
 
 	<?php if ($model->id > 0): ?>
-	<div class="row-fluid rememberMe">
+	<div class="row-fluid rememberMe spaceafter">
 		<?php echo $form->checkBox($model,'deleteMe',array(
 			'onclick'=>'$("#btnSubmit").val("'. Yii::t('global','DELETE THIS WISHLIST').'"),
 			    $("#btnSubmit").addClass("btnDelete")

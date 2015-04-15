@@ -9,27 +9,6 @@
 }
 
 .webstore-modal {
-    //MO
-    input{
-      font-size: 100%;
-      margin-bottom: 0;
-      line-height: normal;
-      background-color: #fff;
-      border: $input-border;
-      &:focus{
-        background-color: transparent;
-        line-height: normal;
-      }
-    }
-
-    input[type="text"]{
-      border: none;
-      line-height: normal;
-        &:focus{
-          line-height: normal;
-        }
-      }
-
 	visibility: hidden;
 	cursor: pointer;
 	position: fixed;
@@ -151,45 +130,7 @@
       }
     }
 
-
-	form {
-		ol {
-			margin: 0;
-			list-style: none;
-			padding: 0;
-		}
-		li {
-			overflow: hidden;
-			position: relative;
-
-            &.split-3 {
-              label {
-                width: 32%;
-                display: inline-block;
-                vertical-align: top;
-                font-size: .7rem;
-                &:last-child {
-                  width: 33%;
-                }
-              }
-            }
-
-			&.options-split {
-				overflow: hidden;
-				width: 100%;
-
-				> *:first-child {
-					float: left;
-				}
-				> *:last-child {
-					float: right;
-				}
-			}
-		}
-	}
-
   h1 {
-
     font-weight: 600;
     //MO conflicting with Edit cart Is this needed anywhere else?
     font: 1rem $webstore-modal-header-font-family;
@@ -268,107 +209,6 @@
 	}
 
 	.hint p { margin-right: 80px; }
-
-	input[type="text"], input[type="email"], input[type="password"], input[type="tel"] {
-		&.split-2 {
-			width: 50%;
-			float: left;
-			border-right: $input-border;
-			&:last-child {
-				border-right: none;
-			}
-		}
-        &.split-3 {
-          width: 33%;
-          float: left;
-          border-right: $input-border;
-          &:last-child {
-            border-right: none;
-            width: 34%;
-          }
-        }
-
-		&:focus {
-			box-shadow: inset 1px 1px 3px #ccc;
-			background-color: #f8f8f8;
-			outline: none;
-		}
-	}
-	label {
-		&.transient {
-			display: none;
-			color: #666;
-			position: absolute;
-			top: 3px;
-			left: $modal-padding;
-			font-size: .5rem;
-			text-transform: uppercase;
-			font-weight: bold;
-		}
-        &.text {
-          @include transition-property(background-color, color);
-          @include transition-duration(.3s);
-          display: block;
-          padding: $modal-padding;
-          font-size: .85rem;
-          color: #888;
-          cursor: pointer;
-          @include transition-property(color);
-          @include transition-duration(.3s);
-          background-color: #fff;
-        }
-		&.checkbox {
-			@include transition-property(background-color, color);
-			@include transition-duration(.3s);
-
-			display: block;
-			padding: $modal-padding;
-			font-size: .85rem;
-			color: #888;
-			cursor: pointer;
-			@include transition-property(color);
-			@include transition-duration(.3s);
-			background-color: #fff;
-
-			&:hover {
-				color: #555;
-			}
-
-			input {
-				font-size: 2em;
-                //MO
-				margin-right: 2px;
-			}
-		}
-	}
-
-	.minor {
-		@include transition-property(background-color, color, border-color);
-		@include transition-duration(.3s);
-		text-decoration: none;
-		width: auto;
-        @include border-radius(0);
-		background: none;
-		color: #aaa;
-		padding: 7px 6px;
-		text-align: right;
-		font-size: .75rem;
-		line-height: 1;
-		position: absolute;
-		right: 18px;
-		top: 18px;
-
-		strong {
-			font-weight: normal;
-			color: $calltoaction-color;
-			text-decoration: underline;
-		}
-
-		&:hover {
-			color: #888;
-			strong { color: darken($calltoaction-color,10%); }
-		}
-	}
 
 	label {
 		margin: 0 0 2px;

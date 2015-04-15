@@ -47,7 +47,7 @@
 		</div>
 		<div class="shortrow buttons">
 		<?php
-		echo CHtml::ajaxSubmitButton(Yii::t('global','DELETE THIS ITEM'),
+		echo CHtml::ajaxSubmitButton(Yii::t('global','Delete this item'),
 			CHtml::normalizeUrl(array('wishlist/deleteitem','render'=>false)),
 			array(
 				'type'=>"POST",

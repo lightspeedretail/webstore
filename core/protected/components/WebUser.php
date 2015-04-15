@@ -139,6 +139,24 @@ class WebUser extends CWebUser
 	}
 
 	/**
+	 * Ensure any existing flash message of the same type that has not yet
+	 * been shown to the user, are appended to the newly created message.
+	 *
+	 * @param $key
+	 * @param $message
+	 * @return void
+	 */
+	public function addFlash($key, $message)
+	{
+		if ($this->hasFlash($key))
+		{
+			$message = $this->getFlash($key, null, false) . '<br>' . $message;
+		}
+
+		$this->setFlash($key, $message);
+	}
+
+	/**
 	 * Overrides a Yii method that is used for roles in controllers (accessRules).
 	 *
 	 * @param string $operation Name of the operation required (here, a role).

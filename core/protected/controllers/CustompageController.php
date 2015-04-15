@@ -50,7 +50,7 @@ class CustompageController extends Controller
 			$model->title=>$model->RequestUrl,
 		);
 
-		$this->CanonicalUrl = $model->CanonicalUrl;
+		$this->canonicalUrl = $model->canonicalUrl;
 		$this->layout = "//layouts/column".$model->column_template;
 		if (!empty($model->product_tag) && $model->product_display==2)
 		{
@@ -141,7 +141,7 @@ class CustompageController extends Controller
 
 		}
 
-		$this->CanonicalUrl = $model->CanonicalUrl;
+		$this->canonicalUrl = $model->canonicalUrl;
 
 		$this->render('contact',array('ContactForm'=>$ContactForm,'model'=>$model));
 	}

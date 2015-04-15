@@ -1,4 +1,3 @@
-// TODO: add error message in tooltip when item quantity is not available.
 .alert-tooltip {
   position:  absolute;
   width: 200px;

@@ -12,7 +12,11 @@
 			echo $form->textField(
 				$model,
 				'billingAddress1',
-				$htmlOptions = array('placeholder' => Yii::t('checkout', "Mailing address"), 'required' => "required")
+				$htmlOptions = array(
+					'placeholder' => Yii::t('checkout', "Mailing address"),
+					'class' => 'no-bottom-border',
+					'required' => "required"
+				)
 			);
 			?>
 		</li>

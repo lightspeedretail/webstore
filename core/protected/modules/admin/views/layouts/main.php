@@ -45,7 +45,7 @@
 		            <a class="brand" href="<?php echo $this->createUrl("default/index"); ?>">Web Store Admin</a>
 		            <p class="navbar-text pull-right hidden-xs">
 		                <?php
-		                    echo CHtml::link('Logout ('.Yii::app()->user->firstname.')',array('default/logout'),array('class'=>'navbar-link'));
+		                    echo CHtml::link('Logout ('.Yii::app()->user->firstname.')',array('default/logout'),array('class'=>'navbar-link', 'id'=>'admin-logout'));
 		                ?>
 		            </p>
 		            <?php if(!Yii::app()->user->isGuest && !Yii::app()->user->getState('internal', false)):

@@ -62,8 +62,16 @@ class Classes extends BaseClasses
 		return _xls_site_url("/class/".$this->request_url);
 	}
 
-	public static function GetTree() {
+	public function getCanonicalUrl()
+	{
+		return Yii::app()->createCanonicalUrl(
+			"/search/browse",
+			array('class_name' => $this->request_url)
+		);
+	}
 
+	public static function getTree()
+	{
 		$criteria = new CDbCriteria();
 		$criteria->alias = 'Classes';
 
@@ -71,8 +79,7 @@ class Classes extends BaseClasses
 
 		$objRet = Classes::model()->findAll($criteria);
 
-		return Classes::getDataFormatted(Classes::parseTree($objRet,0));
-
+		return Classes::getDataFormatted(Classes::parseTree($objRet, 0));
 	}
 
 	protected static function formatData($person) {

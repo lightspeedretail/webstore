@@ -13,14 +13,15 @@ class Sitemap extends CAction
 	{
 
 		//Load some information we'll use within the loops
-		$intStockHandling = _xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0);
-		$strQueryAddl = ($intStockHandling == 0 ? " AND inventory_avail>0" : "");
-
+		$intStockHandling = _xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0);
+		$strQueryAddl = ($intStockHandling == 0 ? " AND inventory_avail > 0" : "");
 
 		header("Content-Type: text/xml;charset=UTF-8");
 
 		$ret = "";
 		$strSiteDir = _xls_site_dir();
+		$canonicalUrl = Yii::app()->createCanonicalUrl("site/index");
+		$strSiteDir = $canonicalUrl;
 
 		echo('<?xml version="1.0" encoding="UTF-8"?>' . "\n");
 		echo('<urlset
@@ -33,34 +34,38 @@ class Sitemap extends CAction
 		// index page
 		echo($this->sitemapXml($strSiteDir));
 		// sitemap page
-		echo($this->sitemapXml($strSiteDir . "/sitemap.xml"));
+		echo($this->sitemapXml($strSiteDir . "sitemap.xml"));
 
 		$categories = Category::model()->findAll();
 
-		foreach($categories as $category){
-			$ret .=  _sp("Generating URL for category ") .
+		foreach ($categories as $category)
+		{
+			$ret .= _sp("Generating URL for category ") .
 				$category->label . "\n";
 
-			echo($this->sitemapXml($category->AbsoluteUrl,
-				date("c",strtotime($category->modified)),
-				'weekly'));
-
+			echo(
+				$this->sitemapXml(
+					$category->canonicalUrl,
+					date("c", strtotime($category->modified)),
+					'weekly'
+				)
+			);
 		}
 
-		$arrProducts=Yii::app()->db->createCommand(
+		$arrProducts = Yii::app()->db->createCommand(
 			'SELECT * FROM '.Product::model()->tableName().' WHERE current=1 AND web=1 AND parent IS NULL '.$strQueryAddl.' ORDER BY id'
 		)->query();
 
-		while(($arrItem=$arrProducts->read())!==false)
+		while(($arrItem = $arrProducts->read()) !== false)
 		{
-
 			$objProduct = Product::model()->findByPk($arrItem['id']);
 
-			echo($this->sitemapXml($objProduct->AbsoluteUrl,
-				date("c",strtotime($objProduct->modified)),
+			echo($this->sitemapXml(
+				$objProduct->canonicalUrl,
+				date("c", strtotime($objProduct->modified)),
 				'daily',
-				($objProduct->featured ? '0.8' : '0.5')));
-
+				($objProduct->featured ? '0.8' : '0.5')
+			));
 		}
 
 		$criteria = new CDbCriteria();
@@ -68,26 +73,22 @@ class Sitemap extends CAction
 		$criteria->order = 'tab_position';
 		$pages = CustomPage::model()->findAll($criteria);
 
+		foreach($pages as $page)
+		{
+			$ret .= _sp("Generating url for page ") . $page->title . "\n";
 
-		foreach($pages as $page) {
-			$ret .=  _sp("Generating url for page ") . $page->title . "\n";
-
-
-			echo($this->sitemapXml($page->Link,
-				date("c",strtotime($page->modified)),
-				'weekly'));
-
-
+			echo($this->sitemapXml(
+				$page->canonicalUrl,
+				date("c", strtotime($page->modified)),
+				'weekly'
+			));
 		}
 
 		echo( '</urlset>' . "\n");
 	}
 
-
-
-
-	protected function sitemapXml($url , $lastmod = false , $changefreq = 'weekly', $priority = '0.8') {
-
+	protected function sitemapXml($url, $lastmod = false, $changefreq = 'weekly', $priority = '0.8')
+	{
 		return
 			'  <url>  
         <loc>'.$url.'</loc>  
@@ -96,9 +97,5 @@ class Sitemap extends CAction
         <priority>'.$priority.'</priority>  
         </url>  
     ';
-
-
 	}
-
-
 }

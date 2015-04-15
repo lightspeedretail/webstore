@@ -140,6 +140,12 @@ Yii::app()->clientScript->registerScript(
 		if (typeof promoCodeInput !== 'undefined') {
 			promoCodeInput.wsShippingEstimator = confirmationShippingEstimator;
 		}
+
+		<?php
+		if (isset($recalculateShippingOnLoad) && $recalculateShippingOnLoad === true):
+		?>
+		confirmationShippingEstimator.updateShippingEstimates();
+		<?php endif; ?>
 	});
 </script>
 <?php

@@ -38,12 +38,6 @@ body.overlay {
   right: 0;
   font-family: $webstore-modal-font;
 
-  .field-container {
-	input {
-	  border: 1px solid #ddd;
-	}
-  }
-
   .section-inner {
 	background-color: #fff;
 	padding: 15px 20px 20px;
@@ -226,12 +220,6 @@ body.overlay {
   .field-container {
 	label.placeheld {
 	  font-size: .8375rem;
-	}
-	input {
-	  height: 4.25rem;
-	  &.show {
-	  }
-
 	}
   }
 

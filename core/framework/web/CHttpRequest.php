@@ -951,7 +951,7 @@ class CHttpRequest extends CApplicationComponent
 	{
 		if($this->_preferredLanguages===null)
 		{
-			$sortedLanguages=array('en');
+			$sortedLanguages=array();
 			if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && $n=preg_match_all('/([\w\-_]+)(?:\s*;\s*q\s*=\s*(\d*\.?\d*))?/',$_SERVER['HTTP_ACCEPT_LANGUAGE'],$matches))
 			{
 				$languages=array();

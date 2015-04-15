@@ -2,8 +2,13 @@
 
   //MO
   input[type] { margin-bottom: 0;}
+
   *, *:before, *:after {
-    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box;}
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+  }
 
   ol {
     list-style: none;
@@ -17,29 +22,11 @@
     line-height: 1.5;
   }
 
-  label.checkbox {
-    text-align: center;
-    width: 100%;
-    display: block;
-    font-size: .875rem;
-
-    input {
-      font-size: 1rem;
-      margin: 0 .25rem 0 0;
-      width: auto;
-      display: inline-block;
-    }
-
-    //MO alignment of store pickup checkbox
-    input.instore-toggle {
-      margin: 0.2rem 0.5rem 0 0;
-    }
-  }
-
   footer.submit {
     @extend %clearfix;
     margin-bottom: 15px;
   }
+
   //MO
   input[type="submit"]:focus{
     &#Payment{
@@ -50,7 +37,9 @@
     }
   }
 
-  input[type="submit"], button, .button {
+  input[type="submit"],
+  button,
+  .button {
     width: 100%;
     font-size: 1.125rem;
     padding: 20px 0;
@@ -60,6 +49,7 @@
       height: 64px;
       font-size: 1.125rem;
     }
+
     @include transition-property(border,background);
     @include transition-duration(.5s);
 
@@ -70,23 +60,24 @@
     }
   }
 
-    .notice {
-        padding: 15px 30px;
-        margin: 0 -30px 1em;
+  .notice {
+    padding: 15px 30px;
+    margin: 0 -30px 1em;
+    background-color: #ffc;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
 
-        background-color: #ffc;
-        border-top: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
+    p { margin: 0; }
 
-        p { margin: 0; }
-        strong { color: #333; }
-    }
+    strong { color: #333; }
+  }
 
 
   .choices {
     overflow: hidden;
 
-    button, .button {
+    button,
+    .button {
       width: 100%;
       font-size: .9375rem;
       float: left;
@@ -115,7 +106,12 @@
   }
 }
 
-//TODO:MO have path similar to design?
+<<<<<<< HEAD
+=======
+
+@import "../mixins/box-shadow";
+
+>>>>>>> refs/heads/WS-3687-new-inputs-rebase
 @import 'address_blocks';
 @import 'checkout_sidebar';
 @import 'checkout_forms';
@@ -132,7 +128,8 @@ select[name="city_state"] { max-width: 12em; }
 .webstore-checkout footer.submit-small {
   height: 65px;
 
-  input[type="submit"], .button {
+  input[type="submit"],
+  .button {
     font-size: .9375rem;
     padding: 15px 0;
   }
@@ -192,6 +189,7 @@ p.tip {
     text-transform: uppercase;
     margin: 0 0 .25em;
   }
+
   p {
     margin: 0;
   }
@@ -215,4 +213,3 @@ p.tip {
     }
   }
 }
-

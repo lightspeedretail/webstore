@@ -501,7 +501,7 @@ class Customer extends BaseCustomer
 	protected function afterConstruct()
 	{
 		$this->newsletter_subscribe = _xls_get_conf('DISABLE_ALLOW_NEWSLETTER', 1) == 1 ? 0 : 1;
-		$this->preferred_language = _xls_get_conf('LANG_CODE', 'en');
+		$this->preferred_language = 'en';
 		$this->currency = _xls_get_conf('CURRENCY_DEFAULT', 'USD');
 	}
 

@@ -56,9 +56,9 @@
 		?>
 		<div class="row-fluid">
 			<div class="span9">
-				<?php echo Yii::t('global','Search for a wish list by email address'); ?>
-				<?php echo $form->textField($model,'email'); ?>
-				<?php echo $form->error($model,'email'); ?>
+				<?= CHtml::label(Yii::t('global', 'Search for a wish list by email address'), 'wishlistsearch') ?>
+				<?php echo $form->textField($model, 'email', array('id' => 'wishlistsearch')); ?>
+				<?php echo $form->error($model, 'email'); ?>
 			</div>
 		</div>
 		<div class="row-fluid shortrow buttons">

@@ -370,14 +370,17 @@ class CustomPage extends BaseCustomPage
 		return $page;
 	}
 
+	/**
+	 * GetCanonicalUrl returns the canonical url to the current category
+	 * @return string The canonical url
+	 */
+	public function getCanonicalUrl()
+	{
+		return Yii::app()->createCanonicalUrl("custompage/index", array('id' => $this->request_url));
+	}
+
 	public function __get($strName) {
 		switch ($strName) {
-			case 'Link':
-				return $this->GetLink(); //Yii::app()->createUrl($this->request_url);
-
-			case 'CanonicalUrl':
-				return Yii::app()->createAbsoluteUrl("custompage/index", array('id' => $this->request_url));
-
 			case 'RequestUrl':
 				return $this->request_url;
 

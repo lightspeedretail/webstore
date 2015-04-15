@@ -346,7 +346,7 @@ aside.related-products {
 /* right side tweaks */
 .webstore-modal .cart-summary header { font-family: 'Open Sans','Helvetica Neue',Helvetica,sans-serif; }
 .webstore-modal .cart-summary .webstore-promo-form button.inset { max-height: 30px; min-width: 50px; }
-.webstore-modal input[type="text"] { min-height: 41px; margin-bottom: 0;  }
+.webstore-modal input[type="text"] { margin-bottom: 0;  }
 .webstore-modal form { background-color: #EEE; margin-bottom: 0; }
 .webstore-modal button, .cart-summary footer .button { margin-bottom: 0; }
 .webstore-modal .cart-summary table td,
@@ -370,10 +370,6 @@ aside.related-products {
 .webstore-modal aside.related-products img { max-height: 80px; width: auto; }
 .webstore-modal aside.related-products p.price { position: static; }
 
-@media (max-width: 640px) {
-	.webstore-modal .promo input[type="text"]:focus { max-width: 100%; }
-}
-
 @media (max-width: 740px) {
 	.webstore-modal .item-confirm img { margin-bottom: 154px; }
 }
@@ -395,10 +391,6 @@ aside.related-products {
 
 @media (max-width: 360px) {
 	.webstore-modal .item-confirm header h1 { font-size: 1rem; }
-}
-
-form.webstore-promo-form.promo{
-	width:100%;
 }
 
 //Note that webstore-shipping-options was updated to shipping-options. The

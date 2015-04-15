@@ -16,7 +16,7 @@
     margin-top: 6px;
     display: block;
   }
-  input, button {
+  button {
     float: left;
 
     &:focus {
@@ -24,21 +24,6 @@
       box-shadow: inset 1px 1px 2px rgba(0,0,0,.1);
       border: 1px solid #bbb;
     }
-  }
-  input {
-    border: $input-border;
-    padding: 9px 8px;
-    &:focus{
-      padding: 9px 8px;
-    }
-  }
-
-  select.webstore-estimator-country-form, select#webstore-estimator-country-form {
-    -webkit-appearance: menulist;
-    -moz-appearance: menulist;
-    appearance: menulist;
-    margin: 8px 0 0;
-    border: solid 1px #ccc;
   }
 
   button {
@@ -178,60 +163,6 @@
       padding: 10px;
     }
   }
-
-  //MO
-  .radio input[type="radio"]{
-    float: left;
-    margin-left: -18px;
-    margin-top: 2px;
-  }
-
-  label {
-    padding: 8px 48px 8px 24px;
-    color: #666;
-    margin: 0;
-    font-weight: bold;
-    display: block;
-
-    small {
-      float: right;
-      font-weight: normal;
-      color: #999;
-      font-size: .9375rem;
-      margin-right: -42px;
-      @include media(small) { font-size: .75rem; }
-    }
-
-    &:hover{
-      background-color: #eee;
-      cursor: pointer;
-    }
-  }
-
-  input{
-    margin-right: 3px;
-  }
-}
-
-.shipping-postal-entry{
-  position: relative;
-  display: block;
-  height: 47px;
-  width: 100%;
-  overflow: hidden;
-
-  button.inset{
-    right: 8px;
-    top: 7px;
-  }
-
-  input, input:focus{
-    font-size: .875rem;
-    width: 100%;
-    outline: none;
-    box-shadow: inset 1px 1px 2px rgba(0,0,0,.1);
-    border: 1px solid #bbb!important;
-  }
 }
 
 .webstore-modal-cart-confirm .shipping-postal-entry input, .shipping-postal-entry input:focus {
@@ -240,24 +171,6 @@
 
 
 @media (min-width: 560px){
-  .webstore-shipping-choices{
-    input[type="button"] {
-      font-size: .875rem;
-      padding: 10px;
-    }
-
-    form {
-      left: -265px;
-      top: -24px;
-      width: 250px;
-      padding: 0 0 39px;
-    }
-  }
-
-  input.close-shipping-options.close-shipping-choices:focus{
-    padding: 10px!important;
-    font-size: 0.875rem!important;
-  }
   .close-shipping-options, .close-shipping-options:focus{
     max-height: 39px;
     font-size: 0.875rem;

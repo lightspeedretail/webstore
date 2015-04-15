@@ -69,6 +69,11 @@ class ThemeForm extends CFormModel
 	//Public options (additional framework settings)
 	public $disableGridRowDivs = false;
 
+	/**
+	 * @property The version of modal.css to use. By default, use the legacy version.
+	 */
+	protected $modalVersion = "1.0.0";
+
 	public function __get($name)
 	{
 		$vars = get_class_vars(get_class($this));

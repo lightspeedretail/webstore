@@ -54,7 +54,7 @@
 					echo $form->textField(
 						$model,
 						'pickupFirstName',
-						$htmlOptions = array('placeholder' => Yii::t('checkout', "First Name"),'required' => "required", 'autofocus' => "")
+						$htmlOptions = array('placeholder' => Yii::t('checkout', "First Name"),'class' => 'no-right-border','required' => "required", 'autofocus' => "")
 					);
 					?>
 				</li>
@@ -82,7 +82,10 @@
 					echo $form->emailField(
 						$model,
 						'pickupPersonEmail',
-						$htmlOptions = array('placeholder' => Yii::t('cart', "Email"))
+						$htmlOptions = array(
+							'placeholder' => Yii::t('cart', "Email"),
+							'class' => 'no-bottom-border'
+						)
 					);
 					?>
 					<p class="hint"><?php echo Yii::t('checkout', "Optional")?></p>

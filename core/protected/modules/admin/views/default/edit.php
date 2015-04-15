@@ -13,15 +13,15 @@
 		                    case "NULL":
 			                case "INT":
 		                    case "PINT":
-			                    echo CHtml::activeTextField($item,"[$i]key_value",array('title'=>$item->helper_text));
+			                    echo CHtml::activeTextField($item,"[$i]key_value",array('title'=>$item->helper_text, 'id'=>$item->key_name));
 			                    break;
 
                             case "EMAIL":
-                                echo CHtml::activeEmailField($item,"[$i]key_value",array('title'=>$item->helper_text,'pattern'=> '^[a-zA-Z0-9!#$%&\'*+\\/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&\'*+\\/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$'));
+                                echo CHtml::activeEmailField($item,"[$i]key_value",array('title'=>$item->helper_text, 'id'=>$item->key_name,'pattern'=> '^[a-zA-Z0-9!#$%&\'*+\\/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&\'*+\\/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$'));
                                 break;
 
 		                    case "PASSWORD":
-			                    echo CHtml::activePasswordField($item,"[$i]key_value",array('title'=>$item->helper_text));
+			                    echo CHtml::activePasswordField($item,"[$i]key_value",array('title'=>$item->helper_text, 'id'=>$item->key_name));
 			                    break;
 
 		                    case "BOOL":
@@ -32,7 +32,7 @@
 		                    default:
 			                    echo CHtml::activeDropDownList($item,"[$i]key_value",
 				                    Configuration::getAdminDropdownOptions($item->options),
-				                    array('title'=>$item->helper_text));
+				                    array('title'=>$item->helper_text, 'id'=>$item->key_name));
 
 
 	                    }

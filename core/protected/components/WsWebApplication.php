@@ -193,6 +193,29 @@ class WsWebApplication extends CWebApplication
 		return $host.$url;
 	}
 
+	/**
+	 * CreateCanonicalUrl first creates an AbsoluteUrl and then converts it to a
+	 * canonical url if needed.
+	 *
+	 * @param string $route
+	 * @param array $params
+	 * @param string $schema
+	 * @param string $ampersand
+	 * @return string
+	 */
+	public function createCanonicalUrl($route, $params = array(), $schema = '', $ampersand = '&')
+	{
+		$canonicalUrl = $this->createAbsoluteUrl($route, $params, $schema, $ampersand);
+		$parsedUrl = parse_url($canonicalUrl);
+		$host = Yii::app()->controller->getCanonicalHostName();
+
+		if (array_key_exists('host', $parsedUrl) && $parsedUrl['host'] !== $host)
+		{
+			$canonicalUrl = str_replace($parsedUrl['host'], $host, $canonicalUrl);
+		}
+
+		return $canonicalUrl;
+	}
 
 	/**
 	 * Is this system using a Common SSL

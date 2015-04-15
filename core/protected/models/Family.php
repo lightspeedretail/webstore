@@ -172,14 +172,26 @@ class Family extends BaseFamily
 	{
 		return 1;
 	}
-	public function getLink() {
-
+	public function getLink()
+	{
 		return Yii::app()->createAbsoluteUrl("/brand/".urlencode($this->request_url));
-
 	}
+
 	public function getUrl()
 	{
 		return $this->getLink();
+	}
+
+	/**
+	 * GetCanonicalUrl returns the canonical url to the current category
+	 * @return string The canonical url
+	 */
+	public function getCanonicalUrl()
+	{
+		return Yii::app()->createCanonicalUrl(
+			"/search/browse",
+			array('brand' => $this->request_url)
+		);
 	}
 
 	public function __get($strName) {

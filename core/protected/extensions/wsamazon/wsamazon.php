@@ -353,8 +353,6 @@ class wsamazon extends ApplicationComponent {
 
 	public function OnActionListOrders($event)
 	{
-
-
 		$checkTime = date("Y-m-d H:i:s",strtotime($this->amazon_check_time));
 		$checkDate = date("Y-m-d",strtotime($this->amazon_check_time));
 
@@ -391,185 +389,223 @@ class wsamazon extends ApplicationComponent {
 
 		$response = $this->invokeListOrders($service, $request);
 
-		if ($response->isSetListOrdersResult()) {
-			$listOrdersResult = $response->getListOrdersResult();
+		if ($response->isSetListOrdersResult())
+		{
+			$this->parseListOrders($response);
+		}
 
-			if ($listOrdersResult->isSetOrders()) {
-				$orders = $listOrdersResult->getOrders();
-				$orderList = $orders->getOrder();
-				foreach ($orderList as $order) {
-					if ($order->isSetAmazonOrderId())
+		return self::SUCCESS;
+	}
+
+	/**
+	 * This function will run parse an order that we get from Amazon MWS.
+	 * It saves orders of the customers to the DB.
+	 * @param $response ListOrderItemsResponse Contains the orders from Amazon
+	 * Marketplace WebService
+	 * @return void
+	 */
+	public function parseListOrders($response)
+	{
+		$checkDate = date("Y-m-d",strtotime($this->amazon_check_time));
+
+		$listOrdersResult = $response->getListOrdersResult();
+
+		if ($listOrdersResult->isSetOrders()) {
+			$orders = $listOrdersResult->getOrders();
+			$orderList = $orders->getOrder();
+			foreach ($orderList as $order) {
+				if ($order->isSetAmazonOrderId())
+				{
+
+					$strOrderId = $order->getAmazonOrderId();
+					Yii::log("Found Amazon Order ".$strOrderId ,
+						'info', 'application.'.__CLASS__.".".__FUNCTION__);
+
+					$objCart = Cart::LoadByIdStr($strOrderId);
+					if (!($objCart instanceof Cart))
 					{
+						//We ignore orders we've already downloaded
+						$objCart = new Cart();
 
-						$strOrderId = $order->getAmazonOrderId();
-						Yii::log("Found Amazon Order ".$strOrderId ,
+						$objCart->id_str = $strOrderId;
+						$objCart->origin = 'amazon';
+
+						//We mark this as just a cart, not an order, because we download the items next
+						$objCart->cart_type = CartType::cart;
+
+						$objOrderTotal = $order->getOrderTotal();
+						Yii::log("Order total information ".print_r($objOrderTotal,true),
 							'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
-						$objCart = Cart::LoadByIdStr($strOrderId);
-						if (!($objCart instanceof Cart))
+						$objCart->total = $objOrderTotal->getAmount();
+						$objCart->currency =$objOrderTotal->getCurrencyCode();
+						$objCart->status = OrderStatus::Requested;
+						$objCart->datetime_cre = $order->getPurchaseDate();
+						$objCart->modified = $order->getLastUpdateDate();
+
+						if(!$objCart->save())
 						{
-							//We ignore orders we've already downloaded
-							$objCart = new Cart();
+							Yii::log(
+								"Error saving cart " . print_r($objCart->getErrors(), true),
+								'error',
+								'application.'.__CLASS__.".".__FUNCTION__
+							);
+						}
 
-							$objCart->id_str = $strOrderId;
-							$objCart->origin = 'amazon';
+						//Since email from is Anonymous, we probably will have to create a shell record
+						$objCustomer = Customer::LoadByEmail($order->getBuyerEmail());
+						if (!($objCustomer))
+						{
+							$customerName = $this->_getCustomerName($order->getBuyerName());
+							$objCustomer = new Customer();
+							$objCustomer->email = $order->getBuyerEmail();
 
-							//We mark this as just a cart, not an order, because we download the items next
-							$objCart->cart_type = CartType::cart;
+							$objCustomer->first_name = $customerName['first_name'];
+							$objCustomer->last_name = $customerName['last_name'];
 
-							$objOrderTotal = $order->getOrderTotal();
-							Yii::log("Order total information ".print_r($objOrderTotal,true),
-								'info', 'application.'.__CLASS__.".".__FUNCTION__);
+							$objCustomer->record_type = Customer::EXTERNAL_SHELL_ACCOUNT;
+							$objCustomer->allow_login = Customer::UNAPPROVED_USER;
+							$objCustomer->save();
+						}
 
-							$objCart->total = $objOrderTotal->getAmount();
-							$objCart->currency =$objOrderTotal->getCurrencyCode();
-							$objCart->status = OrderStatus::Requested;
-							$objCart->datetime_cre = $order->getPurchaseDate();
-							$objCart->modified = $order->getLastUpdateDate();
-
-							if(!$objCart->save())
-								Yii::log("Error saving cart ".print_r($objCart->getErrors(),true),
-									'error', 'application.'.__CLASS__.".".__FUNCTION__);;
-
-							//Since email from is Anonymous, we probably will have to create a shell record
-							$objCustomer = Customer::LoadByEmail($order->getBuyerEmail());
-							if (!($objCustomer))
-							{
-								$parser = _xls_parse_name($order->getBuyerName());
-
-								$objCustomer = new Customer();
-								$objCustomer->email = $order->getBuyerEmail();
-								$objCustomer->first_name = $parser->getFirst();
-								$objCustomer->last_name = $parser->getLast();
-								$objCustomer->record_type = Customer::EXTERNAL_SHELL_ACCOUNT;
-								$objCustomer->allow_login = Customer::UNAPPROVED_USER;
-								$objCustomer->save();
-
-							}
-							$objCart->customer_id = $objCustomer->id;
-							if(!$objCart->save())
-								Yii::log("Error saving cart ".print_r($objCart->getErrors(),true),
-									'error', 'application.'.__CLASS__.".".__FUNCTION__);;
+						$objCart->customer_id = $objCustomer->id;
+						if(!$objCart->save())
+							Yii::log("Error saving cart ".print_r($objCart->getErrors(),true),
+								'error', 'application.'.__CLASS__.".".__FUNCTION__);;
 
 
-							if ($order->isSetShippingAddress()) {
+						if ($order->isSetShippingAddress()) {
 
-								$shippingAddress = $order->getShippingAddress();
-								$countrycode = Country::IdByCode($shippingAddress->getCountryCode());
-								if ($shippingAddress->isSetStateOrRegion())
-									$objState = State::LoadByCode($shippingAddress->getStateOrRegion(),$countrycode);
+							$shippingAddress = $order->getShippingAddress();
+							$countrycode = Country::IdByCode($shippingAddress->getCountryCode());
+							if ($shippingAddress->isSetStateOrRegion())
+								$objState = State::LoadByCode($shippingAddress->getStateOrRegion(),$countrycode);
 
-								$parser = _xls_parse_name($shippingAddress->getName());
-								$config['first_name']=$parser->getFirst();
-								$config['last_name']=$parser->getLast();
+							$customerName = $this->_getCustomerName($shippingAddress->getName());
 
-								$config = array(
-									'address_label'=>'amazon',
-									'customer_id'=>$objCustomer->id,
-									'first_name'=>$parser->getFirst(),
-									'last_name'=>$parser->getLast(),
-									'address1'=>$shippingAddress->getAddressLine1(),
-									'address2'=>trim($shippingAddress->getAddressLine2()." ".$shippingAddress->getAddressLine3()),
-									'city'=>$shippingAddress->getCity(),
-									//'county'=>$shippingAddress->getCounty(),
-									//'district'=>$shippingAddress->getDistrict(),
-									'state_id'=>$objState->id,
-									'postal'=>$shippingAddress->getPostalCode(),
-									'country_id'=>$countrycode,
-									'phone'=>$shippingAddress->getPhone()
-								);
-								$objCustAddress  = CustomerAddress::findOrCreate($config);
-								$objCustomer->default_billing_id = $objCustAddress->id;
-								$objCustomer->default_shipping_id = $objCustAddress->id;
-								$objCustomer->save();
+							$config = array(
+								'address_label' => 'amazon',
+								'customer_id' => $objCustomer->id,
+								'first_name' => $customerName['first_name'],
+								'last_name' => $customerName['last_name'],
+								'address1' => $shippingAddress->getAddressLine1(),
+								'address2' => trim($shippingAddress->getAddressLine2()." ".$shippingAddress->getAddressLine3()),
+								'city' => $shippingAddress->getCity(),
+								//'county' => $shippingAddress->getCounty(),
+								//'district' => $shippingAddress->getDistrict(),
+								'state_id' => $objState->id,
+								'postal' => $shippingAddress->getPostalCode(),
+								'country_id' => $countrycode,
+								'phone' => $shippingAddress->getPhone()
+							);
+							$objCustAddress  = CustomerAddress::findOrCreate($config);
+							$objCustomer->default_billing_id = $objCustAddress->id;
+							$objCustomer->default_shipping_id = $objCustAddress->id;
+							$objCustomer->save();
 
-								$objCart->shipaddress_id = $objCustAddress->id;
-								$objCart->billaddress_id = $objCustAddress->id; //Amazon doesn't provide billing data, just dupe
-								if(!$objCart->save())
-									Yii::log("Error saving cart ".print_r($objCart->getErrors(),true),
-										'error', 'application.'.__CLASS__.".".__FUNCTION__);
-
-								Yii::log("Looking for destination ".$objState->country_code." ".
-									$objState->code." ".$shippingAddress->getPostalCode(),
-									'info', 'application.'.__CLASS__.".".__FUNCTION__);
-
-								$objDestination = Destination::LoadMatching(
-									$objState->country_code,
-									$objState->code,
-									$shippingAddress->getPostalCode());
-
-								if ($objDestination === null)
-								{
-									Yii::log("Did not find destination, using default in Web Store ",
-										'info', 'application.'.__CLASS__.".".__FUNCTION__);
-									$objDestination = Destination::getAnyAny();
-								}
-
-								$objCart->tax_code_id = $objDestination->taxcode;
-								$objCart->recalculateAndSave();
-
-							}
-
-							if ($order->isSetShipServiceLevel())
-							{
-								$strShip =  $order->getShipServiceLevel();
-
-								//If we have a shipping object already, update it, otherwise create it
-								if (isset($objCart->shipping))
-									$objShipping = $objCart->shipping; //update
-								else {
-									//create
-									$objShipping = new CartShipping;
-									if(!$objShipping->save())
-										Yii::log("Error saving shipping info for cart ".print_r($objShipping->getErrors(),true),
-											'error', 'application.'.__CLASS__.".".__FUNCTION__);;
-								}
-
-								if ($order->isSetShipmentServiceLevelCategory())
-									$strShip= $order->getShipmentServiceLevelCategory();
-
-								$objShipping->shipping_module = get_class($this);
-								$objShipping->shipping_data = $strShip;
-								$objShipping->shipping_method = $this->objModule->getConfig('product');
-								$objShipping->shipping_cost = 0;
-								$objShipping->shipping_sell = 0;
-								$objShipping->save();
-
-								$objCart->shipping_id = $objShipping->id;
-								if(!$objCart->save())
-									Yii::log("Error saving cart ".print_r($objCart->getErrors(),true),
-										'error', 'application.'.__CLASS__.".".__FUNCTION__);
-							}
-
-
-							//Because Amazon comes down with no payment info, just generate one here
-							$objP = new CartPayment;
-							$objP->payment_method=$this->objModule->getConfig('ls_payment_method');
-							$objP->payment_module=get_class($this);
-							$objP->payment_data='Amazon';
-							$objP->payment_amount=$objOrderTotal->getAmount();
-							$objP->datetime_posted=$order->getPurchaseDate();
-							if(!$objP->save())
-								Yii::log("Error saving payment ".print_r($objP->getErrors(),true),
-									'error', 'application.'.__CLASS__.".".__FUNCTION__);;
-
-
-							$objCart->payment_id = $objP->id;
+							$objCart->shipaddress_id = $objCustAddress->id;
+							$objCart->billaddress_id = $objCustAddress->id; //Amazon doesn't provide billing data, just dupe
 							if(!$objCart->save())
 								Yii::log("Error saving cart ".print_r($objCart->getErrors(),true),
 									'error', 'application.'.__CLASS__.".".__FUNCTION__);
 
+							Yii::log("Looking for destination ".$objState->country_code." ".
+								$objState->code." ".$shippingAddress->getPostalCode(),
+								'info', 'application.'.__CLASS__.".".__FUNCTION__);
 
+							$objDestination = Destination::LoadMatching(
+								$objState->country_code,
+								$objState->code,
+								$shippingAddress->getPostalCode());
 
-							TaskQueue::CreateEvent('integration',get_class($this),'ListOrderDetails',$objCart->id_str.",".$checkDate);
+							if ($objDestination === null)
+							{
+								Yii::log("Did not find destination, using default in Web Store ",
+									'info', 'application.'.__CLASS__.".".__FUNCTION__);
+								$objDestination = Destination::getAnyAny();
+							}
+
+							$objCart->tax_code_id = $objDestination->taxcode;
+							$objCart->recalculateAndSave();
+
 						}
+
+						if ($order->isSetShipServiceLevel())
+						{
+							$strShip =  $order->getShipServiceLevel();
+
+							//If we have a shipping object already, update it, otherwise create it
+							if (isset($objCart->shipping))
+								$objShipping = $objCart->shipping; //update
+							else {
+								//create
+								$objShipping = new CartShipping;
+								if(!$objShipping->save())
+									Yii::log("Error saving shipping info for cart ".print_r($objShipping->getErrors(),true),
+										'error', 'application.'.__CLASS__.".".__FUNCTION__);;
+							}
+
+							if ($order->isSetShipmentServiceLevelCategory())
+								$strShip= $order->getShipmentServiceLevelCategory();
+
+							$objShipping->shipping_module = get_class($this);
+							$objShipping->shipping_data = $strShip;
+							$objShipping->shipping_method = $this->objModule->getConfig('product');
+							$objShipping->shipping_cost = 0;
+							$objShipping->shipping_sell = 0;
+							$objShipping->save();
+
+							$objCart->shipping_id = $objShipping->id;
+							if(!$objCart->save())
+								Yii::log("Error saving cart ".print_r($objCart->getErrors(),true),
+									'error', 'application.'.__CLASS__.".".__FUNCTION__);
+						}
+
+
+						//Because Amazon comes down with no payment info, just generate one here
+						$objP = new CartPayment;
+						$objP->payment_method=$this->objModule->getConfig('ls_payment_method');
+						$objP->payment_module=get_class($this);
+						$objP->payment_data='Amazon';
+						$objP->payment_amount=$objOrderTotal->getAmount();
+						$objP->datetime_posted=$order->getPurchaseDate();
+						if(!$objP->save())
+							Yii::log("Error saving payment ".print_r($objP->getErrors(),true),
+								'error', 'application.'.__CLASS__.".".__FUNCTION__);;
+
+
+						$objCart->payment_id = $objP->id;
+						if(!$objCart->save())
+							Yii::log("Error saving cart ".print_r($objCart->getErrors(),true),
+								'error', 'application.'.__CLASS__.".".__FUNCTION__);
+
+						TaskQueue::CreateEvent('integration',get_class($this),'ListOrderDetails',$objCart->id_str.",".$checkDate);
 					}
 				}
-
 			}
-		}
 
-		return self::SUCCESS;
+		}
+	}
+
+	/**
+	 * This function parses the name of the customer from the Amazon order.
+	 * Since Amazon only has a field for a full name, Web Store needs to break
+	 * it down into a first name and last name. To do so we use the HumanName Parser
+	 * library.
+	 *
+	 * @param $customerName string The full name of the customer.
+	 * @return array string The first name and last name of the customer
+	 */
+	private function _getCustomerName($customerName)
+	{
+		$parser = _xls_parse_name($customerName);
+
+		$name = array(
+			'first_name' => $parser->getFirst(),
+			'last_name' => $parser->getLast()
+		);
+
+		return $name;
 	}
 
 	protected function invokeListOrders(MarketplaceWebServiceOrders_Interface $service, $request)
@@ -658,7 +694,7 @@ class wsamazon extends ApplicationComponent {
 					//so we divide
 					if($intQty>1)
 						$fltPrice = ($fltPrice/$intQty);
-					
+
 					if ($orderItem->isSetShippingPrice()) {
 						$objShippingPrice = $orderItem->getShippingPrice();
 						if ($objShippingPrice->isSetAmount())
@@ -904,7 +940,7 @@ class wsamazon extends ApplicationComponent {
 			</AmazonEnvelope>';
 		Yii::log("Created product feed ".$strFeed, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 		return $strFeed;
-		
+
 	}
 
 	public function getUploadPriceFeed($objProduct)

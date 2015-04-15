@@ -1,6 +1,7 @@
 @import "../mixins/arrows";
 @import "../mixins/borders";
 @import "../mixins/flexbox";
+@import "../mixins/box-shadow";
 @import "../mixins/transitions";
 @import "../mixins/animations";
 @import "../lib/normalize";
@@ -34,7 +35,6 @@
 @import 'overlay';
 @import 'cart';
 @import 'cartadd';
-@import 'wishlist';
 @import 'promo';
 @import '_tooltip';
 @import 'estimator';
@@ -43,7 +43,6 @@
 @import 'checkout';
 @import 'overview';
 @import 'lines';
-@import 'wishlist_view';
 
 @import 'print';
 
@@ -99,10 +98,18 @@ main.verification {
 }
 
 
-th{
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, sans-serif;
-  font-weight: bold;
+.webstore-overlay{
+  input,
+  button,
+  select,
+  textarea {
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, sans-serif;
+    th{
+      font-weight: bold;
+    }
+  }
 }
+
 
 //MO temporary
 @import '../customized/brooklyn2014';

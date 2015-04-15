@@ -14,8 +14,8 @@ class wseditcartmodal extends wsmodal
 		$this->assetUrl = $assets = Yii::app()->getAssetManager()->publish(
 			dirname(__FILE__) . DIRECTORY_SEPARATOR . 'assets'
 		);
-
-		$cs->registerCssFile('//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css');
+		
+		$cs->registerCssFile('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css');
 		$cs->registerCssFile($assets . '/css/wseditcartmodal.css');
 		$this->widget('ext.jquery-history-js.jqueryHistoryJs');
 

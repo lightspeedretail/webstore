@@ -453,46 +453,80 @@ class Product extends BaseProduct
 
 	}
 
-	public static function ConvertSEO($id=null) {
+	/**
+	 * Builds the SEO friendly request_url for a single product.
+	 * @param integer $id The Product Id
+	 * @return void
+	 */
+	public static function convertSEO($id = null) {
 
 		//Because our product table is potentially huge, we can't risk loading everything into an array and having PHP crash,
 		//so we just have to do this directly with the db
 		if (!is_null($id))
 		{
-			if($id==-1)
-				$matches=Yii::app()->db->createCommand('SELECT id,title,code FROM '.Product::model()->tableName().' WHERE request_url IS NULL AND title is not null ORDER BY id LIMIT 1000')->query();
+			if($id == -1)
+			{
+				$matches = Yii::app()->db->createCommand('SELECT id,title,code FROM '.Product::model()->tableName().' WHERE request_url IS NULL AND title is not null ORDER BY id LIMIT 1000')->query();
+			}
 			else
-				$matches=Yii::app()->db->createCommand('SELECT id,title,code FROM '.Product::model()->tableName().' WHERE id='.$id.' ORDER BY id')->query();
-
+			{
+				$matches = Yii::app()->db->createCommand('SELECT id,title,code FROM '.Product::model()->tableName().' WHERE id='.$id.' ORDER BY id')->query();
+			}
 		}
 		else
-			$matches=Yii::app()->db->createCommand('SELECT id,title,code FROM '.Product::model()->tableName().' WHERE web=1 ORDER BY id')->query();
-		while(($row=$matches->read())!==false)
-			Product::model()->updateByPk($row['id'],
-				array('request_url'=>self::BuildRequestUrl($row['id'],$row['title'],$row['code'])));
+		{
+			$matches = Yii::app()->db->createCommand('SELECT id,title,code FROM '.Product::model()->tableName().' WHERE web=1 ORDER BY id')->query();
+		}
 
-
+		while(($row = $matches->read()) !== false)
+		{
+			Product::model()->updateByPk(
+				$row['id'],
+				array(
+					'request_url' => self::buildRequestUrl($row['id'], $row['title'], $row['code']))
+			);
+		}
 	}
 
 
-	public static function BuildRequestUrl($id,$title,$code)
+	/**
+	 * Builds the SEO friendly request_url for a single product.
+	 * @param integer $id The Product Id
+	 * @param string $title The Product Title
+	 * @param integer $code The Product Code
+	 * @return string The SEO formatted reqeuest_url.
+	 */
+	public static function buildRequestUrl($id, $title, $code)
 	{
 		$strRequest = _xls_parse_language($title);
 		if (Yii::app()->params['SEO_URL_CODES'])
-			$strRequest .= "-".$code;
+		{
+			$strRequest .= "-" . $code;
+		}
 
 		if (Yii::app()->params['SEO_URL_CATEGORIES'])
 		{
-			$strBread = Category::getBreadcrumbByProductId($id,'names');
+			$objProduct = Product::model()->findByPk($id);
 
-			if (!empty($strBread))
-				$strRequest = array_pop($strBread)."-".$strRequest;
+			if ($objProduct instanceof Product === false)
+			{
+				return false;
+			}
 
+			$objCategory = $objProduct->xlswsCategories;
+
+			if ($objCategory)
+			{
+				$strBread = $objCategory[0]->getBreadcrumbs("requestUrl");
+			}
+
+			if (empty($strBread) === false)
+			{
+				$strRequest = array_pop($strBread) . "-" . $strRequest;
+			}
 		}
 
 		return _xls_seo_url($strRequest);
-
-
 	}
 
 	/**
@@ -541,14 +575,24 @@ class Product extends BaseProduct
 
 	public function getAbsoluteLink() {
 		if ($this->IsChild)
-			//if ($prod = Product::model()->findByPk($this->parent))
-				return $this->parent0->getAbsolutelink();
+		{
+			return $this->parent0->getAbsolutelink();
+		}
 
-		//return _xls_site_url($this->request_url."/".XLSURL::KEY_PRODUCT."/".$this->id);
-		//return Yii::app()->createUrl('/product',array('id'=>$this->id));
+		return Yii::app()->createAbsoluteUrl('product/view', array('id' => $this->id, 'name' => $this->request_url));
+	}
 
-		return Yii::app()->createAbsoluteUrl('product/view',array('id'=>$this->id,'name'=>$this->request_url));
+	/**
+	 * Get the canonical url for this product page.
+	 * @return string
+	 */
+	public function getCanonicalUrl() {
+		if ($this->IsChild)
+		{
+			return $this->parent0->getCanonicalUrl();
+		}
 
+		return Yii::app()->createCanonicalUrl('product/view', array('id' => $this->id, 'name' => $this->request_url));
 	}
 
 	protected function GetPageMeta($strConf = 'SEO_PRODUCT_TITLE') {
@@ -940,64 +984,94 @@ class Product extends BaseProduct
 	}
 
 	/**
-	 * GetSlashedPrice will return
-	 * that it will optionally return a message for Master products.
-	 * @param integer defaults to 1
-	 * @return float or string
+	 * When a product's sell_web price is lower than its sell price,
+	 * we display a strikethrough on the original price. If a web price
+	 * is not set, sell_web is set to sell. This function will return the
+	 * original sell price formatted by the currency.
+	 *
+	 * @param int $intQuantity
+	 * @return null|string
 	 */
 	public function getSlashedPrice($intQuantity = 1) {
+		if(CPropertyValue::ensureInteger(Yii::app()->params['ENABLE_SLASHED_PRICES']) > 0 &&
+			$this->sell_web < $this->sell)
+		{
+			return _xls_currency($this->getSlashedPriceValue($intQuantity));
+		}
 
-		if(_xls_get_conf('ENABLE_SLASHED_PRICES' , 0)>0)
-		return _xls_currency($this->getSlashedPriceValue($intQuantity));
-		else return null;
+		return null;
 	}
 
+	/**
+	 * This function returns the regular price of a product if its web price was set lower than
+	 * its regular price. If the web price is not lower than the regular price this function
+	 * returns 'null'.
+	 *
+	 * @param int $intQuantity
+	 * @return null|string
+	 */
 	public function getSlashedPriceValue($intQuantity = 1) {
 
-		if (_xls_get_conf('PRICE_REQUIRE_LOGIN',0) == 1 && Yii::app()->user->IsGuest)
-			return '';
+		if (CPropertyValue::ensureInteger(Yii::app()->params['PRICE_REQUIRE_LOGIN']) === 1 && Yii::app()->user->IsGuest)
+		{
+			return null;
+		}
 
 		$taxInclusive = Yii::app()->shoppingcart->IsTaxIn;
-		if ($taxInclusive) $strField = "sell_tax_inclusive"; else $strField = "sell";
+		if ($taxInclusive)
+		{
+			$strField = "sell_tax_inclusive";
+		}
+		else
+		{
+			$strField = "sell";
+		}
 
-		if ($this->IsMaster()) {
-
+		if ($this->IsMaster())
+		{
 			$criteria = new CDbCriteria();
 
-			if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) == Product::InventoryMakeDisappear)
+			if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0) == Product::InventoryMakeDisappear)
+			{
 				$criteria->condition = 'web=1 AND parent=:id AND (inventory_avail>0 OR inventoried=0)';
+			}
 			else
+			{
 				$criteria->condition = 'web=1 AND parent=:id';
-			$criteria->params = array (':id'=>$this->id);
+			}
 
+			$criteria->params = array (':id' => $this->id);
 			$criteria->order = $strField;
 
 			$arrMaster = Product::model()->findAll($criteria);
 
-			if (count($arrMaster)==0) return '';
+			if (count($arrMaster) == 0)
+			{
+				return null;
+			}
 
-			switch (_xls_get_conf('MATRIX_PRICE')) {
-
+			switch (_xls_get_conf('MATRIX_PRICE'))
+			{
 				case Product::HIGHEST_PRICE: //Show Highest Price
 				case Product::PRICE_RANGE:
 					return ( $arrMaster[count($arrMaster)-1]->$strField >
 						$arrMaster[count($arrMaster)-1]->getPriceValue($intQuantity, $taxInclusive)) ?
-						$arrMaster[count($arrMaster)-1]->$strField : "";
+						$arrMaster[count($arrMaster)-1]->$strField : null;
 				case Product::CLICK_FOR_PRICING:
-					return '';
+					return null;
 
 				case Product::LOWEST_PRICE:
-					return ( $arrMaster[0]->$strField > $arrMaster[0]->getPriceValue($intQuantity, $taxInclusive)) ? $arrMaster[0]->$strField : "";
+					return ( $arrMaster[0]->$strField > $arrMaster[0]->getPriceValue($intQuantity, $taxInclusive)) ? $arrMaster[0]->$strField : null;
 
 				case Product::MASTER_PRICE:
 				default:
-					return ($this->$strField > $this->getPriceValue($intQuantity, $taxInclusive)) ? $this->$strField : "";
-
-
+					return ($this->$strField > $this->getPriceValue($intQuantity, $taxInclusive)) ? $this->$strField : null;
 			}
-
 		}
-		else return ($this->$strField > $this->getPriceValue($intQuantity, $taxInclusive)) ? $this->$strField : "";
+		else
+		{
+			return ($this->$strField > $this->getPriceValue($intQuantity, $taxInclusive)) ? $this->$strField : null;
+		}
 	}
 	/**
 	 * Calculates pending order qty to count against available
@@ -1469,7 +1543,6 @@ class Product extends BaseProduct
 			case 'SEOName':
 				return $this->GetSEOName();
 
-			case 'CanonicalUrl':
 			case 'AbsoluteUrl':
 				return $this->GetAbsoluteUrl();
 			case 'AddToCartImage':

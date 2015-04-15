@@ -1,5 +1,13 @@
 @charset "utf-8";
-
+/**
+ * ==========================================================================
+ * Media queries
+ * ==========================================================================
+ */
+/**
+ * Break points
+ * ==========================================================================
+ */
 $break-mobile: 0px; // This is used in limited situations, generally styles layer-up, not down.
 $break-narrow-modal: 360px;
 $break-verysmall: 450px;
@@ -13,7 +21,10 @@ $break-verylarge: 1240px;
 @import 'compass';
 @import '../mixins/html5-input-types';
 
-
+/**
+ * Media queries set up
+ * ==========================================================================
+ */
 @mixin media($media) {
   @if $media == 'mobile' {
 	@media (max-width: $break-small) { @content; }
@@ -54,9 +65,15 @@ $break-verylarge: 1240px;
   padding-bottom: 0;
 }
 
-// Colors
-$font-color: #000;
-
+/**
+ * ==========================================================================
+ * Variables
+ * ==========================================================================
+ */
+/**
+ * Color palette
+ * ==========================================================================
+ */
 $blue: #3287CC;
 $blue-steel: #435261;
 
@@ -68,16 +85,50 @@ $red: #A44039;
 $orange: #E27E38;
 $yellow: #F6B444;
 
-$light-grey-border: #ccc;
+$light-grey-border: #ddd;
 $light-grey-text: #aaa;
 
-// Input borders
+/**
+ * Fonts
+ * ==========================================================================
+ */
+$font-color: #000;
+
+/**
+ * Forms and inputs
+ * ==========================================================================
+ */
 $input-border:1px solid $light-grey-border;
 
-// Link colors
+// Input outlines
+$input-shadow-color: #eee;
+$input-shadow-top: 1px;
+$input-shadow-left: 1px;
+$input-shadow-blur: 1px;
+$input-shadow-spread: 0;
+$input-shadow-inset: true;
+$input-shadow-color-focus: #8fbbe5;
+$input-shadow-top-focus: 0;
+$input-shadow-left-focus: 0;
+$input-shadow-blur-focus: 2px;
+$input-shadow-spread-focus: 2px;
+$input-shadow-inset-focus: true;
+
+/**
+ * Links
+ * ==========================================================================
+ */
 $link-color: $blue;
 $link-hover-color: darken($blue,10%);
 $link-active-color: darken($blue,20%);
+
+/**
+ * Error messages
+ * ==========================================================================
+ */
+$error-background: #FFF2F2;
+$error-color: #B4282E;
+$success-color: #ffffcc;
 
 
 
@@ -109,9 +160,6 @@ $modal-padding: 20px;
 
 $modal-width: 720px;
 $modal-width-narrow: 480px;
-
-$error-color: #B4282E;
-$success-color: #ffffcc;
 
 $calltoaction-color: $blue;
 $confirmation-color: $green !default;

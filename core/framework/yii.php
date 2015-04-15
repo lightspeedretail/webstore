@@ -24,10 +24,10 @@ require(dirname(__FILE__).'/YiiBase.php');
  */
 class Yii extends YiiBase
 {
-	public static function createWebApplication($config=null)
-	{
-		$wsbootstrap=dirname(__FILE__).'/../protected/components/WsWebApplication.php';
-		require_once($wsbootstrap);
-		return self::createApplication('WsWebApplication',$config);
-	}
+       public static function createWebApplication($config=null)
+       {
+               $wsbootstrap=dirname(__FILE__) . '/../protected/components/WsWebApplication.php';
+               require_once($wsbootstrap);
+               return self::createApplication('WsWebApplication', $config);
+       }
 }

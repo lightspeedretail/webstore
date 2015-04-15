@@ -23,6 +23,12 @@
 	<link rel="shortcut icon" href="<?=Yii::app()->baseUrl."/images/favicon.ico" ?>" />
 
 	<?php
+		Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->baseUrl . '/css/bootstrap.css');
+		Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->baseUrl . '/css/bootstrap-responsive.css');
+		Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->baseUrl . '/css/bootstrap-yii.css');
+		Yii::app()->getClientScript()->registerCoreScript('jquery');
+		Yii::app()->getClientScript()->registerScriptFile(Yii::app()->theme->baseUrl . '/js/bootstrap.js');
+
 		foreach(Yii::app()->theme->info->cssfiles as $cssfile)
 		{
 			Yii::app()->getClientScript()->registerCssFile(Yii::app()->theme->cssUrl($cssfile));

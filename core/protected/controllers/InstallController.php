@@ -634,9 +634,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 			$obj->save();
 
 		}
-		$obj = Configuration::LoadByKey('LANG_CODE');
-		$obj->key_value = strtolower($obj->key_value);
-		$obj->save();
+
 		$obj = Configuration::LoadByKey('LANGUAGES');
 		$obj->key_value = strtolower($obj->key_value);
 		$obj->save();
@@ -982,7 +980,7 @@ VALUES	(0, 'wsmailchimp', 'CEventCustomer', 1, 'MailChimp', 1, 'a:2:{s:7:\"api_k
 	public function actionConvertProductSEO()
 	{
 		//First, run our request_url creation if needed
-		Product::ConvertSEO(-1);
+		Product::convertSEO(-1);
 		Category::ConvertSEO();
 
 		$matches=Yii::app()->db->createCommand('SELECT count(*) FROM '.Product::model()->tableName().' WHERE request_url IS NULL AND title is not null')->queryScalar();

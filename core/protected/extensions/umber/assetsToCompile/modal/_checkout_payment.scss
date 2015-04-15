@@ -276,10 +276,6 @@
 		}
 
 		.card-details {
-			input, input#MultiCheckoutForm_cardExpiry:focus,
-			input#MultiCheckoutForm_cardNumber:focus, input#MultiCheckoutForm_cardCVV:focus {
-			  background-color: #fff;
-			}
 			input#MultiCheckoutForm_cardNumber:focus{
 			  font-size: 1.325rem;
 			}
@@ -288,7 +284,7 @@
 			  border: 1px solid #ddd;
 			  padding: 20px 20px 15px;
 			  $height: 204px;
-			  height: $height;
+			  min-height: $height;
 			  max-width:($height*1.76)
 			}
 			margin-top: 20px;
@@ -296,14 +292,6 @@
 
 			ol.field-container-gap {
 				margin-bottom: 1rem;
-			}
-
-			input:focus {
-				background-color: #fff;
-				outline-color: rgb(91, 157, 217);
-				outline-offset: -2px;
-				outline-style: auto;
-				outline-width: 5px;
 			}
 
 			p.cardholder {
@@ -396,10 +384,3 @@
 		}
 	}
 
-//temporary fix, confirm exact styling with Kevin and Luke
-input#MultiCheckoutForm_cardNumber {
-  &:focus{
-	padding-left: 10px;
-	padding-right: 10px;
-  }
-}

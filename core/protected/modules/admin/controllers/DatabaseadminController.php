@@ -45,15 +45,16 @@ class DatabaseadminController extends AdminBaseController
 			);
 
 		$arrLang = _xls_avail_languages();
-		if (count($arrLang)>1)
+		if (count($arrLang) > 1)
 		{
 			$this->menuItems[] = array('label'=>'Translations', 'linkOptions'=>array('class'=>'nav-header'));
-			$strOriginal = $arrLang[_xls_get_conf('LANG_CODE')];
 			array_shift($arrLang);
 			foreach($arrLang as $key => $value)
+			{
 				$this->menuItems[] = array(
-					'label'=>$strOriginal."=>".$value,
-					'url'=>array('databaseadmin/translate?dest='.$key));
+					'label'=>'English' . "=>" . $value,
+					'url'=>array('databaseadmin/translate?dest=' . $key));
+			}
 		}
 
 

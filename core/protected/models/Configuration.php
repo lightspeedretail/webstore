@@ -404,13 +404,6 @@ return array(
 		$lang = str_replace(" ", "", $lang);
 		$arr = explode(",",$lang);
 
-		//If we didn't include our default language as part of our array, add it (first)
-		if (!in_array(_xls_get_conf('LANG_CODE'),$arr))
-		{
-			$lang = _xls_get_conf('LANG_CODE').",".$lang;
-			$arr = explode(",",$lang);
-		}
-
 		$data = array();
 		foreach ($arr as $language)
 		{
@@ -478,7 +471,7 @@ return array(
 
 			case "SEO_URL_CATEGORIES":
 				Yii::app()->params['SEO_URL_CATEGORIES'] = $this->key_value;
-				Product::ConvertSEO();
+				Product::convertSEO();
 				break;
 
 			case 'AUTO_UPDATE':

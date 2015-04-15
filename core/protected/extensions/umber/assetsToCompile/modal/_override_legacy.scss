@@ -62,43 +62,10 @@ a, a:hover, a:focus, a:visited, a * {
 	margin-bottom: 0;
   }
 
-  //override bootstrap:1518
-  input:focus:required:invalid:focus, textarea:focus:required:invalid:focus, select:focus:required:invalid:focus{
-	border-color:#ddd;
-	-webkit-box-shadow:none;
-	-moz-box-shadow:none;
-	box-shadow:none;
-  }
   //override bootstrap:1511
   input:focus:required:invalid, textarea:focus:required:invalid, select:focus:required:invalid{
 	color:#000000;
 	border-color:#ddd;
-  }
-
-  input:focus {
-	outline: -webkit-focus-ring-color auto 5px;
-  }
-
-  select, input[type="text"], input[type="password"], input[type="email"],input[type="text"]:focus,
-  input[type="password"]:focus, input[type="email"]:focus {
-	width: 100%;
-	background-color: transparent;
-	line-height: normal;
-	max-width: none;
-  }
-
-  select, textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"],
-  input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"],
-  input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"],
-  .uneditable-input{
-	@include border-radius(0);
-	line-height:normal;
-  }
-
-  @media only screen and (max-width: 960px){
-	select, input[type="text"], input[type="password"], input[type="email"], input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
-	  max-width: none;
-	}
   }
 
   input[type=submit] {
@@ -127,70 +94,50 @@ a, a:hover, a:focus, a:visited, a * {
   }
 }
 
-.overlay{
-  #checkout input[type="text"], #checkout input[type="password"],
-  #checkout input[type="email"], #checkout input[type="select"],
-  #checkout input[type="text"]:focus, #checkout input[type="password"]:focus,
-  #checkout input[type="email"]:focus, #checkout input[type="select"]:focus {
-//    border: 1px solid #ddd;
-  }
-  #checkout label{
-	text-transform: none;
-  }
-}
-
-
 .webstore-modal{
-  select{
-	font-size: 11px;
-	height: 18px;
-	line-height: normal;
-  }
-
-  //override style.css l.27 and bootstrap.
-  input[type="radio"] {
-	width: initial;
-	height: initial;
-  }
-
-  //bootstrap override
-  .radio input[type="radio"], .checkbox input[type="checkbox"] {
-	margin-left:0;
-  }
-
   .webstore-checkout .choices .button:focus {
 	height:46px;
   }
 
+  //override base.css
+  //l.119
+  p{  margin-bottom: 0;  }
+
+  /* JPickard - added this because in base.css: #shoppingcart {text-transform: uppercase} */
+  text-transform: none;
+
+  //override style.css l.27 and bootstrap.
+  input[type="radio"] {
+    width: initial;
+    height: initial;
+  }
+
+  //bootstrap override
+  .radio input[type="radio"], .checkbox input[type="checkbox"] {
+    margin-left:0;
+  }
+
   button, input, select, textarea{
-	vertical-align:baseline;
+    vertical-align:baseline;
   }
 
   //override light.css
-  input[type=button], input[type=submit], button, label{
-	text-transform:none;
+  label{
+    text-transform:none;
   }
 
   //override style.css
   select, input[type="text"], input[type="password"], input[type="email"] {
-	max-width: none;
+    max-width: none;
   }
-
   //override base.css
-
-  //l.119
-  p{  margin-bottom: 0;  }
-
   //l.265
   .button, button, input[type="submit"], input[type="reset"], input[type="button"] {
-	margin-bottom: initial;
+    margin-bottom: initial;
   }
   //l.350
   form{
-	margin-bottom: initial;
+    margin-bottom: initial;
   }
-
-  /* JPickard - added this because in base.css: #shoppingcart {text-transform: uppercase} */
-  text-transform: none;
 }
 

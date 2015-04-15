@@ -54,7 +54,7 @@ class CheckoutController extends Controller
 				'application.'.__CLASS__.".".__FUNCTION__
 			);
 
-			Yii::app()->user->setFlash(
+			Yii::app()->user->addFlash(
 				'warning',
 				$defaultErrorMsg . Yii::t('cart', 'You have no items in your cart.')
 			);
@@ -1046,7 +1046,6 @@ class CheckoutController extends Controller
 						break;
 					}
 				}
-
 			}
 
 			$this->checkoutForm->objAddresses = $arrAddresses;
@@ -1282,26 +1281,13 @@ class CheckoutController extends Controller
 						$this->checkoutForm->validate() &&
 						$objPayment->updateCartPayment($this->checkoutForm))
 					{
-						$selectedCartScenario = Shipping::getSelectedCartScenarioFromSession();
-
-						$wsShippingEstimatorOptions = WsShippingEstimator::getShippingEstimatorOptions(
-							array($selectedCartScenario),
-							$this->checkoutForm->shippingProvider,
-							$this->checkoutForm->shippingPriority,
-							$this->checkoutForm->shippingCity,
-							$this->checkoutForm->shippingStateCode,
-							$this->checkoutForm->shippingCountryCode
-						);
-
-						$wsShippingEstimatorOptions['redirectToShippingOptionsUrl'] = Yii::app()->getController()->createUrl('shipping');
-
 						$this->layout = '/layouts/checkout-confirmation';
 						$this->render(
 							'confirmation',
 							array(
 								'model' => $this->checkoutForm,
 								'cart' => Yii::app()->shoppingcart,
-								'shippingEstimatorOptions' => $wsShippingEstimatorOptions,
+								'shippingEstimatorOptions' => $this->_getShippingEstimatorOptions(),
 								'error' => $this->formatErrors()
 							)
 						);
@@ -1348,6 +1334,8 @@ class CheckoutController extends Controller
 		// end user has clicked Place Order button on confirmation page
 		elseif (isset($_POST['Confirmation']))
 		{
+			$haveCartItemsBeenUpdated = false;
+
 			if (isset($_POST['MultiCheckoutForm']))
 			{
 				$this->checkoutForm->attributes = $_POST['MultiCheckoutForm'];
@@ -1364,37 +1352,30 @@ class CheckoutController extends Controller
 				// validate form and cart
 				if ($this->checkoutForm->updateCartCustomerId() && $this->checkoutForm->validate())
 				{
-					$result = $this->executeCheckoutProcess();
-					if (isset($result['success']) && isset($result['cartlink']))
+					// if the cart was modified stop checkout and re-render the page with the message to the end user
+					if (Yii::app()->shoppingcart->wasCartModified === false)
 					{
-						// send user to receipt
-						$this->redirect($this->createAbsoluteUrl("/checkout/thankyou/".$result['cartlink']));
+						// cart is as we expect, continue
+						$result = $this->executeCheckoutProcess();
+						if (isset($result['success']) && isset($result['cartlink']))
+						{
+							// send user to receipt
+							$this->redirect($this->createAbsoluteUrl("/checkout/thankyou/".$result['cartlink']));
+						}
 					}
 				}
 			}
 
 			$this->layout = '/layouts/checkout-confirmation';
 
-			$selectedCartScenario = Shipping::getSelectedCartScenarioFromSession();
-
-			$wsShippingEstimatorOptions = WsShippingEstimator::getShippingEstimatorOptions(
-				array($selectedCartScenario),
-				$this->checkoutForm->shippingProvider,
-				$this->checkoutForm->shippingPriority,
-				$this->checkoutForm->shippingCity,
-				$this->checkoutForm->shippingStateCode,
-				$this->checkoutForm->shippingCountryCode
-			);
-
-			$wsShippingEstimatorOptions['redirectToShippingOptionsUrl'] = Yii::app()->getController()->createUrl('shippingoptions');
-
 			$this->render(
 				'confirmation',
 				array(
 					'model' => $this->checkoutForm,
 					'cart' => Yii::app()->shoppingcart,
-					'shippingEstimatorOptions' => $wsShippingEstimatorOptions,
-					'error' => $this->formatErrors()
+					'shippingEstimatorOptions' => $this->_getShippingEstimatorOptions(),
+					'error' => $this->formatErrors(),
+					'recalculateShippingOnLoad' => Yii::app()->shoppingcart->wasCartModified
 				)
 			);
 		}
@@ -1531,22 +1512,31 @@ class CheckoutController extends Controller
 				$this->checkoutForm->setScenario('ConfirmationSim');
 			}
 
-			if ($this->checkoutForm->updateCartCustomerId() && $this->checkoutForm->validate())
+			$isFormValid = $this->checkoutForm->updateCartCustomerId() && $this->checkoutForm->validate();
+
+			if ($isFormValid && Yii::app()->shoppingcart->wasCartModified === false)
 			{
+				// our form is valid and the cart items are as we expect, continue
 				self::executeCheckoutProcessInit();
 				$this->runPaymentSim();
-			} else {
+			}
+			else
+			{
 				$this->layout = '/layouts/checkout-confirmation';
 				$this->render(
 					'confirmation',
 					array(
 						'model' => $this->checkoutForm,
 						'cart' => $objCart,
-						'error' => $this->formatErrors()
+						'error' => $this->formatErrors(),
+						'shippingEstimatorOptions' => $this->_getShippingEstimatorOptions(),
+						'recalculateShippingOnLoad' => Yii::app()->shoppingcart->wasCartModified
 					)
 				);
 			}
-		} else {
+		}
+		else
+		{
 			$orderId = Yii::app()->getRequest()->getQuery('orderId');
 			$errorNote = Yii::app()->getRequest()->getQuery('errorNote');
 
@@ -1576,29 +1566,41 @@ class CheckoutController extends Controller
 				$this->checkoutForm->addErrors(array('note' => $translatedErrorNote));
 			}
 
-			$selectedCartScenario = Shipping::getSelectedCartScenarioFromSession();
-
-			$wsShippingEstimatorOptions = WsShippingEstimator::getShippingEstimatorOptions(
-				array($selectedCartScenario),
-				$this->checkoutForm->shippingProvider,
-				$this->checkoutForm->shippingPriority,
-				$this->checkoutForm->shippingCity,
-				$this->checkoutForm->shippingStateCode,
-				$this->checkoutForm->shippingCountryCode
-			);
-
-			$wsShippingEstimatorOptions['redirectToShippingOptionsUrl'] = Yii::app()->getController()->createUrl('shippingoptions');
-
 			$this->render(
 				'confirmation',
 				array(
 					'model' => $this->checkoutForm,
 					'cart' => $objCart,
-					'shippingEstimatorOptions' => $wsShippingEstimatorOptions,
+					'shippingEstimatorOptions' => $this->_getShippingEstimatorOptions(),
 					'error' => $this->formatErrors()
 				)
 			);
 		}
+	}
+
+
+	/**
+	 * Return the options required by ConfirmationShippingEstimator.js
+	 * which is registered anytime the confirmation page is rendered
+	 *
+	 * @return array
+	 */
+	private function _getShippingEstimatorOptions()
+	{
+		$selectedCartScenario = Shipping::getSelectedCartScenarioFromSession();
+
+		$wsShippingEstimatorOptions = WsShippingEstimator::getShippingEstimatorOptions(
+			array($selectedCartScenario),
+			$this->checkoutForm->shippingProvider,
+			$this->checkoutForm->shippingPriority,
+			$this->checkoutForm->shippingCity,
+			$this->checkoutForm->shippingStateCode,
+			$this->checkoutForm->shippingCountryCode
+		);
+
+		$wsShippingEstimatorOptions['redirectToShippingOptionsUrl'] = Yii::app()->getController()->createUrl('shippingoptions');
+
+		return $wsShippingEstimatorOptions;
 	}
 
 

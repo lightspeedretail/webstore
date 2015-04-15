@@ -31,7 +31,7 @@ class MissingMessages extends CApplicationComponent
 			$lastID = Yii::app()->db->lastInsertID;
 		}
 		
-		if( $event->language != Yii::app()->sourceLanguage && $event->language != _xls_get_conf('LANG_CODE') )
+		if( $event->language != Yii::app()->sourceLanguage )
 		{
 			// Do the same thing with the messages	
 			$objTranslate = Stringtranslate::model()->find('language=:language AND id=:id',

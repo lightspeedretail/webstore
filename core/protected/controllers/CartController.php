@@ -62,7 +62,7 @@ class CartController extends Controller
 		{
 			if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on')
 			{
-				$this->redirect(Yii::app()->createAbsoluteUrl('cart/'.$action->Id,array(),'https'));
+				$this->redirect(Yii::app()->createAbsoluteUrl('cart/'.$action->Id, array(), 'https'));
 				Yii::app()->end();
 			}
 		}
@@ -73,9 +73,23 @@ class CartController extends Controller
 			$c = Yii::app()->getRequest()->getQuery('c');
 			if (isset($c))
 			{
-				$item = explode(",",_xls_decrypt($c));
+				$item = explode(",", _xls_decrypt($c));
 				Yii::app()->shoppingcart->assign($item[0]);
 			}
+		}
+
+		if (Yii::app()->shoppingcart->wasCartModified && Yii::app()->request->isAjaxRequest === false)
+		{
+			// Web Store has removed cart items or modified requested quantities
+			// to reflect recent updates to inventory.
+
+			// Since these changes may have invalidated the end user's originally selected shipping
+			// option, clear cache of shipping info. When the user returns to checkout they will be
+			// forced to recalculate shipping and choose from valid options
+			Yii::app()->shoppingcart->clearCachedShipping();
+
+			// Redirect the user to the index page and display the relevant message.
+			$this->redirect(Yii::app()->createUrl('cart/index'));
 		}
 
 		return parent::beforeAction($action);
@@ -609,7 +623,7 @@ class CartController extends Controller
 			}
 
 			// Copy address book to field if necessary.
-			$model = $this->FillFieldsFromPreselect($model);
+			$model->fillFieldsFromPreselect();
 
 			// Validate our primary CheckoutForm model here.
 			$valid = $model->validate();
@@ -818,6 +832,7 @@ class CartController extends Controller
 						{
 							$objCart->setTaxCodeByDefaultShippingAddress();
 						}
+
 						catch(Exception $e)
 						{
 							Yii::log("Error updating customer cart ".$e->getMessage(), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
@@ -1651,70 +1666,6 @@ class CartController extends Controller
 	}
 
 	/**
-	 * If the shopper has chosen an address from the address book, copy the values to the normal
-	 * fields since they're needed for shipping and payment calculations
-	 */
-	protected function FillFieldsFromPreselect($checkoutForm)
-	{
-		if ($checkoutForm->intShippingAddress > 0)
-		{
-			// We've picked a preset to ship to, so grab that info from the db.
-			$objAddresses = CustomerAddress::getActiveAddresses();
-			if (Yii::app()->shoppingcart->HasShippableGift)
-			{
-				$objAddresses = array_merge($objAddresses,Yii::app()->shoppingcart->GiftAddress);
-			}
-
-			foreach ($objAddresses as $objAddress)
-			{
-				if ($objAddress->id == $checkoutForm->intShippingAddress)
-				{
-					$checkoutForm->shippingFirstName = $objAddress->first_name;
-					$checkoutForm->shippingLastName = $objAddress->last_name;
-					$checkoutForm->shippingAddress1 = $objAddress->address1;
-					$checkoutForm->shippingAddress2 = $objAddress->address2;
-					$checkoutForm->shippingCity = $objAddress->city;
-					$checkoutForm->shippingState = $objAddress->state_id;
-					$checkoutForm->shippingPostal = $objAddress->postal;
-					$checkoutForm->shippingCountry = $objAddress->country_id;
-					$checkoutForm->shippingResidential = $objAddress->residential;
-
-				}
-			}
-		}
-
-		if ($checkoutForm->billingSameAsShipping)
-		{
-			//If we have our Same As Billing address checked, copy the values to shipping fields
-			//because our shipping modules will only be looking at the shipping fields
-			$checkoutForm->billingAddress1 = $checkoutForm->shippingAddress1;
-			$checkoutForm->billingAddress2 = $checkoutForm->shippingAddress2;
-			$checkoutForm->billingCity = $checkoutForm->shippingCity;
-			$checkoutForm->billingCountry = $checkoutForm->shippingCountry;
-			$checkoutForm->billingCountryCode = $checkoutForm->shippingCountryCode;
-			$checkoutForm->billingState = $checkoutForm->shippingState;
-			$checkoutForm->billingStateCode = $checkoutForm->shippingStateCode;
-			$checkoutForm->billingPostal = $checkoutForm->shippingPostal;
-			$checkoutForm->contactFirstName = $checkoutForm->shippingFirstName;
-			$checkoutForm->contactLastName = $checkoutForm->shippingLastName;
-			$checkoutForm->billingResidential = $checkoutForm->shippingResidential;
-		}
-
-		if (!Yii::app()->user->isGuest)
-		{
-			$objCustomer = Customer::GetCurrent();
-
-			$checkoutForm->contactFirstName = $objCustomer->first_name;
-			$checkoutForm->contactLastName = $objCustomer->last_name;
-			$checkoutForm->contactPhone = $objCustomer->mainphone;
-			$checkoutForm->contactEmail = $objCustomer->email;
-		}
-
-		return $checkoutForm;
-
-	}
-
-	/**
 	 * If any custom functions have been defined to run before completion process, attempt to run here
 	 * @param $objCart
 	 * @return mixed
@@ -2265,7 +2216,7 @@ class CartController extends Controller
 		$model->scenario = 'CalculateShipping';
 
 		// Copy address book to field if necessary.
-		$model = $this->FillFieldsFromPreselect($model);
+		$model->fillFieldsFromPreselect();
 
 		// Set up the exception handle for the remainder of this function.
 		$handleException = function (Exception $e) {

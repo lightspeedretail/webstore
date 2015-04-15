@@ -84,8 +84,8 @@ class ProductController extends Controller
 
 		$this->setPageTitle($model->PageTitle);
 		$this->pageDescription = $model->PageDescription;
-		$this->CanonicalUrl = $model->AbsoluteLink;
-		$this->returnUrl = $this->CanonicalUrl;
+		$this->canonicalUrl = $model->canonicalUrl;
+		$this->returnUrl = $model->absoluteLink;
 		$model->intQty=1;
 
 		//Raise any events first

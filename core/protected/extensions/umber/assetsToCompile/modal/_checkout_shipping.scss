@@ -30,9 +30,13 @@
         border-bottom: 1px solid #eee;
         padding: 1em .75em;
       }
-      th {
+      th, label{
         color: #555;
         font-size: .9375rem;
+        font-weight: bold;
+        //override light.css label
+        text-transform: none;
+
 
         input { font-size: 1rem; }
       }
@@ -94,15 +98,3 @@
   }
 }
 
-
-//MO
-.overlay #checkout label {
-  color: #555; font-size: 15px;
-}
-
-#MultiCheckoutForm_shippingFirstName, #MultiCheckoutForm_pickupFirstName{
-  border-right: none;
-}
-#MultiCheckoutForm_shippingAddress1:focus{
-  border-bottom: none;
-}
