@@ -27,9 +27,10 @@ class WishlistController extends Controller
 
 	public function beforeAction($action)
 	{
-		if (_xls_get_conf('ENABLE_WISH_LIST',0)==0)
+		if (_xls_get_conf('ENABLE_WISH_LIST', 0) == 0)
 		{
-			throw new CHttpException(404,'Wish lists are not enabled on this store.');
+			_xls_404('Wish lists are not enabled on this store.');
+
 			return false;
 		}
 
@@ -63,8 +64,9 @@ class WishlistController extends Controller
 
 
 		//We should only show this option to a logged in user
-		if (Yii::app()->user->isGuest)
-			throw new CHttpException(404,'The requested page does not exist.');
+		if (Yii::app()->user->isGuest){
+			_xls_404();
+		}
 
 		$model = new Wishlist();
 
@@ -72,15 +74,15 @@ class WishlistController extends Controller
 		if(isset($_POST['Wishlist']))
 		{
 
-			$model->attributes=$_POST['Wishlist'];
+			$model->attributes = $_POST['Wishlist'];
 			if($model->validate())
 			{
 
 				$model->customer_id = Yii::app()->user->id;
 				$model->gift_code = md5(uniqid());
 				if (!$model->save())
-					Yii::log("Error creating Wish List ".print_r($model->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-				$this->redirect($this->createUrl("wishlist/view",array('code'=>$model->gift_code)));
+					Yii::log("Error creating Wish List ".print_r($model->getErrors(),true), 'error', 'application.' . __CLASS__ . '.' . __FUNCTION__);
+				$this->redirect($this->createUrl("wishlist/view", array('code' => $model->gift_code)));
 
 
 			}
@@ -89,10 +91,9 @@ class WishlistController extends Controller
 			//Set up defaults
 			$model->visibility = Wishlist::PERSONALLIST;
 			$model->after_purchase = Wishlist::LEAVEINLIST;
-
 		}
 
-		$this->render('create',array('model'=>$model));
+		$this->render('create', array('model' => $model));
 
 	}
 
@@ -100,7 +101,9 @@ class WishlistController extends Controller
 	{
 		//We should only show this option to a logged in user
 		if (Yii::app()->user->isGuest)
-			throw new CHttpException(404, Yii::t('wishlist','You must be logged in to edit Wish Lists.'));
+		{
+			_xls_404('You must be logged in to edit Wish Lists.');
+		}
 
 		$strCode = Yii::app()->getRequest()->getParam('code');
 
@@ -112,10 +115,14 @@ class WishlistController extends Controller
 		);
 
 		if (!($objWishlist instanceof Wishlist))
-			throw new CHttpException(404,Yii::t('wishlist','The requested Wish List does not exist.'));
+		{
+			_xls_404('The requested Wish List does not exist.');
+		}
 
 		if ($objWishlist->visibility == Wishlist::PRIVATELIST && $objWishlist->customer_id != Yii::app()->user->id)
-			throw new CHttpException(404,Yii::t('wishlist','The requested Wish List is not viewable.'));
+		{
+			_xls_404('The requested Wish List is not viewable.');
+		}
 
 		// collect user input data
 		if(isset($_POST['Wishlist']))
@@ -124,35 +131,48 @@ class WishlistController extends Controller
 			$model->attributes=$_POST['Wishlist'];
 			if($model->validate())
 			{
-
 				//Did we check our Delete Me box?
-				if ($model->deleteMe) {
-					Yii::log("User ".Yii::app()->user->fullname." deleted wish list ".$model->registry_name,
-						'warning', 'application.'.__CLASS__.".".__FUNCTION__);
+				if ($model->deleteMe)
+				{
+					Yii::log(
+						'User ' . Yii::app()->user->fullname . ' deleted wish list ' . $model->registry_name,
+						'warning',
+						'application.' . __CLASS__ . '.' . __FUNCTION__
+					);
 
 					foreach ($objWishlist->wishlistItems as $objWishrow)
 					{
 						if (!(is_null($objWishrow->cart_item_id)))
-							CartItem::model()->updateByPk($objWishrow->cart_item_id,array('wishlist_item'=>null));
-						$objWishrow->delete();
+						{
+							CartItem::model()->updateByPk($objWishrow->cart_item_id, array('wishlist_item' => null));
+						}
 
+						$objWishrow->delete();
 					}
+
 					$objWishlist->delete();
-				} else
-					if (!$model->save())
-						Yii::log("Error creating Wish List ".print_r($model->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				}
+				elseif (!$model->save())
+				{
+					Yii::log(
+						'Error creating Wish List ' .
+						print_r(
+							$model->getErrors(),
+							true
+						),
+						'error',
+						'application.' . __CLASS__ . "." . __FUNCTION__
+					);
+				}
 
 				$this->redirect($this->createUrl("/wishlist"));
-
 			}
-
 		} else {
 			//Set up defaults
 			$model = $objWishlist;
-
 		}
 
-		$this->render('/wishlist/create',array('model'=>$model));
+		$this->render('/wishlist/create', array('model' => $model));
 
 	}
 
@@ -161,31 +181,49 @@ class WishlistController extends Controller
 
 		$strCode = Yii::app()->getRequest()->getParam('code');
 
-		$objWishlist = Wishlist::model()->findByAttributes(array('gift_code'=>$strCode));
+		$objWishlist = Wishlist::model()->findByAttributes(array('gift_code' => $strCode));
 
 		if (!($objWishlist instanceof Wishlist))
-			throw new CHttpException(404,'The requested wish list does not exist.');
+		{
+			_xls_404('The requested wish list does not exist.');
+		}
 
 		if ($objWishlist->visibility == Wishlist::PRIVATELIST && $objWishlist->customer_id != Yii::app()->user->id)
-			throw new CHttpException(404,'The requested wish list is private.');
-
-
+		{
+			_xls_404('The requested wish list is private.');
+		}
 
 		$WishlistShare = new ShareForm();
 		$WishlistShare->code = $objWishlist->gift_code;
-		$WishlistShare->comment = Yii::t('wishlist','Please check out my Wish List at {url}',
-			array('{url}'=>Yii::app()->createAbsoluteUrl('wishlist/view',array('code'=>$WishlistShare->code))));
+		$WishlistShare->comment = Yii::t(
+			'wishlist',
+			'Please check out my Wish List at {url}',
+			array(
+				'{url}' => Yii::app()->createAbsoluteUrl(
+					'wishlist/view',
+					array(
+						'code' => $WishlistShare->code
+					)
+				)
+			)
+		);
 
 		$this->breadcrumbs = array(
-			'My Wish Lists'=>$this->createUrl("/wishlist"),
-			'Edit Wish List: '.$objWishlist->registry_name=>Yii::app()->createUrl('wishlist/view',array('code'=>$WishlistShare->code)),
+			'My Wish Lists' => $this->createUrl("/wishlist"),
+			'Edit Wish List: ' .
+			$objWishlist->registry_name => Yii::app()->createUrl(
+				'wishlist/view',
+				array(
+					'code' => $WishlistShare->code
+				)
+			),
 		);
 
 		//We pass a dummy model of WishListItem to get our edit form ready
-		$this->render('/wishlist/view',array(
-			'model'=>$objWishlist,
-			'formmodel'=>new WishlistEditForm(),
-			'WishlistShare'=>$WishlistShare,
+		$this->render('/wishlist/view', array(
+			'model' => $objWishlist,
+			'formmodel' => new WishlistEditForm(),
+			'WishlistShare' => $WishlistShare,
 		));
 
 	}
@@ -358,27 +396,35 @@ class WishlistController extends Controller
 	{
 
 		if (Yii::app()->user->isGuest)
-			throw new CHttpException(404,'The requested page does not exist.');
+		{
+			_xls_404();
+		}
 
-		$model=new WishlistEditForm();
+		$model = new WishlistEditForm();
 		error_log(print_r($_POST,true));
 		// collect user input data
 		if(isset($_POST['WishlistEditForm']))
 		{
-
 			$model->attributes=$_POST['WishlistEditForm'];
 			if($model->validate())
 			{
-
 				$strCode = $model->code;
 				$intRow = $model->id;
 
 				//Make sure code we've been passed is valid
 				$objWishlist = Wishlist::model()->findByAttributes(array('gift_code'=>$strCode));
 				if (!$objWishlist->Visible)
-					throw new CHttpException(404,'The requested page does not exist.');
+				{
+					_xls_404();
+				}
 
-				$objWishrow = WishlistItem::model()->findByAttributes(array('id'=>$intRow,'registry_id'=>$objWishlist->id));
+				$objWishrow = WishlistItem::model()->findByAttributes(
+					array(
+						'id' => $intRow,
+						'registry_id' => $objWishlist->id
+					)
+				);
+
 				$objWishrow->qty = $model->qty;
 				$objWishrow->qty_received = $model->qty_received;
 				$objWishrow->comment = $model->comment;
@@ -425,7 +471,9 @@ class WishlistController extends Controller
 	{
 
 		if (Yii::app()->user->isGuest)
-			throw new CHttpException(404,'The requested page does not exist.');
+		{
+			_xls_404();
+		}
 
 		$model=new WishlistEditForm();
 
@@ -442,30 +490,54 @@ class WishlistController extends Controller
 				//Make sure code we've been passed is valid
 				$objWishlist = Wishlist::model()->findByAttributes(array('gift_code'=>$strCode));
 				if (!$objWishlist->Visible)
-					throw new CHttpException(404,'The requested page does not exist.');
+				{
+					_xls_404();
+				}
 
-				$objWishrow = WishlistItem::model()->findByAttributes(array('id'=>$intRow,'registry_id'=>$objWishlist->id));
+				$objWishrow = WishlistItem::model()->findByAttributes(
+					array(
+						'id' => $intRow,
+						'registry_id' => $objWishlist->id
+					)
+				);
 				if (!(is_null($objWishrow->cart_item_id)))
-					CartItem::model()->updateByPk($objWishrow->cart_item_id,array('wishlist_item'=>null));
-
-				if (!$objWishrow->delete()) {
-					Yii::log("Error deleting wish list item ".print_r($objWishrow->getErrors(),true),
-						'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				{
+					CartItem::model()->updateByPk(
+						$objWishrow->cart_item_id,
+						array(
+							'wishlist_item' => null
+						)
+					);
+				}
+				if (!$objWishrow->delete())
+				{
+					Yii::log('Error deleting wish list item ' .
+						print_r(
+							$objWishrow->getErrors(),
+							true
+						),
+						'error',
+						'application.' . __CLASS__ . '.' . __FUNCTION__
+					);
 					$response_array['status'] = 'error';
-					$response_array['errormsg'] = print_r($objWishrow->getErrors(),true);
+					$response_array['errormsg'] = print_r(
+						$objWishrow->getErrors(),
+						true
+					);
 
 				}
 				else
+				{
 					$response_array = array(
 						'status'=>"success",
 						'code'=>$objWishlist->gift_code,
 						'id'=>$objWishrow->id,
 						'reload'=>true,
 					);
-
-
+				}
 			}
-			else {
+			else
+			{
 				$response_array['status'] = 'error';
 				$response_array['errormsg'] = print_r($model->getErrors(),true);
 			}
@@ -487,18 +559,25 @@ class WishlistController extends Controller
 		$intRow = Yii::app()->getRequest()->getParam('id');
 		$objWishlist = Wishlist::model()->findByAttributes(array('gift_code'=>$strCode));
 		if (!$objWishlist->Visible)
-			throw new CHttpException(404,'The requested page does not exist.');
+		{
+			_xls_404();
+		}
 
-		$objWishrow = WishlistItem::model()->findByAttributes(array('id'=>$intRow,'registry_id'=>$objWishlist->id));
+		$objWishrow = WishlistItem::model()->findByAttributes(
+			array(
+				'id' => $intRow,
+				'registry_id' => $objWishlist->id
+			)
+		);
 
 		$arrReturn = array(
-			'action'=>"update",
-			'code'=>$objWishlist->gift_code,
-			'id'=>$objWishrow->id,
-			'qty'=>$objWishrow->qty,
-			'qty_received'=>$objWishrow->qty_received,
-			'priority'=>$objWishrow->priority,
-			'comment'=>$objWishrow->comment
+			'action' => 'update',
+			'code' => $objWishlist->gift_code,
+			'id' => $objWishrow->id,
+			'qty' => $objWishrow->qty,
+			'qty_received' => $objWishrow->qty_received,
+			'priority' => $objWishrow->priority,
+			'comment' => $objWishrow->comment
 		);
 
 		echo json_encode($arrReturn);
@@ -509,25 +588,25 @@ class WishlistController extends Controller
 	{
 
 		if (Yii::app()->user->isGuest)
-			throw new CHttpException(404,'The requested page does not exist.');
+		{
+			_xls_404();
+		}
 
-		$model=new ShareForm();
+		$model = new ShareForm();
 
 		if(isset($_POST['ShareForm']))
 		{
-
 			$model->attributes=$_POST['ShareForm'];
 			if($model->validate())
 			{
-
 				$strCode = $model->code;
 
 				//Make sure code we've been passed is valid
 				$objWishlist = Wishlist::model()->findByAttributes(array('gift_code'=>$strCode));
 				if (!$objWishlist->Visible)
-					throw new CHttpException(404,'The requested page does not exist.');
-
-
+				{
+					_xls_404();
+				}
 				if (!Yii::app()->user->isGuest)
 				{
 					$objCustomer = Customer::model()->findByPk(Yii::app()->user->Id);
@@ -535,8 +614,12 @@ class WishlistController extends Controller
 					$model->fromName = $objCustomer->fullname;
 				}
 
-				$strHtmlBody =$this->renderPartial('/mail/_cart',array('model'=>$model), true);
-				$strSubject = _xls_format_email_subject('EMAIL_SUBJECT_WISHLIST',$objWishlist->customer->fullname,null);
+				$strHtmlBody = $this->renderPartial('/mail/_cart',array('model' => $model), true);
+				$strSubject = _xls_format_email_subject(
+					'EMAIL_SUBJECT_WISHLIST',
+					$objWishlist->customer->fullname,
+					null
+				);
 
 				$objEmail = new EmailQueue;
 

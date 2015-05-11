@@ -589,9 +589,22 @@
 	<div id="submitblock">
 		<div class="row">
 	        <div id="submitSpinner" style="display:none">
-		        <?php echo CHtml::image(Yii::app()->getBaseUrl(true).'/images/wait_animated.gif')?>
+		        <?=
+		            CHtml::image(
+			            Yii::app()->getBaseUrl(true) . '/images/wait_animated.gif'
+		            )
+		        ?>
 	        </div>
-			<?php echo CHtml::submitButton('Submit',array('id'=>'checkoutSubmitButton')); ?>
+			<?=
+				CHtml::submitButton(
+					Yii::t(
+						'forms',
+						'Submit'
+					),
+					array(
+						'id' => 'checkoutSubmitButton'
+					)
+				); ?>
 		</div>
 	</div>
 

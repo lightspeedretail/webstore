@@ -72,7 +72,7 @@
         font-weight: bold;
         color: #666;
         border: 1px solid #ccc;
-        background-color: #eee;
+        background-color: $default-background-color;
         position: absolute;
         top: 10px;
         padding: 3px 6px 2px;
@@ -110,7 +110,7 @@
           font-size: .75rem;
           color: #888;
           border: 1px solid #ccc;
-          background-color: #eee;
+          background-color: $default-background-color;
           position: absolute;
           top: 10px;
           padding: 3px 6px 2px;
@@ -139,7 +139,7 @@
       }
 
       &.secondary {
-        background-color: #eee;
+        background-color: $default-background-color;
         color: #666;
         width: 48%;
         margin-bottom: 0;
@@ -169,4 +169,42 @@
   .address-block-pickable {
     p { border-bottom: none; }
   }
+}
+
+.to-label,
+.default-address-label {
+  font-size: .75rem;
+  border: 1px solid #ccc;
+  text-transform: uppercase;
+  padding: 3px 6px 2px;
+  background-color: $default-background-color;
+  position: absolute;
+  top: 10px;
+}
+
+.to-label {
+  font-weight: bold;
+  color: #666;
+  left: -15px;
+}
+
+.default-address-label {
+  color: #888;
+  right: -10px;
+}
+
+.superscript-label {
+  font-size: .75rem;
+  color: #888;
+  border: 1px solid #ccc;
+  background-color: #eee;
+  position: absolute;
+  top: 10px;
+  padding: 3px 6px 2px;
+  right: -10px;
+  text-transform: uppercase;
+}
+
+.superscript-label-last {
+  top: 45px;
 }

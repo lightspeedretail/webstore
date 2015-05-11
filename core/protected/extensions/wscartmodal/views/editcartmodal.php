@@ -7,7 +7,7 @@
 						<?php
 							echo
 								CHtml::link(
-									CHtml::image(Yii::app()->params['HEADER_IMAGE'], Yii::t('cart', 'web store header image')).
+									CHtml::image(Yii::app()->controller->pageHeaderImage, Yii::t('cart', 'web store header image')).
 									CHtml::tag('span', array(), Yii::app()->params['STORE_NAME']),
 									Yii::app()->createUrl("site/index"),
 									array('class' => 'logo-placement')
@@ -17,10 +17,12 @@
 					<?php
 						echo CHtml::htmlButton(
 							Yii::t('cart', 'Continue Shopping'),
-							array('class' => 'exit')
+							array('class' => 'exit continue-shopping')
 						);
 					?>
-					<a href="#" class="edit button inset" onclick="$('table.lines').toggleClass('edit'); return false;">Edit</a>
+					<a href="#" class="edit button inset" onclick="$('table.lines').toggleClass('edit'); return false;">
+						<?= Yii::t('cart', 'Edit'); ?>
+					</a>
 				</header>
 				<article class="section-inner">
 						<h1><?= Yii::t('cart', 'Shopping Cart'); ?></h1>
@@ -88,7 +90,7 @@
 											),
 											'type' => 'raw',
 											'value' => 'CHtml::link("×","#",array(
-												"data-pk"=>$data->id,"class"=>"remove", "onclick"=>"wsEditCartModal.removeItem(this)")
+												"data-pk"=>$data->id,"class"=>"remove", "onclick"=>"wsEditCartModal.removeItem(this, event)")
 												)',
 										),
 									),
@@ -159,7 +161,7 @@
 
 									echo CHtml::htmlButton(
 										Yii::t('cart', 'Continue Shopping'),
-										array('class' => 'continue')
+										array('class' => 'continue continue-shopping')
 									);
 								?>
 							</div>
@@ -171,9 +173,7 @@
 							CHtml::htmlButton(
 								Yii::t('cart', 'Continue Shopping'),
 								array(
-									'class' => 'button continue',
-									'value' => Yii::t('checkout', "See Shipping Options"),
-									'onClick' => "window.location.href = "."'".Yii::app()->createUrl('site/index')."'"
+									'class' => 'button continue continue-shopping',
 								)
 							);
 					?>

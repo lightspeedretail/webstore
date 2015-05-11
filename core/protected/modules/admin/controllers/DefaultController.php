@@ -17,7 +17,7 @@ class DefaultController extends AdminBaseController
 	const  PRODUCTS = 8;
 	const  INVENTORY = 11;
 	const  PRODUCT_PHOTOS = 17;
-	const  CARTS = 4 ;
+	const  CARTS = 4;
 	const  WISH_LIST = 7;
 	const  SRO = 6;
 

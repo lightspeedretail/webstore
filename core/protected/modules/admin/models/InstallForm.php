@@ -94,9 +94,23 @@ class InstallForm extends CFormModel
 
 	public function checkForemail($lpass,$params)
 	{
-		if (!empty($this->loginemail))
-			if (empty($this->loginpassword))
-				$this->addError($lpass,'Password cannot be blank if Email is entered');
+		if (empty($this->loginemail))
+		{
+			return;
+		}
+
+		if (empty($this->loginpassword))
+		{
+			$this->addError($lpass, 'Password cannot be blank if Email is entered');
+			return;
+		}
+
+		$intMinLenth = Yii::app()->params['MIN_PASSWORD_LEN'];
+
+		if (strlen($this->loginpassword) < $intMinLenth)
+		{
+			$this->addError($lpass, 'Minimum Password length is ' . $intMinLenth);
+		}
 	}
 
 	public function getPage1()

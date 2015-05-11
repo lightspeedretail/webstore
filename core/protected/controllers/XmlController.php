@@ -59,11 +59,7 @@ class XmlController extends Controller
 
 	public function actionIndex()
 	{
-
 		//Not used for this controller
-		throw new CHttpException(404,'The requested page does not exist.');
-
+		_xls_404();
 	}
-
-
 }

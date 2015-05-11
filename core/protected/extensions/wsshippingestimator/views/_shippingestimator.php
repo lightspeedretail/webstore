@@ -32,7 +32,7 @@
 				$shippingCountryCode,
 				$countries,
 				array(
-					'class' => 'shipping-country-picker',
+					'class' => 'shipping-country-picker no-style-select',
 					'onchange' => 'wsShippingEstimator.selectedCountry(this)'
 				)
 			);

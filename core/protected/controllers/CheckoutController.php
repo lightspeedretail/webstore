@@ -5,6 +5,8 @@
 class CheckoutController extends Controller
 {
 	public $layout;
+	public $divId = 'checkout';
+	public $sectionId = 'confirm';
 
 	const NEWADDRESS = 1;
 	const EDITADDRESS = 2;
@@ -1633,7 +1635,7 @@ class CheckoutController extends Controller
 
 		if ($objCart instanceof Cart === false)
 		{
-			throw new CHttpException(404, 'The requested page does not exist.');
+			_xls_404();
 		}
 
 		// Send any emails we may still have.
@@ -1918,6 +1920,14 @@ class CheckoutController extends Controller
 			$objCart->save();
 			$objCart->completeUpdatePromoCode();
 			$this->redirect($arrPaymentResult['jump_url']);
+		}
+
+		// to support error messages that occur with Cayan during the createTransaction process
+		// see the extension for more info
+		elseif (isset($arrPaymentResult['errorMessage']))
+		{
+			Yii::app()->user->setFlash('error', $arrPaymentResult['errorMessage']);
+			$this->redirect($this->createAbsoluteUrl('/checkout/confirmation/'));
 		}
 
 		else

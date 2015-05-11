@@ -30,8 +30,8 @@
   text-align: center;
 }
 
-@import 'basic_modal';
 @import 'modal_overlay_shared';
+@import 'basic_modal';
 @import 'overlay';
 @import 'cart';
 @import 'cartadd';
@@ -63,7 +63,7 @@ main.verification {
 	//MO hack for input zoom bug ios. http://www.ampedupdesigns.com/blog/show?bid=53
 	//Do not override without finding an alternate solution.
 	input[type="text"], input[type="password"], input[type="phone"], input[type="email"],
-	input[type="tel"], textarea, .field-container-toggle a, .field-container-select select{
+	input[type="tel"], textarea, .field-container-toggle a {
 	  font-size: 16px !important;  }
 	}
 }

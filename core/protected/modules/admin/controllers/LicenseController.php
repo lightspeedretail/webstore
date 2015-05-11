@@ -19,11 +19,12 @@ class LicenseController extends AdminBaseController
 
 	public function actionIndex()
 	{
-		if (_xls_get_conf('INSTALLED',0)==1)
-			throw new CHttpException(404,'The requested page does not exist.');
+		if (_xls_get_conf('INSTALLED', 0) == 1)
+		{
+			_xls_404();
+		}
 
 		$this->layout = "license";
-
 
 		$this->editSectionInstructions = "";
 		$this->license = $this->renderPartial("license",null,true,false);

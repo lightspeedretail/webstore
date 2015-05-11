@@ -34,19 +34,25 @@ $this->renderPartial("_storepickup", array(
 <?php if ($shouldDisplayShippingAddresses): ?>
 <div class="modal-conditional-block <?= ($onLoadDisplayInStorePickup === false) ? 'active' : ''?>">
 	<?php $this->renderPartial('_shippingheader', array('model' => $model)); ?>
-	<div class="address-form">
+	<div class="address-form outer-address-form">
 		<?php $this->renderPartial('//site/_flashmessages'); ?>
 		<?php $this->renderPartial('_shippingaddress',array('model' => $model, 'form' => $form, 'error' => $error) ); ?>
 		<footer class="submit submit-small">
-			<?php
-				echo CHtml::submitButton(
-					'Submit',
-					array(
-						'type' => 'submit',
-						'class' => 'button',
-						'value' => Yii::t('checkout', "See Shipping Options"),
-					)
-				);
+			<?=
+				CHtml::submitButton(
+						Yii::t(
+							'forms',
+							'Submit'
+						),
+						array(
+							'type' => 'submit',
+							'class' => 'button',
+							'value' => Yii::t(
+								'checkout',
+								'See Shipping Options'
+							),
+						)
+					);
 			?>
 		</footer>
 	</div>

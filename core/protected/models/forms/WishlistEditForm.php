@@ -41,10 +41,10 @@ class WishlistEditForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'qty'=>Yii::t('wishlist','Qty Desired'),
-			'qty_received'=>Yii::t('wishlist','Qty Received'),
-			'priority'=>Yii::t('wishlist','Priority'),
-			'comment'=>Yii::t('wishlist','Item Comment (max 500 characters)'),
+			'qty' => Yii::t('wishlist', 'Qty Desired'),
+			'qty_received' => Yii::t('wishlist', 'Qty Received'),
+			'priority' => Yii::t('wishlist', 'Priority'),
+			'comment' => Yii::t('wishlist', 'Item Comment (max 500 characters)'),
 
 		);
 	}
@@ -56,9 +56,9 @@ class WishlistEditForm extends CFormModel
 	{
 
 		return array(
-			'0'=> Yii::t('wishlist','Low Priority'),
-			'1'=> Yii::t('wishlist','Normal Priority'),
-			'2'=> Yii::t('wishlist','High Priority'),
+			'0' => Yii::t('wishlist','Low Priority'),
+			'1' => Yii::t('wishlist','Normal Priority'),
+			'2' => Yii::t('wishlist','High Priority'),
 		);
 
 	}

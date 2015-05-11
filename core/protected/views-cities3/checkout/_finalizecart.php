@@ -11,8 +11,8 @@
 			$editButton = array(
 				'type' => 'raw',
 				'value' => 'CHtml::link("Edit","#",array(
-									"data-pk"=>$data->id,"class"=>"edit", "onclick"=>"$(this).closest(\'tr\').addClass(\'active\'); $(this).closest(\'input\').focus(); return false;")
-									).CHtml::link("&times;","#",array("data-pk"=>$data->id,"class"=>"remove", "onclick"=>"wsEditCartModal.removeItem(this); return false;"))',
+					"data-pk"=>$data->id,"class"=>"edit", "onclick"=>"$(this).closest(\'tr\').addClass(\'active\'); $(this).closest(\'input\').focus(); return false;")
+					).CHtml::link("&times;","#",array("data-pk"=>$data->id,"class"=>"remove", "onclick"=>"wsEditCartModal.removeItem(this, event); return false;"))',
 				'htmlOptions' => array(
 					'class' => 'controls'
 				),

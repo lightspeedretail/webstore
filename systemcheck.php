@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: stevenam
- * Date: 2014-07-03
- * Time: 3:30 PM
- */
+
+const DEFAULT_UPDATER_URL = 'http://updater.lightspeedretail.com';
 
 function displayHeader()
 {
@@ -119,8 +115,16 @@ function xls_check_server_environment()
 
 function xls_check_file_signatures($complete = false)
 {
-	$url = "http://updater.lightspeedretail.com";
-	//$url = "http://www.lsvercheck.site";
+	$url = DEFAULT_UPDATER_URL;
+
+	if(isset($_SERVER['WS_UPDATER_URL']))
+	{
+		$url = 'http://' . $_SERVER['WS_UPDATER_URL'];
+		if (filter_var($url, FILTER_VALIDATE_URL) === false)
+		{
+			$url = DEFAULT_UPDATER_URL;
+		}
+	}
 
 	$url .= "/webstore/hash";
 

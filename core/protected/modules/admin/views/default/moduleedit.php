@@ -42,6 +42,37 @@ $this->Widget('zii.widgets.jui.CJuiDialog',array(
 		'draggable'=>true,
 	),
 ));
+
+$this->Widget('zii.widgets.jui.CJuiDialog',array(
+	'id'=>'setcayan-modal',
+	'options'=>array(
+		'title'=>'Cayan Customization Options',
+		'autoOpen'=>false,
+		'modal'=>'true',
+		'width'=>'400',
+		'height'=>'473',
+		'scrolling'=>'no',
+		'resizable'=>false,
+		'position'=>'center',
+		'draggable'=>true,
+	),
+));
+
+$this->Widget('zii.widgets.jui.CJuiDialog',array(
+	'id'=>'viewcayan-modal',
+	'options'=>array(
+		'title'=>'Cayan Pay Page Demo',
+		'autoOpen'=>false,
+		'modal'=>'true',
+		'width'=>'525',
+		'height'=>'473',
+		'scrolling'=>'no',
+		'resizable'=>false,
+		'position'=>'center',
+		'draggable'=>true,
+	),
+));
+
 ?><div class="span9">
 	<?php
 		if ($objModule->category === 'theme') {

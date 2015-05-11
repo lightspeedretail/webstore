@@ -102,16 +102,21 @@
 				</li>
 			</ol>
 			<footer class="submit submit-small">
-				<?php
-					echo
-						CHtml::submitButton(
-							'Submit',
-							array(
-								'type' => 'submit',
-								'class' => 'button',
-								'value' => Yii::t('checkout', "Proceed to Payment"),
-							)
-						);
+				<?=
+					CHtml::submitButton(
+						Yii::t(
+							'forms',
+							'Submit'
+						),
+						array(
+							'type' => 'submit',
+							'class' => 'button',
+							'value' => Yii::t(
+								'checkout',
+								"Proceed to Payment"
+							),
+						)
+					);
 				?>
 			</footer>
 		</div>

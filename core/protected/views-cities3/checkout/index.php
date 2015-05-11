@@ -4,6 +4,7 @@
 			'contactEmail' => $model->email,
 			'blnShowLogin' => $blnShowLogin,
 			'showLoginPasswordField' => $showLoginPasswordField,
+			'forgotPasswordLink' => Yii::app()->createUrl("site/forgotpassword")
 		)
 	);
 ?>
@@ -15,7 +16,7 @@
 				<h1>
 					<?php
 						echo CHtml::link(
-							CHtml::image(Yii::app()->params['HEADER_IMAGE'], Yii::t('cart','web store header image')).
+							CHtml::image(Yii::app()->controller->pageHeaderImage, Yii::t('cart','web store header image')).
 							CHtml::tag('span', array(), Yii::app()->params['STORE_NAME']),
 							Yii::app()->createUrl("site/index"),
 							array('class' => 'logo-placement')
@@ -123,18 +124,25 @@
 						</p>
 					</div>
 					<div class="choices">
-						<?php
-							echo CHtml::submitButton(
-								'Submit',
+						<?=
+							CHtml::submitButton(
+								Yii::t(
+									'forms',
+									'Submit'
+								),
 								array(
 									'type' => 'button',
 									'class' => 'button new_customer',
-									'value' => Yii::t('checkout', "I'm a new customer"),
+									'value' => Yii::t(
+										'checkout',
+										"I'm a new customer"),
 								)
-							);
-
-							echo CHtml::htmlButton(
-								Yii::t('checkout', "I've ordered before"),
+							) .
+							CHtml::htmlButton(
+								Yii::t(
+									'checkout',
+									"I've ordered before"
+								),
 								array(
 									'type' => 'button',
 									'class' => 'ordered_before',
@@ -143,15 +151,21 @@
 						?>
 					</div>
 					<div class="new_customer invisible">
-						<?php
-						echo CHtml::submitButton(
-							'Submit',
-							array(
-								'type' => 'button',
-								'class' => 'button',
-								'value' => Yii::t('cart', "Continue to Shipping"),
-							)
-						);
+						<?=
+							CHtml::submitButton(
+								Yii::t(
+									'forms',
+									'Submit'
+								),
+								array(
+									'type' => 'button',
+									'class' => 'button',
+									'value' => Yii::t(
+										'cart',
+										'Continue to Shipping'
+									),
+								)
+							);
 						?>
 						<p>
 							<?php
@@ -165,16 +179,21 @@
 						</p>
 					</div>
 					<div class="guest invisible">
-						<?php
-						echo CHtml::submitButton(
-							'Submit',
-							array(
-								'id' => 'guest-button',
-								'type' => 'button',
-								'class' => 'button',
-								'value' => Yii::t('checkout', "Guest Checkout"),
-							)
-						);
+						<?=
+							CHtml::submitButton(
+								Yii::t(
+									'forms',
+									'Submit'
+								),
+								array(
+									'id' => 'guest-button',
+									'type' => 'button',
+									'class' => 'button',
+									'value' => Yii::t(
+										'checkout',
+										'Guest Checkout'),
+								)
+							);
 						?>
 						<p>
 							<?php

@@ -33,7 +33,7 @@ class wsmodal extends CWidget
 			Yii::app()->params['modal_css'] =
 				Yii::app()->params['umber_assets'] . '/modal-' . $version . '.css';
 		}
-		
+
 		static::_createSprites();
 
 		$jsAssets = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'assets');

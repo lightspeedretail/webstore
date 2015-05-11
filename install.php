@@ -1,6 +1,5 @@
 <?php
 set_time_limit(300);
-// @codingStandardsIgnoreStart
 define('DBARRAY_NUM', MYSQL_NUM);
 define('DBARRAY_ASSOC', MYSQL_ASSOC);
 define('DBARRAY_BOTH', MYSQL_BOTH);
@@ -9,11 +8,9 @@ if (!defined('DB_EXPLAIN'))
 if (!defined('DB_QUERIES'))
 	define('DB_QUERIES', false);
 
-
 if (version_compare(PHP_VERSION, '5.3.0') < 0) {
 	die('WebStore requires at least PHP version of 5.3 (5.4 is preferable). Sorry cannot continue installation.');
 }
-
 
 define ('__SUBDIRECTORY__', preg_replace('/\/?\w+\.php$/', '', $_SERVER['PHP_SELF']));
 define ('__DOCROOT__', substr(dirname(__FILE__), 0, strlen(dirname(__FILE__)) - strlen(__SUBDIRECTORY__)));
@@ -56,10 +53,10 @@ if(count($arg))
 		echo "\nCommand: core/protected/yiic migrate up --interactive=0\n\n";
 		die();
 	}
+
 	if(file_exists("config/main.php")) die("\nENTER 1 OR 2 FOR INSTRUCTIONS (ENTER 2 TO PAGE)\n\nENTER SEED NUMBER
 INITIALIZING...\n\nYOU MUST DESTROY 17 KINGONS IN 30 STARDATES WITH 3 STARBASES\n\n-=--=--=--=--=--=--=--=-\n
     *\n                         STARDATE  2100\n                *     *  CONDITION GREEN\n            <*>          QUADRANT  5,2\n    *                    SECTOR    5,4\n                         ENERGY    3000\n                         SHIELDS   0\n                   *     PHOTON TORPEDOES 10\n-=--=--=--=--=--=--=--=-\nCOMMAND\n\nHey, ensign Wesley, Web Store is already installed!\n\n");
-
 
 	$arrRequired = array('dbhost','dbuser','dbpass','dbname','url');
 	foreach($arrRequired as $item)
@@ -79,10 +76,6 @@ INITIALIZING...\n\nYOU MUST DESTROY 17 KINGONS IN 30 STARDATES WITH 3 STARBASES\
 	downloadLatest();
 	zipAndFolders();
 	writeDB($arg['dbhost'],$arg['dbuser'],$arg['dbpass'],$arg['dbname']);
-
-
-
-
 
 	$db = createDbConnection();
 	$sqlline = 1;
@@ -121,17 +114,13 @@ INITIALIZING...\n\nYOU MUST DESTROY 17 KINGONS IN 30 STARDATES WITH 3 STARBASES\
 	else
 		$hosted=0;
 
-
 	echo "\nLaunching Yii bootstrap\n";
 	runYii($arg['url'],$arg['scriptname'],1,$upgrade,$hosted);
-
 }
-else {
+else
+{
 	//We're running this install from the browser
-
-	//////////////////////////////////////////////////////////////////
 	// Set up initial pathing so install can continue
-
 	$step = 1;
 	if (isset($_POST['step']))
 		$step = preg_replace('/[^0-9]/', '', $_POST['step']);
@@ -141,6 +130,7 @@ else {
 		echo runInstall($db,preg_replace('/[^0-9]/', '', $_POST['sqlline']));
 		exit();
 	}
+
 	switch ($step)
 	{
 		case 2:displayFormTwo(); break;
@@ -152,11 +142,9 @@ else {
 		) {
 			displayNotAcceptable($checkenv);
 		} else {
-
 			displayForm();
 		}
 		break;
-
 	}
 }
 
@@ -164,19 +152,19 @@ function showCommandLine()
 {
 	die("\n*error halting*\n\nusage: php install.php --dbhost=localhost --dbuser=root --dbpass=mypass --dbname=webstore --url=store.example.com --dboldname=webstorebak (optional) --hosted=1 (optional)\n\n");
 }
+
 function runYii($url,$scriptname,$sqlline=1,$upgrade,$hosted)
 {
 	global $arg;
 	$_SERVER=array(
-		'REQUEST_URI'=>'/index.php',
-		'SERVER_NAME'=>$url,
-		'SCRIPT_FILENAME'=>realpath(dirname(__FILE__)."/".$scriptname),
-		'SCRIPT_NAME'=>$scriptname,
-		'PHP_SELF'=>$scriptname,
-		'HTTP_USER_AGENT'=>'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/536.30.1 (KHTML, like Gecko)',
-		'HTTP_HOST'=>$url,
-		'QUERY_STRING'=>'',
-
+		'REQUEST_URI' => $scriptname,
+		'SERVER_NAME' => $url,
+		'SCRIPT_FILENAME' => realpath(__FILE__),
+		'SCRIPT_NAME' => $scriptname,
+		'PHP_SELF' => $scriptname,
+		'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/536.30.1 (KHTML, like Gecko)',
+		'HTTP_HOST' => $url,
+		'QUERY_STRING' => '',
 	);
 	$_SESSION['DUMMY']="nothing"; //force creation of session just in case
 	//This is the halfway point, we have to switch to the Yii framework now, so let's bootstrap it
@@ -196,7 +184,6 @@ function runYii($url,$scriptname,$sqlline=1,$upgrade,$hosted)
 		else
 			$objYii->runController("install/install");
 		$retVal = ob_get_contents();
-
 		$j = json_decode($retVal);
 
 		if(isset($j->result) && $j->result=="success")
@@ -210,55 +197,41 @@ function runYii($url,$scriptname,$sqlline=1,$upgrade,$hosted)
 		} else die();
 
 		ob_end_flush();
-
 	} while ($sqlline<50);
 
 	if(!isset($arg['dbupdate'])) //IOW only command line db updates
-		echo "\n** finished **\n\nCustomer needs to go to http://".$url."/admin/license to complete installation.\n\n";
-
+		echo "\n** finished **\n\nCustomer needs to go to http://" .$url . str_replace('install.php', 'admin/license', $scriptname) ." to complete installation.\n\n";
 }
+
 function xls_check_file_signatures($complete = false)
 {
 	$url = "http://updater.lightspeedretail.com";
-	//$url = "http://www.lsvercheck.site";
-
 	$url .= "/webstore/hash";
-
 	$json = json_encode(array('version'=> _ws_version()));
-
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_VERBOSE, 0);
-
 	// Turn off the server and peer verification (TrustManager Concept).
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($ch, CURLOPT_HTTPHEADER,
 		array("Content-type: application/json"));
 	curl_setopt($ch, CURLOPT_POST, true);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-
-
 	$strXml = curl_exec($ch);
 	curl_close($ch);
 	$oXML = new SimpleXMLElement($strXml);
-
 	$signatures = $oXML->signatures;
 	$versions = explode(",",$oXML->versions);
-
 	$checked = array();
 	$checked['<b>--File Signatures Check for ' . _ws_version() . '--</b>'] = "pass";
-
-
 	$fn = unserialize($signatures);
 	if (!isset($signatures)) {
 		$checked['Signature File in /core/protected/modules/admin'] = "fail";
 	}
 
 	foreach ($fn as $key => $value) {
-
 		if (!file_exists($key)) {
 			$checked[$key] = "MISSING";
 		} else {
@@ -270,8 +243,6 @@ function xls_check_file_signatures($complete = false)
 				$checked[$key] = $versions[array_search($hashfile, $hashes)];
 			}
 		}
-
-
 	}
 	return $checked;
 }
@@ -290,14 +261,12 @@ function makeHtaccess()
 		//our .htaccess is fine
 	} elseif ($strFileContents) {
 		$fp = @fopen('.htaccess', 'w');
-
 		if ($fp) {
 			$str = str_replace($origText, $replText, $strFileContents);
 			fwrite($fp, $str, strlen($str));
 			fclose($fp);
 		} else die("cannot create/update your .htaccess file. Try renaming/removing the existing one and running install again.");
 	}
-
 
 	//Write robots.txt too
 	$strFileContents = "User-agent: *
@@ -315,8 +284,6 @@ Sitemap: http://www.example.com/store/sitemap.xml
 		fwrite($fp, $str, strlen($str));
 		fclose($fp);
 	} else die("cannot create/update your robots.txt file. Try renaming/removing the existing one and running install again.");
-
-
 }
 
 function  _ws_version()
@@ -324,7 +291,6 @@ function  _ws_version()
 	if(file_exists("core/protected/config/wsver.php"))
 	{
 		include_once("core/protected/config/wsver.php");
-
 		return XLSWS_VERSION;
 	}
 	else return 3;
@@ -338,11 +304,7 @@ function displayForm()
 	$dbuser = ini_get('mysql.default_user');
 	$dbpass = "";
 	$dbname = "";
-
 	?>
-
-
-
 	<h2>Welcome!</h2>
 	<div class="hero-unit">
 		<p>This process will install the latest Web Store, optionally importing your old 2.x information. This initial page will set up the database for you, and then you will be redirected for additional setup steps. We've made install as simple as possible to get you going on your new eCommerce store!</p>
@@ -398,23 +360,19 @@ function displayForm()
 	displayFooter();
 }
 
-
 function displayNotAcceptable($checkenv)
 {
 	displayHeader();
-
 	$warning_text = "<table class='table table-striped'>";
 	if (stripos($_SERVER['REQUEST_URI'],"install.php?check") !== false) {
 		?><h2>System Check</h2><?php
 		$warning_text .= "<tr><td colspan='2'><b>SYSTEM CHECK for " . _ws_version() . "</b></td></tr>";
 		$warning_text .= "<tr><td colspan='2'>The chart below shows the results of the system check and if upgrades have been performed.</td></td>";
-
 		//For 2.1.x upgrade, have the upgrades been run?
 		if (stripos($_SERVER['REQUEST_URI'],"install.php?check") !== false) {
 			//$checkenv = array_merge($checkenv, xls_check_upgrades());
 			$checkenv = array_merge($checkenv, xls_check_file_signatures());
 		}
-
 	} else {
 		?>
 		<h2>Error</h2>
@@ -425,6 +383,7 @@ function displayNotAcceptable($checkenv)
 		$warning_text .= "<tr><td colspan='2'><b>CANNOT INSTALL</b></td></tr>";
 		$warning_text .= "<tr><td colspan='2'>There are issues with your PHP environment which need to be fixed before you can install WebStore. Please check the chart below for required changes to your PHP installation which must be changed, and subdirectories which you need to make writeable. (Making php.ini changes on a web hosting service will vary by company. Please consult their technical support for exact instructions.)</td></td>";
 	}
+
 	$warning_text .= "<tr><td colspan='2'><hr></td></tr>";
 	$curver = _ws_version();
 	foreach ($checkenv as $key => $value) {
@@ -433,13 +392,8 @@ function displayNotAcceptable($checkenv)
 				: "<font color='#cc0000'><b>$value</b></font>") . "</td>";
 	}
 
-
 	$warning_text .= "</table>";
 	?>
-
-
-
-
 	<div>
 		<?php echo $warning_text; ?>
 	</div>
@@ -447,20 +401,25 @@ function displayNotAcceptable($checkenv)
 	<?php
 	displayFooter();
 }
+
 function displayFormTwo()
 {
 	$sanitized = preg_replace('/[^a-zA-Z0-9\.\,\(\)@#!?_]/', '', $_POST);
 	writeDB($sanitized['dbhost'],$sanitized['dbuser'],$sanitized['dbpass'],$sanitized['dbname']);
-
 	displayHeader();
-
 	if (strlen($_POST['dboldname'])>0)
-	{   $headerstring = "Installing and migrating..."; $quip = "You probably have time to get a coffee."; }
-	else {  $headerstring= "Installing..."; $quip = "This shouldn't take too long."; }
+	{
+		$headerstring = "Installing and migrating...";
+		$quip = "You probably have time to get a coffee.";
+	}
+	else
+	{
+		$headerstring = "Installing...";
+		$quip = "This shouldn't take too long.";
+	}
 
 	if (!isset($_POST['dboldname'])) $_POST['dboldname'] = "";
 	?>
-
 	<h2><?php echo $headerstring; ?></h2>
 	<div class="hero-unit">
 
@@ -655,9 +614,7 @@ function displayFormTwo()
 		startInstall();
 
 	</script>
-
 	<?php
-
 	displayFooter();
 }
 
@@ -699,7 +656,6 @@ function displayHeader()
 		<div class="welcome">Web Store Installation</div>
 	</div>
 	<div class="container">
-
 <?php
 }
 
@@ -748,9 +704,7 @@ return array(
 	if ($fp2 === false) die("Error, can't write file config/wsdb.php");
 	fwrite($fp2,$strtoexport);
 	fclose($fp2);
-
 }
-
 
 class DB_Class {
 	var $db;
@@ -773,21 +727,27 @@ class DB_Class {
 		{
 			$blnSuccess =$this->db->select_db($this->olddb);
 			if (!$blnSuccess)
-			{ error_log("Cannot find or use \"".$this->olddb."\" database to upgrade.",3,"errorlog.txt");
-				echo ("Cannot find or use \"".$this->olddb."\" database to upgrade."); die(); }
-
+			{
+				error_log("Cannot find or use \"".$this->olddb."\" database to upgrade.", 3, "errorlog.txt");
+				echo ("Cannot find or use \"".$this->olddb."\" database to upgrade.");
+				die();
+			}
 
 			$this->getSchema();
 		}
+
 		if ($to=="new")
 		{
 			$blnSuccess =$this->db->select_db($this->newdb);
 			if (!$blnSuccess)
-			{ error_log("Cannot find or use \"".$this->newdb."\" database. Make sure it has been created and is blank",3,"errorlog.txt");
-				echo ("Cannot find or use \"".$this->newdb."\" database. Make sure it has been created and is blank."); die(); }
+			{
+				error_log("Cannot find or use \"".$this->newdb."\" database. Make sure it has been created and is blank", 3, "errorlog.txt");
+				echo ("Cannot find or use \"".$this->newdb."\" database. Make sure it has been created and is blank.");
+				die();
+			}
+
 			$this->getSchema();
 		}
-
 	}
 
 	public function getSchema()
@@ -813,8 +773,6 @@ class DB_Class {
 				$this->schemaNumber=$res[0]['id'];
 			else $this->schemaNumber=0;
 		} else $this->schemaNumber=0;
-
-
 	}
 
 	public function query($sql) {
@@ -843,11 +801,9 @@ class DB_Class {
 
 		$this->query("ALTER TABLE `$table` ADD INDEX `$indexname` (`$indexname`)");
 		return true;
-
 	}
 
 	public function add_column($table , $column , $create_sql , $version = false) {
-
 		$res = $this->fetch("SHOW COLUMNS FROM $table WHERE Field='$column'" );
 
 		if($res) return false;
@@ -866,14 +822,12 @@ class DB_Class {
 
 		if($ctype != $type)
 			$this->query("ALTER TABLE  `$table` CHANGE  `$column`  `$column` $type  $misc ;");
-
 	}
 
 
 	//title,key,value,helper,config,sort,options
 	public function add_config_key($key,$title,$value,$helper,$config,$sort,$options = null, $template_specific=0, $param=1,$required=null)
 	{
-
 		$res = $this->fetch("SHOW COLUMNS FROM xlsws_configuration" );
 		foreach ($res as $row) $fields[] = $row['Field'];
 
@@ -881,7 +835,6 @@ class DB_Class {
 		if(in_array('key_name',$fields)) $kn = "key_name";
 		if(in_array('value',$fields)) $vn = "value";
 		if(in_array('key_value',$fields)) $vn = "key_value";
-
 		$conf = $this->fetch("select * from xlsws_configuration where `".$kn."`='".$key."'");
 
 		if(!$conf)
@@ -899,12 +852,9 @@ class DB_Class {
 			if(in_array('template_specific',$fieldnames)) $sql .= ", `template_specific`=".$template_specific;
 			if(in_array('param',$fieldnames)) $sql .= ", `param`=".$param;
 			if(in_array('required',$fieldnames) && !is_null($required)) $sql .= ", `required`=".$required;
-
 			$sql .= ", `created`='".date("Y-m-d H:i:s")."'";
-
 			$this->query($sql);
 		}
-
 	}
 
 	public function add_table($table , $create_sql ,  $version = false){
@@ -916,23 +866,18 @@ class DB_Class {
 
 		if(!in_array($table,$fieldnames)){
 			$this->query($create_sql);
-
 		}
 	}
 
 
 	public function update_row($table , $key_column , $key , $value_column , $value , $version = false){
-
 		$sql = "UPDATE $table SET $value_column = $value WHERE $key_column =  $key ";
 		$this->query($sql);
 	}
-
-
 }
 
 function downloadFile($url)
 {
-
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_VERBOSE, 0);
@@ -950,10 +895,7 @@ function downloadFile($url)
 	$resp = curl_exec($ch);
 	curl_close($ch);
 	return $resp;
-
-
 }
-
 
 function progressCallback( $download_size, $downloaded, $upload_size, $uploaded_size )
 {
@@ -961,9 +903,7 @@ function progressCallback( $download_size, $downloaded, $upload_size, $uploaded_
 		$progress = 1;
 	else
 		$progress = round( ($downloaded / $download_size  * 100 ),0);
-
 	file_put_contents("progress.txt",$progress);
-
 }
 
 function downloadLatest()
@@ -1007,7 +947,6 @@ function zipAndFolders()
 		if(!isset($_POST['debug'])) @unlink("webstore.zip");
 	}
 
-	//////////////////////////////////////////////////////////////////
 	// Verify the cache folders exist and if not, create them
 	// These may fail if cache isn't yet writable, so we ignore errors
 	// and will get them again after fixing cache
@@ -1036,7 +975,6 @@ function zipAndFolders()
  */
 function decompress($zipFile = '', $dirFromZip = '', $zipDir=null)
 {
-
 	if (is_null($zipDir)) $zipDir = getcwd() . '/'; else $zipDir .=  '/';
 	$zip = zip_open($zipDir.$zipFile);
 
@@ -1088,38 +1026,29 @@ function decompress($zipFile = '', $dirFromZip = '', $zipDir=null)
 		zip_close($zip);
 	}
 	return true;
-
 }
 
 function createDbConnection()
 {
 	//Since we have our db information already saved in the Yii file, read it back here
 	$dbinfo = require(dirname(__FILE__).'/config/wsdb.php');
-
 	$dbuser = $dbinfo['username'];
 	$dbpassword = $dbinfo['password'];
-
-
 	$connstring = $dbinfo['connectionString'];
 	$arrC = array();
 	preg_match('/host=(.*);/', $connstring,$arrC);
-
 	$servername = $arrC[1];
-
 	preg_match('/dbname=(.*)/',$connstring,$arrC);
 	$dbname = $arrC[1];
-
 	$dboldname = isset($_POST['dboldname']) ? $_POST['dboldname'] : "";
-
 	if (strlen($servername)==0 || strlen($dbuser)==0 || strlen($dbname)==0 || strlen($dbpassword)==0)
+	{
 		return json_encode(array('result'=>"Database connection info missing."));
-
+	}
 
 	$db = new DB_Class($servername, $dbuser, $dbpassword, $dbname);
-
 	$db->olddb = $dboldname;
 	$db->newdb = $dbname;
-
 	return $db;
 }
 
@@ -1133,11 +1062,8 @@ function runInstall($db,$sqlline = 0)
 	if (strlen($db->olddb)>0)
 		$upgrade=1; else $upgrade=0;
 
-
 	//Depending on our scenario, gather SQL strings
-
 	//The beginning of our line# process is for migrating
-
 	if ($upgrade)
 	{
 		$sqlstrings = initialMigrateTables().migrateTwoFiveToThree();
@@ -1153,12 +1079,9 @@ function runInstall($db,$sqlline = 0)
 		$lineDeduct=0;
 	}
 
-
 	switch ($sqlline)
 	{
-
 		case 1:
-
 			if (!file_exists('core') && !file_exists('webstore.zip'))
 			{
 				$dest = (isset($_POST['qa']) ? "qa/".$_POST['qa'] : "latestwebstore");
@@ -1171,24 +1094,19 @@ function runInstall($db,$sqlline = 0)
 			} else
 				return json_encode(array('result'=>"success",
 						'tag'=>'Skipping downloading','line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
-
 			break;
-
 		case 2:
 			downloadLatest();
 			return json_encode(array('result'=>"success",
 				'tag'=>'Extracting Web Store files...','line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
 			break;
-
 		case 3:
 			zipAndFolders();
 			$tag = "Starting Install...";
 			return json_encode(array('result'=>"success",
 				'tag'=>$tag,'line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
 			break;
-
 		case 4:
-
 			if ($upgrade) $db->changedb('old');
 			if ($upgrade) if ($db->schemaNumber<217) up217($db);
 			if ($upgrade) $db->changedb('old');
@@ -1203,7 +1121,6 @@ function runInstall($db,$sqlline = 0)
 						'tag'=>$tag,'line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
 			}
 			break;
-
 		case 5:
 		case 6:
 		case 7:
@@ -1226,24 +1143,18 @@ function runInstall($db,$sqlline = 0)
 			if ($upgrade) prep252($db);
 			$tag = "Creating new tables. Line #".$sqlline;
 			break;
-
 		case 14:
 			$db->changedb('new');
 			initialCreateTables($db); //Create all tables at once
 			if (!$upgrade)
 				initialConfigLoad($db);
 			break;
-
 		default:
 			$db->changedb('new');
-
 			if($upgrade)
 			{
 				$sqlStringtoRun = trim($arrSql[$sqlline-15],"\n\r\t");
-
 				$sqlStringtoRun = str_replace("{newdbname}",$db->newdb,$sqlStringtoRun);
-
-
 				if(!($upgrade==0 && strpos($sqlStringtoRun,'{olddbname}') !== false))
 				{
 					$sqlStringtoRun = str_replace("{olddbname}",$db->olddb,$sqlStringtoRun);
@@ -1252,9 +1163,7 @@ function runInstall($db,$sqlline = 0)
 					$db->query($sqlStringtoRun);
 					if ($sqlline<28) $tag = "Creating tables";
 					if ($sqlline>=28 && $sqlline<=75) $tag = "Processing images table";
-
 				}
-
 			}
 
 			//Build our main.php in config so we can run the system
@@ -1265,13 +1174,16 @@ function runInstall($db,$sqlline = 0)
 				if(!isset($arg['hosted']))
 					$tag = "Downloading default template...";
 			}
-
 	}
 
-
 	if (isset($tag))
+	{
 		$retVal =  json_encode(array('result'=>"success",'line'=>$sqlline,'tag'=>$tag,'total'=>$total,'upgrade'=>$upgrade));
-	else $retVal =   json_encode(array('result'=>"success",'line'=>$sqlline,'total'=>$total,'upgrade'=>$upgrade));
+	}
+	else
+	{
+		$retVal = json_encode(array('result' => "success",'line' => $sqlline,'total' => $total,'upgrade' => $upgrade));
+	}
 
 	return $retVal;
 }
@@ -1282,18 +1194,14 @@ function installMainConfig()
 	$fp2 = fopen("config/main.php","w");
 	fwrite($fp2,$configtext);
 	fclose($fp2);
-
 }
-
 
 function createOldConfiguration()
 {
 	//If we're migrating, we need to copy the old config first, then run updates against it
-
 	$db = createDbConnection();
 	$db->query('SET NAMES utf8');
 	$db->query('SET FOREIGN_KEY_CHECKS=0');
-
 	$db->query("CREATE TABLE `xlsws_configuration` (
 	  `rowid` bigint(20) NOT NULL AUTO_INCREMENT,
 	  `title` varchar(64) NOT NULL,
@@ -1309,9 +1217,6 @@ function createOldConfiguration()
 	  UNIQUE KEY `key` (`key`),
 	  KEY `configuration_type_id` (`configuration_type_id`)
 	) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
-
-
-
 }
 
 function initialCreateTables($db)
@@ -1924,9 +1829,8 @@ function initialCreateTables($db)
 		$sqlStringtoRun = str_replace("{newdbname}",$db->newdb,$sqlStringtoRun);
 		$db->query($sqlStringtoRun);
 	}
-
-
 }
+
 function initialMigrateTables()
 {
 	return "INSERT INTO `{newdbname}`.`xlsws_customer`
@@ -2072,7 +1976,6 @@ function initialMigrateTables()
 
 function migrateTwoFiveToThree()
 {
-
 	return "alter table `{newdbname}`.xlsws_cart CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
 	alter table `{newdbname}`.xlsws_cart_item CHANGE `rowid` `id` BIGINT(20) unsigned NOT NULL  AUTO_INCREMENT;
 	alter table `{newdbname}`.xlsws_cart_messages CHANGE `rowid` `id` INT(11) unsigned NOT NULL  AUTO_INCREMENT;
@@ -2949,7 +2852,6 @@ DELETE FROM `xlsws_configuration` where `key_name`='HTML_DESCRIPTION';
 
 function initialConfigLoad($db)
 {
-
 	$db->add_config_key("DISABLE_CART","Disable Cart","","If selected, products will only be shown but not sold",4,4,"BOOL");
 	$db->add_config_key("LANG_CODE","Default Language","en"," ",15,1,NULL);
 	$db->add_config_key("CURRENCY_DEFAULT","Default Currency","USD"," ",15,7,NULL);
@@ -2992,18 +2894,15 @@ function initialConfigLoad($db)
 	$db->add_config_key("RESET_GIFT_REGISTRY_PURCHASE_STATUS","Number Of Hours Before Purchase Status Is Reset",6,"A visitor may add an item to cart from gift registry but may never order it. The option will reset the status to available for purchase after the specified number of hours since it was added to cart.",7,3,"INT");
 	$db->add_config_key("CURRENCY_FORMAT","Currency Printing Format","%n","Currency will be printed in this format. Please see http://www.php.net/money_format for more details.",0,8,"");
 	$db->add_config_key("LOCALE","Locale","en_US","Locale for your web store. See http://www.php.net/money_format for more information",15,1,"");
-
 	$db->add_config_key("STORE_PHONE","Store Phone","555-555-1212","Phone number displayed in email footer.",2,2,NULL);
 	$db->add_config_key("DEFAULT_COUNTRY","Default Country",224,"Default country for shipping or customer registration",15,2,"COUNTRY");
 	$db->add_config_key("DEFAULT_TEMPLATE","Template","brooklyn","The default template from templates directory to be used for Web Store",19,1,"TEMPLATE");
 	$db->add_config_key("QUOTE_EXPIRY","Quote Expiry Days",30,"Number of days before discount in quote will expire.",4,5,"INT");
 	$db->add_config_key("CART_LIFE","Cart Expiry Days",30,"Number of days before ordered/process carts are deleted from the system",4,6,"INT");
 	$db->add_config_key("WEIGHT_UNIT","Weight Unit","lb","What is the weight unit used in Web Store?",25,3,"WEIGHT");
-
 	$db->add_config_key("INVENTORY_OUT_ALLOW_ADD","When a product is Out of Stock",1,"How should system treat products currently out of stock. Note: Turn OFF the checkbox for -Only Upload Products with Available Inventory- in Tools->eCommerce.",11,10,"INVENTORY_OUT_ALLOW_ADD");
 	$db->add_config_key("DIMENSION_UNIT","Dimension Unit","in","What is the dimension unit used in Web Store?",25,4,"DIMENSION");
 	$db->add_config_key("LSKEY","LightSpeed Secure Key","","The secure key or password for administrative access to your lightspeed web store",0,1,NULL);
-
 	$db->add_config_key("HEADER_IMAGE","Enter relative URL","/images/header/defaultheader.png","This path should start with /images",27,1,NULL);
 	$db->add_config_key("STORE_OFFLINE","Put store in Maintenance Mode",0,"If selected, store will be offline.",2,16,"BOOL");
 	$db->add_config_key("EMAIL_SMTP_PORT","SMTP Server Port",80,"SMTP Server Port",5,12,"INT");
@@ -3026,7 +2925,6 @@ function initialConfigLoad($db)
 	$db->add_config_key("DEBUG_RESET","Reset Without Flush",0,"If selected, WS will not perform a flush on content tables when doing a Reset Store Products.",1,20,"BOOL");
 	$db->add_config_key("ENABLE_FAMILIES_MENU_LABEL","Show Families Menu label","By Manufacturer","",19,6,NULL);
 	$db->add_config_key("ENABLE_SLASHED_PRICES","Enabled Slashed \"Original\" Prices",2,"If selected, will display original price slashed out and Web Price as a Sale Price.",19,9,"ENABLE_SLASHED_PRICES");
-
 	$db->add_config_key("RECAPTCHA_PUBLIC_KEY","ReCaptcha Public Key","6LfxAtASAAAAADyBjHu6_cfVdMYLVBzgEnbTSbWi","Sign up for an account at http://www.google.com/recaptcha",18,2,NULL);
 	$db->add_config_key("RECAPTCHA_PRIVATE_KEY","ReCaptcha Private Key","6LfxAtASAAAAACkJllJojWMmxvQZf2Mtt3IAMnF0","Sign up for an account at http://www.google.com/recaptcha",18,3,NULL);
 	$db->add_config_key("CAPTCHA_STYLE","Captcha Style",0,"Sign up for an account at http://www.google.com/recaptcha",18,1,"CAPTCHA_STYLE");
@@ -3040,7 +2938,6 @@ function initialConfigLoad($db)
 	$db->add_config_key("UPLOADER_TIMESTAMP","Last timestamp uploader ran",0,"Internal",0,0,"NULL");
 	$db->add_config_key("GOOGLE_ANALYTICS","Google Analytics Code (format: UA-00000000-0)","","Google Analytics code for tracking",20,1,"NULL");
 	$db->add_config_key("STORE_TAGLINE","Store Tagline","Amazing products available to order online!","Used as default for Title bar for home page",2,4,"NULL");
-
 	$db->add_config_key("LOG_ROTATE_DAYS","Log Rotate Days",30,"How many days System Log should be retained.",1,30,"INT");
 	$db->add_config_key("CAPTCHA_THEME","ReCaptcha Theme","white","",18,4,"CAPTCHA_THEME");
 	$db->add_config_key("EMAIL_SEND_CUSTOMER","Send Receipts to Customers",1,"",24,1,"BOOL");
@@ -3076,18 +2973,14 @@ function initialConfigLoad($db)
 	$db->add_config_key("EMAIL_SUBJECT_CART","Share Cart Email Subject Line","{storename} Cart for {customername}","Configure Email Subject line with variables for Customer Email",24,10,NULL);
 	$db->add_config_key("DEBUG_LOGGING","System Logging","error"," ",1,21,"LOGGING");
 	$db->add_config_key("SHIPPING_FORMAT","Delivery Speed format","{label} ({price})","Formatting for Delivery Speed. The variables {label} and {price} can be used.",25,5,NULL);
-
 }
 
 function initialDataLoad($db)
 {
 	$sql = array();
-
-
 	$sql[] = "insert into xlsws_country set id=39,code='CA', region='NA', active=1, sort_order=2, country='Canada', zip_validate_preg='/^[ABCEGHJKLMNPRSTVXY]\\\d[A-Z]( )?\\\d[A-Z]\\\d$/'";
 	$sql[] = "insert into xlsws_country set id=13,code='AU', region='AU', active=1, sort_order=4, country='Australia', zip_validate_preg='/\\\d{4}/'";
 	$sql[] = "insert into xlsws_country set id=224,code='US', region='NA', active=1, sort_order=1, country='United States', zip_validate_preg='/^([0-9]{5})(-[0-9]{4})?$/i'";
-
 	$sql[] = "insert into xlsws_country set id=1,code='AF', region='AS', active=1, sort_order=10, country='Afghanistan'";
 	$sql[] = "insert into xlsws_country set id=2,code='AL', region='EU', active=1, sort_order=10, country='Albania'";
 	$sql[] = "insert into xlsws_country set id=3,code='DZ', region='AF', active=1, sort_order=10, country='Algeria'";
@@ -3325,8 +3218,6 @@ function initialDataLoad($db)
 	$sql[] = "insert into xlsws_country set id=240,code='RS', region='', active=1, sort_order=10, country='Republic of Serbia'";
 	$sql[] = "insert into xlsws_country set id=241,code='AX', region='', active=1, sort_order=10, country='Aland Islands'";
 	$sql[] = "insert into xlsws_country set id=242,code='EU', region='', active=1, sort_order=10, country='Europe'";
-
-
 	$sql[] = "insert into xlsws_state set id=10, country_id=224, country_code='US', code='AL', active=1, sort_order=10, state='Alabama'";
 	$sql[] = "insert into xlsws_state set id=11, country_id=224, country_code='US', code='AK', active=1, sort_order=10, state='Alaska'";
 	$sql[] = "insert into xlsws_state set id=12, country_id=224, country_code='US', code='AZ', active=1, sort_order=10, state='Arizona'";
@@ -3600,8 +3491,6 @@ function initialDataLoad($db)
 	$sql[] = "insert into xlsws_state set id=282, country_id=223, country_code='GB', code='WLT', active=1, sort_order=10, state='Wiltshire'";
 	$sql[] = "insert into xlsws_state set id=283, country_id=223, country_code='GB', code='WORCS', active=1, sort_order=10, state='Worcestershire'";
 	$sql[] = "insert into xlsws_state set id=284, country_id=223, country_code='GB', code='WRX', active=1, sort_order=10, state='Wrexham'";
-
-
 	$sql[] = "insert into xlsws_credit_card set id=1, label='American Express', numeric_length='15', prefix='34,37', sort_order=3, enabled=0, modified='".date("Y-m-d H:i:s")."' ";
 	$sql[] = "insert into xlsws_credit_card set id=2, label='Carte Blanche', numeric_length='14', prefix='300,301,302,303,304,305,36,38', sort_order=0, enabled=0, modified='".date("Y-m-d H:i:s")."' ";
 	$sql[] = "insert into xlsws_credit_card set id=3, label='Diners Club', numeric_length='14', prefix='300,301,302,303,304,305,36,38', sort_order=0, enabled=0, modified='".date("Y-m-d H:i:s")."' ";
@@ -3614,8 +3503,6 @@ function initialDataLoad($db)
 	$sql[] = "insert into xlsws_credit_card set id=10, label='Switch', numeric_length='16,18,19', prefix='4.90349054911493E+35', sort_order=0, enabled=0, modified='".date("Y-m-d H:i:s")."' ";
 	$sql[] = "insert into xlsws_credit_card set id=11, label='Visa', numeric_length='13,16', prefix='4', sort_order=0, enabled=1, modified='".date("Y-m-d H:i:s")."' ";
 	$sql[] = "insert into xlsws_credit_card set id=12, label='Visa Electron', numeric_length='16', prefix='41750049174913', sort_order=0, enabled=0, modified='".date("Y-m-d H:i:s")."' ";
-
-
 	$sql[] = "insert into xlsws_custom_page set id=1, page_key='top', title='Top Products', page='a:1:{s:2:\"en\";s:26:\"<p>Page coming soon...</p>\";}', request_url='top-products', tab_position=12, modified='".date("Y-m-d H:i:s")."' ";
 	$sql[] = "insert into xlsws_custom_page set id=2, page_key='new', title='New Products', page='a:1:{s:2:\"en\";s:26:\"<p>Page coming soon...</p>\";}', request_url='new-products', tab_position=11, modified='".date("Y-m-d H:i:s")."' ";
 	$sql[] = "insert into xlsws_custom_page set id=3, page_key='promo', title='Promotions', page='a:1:{s:2:\"en\";s:26:\"<p>Page coming soon...</p>\";}', request_url='promotions', tab_position=13, modified='".date("Y-m-d H:i:s")."' ";
@@ -3624,32 +3511,23 @@ function initialDataLoad($db)
 	$sql[] = "insert into xlsws_custom_page set id=6, page_key='tc', title='Terms and Conditions', page='a:1:{s:2:\"en\";s:26:\"<p>Page coming soon...</p>\";}', request_url='terms-and-conditions', tab_position=22, modified='".date("Y-m-d H:i:s")."' ";
 	$sql[] = "insert into xlsws_custom_page set id=7, page_key='contactus', title='Contact Us', page='a:1:{s:2:\"en\";s:118:\"<p>If you have business inquiries or other questions, please fill out the following form to contact us. Thank you.</p>\";}', request_url='contact-us', tab_position=13, modified='".date("Y-m-d H:i:s")."' ";
 	$sql[] = "insert into xlsws_custom_page set id=8, page_key='Welcome', title='Welcome', page='a:1:{s:2:\"en\";s:26:\"<p>Page coming soon...</p>\";}', request_url='welcome', tab_position=0, modified='".date("Y-m-d H:i:s")."' ";
-
-
 	$sql[] = "INSERT INTO `xlsws_modules` set active=1,module='wsborderlookup', category='sidebar', sort_order=2";
 	$sql[] = "INSERT INTO `xlsws_modules` set active=1,module='wsbwishlist', category='sidebar', sort_order=3";
 	$sql[] = "INSERT INTO `xlsws_modules` set active=0,module='wsbsidebar', category='sidebar', sort_order=4";
-
 	$sql[] = "INSERT INTO `xlsws_modules` (`active`, `module`, `category`, `version`, `name`, `sort_order`, `configuration`, `modified`, `created`)
 VALUES	(1, 'cashondelivery', 'payment', 1, 'Cash on Delivery', 14, 'a:1:{s:5:\"label\";s:16:\"Cash On Delivery\";}', '".date("Y-m-d H:i:s")."', NULL);";
-
 	$sql[] = "INSERT INTO `xlsws_modules` (`active`, `module`, `category`, `version`, `name`, `sort_order`, `configuration`, `modified`, `created`)
 VALUES	(1, 'storepickup', 'shipping', 1, 'Store Pickup', 21, 'a:4:{s:5:\"label\";s:12:\"Store Pickup\";s:3:\"msg\";s:71:\"Please quote order ID %s with photo ID at the reception for collection.\";s:7:\"product\";s:8:\"SHIPPING\";s:6:\"markup\";s:1:\"0\";}', '".date("Y-m-d H:i:s")."', NULL);";
-
 
 	foreach ($sql as $s) {
 		$db->query($s);
 	}
-
 }
-
 
 function up217($db)
 {
 	//We make the assumption the customer is at least on 2.0.8, and start running updates from that point that apply. Anything redundant is ignored.
-
 	$db->add_config_key('MATRIX_PRICE' , 'Hide price of matrix master product', '3', 'If you do not want to show the price of your master product in a size/color matrix, turn this option on', 8,9 ,'BOOL');
-
 	$db->add_table('xlsws_promo_code' , "CREATE TABLE `xlsws_promo_code` (
 			  `rowid` int(11) NOT NULL auto_increment,
 			  `code` varchar(255) default NULL,
@@ -3662,7 +3540,6 @@ function up217($db)
 			  `threshold` double NOT NULL,
 			  PRIMARY KEY  (`rowid`)
 			) ENGINE=MyISAM  DEFAULT CHARSET=utf8" , '2.1');
-
 	$db->add_table('xlsws_shipping_tiers' , "CREATE TABLE `xlsws_shipping_tiers` (
 			  `rowid` int(11) NOT NULL auto_increment,
 			  `start_price` double default '0',
@@ -3670,7 +3547,6 @@ function up217($db)
 			  `rate` double default '0',
 			  PRIMARY KEY  (`rowid`)
 			) ENGINE=MyISAM  DEFAULT CHARSET=utf8" , '2.1');
-
 	$db->add_table('xlsws_sessions' , "CREATE TABLE `xlsws_sessions` (
 				  `intSessionId` int(10) NOT NULL auto_increment,
 				  `vchName` varchar(255) NOT NULL default '',
@@ -3680,52 +3556,37 @@ function up217($db)
 				  KEY `idxName` (`vchName`),
 				  KEY `idxExpires` (`uxtExpires`)
 				) ENGINE=MyISAM  DEFAULT CHARSET=utf8" , '2.1');
-
 	$db->add_column('xlsws_cart' , 'fk_promo_id' , "ALTER TABLE  `xlsws_cart` ADD  `fk_promo_id` int(5) DEFAULT  NULL " , '2.1');
-
 	$db->add_config_key('CHILD_SEARCH' , 'Show child products in search results',  '','If you want child products from a size color matrix to show up in search results, enable this option',8,10,'BOOL');
-
 	$db->add_config_key('EMAIL_SMTP_SECURITY_MODE' , 'Security mode for outbound SMTP',  '0',  'Automatic based on SMTP Port, or force security.',  '5',  '8', 'EMAIL_SMTP_SECURITY_MODE');
-
 	$db->add_config_key('MAX_PRODUCTS_IN_SLIDER' , 'Maximum Products in Slider', '64',  'For a custom page, max products in slider.',  '8',  '11', 'PINT');
-
 	$db->query("ALTER TABLE xlsws_family MODIFY COLUMN family varchar (255)");
-
 	$db->query("ALTER TABLE xlsws_product MODIFY COLUMN family varchar (255)");
-
 	$db->add_config_key('DATABASE_SCHEMA_VERSION' ,'Database Schema Version',
 		'217',  'Used for tracking schema changes',  '',  '',  NULL);
 	$db->query("UPDATE `xlsws_configuration` SET `value`='217' where `key`='DATABASE_SCHEMA_VERSION'");
-
 }
 
 function up250($db,$sqlline)
 {
 	if ($sqlline==4)
 	{
-
 		$db->add_column('xlsws_configuration' , 'template_specific',
 			"ALTER TABLE xlsws_configuration ADD COLUMN `template_specific` tinyint (1) NULL DEFAULT 0 AFTER `options`");
-
 		$db->add_column('xlsws_category' , 'google_id' ,
 			"ALTER TABLE `xlsws_category` ADD `google_id` INT  DEFAULT NULL AFTER `image_id`");
-
 		$db->query("ALTER TABLE `xlsws_cart` CHANGE `printed_notes` `printed_notes` TEXT  NULL");
-
 		$db->add_config_key('DEBUG_LS_SOAP_CALL' ,
 			'Debug SOAP Calls', '0',
 			'Turn on soap debugging.',
 			1, 17, 'BOOL',0);
-
 		$db->add_config_key('FEATURED_KEYWORD' ,
 			'Featured Keyword', 'featured',
 			'If this keyword is one of your product keywords, the product will be featured on the Web Store homepage.',
 			8, 6, NULL,0);
-
 		$db->add_config_key('LIGHTSPEED_HOSTING' ,
 			'LightSpeed Hosting',
 			'0', 'Flag which indicates site is hosted by LightSpeed', 0, 0, 'BOOL',0);
-
 		//Add debug keys
 		$db->add_config_key('DEBUG_PAYMENTS' , 'Debug Payment Methods', '',
 			'If selected, WS logs all activity for credit card processing and other payment methods.',
@@ -3745,11 +3606,9 @@ function up250($db,$sqlline)
 			'30', 'How many days System Log should be retained.', 1, 30,  'INT',0);
 		$db->add_config_key('UPLOADER_TIMESTAMP' , 'Last timestamp uploader ran',
 			'0', 'Internal', 0, 0,  'NULL',0);
-
 		//Families menu labeling
 		$db->query("UPDATE `xlsws_configuration` SET `title`='Show Families on Product Menu?',`configuration_type_id`=19,`sort_order`=3,
 					`options`='ENABLE_FAMILIES' where `key`='ENABLE_FAMILIES'");
-
 		$db->add_config_key('ENABLE_FAMILIES_MENU_LABEL' ,
 			'Show Families Menu label',
 			'By Manufacturer', '', 19, 4,  NULL,0);
@@ -3761,15 +3620,11 @@ function up250($db,$sqlline)
 		if ($db->add_column('xlsws_promo_code' , 'enabled' ,
 			"ALTER TABLE xlsws_promo_code ADD COLUMN enabled tinyint (1) NOT NULL DEFAULT 1 AFTER rowid "))
 			$db->query("UPDATE xlsws_promo_code SET enabled=1");
-
 		if ($db->add_column('xlsws_promo_code' , 'except' ,
 			"ALTER TABLE xlsws_promo_code ADD COLUMN except tinyint (1) NOT NULL DEFAULT 0 AFTER enabled "))
 			$db->query("UPDATE xlsws_promo_code SET except=0");
-
 		$db->add_column('xlsws_cart' , 'tracking_number',
 			"ALTER TABLE xlsws_cart ADD COLUMN `tracking_number` VARCHAR(255) NULL DEFAULT NULL AFTER `payment_amount`");
-
-
 		//Template section
 		$db->query("UPDATE `xlsws_configuration` SET `configuration_type_id`=0,`sort_order`=1
 					where `key`='DEFAULT_TEMPLATE'");
@@ -3781,8 +3636,6 @@ function up250($db,$sqlline)
 			'Enabled Slashed \"Original\" Prices', '',
 			'If selected, will display original price slashed out and Web Price as a Sale Price.',
 			19, 3,  'ENABLE_SLASHED_PRICES',0);
-
-
 		//Fix some sequencing problems for Product options
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=1 where `key`='PRODUCT_COLOR_LABEL'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=2 where `key`='PRODUCT_SIZE_LABEL'");
@@ -3793,13 +3646,10 @@ function up250($db,$sqlline)
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=8 where `key`='MATRIX_PRICE'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=9 where `key`='ENABLE_SLASHED_PRICES'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=10 where `key`='CHILD_SEARCH'");
-
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=12 where `key`='DISPLAY_EMPTY_CATEGORY'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=13 where `key`='FEATURED_KEYWORD'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=14 where `key`='SITEMAP_SHOW_PRODUCTS'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=16 where `key`='MAX_PRODUCTS_IN_SLIDER'");
-
-
 		if ($db->add_column('xlsws_custom_page' , 'tab_position' ,
 			"ALTER TABLE xlsws_custom_page ADD COLUMN tab_position int NULL"))
 		{
@@ -3812,10 +3662,7 @@ function up250($db,$sqlline)
 			$db->query("UPDATE xlsws_custom_page SET tab_position=23 where `key`='privacy'");
 		}
 
-
 		$db->query("UPDATE `xlsws_country` SET `country`='Russia' WHERE `code`='RU'");
-
-
 		//ReCaptcha Keys
 		$db->add_config_key('RECAPTCHA_PUBLIC_KEY' ,
 			'ReCaptcha Public Key',
@@ -3823,11 +3670,9 @@ function up250($db,$sqlline)
 		$db->add_config_key('RECAPTCHA_PRIVATE_KEY' ,
 			'ReCaptcha Private Key',
 			'', 'Sign up for an account at http://www.google.com/recaptcha', 18, 3,  NULL,0);
-
 		$db->add_config_key('CAPTCHA_STYLE' ,
 			'Captcha Style',
 			'0', 'Sign up for an account at http://www.google.com/recaptcha', 18, 1,  'CAPTCHA_STYLE',0);
-
 		$db->add_config_key('CAPTCHA_CHECKOUT' ,
 			'Use Captcha on Checkout',
 			'1', '', 18, 6,  'CAPTCHA_CHECKOUT',0);
@@ -3840,8 +3685,6 @@ function up250($db,$sqlline)
 		$db->add_config_key('CAPTCHA_THEME' ,
 			'ReCaptcha Theme',
 			'white', '', 18, 4,  'CAPTCHA_THEME',1);
-
-
 		//Email options
 		$db->add_config_key('EMAIL_SMTP_AUTH_PLAIN' ,
 			'Force AUTH PLAIN Authentication',
@@ -3859,8 +3702,6 @@ function up250($db,$sqlline)
 			'Owner Email Subject Line',
 			'%storename% Order Notification %orderid%', 'Configure Email Subject line with variables for Owner email', 24, 11,  NULL,0);
 
-
-
 		//Fix some sequencing problems for options
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=10 where `key`='EMAIL_SIGNATURE'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=11 where `key`='EMAIL_SMTP_SERVER'");
@@ -3869,13 +3710,6 @@ function up250($db,$sqlline)
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=14,options='PASSWORD' where `key`='EMAIL_SMTP_PASSWORD'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=15 where `key`='EMAIL_SMTP_SECURITY_MODE'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=16 where `key`='EMAIL_SMTP_AUTH_PLAIN'");
-
-
-
-
-
-
-
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=5 where `key`='INVENTORY_ZERO_NEG_TITLE'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=6 where `key`='INVENTORY_AVAILABLE'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=7 where `key`='INVENTORY_LOW_TITLE'");
@@ -3925,7 +3759,6 @@ function up250($db,$sqlline)
 		//Fix some sequencing problems for options
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=4 where `key`='LANGUAGES'");
 		$db->query("UPDATE `xlsws_configuration` SET `sort_order`=5 where `key`='MIN_PASSWORD_LEN'");
-
 		$db->query("UPDATE `xlsws_configuration` SET `title`='SSL Security certificate should be used',
 					`options`='SSL_NO_NEED_FORWARD',`helper_text`='Change when SSL secure mode is used.' where `key`='SSL_NO_NEED_FORWARD'");
 	}
@@ -3977,9 +3810,6 @@ function up250($db,$sqlline)
 		$db->add_config_key('GOOGLE_VERIFY' ,
 			'Google Site Verify ID (format: _PRasdu8f9a8F9A..etc)',
 			'', 'Google Verify Code (found in google-site-verification meta header)', 20, 3,  'NULL',0);
-
-
-
 		$db->add_config_key('STORE_TAGLINE' ,
 			'Store Tagline',
 			'Amazing products available to order online!', 'Slogan which follows your store name on the Title bar', 2, 4,  'NULL',0);
@@ -3992,8 +3822,6 @@ function up250($db,$sqlline)
 		$db->add_config_key('STORE_HOURS' ,
 			'Store Operating Hours',
 			'MON - SAT: 9AM-9PM', 'Store hours.', 2, 7,  'NULL',0);
-
-
 		//URL and Description Formatting
 		$db->add_config_key('SEO_PRODUCT_TITLE' ,
 			'Product Title format',
@@ -4007,7 +3835,6 @@ function up250($db,$sqlline)
 		$db->add_config_key('SEO_CUSTOMPAGE_TITLE' ,
 			'Custom pages Title format',
 			'%name% : %storename%', 'Which elements appear in the title of a custom page', 23, 2,  'NULL',0);
-
 		//Copy our category table since we will use this to handle uploads and SEO activities
 		$db->add_table('xlsws_category_addl' , "CREATE TABLE `xlsws_category_addl` (
 				  `rowid` int(11) NOT NULL AUTO_INCREMENT,
@@ -4020,25 +3847,18 @@ function up250($db,$sqlline)
 				  KEY `name` (`name`),
 				  KEY `parent` (`parent`)
 				) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
-
-
-
 		$db->query("UPDATE `xlsws_configuration` SET `title`='Product Grid image width', `configuration_type_id`=29, `sort_order`=1,options='INT',template_specific=1
 					where `key`='LISTING_IMAGE_WIDTH'");
 		$db->query("UPDATE `xlsws_configuration` SET `title`='Product Grid image height', `configuration_type_id`=29, `sort_order`=2 ,options='INT' ,template_specific=1
 					where `key`='LISTING_IMAGE_HEIGHT'");
-
 		$db->query("UPDATE `xlsws_configuration` SET `title`='Shopping Cart image width', `configuration_type_id`=29, `sort_order`=3 ,options='INT',template_specific=1
 					where `key`='MINI_IMAGE_WIDTH'");
 		$db->query("UPDATE `xlsws_configuration` SET `title`='Shopping Cart image height', `configuration_type_id`=29, `sort_order`=4 ,options='INT',template_specific=1
 					where `key`='MINI_IMAGE_HEIGHT'");
-
 		$db->query("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Width', `configuration_type_id`=29, `sort_order`=5 ,options='INT' ,template_specific=1
 					where `key`='DETAIL_IMAGE_WIDTH'");
 		$db->query("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Height', `configuration_type_id`=29, `sort_order`=6 ,options='INT' ,template_specific=1
 					where `key`='DETAIL_IMAGE_HEIGHT'");
-
-
 		$db->add_config_key('CATEGORY_IMAGE_WIDTH' ,
 			'Category Page Image Width',
 			'180', 'if using a Category Page image', 29, 7,  'INT',1);
@@ -4060,10 +3880,8 @@ function up250($db,$sqlline)
 		$db->add_config_key('IMAGE_FORMAT' ,
 			'Image Format',
 			'jpg', 'Use .jpg or .png format for images. JPG files are smaller but slightly lower quality. PNG is higher quality and supports transparency, but has a larger file size.', 17, 18,  'IMAGE_FORMAT',0);
-
 		$db->query("UPDATE `xlsws_configuration` SET `configuration_type_id`=17, `sort_order`=15
 					where `key`='PRODUCT_ENLARGE_SHOW_LIGHTBOX'");
-
 		$db->add_config_key('ENABLE_CATEGORY_IMAGE' ,
 			'Display Image on Category Page (when set)',
 			'0', 'Requires a defined Category image under SEO settings', 0, 13,  'BOOL',1);
@@ -4071,7 +3889,6 @@ function up250($db,$sqlline)
 		$db->query("update `xlsws_configuration` set template_specific=1,`configuration_type_id`=29 where `key` like '%_IMAGE_HEIGHT'");
 		$db->query("update `xlsws_configuration` set template_specific=1 where `key` = 'DEFAULT_TEMPLATE_THEME'");
 		$db->query("update `xlsws_configuration` set template_specific=1 where `key` = 'PRODUCTS_PER_PAGE'");
-
 		//Because of a change to the width display in Admin panel, make sure the option type is set so numbers aren't huge fields
 		$db->query("UPDATE `xlsws_configuration` SET options='INT' where `key`='QUOTE_EXPIRY'");
 		$db->query("UPDATE `xlsws_configuration` SET options='INT' where `key`='CART_LIFE'");
@@ -4086,11 +3903,8 @@ function up250($db,$sqlline)
 			"ALTER TABLE xlsws_modules ADD COLUMN `active` INT(11) DEFAULT NULL AFTER `rowid`"))
 			$db->query("update xlsws_modules set active=1");
 
-
 		$db->add_column('xlsws_customer' , 'check_same' ,
 			"ALTER TABLE xlsws_customer ADD COLUMN `check_same` INT(11) DEFAULT NULL AFTER `zip2`");
-
-
 
 		//Cart flash messages table
 		$db->add_table('xlsws_cart_messages' , "CREATE TABLE `xlsws_cart_messages` (
@@ -4100,9 +3914,6 @@ function up250($db,$sqlline)
 				  PRIMARY KEY (`rowid`),
 				  KEY `cart_id` (`cart_id`)
 				) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
-
-
-
 
 		//Shipping options
 		$db->add_config_key('SHIP_SAME_BILLSHIP' ,
@@ -4114,48 +3925,35 @@ function up250($db,$sqlline)
 			"ALTER TABLE `xlsws_shipping_tiers` ADD `class_name` VARCHAR(255)  NULL  DEFAULT NULL  AFTER `rate`;"))
 			$db->query("update xlsws_shipping_tiers set `class_name`='tier_table'");
 
-
-
 		//Drop some unused keys
-
 		$db->query("UPDATE `xlsws_configuration` SET `title`='Display My Repairs (SROs) under My Account',
 					helper_text='If your store uses SROs for repairs and uploads them to Web Store, turn this option on to allow customers to view pending repairs.'
 					where `key`='ENABLE_SRO'");
-
 		$db->query("UPDATE `xlsws_configuration` SET `value`='250' where `key`='DATABASE_SCHEMA_VERSION'");
-
 	}
 }
 
 function up251($db)
 {
-
 	$db->query("UPDATE `xlsws_configuration` SET `title`='Product Detail Image Height' where `key`='DETAIL_IMAGE_HEIGHT'");
 	$db->query("UPDATE `xlsws_configuration` SET `title`='Category Page Image Height' where `key`='CATEGORY_IMAGE_HEIGHT'");
 	$db->query("UPDATE `xlsws_configuration` SET `value`='251' where `key`='DATABASE_SCHEMA_VERSION'");
-
-
 }
-
 
 function up252($db)
 {
-
 	$db->add_config_key('FACEBOOK_APPID' ,'Facebook App ID', '', 'Create Facebook AppID', 26, 1, NULL, 0);
 	$db->query("UPDATE `xlsws_configuration` SET `value`='252' where `key`='DATABASE_SCHEMA_VERSION'");
-
 }
 
 function prep252($db)
 {
-
 	$db->query("UPDATE xlsws_cart set fk_tax_code_id=NULL where fk_tax_code_id='-1'");
 	$db->query("UPDATE xlsws_customer set id_customer=NULL where id_customer=''");
 	$db->query("ALTER TABLE xlsws_promo_code change valid_from valid_from TINYTEXT default NULL");
 	$db->query("ALTER TABLE xlsws_promo_code change valid_until valid_until TINYTEXT default NULL");
 	$db->query("UPDATE xlsws_promo_code set valid_from=NULL where valid_from=''");
 	$db->query("UPDATE xlsws_promo_code set valid_until=NULL where valid_until=''");
-
 }
 
 function afterMigrationCleanup($db)
@@ -4166,10 +3964,7 @@ function afterMigrationCleanup($db)
 	$db->query("DELETE FROM `xlsws_configuration` where `key`='ENABLE_SEO_URL'");
 	$db->query("DELETE FROM `xlsws_country` WHERE `code`='FX'");
 	$db->query("DELETE from `xlsws_configuration` where `key`='CACHE_CATEGORY'");
-
-
 }
-
 
 function parse_php_info()
 {
@@ -4203,10 +3998,8 @@ function parse_php_info()
 
 		foreach ($section as $key => $val) {
 			preg_match_all('|<td.*>(.*)</td>|U', $val[1], $output);
-
 			if (count($output[0])>1)
 				$phpinfo[$name][trim(strip_tags($output[0][0]))] = trim(strip_tags($output[0][1]));
-
 		}
 	}
 	ob_end_flush();
@@ -4218,7 +4011,6 @@ function xls_check_server_environment()
 	$phpinfo = parse_php_info();
 	//We check all the elements we need for a successful install and pass back the report
 	$checked = array();
-
 	$checked['MySQLi'] = isset($phpinfo['mysqli']) ? "pass" : "fail";
 	$checked['PHP Session'] = ($phpinfo['session']['Session Support'] == "enabled" ? "pass" : "fail");
 	$checked['cURL Support'] = isset($phpinfo['curl']) ? "pass" : "fail";
@@ -4254,11 +4046,8 @@ function xls_check_server_environment()
 	$checked['Zip Library'] = isset($phpinfo['zip']) ? "pass" : "fail";
 	$checked['Soap Library'] = ($phpinfo['soap']['Soap Client'] == "enabled" ? "pass" : "fail");
 	$checked['OpenSSL'] = ($phpinfo['openssl']['OpenSSL support'] == "enabled" ? "pass" : "fail");
-
 	//Check php.ini settings
-
 	//Removed in 5.4.0 so just check if we're running an older version
-
 	if (version_compare(PHP_VERSION, '5.4.0', '<')) {
 		$checked['magic_quotes_gpc in Php.ini must be turned Off'] = (
 		$phpinfo['Core']['magic_quotes_gpc'] == "Off" ? "pass" : "fail");
@@ -4270,7 +4059,6 @@ function xls_check_server_environment()
 
 	if (version_compare(PHP_VERSION, '5.3.27', '>='))
 		$checked['Default timezone'] = ($phpinfo['date']['date.timezone'] == "no value" ? "fail" : "pass");
-
 
 	//Check folder permissions
 	if (file_exists('images'))
@@ -4289,6 +4077,7 @@ function xls_check_server_environment()
 		$checked = array_merge(array('<b>php.ini file is at</b> '.$phpinfo['phpinfotemp']['Loaded Configuration File']=>"pass"),$checked);
 	return $checked;
 }
+
 function xls_check_upgrades()
 {
 	$checked = array();
@@ -4304,16 +4093,12 @@ function xls_check_upgrades()
 	}
 
 	$checked['<b>--Upgrade Check RESULTS BELOW--</b>'] = "pass";
-
 	//Have we run the Upgrade Database to add new fields to the database?
 	$result = _dbx_first_cell("select `key` from xlsws_configuration where `key`='DEFAULT_TEMPLATE_THEME'");
 	$checked['Upgrade Database command has been run from Admin Panel'] = (
 	$result == "DEFAULT_TEMPLATE_THEME" ? "pass" : "fail");
 	//Have new 2.5 templates been added
-
-
 	$checked['<b>Note: Specific template code changes are not checked.</b>'] = "pass";
-
 	return $checked;
 }
 
@@ -4368,17 +4153,12 @@ function modifyArgs($arg)
 		}
 		else
 		{
-
 			$marker = stripos($arg['url'],"/");
 			$path=substr($arg['url'],$marker);
 			$arg['url'] = substr($arg['url'],0,$marker);
-
 			$_SERVER['SERVER_NAME'] = $arg['url'];
 			$arg['scriptname'] = $_SERVER['SCRIPT_NAME']=$_SERVER['PHP_SELF']=$path."/install.php";
-
 		}
-
-
 	}
 
 	if(isset($arg['qa']))
@@ -4388,4 +4168,3 @@ function modifyArgs($arg)
 	}
 	return $arg;
 }
-// @codingStandardsIgnoreBegin

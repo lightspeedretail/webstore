@@ -190,7 +190,7 @@ class Controller extends CController
 		$this->buildBootstrap();
 		if(_xls_facebook_login())
 		{
-			$this->getFacebookLogin();
+			$this->setFacebookComponent();
 		}
 
 		if (Yii::app()->params['STORE_OFFLINE'] != '0' || Yii::app()->params['INSTALLED'] != '1')
@@ -544,46 +544,12 @@ class Controller extends CController
 
 	}
 
-	protected function getFacebookLogin()
+	protected function setFacebookComponent()
 	{
-
-		//Facebook integration
 		$fbArray = require(YiiBase::getPathOfAlias('application.config').'/_wsfacebook.php');
 		$fbArray['appId'] = Yii::app()->params['FACEBOOK_APPID'];
 		$fbArray['secret'] = Yii::app()->params['FACEBOOK_SECRET'];
 		Yii::app()->setComponent('facebook', $fbArray);
-
-		if (Yii::app()->user->isGuest)
-		{
-			$userid = Yii::app()->facebook->getUser();
-
-			if ($userid > 0)
-			{
-				$results = Yii::app()->facebook->api('/'.$userid);
-				if(!isset($results['email']))
-				{
-					//we've lost our authentication, user may have revoked
-					Yii::app()->facebook->destroySession();
-					$this->redirect(Yii::app()->createUrl("site/index"));
-				}
-
-				$identity = new FBIdentity($results['email'], $userid); //we user userid in the password field
-				$identity->authenticate();
-				if($identity->errorCode === UserIdentity::ERROR_NONE)
-				{
-					Yii::app()->user->login($identity, 0);
-					$this->redirect(Yii::app()->createUrl("site/index"));
-				}
-			}
-		}
-
-		if(isset(Yii::app()->user->facebook))
-		{
-			if(Yii::app()->user->facebook)
-			{
-				$this->logoutUrl = Yii::app()->facebook->getLogoutUrl();
-			}
-		}
 	}
 
 	public function setReturnUrl()
@@ -700,10 +666,16 @@ class Controller extends CController
 		{
 			$familyMenu['families_brands_menu'] = array(
 				'text' => CHtml::link(
-					Yii::app()->params['ENABLE_FAMILIES_MENU_LABEL'],
-					$this->createUrl("search/browse", array('brand' => '*'))
+					Yii::t(
+						'category',
+						Yii::app()->params['ENABLE_FAMILIES_MENU_LABEL']
+					),
+					$this->createUrl(
+						"search/browse",
+						array('brand' => '*')
+					)
 				),
-				'label' => Yii::app()->params['ENABLE_FAMILIES_MENU_LABEL'],
+				'label' => Yii::t('category', Yii::app()->params['ENABLE_FAMILIES_MENU_LABEL']),
 				'link' => $this->createUrl("search/browse", array('brand' => '*')),
 				'url' => $this->createUrl("search/browse", array('brand' => '*')),
 				'id' => 0,

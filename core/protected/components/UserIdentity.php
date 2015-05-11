@@ -20,27 +20,39 @@ class UserIdentity extends CUserIdentity
 	 */
 	public function authenticate()
 	{
-
 		$user = $this->getCustomerRecord();
 
-		if (!($user instanceof Customer) || $user->email !== $this->username)
+		if (is_null($user))
 		{
 			$this->errorCode = self::ERROR_USERNAME_INVALID;
-		} elseif ($user->allow_login != Customer::NORMAL_USER && $user->allow_login != Customer::ADMIN_USER) {
+			return false;
+		}
+
+		if ($user->allow_login != Customer::NORMAL_USER && $user->allow_login != Customer::ADMIN_USER)
+		{
 			$this->errorCode = self::ERROR_NOT_APPROVED;
-		} elseif (!$user->authenticate($this->password)) {
+			return false;
+		}
+
+		if ($user->authenticate($this->password))
+		{
+			$this->successfullyLogin($user);
+			return true;
+		}
+		else
+		{
 			//is this an account that was set up via facebook login and doesn't have its own password?
 			if ($user->password == "facebook")
 			{
 				$this->errorCode = self::ERROR_PASSWORD_FACEBOOK;
-			} else {
+			}
+			else
+			{
 				$this->errorCode = self::ERROR_PASSWORD_INVALID;
 			}
-		} else {
-			$this->successfullyLogin($user);
 		}
 
-		return !$this->errorCode;
+		return false;
 	}
 
 	//Note that this is only for backwards compatibility, password is upgraded on login
@@ -69,7 +81,7 @@ class UserIdentity extends CUserIdentity
 
 	protected function getCustomerRecord()
 	{
-		return Customer::model()->findByAttributes(array('email' => $this->username,'record_type' => Customer::REGISTERED));
+		return Customer::model()->findByAttributes(array('email' => $this->username, 'record_type' => Customer::REGISTERED));
 	}
 
 	protected function successfullyLogin($user)
@@ -83,7 +95,9 @@ class UserIdentity extends CUserIdentity
 		if ($user->allow_login == Customer::ADMIN_USER)
 		{
 			$this->setState('role', 'admin');
-		} else {
+		}
+		else
+		{
 			$this->setState('role', 'user');
 		}
 
@@ -103,7 +117,7 @@ class UserIdentity extends CUserIdentity
 
 		if (!$user->save())
 		{
-			Yii::log("ERROR Saving user record ".print_r($user->getErrors(), true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			Yii::log("ERROR Saving user record " . print_r($user->getErrors(), true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		}
 	}
 }

@@ -141,5 +141,24 @@ class WsPayment extends WsExtension
 		return CLogger::LEVEL_INFO;
 	}
 
+	/**
+	 * We use this function to know if the payment method is allowed to be
+	 * used.
+	 *
+	 * @return bool True if we can display the payment method. False
+	 * otherwise.
+	 */
+	public function isDisplayable()
+	{
+		$allowAdvancedPayments = CPropertyValue::ensureBoolean(
+			Yii::app()->params['ALLOW_ADVANCED_PAY_METHODS']
+		);
 
+		if ($allowAdvancedPayments === false && $this->advancedMode === true)
+		{
+			return false;
+		}
+
+		return parent::isDisplayable();
+	}
 }

@@ -50,7 +50,7 @@ class LoginForm extends CFormModel
 		return array(
 			'email' => Yii::t('CheckoutForm', 'Email Address'),
 			'password' => Yii::t('CheckoutForm', 'Password'),
-			'rememberMe' => 'Remember me next time',
+			'rememberMe' => Yii::t('CheckoutForm', 'Remember me next time'),
 		);
 	}
 
@@ -69,7 +69,7 @@ class LoginForm extends CFormModel
 				{
 					case UserIdentity::ERROR_NOT_APPROVED:
 						$this->addError('password', Yii::t('global', 'Your account has not yet been approved.'));
-						Yii::log("Denied: Unapproved user ".$this->email." attempted login", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+						Yii::log("Denied: Unapproved user ".$this->email ." attempted login", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 						break;
 
 					case UserIdentity::ERROR_PASSWORD_FACEBOOK:
@@ -78,7 +78,7 @@ class LoginForm extends CFormModel
 
 					case UserIdentity::ERROR_PASSWORD_INVALID:
 						$this->addError('password', Yii::t('global', 'Incorrect password.'));
-						Yii::log("Login denied: Incorrect password for ".$this->email." attempted login", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+						Yii::log("Login denied: Incorrect password for ". $this->email ." attempted login", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 						break;
 
 					case UserIdentity::ERROR_USERNAME_INVALID:
@@ -176,7 +176,7 @@ class LoginForm extends CFormModel
 	 */
 	protected function beforeValidate()
 	{
-	    $this->email = strtolower($this->email);
+		$this->email = strtolower($this->email);
 
 		if ($this->getScenario() === '')
 		{

@@ -217,7 +217,7 @@ class CartController extends Controller
 
 		if (!($objCart instanceof Cart))
 		{
-			throw new CHttpException(404, 'The requested page does not exist.');
+			_xls_404();
 		}
 
 		//Try to send e-mails that might still be stuck in the queue.
@@ -497,7 +497,7 @@ class CartController extends Controller
 
 				if (!($objCart instanceof Cart))
 				{
-					throw new CHttpException(404,'The requested page does not exist.');
+					_xls_404();
 				}
 
 				if (!Yii::app()->user->isGuest)
@@ -1052,6 +1052,14 @@ class CartController extends Controller
 					Yii::app()->shoppingcart->releaseCart();
 					Yii::app()->controller->redirect($arrPaymentResult['jump_url']);
 					return;
+				}
+
+				// to support error messages that occur with Cayan during the createTransaction process
+				// see the extension for more info
+				if (isset($arrPaymentResult['errorMessage']))
+				{
+					Yii::app()->user->setFlash('error', $arrPaymentResult['errorMessage']);
+					$this->redirect($this->createAbsoluteUrl('/cart/checkout'));
 				}
 
 				// If we are this far, we're using an Advanced Payment (or

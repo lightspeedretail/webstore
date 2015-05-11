@@ -13,9 +13,6 @@ class WsWebApplication extends CWebApplication
 		'site/logout',
 		'site/forgotpassword',
 		'site/sendemail',
-		'myaccount/edit',
-		'myaccount/address',
-		'myaccount/resetpassword',
 		'checkout/thankyou',
 	);
 
@@ -34,7 +31,8 @@ class WsWebApplication extends CWebApplication
 	 */
 	private $_arrNeedToSecureControllers = array(
 		'admin',
-		'checkout'
+		'checkout',
+		'myaccount'
 	);
 
 	/**

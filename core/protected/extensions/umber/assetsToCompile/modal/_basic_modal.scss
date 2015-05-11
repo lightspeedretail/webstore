@@ -99,13 +99,13 @@
 
 			display: block;
 
-			background-color: #eee;
+			background-color: $default-background-color;
 			color: #999;
 			font: .875rem 'Open Sans', 'Helvetica Neue', sans-serif;
 			text-transform: uppercase;
 
 			&:hover {
-				background-color: #eee;
+				background-color: $default-background-color;
 				color: #666;
 			}
 			&:focus { outline: none; }
@@ -131,11 +131,12 @@
     }
 
   h1 {
-    font-weight: 600;
-    //MO conflicting with Edit cart Is this needed anywhere else?
-    font: 1rem $webstore-modal-header-font-family;
-    font-weight: $webstore-modal-header-font-weight;
-    margin: .25rem 0;
+	color: #777;
+	font-weight: 600;
+	text-transform: uppercase;
+	font: 1rem $webstore-modal-header-font-family;
+	font-weight: $webstore-modal-header-font-weight;
+	margin: .25rem 0;
 
     .cancel {
       position: absolute;
@@ -167,7 +168,7 @@
 	}
 
 	header {
-		background-color: #eee;
+		background-color: $default-background-color;
 		border-bottom: 1px solid #ccc;
 	}
 
@@ -175,7 +176,7 @@
 
 	footer.submit {
 		padding: 0;
-		background-color: #eee;
+		background-color: $default-background-color;
 		color: #999;
 		overflow: hidden;
 

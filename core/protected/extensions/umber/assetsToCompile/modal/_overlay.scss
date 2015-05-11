@@ -1,5 +1,5 @@
 body.overlay {
-  background-color: #eee;
+  background-color: $default-background-color;
 }
 
 .editcartmodal{
@@ -37,6 +37,10 @@ body.overlay {
   left: 0;
   right: 0;
   font-family: $webstore-modal-font;
+
+  @include media(small) {
+	section#confirm { max-width: 720px; }
+  }
 
   .section-inner {
 	background-color: #fff;
@@ -180,7 +184,7 @@ body.overlay {
 
   header.webstore-brand {
 	border-bottom: 1px solid #ccc;
-	background: #eee;
+	background: $default-background-color; //TODO: is this valid?
 	padding: 10px;
 
 	@include media(small) { padding: 10px 30px; }
@@ -198,7 +202,6 @@ body.overlay {
   }
 
   header {
-	padding: none;
 	background: none;
 	padding: 0 8px;
 	border: none;
@@ -206,14 +209,6 @@ body.overlay {
 	@include media(small) {
 	  padding-right: 30px;
 	  padding-left: 30px;
-	}
-
-	h1 {
-	  font: normal 2.25rem $webstore-modal-header-font-family;
-	  font-weight: $webstore-modal-header-font-weight;
-	  margin: .5em 0 .35em;
-	  text-transform: none;
-	  color: #555;
 	}
   }
 
@@ -307,7 +302,3 @@ body.overlay {
 	display:none;
   }
 }
-
-
-
-

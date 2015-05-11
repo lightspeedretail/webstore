@@ -1583,6 +1583,29 @@ function _xls_get_url_resource($filename)
 	return $filename;
 }
 
+
+/**
+ * Convert accented characters into their non-accented equivalent
+ *
+ * @param $str
+ * @return mixed
+ */
+// @codingStandardsIgnoreStart
+function _xls_replaceAccents($str)
+// @codingStandardsIgnoreEnd
+{
+	$search = explode(
+		",",
+		"ç,æ,œ,á,é,í,ó,ú,à,è,ì,ò,ù,ä,ë,ï,ö,ü,ÿ,â,ê,î,ô,û,å,ø,Ø,Å,Á,À,Â,Ä,È,É,Ê,Ë,Í,Î,Ï,Ì,Ò,Ó,Ô,Ö,Ú,Ù,Û,Ü,Ÿ,Ç,Æ,Œ"
+	);
+	$replace = explode(
+		",",
+		"c,ae,oe,a,e,i,o,u,a,e,i,o,u,a,e,i,o,u,y,a,e,i,o,u,a,o,O,A,A,A,A,A,E,E,E,E,I,I,I,I,O,O,O,O,U,U,U,U,Y,C,AE,OE"
+	);
+
+	return str_replace($search, $replace, $str);
+}
+
 /**
  * Do a permanent 301 redirect
  *
@@ -1601,10 +1624,16 @@ function _xls_301($strUrl)
  *
  */
 // @codingStandardsIgnoreStart
-function _xls_404()
+function _xls_404($errorMessage = "The requested page does not exist.")
 // @codingStandardsIgnoreEnd
 {
-	throw new CHttpException(404, 'The requested page does not exist.');
+	throw new CHttpException(
+		404,
+		Yii::t(
+			'application errors',
+			$errorMessage
+		)
+	);
 }
 
 /**
@@ -3156,6 +3185,39 @@ function findWhere($arr, $properties)
 	}
 
 	return null;
+}
+
+/**
+ * Implementation of Underscore.js where.
+ * Looks through the $arr and returns all values that matches all of the
+ * key-value pairs listed in properties.
+ * @param array $arr An array of containing associative arrays.
+ * @param array $properties An associative array of properties to match against
+ * each element in $arr.
+ * @return mixed The matching elements of $arr.
+ */
+function where($arr, $properties)
+{
+	if (is_array($arr) === false && $arr instanceof Traversable === false)
+	{
+		return array();
+	}
+
+	if (is_array($properties) === false)
+	{
+		return array();
+	}
+
+	$results = array();
+	foreach ($arr as $element)
+	{
+		if (sizeof(array_intersect_assoc($element, $properties)) === sizeof($properties))
+		{
+			$results[] = $element;
+		}
+	}
+
+	return $results;
 }
 
 /**

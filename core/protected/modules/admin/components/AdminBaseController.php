@@ -38,10 +38,10 @@ class AdminBaseController extends CController
 
 	/**
 	 * These keys do not apply to Cloud, so remove them from any edit screens. They will
-	 * be returned as features are added to Clou.
+	 * be returned as features are added to Cloud.
 	 * @var array
 	 */
-	public $hideCloudKeys = array('TAX_INCLUSIVE_PRICING');
+	public $hideCloudKeys = array('TAX_INCLUSIVE_PRICING','SHIPPING_TAXABLE','INVENTORY_FIELD_TOTAL');
 
 	/**
 	 * These keys do not apply to Multitenant mode, so remove them from any edit screens.
@@ -221,17 +221,6 @@ class AdminBaseController extends CController
 			);
 		}
 
-		if(isset($action->id) && $action->id == "edit")
-		{
-			//Remove some options that aren't applicable in Cloud right now
-			if(Yii::app()->params['LIGHTSPEED_CLOUD'] > 0)
-			{
-				_dbx("update xlsws_configuration set key_value=0,configuration_type_id=0,sort_order=0 where key_name='SHIPPING_TAXABLE'");
-				_dbx("update xlsws_configuration set key_value=0,configuration_type_id=0,sort_order=0 where key_name='INVENTORY_FIELD_TOTAL'");
-
-			}
-		}
-		
 		return parent::beforeAction($action);
 
 	}
@@ -370,14 +359,15 @@ class AdminBaseController extends CController
 
 		$objComponent = Yii::app()->getComponent($id);
 
-		if (!$objComponent)
-			throw new CHttpException(404,'The requested page does not exist.');
+		if (!$objComponent || $objComponent->isDisplayable() === false)
+		{
+			_xls_404();
+		}
 
 		$model = $objComponent->getAdminModel();
 
 		if (!is_null($model))
 		{
-
 			//Get form elements (Admin panel configuration) and add our layout formatting so the form looks nice within Admin Panel
 			$this->editSectionInstructions = $this->getInstructions(get_class($this))."<p>".$this->editSectionInstructions;
 
@@ -465,6 +455,14 @@ class AdminBaseController extends CController
 			$this->registerAsset("js/destinationrates.js");
 			$this->registerAsset("js/tiers.js");
 			$this->registerAsset("js/offerservices.js");
+
+			if ($id === 'cayan')
+			{
+				$this->registerAsset("js/cayan.js");
+				$this->registerAsset("css/cayan.css");
+				Yii::import('ext.SMiniColors.SActiveColorPicker');
+				SActiveColorPicker::registerScriptFiles();
+			}
 
 			$this->render(
 				'admin.views.default.moduleedit',

@@ -7,6 +7,7 @@ if($model): ?>
 	<div class="row">
         <h1 class="center"><?= Yii::t('cart','Thank you for your order!') ?></h1>
 	</div>
+    <div id="order-info">
     <div class="row">
         <div class="col-sm-2 cartlabel"><?php echo Yii::t('cart','Order ID') ?>:</div>
         <div class="col-sm-3"><?= $model->id_str; ?></div>
@@ -31,6 +32,7 @@ if($model): ?>
     <div class="row spaceafter">
         <div class="ten column alpha omega"><span class="cartlabel cartNotes"><?php echo Yii::t('cart','Notes') ?>:</span></div>
         <div class="ten column offset-by-one"><?= nl2br($model->printed_notes) ?></div>
+    </div>
     </div>
 
   	<?php echo $this->renderPartial('/cart/_cartitems',array('model'=>$model),true); ?>

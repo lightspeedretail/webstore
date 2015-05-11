@@ -6,7 +6,7 @@
 								<h1>
 									<?php
 										echo CHtml::link(
-											CHtml::image(Yii::app()->params['HEADER_IMAGE']).
+											CHtml::image(Yii::app()->controller->pageHeaderImage).
 											CHtml::tag('span', array(), Yii::app()->params['STORE_NAME']),
 											Yii::app()->createUrl("site/index"),
 											array('class' => 'logo-placement')

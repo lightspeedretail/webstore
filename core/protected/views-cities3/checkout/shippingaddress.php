@@ -55,7 +55,7 @@ $this->renderPartial("_storepickup", array(
 							?>
 							<?php
 							echo CHtml::ajaxLink(
-								Yii::t('checkout', 'Hide'),
+								Yii::t('checkout', 'Remove'),
 								Yii::app()->createUrl('myaccount/removeaddress'),
 								array(
 									'type' => 'POST',

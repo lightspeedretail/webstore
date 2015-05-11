@@ -88,18 +88,24 @@
 		<?php endif; ?>
 
 		<div class="submitblock" >
-			<div id="submitSpinner" style="display:none"><?php
-				echo CHtml::image(Yii::app()->getBaseUrl(true).'/images/wait_animated.gif')?></div>
-			<?php echo CHtml::submitButton('Submit');  ?>
-
+			<div id="submitSpinner" style="display:none">
+				<?=
+					CHtml::image(
+						Yii::app()->getBaseUrl(true) . '/images/wait_animated.gif'
+					)
+				?>
+			</div>
+			<?=
+				CHtml::submitButton(
+					Yii::t(
+						'forms',
+						'Submit'
+					)
+				);
+			?>
 		</div>
 
 	</div>
-
-
-
-
-
 
 </div> <!--end of contact-form -->
 

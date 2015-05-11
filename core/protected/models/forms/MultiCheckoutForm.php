@@ -537,8 +537,18 @@ class MultiCheckoutForm extends CheckoutForm
 				$this->shippingState = $objAddress->state_id;
 				$this->shippingPostal = $objAddress->postal;
 				$this->shippingCountry = $objAddress->country_id;
-				$this->contactPhone = $objAddress->phone;
 				$this->shippingResidential = $objAddress->residential;
+				if (isset($objAddress->phone) && $objAddress->phone !== '')
+				{
+					// the intended behaviour is to always set the shipping address
+					// phone number (if it exists) as the contact number...
+					$this->contactPhone = $objAddress->phone;
+				}
+				else
+				{
+					// ...otherwise we set it to the customer's main phone number
+					$this->contactPhone = $objAddress->customer->mainphone;
+				}
 				break;
 		}
 	}

@@ -119,8 +119,13 @@ body.overlay, .editcartmodal.webstore-modal.show {
     .wishlist-block {
       span.title {
         color: $accent-background-color;
+        font-weight: bold;
+        font-size: 1rem;
       }
+
       p:hover {
+        color: #FFF;
+        cursor: pointer;
         background-color: $accent-background-color;
         border-color: $accent-background-color;
         span.title {

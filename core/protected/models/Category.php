@@ -650,25 +650,29 @@ class Category extends BaseCategory
 	{
 		$criteria = new CDbCriteria();
 		$criteria->alias = 'Product';
-		$criteria->join='LEFT JOIN xlsws_product_category_assn as ProductAssn ON ProductAssn.product_id=Product.id';
+		$criteria->join = 'LEFT JOIN xlsws_product_category_assn as ProductAssn ON ProductAssn.product_id=Product.id';
 
 		//This count shows if there are products in the category (including ones that are temporarily hidden
 		//due to hiding out of stock)
 		$criteria->condition = 'category_id = :id AND web=1
-			AND (current=1 OR (current=0 AND inventoried=1 AND inventory_avail>0))
+			AND (current = 1 AND inventoried = 1 AND inventory_avail > 0)
 			AND (
-				(master_model=1) OR
-				(master_model=0 AND parent IS NULL)
-			)';		$criteria->params = array (':id'=>$this->id);
+				(master_model = 1) OR
+				(master_model = 0 AND parent IS NULL)
+			)';		$criteria->params = array (':id' => $this->id);
 
 		$intCount = Product::model()->count($criteria);
 		Yii::log("Calculating child count for ".$this->label." and got ".$intCount, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
 		$this->child_count = $intCount;
 		if (!$this->save())
-			Yii::log("Error saving category ".$this->label." ". print_r($this->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		{
+			Yii::log("Error saving category ".$this->label." ". print_r($this->getErrors(), true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		}
 
 		if(!$this->IsPrimary() && $this->ParentObject)
+		{
 			$this->ParentObject->UpdateChildCount();
+		}
 	}
 
 	public static function LoadByNameParent($strName, $intParentId) {

@@ -185,12 +185,11 @@ $(function () {
 
         // if forgot password, send ajax request. Else if login, submit form normally (no js required - it's a regular submit in this case)
         if (loginButton.hasClass("is-login") === false) {
-
             $.ajax({
                 'type':'POST',
                 'data': $("form").serialize(),
                 'dataType': 'json',
-                'url': '/site/forgotpassword',
+                'url': login.forgotPasswordLink,
                 'cache': false,
                 'success': function(data) {
                     if (data.status === "success") {

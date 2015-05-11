@@ -1,0 +1,33 @@
+/* global */
+#divLogo { text-align: center; background-color: #F7F7F7; border: 2px solid #4F4F4F; padding: 14px; margin-bottom: 15px; }
+#divInstructions { background-color: #CDEB8B; border: solid 2px #006E2E; padding: 15px; font-size: 12px; text-align: center; margin-bottom: 15px; }
+.myForm { background-color: #F7F7F7; border: 2px solid #4F4F4F; padding: 14px; margin-bottom: 15px; }
+.myForm h4 { border-bottom: 1px solid #4F4F4F; padding-bottom: 5px; }
+.myForm .field { display: inline-block; text-align: right; font-size: 13px; font-weight: 700; }
+.myForm .help { font-size: 11px; font-weight: normal; color: #666; }
+.myForm input[type="text"], .myForm input[type="password"] { vertical-align: top; border-radius: 0; padding: 10px; margin-left: 10px; border: 2px solid #8F8F8F; }
+.myForm input[type="text"]:focus, .myForm input[type="password"]:focus { box-shadow: none; border-color: #363636; }
+.right { text-align: right; }
+.span3.optionlabel { margin-left: 10px; }
+.span1.optionvalue { margin-top: -3px; width: 10px; }
+#cayanForm .links { margin: 10px 0 15px; }
+
+/* necessary individual tweaks */
+#divLogo img { max-width: none; }
+
+#divExpDate { margin: 10px 0 0 24px; }
+input#txtExpDate { width: 50px; }
+
+#divCVV { margin: 10px 0 0 70px; }
+input#txtCVV { width: 40px; }
+
+#divKeyedCardHolder { margin: 10px 0 0 38px; }
+#divKeyedStreet { margin: 10px 0 0 24px; }
+
+#divKeyedZip { margin: 10px 0 0 20px }
+input#txtKeyedZip { width: 100px; }
+
+#divCustomButtons { margin: 30px 0; text-align: center; }
+#divCustomButtons a img { margin: 0 40px; border-width: 0; }
+
+#additional div { font-size: 12px; }

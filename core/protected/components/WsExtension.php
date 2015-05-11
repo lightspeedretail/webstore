@@ -565,4 +565,14 @@ class WsExtension extends CComponent
 		}
 
 	}
+
+	/**
+	 * Whether the module is allowed to be displayed in admin panel. This is
+	 * overridden for payment modules.
+	 *
+	 * @return bool True if we can display the module. False otherwise.
+	 */
+	public function isDisplayable () {
+		return true;
+	}
 }

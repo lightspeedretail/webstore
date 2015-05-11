@@ -10,7 +10,7 @@ class PaymentsController extends AdminBaseController
 	{
 		return array(
 			array('allow',
-				'actions'=>array('index','module','newpromo','order','promocodes','cardtypes','promotasks','updatepromo'),
+				'actions'=>array('index','module','newpromo','order','promocodes','cardtypes','promotasks','updatepromo','cayan','cayandemo'),
 				'roles'=>array('admin'),
 			),
 		);
@@ -18,52 +18,95 @@ class PaymentsController extends AdminBaseController
 
 	public function beforeAction($action)
 	{
-
 		$this->scanModules('payment');
 
-		$arrModules =  Modules::model()->findAllByAttributes(array('category'=>'payment'),array('order'=>'module')); //Get active and inactive
+		$arrModules =  Modules::model()->findAllByAttributes(
+			array('category' => 'payment'),
+			array('order' => 'module')
+		);
 
 		$menuSidebar = array();
-		$menuSidebara = array();
+
 		foreach ($arrModules as $module)
-			try {
-				if (Yii::app()->getComponent($module->module))
-					if (Yii::app()->getComponent($module->module)->cloudCompatible || _xls_get_conf('LIGHTSPEED_CLOUD')==0)
-						if (Yii::app()->getComponent($module->module)->advancedMode)
-							$menuSidebara[] = array('label'=>Yii::app()->getComponent($module->module)->AdminName, 'url'=>array('payments/module', 'id'=>$module->module));
-						else
-							$menuSidebar[] = array('label'=>Yii::app()->getComponent($module->module)->AdminName, 'url'=>array('payments/module', 'id'=>$module->module));
+		{
+			$currentModule = Yii::app()->getComponent($module->module);
+			if (is_null($currentModule))
+			{
+				continue;
 			}
-			catch (Exception $e) {
-				Yii::log("Missing widget ".$e, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+
+			if ($currentModule->cloudCompatible === false &&
+				_xls_get_conf('LIGHTSPEED_CLOUD') > 0)
+			{
+				continue;
 			}
+
+			if ($currentModule->isDisplayable() === false)
+			{
+				continue;
+			}
+
+			$menuSidebar[] = array(
+				'label' => $currentModule->AdminName,
+				'url' => array(
+					'payments/module',
+					'id' => $module->module
+				),
+				'advancedPayment' => $currentModule->advancedMode
+			);
+		}
+
+		$advancedPaymentMethods = where(
+			$menuSidebar,
+			array('advancedPayment' => true)
+		);
+
+		$simplePaymentMethods = where(
+			$menuSidebar,
+			array('advancedPayment' => false)
+		);
 
 		$this->menuItems = array_merge(
 			array(
-				array('label'=>'Simple Integration Modules', 'linkOptions'=>array('class'=>'nav-header'))
-				),
-			$menuSidebar,
-			array(
-				array('label'=>'Advanced Integration Modules', 'linkOptions'=>array('class'=>'nav-header'), 'visible'=>count($menuSidebara)>0)
+				array(
+					'label' => 'Simple Integration Modules',
+					'linkOptions' => array('class' => 'nav-header')
+				)
 			),
-			$menuSidebara,
+			$simplePaymentMethods,
 			array(
-				array('label'=>'Payment Setup', 'linkOptions'=>array('class'=>'nav-header')),
-				array('label'=>'Set Display Order', 'url'=>array('payments/order')),
-				array('label'=>'Credit Card Types', 'url'=>array('payments/cardtypes')),
-				array('label'=>'Promo Codes', 'url'=>array('payments/promocodes')),
-				array('label'=>'Promo Code Tasks', 'url'=>array('payments/promotasks')),
+				array(
+					'label' => 'Advanced Integration Modules',
+					'linkOptions' => array('class' => 'nav-header'),
+					'visible' => count($advancedPaymentMethods) > 0
+				)
+			),
+			$advancedPaymentMethods,
+			array(
+				array('label' => 'Payment Setup', 'linkOptions' => array('class'=>'nav-header')),
+				array('label' => 'Set Display Order', 'url' => array('payments/order')),
+				array('label' => 'Credit Card Types', 'url' => array('payments/cardtypes')),
+				array('label' => 'Promo Codes', 'url' => array('payments/promocodes')),
+				array('label' => 'Promo Code Tasks', 'url' => array('payments/promotasks')),
 
 			)
 		);
 
 
-		$objModules = Modules::model()->findAllByAttributes(array('category'=>'payment','active'=>1));
+		$objModules = Modules::model()->findAllByAttributes(
+			array(
+				'category' => 'payment',
+				'active' => 1
+			)
+		);
 
-		if (count($objModules)==0 && $action->id=="index")
+		if (count($objModules) === 0 && $action->id == "index")
 		{
 			$this->noneActive=1;
-			Yii::app()->user->setFlash('error',Yii::t('admin','WARNING: You have no payment modules activated. No one can checkout.'));
+			Yii::app()->user->setFlash(
+				'error',
+				Yii::t('admin','WARNING: You have no payment modules activated. No one can checkout.')
+			);
 		}
 
 		return parent::beforeAction($action);
@@ -277,8 +320,129 @@ class PaymentsController extends AdminBaseController
 				);
 			}
 		}
+	}
+
+	/**
+	 * Cayan doesn't offer an admin interface to customize the look of their hosted pay page.
+	 * This action provides that ability to store owners within our Admin Panel. See the
+	 * CayanConfigForm class for a list of the options we make available.
+	 *
+	 * @return void
+	 */
+	public function actionCayan()
+	{
+		$module = Modules::LoadByName('cayan');
+		$configValues = $module->GetConfigValues();
+
+		if (isset($_POST['cayanConfigForm']))
+		{
+			$configValues['customConfig'] = $_POST['cayanConfigForm'];
+			foreach ($configValues['customConfig'] as $key => $strColor)
+			{
+				$configValues['customConfig'][$key] = str_replace('#', '', $strColor);
+			}
+
+			$module->SaveConfigValues($configValues);
+			echo 'success';
+			return;
+		}
+
+		$model = new cayanConfigForm();
+		$formDefinition = $model->getAdminForm();
+		foreach ($formDefinition['elements'] as $key => $value)
+		{
+			if ($value['type'] == 'checkbox')
+			{
+				$formDefinition['elements'][$key]['layout'] =
+					'<div class="span1 optionvalue">{input}</div>'.
+					'<div class="span3 optionlabel">{label}</div>'.
+					'<div class="span5 optionlabel">{error}</div>';
+				continue;
+			}
+
+			$formDefinition['elements'][$key]['layout'] =
+				'<div class="span5 optionlabel">{label}</div>'.
+				'<div class="span5 optionvalue">{input}</div>{error}';
+		}
+
+		if (isset($configValues['customConfig']) && is_array($configValues['customConfig']))
+		{
+			foreach ($configValues['customConfig'] as $key => $value)
+			{
+				$model->$key = $value;
+			}
+		}
+
+		$form = new CForm($formDefinition, $model);
+		$form->attributes = array('id' => 'cayanForm');
+
+		$this->renderPartial('_cayanconfig', array('form' => $form));
+	}
+	
+	/**
+	 * This action allows the store owner to view their defined customizations and see a
+	 * demo of the hosted pay page that their customers will experience when checking out.
+	 * The demo isn't a perfect replica but is close enough to the real thing.
+	 *
+	 * @return void
+	 */
+	public function actionCayanDemo()
+	{
+		$module = Modules::LoadByName('cayan');
+		$config = $module->getConfig('customConfig');
+
+		$colorContainerBackground = '';
+		$colorContainerBorder = '';
+		$colorLogoBackground = '';
+		$colorLogoBorder = '';
+		$colorTextBoxBorder = '';
+		$colorTextBoxBorderFocus = '';
+
+		if ($config['colorContainerBackground'] != '')
+		{
+			$colorContainerBackground = 'background-color:#'.$config['colorContainerBackground'].';';
+		}
+
+		if ($config['colorContainerBorder'] != '')
+		{
+			$colorContainerBorder = 'border-color:#'.$config['colorContainerBorder'].';';
+		}
+
+		if ($config['colorLogoBackground'] != '')
+		{
+			$colorLogoBackground = 'background-color:#'.$config['colorLogoBackground'].';';
+		}
+
+		if ($config['colorLogoBorder'] != '')
+		{
+			$colorLogoBorder = 'border-color:#'.$config['colorLogoBorder'].';';
+		}
+
+		if ($config['colorTextBoxBorder'] != '')
+		{
+			$colorTextBoxBorder = 'border-color:#'.$config['colorTextBoxBorder'].';';
+		}
+
+		if ($config['colorTextBoxBorderFocus'] != '')
+		{
+			$colorTextBoxBorderFocus = 'border-color:#'.$config['colorTextBoxBorderFocus'].';';
+		}
 
 
+		$this->registerAsset('css/cayan.css');
+		$this->renderPartial(
+			'_cayanpreview',
+			array(
+				'config' => $config,
+				'logoUrl' => $module->getConfig('logoUrl'),
+				'colorContainerBackground' => $colorContainerBackground,
+				'colorContainerBorder' => $colorContainerBorder,
+				'colorLogoBackground' => $colorLogoBackground,
+				'colorLogoBorder' => $colorLogoBorder,
+				'colorTextBoxBorder' => $colorTextBoxBorder,
+				'colorTextBoxBorderFocus' => $colorTextBoxBorderFocus,
+			)
+		);
 	}
 
 

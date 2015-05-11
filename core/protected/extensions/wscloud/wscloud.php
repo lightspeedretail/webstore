@@ -37,15 +37,18 @@ class wscloud extends ApplicationComponent {
 	public function onAddCustomer($event)
 	{
 		$this->init();
-		$topicArn = $this->objModule->getConfig('topic_arn');
+		$topicArn = $this->getTopicArn();
 
 		//don't run this unless we actually have a cloud acct
-		if(_xls_get_conf('LIGHTSPEED_CLOUD')=='0' || empty($topicArn)) return true;
+		if (_xls_get_conf('LIGHTSPEED_CLOUD') == '0' || empty($topicArn))
+		{
+			return true;
+		}
 
 		$objCustomer = $event->objCustomer;
 		$strSignal = $this->buildCustomerSignal($objCustomer);
 
-		$this->sendSignal($strSignal,$topicArn);
+		$this->sendSignal($strSignal, $topicArn);
 	}
 
 	/**
@@ -68,16 +71,18 @@ class wscloud extends ApplicationComponent {
 	public function onCreateOrder($event)
 	{
 		$this->init();
-		$topicArn = $this->objModule->getConfig('topic_arn');
+		$topicArn = $this->getTopicArn();
 
 		//don't run this unless we actually have a cloud acct
-		if(Yii::app()->params['LIGHTSPEED_CLOUD']=='0' || empty($topicArn)) return true;
+		if (Yii::app()->params['LIGHTSPEED_CLOUD'] == '0' || empty($topicArn))
+		{
+			return true;
+		}
 
 		$objCart = Cart::LoadByIdStr($event->order_id);
 		$strSignal = $this->buildOrderSignal($objCart);
 
-		$this->sendSignal($strSignal,$topicArn);
-
+		$this->sendSignal($strSignal, $topicArn);
 		return true;
 	}
 
@@ -221,14 +226,17 @@ class wscloud extends ApplicationComponent {
 	public function Resynccloud()
 	{
 		$this->init();
-		$topicArn = $this->objModule->getConfig('topic_arn');
+		$topicArn = $this->getTopicArn();
 
 		//don't run this unless we actually have a cloud acct
-		if(Yii::app()->params['LIGHTSPEED_CLOUD']=='0' || empty($topicArn)) return true;
+		if (Yii::app()->params['LIGHTSPEED_CLOUD'] == '0' || empty($topicArn))
+		{
+			return true;
+		}
 
 		$strSignal = $this->buildResyncSignal();
 
-		$this->sendSignal($strSignal,$topicArn);
+		$this->sendSignal($strSignal, $topicArn);
 	}
 
 	protected function buildOrderSignal($objCart)
@@ -425,10 +433,18 @@ class wscloud extends ApplicationComponent {
 
 	}
 
-	protected function sendSignal($strSignal,$topicArn)
+	protected function sendSignal($strSignal, $topicArn)
 	{
 
-		Yii::log("Attempting SNS Cloud signal ".$strSignal, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+		Yii::log(
+			sprintf(
+				'Attempting SNS Cloud signal to %s: %s',
+				$topicArn,
+				$strSignal
+			),
+			'info',
+			'application.'.__CLASS__.".".__FUNCTION__
+		);
 
 		try
 		{
@@ -451,15 +467,13 @@ class wscloud extends ApplicationComponent {
 
 	}
 
-	private function sendAwsSnsSignal($strSignal,$topicArn)
+	private static function sendAwsSnsSignal($strSignal, $topicArn)
 	{
 		$sns = new A2Sns();
 
 		$msgId = $sns->publish(array(
-			'TopicArn'=>$topicArn,
-			'TargetArn'=>$topicArn,
-			'Message'=>$strSignal,
-
+			'TopicArn' => $topicArn,
+			'Message' => $strSignal,
 		));
 
 		return $msgId;
@@ -536,5 +550,24 @@ class wscloud extends ApplicationComponent {
 		$url = str_replace("http:", "", str_replace("https:", "", $url));
 		return $url;
 
+	}
+
+	/**
+	 * Get the configured SNS Topic ARN.
+	 *
+	 * Use the environment variable if set, otherwise fall back to the database
+	 * configuration.
+	 *
+	 * TODO WS-4151 - Remove support for legacy configuration.
+	 *
+	 * @return {string|null} The configured topic ARN.
+	 */
+	protected function getTopicArn() {
+		if (isset($_SERVER['amazon_sns_topic_arn']))
+		{
+			return $_SERVER['amazon_sns_topic_arn'];
+		}
+
+		return $this->objModule->getConfig('topic_arn');
 	}
 }

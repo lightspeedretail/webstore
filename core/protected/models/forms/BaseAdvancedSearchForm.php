@@ -37,10 +37,10 @@ class BaseAdvancedSearchForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'q'=>Yii::t('global','Search Term'),
-			'startprice'=>Yii::t('global','Start Price'),
-			'endprice'=>Yii::t('global','End Price'),
-			'cat'=>Yii::t('global','Restrict by category'),
+			'q' => Yii::t('global', 'Search Term'),
+			'startprice' => Yii::t('global', 'Start Price'),
+			'endprice' => Yii::t('global', 'End Price'),
+			'cat' => Yii::t('global', 'Restrict by category'),
 		);
 	}
 

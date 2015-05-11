@@ -95,18 +95,23 @@ if (count($altMethods) > 0):
 <?php endif; ?>
 
 <footer class="submit">
-	<?php
-		echo
-			CHtml::submitButton(
-				'Submit',
-				array(
-					'type' => 'submit',
-					'class' => 'button',
-					'name' => 'Payment',
-					'id' => 'Payment',
-					'value' => Yii::t('checkout', "Review and Confirm Order")
+	<?=
+		CHtml::submitButton(
+			Yii::t(
+				'forms',
+				'Submit'
+			),
+			array(
+				'type' => 'submit',
+				'class' => 'button',
+				'name' => 'Payment',
+				'id' => 'Payment',
+				'value' => Yii::t(
+					'checkout',
+					'Review and Confirm Order'
 				)
-			);
+			)
+		);
 	?>
 </footer>
 

@@ -1,6 +1,6 @@
 <div id="contact-page" class="row-fluid">
 
-		<h1><?php echo Yii::t('tabs',$model->title) ?></h1>
+		<h1><?= Yii::t('tabs', $model->title) ?></h1>
 
 		<div id="custom-page-content">
 			<?php echo $model->page;  ?>
@@ -16,15 +16,15 @@
 			'clientOptions' => array(
 				'validateOnSubmit' => true,
 				'beforeValidate' => "js:function(form) {
-            $(\"#submitSpinner\").toggle();
-            return true;
-	        }",
+			$(\"#submitSpinner\").toggle();
+			return true;
+			}",
 				'afterValidate' => "js:function(form, data, hasError) {
-            if(hasError) {
-                $(\"#submitSpinner\").toggle();
-                return false;
-            } else return true;
-            }",
+			if(hasError) {
+				$(\"#submitSpinner\").toggle();
+				return false;
+			} else return true;
+			}",
 			),
 		)); ?>
 
@@ -70,16 +70,24 @@
 		<?php endif; ?>
 
 		<div class="submitblock" >
-			<div id="submitSpinner" style="display:none"><?php
-				echo CHtml::image(Yii::app()->getBaseUrl(true).'/images/wait_animated.gif')?></div>
-			<?php echo CHtml::submitButton('Submit');  ?>
-
+			<div id="submitSpinner" style="display:none">
+				<?=
+					CHtml::image(
+						Yii::app()->getBaseUrl(true) . '/images/wait_animated.gif'
+					)
+				?>
+			</div>
+			<?=
+				CHtml::submitButton(
+					Yii::t(
+						'forms',
+						'Submit'
+					)
+				);
+			?>
 		</div>
 
-
-
 		<?php $this->endWidget(); ?>
-
 
 		<div class="carousel span9">
 			<?php

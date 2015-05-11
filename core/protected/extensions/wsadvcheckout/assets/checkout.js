@@ -626,8 +626,11 @@ WsEditCartModal.prototype.updateCart = function(DOMInput) {
 /**
  * Remove an item from the cart given an input element on the page.
  * @param {DOM element} DOMInput The input element in the DOM.
+ * @param {Event} event The event which fired this function.
  */
-WsEditCartModal.prototype.removeItem = function(DOMInput) {
+WsEditCartModal.prototype.removeItem = function(DOMInput, event) {
+	// Prevent the event firing and modifying the browser history.
+	event.preventDefault();
 	var cartItemId = DOMInput.getAttribute('data-pk');
 	this.updateCartItemQty(cartItemId, 0);
 };
@@ -882,8 +885,4 @@ $(document).on('click', function() {
 	}
 
 	Checkout.creatingTooltip = false;
-});
-
-$(document).on('click', '#cart .exit, #cart .continue', function() {
-	hideModal();
 });

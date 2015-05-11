@@ -45,9 +45,18 @@ if(_xls_facebook_login()): ?>
 
 	<div class="row-fluid shortrow buttons">
 		<div class="inline">
-			<?php
-			echo CHtml::SubmitButton(Yii::t('global','Login'),
-				array('id'=>'btnModalLogin','name'=>'btnModalLogin')); ?>
+			<?=
+				CHtml::SubmitButton(
+					Yii::t(
+						'global',
+						'Login'
+					),
+				array(
+					'id' => 'btnModalLogin',
+					'name' => 'btnModalLogin'
+				)
+				);
+			?>
 		</div>
         <div class="forgotpassword inline">
             <?php echo CHtml::ajaxLink(Yii::t('global','Forgot Password?'),

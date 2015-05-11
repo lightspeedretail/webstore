@@ -81,21 +81,25 @@ class Family extends BaseFamily
 	{
 		$return = array();
 		# Traverse the tree and search for direct children of the root
-		foreach($objRet as $objItem) {
-			if ($objItem->child_count>0 || Yii::app()->params['DISPLAY_EMPTY_CATEGORY'])
-			$return[] = array(
-						'text'=>CHtml::link($objItem->family,$objItem->Link),
-						'label' => $objItem->family,
-						'link' => $objItem->Link,
-						'request_url' => $objItem->request_url,
-						'url' => $objItem->Link,
-						'id' => $objItem->id,
-						'child_count' => $objItem->child_count,
-						'children' => null,
-						'items' => null
-					);
-
+		foreach($objRet as $objItem)
+		{
+			if (CPropertyValue::ensureInteger($objItem->child_count) > 0 ||
+				CPropertyValue::ensureBoolean(Yii::app()->params['DISPLAY_EMPTY_CATEGORY']))
+			{
+				$return[] = array(
+					'text' => CHtml::link($objItem->family, $objItem->Link),
+					'label' => $objItem->family,
+					'link' => $objItem->Link,
+					'request_url' => $objItem->request_url,
+					'url' => $objItem->Link,
+					'id' => $objItem->id,
+					'child_count' => $objItem->child_count,
+					'children' => null,
+					'items' => null
+				);
+			}
 		}
+
 		return empty($return) ? null : $return;
 	}
 	public static function ConvertSEO() {
@@ -142,22 +146,17 @@ class Family extends BaseFamily
 		$criteria = new CDbCriteria();
 		$criteria->alias = 'Product';
 
-
-
 		$criteria->condition = 'family_id = :id AND web=1
-			AND (current=1 OR (current=0 AND inventoried=1 AND inventory_avail>0))
+			AND (current = 1 AND inventoried = 1 AND inventory_avail > 0)
 			AND (
-				(master_model=1) OR
-				(master_model=0 AND parent IS NULL)
+				(master_model = 1) OR
+				(master_model = 0 AND parent IS NULL)
 			)';
-		$criteria->params = array (':id'=>$this->id);
-
+		$criteria->params = array (':id' => $this->id);
 
 		$intCount = Product::model()->count($criteria);
 		$this->child_count = $intCount;
 		$this->save();
-
-
 	}
 
 	public function setLabel($str)

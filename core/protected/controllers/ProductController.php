@@ -14,7 +14,7 @@
  */
 class ProductController extends Controller
 {
-	public $layout='//layouts/column2';
+	public $layout = '//layouts/column2';
 	public $objProduct;
 
 	/**
@@ -24,14 +24,14 @@ class ProductController extends Controller
 	{
 		return array(
 			// captcha action renders the CAPTCHA image displayed on the contact page
-			'captcha'=>array(
-				'class'=>'CCaptchaAction',
-				'backColor'=>0xFFFFFF,
+			'captcha' => array(
+				'class' => 'CCaptchaAction',
+				'backColor' => 0xFFFFFF,
 			),
 			// page action renders "static" pages stored under 'protected/views/site/pages'
 			// They can be accessed via: index.php?r=site/page&view=FileName
-			'page'=>array(
-				'class'=>'CViewAction',
+			'page' => array(
+				'class' => 'CViewAction',
 			),
 		);
 	}
@@ -42,7 +42,7 @@ class ProductController extends Controller
 	 */
 	public function actionIndex()
 	{
-		throw new CHttpException(404,'The requested page does not exist.');
+		_xls_404();
 	}
 
 	/**
@@ -50,30 +50,32 @@ class ProductController extends Controller
 	 * If we do not receive this id, redirect back to the home page since something
 	 * went wrong.
 	 */
-	public function actionView() {
-
-
+	public function actionView()
+	{
 		$id = Yii::app()->getRequest()->getQuery('id');
+
 		if (empty($id))
-			throw new CHttpException(404,'The requested page does not exist.');
+		{
+			_xls_404();
+		}
 
 		//Load a product and display the information
 		$model = $this->objProduct = Product::model()->findByPk($id);
 
-		if (!$model)
-			throw new CHttpException(404,'The requested page does not exist.');
-
-		if(!$model->IsDisplayable)
-			throw new CHttpException(404,'The requested page does not exist.');
+		if (!$model || !$model->IsDisplayable)
+		{
+			_xls_404();
+		}
 
 		//If our request_url (based on description) has changed, redirect properly
 		if ($model->request_url != Yii::app()->getRequest()->getQuery('name'))
+		{
 			_xls_301($model->Link);
+		}
 
 		//Set breadcrumbs
 		$this->breadcrumbs = $model->Breadcrumbs;
 		$this->pageImageUrl = $model->SmallImageAbsolute;
-
 
 		$objWishlistAddForm = new WishlistAddForm();
 		$objWishlistAddForm->id = $this->objProduct->id;
@@ -86,19 +88,21 @@ class ProductController extends Controller
 		$this->pageDescription = $model->PageDescription;
 		$this->canonicalUrl = $model->canonicalUrl;
 		$this->returnUrl = $model->absoluteLink;
-		$model->intQty=1;
+		$model->intQty = 1;
 
 		//Raise any events first
-		$objEvent = new CEventProduct(get_class($this),'onActionProductView',$model);
-		_xls_raise_events('CEventProduct',$objEvent);
+		$objEvent = new CEventProduct(get_class($this), 'onActionProductView', $model);
+		_xls_raise_events('CEventProduct', $objEvent);
 
 		$this->widget('ext.wscartanimate.wscartanimate');
 
-		$this->render('index',array(
-			'model'=>$model,
-			'WishlistAddForm'=>$objWishlistAddForm,
-		));
-
+		$this->render(
+			'index',
+			array(
+			'model' => $model,
+			'WishlistAddForm' => $objWishlistAddForm,
+			)
+		);
 	}
 
 

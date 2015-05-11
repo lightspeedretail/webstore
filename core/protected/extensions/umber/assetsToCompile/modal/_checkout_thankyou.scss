@@ -144,7 +144,7 @@ $check-width: 3.25rem;
 	font-size: .8375rem;
 	padding: 11px 10px;
 	color: #666;
-	background-color: #eee;
+	background-color: $default-background-color;
 	// border: 1px solid #ccc;
 
 	&:hover {

@@ -98,7 +98,7 @@ $(function() {
 		var postal = $('#MultiCheckoutForm_shippingPostal').val();
 		var country = $('#MultiCheckoutForm_shippingCountryCode :selected').val();
 
-		if (postal.length > 2) {
+		if (postal !== null && postal.length > 2) {
 			options.country =  country;
 			options.postal = postal;
 			zippothatnow(options);

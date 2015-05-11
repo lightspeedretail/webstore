@@ -136,7 +136,7 @@ class CommonsslController extends Controller
 
 		if (!Yii::app()->params['LIGHTSPEED_HOSTING_COMMON_SSL'])
 		{
-			throw new CHttpException(404, 'The requested page does not exist.');
+			_xls_404();
 		}
 
 		//Parse the information we were sent (encrypted) on the command line
@@ -144,7 +144,7 @@ class CommonsslController extends Controller
 
 		if (empty($strLink))
 		{
-			throw new CHttpException(404, 'The requested page does not exist.');
+			_xls_404();
 		}
 
 		$link = _xls_decrypt($strLink);

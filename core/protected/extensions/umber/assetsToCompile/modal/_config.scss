@@ -89,6 +89,12 @@ $light-grey-border: #ddd;
 $light-grey-text: #aaa;
 
 /**
+ * Background
+ * ==========================================================================
+ */
+$default-background-color: #eee;
+
+/**
  * Fonts
  * ==========================================================================
  */
@@ -113,6 +119,8 @@ $input-shadow-left-focus: 0;
 $input-shadow-blur-focus: 2px;
 $input-shadow-spread-focus: 2px;
 $input-shadow-inset-focus: true;
+
+$address-form-width: 420px;
 
 /**
  * Links
@@ -159,6 +167,7 @@ $success-color: #ffffcc;
 $modal-padding: 20px;
 
 $modal-width: 720px;
+$modal-width-large: 840px;//TODO: is this used or somewhat overriden
 $modal-width-narrow: 480px;
 
 $calltoaction-color: $blue;

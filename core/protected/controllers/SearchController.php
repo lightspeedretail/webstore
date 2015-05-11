@@ -151,7 +151,6 @@ class SearchController extends Controller
 		$criteria->addCondition('current=1');
 		$criteria->order = 'Product.'._xls_get_sort_order();
 
-
 		$numberOfRecords = Product::model()->count($criteria);
 
 		$pages = new CPagination($numberOfRecords);
@@ -164,20 +163,31 @@ class SearchController extends Controller
 		$this->returnUrl = $this->canonicalUrl;
 		$this->pageImageUrl = "";
 
-        if ($strB=='*')
-        {
-            $families = Family::model()->findAll(array('order'=>'family'));
-            $this->render('brands',array('model'=>$families));
-        }
-        else
-		$this->render('grid',array(
-		'model'=> $model,
-		'item_count'=>$numberOfRecords,
-		'page_size'=>Yii::app()->params['PRODUCTS_PER_PAGE'],
-		'items_count'=>$numberOfRecords,
-		'pages'=>$pages,
-		));
+		if ($strB == '*')
+		{
+			$familiesCriteria = new CDbCriteria();
+			$familiesCriteria->order = 'family';
+			if (CPropertyValue::ensureBoolean(Yii::app()->params['DISPLAY_EMPTY_CATEGORY']) === false)
+			{
+				$familiesCriteria->addCondition('child_count > 0');
+			}
 
+			$families = Family::model()->findAll($familiesCriteria);
+			$this->render('brands', array('model' => $families));
+		}
+		else
+		{
+	        $this->render(
+		        'grid',
+		        array(
+		            'model' => $model,
+		            'item_count' => $numberOfRecords,
+		            'page_size' => Yii::app()->params['PRODUCTS_PER_PAGE'],
+		            'items_count' => $numberOfRecords,
+		            'pages' => $pages,
+	            )
+	        );
+		}
 	}
 
 	/**

@@ -80,15 +80,25 @@ if ($model->id > 0)
 	<div class="row-fluid rememberMe spaceafter">
 		<?php echo $form->checkBox($model,'deleteMe',array(
 			'onclick'=>'$("#btnSubmit").val("'. Yii::t('global','DELETE THIS WISHLIST').'"),
-			    $("#btnSubmit").addClass("btnDelete")
-			    ')); ?>
+				$("#btnSubmit").addClass("btnDelete")
+				')); ?>
 		<?php echo $form->labelEx($model,'deleteMe'); ?>
 		<?php echo $form->error($model,'deleteMe'); ?>
 	</div>
 	<?php endif; ?>
 
 	<div class="submitblock" >
-		<?php echo CHtml::submitButton('Submit', array('id'=>'btnSubmit'));  ?>
+		<?=
+			CHtml::submitButton(
+				Yii::t(
+					'forms',
+					'Submit'
+				),
+				array(
+					'id' => 'btnSubmit'
+				)
+			);
+		?>
 	</div>
 
 <?php $this->endWidget(); ?>

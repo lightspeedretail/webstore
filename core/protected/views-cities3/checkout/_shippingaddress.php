@@ -149,21 +149,25 @@
 			</li>
 		</ol>
 	</li>
-	<li class="field-container field-container-select field-container-select-no-handle country country-container">
-		<?php
-		echo $form->dropDownList(
-			$model,
-			'shippingCountryCode',
-			CHtml::listData(Country::sortShippingCountries($model->shippingCountryCode), 'code', 'country'),
-			$htmlOptions = array('class' => 'modal-accent-color')
-		);
+	<li class="field-container country country-container">
+		<?=
+	        $form->dropDownList(
+		        $model,
+		        'shippingCountryCode',
+		        CHtml::listData(
+			        Country::sortShippingCountries($model->shippingCountryCode),
+			        'code',
+			        'country'
+		        ),
+		        $htmlOptions = array('class' => 'no-style-select')
+	        );
 		?>
 	</li>
-
 </ol>
 <ol class="field-containers-small">
 	<li class="field-container">
-		<?php echo $form->labelEx(
+		<?php
+		echo $form->labelEx(
 			$model,
 			'contactPhone',
 			$htmlOptions = array('class' => 'placeheld'),

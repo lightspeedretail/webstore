@@ -63,7 +63,15 @@
 		</div>
 		<div class="row-fluid shortrow buttons">
 			<div class="inline">
-				<?php echo CHtml::submitButton(Yii::t('global','Search'), array('id'=>'btnSubmit'));  ?>
+				<?=
+					CHtml::submitButton(
+						Yii::t(
+							'forms',
+							'Search'
+						),
+						array('id' => 'btnSubmit')
+					);
+				?>
 			</div>
 			<div class="forgotpassword inline">
 				<?php if(Yii::app()->user->isGuest):

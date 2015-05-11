@@ -100,11 +100,16 @@ class Customer extends BaseCustomer
 		return array_merge(
 			parent::attributeLabels(),
 			array(
-				'active' => 'This is an active address',
-				'email_repeat' => 'Email Address (confirm)',
-				'password_repeat' => 'Password (confirm)',
-				'newsletter_subscribe' => 'Allow us to send you emails about our products',
-				'mainphone' => 'Phone Number')
+				'active' => Yii::t('forms', 'This is an active address'),
+				'first_name' => Yii::t('forms', 'First Name'),
+				'last_name' => Yii::t('forms', 'Last Name'),
+				'email' => Yii::t('forms', 'Email Address'),
+				'email_repeat' => Yii::t('forms', 'Email Address (confirm)'),
+				'mainphone' => Yii::t('forms', 'Phone'),
+				'password' => Yii::t('forms', 'Password'),
+				'password_repeat' => Yii::t('forms', 'Password (confirm)'),
+				'newsletter_subscribe' => Yii::t('forms', 'Allow us to send you emails about our products'),
+			)
 		);
 	}
 
@@ -326,6 +331,24 @@ class Customer extends BaseCustomer
 		}
 
 		return Customer::model()->findByPk(Yii::app()->user->id);
+	}
+
+	/**
+	 * Return the current or a new customer object
+	 *
+	 * @return Customer
+	 */
+	public static function getCurrentOrNew()
+	{
+		$model = self::GetCurrent();
+
+		if (is_null($model))
+		{
+			$model = new Customer();
+			$model->newsletter_subscribe = Yii::app()->params['DISABLE_ALLOW_NEWSLETTER'] == 1 ? 0 : 1;
+		}
+
+		return $model;
 	}
 
 	/**

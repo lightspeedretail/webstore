@@ -35,7 +35,7 @@
 	    </div>
 
 	</div>
-		<?php echo CHtml::submitButton(Yii::t('global','Search'), array('id'=>'btnSubmit'));  ?>
+		<?php echo CHtml::submitButton(Yii::t('global','SEARCH'), array('id'=>'btnSubmit'));  ?>
 	</fieldset>
 
 	<?php $this->endWidget(); ?>

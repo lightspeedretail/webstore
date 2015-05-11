@@ -297,15 +297,24 @@ class Cart extends BaseCart
 	public function RecalculateInventoryOnCartItems() {
 
 		$arrItems = $this->cartItems;
-		foreach($arrItems as $objItem) {
+		foreach($arrItems as $objItem)
+		{
 			$objItem->product->SetAvailableInventory();
 
 			foreach($objItem->product->xlswsCategories as $objCategory)
+			{
 				$objCategory->UpdateChildCount();
+			}
 
-			$objEvent = new CEventProduct(get_class($this),'onUpdateInventory',$objItem->product);
-			_xls_raise_events('CEventProduct',$objEvent);
+			// Since products belong to one family we can call updateChildCount on the
+			// product's family
+			if (is_null($objItem->product->family) === false)
+			{
+				$objItem->product->family->UpdateChildCount();
+			}
 
+			$objEvent = new CEventProduct(get_class($this), 'onUpdateInventory', $objItem->product);
+			_xls_raise_events('CEventProduct', $objEvent);
 		}
 	}
 
@@ -1058,14 +1067,6 @@ class Cart extends BaseCart
 			$objTaxCode = TaxCode::GetDefault();
 			if ($objTaxCode instanceof TaxCode)
 			{
-				Yii::log(
-					sprintf(
-						'ResetTaxIncFlag $objTaxCode->lsid = %s',
-						$objTaxCode->lsid
-					),
-					'error',
-					'application.'.__CLASS__.".".__FUNCTION__
-				);
 				$this->tax_code_id = $objTaxCode->lsid;
 				$this->tax_inclusive = 1;
 			}

@@ -71,7 +71,7 @@ $this->renderPartial('_paypalpayment', array('isPaypalValid' => $model->isPaymen
 								<?= Yii::t('checkout', 'or'); ?>
 								<?=
 								CHtml::ajaxLink(
-									Yii::t('checkout', 'Hide'),
+									Yii::t('checkout', 'Remove'),
 									Yii::app()->createUrl('myaccount/removeaddress'),
 									array(
 										'type' => 'POST',
@@ -166,14 +166,20 @@ if ($count > 0):
 <footer>
 	<?=
 		CHtml::submitButton(
-			'Submit',
+			Yii::t(
+				'forms',
+				'Submit'
+			),
 			array(
 				'type' => 'submit',
 				'class' => 'button',
 				'name' => 'Payment',
 				'id' => 'Payment',
-				'value' => Yii::t('checkout', "Review and Confirm Order")
+				'value' => Yii::t(
+					'checkout',
+					'Review and Confirm Order'
 				)
+			)
 		);
 	?>
 </footer>

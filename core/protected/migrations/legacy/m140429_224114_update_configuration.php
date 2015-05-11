@@ -164,7 +164,7 @@ class m140429_224114_update_configuration extends CDbMigration
 				'required' => '1',
 			));
 
-    if(!$this->find('configuration', 'key_name=:key', array(':key' => 'LANG_MISSING')))
+    if(!$this->find('configuration', 'key_name=:key', array(':key' => 'LANG_OPTIONS')))
     {
       $this->insert('xlsws_configuration',array(
           'title' =>'Language Options',

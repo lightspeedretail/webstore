@@ -32,7 +32,7 @@ pre {font-size: 0.8em; }
 #restrictions select.tall { font-size: 0.7em; width: 155px; height: 150px; margin-bottom: 0px;}
 #restrictions select.wider {  width: 205px; }
 #restrictions select option { padding-left: 0px;}
-.basic, .item, .destinationrates, .settiers, .resetpw { border-bottom: 1px dashed #0088CC;text-decoration: none;}
+.basic, .item, .destinationrates, .settiers, .setcayan, .viewcayan, .resetpw { border-bottom: 1px dashed #0088CC;text-decoration: none;}
 #restrictions [class*="span"] { margin-left: 3px;}
 #buttonSavePCR { color: white;}
 #restrictions .dropdown { font-size: 0.9em; font-weight: 600;  padding-right: 5px; margin-top: 7px; }

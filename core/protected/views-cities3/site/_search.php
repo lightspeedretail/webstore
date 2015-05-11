@@ -3,7 +3,7 @@
 		$this->widget('bootstrap.widgets.TbTypeahead',array(
 			'name'=>'q',
 			'id'=>'xlsSearch',
-			'htmlOptions'=>array('autocomplete'=>'off','placeholder'=>Yii::t('global','Search')),
+			'htmlOptions'=>array('autocomplete'=>'off','placeholder' => Yii::t('tabs','Search')),
 			'options'=>array(
 				'minChars'=>2,
 				'autoFill'=>false,

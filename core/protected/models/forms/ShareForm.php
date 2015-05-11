@@ -42,12 +42,10 @@ class ShareForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'toName'=>'Recipient Name',
-			'toEmail'=>'Recipient Email Address',
-			'comment'=>'Comment',
+			'toName' => Yii::t('forms', 'Recipient Name'),
+			'toEmail' => Yii::t('forms', 'Recipient Email Address'),
+			'comment' => Yii::t('forms', 'Comment'),
 
 		);
 	}
-
-
 }

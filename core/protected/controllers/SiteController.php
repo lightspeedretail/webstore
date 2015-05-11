@@ -191,10 +191,7 @@ class SiteController extends Controller
 	public function actionLogout()
 	{
 		Yii::app()->user->logout();
-		if (_xls_facebook_login())
-		{
-			Yii::app()->facebook->destroySession();
-		}
+
 		if (Yii::app()->isCommonSSL)
 		{
 			$url = Yii::app()->createUrl("site/logout");
@@ -207,6 +204,17 @@ class SiteController extends Controller
 		else
 		{
 			$url = $this->createAbsoluteUrl("site/index", array(), 'http');
+		}
+
+		if (_xls_facebook_login())
+		{
+			$url = Yii::app()->facebook->getLogoutUrl(
+				array(
+					'next' => $url,
+					'access_token' => Yii::app()->facebook->accessToken
+				)
+			);
+			Yii::app()->facebook->destroySession();
 		}
 
 		$this->redirect($url);

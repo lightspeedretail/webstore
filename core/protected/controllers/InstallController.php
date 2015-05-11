@@ -41,7 +41,7 @@ class InstallController extends Controller
 			$action->id != "upgrade" &&
 			$action->id != "migratephotos")
 		{
-			throw new CHttpException(404, 'The requested page does not exist.');
+			_xls_404();
 			return false;
 		}
 
@@ -55,7 +55,7 @@ class InstallController extends Controller
 	 */
 	public function actionIndex()
 	{
-		throw new CHttpException(404,'The requested page does not exist.');
+		_xls_404();
 	}
 
 	/**

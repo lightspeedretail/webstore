@@ -17,62 +17,62 @@
 		echo $form->hiddenField($model,'id');
 	}
 	?>
-        <div class="row-fluid">
-	        <div class="span5">
+		<div class="row-fluid">
+			<div class="span5">
 				<?php echo $form->labelEx($model,'address_label'); ?>
 				<?php echo $form->textField($model,'address_label',array('prompt' =>'Home, Work')); ?>
 				<?php echo $form->error($model,'address_label'); ?>
-	        </div>
-	        <div class="span5 rememberMe">
-		        <?php echo $form->checkbox($model,'active'); ?>
-		        <?php echo $form->labelEx($model,'active'); ?>
-		        <?php echo $form->error($model,'active'); ?><br>
-		        <?php echo $form->checkbox($model,'makeDefaultBilling'); ?>
-		        <?php echo $form->labelEx($model,'makeDefaultBilling'); ?>
-		        <?php echo $form->error($model,'makeDefaultBilling'); ?><br>
-		        <?php echo $form->checkbox($model,'makeDefaultShipping'); ?>
-		        <?php echo $form->labelEx($model,'makeDefaultShipping'); ?>
-		        <?php echo $form->error($model,'makeDefaultShipping'); ?>
+			</div>
+			<div class="span5 rememberMe">
+				<?php echo $form->checkbox($model,'active'); ?>
+				<?php echo $form->labelEx($model,'active'); ?>
+				<?php echo $form->error($model,'active'); ?><br>
+				<?php echo $form->checkbox($model,'makeDefaultBilling'); ?>
+				<?php echo $form->labelEx($model,'makeDefaultBilling'); ?>
+				<?php echo $form->error($model,'makeDefaultBilling'); ?><br>
+				<?php echo $form->checkbox($model,'makeDefaultShipping'); ?>
+				<?php echo $form->labelEx($model,'makeDefaultShipping'); ?>
+				<?php echo $form->error($model,'makeDefaultShipping'); ?>
 
-	        </div>
-        </div>
+			</div>
+		</div>
 
-	    <div class="row-fluid">
-            <div class="span5">
+		<div class="row-fluid">
+			<div class="span5">
 				<?php echo $form->label($model,'first_name'); ?>
 				<?php echo $form->textField($model,'first_name'); ?>
 				<?php echo $form->error($model,'first_name'); ?>
-            </div>
-           <div class="span5">
+			</div>
+		   <div class="span5">
 				<?php echo $form->label($model,'last_name'); ?>
 				<?php echo $form->textField($model,'last_name'); ?>
 				<?php echo $form->error($model,'last_name'); ?>
-            </div>
-	    </div>
+			</div>
+		</div>
 
 
 
-        <div class="row-fluid">
-            <div class="span5">
+		<div class="row-fluid">
+			<div class="span5">
 				<?php echo $form->labelEx($model,'address1'); ?>
 				<?php echo $form->textField($model,'address1'); ?>
 				<?php echo $form->textField($model,'address2'); ?>
 				<?php echo $form->error($model,'address1'); ?>
 				<?php echo $form->error($model,'address2'); ?>
-            </div>
-        </div>
+			</div>
+		</div>
 
-        <div class="row-fluid">
-            <div class="span5">
+		<div class="row-fluid">
+			<div class="span5">
 				<?php echo $form->labelEx($model,'city'); ?>
 				<?php echo $form->textField($model,'city'); ?>
 				<?php echo $form->error($model,'city'); ?>
-            </div>
-        </div>
+			</div>
+		</div>
 
-        <div class="row-fluid">
-            <div class="span5">
-	            <?php echo $form->labelEx($model,'country_id'); ?>
+		<div class="row-fluid">
+			<div class="span5">
+				<?php echo $form->labelEx($model,'country_id'); ?>
 				<?php echo $form->dropDownList($model,'country_id',$checkout->getCountries(),array(
 				'ajax' => array(
 					'type'=>'POST',
@@ -81,45 +81,53 @@
 					'data' => 'js:{"country_id": $("#'.CHtml::activeId($model,'country_id').' option:selected").val()}',
 				))); ?>
 				<?php echo $form->error($model,'country_id'); ?>
-            </div>
-        </div>
+			</div>
+		</div>
 
-        <div class="row-fluid">
-            <div id="state_id" class="span5">
+		<div class="row-fluid">
+			<div id="state_id" class="span5">
 				<?php echo $form->labelEx($model,'state_id'); ?>
 				<?php echo $form->dropDownList($model,'state_id',
 					$checkout->getStates('myaccount',$model->country_id),array('prompt' =>'--')); ?>
 				<?php echo $form->error($model,'state_id'); ?>
-            </div>
-            <div id="postal" class="span5">
+			</div>
+			<div id="postal" class="span5">
 				<?php echo $form->labelEx($model,'postal'); ?>
 				<?php echo $form->textField($model,'postal'); ?>
 				<?php echo $form->error($model,'postal'); ?>
-            </div>
-        </div>
+			</div>
+		</div>
 
-	    <div class="row-fluid">
-		    <div class="span5 rememberMe">
+		<div class="row-fluid">
+			<div class="span5 rememberMe">
 				<?php echo $form->checkbox($model,'residential'); ?>
 				<?php echo $form->labelEx($model,'residential'); ?>
 				<?php echo $form->error($model,'residential'); ?>
-		    </div>
+			</div>
 		</div>
 
-	    <div class="row-fluid">
-	        <div class="span5">
+		<div class="row-fluid">
+			<div class="span5">
 				<?php echo $form->labelEx($model,'phone'); ?>
 				<?php echo $form->textField($model,'phone'); ?>
 				<?php echo $form->error($model,'phone'); ?>
-	        </div>
-	    </div>
+			</div>
+		</div>
 
 
-        <div class="span9 submitblock" >
-			<?php echo CHtml::submitButton('Submit', array('id'=>'btnSubmit'));  ?>
-        </div>
-
-
+		<div class="span9 submitblock" >
+			<?=
+				CHtml::submitButton(
+					Yii::t(
+						'forms',
+						'Submit'
+					),
+					array(
+						'id' => 'btnSubmit'
+					)
+				);
+			?>
+		</div>
 
 	<?php $this->endWidget(); ?>
 </div><!-- form -->

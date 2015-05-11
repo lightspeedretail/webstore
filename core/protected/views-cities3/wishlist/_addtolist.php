@@ -14,25 +14,25 @@
 	}
 	?>
 
-    <div class="row-fluid spaceafter">
+	<div class="row-fluid spaceafter">
 		<?php echo $popupform->labelEx($model,'gift_code'); ?>
-	    <?php echo $popupform->radioButtonList($model,'gift_code',$model->lists, array('separator'=>'')); ?>
+		<?php echo $popupform->radioButtonList($model,'gift_code',$model->lists, array('separator'=>'')); ?>
 		<?php echo $popupform->error($model,'gift_code'); ?>
-    </div>
+	</div>
 
-    <div class="row-fluid shortrow buttons">
-        <?php
-        echo CHtml::ajaxSubmitButton(Yii::t('global','Submit'),
-            CHtml::normalizeUrl(array('wishlist/add','render'=>false)),
-            array(
-	            'type'=>"POST",
-	            'success'=>'js:function(data) {
-	                alert(data);
-	                $("#WishitemShare").dialog("close");
-                 }',
-            ),array('id'=>'btnAddWishList')); ?>
+	<div class="row-fluid shortrow buttons">
+		<?php
+		echo CHtml::ajaxSubmitButton(Yii::t('global','Submit'),
+			CHtml::normalizeUrl(array('wishlist/add','render'=>false)),
+			array(
+				'type'=>"POST",
+				'success'=>'js:function(data) {
+					alert(data);
+					$("#WishitemShare").dialog("close");
+				 }',
+			),array('id'=>'btnAddWishList')); ?>
 
-    </div>
+	</div>
 
 <?php $this->endWidget(); ?>
 </div><!-- form -->

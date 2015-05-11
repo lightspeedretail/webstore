@@ -67,7 +67,7 @@
         </div>
 
         <div class="col-sm-9 submitblock" >
-			<?php echo CHtml::submitButton(Yii::t('global','Search'), array('id'=>'btnSubmit'));  ?>
+			<?php echo CHtml::submitButton(Yii::t('global','SEARCH'), array('id'=>'btnSubmit'));  ?>
         </div>
 
 

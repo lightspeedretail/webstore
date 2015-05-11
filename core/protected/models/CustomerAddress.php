@@ -44,7 +44,6 @@ class CustomerAddress extends BaseCustomerAddress
 			array('postal', 'length', 'max' => 64),
 			array('phone', 'length', 'min' => 7, 'max' => 32),
 			array('store_pickup_email', 'email'),
-			array('postal', 'validatePostal', 'on' => 'Default'),
 			array('created, makeDefaultBilling, makeDefaultShipping', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
@@ -62,40 +61,16 @@ class CustomerAddress extends BaseCustomerAddress
 		return array_merge(
 			parent::attributeLabels(),
 			array(
-				'address_label'=>'Address Label (Home, Work)',
-				'residential'=>'This is a residential address',
-				'active'=>'Show this address on checkout',
-				'address1'=>'Address',
-				'address2'=>'Address Line 2 (Apt/Unit)',
-				'makeDefaultBilling'=>'Default billing address',
-				'makeDefaultShipping'=>'Default shipping address',
-				'postal'=>'Postal / Zip Code',
-
-
-
-		));
-	}
-
-	/**
-	 * @param $attribute
-	 * @param $params
-	 */
-	public function validatePostal($attribute, $params)
-	{
-		$obj = Country::Load($this->country_id);
-		if ($obj instanceof Country)
-		{
-			if ($this->$attribute == '')
-				$this->addError($attribute,
-					Yii::t('yii','{attribute} cannot be blank.',
-						array('{attribute}'=>$this->getAttributeLabel($attribute))));
-			elseif (!is_null($obj->zip_validate_preg) && !_xls_validate_zip($this->$attribute,$obj->zip_validate_preg))
-				$this->addError($attribute,
-					Yii::t('yii','{attribute} format is incorrect for this country.',
-						array('{attribute}'=>$this->getAttributeLabel($attribute))));
-
-		}
-
+				'address_label' => 'Address Label (Home, Work)',
+				'residential' => 'This is a residential address',
+				'active' => 'Show this address on checkout',
+				'address1' => 'Address',
+				'address2' => 'Address Line 2 (Apt/Unit)',
+				'makeDefaultBilling' => 'Default billing address',
+				'makeDefaultShipping' => 'Default shipping address',
+				'postal' => 'Postal / Zip Code',
+			)
+		);
 	}
 
 	//Called both from original form when displayed, and from AJAX query as Country changes (via Cart Controller)
@@ -104,19 +79,20 @@ class CustomerAddress extends BaseCustomerAddress
 	 * @param null $intCountry
 	 * @return array
 	 */
-	public function getStates($type = 'billing',$intCountry = null) {
-
+	public function getStates($type = 'billing', $intCountry = null)
+	{
 		$obj = new CheckoutForm();
-		return $obj->getStates($type,$intCountry);
-
+		return $obj->getStates($type, $intCountry);
 
 	}
 
 	public static function getAllAddresses()
 	{
 		//Only valid for logged in users
-		if (Yii::app()->user->isGuest)
+		if(Yii::app()->user->isGuest)
+		{
 			return array();
+		}
 
 		// ignore any addresses created during a store pickup order with the
 		// advanced checkout as these addresses will not have address1
@@ -130,12 +106,13 @@ class CustomerAddress extends BaseCustomerAddress
 		return CustomerAddress::model()->findAll($criteria);
 	}
 
-
 	public static function getActiveAddresses()
 	{
 		//Only valid for logged in users
 		if (Yii::app()->user->isGuest)
+		{
 			return array();
+		}
 
 		// ignore any addresses created during a store pickup order with the
 		// advanced checkout as these addresses will not have address1
@@ -167,15 +144,35 @@ class CustomerAddress extends BaseCustomerAddress
 		$obj = new CustomerAddress();
 		$obj->attributes = $config;
 
+		if ($obj->validate() === false)
+		{
+			return $obj;
+		}
+
 		$dataProvider = $obj->search();
 		$arrAdd = $dataProvider->getData();
 		if(count($arrAdd))
+		{
 			return $arrAdd[0];
+		}
 		else
 		{
 			$obj->save();
 			return $obj;
 		}
+	}
+
+	public static function updateAddress($id, $address)
+	{
+		$model = self::model()->findByPk($id);
+		$model->attributes = $address;
+
+		if ($model->validate())
+		{
+			$model->save();
+		}
+
+		return $model;
 	}
 
 	public static function updateAddressFromForm($id, CheckoutForm $checkoutForm, $str = 'shipping')
@@ -184,7 +181,14 @@ class CustomerAddress extends BaseCustomerAddress
 
 		if ($obj === null)
 		{
-			Yii::log(sprintf('Customer address with id %s not found', $id), 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
+			Yii::log(
+				sprintf(
+					'Customer address with id %s not found',
+					$id
+				),
+				'error',
+				'application.' . __CLASS__ . '.' . __FUNCTION__
+			);
 			return;
 		}
 
@@ -227,7 +231,14 @@ class CustomerAddress extends BaseCustomerAddress
 			);
 		}
 
-		Yii::log(sprintf('Updated Customer address with id: %s', $id), 'info', 'application.'.__CLASS__.'.'.__FUNCTION__);
+		Yii::log(
+			sprintf(
+				'Updated Customer address with id: %s',
+				$id
+			),
+			'info',
+			'application.'  .__CLASS__ . '.' . __FUNCTION__
+		);
 	}
 
 	public function search()
@@ -256,7 +267,7 @@ class CustomerAddress extends BaseCustomerAddress
 			'criteria' => $criteria,
 		));
 	}
-	
+
 	/**
 	 * Since Validate tests to make sure certain fields have values, populate requirements here such as the modified timestamp
 	 * @return boolean from parent
@@ -270,7 +281,7 @@ class CustomerAddress extends BaseCustomerAddress
 
 		if (empty($this->address_label))
 		{
-			$this->address_label = Yii::t('global','Unlabeled Address');
+			$this->address_label = Yii::t('global', 'Unlabeled Address');
 		}
 
 		if (empty($this->state_id))
@@ -294,7 +305,10 @@ class CustomerAddress extends BaseCustomerAddress
 		return CustomerAddress::model()->updateAll(
 			array("active" => 0),
 			'id = :id AND customer_id = :customer_id',
-			array(':id' => $address_id, ':customer_id' => $customer_id)
+			array(
+				':id' => $address_id,
+				':customer_id' => $customer_id
+			)
 		);
 	}
 
@@ -302,13 +316,23 @@ class CustomerAddress extends BaseCustomerAddress
 		switch ($strName) {
 			case 'state':
 				if ($this->state_id)
+				{
 					return State::CodeById($this->state_id);
-				else return null;
+				}
+				else
+				{
+					return null;
+				}
 
 			case 'country':
 				if ($this->country_id)
+				{
 					return Country::CodeById($this->country_id);
-				else return null;
+				}
+				else
+				{
+					return null;
+				}
 
 			case 'country_name':
 				if ($this->country_id)

@@ -108,7 +108,7 @@ aside.related-products {
 }
 
 .cart-summary {
-	background-color: #eee;
+	background-color: $default-background-color;
 	border-left: 1px solid #ccc;
 
 	table {
@@ -130,7 +130,7 @@ aside.related-products {
 
 		input {
 			border: none;
-			background-color: #eee;
+			background-color: $default-background-color;
 			border-top: $input-border;
 			font-size: .9375rem;
 			padding: 12px 20px 13px;
@@ -347,7 +347,6 @@ aside.related-products {
 .webstore-modal .cart-summary header { font-family: 'Open Sans','Helvetica Neue',Helvetica,sans-serif; }
 .webstore-modal .cart-summary .webstore-promo-form button.inset { max-height: 30px; min-width: 50px; }
 .webstore-modal input[type="text"] { margin-bottom: 0;  }
-.webstore-modal form { background-color: #EEE; margin-bottom: 0; }
 .webstore-modal button, .cart-summary footer .button { margin-bottom: 0; }
 .webstore-modal .cart-summary table td,
 .webstore-modal .cart-summary footer .button,
@@ -412,7 +411,7 @@ aside.related-products {
 }
 
 .webstore-shipping-choices li.webstore-shipping-choices-notice.grey{
-	background-color: #eee;
+	background-color: $default-background-color;
 }
 
 

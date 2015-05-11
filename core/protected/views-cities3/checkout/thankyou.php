@@ -98,3 +98,5 @@
 
 	</div>
 </div>
+
+<?php $this->renderPartial('_googleconversion', array('model' => $cart)); ?>

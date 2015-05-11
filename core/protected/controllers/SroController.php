@@ -47,13 +47,14 @@ class SroController extends Controller
 			Yii::app()->controller->redirect(Yii::app()->createUrl('site/index'));
 
 		//Use our class variable which is accessible from the view
-		$model = Sro::model()->findByAttributes(array('linkid'=>$strLink));
+		$model = Sro::model()->findByAttributes(array('linkid' => $strLink));
 
 		if (!($model instanceof Sro))
-			throw new CHttpException(404,'The requested page does not exist.');
+		{
+			_xls_404();
+		}
 
-
-		$this->render('sro',array('model'=>$model));
+		$this->render('sro', array('model' => $model));
 
 	}
 

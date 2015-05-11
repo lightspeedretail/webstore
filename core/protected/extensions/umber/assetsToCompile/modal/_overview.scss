@@ -3,128 +3,133 @@
   height: auto;
   opacity: 1;
   &.flipped {
-    height: 0;
-    opacity: 0;
-    overflow: hidden;
+	height: 0;
+	opacity: 0;
+	overflow: hidden;
   }
 }
 
 .address-new {
   position: relative;
+  .error-holder{
+	max-width: $address-form-width;
+  }
   footer {
-    max-width: 200px;
-    .button {
-      padding: 10px 0;
-    }
+	.button {
+	  padding: 15px 0;
+	}
   }
   .select-options {
-    font-size: .9rem;
-    color: #888;
-    label.checkbox {
-      padding-bottom: 5px;
-      display: block;
-      padding-right: 10px;
-      @include media(medium) {
-        display: inline-block;
-        padding-bottom: 0;
-      }
-      &:last-child {
-        padding-right: 0;
-      }
-    }
+	font-size: .9rem;
+	color: #888;
+	label.checkbox {
+	  padding-bottom: 5px;
+	  display: block;
+	  padding-right: 10px;
+	  @include media(medium) {
+		display: inline-block;
+		padding-bottom: 0;
+	  }
+	  &:last-child {
+		padding-right: 0;
+	  }
+	}
   }
   .address-form {
-    max-width: 420px;
-    .submit-small .button {
-      font-size: .9rem;
-    }
-    ol {
-      padding-left: 0;
-      li {
-        list-style: none;
-      }
-    }
+	max-width: $address-form-width;
+	.submit-small .button {
+	  font-size: .9rem;
+	  &:focus {
+		min-height: 0;
+	  }
+	}
+	ol {
+	  padding-left: 0;
+	  li {
+		list-style: none;
+	  }
+	}
   }
   @include transition(opacity .5s);
   height: 0;
   opacity: 0;
   overflow: hidden;
   &.flipped {
-    height: auto;
-    opacity: 1;
+	height: auto;
+	opacity: 1;
   }
 }
 .account-address {
   .address-block {
-    width: 100%;
-    margin-right: 0;
-    margin-bottom: 30px;
-    display: inline-block;
-    vertical-align: top;
-    p:before {
-      display: none;
-    }
-    @include media(medium) {
-      width: 47%;
-      margin-right: 4%;
-      &:last-child {
-        margin-right: 0;
-      }
-    }
+	width: 100%;
+	margin-right: 0;
+	margin-bottom: 30px;
+	display: inline-block;
+	vertical-align: top;
+	p:before {
+	  display: none;
+	}
+	@include media(medium) {
+	  width: 47%;
+	  margin-right: 4%;
+	  &:last-child {
+		margin-right: 0;
+	  }
+	}
   }
 }
 
 .order-history {
   table {
-    border-collapse: collapse;
-    color: #444;
+	border-collapse: collapse;
+	color: #444;
 
-    th, td {
-      text-align: left;
-    }
-    tr {
-      @include transition(color .1s, border .1s, background .1s);
-      &:hover {
-        cursor: pointer;
-        background-color: #f8f8f8;
-      }
-    }
+	th, td {
+	  text-align: left;
+	}
+	tr {
+	  @include transition(color .1s, border .1s, background .1s);
+	  &:hover {
+		cursor: pointer;
+		background-color: #f8f8f8;
+	  }
+	}
 
-    &.lines {
-      a { color: #555; }
-      td {
-        padding: 10px 0;
-        font-size: 0.875rem;
-        &.date {
-          color: $blue;
-          font-weight: bold;
-        }
-        &.num {
-          font-weight: bold;
-        }
-      }
-      tr td:first-child, tr th:first-child {
-        padding-left: 8px;
-        @include media(small) {
-          padding-left: 10px;
-        }
-      }
-      tr td:last-child, tr th:last-child {
-        padding-right: 8px;
-        @include media(small) {
-          padding-right: 10px;
-        }
-      }
-      tbody {
-        border-top: 1px solid #eee;
-      }
-      td { border-bottom: 1px solid #eee; }
-    }
+	&.lines {
+	  a { color: #555; }
+	  td {
+		padding: 10px 0;
+		font-size: 0.875rem;
+		&.date {
+		  color: $blue;
+		  font-weight: bold;
+		}
+		&.num {
+		  font-weight: bold;
+		}
+	  }
+	  tr td:first-child, tr th:first-child {
+		padding-left: 8px;
+		@include media(small) {
+		  padding-left: 10px;
+		}
+	  }
+	  tr td:last-child, tr th:last-child {
+		padding-right: 8px;
+		@include media(small) {
+		  padding-right: 10px;
+		}
+	  }
+	  tbody {
+		border-top: 1px solid #eee;
+	  }
+	  td { border-bottom: 1px solid #eee; }
+	}
 
 
   }
   .subtotal {
-    text-align: right;
+	text-align: right;
   }
 
 }
@@ -145,33 +150,159 @@ button.small, .add .small {
   padding-left: 0;
   list-style: none;
   li {
-    display: inline;
-    margin-right: 20px;
-    &:last-child {
-      margin-right: 0;
-    }
+	display: inline;
+	margin-right: 20px;
+	&:last-child {
+	  margin-right: 0;
+	}
   }
   a {
-    text-decoration: none;
-    border-bottom: 1px solid #fff;
-    padding-bottom: 1px;
+	text-decoration: none;
+	border-bottom: 1px solid #fff;
+	padding-bottom: 1px;
 
-    &:hover {
-      border-bottom-color: $blue;
-    }
+	&:hover {
+	  border-bottom-color: $blue;
+	}
   }
 }
 
 .customer p {
   font-size: 1.1em;
   strong {
-    font-size: 1.2em;
+	font-size: 1.2em;
   }
 }
 
 .customerorder p {
   font-size: .75em;
   strong {
-    font-size: 1.2em;
+	font-size: 1.2em;
   }
 }
+.wishlist-block p {
+  -webkit-transition: color 0.1s, border 0.1s, background 0.1s;
+  -moz-transition: color 0.1s, border 0.1s, background 0.1s;
+  -o-transition: color 0.1s, border 0.1s, background 0.1s;
+  transition: color 0.1s, border 0.1s, background 0.1s;
+  position: relative;
+  margin: 0;
+  padding: 10px 2px 10px 10px;
+  border: 1px solid #ddd;
+  color: #999;
+  font-size: .75rem;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+/**
+ * ==========================================================================
+ * Small modals used in Account edit profile and Account change password.
+ * ==========================================================================
+ */
+.webstore-modal-narrow{
+  section{
+	max-width: 480px;
+
+	header{
+	  padding: 10px 20px;
+
+	  h1{
+		text-transform: uppercase;
+		font: 1rem "Open Sans", "Helvetica Neue", Helvetica, sans-serif;
+		margin: .25rem 0;
+		font-weight: normal;
+	  }
+	}
+  }
+  .form-error {
+	margin:0;
+  }
+
+  .cancel {
+	float: right;
+	margin: .5em 0;
+	color: #888;
+	font-size: 12px;
+	border-bottom: 1px solid #ccc;
+	&:hover{
+	  border-bottom-color: #888;
+	}
+  }
+  label.checkbox {
+	text-align: left;
+	padding: 20px;
+  }
+
+  input{
+	border-top:none;
+	border-bottom: 1px solid #ddd;
+	border-left: none;
+	border-right: none;
+
+	&.split-2,
+	&.split-2-first{
+	  width: 50%;
+	  float: left;
+	}
+
+	&.split-2-first{
+	  border-right: 1px solid #ddd;
+	}
+  }
+}
+
+.checkbox .label-toggle{
+  margin: 0.2rem 0.5rem 0 0;
+}
+
+.customer p{
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.checkbox {
+  text-align: left;
+  font-size: 1rem;
+}
+
+ol.select-options{
+  margin-top: 1em;
+  margin-bottom: 1rem;
+}
+.select-options{
+  .checkbox{
+	font-size: .9rem;
+	color: #888;
+	width: auto;
+	display: inline-block !important;
+  }
+}
+
+.webstore-modal{
+  ol {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+  }
+}
+.webstore-modal{
+  #webstore-createaccount header{
+	background-color: #eee;
+	border-bottom: 1px solid #ccc;
+  }
+}
+
+ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.account-info,
+.address-info,
+.order-history,
+.sro-list{
+  border-bottom: 1px solid $light-grey-border;
+  padding-bottom: 30px;
+}
+

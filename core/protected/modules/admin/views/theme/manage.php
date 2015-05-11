@@ -71,50 +71,64 @@
 	<p>
 		<div>
 			<?php
-				$copyThemeWarningMsg = "<strong>Warning:</strong> This functionality is intended for web developers only. " .
-				"Copying a theme for customization may require occasional updates to the custom theme files " .
-				"as Web Store updates are released. If you are not comfortable with updating CSS or PHP files " .
-				"as required, we highly recommend that you do not copy a theme.";
-			?>
+				if (Yii::app()->params['SHOW_CUSTOMIZATION_BUTTON'] === '1')
+				{
+					$copyThemeWarningMsg = "<strong>Warning:</strong> This functionality is intended for web developers only. " .
+						"Copying a theme for customization may require occasional updates to the custom theme files " .
+						"as Web Store updates are released. If you are not comfortable with updating CSS or PHP files " .
+						"as required, we highly recommend that you do not copy a theme.";
 
-			<?php $this->widget('bootstrap.widgets.TbButton', array(
-				'label' => 'Copy selected theme for customization',
-				'type' => 'inverse',
-				'size' => 'mini',
-				'htmlOptions' => array(
-					'id' => 'btnCopy',
-					'value' => 'btnCopy',
-					'onclick' => 'js:bootbox.confirm("'. $copyThemeWarningMsg . '", "Cancel", "Continue", function(confirmed) {
-						if(confirmed)
-						{
-							$("#task").val("btnCopy");
-							$("#manage").submit();
-						}
-					})'),
-			)); ?>
-			<?php $this->widget('bootstrap.widgets.TbButton', array(
-				'buttonType'=>'submit',
-				'label'=>'Remove unchanged files from selected theme',
-				'type'=>'inverse',
-				'size'=>'mini',
-				'htmlOptions'=>array('id'=>'btnClean','value'=>'btnClean'),
-			)); ?>
-			<?php $this->widget('bootstrap.widgets.TbButton', array(
-				//'buttonType'=>'submit',
-				'label'=>'Move to trash',
-				'type'=>'inverse',
-				'size'=>'mini',
-				'htmlOptions'=>array(
-					'id'=>'btnTrash',
-					'name'=>'btnTrash',
-					'value'=>'btnTrash',
-					'onclick'=>'js:bootbox.confirm("Move theme to trash?",function(confirmed){if(confirmed)
-					{
-						$("#task").val("btnTrash");
-						$("#manage").submit();
-					}})'
-				),
-			)); ?>
+					$this->widget(
+						'bootstrap.widgets.TbButton', array(
+						'label' => 'Copy selected theme for customization',
+						'type' => 'inverse',
+						'size' => 'mini',
+						'htmlOptions' => array(
+							'id' => 'btnCopy',
+							'value' => 'btnCopy',
+							'onclick' => 'js:bootbox.confirm("' . $copyThemeWarningMsg . '", "Cancel", "Continue", function(confirmed) {
+							if(confirmed)
+							{
+								$("#task").val("btnCopy");
+								$("#manage").submit();
+							}
+						})'),
+					)
+					);
+
+					echo '&nbsp;';
+
+					$this->widget(
+						'bootstrap.widgets.TbButton', array(
+						'buttonType' => 'submit',
+						'label' => 'Remove unchanged files from selected theme',
+						'type' => 'inverse',
+						'size' => 'mini',
+						'htmlOptions' => array('id' => 'btnClean', 'value' => 'btnClean'),
+					)
+					);
+
+					echo '&nbsp;';
+
+					$this->widget(
+						'bootstrap.widgets.TbButton', array(
+						//'buttonType'=>'submit',
+						'label' => 'Move to trash',
+						'type' => 'inverse',
+						'size' => 'mini',
+						'htmlOptions' => array(
+							'id' => 'btnTrash',
+							'name' => 'btnTrash',
+							'value' => 'btnTrash',
+							'onclick' => 'js:bootbox.confirm("Move theme to trash?",function(confirmed){if(confirmed)
+							{
+								$("#task").val("btnTrash");
+								$("#manage").submit();
+							}})'
+						),
+					));
+				}
+			?>
 		</div>
 	</p>
 

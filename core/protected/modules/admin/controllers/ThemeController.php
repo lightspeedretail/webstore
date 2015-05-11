@@ -6,6 +6,8 @@ class ThemeController extends AdminBaseController
 	public $currentTheme;
 	const THEME_PHOTOS = 29;
 
+	private static $_legacyThemes = array('glencoe', 'monaco', 'portland', 'santacruz', 'soho');
+
 	public function actions()
 	{
 		return array(
@@ -914,14 +916,19 @@ class ThemeController extends AdminBaseController
 		while (false !== ($filename = $d->read()))
 		{
 			if (is_dir($strThemePath."/".$filename) && $filename[0] != "." && $filename != "trash" && $filename != "_customcss")
+			{
 				$arr[$filename] = $this->loadConfiguration($filename);
-
+			}
 		}
+
 		$d->close();
 
 		if(isset(Yii::app()->theme))
+		{
 			$strTheme = Yii::app()->theme->name;
-		else $strTheme='';
+		} else {
+			$strTheme = '';
+		}
 
 		if (isset($arr[$strTheme]))
 		{
@@ -930,16 +937,27 @@ class ThemeController extends AdminBaseController
 			ksort($arr);
 			$newarray = $hold + $arr;
 			$arr = $newarray;
-
 		}
 
 		if(Yii::app()->params['LIGHTSPEED_MT'])
-			foreach ($arr as $key=>$objTheme)
+		{
+			foreach ($arr as $key => $objTheme)
 			{
 				$objModule = Modules::LoadByName($key);
-//				if (!$objModule->mt_compatible)
-//					unset($arr[$key]);
 			}
+		}
+
+		// WS-4074 Disable legacy themes for new installs
+		if (_xls_get_conf('ALLOW_LEGACY_THEMES') === '0')
+		{
+			foreach ($arr as $key => $theme)
+			{
+				if(in_array($key, self::$_legacyThemes))
+				{
+					unset($arr[$key]);
+				}
+			}
+		}
 
 		return $arr;
 	}

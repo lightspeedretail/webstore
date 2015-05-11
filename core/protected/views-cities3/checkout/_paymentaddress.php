@@ -86,13 +86,13 @@
 			</li>
 		</ol>
 	</li>
-	<li class="field-container field-container-select field-container-select-no-handle country-container">
+	<li class="field-container country-container">
 		<?php
 		echo $form->dropDownList(
 			$model,
 			'billingCountryCode',
 			CHtml::listData(Country::sortShippingCountries($model->billingCountryCode), 'code', 'country'),
-			$htmlOptions = array('class' => 'modal-accent-color')
+			$htmlOptions = array('class' => 'no-style-select')
 		);
 		?>
 	</li>
