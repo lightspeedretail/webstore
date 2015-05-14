@@ -26,7 +26,7 @@ class MyaccountController extends Controller
 	{
 		if (Yii::app()->user->isGuest)
 		{
-			$this->redirect($this->createUrl('site/login'));
+			$this->redirect($this->createUrl('myaccount/edit'));
 		}
 
 		// New styles, javascript and layout for Brooklyn2014
