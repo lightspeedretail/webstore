@@ -29,7 +29,7 @@
 
 	<?php $this->widget('ext.wsiosorientationbugfix.iosorientationbugfix'); ?>
 
-	<?php echo $this->renderPartial("/site/_google",null,true); ?>
+	<?php $this->widget('ext.wsgoogle.wspageviews'); ?>
 </head>
 
 

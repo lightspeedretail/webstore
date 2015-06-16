@@ -647,7 +647,7 @@ class SoapController extends CController
 	 * @param string $strWebKeyword2
 	 * @param string $strWebKeyword3
 	 * @param int $blnFeatured
-	 * @param string $strCategoryPath
+	 * @param int $intCategoryId
 	 * @return string
 	 * @throws SoapFault
 	 *
@@ -686,7 +686,7 @@ class SoapController extends CController
 		$strWebKeyword2,
 		$strWebKeyword3,
 		$blnFeatured,
-		$strCategoryPath
+		$intCategoryId
 	)
 	{
 		self::check_passkey($passkey);
@@ -885,29 +885,27 @@ class SoapController extends CController
 			$objClass->UpdateChildCount();
 		}
 
-		// Save category
-		$strCategoryPath = trim($strCategoryPath);
+		// Assign the product category.
+		// Delete any prior category from the product.
+		ProductCategoryAssn::model()->deleteAllByAttributes(
+			array('product_id' => $objProduct->id)
+		);
 
-		if($strCategoryPath && ($strCategoryPath != "Default"))
+		// A categoryId of 0 indicates that the Item is not assigned to a category.
+		if ($intCategoryId !== 0)
 		{
-			$arrCategories = explode("\t", $strCategoryPath);
-			$intCategory = Category::GetIdByTrail($arrCategories);
-
-			if (!is_null($intCategory))
+			$objCategory = Category::model()->findByPk($intCategoryId);
+			if ($objCategory === null)
 			{
-				$objCategory = Category::model()->findByPk($intCategory);
-				//Delete any prior categories from the table
-				ProductCategoryAssn::model()->deleteAllByAttributes(
-					array('product_id'=>$objProduct->id));
+				Yii::log('Unable to find matching category.', 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+			} else {
 				$objAssn = new ProductCategoryAssn();
-				$objAssn->product_id=$objProduct->id;
-				$objAssn->category_id=$intCategory;
+				$objAssn->product_id = $objProduct->id;
+				$objAssn->category_id = $intCategoryId;
 				$objAssn->save();
 				$objCategory->UpdateChildCount();
 			}
 		}
-		else
-			ProductCategoryAssn::model()->deleteAllByAttributes(array('product_id'=>$objProduct->id));
 
 		Product::convertSEO($intRowid); //Build request_url
 
@@ -1282,19 +1280,13 @@ class SoapController extends CController
 
 	public function actionImage()
 	{
-		$ctx=stream_context_create(array(
-			'http'=>array('timeout' => ini_get('max_input_time'))
-		));
-
-		$rawImage = file_get_contents('php://input',false,$ctx);
-		$CloudinaryURL=null;
-
 		if (isset($_SERVER['HTTP_PASSKEY']))
+		{
 			$PassKey = $_SERVER['HTTP_PASSKEY'];
-		if (isset($_SERVER['HTTP_CLOUDINARYURL']))
-			$CloudinaryURL = $_SERVER['HTTP_CLOUDINARYURL'];
+		}
 
-		if(!$this->check_passkey($PassKey)) {
+		if($this->check_passkey($PassKey) === false)
+		{
 			Yii::log("image upload: authentication failed", CLogger::LEVEL_ERROR, 'application.'.__CLASS__.".".__FUNCTION__);
 			Yii::app()->end();
 		}
@@ -1303,10 +1295,14 @@ class SoapController extends CController
 		$position = Yii::app()->getRequest()->getQuery('position');
 		$imageId = Yii::app()->getRequest()->getQuery('imageid');
 
-		if ($this->saveProductImage($id, $rawImage,$position,$imageId))
+		if ($this->saveProductImage($id, $position, $imageId))
+		{
 			$this->successResponse("Image saved for product " . $id);
+		}
 		else
+		{
 			$this->errorConflict('Problem saving image for product ' . $id, WsSoapException::ERROR_UNKNOWN);
+		}
 	}
 
 	/**
@@ -1400,7 +1396,7 @@ class SoapController extends CController
 		Yii::app()->end();
 	}
 
-	public function saveProductImage($intRowid, $blbRawImage,$image_index,$imageId=null)
+	public function saveProductImage($intRowid, $image_index, $imageId = null)
 	{
 		$objProduct = Product::model()->findByPk($intRowid);
 
@@ -1409,13 +1405,8 @@ class SoapController extends CController
 			return false;
 		}
 
-		//Convert incoming base64 to binary image
-		if(!is_null($blbRawImage))
-			$blbImage = imagecreatefromstring($blbRawImage);
-		else $blbImage = null;
-
 		//Create event
-		$objEvent = new CEventPhoto('LegacysoapController','onUploadPhoto',$blbImage,$objProduct,$image_index);
+		$objEvent = new CEventPhoto('LegacysoapController', 'onUploadPhoto', null,$objProduct, $image_index);
 		$objEvent->cloud_image_id = $imageId;
 
 		if (isset($_SERVER['HTTP_CLOUDINARY_PUBLIC_ID']))
@@ -1492,68 +1483,98 @@ class SoapController extends CController
 	{
 		self::check_passkey($passkey);
 
-		$obj = Cart::model()->findAllByAttributes(array('id_str'=>$id_str));
-		$modelAttributeNames = 'id,
-			id_str,
-			customer,
-			billaddress,
-			billaddress.state,
-			billaddress.country,
-			shipaddress,
-			shipaddress.state,
-			shipaddress.country,
-			taxCode,
-			shipping,
-			payment,
-			cart_type,
-			status,
-			currency,
-			printed_notes,
-			tax_inclusive,
-			tax1,tax2,tax3,tax4,tax5,subtotal,total,
-			cartItems';
+		$objCart = Cart::model()->findByAttributes(array('id_str' => $id_str));
+		$modelAttributeNames = array(
+			'id',
+			'id_str',
+			'customer',
+			'billaddress',
+			'billaddress.state',
+			'billaddress.country',
+			'shipaddress',
+			'shipaddress.state',
+			'shipaddress.country',
+			'taxCode',
+			'shipping',
+			'payment',
+			'cart_type',
+			'status',
+			'currency',
+			'printed_notes',
+			'tax_inclusive',
+			'tax1',
+			'tax2',
+			'tax3',
+			'tax4',
+			'tax5',
+			'subtotal',
+			'total',
+			'cartItems'
+		);
 
+		// TODO: The call to Yii::app()->cronJobs->run() can make this request
+		// take much longer than necessary. Investigate a way to avoid this.
 		Yii::app()->cronJobs->run();
-		return self::json_encode_orders($obj,$modelAttributeNames);
 
+		// For some reason, we return an array containing a single order.
+		return CJSON::encode(
+			array(
+				self::orderToArray($objCart, $modelAttributeNames)
+			)
+		);
 	}
 
-	protected function json_encode_orders($obj, $attributeNames)
+	/**
+	 * Transforms an order (actually a Cart model) into an array structure
+	 * matching the JSON response of get_order.
+	 *
+	 * @param Cart $objCart A completed Cart model.
+	 * @param string[] $attributeNames An array of attribute names to return in
+	 * the array. Dot notation may be used for accessing model relations.
+	 * @return array
+	 */
+	protected function orderToArray($objCart, $attributeNames)
 	{
-		$attributeNames = explode(',', $attributeNames);
-
-		$order = $obj[0];
-
-		$row = array(); //you will be copying in model attribute values to this array
-		foreach ($attributeNames as $name) {
-			$name = trim($name); //in case of spaces around commas
-			$row[$name] = CHtml::value($order, $name); //this function walks the relations
+		// Copy the specified attributes into the array to be returned.
+		$arrOrder = array();
+		foreach ($attributeNames as $name)
+		{
+			 // Get the relation property using dot-notation.
+			$arrOrder[$name] = CHtml::value($objCart, $name);
 		}
 
-		$arrItems = $row['cartItems'];
-
-		foreach ($arrItems as $itemKey => $objItem)
+		// Add the tax rates for each cart item.
+		$arrCartItems = array();
+		foreach ($arrOrder['cartItems'] as $objCartItem)
 		{
-			$arr = Tax::calculatePricesWithTax($objItem->sell_total, $order->tax_code_id, $objItem->product->tax_status_id);
-			$taxRates = $arr['arrTaxRates'];
+			$pricesWithTax = Tax::calculatePricesWithTax(
+				$objCartItem->sell_total,
+				$objCart->tax_code_id,
+				$objCartItem->product->tax_status_id
+			);
 
-			$arrTaxRatesForItem = array();
-			foreach ($taxRates as $key => $value) {
-				if ($value > 0) {
-					$arrTaxRatesForItem['tax'.$key.'_rate'] = $value;
+			// Convert the CartItem from an object to an array with the
+			// iterable properties.
+			$arrCartItem = array();
+			foreach ($objCartItem as $property => $value)
+			{
+				$arrCartItem[$property] = $value;
+			}
+
+			// Add any non-zero tax rates to the CartItem array.
+			foreach ($pricesWithTax['arrTaxRates'] as $taxKey => $taxRate)
+			{
+				if ($taxRate > 0)
+				{
+					$arrCartItem['tax' . $taxKey . '_rate'] = $taxRate;
 				}
 			}
-			$arrItem = CJSON::decode(CJSON::encode($objItem), true);
-			$arrItem = array_merge($arrItem, $arrTaxRatesForItem);
-			$objItem = CJSON::decode(CJSON::encode($arrItem), false);
-			$arrItems[$itemKey] = $objItem;
+
+			array_push($arrCartItems, $arrCartItem);
 		}
 
-		$row['cartItems'] = $arrItems;
-
-		$obj[0] = $row;
-
-		return CJSON::encode($obj);
+		$arrOrder['cartItems'] = $arrCartItems;
+		return $arrOrder;
 	}
 
 	/**

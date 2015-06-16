@@ -14,21 +14,23 @@ class GoogleMerchant extends CAction
 		// place the action logic here
 
 		//Load some information we'll use within the loops
-		$intStockHandling = _xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0);
-		$intGoogleMPN = _xls_get_conf('GOOGLE_MPN',0);
+		$intStockHandling = _xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0);
+		$intGoogleMPN = _xls_get_conf('GOOGLE_MPN', 0);
 		$strQueryAddl = ($intStockHandling == 0 ? " AND inventory_avail>0" : "");
 
-		header ("content-type: text/xml;charset=UTF-8");
+		header("content-type: text/xml;charset=UTF-8");
 
 		echo '<?xml version="1.0" encoding="UTF-8"?>'.chr(13);
 		echo ' <rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">'.chr(13);
 		echo '<channel>'.chr(13);
 
-		echo '		<title><![CDATA['._xls_get_conf('STORE_NAME','Lightspeed Web Store').']]></title>'.chr(13);
+		echo '		<title><![CDATA['._xls_get_conf('STORE_NAME', 'Lightspeed Web Store').']]></title>'.chr(13);
 		echo '		<link>'._xls_site_url().'</link>'.chr(13);
 		echo '		<description><![CDATA['._xls_get_conf('STORE_TAGLINE').']]></description>'.chr(13);
 
-		$sql = 'SELECT * FROM '.Product::model()->tableName().' WHERE current=1 AND web=1 '.$strQueryAddl.' ORDER BY id';
+		// We only want active web products that are not master products
+		// https://support.google.com/merchants/answer/188494
+		$sql = 'SELECT * FROM '.Product::model()->tableName().' WHERE current=1 AND web=1 AND master_model=0 '.$strQueryAddl.' ORDER BY id';
 
 		if(isset($_GET['group']))
 		{
@@ -37,20 +39,22 @@ class GoogleMerchant extends CAction
 			{
 				$intGroup = 1;
 			}
-			$parse = _xls_get_conf('GOOGLE_PARSE',5000);
+
+			$parse = _xls_get_conf('GOOGLE_PARSE', 5000);
 			switch ($intGroup)
 			{
-				case 1: $sql .= " limit ".$parse; break;
+				case 1:
+					$sql .= " limit ".$parse;
+					break;
+
 				default:
-					$sql .= " limit ".((($intGroup-1)*$parse)).",".$parse; break;
-
+					$sql .= " limit ".((($intGroup - 1) * $parse)).",".$parse;
+					break;
 			}
-
-
 		}
 
 		$arrProducts = Yii::app()->db->createCommand($sql)->query();
-		
+
 		while(($arrItem = $arrProducts->read()) !== false)
 		{
 			$objProduct = Product::model()->findByPk($arrItem['id']);
@@ -59,7 +63,7 @@ class GoogleMerchant extends CAction
 			$strGoogle = $arrGoogle['Category'];
 
 			$arrTaxGrids = $objProduct->GetTaxRateGrid();
-			$arrTrail = Category::GetTrailByProductId($objProduct->id,'names');
+			$arrTrail = Category::GetTrailByProductId($objProduct->id, 'names');
 
 			//If our current category doesn't have Google set but we have a parent that does, use it
 			if (empty($strGoogle) && count($arrTrail) > 1)
@@ -68,7 +72,6 @@ class GoogleMerchant extends CAction
 				$strGoogle = $arrGoogle['Category'];
 			}
 
-
 			echo '<item>'.chr(13);
 			echo chr(9)."<g:id>".$objProduct->id."</g:id>".chr(13);
 			echo chr(9).'<title><![CDATA['.strip_tags($objProduct->Title).']]></title>'.chr(13);
@@ -76,15 +79,18 @@ class GoogleMerchant extends CAction
 			{
 				echo chr(9).'<description><![CDATA['.$objProduct->WebLongDescription.']]></description>'.chr(13);
 			}
+
 			if ($strGoogle)
 			{
 				echo chr(9).'<g:google_product_category>'.$strGoogle.'</g:google_product_category>'.chr(13);
 			}
+
 			if ($arrTrail)
 			{
-				echo chr(9).'<g:product_type><![CDATA['.implode(" &gt; ",$arrTrail).']]></g:product_type>'.chr(13);
+				echo chr(9).'<g:product_type><![CDATA['.implode(" &gt; ", $arrTrail).']]></g:product_type>'.chr(13);
 			}
-			echo chr(9).'<link>'.$objProduct->AbsoluteUrl.'</link>'.chr(13);
+
+			echo chr(9).'<link>'.$objProduct->directUrl.'</link>'.chr(13);
 
 			if($objProduct->image_id)
 			{
@@ -118,8 +124,7 @@ class GoogleMerchant extends CAction
 				echo chr(9).'<g:mpn><![CDATA['.$objProduct->code.']]></g:mpn>'.chr(13);
 			}
 
-
-			if (substr($strGoogle,0,7) == "Apparel")
+			if (substr($strGoogle, 0, 7) == "Apparel")
 			{
 				echo chr(9).'<g:gender>'.$arrGoogle['Gender'].'</g:gender>'.chr(13);
 				echo chr(9).'<g:age_group>'.$arrGoogle['Age'].'</g:age_group>'.chr(13);
@@ -128,7 +133,7 @@ class GoogleMerchant extends CAction
 			echo chr(9).'<g:color><![CDATA['.$objProduct->product_color.']]></g:color>'.chr(13);
 			echo chr(9).'<g:size><![CDATA['.$objProduct->product_size.']]></g:size>'.chr(13);
 
-			if ($objProduct->parent>0)
+			if ($objProduct->parent > 0)
 			{
 				echo chr(9).'<item_group_id>'.$objProduct->parent.'</item_group_id>'.chr(13);
 			}
@@ -146,8 +151,6 @@ class GoogleMerchant extends CAction
 			echo chr(9).'<g:shipping_weight>'.$objProduct->product_weight.'</g:shipping_weight>'.chr(13);
 
 			echo '</item>'.chr(13);
-
-
 		}
 
 		echo '</channel>'.chr(13);

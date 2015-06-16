@@ -65,7 +65,7 @@ $count = count($simModules);
 		}
 		?>
 	</div>
-	<p class="large"><?php echo Yii::t('checkout', "Review and confirm your order. You'll be forwarded to our secure payment partner to enter your credit cart details.")?></p>
+	<p class="large"><?php echo Yii::t('checkout', "Review and confirm your order. You'll be forwarded to our secure payment partner to enter your credit card details.")?></p>
 
 	<?php $this->renderPartial('_shippingasbillingguest', array('model' => $model, 'form' => $form)); ?>
 

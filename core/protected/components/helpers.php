@@ -17,7 +17,7 @@
  * @return string key value
 */
 // @codingStandardsIgnoreStart
-function _xls_get_conf($strKey, $mixDefault = "")
+function _xls_get_conf($strKey, $mixDefault = '')
 // @codingStandardsIgnoreEnd
 {
 
@@ -3255,3 +3255,5 @@ function arraySwap($array, $key1, $key2)
 
 	return $swappedArray;
 }
+
+

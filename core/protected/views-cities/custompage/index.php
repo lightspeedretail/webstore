@@ -2,6 +2,16 @@
 	<?php echo $model->page; ?>
 </div>
 
+<?php if (CPropertyValue::ensureInteger($model->product_display) === CustomPage::PRODUCT_DISPLAY_GRID): ?>
+	<?php
+	$this->renderPartial(
+		'/custompage/_grid',
+		array(
+			'productsGrid' => $productsGrid
+		)
+	);
+	?>
+<?php else: ?>
 <div class="span9 clearfix">
 	<?php
 		$this->widget('ext.JCarousel.JCarousel', array(
@@ -19,3 +29,4 @@
 			'clickCallback'=>'window.location.href=itemSrc;'
 		)); ?>
 </div>
+<?php endif; ?>

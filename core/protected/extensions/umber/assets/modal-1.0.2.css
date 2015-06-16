@@ -1626,6 +1626,11 @@ body.overlay {
     display: none;
   }
 }
+@media (min-width: 640px) {
+  .desktop-hide {
+    display: none;
+  }
+}
 .webstore-overlay-cart {
   display: block;
   overflow-y: scroll;

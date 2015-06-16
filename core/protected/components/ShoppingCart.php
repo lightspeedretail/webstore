@@ -302,7 +302,7 @@ class ShoppingCart extends CApplicationComponent
 					$objItem->discount
 				);
 
-				if (strlen($retVal) > 5)
+				if (is_string($retVal) && strlen($retVal) > 5)
 				{
 					return $retVal;
 				}

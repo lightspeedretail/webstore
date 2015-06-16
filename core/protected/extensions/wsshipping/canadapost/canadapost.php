@@ -71,29 +71,28 @@ class canadapost extends WsShipping
 		";
 
 		$ch = curl_init();
-		curl_setopt ($ch, CURLOPT_URL,$url);
-		curl_setopt ($ch, CURLOPT_HEADER, 0);
-		curl_setopt ($ch, CURLOPT_POST, 1);
-		curl_setopt ($ch, CURLOPT_POSTFIELDS, $xml);
-		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
-		$result = curl_exec ($ch);
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		$result = curl_exec($ch);
 
-		if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
-			Yii::log(get_class($this) . " sending ".$xml, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-			Yii::log(get_class($this) . " receiving ".$result, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-		}
+		Yii::log(get_class($this) . " sending ".$xml, $this->logLevel, 'application.'.__CLASS__.".".__FUNCTION__);
+		Yii::log(get_class($this) . " receiving ".$result, $this->logLevel, 'application.'.__CLASS__.".".__FUNCTION__);
 
 		$oXML = new SimpleXMLElement($result);
 
-		if($oXML->error) {
+		if ($oXML->error)
+		{
 			//What we have is ... failure to communicate
 			Yii::log('Could not get shipping for Canada Post: '.$oXML->error->statusMessage, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return false;
 		}
 
-
-		foreach($oXML->ratesAndServicesResponse->product as $key=>$val) {
+		foreach ($oXML->ratesAndServicesResponse->product as $key => $val)
+		{
 			$strKey = $val->name;
 			$strRate = $val->rate;
 			$strKey = $this->cleanMethodName($strKey);
@@ -101,16 +100,13 @@ class canadapost extends WsShipping
 			$found++;
 		}
 
-		if($found <=0) {
-
+		if ($found <= 0)
+		{
 			$this->reportShippingFailure();
 			return false;
 		}
 
 		return $this->convertRetToDisplay($ret);
-
-
-
 	}
 
 	public function cleanMethodName($strName) {

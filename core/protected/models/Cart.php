@@ -924,8 +924,12 @@ class Cart extends BaseCart
 			$objItem->save();
 	}
 
+
 	/**
-	 * Attempt to add product to cart. If product cannot be added, the error string is returned. Otherwise, the row id is returned.
+	 * TODO: Five different return types... WS-4319
+	 * Attempt to add product to cart. If product cannot be added, the error string is returned.
+	 * Otherwise, the row id is returned.
+	 *
 	 * @param $objProduct
 	 * @param int $intQuantity
 	 * @param int $mixCartType
@@ -933,63 +937,89 @@ class Cart extends BaseCart
 	 * @param bool $strDescription
 	 * @param bool $fltSell
 	 * @param bool $fltDiscount
-	 * @return bool|string
+	 * @return CartItem|string|string[]|true|void
+	 * @throws Exception
 	 */
-	public function AddProduct($objProduct,
+	public function AddProduct(
+		$objProduct,
 		$intQuantity = 1,
 		$mixCartType = 0,
 		$intGiftItemId = null,
 		$strDescription = false,
 		$fltSell = false,
-		$fltDiscount = false)
+		$fltDiscount = false
+	)
 	{
-
-		if ($mixCartType==0)
+		if ($mixCartType == 0)
+		{
 			$mixCartType = CartType::cart;
-
-
-		if (_xls_get_conf('PRICE_REQUIRE_LOGIN') && Yii::app()->user->isGuest) {
-			return Yii::t('cart',"You must log in to {button}",
-				array('{button}'=>Yii::t('product', 'Add to Cart')));
 		}
 
-		if ($objProduct->IsMaster) {
-			return Yii::t('cart',"Please choose options before selecting {button}",
-				array('{button}'=>Yii::t('product', 'Add to Cart')));
+		if (_xls_get_conf('PRICE_REQUIRE_LOGIN') && Yii::app()->user->isGuest)
+		{
+			return Yii::t(
+				'cart',
+				"You must log in to {button}",
+				array('{button}' => Yii::t('product', 'Add to Cart'))
+			);
+		}
+
+		if ($objProduct->IsMaster)
+		{
+			return Yii::t(
+				'cart',
+				"Please choose options before selecting {button}",
+				array('{button}' => Yii::t('product', 'Add to Cart'))
+			);
 		}
 
 		// Verify inventory
-		if (!$objProduct->getIsAddable() && $mixCartType==CartType::cart) {
-				return Yii::t('cart',_xls_get_conf('INVENTORY_ZERO_NEG_TITLE', 'This item is not currently available'));
+		if (!$objProduct->getIsAddable() && $mixCartType == CartType::cart)
+		 {
+				return Yii::t('cart', _xls_get_conf('INVENTORY_ZERO_NEG_TITLE', 'This item is not currently available'));
 		}
 
 		// Ensure product is Saleable
-		if (!$objProduct->web && $mixCartType==CartType::cart) {
-			return Yii::t('cart',
-				'Selected product is no longer available for ordering. Thank you for your understanding.');
+		if (!$objProduct->web && $mixCartType == CartType::cart)
+		{
+			return Yii::t('cart', 'Selected product is no longer available for ordering. Thank you for your understanding.');
 		}
 
 		//Todo Replace with CEvent
-		if(function_exists('_custom_before_add_to_cart'))
-			_custom_before_add_to_cart($objProduct , $intQuantity);
+		if (function_exists('_custom_before_add_to_cart'))
+		{
+			_custom_before_add_to_cart($objProduct, $intQuantity);
+		}
 
 		$objItem = false;
 
-
 		//Items to use
-		$intTaxIn = ($this->tax_code_id>0 && _xls_get_conf('TAX_INCLUSIVE_PRICING') ? 1 : 0);
-		if ($strDescription==false) $strDescription = $objProduct->Title;
-		if ($fltSell==false) $fltSell = $objProduct->getPriceValue(1,$intTaxIn);
-		if ($fltDiscount==false) $fltDiscount=0;
+		$intTaxIn = ($this->tax_code_id > 0 && _xls_get_conf('TAX_INCLUSIVE_PRICING') ? 1 : 0);
+		if ($strDescription == false)
+		{
+			$strDescription = $objProduct->Title;
+		}
 
-		foreach ($this->cartItems as $item) {
+		if ($fltSell == false)
+		{
+			$fltSell = $objProduct->getPriceValue(1, $intTaxIn);
+		}
 
+		if ($fltDiscount == false)
+		{
+			$fltDiscount = 0;
+		}
+
+		foreach ($this->cartItems as $item)
+		{
 			if ($item->product_id == $objProduct->id &&
 				$item->code == $objProduct->OriginalCode &&
-				$item->description == $strDescription  &&
-				$item->sell_discount == $fltDiscount  &&
+				$item->description == $strDescription &&
+				$item->sell_discount == $fltDiscount &&
 				$item->cart_type == $mixCartType &&
-				$item->wishlist_item == $intGiftItemId) {
+				$item->wishlist_item == $intGiftItemId
+			)
+			{
 				$objItem = $item;
 				break;
 			}
@@ -1012,11 +1042,14 @@ class Cart extends BaseCart
 			Yii::app()->user->setState('cartid', $this->id);
 		}
 
-		if (!$objItem) {
+		if (!$objItem)
+		{
 			$objItem = new CartItem();
 
 			if ($objProduct->id)
+			{
 				$objItem->product_id = $objProduct->id;
+			}
 
 			$objItem->cart_id = $this->id;
 			$objItem->code = $objProduct->OriginalCode;
@@ -1026,11 +1059,12 @@ class Cart extends BaseCart
 			$objItem->sell_discount = $fltDiscount;
 
 			$objItem->description = $strDescription;
-			$objItem->tax_in= $intTaxIn;
+			$objItem->tax_in = $intTaxIn;
 
 			if ($intGiftItemId > 0)
+			{
 				$objItem->wishlist_item = $intGiftItemId;
-
+			}
 		}
 
 		$objItem->qty = ($objItem->qty ? $objItem->qty : 0);
@@ -1043,7 +1077,9 @@ class Cart extends BaseCart
 
 		$retVal = $this->UpdateItemQuantity($objItem, $intQuantity + $objItem->qty);
 		if (!($retVal instanceof CartItem))
+		{
 			return $retVal;
+		}
 
 		$objItem->cart_id = $this->id;
 
@@ -1051,7 +1087,9 @@ class Cart extends BaseCart
 
 		//Todo change to CEvent
 		if(function_exists('_custom_after_add_to_cart'))
-			_custom_after_add_to_cart($objProduct , $intQuantity);
+		{
+			_custom_after_add_to_cart($objProduct, $intQuantity);
+		}
 
 		return $objItem->id;
 	}

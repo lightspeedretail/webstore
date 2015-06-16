@@ -239,7 +239,7 @@ Class NSprite extends CApplicationComponent
 		}
 
 		// Retina stuff
-		$css .= "@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen ad (min--moz-device-pixel-ratio: 1.5), only screen and (min-resolution: 240dpi) { .sprite { background-image:url(retina-sprite.png);  background-size: " . $total['width'] . "px " . $total['height'] . "px;  } }";
+		$css .= "@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (min-resolution: 240dpi) { .sprite { background-image:url(retina-sprite.png);  background-size: " . $total['width'] . "px " . $total['height'] . "px;  } }";
 
 		$fp = $this->getPublishedAssetsPath() . DIRECTORY_SEPARATOR . 'sprite.css';
 		file_put_contents($fp, $css);

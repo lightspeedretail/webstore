@@ -3,6 +3,7 @@
 class PaymentsController extends AdminBaseController
 {
 	private $noneActive=0;
+	private $_allowAdvancedPayments;
 
 	public $controllerName = "Payments";
 
@@ -23,6 +24,10 @@ class PaymentsController extends AdminBaseController
 		$arrModules =  Modules::model()->findAllByAttributes(
 			array('category' => 'payment'),
 			array('order' => 'module')
+		);
+
+		$this->_allowAdvancedPayments = CPropertyValue::ensureBoolean(
+			Yii::app()->params['ALLOW_ADVANCED_PAY_METHODS']
 		);
 
 		$menuSidebar = array();
@@ -82,14 +87,8 @@ class PaymentsController extends AdminBaseController
 				)
 			),
 			$advancedPaymentMethods,
-			array(
-				array('label' => 'Payment Setup', 'linkOptions' => array('class'=>'nav-header')),
-				array('label' => 'Set Display Order', 'url' => array('payments/order')),
-				array('label' => 'Credit Card Types', 'url' => array('payments/cardtypes')),
-				array('label' => 'Promo Codes', 'url' => array('payments/promocodes')),
-				array('label' => 'Promo Code Tasks', 'url' => array('payments/promotasks')),
+			$this->getPaymentSetupLinks()
 
-			)
 		);
 
 
@@ -110,6 +109,54 @@ class PaymentsController extends AdminBaseController
 		}
 
 		return parent::beforeAction($action);
+	}
+
+	public function getPaymentSetupLinks()
+	{
+		$paymentSetupLinks = array();
+		array_push(
+			$paymentSetupLinks,
+			array(
+				'label' => 'Payment Setup',
+				'linkOptions' => array('class'=>'nav-header')
+			)
+		);
+		array_push(
+			$paymentSetupLinks,
+			array(
+				'label' => 'Set Display Order',
+				'url' => array('payments/order')
+			)
+		);
+
+		if ($this->_allowAdvancedPayments)
+		{
+			array_push(
+				$paymentSetupLinks,
+				array(
+					'label' => 'Credit Card Types',
+					'url' => array('payments/cardtypes')
+				)
+			);
+		}
+
+		array_push(
+			$paymentSetupLinks,
+			array(
+				'label' => 'Promo Codes',
+				'url' => array('payments/promocodes')
+			)
+		);
+
+		array_push(
+			$paymentSetupLinks,
+			array(
+				'label' => 'Promo Code Tasks',
+				'url' => array('payments/promotasks')
+			)
+		);
+
+		return $paymentSetupLinks;
 	}
 
 
@@ -448,6 +495,11 @@ class PaymentsController extends AdminBaseController
 
 	public function actionCardtypes()
 	{
+		if ($this->_allowAdvancedPayments === false)
+		{
+			_xls_404();
+		}
+
 		$model = new CreditCard();
 
 		$pk = Yii::app()->getRequest()->getPost('pk');

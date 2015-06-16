@@ -130,10 +130,10 @@ class DefaultController extends AdminBaseController
 						return "Please note these settings affect photos as they are uploaded. You will need to reflag a product photo and Update Store to see the changes.";
 
 			case self::SEO_PRODUCT:
-				return "<P>These settings control the Page Title and Meta Description using keys that represent product information. Each of these keys is wrapped with a percentage ({) sign. Most represent fields in the Product Card. {crumbtrail} and {rcrumbtrail} (reverse crumbtrail) are the product's category path. Below is the available list of keys:</p><P>{storename}, {name}, {description}, {shortdescription}, {longdescription}, {price}, {family}, {class}, {crumbtrail}, {rcrumbtrail}</p>You can use {storename} and {storetagline} for the homepage.";
+				return "<P>These settings control the Page Title and Meta Description using keys that represent product information. Each of these keys is wrapped in curly braces ({}). Most represent fields in the Product Card. {crumbtrail} and {rcrumbtrail} (reverse crumbtrail) are the product's category path. Below is the available list of keys:</p><P>{storename}, {name}, {description}, {shortdescription}, {longdescription}, {price}, {family}, {class}, {crumbtrail}, {rcrumbtrail}</p>You can use {storename} and {storetagline} for the homepage.";
 
 			case self::SEO_CATEGORY:
-				return "<P>These settings control the Category and Custom Page Titles and Meta Descriptions using keys that represent category name or store information. Each of these keys is wrapped with a percentage ({) sign. {crumbtrail} and {rcrumbtrail} (reverse crumbtrail) are the product's category path. Below is the available list of keys:</p>
+				return "<P>These settings control the Category and Custom Page Titles and Meta Descriptions using keys that represent category name or store information. Each of these keys is wrapped with in curly braces ({}). {crumbtrail} and {rcrumbtrail} (reverse crumbtrail) are the product's category path. Below is the available list of keys:</p>
 <P>{storename}, {name}, {crumbtrail}, {rcrumbtrail}{</p>";
 
 			default:

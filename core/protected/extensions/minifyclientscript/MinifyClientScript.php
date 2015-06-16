@@ -354,7 +354,11 @@ class MinifyClientScript extends CClientScript
 			// Skip if the file doesn't exist or is not readable
 			if(is_readable($cssPath) === false)
 			{
-				Yii::log("CSS file '" . $cssPath . "' is not readable.", 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				Yii::log(
+					"CSS file '" . $cssPath . "' is not readable.",
+					'info',
+					'application.' . __CLASS__ . "." . __FUNCTION__
+				);
 				continue;
 			}
 

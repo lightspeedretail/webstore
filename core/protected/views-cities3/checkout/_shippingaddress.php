@@ -102,18 +102,7 @@
 				echo $form->textField(
 					$model,
 					'shippingPostal',
-					$htmlOptions = array('placeholder' => Yii::t('checkout', "Zip"), 'required' => "required" ),
-					array(
-						'ajax' => array(
-							'type' => 'POST',
-							'dataType' => 'json',
-							'url' => CController::createUrl('cart/settax'),
-							'success' => 'js:function(data){ updateTax(data) }',
-							'data' => 'js:{"'.'state_id'.'": $("#'.CHtml::activeId($model,'shippingState').
-								' option:selected").val(),
-								"'.'postal'.'": $("#'.CHtml::activeId($model,'shippingPostal').'").val()}',
-						)
-					)
+					$htmlOptions = array('placeholder' => Yii::t('checkout', "Zip"), 'required' => "required")
 				);
 				?>
 			</li>

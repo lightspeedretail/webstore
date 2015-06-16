@@ -54,6 +54,9 @@ class SiteController extends Controller
 			default:
 				//Custom Page
 				$objCustomPage = CustomPage::LoadByKey($homePage);
+				$productsGrid = null;
+				$dataProvider = null;
+
 				if (!($objCustomPage instanceof CustomPage))
 				{
 					_xls_404();
@@ -66,10 +69,27 @@ class SiteController extends Controller
 					$objCustomPage->title => $objCustomPage->RequestUrl,
 				);
 
-				$dataProvider = $objCustomPage->taggedProducts();
+				if (CPropertyValue::ensureInteger($objCustomPage->product_display) === 2)
+				{
+					$productsGrid = new ProductGrid(
+						$objCustomPage->getProductGridCriteria()
+					);
+				}
+				else
+				{
+					$dataProvider = $objCustomPage->taggedProducts();
+				}
 
 				$this->canonicalUrl = $objCustomPage->canonicalUrl;
-				$this->render('/custompage/index', array('model' => $objCustomPage, 'dataProvider' => $dataProvider));
+
+				$this->render(
+					'/custompage/index',
+					array(
+						'model' => $objCustomPage,
+						'dataProvider' => $dataProvider,
+						'productsGrid' => $productsGrid
+					)
+				);
 				break;
 		}
 	}

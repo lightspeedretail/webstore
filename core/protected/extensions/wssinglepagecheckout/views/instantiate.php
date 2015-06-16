@@ -14,6 +14,8 @@
 			CJSON::encode(
 				array(
 					'calculateShippingEndpoint' => Yii::app()->createUrl('cart/ajaxcalculateshipping'),
+					'destinationStatesEndpoint' => Yii::app()->createUrl('cart/getdestinationstates'),
+					'setTaxEndpoint' => Yii::app()->createUrl('cart/settaxbyaddress'),
 					'paymentModulesThatUseCard' => array_keys($model->getAimPaymentMethods()),
 					'paymentModulesThatUseForms' => array_keys($model->getAlternativePaymentMethodsThatUseSubForms()),
 					'shippingProviderId' => CHtml::activeId($model, 'shippingProvider'),
@@ -23,6 +25,7 @@
 					'shippingAddress1Id' => CHtml::activeId($model, 'shippingAddress1'),
 					'shippingAddress2Id' => CHtml::activeId($model, 'shippingAddress2'),
 					'shippingCityId' => CHtml::activeId($model, 'shippingCity'),
+					'shippingCountryId' => CHtml::activeId($model, 'shippingCountry'),
 					'shippingStateId' => CHtml::activeId($model, 'shippingState'),
 					'shippingPostalId' => CHtml::activeId($model, 'shippingPostal'),
 					'promoCode' => CHtml::activeId($model, 'promoCode'),

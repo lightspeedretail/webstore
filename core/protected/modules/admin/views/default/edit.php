@@ -5,7 +5,7 @@
 		    <?php echo CHtml::beginForm(); ?>
 			    <?php foreach($model as $i=>$item): ?>
 				<div class="row">
-                    <div class="span5"><?php echo CHtml::activeLabelEx($item,$item->title.':'); ?></div>
+                    <div class="span5"><?php echo CHtml::activeLabelEx($item, $item->title.':', $defineLabel ? array('label' => $item->title) : array()); ?></div>
                     <div class="span5"><?php
 	                    switch($item->options)
 	                    {

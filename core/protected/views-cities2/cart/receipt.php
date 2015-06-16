@@ -39,7 +39,7 @@ if($model): ?>
 
 	<?php echo $this->renderPartial('/cart/_facebookwall',array(),true); ?>
 
-	<?php echo $this->renderPartial('/cart/_googleconversion',array('model'=>$model),true); ?>
+	<?php $this->widget('ext.wsgoogle.wsecommerce', array('objCart' => $model)); ?>
 
 </div>
 

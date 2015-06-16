@@ -9,9 +9,10 @@
 						<?= $objCart->id_str ?>
 					</td>
 					<td class="date">
-						<?= date('F jS, Y', strtotime($objCart->datetime_cre)); ?>
+						<span class="mobile-hide"><?= date('F jS, Y', strtotime($objCart->datetime_cre)); ?></span>
+						<span class="desktop-hide"><?= date('m.d.y', strtotime($objCart->datetime_cre)); ?></span>
 					</td>
-					<td class="n-items">
+					<td class="n-items mobile-hide">
 						<?php $totalItemCount = $objCart->getTotalItemCount();
 						echo
 						Yii::t(

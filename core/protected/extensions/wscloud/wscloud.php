@@ -113,7 +113,6 @@ class wscloud extends ApplicationComponent {
 		$this->init();
 
 		//We were passed these by the CEventPhoto class
-		$blbImage = $event->blbImage; //$image resource
 		$objProduct = $event->objProduct;
 		$intSequence = $event->intSequence;
 
@@ -126,25 +125,19 @@ class wscloud extends ApplicationComponent {
 		$objImage = Images::model()->find($criteria);
 
 		if (!($objImage instanceof Images))
+		{
 			$objImage = new Images();
-
-		//Assign width and height of original
-		$objImage->width = imagesx($blbImage);
-		$objImage->height = imagesy($blbImage);
-
-		//Assign filename this image, actually write the binary file
-		$objImage->strImageName = Images::AssignImageName($objProduct,$intSequence);
-
+		}
 
 		$objImage->product_id=$objProduct->id;
 		$objImage->index=$intSequence;
 
-
 		//Save image record
-		Yii::trace("saving ".$objImage->strImageName,'application.'.__CLASS__.".".__FUNCTION__);
-		if (!$objImage->save()) {
+		Yii::trace("saving ".$objImage->strImageName, 'application.'.__CLASS__.".".__FUNCTION__);
+		if (!$objImage->save())
+		{
 			Yii::log("Error saving image " .
-				print_r($objImage->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+				print_r($objImage->getErrors(), true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 			return false;
 		}
 
@@ -152,58 +145,20 @@ class wscloud extends ApplicationComponent {
 		$objImage->save();
 
 		//Update product record with imageid if this is a primary
-		if ($intSequence==0)
+		if ($intSequence == 0)
 		{
 			$objProduct->image_id = $objImage->id;
-			if (!$objProduct->save()) {
+			if (!$objProduct->save())
+			{
 				Yii::log("Error updating product " .
 					print_r($objProduct->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				return false;
 			}
 		}
 
-
-
-		$url=null;
-
-		//Save as temporary file in Pro mode so we can upload
-		if(Yii::app()->params['LIGHTSPEED_MT'] == '1' && Yii::app()->params['LIGHTSPEED_CLOUD'] == '0')
-		{
-			$d = YiiBase::getPathOfAlias('webroot')."/runtime/cloudimages/"._xls_get_conf('LIGHTSPEED_HOSTING_LIGHTSPEED_URL');
-			@mkdir($d,0777,true);
-			$tmpOriginal = tempnam($d,"img");
-			@unlink($tmpOriginal);
-			$tmpOriginal .= ".png";
-			$retVal = Images::check_transparent($blbImage);
-			if($retVal)
-			{
-				imagealphablending($blbImage, false);
-				imagesavealpha($blbImage, true);
-			}
-			imagepng($blbImage,$tmpOriginal);
-
-			$retVal = $this->saveToCloudinary($objImage->strImageName,$tmpOriginal);
-			$event->cloud_image_id = $objImage->id;
-			$event->cloudinary_public_id = $retVal['public_id'];
-			$event->cloudinary_cloud_name = $this->arrCloudinary['cloud_name'];
-			$event->cloudinary_version = $retVal['version'];
-
-			$url = substr($retVal['url'],5);
-		}
-
 		$this->updateCloudId($event,$objImage->id);
 
-		if(!empty($url))
-		{
-			$objImage->image_path = $url;
-			$objImage->save();
-		}
-
-		@unlink($tmpOriginal);
-
 		return true;
-
-
 	}
 
 	/**

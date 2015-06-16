@@ -562,49 +562,6 @@ class Controller extends CController
 		return Yii::app()->session['returnUrl'];
 	}
 
-	/**
-	 * Cycle through Product model for page and mark beginning and end of each row.
-	 *
-	 * Used for <div row> formatting in the view layer.
-	 *
-	 * @param $model
-	 * @return mixed
-	 */
-	protected function createBookends($model)
-	{
-		if (count($model) == 0 || Yii::app()->theme->config->disableGridRowDivs)
-		{
-			return $model;
-		}
-
-		$ct = -1;
-		$next = 0;
-		foreach ($model as $item)
-		{
-			$ct++;
-			if ($ct == 0)
-			{
-				$model[$ct]->rowBookendFront = true;
-			}
-
-			if ($next == 1)
-			{
-				$model[$ct]->rowBookendFront = true;
-				$next = 0;
-			}
-
-			if ((1 + $ct) % $this->gridProductsPerRow == 0)
-			{
-				$model[$ct]->rowBookendBack = true;
-				$next = 1;
-			}
-		}
-
-		$model[count($model) - 1]->rowBookendBack = true; //Last item must always close div
-		return $model;
-	}
-
-
 	protected function afterRender($view, &$output) {
 		parent::afterRender($view, $output);
 		//Yii::app()->facebook->addJsCallback($js); // use this if you are registering any $js code you want to run asyc

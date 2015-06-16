@@ -96,9 +96,6 @@ class Product extends BaseProduct
 		return sprintf('Product Object %s',  $this->id);
 	}
 
-
-
-
 	/**
 	 * Display original price formatted for local currency
 	 * Will be blank if original price is not higher than
@@ -108,15 +105,18 @@ class Product extends BaseProduct
 	public function getFormattedRegularPrice() {
 
 		$fltProductRegPrice = null;
-		if(_xls_get_conf('ENABLE_SLASHED_PRICES' , 0)>0 &&
+		if(_xls_get_conf('ENABLE_SLASHED_PRICES', 0) > 0 &&
 			!$this->master_model &&
 			$this->sell_web != 0 &&
 			$this->sell_web < $this->sell
 		)
+		{
 			$fltProductRegPrice = Yii::app()->numberFormatter->formatCurrency(
 				$this->sell,
-				_xls_get_conf('CURRENCY_DEFAULT','USD')
+				_xls_get_conf('CURRENCY_DEFAULT', 'USD')
 			);
+		}
+
 		return $fltProductRegPrice;
 	}
 
@@ -127,14 +127,84 @@ class Product extends BaseProduct
 	public function getFormattedPrice() {
 
 		if ($this->HasPriceRange)
-			return Yii::t('global',"choose options for pricing");
+		{
+			return Yii::t('global', 'choose options for pricing');
+		}
 		else
+		{
 			return Yii::app()->numberFormatter->formatCurrency(
 				$this->sell_web,
-				_xls_get_conf('CURRENCY_DEFAULT','USD')
+				_xls_get_conf('CURRENCY_DEFAULT', 'USD')
 			);
+		}
 	}
 
+	/**
+	 * Display savings amount formatted for local currency
+	 * Will be blank if original price is not higher than
+	 * current selling price.
+	 *
+	 * @return null, float
+	 */
+	public function getFormattedSavingsAmount()
+	{
+		$fltProductSavings = null;
+
+		if (_xls_get_conf('ENABLE_SLASHED_PRICES', 0)  > 0)
+		{
+			$objProduct = $this->getProductFromDisplayOption();
+
+			$savings = $objProduct->getSell() - $objProduct->getSellWeb();
+
+			$fltProductSavings = Yii::app()->numberFormatter->formatCurrency(
+				$savings,
+				_xls_get_conf('CURRENCY_DEFAULT', 'USD')
+			);
+		}
+
+		return $fltProductSavings;
+	}
+
+	/*
+	 * Returns a product based on the admin panel option for
+	 * 'In Product Grid, When Child Product Prices Vary'. NOTE:
+	 * The master product's price can be displayed.
+	 *
+	 * @return CActiveRecord Returns the product object based on the display
+	 * option.
+	 */
+	public function getProductFromDisplayOption()
+	{
+		if ($this->IsMaster())
+		{
+			$childProducts = $this->getChildProducts();
+			switch (_xls_get_conf('MATRIX_PRICE'))
+			{
+				case Product::HIGHEST_PRICE:
+					return end($childProducts);
+				case Product::LOWEST_PRICE:
+					return $childProducts[0];
+				case Product::MASTER_PRICE:
+				default:
+					return $this;
+			}
+		}
+
+		return $this;
+	}
+	/**
+	 * Get the difference between the Web Price and the In Store price as a
+	 * formatted percentage.
+	 * @return string
+	 */
+	public function getFormattedSavingsPercentage () {
+		if ($this->getPercentSavings() >= 5)
+		{
+			return '(' . $this->getPercentSavings() . '%)';
+		}
+
+		return '';
+	}
 
 	/**
 	 * If we are in multilanguage mode, parse the description and display only the local language.
@@ -143,15 +213,23 @@ class Product extends BaseProduct
 	 */
 	public function getWebLongDescription()
 	{
-		if(_xls_get_conf('LANG_MENU',0))
+		if(_xls_get_conf('LANG_MENU', 0))
+		{
 			$strDesc = _xls_parse_language($this->description_long);
-		else $strDesc = $this->description_long;
-
-		if($strDesc==strip_tags($strDesc,'<b><i><u><font><a>'))
-			return nl2br($strDesc);
+		}
 		else
-			return $strDesc;
+		{
+			$strDesc = $this->description_long;
+		}
 
+		if($strDesc == strip_tags($strDesc, '<b><i><u><font><a>'))
+		{
+			return nl2br($strDesc);
+		}
+		else
+		{
+			return $strDesc;
+		}
 	}
 
 	/**
@@ -188,6 +266,77 @@ class Product extends BaseProduct
 	}
 
 	/**
+	 * Does this master product have children with different
+	 * sizes but only one color?
+	 *
+	 * @return bool
+	 */
+	public function getIsSizeOnlyMatrix()
+	{
+		return $this->isValueSameForAllChildren('product_color');
+	}
+
+	/**
+	 * Does this master product have children with
+	 * different colors but only one size?
+	 *
+	 * @return bool
+	 */
+	public function getIsColorOnlyMatrix()
+	{
+		return $this->isValueSameForAllChildren('product_size');
+	}
+
+	/**
+	 * Take the passed in model attribute and determine whether
+	 * or not the children all have the same value for that attribute.
+	 *
+	 * @param null $strAttr
+	 * @return bool
+	 */
+	protected function isValueSameForAllChildren($strAttr = null)
+	{
+		if ($this->IsMaster() === false)
+		{
+			Yii::log(
+				sprintf("Calling %s on a non master product", __FUNCTION__),
+				'error',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
+
+			return false;
+		}
+
+		if (is_null($strAttr))
+		{
+			Yii::log('Product attribute was not defined', 'error', 'application.'.__CLASS__.'.'.__FUNCTION__);
+			return false;
+		}
+
+		$arrChildren = Product::model()->findAllByAttributes(
+			array(
+				'parent' => $this->id,
+				'web' => 1,
+				'current' => 1
+			)
+		);
+
+		$objFirst = current($arrChildren);
+		$strBase = $objFirst->$strAttr;
+
+		foreach ($arrChildren as $objChild)
+		{
+			if ($strBase !== $objChild->$strAttr)
+			{
+				// we can return right away when we find a non-match
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Return array of available sizes for choosing
 	 * @return array
 	 */
@@ -196,15 +345,17 @@ class Product extends BaseProduct
 
 		$strOptionsArray = array();
 
-		foreach ($this->products as $objProduct) {
+		foreach ($this->products as $objProduct)
+		{
 			$strSize = $objProduct->product_size;
 
-			if (($strSize === "0" || !empty($strSize))  &&
+			if (($strSize === '0' || !empty($strSize))  &&
 				!in_array($strSize, $strOptionsArray) &&
 				$objProduct->IsDisplayable
 			)
+			{
 				$strOptionsArray[$strSize] = $strSize;
-
+			}
 		}
 
 		return $strOptionsArray;
@@ -217,23 +368,23 @@ class Product extends BaseProduct
 	 * @param bool $strSize
 	 * @return array
 	 */
-	public function getColors($strSize = false) {
-
-
+	public function getColors($strSize = false)
+	{
 		$strOptionsArray = array();
 
-		foreach ($this->products as $objProduct) {
+		foreach ($this->products as $objProduct)
+		{
 			$strColor = $objProduct->product_color;
 
-
-			if (($strColor === "0" || !empty($strColor))  &&
-				($strSize==false || $objProduct->product_size == $strSize) &&
+			if (($strColor === "0" || !empty($strColor)) &&
+				($strSize == false || $objProduct->product_size == $strSize) &&
 				!in_array($strColor, $strOptionsArray) &&
 				$objProduct->IsDisplayable
 
 			)
+			{
 				$strOptionsArray[$strColor] = $strColor;
-
+			}
 		}
 
 		return $strOptionsArray;
@@ -257,7 +408,6 @@ class Product extends BaseProduct
 				'condition' => 'product_id=:id AND `parent`=`id` order by `index`',
 				'params' => array(':id' => $this->parent)
 			));
-
 		}
 
 		$arrImages = array();
@@ -265,17 +415,22 @@ class Product extends BaseProduct
 		foreach ($objImages as $obj)
 		{
 			$a = array();
-			$a['image'] = Images::GetLink($obj->id,ImagesType::pdetail,$absolute);
-			$a['image_thumb'] = Images::GetLink($obj->id,ImagesType::preview,$absolute);
+			$a['image'] = Images::GetLink($obj->id, ImagesType::pdetail, $absolute);
+			$a['image_thumb'] = Images::GetLink($obj->id, ImagesType::preview, $absolute);
 			$a['image_alt'] = $this->Title;
 			$a['image_desc'] = '';
-			$a['image_large'] = Images::GetLink($obj->id,ImagesType::normal,$absolute);
-			list($wt, $ht) = ImagesType::GetSize(ImagesType::pdetail);
-			if($obj->width <= $wt && $obj->height <= $ht)
-				$a['image_large'] = $a['image'];
+			$a['image_large'] = Images::GetLink($obj->id, ImagesType::normal, $absolute);
+
+			if (CPropertyValue::ensureInteger(Yii::app()->params['LIGHTSPEED_CLOUD']) === 0)
+			{
+				list($wt, $ht) = ImagesType::GetSize(ImagesType::pdetail);
+				if($obj->width <= $wt && $obj->height <= $ht)
+				{
+					$a['image_large'] = $a['image'];
+				}
+			}
 
 			$arrImages[] = $a;
-
 		}
 
 		//This will force the no-product image
@@ -290,36 +445,38 @@ class Product extends BaseProduct
 			$arrImages[] = $a;
 		}
 
-
 		return $arrImages;
-
 	}
 
 
 	public function getImages()
 	{
 		$objImages = Images::model()->findAll(array(
-			'condition'=>'product_id=:id AND `parent`=`id` order by `index`',
-			'params'=>array(':id'=>$this->id),
+			'condition' => 'product_id=:id AND `parent`=`id` order by `index`',
+			'params' => array(':id' => $this->id),
 		));
 		$arrImages = array();
-		$urlToRemove =Yii::app()->createAbsoluteUrl("/images/")."/";
+		$urlToRemove = Yii::app()->createAbsoluteUrl('/images/') . '/';
 
 		foreach ($objImages as $obj)
 		{
 			$a = array();
-			$a['image']=str_replace($urlToRemove,"",Images::GetLink($obj->id,ImagesType::pdetail,true));
-			$a['image_large']=str_replace($urlToRemove,"",Images::GetLink($obj->id,ImagesType::normal,true));
-			$a['image_thumb']=str_replace($urlToRemove,"",Images::GetLink($obj->id,ImagesType::preview,true));
-			$a['image_alt']=$this->Title;
-			$a['image_desc']='';
-			if (count($objImages)<=1) return $a;
-			$arrImages[] = $a;
+			$a['image'] = str_replace($urlToRemove, '', Images::GetLink($obj->id, ImagesType::pdetail, true));
+			$a['image_large'] = str_replace($urlToRemove, '', Images::GetLink($obj->id, ImagesType::normal, true));
+			$a['image_thumb'] = str_replace($urlToRemove, '', Images::GetLink($obj->id, ImagesType::preview, true));
+			$a['image_alt'] = $this->Title;
+			$a['image_desc'] = '';
 
+			if (count($objImages) <= 1)
+			{
+				return $a;
+			}
+
+			$arrImages[] = $a;
 		}
 
 		//This will force the no-product image
-		if(count($objImages)==0)
+		if(count($objImages) == 0)
 		{
 			$a = array();
 			$a['image']=str_replace($urlToRemove,"",Images::GetImageFallbackPath());
@@ -376,7 +533,7 @@ class Product extends BaseProduct
 	 *
 	 * @return boolean true or false based on whether the item is a master or not
 	 */
-	protected function IsMaster() {
+	public function IsMaster() {
 		if ($this->master_model)
 			return true;
 		return false;
@@ -568,6 +725,17 @@ class Product extends BaseProduct
 		return Yii::app()->createUrl('product/view',array('id'=>$this->id,'name'=>$this->request_url));
 	}
 
+	/**
+	 * This function will return the direct url of the product
+	 * and not that of its parent or master if it is a child.
+	 *
+	 * @return string
+	 */
+	public function getDirectUrl()
+	{
+		return Yii::app()->createCanonicalUrl('product/view', array('id' => $this->id, 'name' => $this->request_url));
+	}
+
 	public function getLink()
 	{
 		return $this->getUrl();
@@ -731,8 +899,6 @@ class Product extends BaseProduct
 		}
 	}
 
-
-
 	/**
 	 * Return an array of the applicable ProductQtyPrice objects
 	 * @return array
@@ -790,8 +956,6 @@ class Product extends BaseProduct
 
 	}
 
-
-
 	/**
 	 * Return the TaxInclusive/Regular pricing field name
 	 * @return string
@@ -806,15 +970,6 @@ class Product extends BaseProduct
 		return $strField;
 
 	}
-
-	/**
-	 * Return the value of the TaxInclusive/Regular pricing field
-	 * @return float
-	 */
-//	protected function GetPriceValue($taxInclusive = false) {
-//		$strPriceField = $this->getPriceField($taxInclusive);
-//		return $this->$strPriceField;
-//	}
 
 	public function getHasPriceRange()
 	{
@@ -891,23 +1046,9 @@ class Product extends BaseProduct
 
 		if ($this->IsMaster())
 		{
-			$criteria = new CDbCriteria();
 
-			if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0) == Product::InventoryMakeDisappear)
-			{
-				$criteria->condition = 'web=1 AND parent=:id AND (inventory_avail>0 OR inventoried=0)';
-			}
-			else
-			{
-				$criteria->condition = 'web=1 AND parent=:id';
-			}
-
-			$criteria->params = array (':id' => $this->id);
-
-			$criteria->order = "sell_web";
-			$arrMaster = Product::model()->findAll($criteria);
-
-			if (count($arrMaster) == 0)
+			$childProducts = $this->getChildProducts();
+			if (count($childProducts) == 0)
 			{
 				return _sp("Missing Child Products?");
 			}
@@ -916,28 +1057,23 @@ class Product extends BaseProduct
 			{
 				case Product::HIGHEST_PRICE:
 					return _xls_currency(
-						$arrMaster[count($arrMaster) - 1] ->getPriceValue($intQuantity, $taxInclusive)
+						end($childProducts)->getPriceValue($intQuantity, $taxInclusive)
 					);
 
 				case Product::PRICE_RANGE:
-					$high = $arrMaster[0]->getPriceValue($intQuantity, $taxInclusive);
-					$low = $arrMaster[count($arrMaster) - 1]->getPriceValue($intQuantity, $taxInclusive);
+					$low = $childProducts[0]->getPriceValue($intQuantity, $taxInclusive);
+					$high = end($childProducts)->getPriceValue($intQuantity, $taxInclusive);
 					if ($high != $low)
 					{
-						return _xls_currency($high)." - "._xls_currency($low);
+						return _xls_currency($low) . ' - ' . _xls_currency($high);
 					}
 					return _xls_currency($high);
 
 				case Product::CLICK_FOR_PRICING:
-					if ($arrMaster[0]->getPriceValue($intQuantity, $taxInclusive) !=
-						$arrMaster[count($arrMaster) - 1]->getPriceValue($intQuantity, $taxInclusive))
-					{
-						return _sp("Click for pricing");
-					}
-					return $this->getPriceValue($intQuantity, $taxInclusive);
+					return _sp('Click for pricing');
 
 				case Product::LOWEST_PRICE:
-					return _xls_currency($arrMaster[0]->getPriceValue($intQuantity, $taxInclusive));
+					return _xls_currency($childProducts[0]->getPriceValue($intQuantity, $taxInclusive));
 
 				case Product::MASTER_PRICE:
 				default:
@@ -951,13 +1087,58 @@ class Product extends BaseProduct
 	}
 
 	/**
+	 * Returns a formatted price of the product if the product is not
+	 * a master matrix product.
+	 *
+	 * @param string $cssClass The class to add to the currency sign
+	 * @return string
+	 */
+	public function getMarkedUpPrice($cssClass = 'currency-sign')
+	{
+		// Master products can show a range of values.
+		if ($this->IsMaster() ||
+			(CPropertyValue::ensureInteger(Yii::app()->params['PRICE_REQUIRE_LOGIN']) === 1 &&
+				Yii::app()->user->IsGuest)
+		)
+		{
+			return $this->Price;
+		}
+
+		return $this->getFormattedPriceValue($cssClass);
+	}
+
+	/**
+	 * Returns the formatted price with the currency sign wrapped in a span.
+	 *
+	 * @param $priceValue An unformatted float
+	 * @param string $cssClass The class to add to the currency sign
+	 * @return mixed
+	 */
+	public function getFormattedPriceValue($cssClass = 'currency-sign')
+	{
+		// Modify the currency format to wrap the currency in a <span>.
+		// In ICU currency formatting, ¤ (\u00A4) represents the currency sign.
+		// See http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#details.
+		$currencyFormat = Yii::app()->getLocale()->getCurrencyFormat();
+		$modifiedCurrencyFormat = str_replace(
+			'¤',
+			'<span class="' . $cssClass . '">¤</span>',
+			$currencyFormat
+		);
+
+		$currency = _xls_get_conf('CURRENCY_DEFAULT');
+
+		return Yii::app()->numberFormatter->format($modifiedCurrencyFormat, $this->PriceValue, $currency);
+	}
+
+
+	/**
 	 * Return the final TaxInclusive/Exclusive price for a given product,
 	 * optionally modified by an amount of Products. No currency formatting.
 	 * @param integer defaults to 1
 	 * @return float
 	 */
 	public function getPriceValue($intQuantity = 1, $taxInclusive = -1) {
-
 		if ($taxInclusive === -1)
 		{
 			$taxInclusive = Yii::app()->shoppingcart->IsTaxIn;
@@ -993,8 +1174,7 @@ class Product extends BaseProduct
 	 * @return null|string
 	 */
 	public function getSlashedPrice($intQuantity = 1) {
-		if(CPropertyValue::ensureInteger(Yii::app()->params['ENABLE_SLASHED_PRICES']) > 0 &&
-			$this->sell_web < $this->sell)
+		if(CPropertyValue::ensureInteger(Yii::app()->params['ENABLE_SLASHED_PRICES']) > 0)
 		{
 			return _xls_currency($this->getSlashedPriceValue($intQuantity));
 		}
@@ -1018,61 +1198,173 @@ class Product extends BaseProduct
 		}
 
 		$taxInclusive = Yii::app()->shoppingcart->IsTaxIn;
-		if ($taxInclusive)
-		{
-			$strField = "sell_tax_inclusive";
-		}
-		else
-		{
-			$strField = "sell";
-		}
 
 		if ($this->IsMaster())
 		{
-			$criteria = new CDbCriteria();
-
-			if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0) == Product::InventoryMakeDisappear)
+			$childProducts = $this->getChildProducts();
+			if (count($childProducts) == 0)
 			{
-				$criteria->condition = 'web=1 AND parent=:id AND (inventory_avail>0 OR inventoried=0)';
-			}
-			else
-			{
-				$criteria->condition = 'web=1 AND parent=:id';
-			}
-
-			$criteria->params = array (':id' => $this->id);
-			$criteria->order = $strField;
-
-			$arrMaster = Product::model()->findAll($criteria);
-
-			if (count($arrMaster) == 0)
-			{
-				return null;
+				return _sp("Missing Child Products?");
 			}
 
 			switch (_xls_get_conf('MATRIX_PRICE'))
 			{
 				case Product::HIGHEST_PRICE: //Show Highest Price
+					return (end($childProducts)->getSell() >
+						end($childProducts)->getPriceValue($intQuantity, $taxInclusive)) ?
+						end($childProducts)->getSell() : null;
 				case Product::PRICE_RANGE:
-					return ( $arrMaster[count($arrMaster)-1]->$strField >
-						$arrMaster[count($arrMaster)-1]->getPriceValue($intQuantity, $taxInclusive)) ?
-						$arrMaster[count($arrMaster)-1]->$strField : null;
-				case Product::CLICK_FOR_PRICING:
+					$low = $childProducts[0]->getPriceValue($intQuantity, $taxInclusive);
+					$high = end($childProducts)->getPriceValue($intQuantity, $taxInclusive);
+					// If the price range returns a single value we can display
+					// the slashed price.
+					if ($low == $high && end($childProducts)->getSell() > $high)
+					{
+						return end($childProducts)->getSell();
+					}
 					return null;
+				case Product::CLICK_FOR_PRICING:
+					return ($this->getSell() >
+						$this->getPriceValue($intQuantity, $taxInclusive)) ?
+						$this->getSell() : null;
 
 				case Product::LOWEST_PRICE:
-					return ( $arrMaster[0]->$strField > $arrMaster[0]->getPriceValue($intQuantity, $taxInclusive)) ? $arrMaster[0]->$strField : null;
+					return ( $childProducts[0]->getSell() >
+						$childProducts[0]->getPriceValue($intQuantity, $taxInclusive)) ?
+						$childProducts[0]->getSell() : null;
 
 				case Product::MASTER_PRICE:
 				default:
-					return ($this->$strField > $this->getPriceValue($intQuantity, $taxInclusive)) ? $this->$strField : null;
+					return ($this->getSell() >
+						$this->getPriceValue($intQuantity, $taxInclusive)) ?
+						$this->getSell() : null;
 			}
 		}
 		else
 		{
-			return ($this->$strField > $this->getPriceValue($intQuantity, $taxInclusive)) ? $this->$strField : null;
+			return ($this->getSell() >
+				$this->getPriceValue($intQuantity, $taxInclusive)) ?
+				$this->getSell() : null;
 		}
 	}
+
+	/**
+	 * If it's a master product get the product to check the percentage
+	 * saving for. This product is based on the options available in the
+	 * admin panel for matrix product 'In Product Grid, When Child
+	 * Product Prices Vary'.
+	 *
+	 * If the web price is lower than the default price, calculate the
+	 * percentage savings and round it, otherwise return 0.
+	 *
+	 * @return int Savings percentage or 0 if no savings.
+	 */
+	public function getPercentSavings() {
+		$objProduct = $this->getProductFromDisplayOption();
+
+		if ($objProduct->getSellWeb() < $objProduct->getSell() && $objProduct->getSell() !== 0)
+		{
+			return round(
+				($objProduct->getSell() - $objProduct->getSellWeb()) / $objProduct->getSell() * 100
+			);
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Returns the sell price of a product. This sell price
+	 * can be either tax-inclusive or tax-exclusive.
+	 *
+	 * @return float The sell price
+	 */
+	public function getSell()
+	{
+		$taxInclusive = Yii::app()->shoppingcart->IsTaxIn;
+
+		if ($taxInclusive)
+		{
+			return $this->sell_tax_inclusive;
+		}
+
+		return $this->sell;
+	}
+
+	/**
+	 * Returns the web price of a product. This web price
+	 * can be either tax-inclusive or tax-exclusive.
+	 *
+	 * @return float
+	 */
+	public function getSellWeb()
+	{
+		$taxInclusive = Yii::app()->shoppingcart->IsTaxIn;
+
+		if ($taxInclusive)
+		{
+			return $this->sell_web_tax_inclusive;
+		}
+
+		return $this->sell_web;
+
+	}
+
+	/**
+	 * This function returns the price to be displayed for a product. That value
+	 * can be different based on the display option and if the product is a
+	 * master matrix product.
+	 *
+	 * @return string
+	 */
+	public function getFormattedSlashedPrice()
+	{
+		if ($this->IsMaster() && _xls_get_conf('MATRIX_PRICE') == self::CLICK_FOR_PRICING)
+		{
+			return $this->getFormattedPriceValue();
+		}
+
+		return $this->getMarkedUpPrice();
+	}
+
+	public function getFormattedSlashedPriceWithClickForPricing()
+	{
+		if ($this->IsMaster() && _xls_get_conf('MATRIX_PRICE') == Product::CLICK_FOR_PRICING)
+		{
+			return null;
+		}
+
+		return $this->SlashedPrice;
+	}
+
+	/**
+	 * This functions returns all the child products of a master
+	 * product sorted by the item's sell price (can be tax inclusive or
+	 * tax exclusive) field.
+	 *
+	 * @return CActiveRecord[] An array containing all the child products
+	 * of a master product.
+	 */
+	public function getChildProducts()
+	{
+		$criteria = new CDbCriteria();
+
+		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0) == Product::InventoryMakeDisappear)
+		{
+			$criteria->condition = 'web=1 AND parent=:id AND (inventory_avail>0 OR inventoried=0)';
+		}
+		else
+		{
+			$criteria->condition = 'web=1 AND parent=:id';
+		}
+
+		$criteria->params = array (':id' => $this->id);
+		$criteria->order = $this->getPriceField(Yii::app()->shoppingcart->IsTaxIn);
+
+		$products = Product::model()->findAll($criteria);
+
+		return $products;
+	}
+
 	/**
 	 * Calculates pending order qty to count against available
 	 * inventory by searching for Requested or Awaiting Processing orders
@@ -1282,14 +1574,15 @@ class Product extends BaseProduct
 	 * Useful for RSS exports
 	 * @return TaxGrid[]
 	 */
-	public function GetTaxRateGrid() {
-
+	public function GetTaxRateGrid()
+	{
 		$arrGrid = array();
 		$intTaxStatus = $this->tax_status_id;
 		$objStatus = TaxStatus::LoadByLS($intTaxStatus);
 		$objDestinations = Destination::model()->findAll();
 
-		foreach ($objDestinations as $objDestination) {
+		foreach ($objDestinations as $objDestination)
+		{
 			//Because of differences in how Google defines zip code ranges, we can't convert our ranges
 			//to theirs. At this time we won't be able to support zip code ranges
 			if (!is_null($objDestination->country) && $objDestination->Zipcode1 == '') {
@@ -1297,7 +1590,8 @@ class Product extends BaseProduct
 				$objTaxCode = TaxCode::LoadByLS($objDestination->taxcode);
 				//print_r($objTaxCode);
 				$fltRate = 0.0;
-				for ($x=1; $x<=5; $x++) {
+				for ($x=1; $x<=5; $x++)
+				{
 					$statusstring = "tax".$x."_status";
 					$codestring = "tax".$x."_rate";
 					if ($objStatus->$statusstring==0) $fltRate += $objTaxCode->$codestring;
@@ -1306,9 +1600,14 @@ class Product extends BaseProduct
 				//Our four elements
 				$strCountry = Country::CodeById($objDestination->country);
 				if (!is_null($objDestination->state))
+				{
 					$strState = State::CodeById($objDestination->state);
+				}
 				else
+				{
 					$strState = '';
+				}
+
 				//$fltRate -- built above
 				$strTaxShip = Yii::app()->params['SHIPPING_TAXABLE'] == '1' ? "y" : "n";
 				$arrGrid[] = array($strCountry,	$strState,$fltRate,$strTaxShip);
@@ -1317,9 +1616,6 @@ class Product extends BaseProduct
 		}
 
 		return $arrGrid;
-
-
-
 	}
 
 	/**

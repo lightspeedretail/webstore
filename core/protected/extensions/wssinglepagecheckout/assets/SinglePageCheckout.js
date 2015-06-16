@@ -9,6 +9,10 @@
  * @param {Object} options
  * @param {string} options.calculateShippingEndPoint The endpoint for the
  *        calculate shipping ajax call
+ * @param {string} options.destinationStatesEndpoint The endpoint for the
+ *        call which returns a country's shipping destination states.
+ * @param {string} options.setTaxEndpoint The endpoint for setting the cart's
+ *        tax code based on the country, state and postal code.
  * @param {number[]} options.paymentModulesThatUseCard An array of payment
  *        module IDs that require display of the credit card form.
  * @param {number[]} options.paymentModulesThatUseForms An array of payment
@@ -26,6 +30,7 @@
  * @param {string} options.shippingAddress2Id The DOM ID of the second shipping
  *        address <input>.
  * @param {string} options.shippingCityId The DOM ID of the city <input>.
+ * @param {string} options.shippingCountryId The DOM ID of the country <select>.
  * @param {string} options.shippingStateId The DOM ID of the state <input>.
  * @param {string} options.shippingPostalId The DOM ID of the postal code
  *        <input>.
@@ -59,6 +64,9 @@
  */
 var SinglePageCheckout = function (options) {
 	this.calculateShippingEndpoint = options.calculateShippingEndpoint;
+	this.destinationStatesEndpoint = options.destinationStatesEndpoint;
+	this.setTaxEndpoint = options.setTaxEndpoint;
+
 	this.paymentModulesThatUseCard = options.paymentModulesThatUseCard;
 	this.paymentModulesThatUseForms = options.paymentModulesThatUseForms;
 
@@ -69,6 +77,7 @@ var SinglePageCheckout = function (options) {
 	this.shippingAddress1Id = options.shippingAddress1Id;
 	this.shippingAddress2Id = options.shippingAddress2Id;
 	this.shippingCityId = options.shippingCityId;
+	this.shippingCountryId = options.shippingCountryId;
 	this.shippingStateId = options.shippingStateId;
 	this.shippingPostalId = options.shippingPostalId;
 
@@ -93,6 +102,7 @@ var SinglePageCheckout = function (options) {
 	this.$shippingAddress1 = $('#' + this.shippingAddress1Id);
 	this.$shippingAddress2 = $('#' + this.shippingAddress2Id);
 	this.$shippingCity = $('#' + this.shippingCityId);
+	this.$shippingCountry = $('#' + this.shippingCountryId);
 	this.$shippingState = $('#' + this.shippingStateId);
 	this.$shippingPostal = $('#' + this.shippingPostalId);
 	this.$promoCode = $('#' + this.promoCode);
@@ -314,11 +324,45 @@ SinglePageCheckout.prototype.updateShippingAuto = function() {
 };
 
 /**
+ * Update the dropdowmn list of shipping states based on the selected country.
+ */
+SinglePageCheckout.prototype.updateShippingStates = function() {
+	$.post(
+		this.destinationStatesEndpoint,
+		{
+			'country_id': this.$shippingCountry.val()
+		}
+	).done(function (destinationStates) {
+		this.$shippingState.html(destinationStates);
+		this.$shippingProvider.html('');
+		this.$shippingPriority.html('');
+
+		this.setTaxCode();
+	}.bind(this));
+};
+
+/**
+ * Send a request to update the tax code of the cart based on the entered
+ * shipping address. Upon receiving a response, update the cart display.
+ */
+SinglePageCheckout.prototype.setTaxCode = function() {
+	$.post(
+		this.setTaxEndpoint,
+		{
+			'country_id': this.$shippingCountry.val(),
+			'state_id': this.$shippingState.val(),
+			postal: this.$shippingPostal.val()
+		}
+	).done(this.updateTax.bind(this));
+};
+
+
+/**
  * Update the cart with updated tax data.
  *
  * Some address updates can trigger an update to the cart tax. Sometimes these
  * updates require the shipping options to be recalculated.
- * @param array setTaxResponse The response from requesting cart/settax.
+ * @param array setTaxResponse The response from requesting cart/settaxbyaddress.
  */
 SinglePageCheckout.prototype.updateTax = function(setTaxResponse) {
 	$('#cartItems').html(setTaxResponse.cartitems);

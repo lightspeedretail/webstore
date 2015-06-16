@@ -151,14 +151,7 @@ class SearchController extends Controller
 		$criteria->addCondition('current=1');
 		$criteria->order = 'Product.'._xls_get_sort_order();
 
-		$numberOfRecords = Product::model()->count($criteria);
-
-		$pages = new CPagination($numberOfRecords);
-		$pages->setPageSize(Yii::app()->params['PRODUCTS_PER_PAGE']);
-		$pages->applyLimit($criteria);  // the trick is here!
-
-		$model = Product::model()->findAll($criteria);
-		$model = $this->createBookends($model);
+		$productsGrid = new ProductGrid($criteria);
 
 		$this->returnUrl = $this->canonicalUrl;
 		$this->pageImageUrl = "";
@@ -180,11 +173,11 @@ class SearchController extends Controller
 	        $this->render(
 		        'grid',
 		        array(
-		            'model' => $model,
-		            'item_count' => $numberOfRecords,
+		            'model' => $productsGrid->getProductGrid(),
+		            'item_count' => $productsGrid->getNumberOfRecords(),
 		            'page_size' => Yii::app()->params['PRODUCTS_PER_PAGE'],
-		            'items_count' => $numberOfRecords,
-		            'pages' => $pages,
+		            'items_count' => $productsGrid->getNumberOfRecords(),
+		            'pages' => $productsGrid->getPages(),
 	            )
 	        );
 		}
@@ -260,7 +253,7 @@ class SearchController extends Controller
 
 		$this->pageImageUrl = "";
 
-		$model = $this->createBookends($model);
+		$model = ProductGrid::createBookends($model);
 
 		$this->render('grid',array(
 				'model'=> $model,

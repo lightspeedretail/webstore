@@ -49,7 +49,7 @@
 
 	<?php $this->widget('ext.wsiosorientationbugfix.iosorientationbugfix'); ?>
 
-	<?php $this->renderPartial('/site/_google'); ?>
+	<?php $this->widget('ext.wsgoogle.wspageviews'); ?>
 	<?php $this->renderPartial('ext.wscartmodal.views._cartscript'); ?>
 	<?php $this->renderPartial('ext.wsadvcheckout.views._advcheckoutscript'); ?>
 </head>

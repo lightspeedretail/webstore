@@ -99,4 +99,4 @@
 	</div>
 </div>
 
-<?php $this->renderPartial('_googleconversion', array('model' => $cart)); ?>
+<?php $this->widget('ext.wsgoogle.wsecommerce', array('objCart' => $cart)); ?>

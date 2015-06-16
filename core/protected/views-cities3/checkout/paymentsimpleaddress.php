@@ -59,7 +59,7 @@ $count = count($simModules);
 		}
 		?>
 	</div>
-	<p class="large"><?php echo Yii::t('checkout', "Review and confirm your order. You'll be forwarded to our secure payment partner to enter your credit cart details.")?></p>
+	<p class="large"><?php echo Yii::t('checkout', "Review and confirm your order. You'll be forwarded to our secure payment partner to enter your credit card details.")?></p>
 
 	<?php $this->renderPartial('_shippingasbillingexisting', array('checkbox' => $checkbox)); ?>
 
@@ -117,7 +117,7 @@ $count = count($simModules);
 				<?php endforeach; ?>
 			<?php endif; ?>
 			<li class="add">
-				<?php echo CHtml::link(Yii::t('checkout', 'Add New Address'), '/checkout/newaddress?type=billing', array('class' => 'small button')); ?>
+				<?php echo CHtml::link(Yii::t('checkout', 'Add New Address'), Yii::app()->createUrl('/checkout/newaddress?type=billing'), array('class' => 'small button')); ?>
 			</li>
 		</ol>
 	</div>

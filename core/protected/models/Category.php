@@ -613,9 +613,9 @@ class Category extends BaseCategory
 		}
 
 		$intId = null;
-		foreach ($arrPath as $value)
+		foreach ($arrPath as $label)
 		{
-			$obj = Category::model()->findByAttributes(array('label' => $value, 'parent' => $intId));
+			$obj = Category::model()->findByAttributes(array('label' => $label, 'parent' => $intId));
 			if ($obj instanceof Category)
 			{
 				$intId = $obj->id;

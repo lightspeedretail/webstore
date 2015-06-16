@@ -194,7 +194,7 @@ class Country extends BaseCountry
 	 * code.
 	 */
 	public static function getCountryShippingStates($intCountryId) {
-		$noStatesAvailable = array(0 => 'n/a');
+		$noStatesAvailable = array('' => 'n/a');
 
 		if (is_null($intCountryId))
 		{

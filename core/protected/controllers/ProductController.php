@@ -83,7 +83,6 @@ class ProductController extends Controller
 		$objWishlistAddForm->lists = $objWishlistAddForm->getLists();
 		$objWishlistAddForm->gift_code = Wishlist::LoadFirstCode();
 
-
 		$this->setPageTitle($model->PageTitle);
 		$this->pageDescription = $model->PageDescription;
 		$this->canonicalUrl = $model->canonicalUrl;
@@ -95,6 +94,7 @@ class ProductController extends Controller
 		_xls_raise_events('CEventProduct', $objEvent);
 
 		$this->widget('ext.wscartanimate.wscartanimate');
+		$this->widget('ext.wsproduct.wsproduct');
 
 		$this->render(
 			'index',
@@ -112,9 +112,10 @@ class ProductController extends Controller
 	public function actionGetColors()
 	{
 
-		if(Yii::app()->request->isAjaxRequest) {
+		if(Yii::app()->request->isAjaxRequest)
+		{
 			$id = Yii::app()->getRequest()->getParam('id');
-			$strSize= Yii::app()->getRequest()->getParam('product_size');
+			$strSize = Yii::app()->getRequest()->getParam('product_size');
 
 			$model = Product::model()->findByPk($id);
 
@@ -136,61 +137,73 @@ class ProductController extends Controller
 	 */
 	public function actionGetmatrixproduct()
 	{
-		if (Yii::app()->request->isAjaxRequest)
+		if (Yii::app()->request->isAjaxRequest === false)
 		{
-
-			$id = Yii::app()->getRequest()->getParam('id');
-			$strSize = Yii::app()->getRequest()->getParam('product_size');
-			$strColor = Yii::app()->getRequest()->getParam('product_color');
-
-			$objProduct = Product::LoadChildProduct($id, $strSize, $strColor);
-
-			if ($objProduct instanceof Product)
-			{
-				$arrReturn['status'] = 'success';
-				$arrReturn['id'] = $objProduct->id;
-				$arrReturn['FormattedPrice'] = $objProduct->Price;
-				$arrReturn['FormattedRegularPrice'] = $objProduct->SlashedPrice;
-				$arrReturn['image_id'] = CHtml::image(Images::GetLink($objProduct->image_id, ImagesType::pdetail));
-				$arrReturn['code'] = $objProduct->code;
-				$arrReturn['title'] = $objProduct->Title;
-				$arrReturn['InventoryDisplay'] = $objProduct->InventoryDisplay;
-
-				if ($objProduct->WebLongDescription)
-					$arrReturn['description_long'] = $objProduct->WebLongDescription;
-				else
-					$arrReturn['description_long'] = $objProduct->parent0->WebLongDescription;
-
-				if ($objProduct->description_short)
-					$arrReturn['description_short'] = $objProduct->WebShortDescription;
-				else
-					$arrReturn['description_short'] = $objProduct->parent0->WebShortDescription;
-
-				Yii::app()->clientscript->scriptMap['jquery.js'] = false;
-				$arrReturn['photos'] = $this->renderPartial('/product/_photos', array('model' => $objProduct), true, false);
-
-			}
-			else
-			{
-				// options are missing so return the master product
-
-				$objProduct = Product::model()->findByPk($id);
-
-				$arrReturn['FormattedPrice'] = $objProduct->Price;
-				$arrReturn['code'] = $objProduct->code;
-				$arrReturn['title'] = $objProduct->Title;
-				$arrReturn['InventoryDisplay'] = $objProduct->InventoryDisplay;
-				if ($objProduct->WebLongDescription)
-					$arrReturn['description_long'] = $objProduct->WebLongDescription;
-				if ($objProduct->description_short)
-					$arrReturn['description_short'] = $objProduct->WebShortDescription;
-				$arrReturn['photos'] = $this->renderPartial('/product/_photos', array('model' => $objProduct), true, false);
-
-			}
-
-			echo json_encode($arrReturn);
+			return;
 		}
 
-	}
+		$id = Yii::app()->getRequest()->getParam('id');
+		$strSize = Yii::app()->getRequest()->getParam('product_size');
+		$strColor = Yii::app()->getRequest()->getParam('product_color');
 
+		$objProduct = Product::LoadChildProduct($id, $strSize, $strColor);
+
+		if ($objProduct instanceof Product)
+		{
+			$arrReturn['status'] = 'success';
+			$arrReturn['id'] = $objProduct->id;
+			$arrReturn['FormattedPrice'] = $objProduct->getMarkedUpPrice();
+			$arrReturn['FormattedRegularPrice'] = $objProduct->SlashedPrice;
+			$arrReturn['image_id'] = CHtml::image(Images::GetLink($objProduct->image_id, ImagesType::pdetail));
+			$arrReturn['code'] = $objProduct->code;
+			$arrReturn['title'] = $objProduct->Title;
+			$arrReturn['InventoryDisplay'] = $objProduct->InventoryDisplay;
+			$arrReturn['FormattedSavingsAmount'] = $objProduct->getFormattedSavingsAmount();
+			$arrReturn['FormattedSavingsPercentage'] = $objProduct->getFormattedSavingsPercentage();
+
+			if ($objProduct->WebLongDescription)
+			{
+				$arrReturn['description_long'] = $objProduct->WebLongDescription;
+			} else {
+				$arrReturn['description_long'] = $objProduct->parent0->WebLongDescription;
+			}
+
+			if ($objProduct->description_short)
+			{
+				$arrReturn['description_short'] = $objProduct->WebShortDescription;
+			} else {
+				$arrReturn['description_short'] = $objProduct->parent0->WebShortDescription;
+			}
+
+			Yii::app()->clientscript->scriptMap['jquery.js'] = false;
+			$arrReturn['photos'] = $this->renderPartial('/product/_photos', array('model' => $objProduct), true, false);
+		}
+		else
+		{
+			// options are missing so return the master product
+
+			$objProduct = Product::model()->findByPk($id);
+
+			$arrReturn['FormattedPrice'] = $objProduct->getFormattedSlashedPrice();
+			$arrReturn['FormattedRegularPrice'] = $objProduct->SlashedPrice;
+			$arrReturn['FormattedSavingsAmount'] = $objProduct->getFormattedSavingsAmount();
+			$arrReturn['FormattedSavingsPercentage'] = $objProduct->getFormattedSavingsPercentage();
+			$arrReturn['code'] = $objProduct->code;
+			$arrReturn['title'] = $objProduct->Title;
+			$arrReturn['InventoryDisplay'] = $objProduct->InventoryDisplay;
+			if ($objProduct->WebLongDescription)
+			{
+				$arrReturn['description_long'] = $objProduct->WebLongDescription;
+			}
+
+			if ($objProduct->description_short)
+			{
+				$arrReturn['description_short'] = $objProduct->WebShortDescription;
+			}
+
+			$arrReturn['photos'] = $this->renderPartial('/product/_photos', array('model' => $objProduct), true, false);
+		}
+
+		echo json_encode($arrReturn);
+	}
 }

@@ -30,7 +30,8 @@ class MyaccountController extends Controller
 		}
 
 		// New styles, javascript and layout for Brooklyn2014
-		if (Yii::app()->theme->name === 'brooklyn2014')
+		if (Yii::app()->theme->info->advancedCheckout &&
+			Yii::app()->theme->info->version > 5)
 		{
 			$this->widget('ext.umber.wsmodal');
 			$this->widget('ext.wsaccount.wsaccount');

@@ -9,6 +9,9 @@
  */
 class CustomPage extends BaseCustomPage
 {
+	const PRODUCT_DISPLAY_SLIDER = 1;
+	const PRODUCT_DISPLAY_GRID = 2;
+
 	public $deleteMe;
 
 	/**
@@ -55,7 +58,7 @@ class CustomPage extends BaseCustomPage
 			if ($objExisting instanceof CustomPage)
 				$this->addError($attribute,
 					Yii::t('yii','{attribute} is already in use.',
-						array('{attribute}'=>$this->getAttributeLabel($attribute)))
+					array('{attribute}'=>$this->getAttributeLabel($attribute)))
 				);
 		}
 	}
@@ -118,8 +121,6 @@ class CustomPage extends BaseCustomPage
 			$this->request_url = 'contact-us';
 
 		return Yii::app()->createAbsoluteUrl("custompage/index",array('id'=>$this->request_url));
-
-
 	}
 	public function getActive()
 	{
@@ -133,33 +134,82 @@ class CustomPage extends BaseCustomPage
 
 	public function taggedProducts()
 	{
-
-		$dataProvider = new CActiveDataProvider('Product',
-			array('criteria' => $this->SliderCriteria,
+		$dataProvider = new CActiveDataProvider(
+			'Product',
+			array(
+				'criteria' => $this->SliderCriteria,
 				'pagination' => array(
-					'pageSize' => _xls_get_conf('MAX_PRODUCTS_IN_SLIDER',64),
+					'pageSize' => _xls_get_conf('MAX_PRODUCTS_IN_SLIDER', 64),
 				),
-			));
+			)
+		);
 
 		return $dataProvider;
 	}
 
-	private function GetSliderCriteria()
+	/**
+	 * Creates the default product criteria that a custom page can use.
+	 *
+	 * @return CDbCriteria
+	 */
+	public function getDefaultProductCriteria()
 	{
 		if (empty($this->product_tag))
+		{
 			$this->product_tag = "";
+		}
 
 		$criteria = new CDbCriteria();
 		$criteria->distinct = true;
 		$criteria->alias = 'Product';
-		$criteria->join='LEFT JOIN '.ProductTags::model()->tableName().' as ProductTags ON ProductTags.product_id=Product.id LEFT JOIN '.Tags::model()->tableName().' as Tags ON ProductTags.tag_id=Tags.id';
-		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0)==Product::InventoryMakeDisappear)
-			$criteria->condition = 'inventory_avail>0 AND web=1 AND Tags.tag=:tag AND parent IS NULL';
+		$criteria->join = 'LEFT JOIN ' .
+			ProductTags::model()->tableName() .
+			' as ProductTags ON ProductTags.product_id=Product.id LEFT JOIN ' .
+			Tags::model()->tableName() .
+			' as Tags ON ProductTags.tag_id=Tags.id';
+
+		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD',0) == Product::InventoryMakeDisappear)
+		{
+			$criteria->condition = 'inventory_avail > 0 AND web = 1 AND Tags.tag = :tag AND parent IS NULL';
+		}
 		else
-			$criteria->condition = 'web=1 AND Tags.tag=:tag AND parent IS NULL';
-		$criteria->params = array(':tag'=>$this->product_tag);
+		{
+			$criteria->condition = 'web = 1 AND Tags.tag = :tag AND parent IS NULL';
+		}
+
+		$criteria->params = array(':tag' => $this->product_tag);
+
+		return $criteria;
+	}
+
+	/**
+	 * Returns a criteria that the custom page can use to display
+	 * a slider for the products.
+	 *
+	 * @return CDbCriteria
+	 */
+	public function GetSliderCriteria()
+	{
+		$criteria = $this->getDefaultProductCriteria();
 		$criteria->limit = _xls_get_conf('MAX_PRODUCTS_IN_SLIDER',64);
 		$criteria->order = _xls_get_sort_order(); //'Product.id DESC';
+
+		return $criteria;
+	}
+
+	/**
+	 * Returns a criteria that the custom page can use to display
+	 * a grid for the products.
+	 *
+	 * @return CDbCriteria
+	 */
+	public function getProductGridCriteria()
+	{
+		$criteria = $this->getDefaultProductCriteria();
+		$criteria->limit = CPropertyValue::ensureInteger(
+			Yii::app()->params['PRODUCTS_PER_PAGE']
+		);
+		$criteria->order = 'ProductTags.product_id DESC';
 
 		return $criteria;
 	}
@@ -280,15 +330,15 @@ class CustomPage extends BaseCustomPage
 		$return = array();
 		# Traverse the tree and search for direct children of the root
 		foreach($objRet as $objItem) {
-				$return[] = array(
-					'text'=>CHtml::link($objItem->title,$objItem->Link),
-					'label' => $objItem->title,
-					'link' => $objItem->Link,
-					'url' => $objItem->Link,
-					'id' => $objItem->id,
-					'child_count' => 0,
-					'children' => null
-				);
+			$return[] = array(
+				'text'=>CHtml::link($objItem->title,$objItem->Link),
+				'label' => $objItem->title,
+				'link' => $objItem->Link,
+				'url' => $objItem->Link,
+				'id' => $objItem->id,
+				'child_count' => 0,
+				'children' => null
+			);
 
 		}
 		return empty($return) ? null : $return;
@@ -311,8 +361,8 @@ class CustomPage extends BaseCustomPage
 	/**
 	 * Set Page Data
 	 * Page data for each language is sent in a content-{lang} element. We need to
-	 *  take each of these elements, and serialize them for storage in the db. The
-	 *  data array elements look like 'en:English' => 'page content here'.
+	 *	take each of these elements, and serialize them for storage in the db. The
+	 *	data array elements look like 'en:English' => 'page content here'.
 	 * @param string[] $data  An array of content-{lang} keys and their values.
 	 * @return void
 	 */
@@ -381,20 +431,20 @@ class CustomPage extends BaseCustomPage
 
 	public function __get($strName) {
 		switch ($strName) {
-			case 'RequestUrl':
-				return $this->request_url;
+		case 'RequestUrl':
+			return $this->request_url;
 
-			case 'Title':
-				return $this->title;
+		case 'Title':
+			return $this->title;
 
-			case 'SliderCriteria':
-				return $this->GetSliderCriteria();
+		case 'SliderCriteria':
+			return $this->GetSliderCriteria();
 
-			case 'PageTitle':
-				return _xls_truncate($this->GetPageMeta('SEO_CUSTOMPAGE_TITLE'), 70);
+		case 'PageTitle':
+			return _xls_truncate($this->GetPageMeta('SEO_CUSTOMPAGE_TITLE'), 70);
 
-			default:
-				return parent::__get($strName);
+		default:
+			return parent::__get($strName);
 		}
 	}
 }

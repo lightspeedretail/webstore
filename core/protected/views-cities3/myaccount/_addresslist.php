@@ -83,12 +83,12 @@
 								{
 									echo ($activeAddress->id == $model->default_billing_id ?
 											'<span class="superscript-label default-billing">' .
-											Yii::t('profile', 'Default Billing Address') .
+											Yii::t('profile', 'Default Billing') .
 											'</span>' : '') .
 
 										($activeAddress->id == $model->default_shipping_id ?
 											'<span class="superscript-label default-shipping">' .
-											Yii::t('profile', 'Default Shipping Address') .
+											Yii::t('profile', 'Default Shipping') .
 											'</span>' : '');
 								}
 							?>

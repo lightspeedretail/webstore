@@ -46,7 +46,8 @@ class WsWebApplication extends CWebApplication
 		'soap',
 		'legacysoap',
 		'commonssl',
-		'images'
+		'images',
+		'editcart'
 	);
 
 

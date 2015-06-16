@@ -356,7 +356,6 @@ class Images extends BaseImages
 	}
 
 	public static function check_transparent($im) {
-
 		$width = imagesx($im); // Get the width of the image
 		$height = imagesy($im); // Get the height of the image
 

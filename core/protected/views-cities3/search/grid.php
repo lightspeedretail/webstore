@@ -34,8 +34,6 @@
 		<?php
 		$ct=-1;
 		foreach($model as $objProduct):
-
-
 			if ($objProduct->rowBookendFront)
 				echo '<div class="row-fluid">';
 
@@ -53,7 +51,7 @@
 							'onclick'=>'window.location.href=\''.$objProduct->Link.'\''
 						),
 				        CHtml::link(_xls_truncate($objProduct->Title , 50), $objProduct->Link).
-					        CHtml::tag('span',array('class'=>'product_cell_price_slash'),$objProduct->SlashedPrice).
+					        CHtml::tag('span',array('class'=>'product_cell_price_slash'),$objProduct->getFormattedSlashedPriceWithClickForPricing()).
 					        CHtml::tag('span',array('class'=>'product_cell_price'),$objProduct->Price)
 		            )
 				);

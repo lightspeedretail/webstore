@@ -19,7 +19,6 @@ class wsphoto extends ApplicationComponent
 	 */
 	public function onUploadPhoto($event)
 	{
-
 		//We were passed these by the CEventPhoto class
 		$blbImage = $event->blbImage; //$image resource
 		$objProduct = $event->objProduct;
