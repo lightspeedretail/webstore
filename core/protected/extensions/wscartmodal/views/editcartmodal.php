@@ -67,7 +67,8 @@
 														"onchange" => "wsEditCartModal.updateCart(this)",
 													))',
 											'htmlOptions' => array(
-												'class' => 'quantity'
+												'class' => 'quantity',
+												'onkeypress' => 'return event.charCode >= 48 && event.charCode <= 57'
 											),
 										),
 										array(

@@ -289,7 +289,7 @@ class SiteController extends Controller
 
 		if (isset($_POST['LoginForm']))
 		{
-			Yii::log(print_r($_POST['LoginForm'], true), 'error', 'application.' . __CLASS__ . "." . __FUNCTION__);
+			Yii::log(print_r($_POST['LoginForm']['email'] . ": Requested a Password Reset Link", true), 'error', 'application.' . __CLASS__ . "." . __FUNCTION__);
 			$model->attributes = $_POST['LoginForm'];
 
 			if (empty($model->email))

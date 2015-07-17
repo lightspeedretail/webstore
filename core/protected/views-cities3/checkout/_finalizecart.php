@@ -45,7 +45,8 @@
 												))',
 					'htmlOptions' => array(
 						'class' => 'quantity',
-						'size' => '2'
+						'size' => '2',
+						'onkeypress' => 'return event.charCode >= 48 && event.charCode <= 57'
 					),
 				),
 				array(

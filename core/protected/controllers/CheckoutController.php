@@ -196,6 +196,7 @@ class CheckoutController extends Controller
 	public function actionShipping()
 	{
 		$this->publishJS('shipping');
+		$this->publishJS('zippo');
 		$this->layout = '/layouts/checkout';
 
 		$this->checkoutForm = MultiCheckoutForm::loadFromSessionOrNew();
@@ -458,6 +459,7 @@ class CheckoutController extends Controller
 		}
 
 		$this->publishJS('shipping');
+		$this->publishJS('zippo');
 		$this->layout = '/layouts/checkout';
 
 		$this->checkoutForm = MultiCheckoutForm::loadFromSessionOrNew();
@@ -549,6 +551,7 @@ class CheckoutController extends Controller
 	public function actionShippingAddress()
 	{
 		$this->publishJS('shipping');
+		$this->publishJS('zippo');
 		$this->layout = '/layouts/checkout';
 		$error = null;
 
@@ -721,6 +724,7 @@ class CheckoutController extends Controller
 	public function actionShippingOptions()
 	{
 		$this->publishJS('shipping');
+		$this->publishJS('zippo');
 		$this->layout = '/layouts/checkout';
 		$this->checkoutForm = MultiCheckoutForm::loadFromSessionOrNew();
 
@@ -836,6 +840,7 @@ class CheckoutController extends Controller
 	public function actionPaymentSimple()
 	{
 		$this->publishJS('payment');
+		$this->publishJS('zippo');
 		$this->layout = '/layouts/checkout';
 		$this->checkoutForm = MultiCheckoutForm::loadFromSessionOrNew();
 		$objCart = Yii::app()->shoppingcart;
@@ -1216,6 +1221,7 @@ class CheckoutController extends Controller
 
 					$this->checkoutForm->addErrors($objPayment->getErrors());
 					$this->publishJS('payment');
+					$this->publishJS('zippo');
 					$this->layout = '/layouts/checkout';
 
 					if (count($this->checkoutForm->objAddresses) > 0)
@@ -1303,6 +1309,7 @@ class CheckoutController extends Controller
 						$this->checkoutForm->clearCCdata();
 
 						$this->publishJS('payment');
+						$this->publishJS('zippo');
 						$this->layout = '/layouts/checkout';
 
 						if (count($this->checkoutForm->objAddresses) > 0)
@@ -1388,6 +1395,7 @@ class CheckoutController extends Controller
 		{
 			$this->layout = '/layouts/checkout';
 			$this->publishJS('payment');
+			$this->publishJS('zippo');
 
 			// clear sensitive data
 			$this->checkoutForm->clearCCdata();

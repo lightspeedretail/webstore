@@ -180,7 +180,71 @@ function xls_check_file_signatures($complete = false)
 
 
 	}
+
+	$mainConfigFile = './config/main.php';
+
+	if (file_exists($mainConfigFile))
+	{
+		$hashFile = md5_file($mainConfigFile);
+		$hashes = explode(',', $fn['./core/protected/config/_main.php']);
+		if (!in_array($hashFile, $hashes))
+		{
+			$checked[$mainConfigFile] = 'modified';
+		}
+	}
+
 	return $checked;
+}
+
+/**
+ * Get the list of files under custom directory
+ *
+ * @return array
+ */
+function xls_check_custom_files()
+{
+	$result = array();
+	$result['<b>--Custom Files--</b>'] = '';
+	$iter = new RecursiveDirectoryIterator('custom');
+	foreach (new RecursiveIteratorIterator($iter) as $filename => $cursor)
+	{
+		if(is_file($filename) === true)
+		{
+			$result[$filename] = '';
+		}
+	}
+	return $result;
+}
+
+/**
+ * Get the list of custom view files in themes.
+ *
+ * @return array
+ */
+function xls_check_custom_view_files()
+{
+	$arrDefaultViewFiles = array (
+		'brooklyn' => array('themes/brooklyn/views/site/index.php'),
+		'brooklyn2014' => array('themes/brooklyn2014/views/site/index.php')
+	);
+
+	$result = array();
+	$result['<b>--Custom Theme View Files--</b>'] = '';
+
+	foreach ($arrDefaultViewFiles as $theme => $files)
+	{
+		$iter = new RecursiveDirectoryIterator('themes/' . $theme . '/views');
+		foreach (new RecursiveIteratorIterator($iter) as $filename=>$cur)
+		{
+			if(is_file($filename) === true &&
+				array_search($filename, $files) === false)
+			{
+				$result[$filename] = '';
+			}
+		}
+	}
+
+	return $result;
 }
 
 function displaySystemCheckResult($checkenv)
@@ -194,6 +258,10 @@ function displaySystemCheckResult($checkenv)
 
 	$checkenv = array_merge($checkenv, xls_check_file_signatures());
 
+	$checkenv = array_merge($checkenv, xls_check_custom_files());
+
+	$checkenv = array_merge($checkenv, xls_check_custom_view_files());
+
 	$warning_text .= "<tr><td colspan='2'><hr></td></tr>";
 	$curver = _ws_version();
 	foreach ($checkenv as $key => $value) {
@@ -202,12 +270,8 @@ function displaySystemCheckResult($checkenv)
 				: "<font color='#cc0000'><b>$value</b></font>") . "</td></tr>";
 	}
 
-
 	$warning_text .= "</table>";
 	?>
-
-
-
 
 	<div>
 		<?php echo $warning_text; ?>
@@ -277,4 +341,3 @@ displayHeader();
 $checkenv = xls_check_server_environment();
 
 displaySystemCheckResult($checkenv);
-

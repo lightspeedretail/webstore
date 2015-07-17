@@ -84,6 +84,14 @@ class cayan extends WsPayment
 		$cardholder = _xls_replaceAccents($this->CheckoutForm->contactFirstName . ' ' . $this->CheckoutForm->contactLastName);
 		$billingAddress = _xls_replaceAccents($this->CheckoutForm->billingAddress1);
 
+		// Limit the number of characters based on size limitations of Cayan's fields
+		// https://cayan.com/partners/developers/genius-documentation/transport/data-structures#transport-request
+		$merchantName = substr($this->config['name'], 0, 160);
+		$doingBusinessAs = substr(Yii::app()->params['STORE_NAME'], 0, 50);
+		$billingAddress = substr($billingAddress, 0, 25);
+		$zipCode = substr($zipCode, 0, 10);
+		$cardholder = substr($cardholder, 0, 100);
+
 		// Construct SOAP object
 		$xmlData =
 			'<?xml version="1.0" encoding="utf-8"?>
@@ -92,7 +100,7 @@ class cayan extends WsPayment
 					xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
 					<soap:Body>
 						<CreateTransaction xmlns="http://transport.merchantware.net/v4/">
-							<merchantName>'.$this->config['name'].'</merchantName>
+							<merchantName>'._xmlSpecialChars($merchantName).'</merchantName>
 							<merchantSiteId>'.$this->config['siteId'].'</merchantSiteId>
 							<merchantKey>'.$this->config['transKey'].'</merchantKey>
 							<request>
@@ -100,13 +108,13 @@ class cayan extends WsPayment
 								<Amount>'.$this->objCart->total.'</Amount>
 								<OrderNumber>'.$wo.'</OrderNumber>
 								<TransactionId>'.$this->objCart->id_str.'</TransactionId>
-								<AddressLine1>'.$billingAddress.'</AddressLine1>
-								<Zip>'.$zipCode.'</Zip>
-								<Cardholder>'.$cardholder.'</Cardholder>
+								<AddressLine1>'._xmlSpecialChars($billingAddress).'</AddressLine1>
+								<Zip>'._xmlSpecialChars($zipCode).'</Zip>
+								<Cardholder>'._xmlSpecialChars($cardholder).'</Cardholder>
 								<LogoLocation>'.$this->config['logoUrl'].'</LogoLocation>
 								<RedirectLocation>'.$redirectUrl.'</RedirectLocation>
 								<ClerkId>'.$clerkId.'</ClerkId>
-								<Dba>'.Yii::app()->params['STORE_NAME'].'</Dba>
+								<Dba>'._xmlSpecialChars($doingBusinessAs).'</Dba>
 								<SoftwareName>Web Store eCommerce solution for Lightspeed Pos</SoftwareName>
 								<SoftwareVersion>'.XLSWS_VERSION.'</SoftwareVersion>
 								<TaxAmount>'.$this->objCart->TaxTotal.'</TaxAmount>
