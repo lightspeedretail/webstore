@@ -186,9 +186,11 @@ class SearchController extends Controller
 	/**
 	 * Display our search results based on  criteria.
 	 */
-	public function actionResults() {
-
+	public function actionResults()
+	{
 		$strQ = Yii::app()->getRequest()->getQuery('q');
+		$customPageId = Yii::app()->getRequest()->getQuery('cpc');
+		$isCustomPage = $customPageId !== null;
 
 		//If we passed a category as a request_url, translate here
 		if (isset($_GET['cat'])) {
@@ -205,12 +207,18 @@ class SearchController extends Controller
 		//We have to run the query twice -- once to get total # for our paginator, then again with our current limits
 
 		//Get our total qty first for pagination
-		$objCommand = $this->BuildCommand($formModel,-1); //passing -1 as the limit triggers a count(*) query
+		$objCommand = $this->buildCommand($formModel, -1); //passing -1 as the limit triggers a count(*) query
 		$numberOfRecords = $objCommand->queryScalar();
 		$pages=new CPagination(intval($numberOfRecords));
 		$pages->pageSize = Yii::app()->params['PRODUCTS_PER_PAGE'];
 
-		$objCommand = $this->BuildCommand($formModel,$pages->pageSize, $pages->currentPage*$pages->pageSize);
+		$objCommand = $this->buildCommand(
+			$formModel,
+			$pages->pageSize,
+			$pages->currentPage * $pages->pageSize,
+			$isCustomPage
+		);
+
 		$rows = $objCommand->QueryAll();
 
 		//Convert rows to objects for our view layer so it's consistent
@@ -227,11 +235,11 @@ class SearchController extends Controller
 
 		$this->breadcrumbs = array($strBreadcrumbText => $strCurrentUrl);
 
-		if(isset($_GET['cpc']))
+		if ($isCustomPage)
 		{
 			//We have been sent over Custom Page Content
-			$objCustomPage = CustomPage::model()->findByPk($_GET['cpc']);
-			if($objCustomPage)
+			$objCustomPage = CustomPage::model()->findByPk($customPageId);
+			if ($objCustomPage)
 			{
 				$this->pageTitle=$objCustomPage->PageTitle;
 				$this->pageDescription=$objCustomPage->meta_description;
@@ -277,7 +285,7 @@ class SearchController extends Controller
 		$formModel = new AdvancedSearchForm();
 		$formModel->q = $strQ;
 
-		$objCommand = $this->BuildCommand($formModel,10);
+		$objCommand = $this->buildCommand($formModel, 10);
 		$rows = $objCommand->QueryAll();
 		$model = Product::model()->populateRecords($rows,false);
 		$arrReturn['options'] = CHtml::listData($model, 'Link', 'title');
@@ -294,9 +302,10 @@ class SearchController extends Controller
 	 * @param $form
 	 * @param null $intLimit
 	 * @param null $intOffset
+	 * @param bool $isCustomPage
 	 * @return mixed
 	 */
-	protected function BuildCommand($formModel,$intLimit = null, $intOffset = null)
+	protected function buildCommand($formModel, $intLimit = null, $intOffset = null, $isCustomPage = false)
 	{
 
 		$strQ = $formModel->q;
@@ -391,9 +400,11 @@ class SearchController extends Controller
 			$objCommand->where(array('AND', '(' . $strWhere . ') ' . $strInv . ' AND web=1 AND current=1', array('in', 'category_id', $intIdArray)));
 		}
 
+		$orderBy = $isCustomPage ? 't.' . _xls_get_sort_order() : 'relevance DESC';
 
 		$objCommand->group('t.id');
-		$objCommand->order('relevance DESC');
+		$objCommand->order($orderBy);
+
 		if (!is_null($intLimit))
 		{
 			if ($intLimit==-1) {

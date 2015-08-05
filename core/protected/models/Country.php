@@ -241,28 +241,6 @@ class Country extends BaseCountry
 	}
 
 	/**
-	 * Very specific function meant to return a specifically structured array.
-	 * When called, it will populate the <option> values in the country dropdown
-	 * with a 'code' attribute that will be read by jquery and used in the api
-	 * request for the dynamic city and state population feature.
-	 *
-	 * @return mixed
-	 */
-	public static function getCountryCodes()
-	{
-		$models = Country::model()->findAll();
-		$arr = array();
-
-		foreach ($models as $model)
-		{
-			$arr[$model->id] = array('code' => $model->code);
-		}
-
-		return $arr;
-	}
-
-
-	/**
 	 * @return null
 	 */
 	protected function noCountryForOldMen() {

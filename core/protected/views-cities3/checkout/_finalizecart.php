@@ -42,6 +42,7 @@
 													"data-pk"=>$data->id,
 													"size" => "3",
 													"onchange" =>"wsEditCartModal.updateCart(this)",
+													"onfocus" => "this.oldValue = this.value",
 												))',
 					'htmlOptions' => array(
 						'class' => 'quantity',
@@ -109,6 +110,14 @@
 		<div class="totals">
 			<table class="totals">
 				<tbody>
+				    <tr id="SubtotalLine" class="subtotal">
+					    <th colspan='3'>
+						    <?php echo Yii::t('cart', 'Subtotal'); ?>
+						    <td id="CartSubtotal" class="cart-subtotal money">
+						        <?= _xls_currency($cartDisplay->subtotal); ?>
+						    </td>
+					    </th>
+				    </tr>
 					<tr id="PromoCodeLine" class="<?= $cartDisplay->promoCode ? 'webstore-promo-line' : 'webstore-promo-line hide-me';?>" >
 						<th colspan='3'>
 							<?= Yii::t('cart', 'Promo & Discounts'); ?>

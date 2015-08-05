@@ -14,6 +14,7 @@ class WsWebApplication extends CWebApplication
 		'site/forgotpassword',
 		'site/sendemail',
 		'checkout/thankyou',
+		'cart/receipt',
 	);
 
 	/**
@@ -21,7 +22,6 @@ class WsWebApplication extends CWebApplication
 	 * @var array
 	 */
 	private $_arrNeverSecureRoutes = array(
-		'cart/receipt',
 		'search/browse',
 	);
 

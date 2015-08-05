@@ -43,6 +43,10 @@ class ThemeController extends AdminBaseController
 		else
 			$this->currentTheme = "unknown";
 
+		// Only old self-hosted customers can download/upgrade themes on their own.
+		$canDisplayThemeGallery = CPropertyValue::ensureBoolean(Yii::app()->params['LIGHTSPEED_HOSTING']) === false &&
+			CPropertyValue::ensureBoolean(Yii::app()->params['ALLOW_LEGACY_THEMES']);
+
 		$this->menuItems =
 			array(
 				array('label' => 'Manage My Themes',
@@ -57,7 +61,7 @@ class ThemeController extends AdminBaseController
 				),
 				array('label' => 'View Theme Gallery',
 					'url' => array('theme/gallery'),
-					'visible' => !(Yii::app()->params['LIGHTSPEED_HOSTING'] > 0)    // only self hosted customers can download/upgrade themes on their own
+					'visible' => $canDisplayThemeGallery,
 				),
 				array('label' => 'Upload Theme .Zip',
 					'url' => array('theme/upload'),

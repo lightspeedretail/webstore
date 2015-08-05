@@ -65,9 +65,10 @@
 											'value' => 'CHtml::numberField("CartItem_qty[$data->id]",$data->qty,array(
 														"data-pk" => $data->id,
 														"onchange" => "wsEditCartModal.updateCart(this)",
+														"onfocus" => "this.oldValue = this.value",
 													))',
 											'htmlOptions' => array(
-												'class' => 'quantity'
+												'class' => 'quantity',
 											),
 										),
 										array(

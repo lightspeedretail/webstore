@@ -992,7 +992,7 @@ class ShoppingCart extends CApplicationComponent
 			case 'subtotalFormatted':
 				if (empty($this->model->subtotal))
 				{
-					return '';
+					return _xls_currency(0);
 				}
 				return _xls_currency($this->model->subtotal);
 

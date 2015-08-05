@@ -84,12 +84,16 @@
 				</li>
 			</ol>
 		<li class="field-container country country-container">
-			<?php
-			echo $form->dropDownList(
+			<?=
+			$form->dropDownList(
 				$model,
-				'billingCountry',
-				$model->getCountries(),
-				$htmlOptions = array('class' => 'no-style-select', 'options' => Country::getCountryCodes())
+				'billingCountryCode',
+				CHtml::listData(
+					Country::sortShippingCountries($model->shippingCountryCode),
+					'code',
+					'country'
+				),
+				$htmlOptions = array('class' => 'no-style-select')
 			);
 			?>
 		</li>

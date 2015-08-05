@@ -33,6 +33,10 @@ class WsShippingEstimator extends CWidget
 		$assets = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'assets', false, -1, true);
 		Yii::app()->clientScript->registerScriptFile($assets . '/js/WsShippingEstimator.js');
 
+		$pathToZippo = Yii::getPathOfAlias('ext'). DIRECTORY_SEPARATOR . 'wsadvcheckout' . DIRECTORY_SEPARATOR . 'assets';
+		$assets = Yii::app()->getAssetManager()->publish($pathToZippo, false, -1, true);
+		Yii::app()->clientScript->registerScriptFile($assets . '/zippo.js');
+
 		$checkoutForm = MultiCheckoutForm::loadFromSessionOrNew();
 
 		// We may wish to update the shipping options right away if we know the

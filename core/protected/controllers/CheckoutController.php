@@ -196,6 +196,7 @@ class CheckoutController extends Controller
 	public function actionShipping()
 	{
 		$this->publishJS('shipping');
+		$this->publishJS('zippo');
 		$this->layout = '/layouts/checkout';
 
 		$this->checkoutForm = MultiCheckoutForm::loadFromSessionOrNew();
@@ -458,6 +459,7 @@ class CheckoutController extends Controller
 		}
 
 		$this->publishJS('shipping');
+		$this->publishJS('zippo');
 		$this->layout = '/layouts/checkout';
 
 		$this->checkoutForm = MultiCheckoutForm::loadFromSessionOrNew();
@@ -549,6 +551,7 @@ class CheckoutController extends Controller
 	public function actionShippingAddress()
 	{
 		$this->publishJS('shipping');
+		$this->publishJS('zippo');
 		$this->layout = '/layouts/checkout';
 		$error = null;
 
@@ -610,6 +613,9 @@ class CheckoutController extends Controller
 			$this->checkoutForm->pickupLastName = null;
 		}
 
+		$addressId = Yii::app()->getRequest()->getPost('Address_id');
+		$wishlistId = Yii::app()->getRequest()->getPost('wishlistId');
+
 		// Store pickup.
 		if ($inStorePickupSelected === true)
 		{
@@ -626,10 +632,20 @@ class CheckoutController extends Controller
 		}
 
 		// An address was selected.
-		elseif (isset($_POST['Address_id']))
+		elseif ($addressId || $wishlistId)
 		{
-			// an existing shipping address is chosen
-			$result = $this->checkoutForm->fetchCustomerShippingAddress($_POST['Address_id']);
+			$customerId = null;
+
+			if ($wishlistId)
+			{
+				$wishlist = Wishlist::model()->findByPk($wishlistId);
+				$addressId = $wishlist->ship_option;
+				$customerId = $wishlist->customer_id;
+			}
+
+			// An existing shipping address is chosen.
+			$result = $this->checkoutForm->fetchCustomerShippingAddress($addressId, $customerId);
+
 			if ($result === false)
 			{
 				$this->redirect($this->createAbsoluteUrl("/checkout/shippingaddress"));
@@ -642,12 +658,30 @@ class CheckoutController extends Controller
 				$hasErrors = true;
 			}
 		} else {
+			$wishlist = null;
+			$wishlistAddress = null;
+
+			// If any of the cart items are on a wishlist, then we show the
+			// wishlist address to the user.
+			foreach ($objCart->cartItems as $item)
+			{
+				if ($item->wishlist_item !== null)
+				{
+					$wishlist = $item->wishlistItem()->registry();
+					$wishlistAddressId = $wishlist->ship_option;
+					$wishlistAddress = CustomerAddress::model()->findByPk($wishlistAddressId);
+					break; // Multiple wishlist addresses are not yet supported.
+				}
+			}
+
 			// Nothing was posted, just render the shipping address page.
 			$this->render(
 				'shippingaddress',
 				array(
 					'model' => $this->checkoutForm,
-					'error' => $this->formatErrors()
+					'error' => $this->formatErrors(),
+					'wishlist' => $wishlist,
+					'wishlistAddress' => $wishlistAddress,
 				)
 			);
 			return;
@@ -721,6 +755,7 @@ class CheckoutController extends Controller
 	public function actionShippingOptions()
 	{
 		$this->publishJS('shipping');
+		$this->publishJS('zippo');
 		$this->layout = '/layouts/checkout';
 		$this->checkoutForm = MultiCheckoutForm::loadFromSessionOrNew();
 
@@ -836,6 +871,7 @@ class CheckoutController extends Controller
 	public function actionPaymentSimple()
 	{
 		$this->publishJS('payment');
+		$this->publishJS('zippo');
 		$this->layout = '/layouts/checkout';
 		$this->checkoutForm = MultiCheckoutForm::loadFromSessionOrNew();
 		$objCart = Yii::app()->shoppingcart;
@@ -1216,6 +1252,7 @@ class CheckoutController extends Controller
 
 					$this->checkoutForm->addErrors($objPayment->getErrors());
 					$this->publishJS('payment');
+					$this->publishJS('zippo');
 					$this->layout = '/layouts/checkout';
 
 					if (count($this->checkoutForm->objAddresses) > 0)
@@ -1303,6 +1340,7 @@ class CheckoutController extends Controller
 						$this->checkoutForm->clearCCdata();
 
 						$this->publishJS('payment');
+						$this->publishJS('zippo');
 						$this->layout = '/layouts/checkout';
 
 						if (count($this->checkoutForm->objAddresses) > 0)
@@ -1388,6 +1426,7 @@ class CheckoutController extends Controller
 		{
 			$this->layout = '/layouts/checkout';
 			$this->publishJS('payment');
+			$this->publishJS('zippo');
 
 			// clear sensitive data
 			$this->checkoutForm->clearCCdata();

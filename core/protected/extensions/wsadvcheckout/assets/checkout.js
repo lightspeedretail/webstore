@@ -607,6 +607,11 @@ function WsEditCartModal(options) {
  * @param {DOM element} DOMInput The input element in the DOM.
  */
 WsEditCartModal.prototype.updateCart = function(DOMInput) {
+	if (isNaN(parseInt(DOMInput.value, 10))){
+		$(DOMInput).val(DOMInput.oldValue);
+		$(DOMInput).change();
+	}
+
 	this.updateCartItemQty(
 		$(DOMInput).attr('data-pk'),
 		DOMInput.value
@@ -657,7 +662,13 @@ WsEditCartModal.prototype.updateCartItemQty = function(cartItemId, qty) {
 	}).done(function (updateResponse) {
 		if (updateResponse.updateResult.action === 'success') {
 			this.checkout.redrawCart(updateResponse.shoppingCart, this.cartId);
-			$('#cartItemsTotal').text(updateResponse.shoppingCart.cartItems.length);
+
+			var totalQty = 0;
+			for (var i = 0; i < updateResponse.shoppingCart.cartItems.length; i++) {
+			    totalQty += parseInt(updateResponse.shoppingCart.cartItems[i].qty);
+			}
+
+			$('#cartItemsTotal').text(totalQty);
 
 			// Update the shipping estimate.
 			if (this.wsShippingEstimator !== null) {

@@ -1186,16 +1186,24 @@ class MultiCheckoutForm extends CheckoutForm
 	}
 
 	/**
-	 * When a user selects an address on the shipping address page the information gets
-	 * updated to the checkout form object.
-	 * @param $addressId
-	 * @return bool false if it was not possible to change shipping and customer information
-	 * true if it was possible.
+	 * When a user selects an address on the shipping address page the
+	 * information gets updated to the checkout form object.
+	 *
+	 * @param $addressId An existing customer address id.
+	 * @param $userId When a userId is provided then the address must belong to
+	 * the provided user, otherwise the address must belong to the current user.
+	 *
+	 * @return bool false if it was not possible to change shipping and customer
+	 * information true if it was possible.
 	 */
-	public function fetchCustomerShippingAddress($addressId)
+	public function fetchCustomerShippingAddress($addressId, $userId = null)
 	{
-		// Should be moved to CustomerAddress.php
-		$selectedAddress = CustomerAddress::findCustomerAddress(Yii::app()->user->id, $addressId);
+		if (is_null($userId))
+		{
+			$userId = Yii::app()->user->id;
+		}
+
+		$selectedAddress = CustomerAddress::findCustomerAddress($userId, $addressId);
 
 		if ($selectedAddress instanceof CustomerAddress === false)
 		{

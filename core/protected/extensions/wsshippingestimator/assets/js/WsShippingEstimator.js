@@ -544,20 +544,7 @@ WsShippingEstimator.prototype.calculateShippingEstimates = function () {
 WsShippingEstimator.prototype.updateShippingEstimates = function() {
 	// This deferred is what's returned by this function.
 	var deferred = $.Deferred();
-	var zippoPostal = this.getPostal();
-
-	// TODO: This was copied from wsadvcheckout/assets/shipping.js and should be
-	// moved into a shared JavaScript file.
-	switch (this.selectedCountryCode) {
-		// for Great Britain and Canada, Zippopotam only uses the first 3
-		// characters in the query URL. Since the user is likely to enter their
-		// full postal code, we'll trim it for what's required by zippo.
-		case 'GB':
-		case 'CA':
-			zippoPostal = zippoPostal.substring(0, 3);
-			break;
-	}
-	// TODO End copied block.
+	var zippoPostal = parsePostal(this.selectedCountryCode, this.getPostal());
 
 	// Make a deferred for the zippopotam.us lookup. The resolve() method is
 	// called once the zippo lookup returns successfully.
@@ -584,7 +571,7 @@ WsShippingEstimator.prototype.updateShippingEstimates = function() {
 		var uri = this.selectedCountryCode + '/' + zippoPostal;
 
 		$.ajax({
-			url: 'http://api.zippopotam.us/' + uri,
+			url: 'https://api.zippopotam.us/' + uri,
 			type: 'GET',
 			datatype: 'json',
 			crossDomain: true
@@ -599,11 +586,11 @@ WsShippingEstimator.prototype.updateShippingEstimates = function() {
 				// 'place name' can be quite a few miles away and for England and the
 				// 'state abbreviation' is ENG.
 				city = placeData.places[0]['place name'];
-				stateCode = placeData.places[0]['state abbreviation'];
+				stateCode = getProvinceAbbreviation(placeData.places[0]['state abbreviation']);
 				this.setCityStateLinkValue(city, stateCode);
 				addressLookup.resolve(city, stateCode);
 			} else {
-				// An error occurred in the hippo lookup.
+				// An error occurred in the zippo lookup.
 				// Probably a "404 not found" because the postcode and country
 				// combination isn't valid (according to hippo).
 				this.setCityStateLinkValue(null, null);
