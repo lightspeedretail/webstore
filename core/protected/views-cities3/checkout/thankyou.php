@@ -92,6 +92,12 @@
 	</div>
 	<div class="receipt">
 		<h2><?= Yii::t('checkout', 'Order Receipt')?><span class="order-id"><?= Yii::t('checkout', 'Order #:').' '."<strong>".$cart->id_str?></strong></span></h2>
+        <?php if ($cart->printed_notes): ?>
+        <h4><?= Yii::t('checkout', 'Customer Comments')?></h4>
+            <span class="customer-comments">
+                <p><?= htmlentities($cart->printed_notes);?></p>
+            </span>
+        <?php endif; ?>
 
 		<?php $this->renderPartial('_orderdetails', array('cart' => $cart, 'isReceipt' => true)); ?>
 		<?php $this->renderPartial('_finalizecart', array('cart' => $cart, 'isReceipt' => true)); ?>

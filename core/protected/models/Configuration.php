@@ -386,6 +386,8 @@ return array(
 	 */
 	public function postConfigurationChange()
 	{
+		Yii::app()->params[$this->key_name] = $this->key_value;
+
 		switch ($this->key_name)
 		{
 			case 'STORE_OFFLINE':
@@ -406,10 +408,16 @@ return array(
 				{
 					Yii::app()->user->getFlash('warning');
 				}
+
+				Yii::app()->params[$this->key_name] = $this->key_value;
+				break;
+
+			case 'INVENTORY_OUT_ALLOW_ADD':
+				Category::updateAllChildCounts();
+				Family::updateAllChildCounts();
 				break;
 		}
 
-		Yii::app()->params[$this->key_name] = $this->key_value;
 	}
 
 	/**

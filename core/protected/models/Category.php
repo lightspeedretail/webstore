@@ -19,17 +19,19 @@ class Category extends BaseCategory
 	 * Returns the static model of the specified AR class.
 	 * @return CartType the static model class
 	 */
-	public static function model($className=__CLASS__)
+	public static function model($className = __CLASS__)
 	{
 		return parent::model($className);
 	}
 
-
-
-
-	// Default "to string" handler
-	public function __toString() {
-		return sprintf('Category Object %s',  $this->label);
+	/**
+	 * Default "to string" handler
+	 *
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return sprintf('Category Object %s', $this->label);
 	}
 
 	/**
@@ -41,21 +43,17 @@ class Category extends BaseCategory
 		// Warning: Please modify the following code to remove attributes that
 		// should not be searched.
 
-		$criteria=new CDbCriteria;
+		$criteria = new CDbCriteria;
 
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-			'sort'=>array(
-				'defaultOrder'=>'request_url ASC',
-			),
-			'pagination' => array(
-				'pageSize' => 15,
-			),
-		));
-
-
+		return new CActiveDataProvider(
+			$this,
+			array(
+				'criteria' => $criteria,
+				'sort' => array('defaultOrder' => 'request_url ASC'),
+				'pagination' => array('pageSize' => 15),
+				)
+		);
 	}
-
 
 	public static function GetTree()
 	{
@@ -102,13 +100,14 @@ class Category extends BaseCategory
 
 
 
-	public function GetBranchPath() {
+	public function GetBranchPath()
+	{
 
 		$results = array();
-		foreach ($this->categories as $objCategory) {
+		foreach ($this->categories as $objCategory)
+		{
 			$results[] = $objCategory->id;
-			$results = array_merge($results,
-				$objCategory->GetBranchPath());
+			$results = array_merge($results, $objCategory->GetBranchPath());
 		}
 
 		return $results;
@@ -129,16 +128,23 @@ class Category extends BaseCategory
 		foreach($arrCategories as $category)
 		{
 			if (isset($arrCategories[$category->id]) === false)
+			{
 				$arrCategories[$category->id] = array();
+			}
 
 			$categoryParent = $category->parent;
 			if ($categoryParent !== null)
 			{
 				if (isset($arrCategoriesChildren[$categoryParent]) === false)
+				{
 					$arrCategoriesChildren[$categoryParent] = array();
+				}
 
 				array_push($arrCategoriesChildren[$categoryParent], $category->id);
-			} else {
+			}
+
+			else
+			{
 				array_push($arrCategoriesChildren['null'], $category->id);
 			}
 		}
@@ -194,14 +200,20 @@ class Category extends BaseCategory
 
 		// Get the list of children for this category.
 		if ($iParentCategoryId === null)
+		{
 			$arrCategoryChildren = $arrCategoriesChildren['null'];
+		}
 		elseif (isset($arrCategoriesChildren[$iParentCategoryId]))
+		{
 			$arrCategoryChildren = $arrCategoriesChildren[$iParentCategoryId];
+		}
 		else
+		{
 			$arrCategoryChildren = array();
+		}
 
 		// Add each child category, if appropriate.
-		foreach($arrCategoryChildren as $categoryId)
+		foreach ($arrCategoryChildren as $categoryId)
 		{
 			// Must be set because of FK constraint on xlsws_category.parent.
 			$category = $arrCategories[$categoryId];
@@ -224,19 +236,27 @@ class Category extends BaseCategory
 	public function getSubcategoryTree($arrMenuTree = null)
 	{
 
-		if(is_null($arrMenuTree))
+		if (is_null($arrMenuTree))
+		{
 			return null;
+		}
 
-		if(!is_null($this->parent) && isset($arrMenuTree[$this->parent0->request_url]['items']))
+		if (!is_null($this->parent) && isset($arrMenuTree[$this->parent0->request_url]['items']))
+		{
 			$arrMenuTree = $arrMenuTree[$this->parent0->request_url]['items'];
+		}
 
-		$compareArray = array($this->request_url=>'');
-		$subcatArray = array_intersect_key($arrMenuTree,$compareArray);
+		$compareArray = array($this->request_url => '');
+		$subcatArray = array_intersect_key($arrMenuTree, $compareArray);
 
-		if(isset($subcatArray[$this->request_url]['items']))
+		if (isset($subcatArray[$this->request_url]['items']))
+		{
 			return $subcatArray[$this->request_url]['items'];
+		}
 		else
+		{
 			return null;
+		}
 
 	}
 
@@ -247,20 +267,19 @@ class Category extends BaseCategory
 	public function getIntegration()
 	{
 
-		$objCategoryInte = CategoryIntegration::model()->findByAttributes(array('category_id'=>$this->id,'module'=>'amazon'));
+		$objCategoryInte = CategoryIntegration::model()->findByAttributes(array('category_id' => $this->id,'module' => 'amazon'));
 		if ($objCategoryInte instanceof CategoryIntegration)
 		{
 			$this->integrated['amazon']['original'] = CategoryAmazon::model()->findByPk($objCategoryInte->foreign_id);
 			$this->integrated['amazon']['int'] = $objCategoryInte;
 		}
 
-		$objCategoryInte = CategoryIntegration::model()->findByAttributes(array('category_id'=>$this->id,'module'=>'google'));
+		$objCategoryInte = CategoryIntegration::model()->findByAttributes(array('category_id' => $this->id,'module' => 'google'));
 		if ($objCategoryInte instanceof CategoryIntegration)
 		{
 			$this->integrated['google']['original']  = CategoryGoogle::model()->findByPk($objCategoryInte->foreign_id);
 			$this->integrated['google']['int']  = $objCategoryInte;
 		}
-
 
 		return $this;
 	}
@@ -271,7 +290,6 @@ class Category extends BaseCategory
 		$obj = new Integration();
 		if(isset($this->integrated['amazon']))
 		{
-
 			$obj->name0 = $this->integrated['amazon']['original']->name0;
 			$obj->extra = $this->integrated['amazon']['int']->extra;
 			$obj->original = $this->integrated['amazon']['original'];
@@ -289,8 +307,8 @@ class Category extends BaseCategory
 			if (isset($matches[1])) $obj->special_size_type = $matches[1];
 
 			$obj->product_type = $this->integrated['amazon']['original']->product_type;
-
 		}
+
 		return $obj;
 
 	}
@@ -298,21 +316,23 @@ class Category extends BaseCategory
 	public function getGoogle()
 	{
 		$obj = new Integration();
-		if(isset($this->integrated['google']))
+		if (isset($this->integrated['google']))
 		{
-
 			$obj->name0 = $this->integrated['google']['original']->name0;
 			$obj->extra = $this->integrated['google']['int']->extra;
 			$obj->original = $this->integrated['google']['original'];
-
 		}
+
 		return $obj;
 	}
 
 
-	public function getHasVisibleProducts() {
+	public function getHasVisibleProducts()
+	{
 		if ($this->child_count == 0)
+		{
 			return false;
+		}
 
 		// Query products in this category.
 		$query = Yii::app()->db->createCommand()
@@ -326,8 +346,6 @@ class Category extends BaseCategory
 			)
 			->limit(1);
 
-
-
 		// If this config item is set, then we take into account the product inventory level.
 		if (Yii::app()->params['INVENTORY_OUT_ALLOW_ADD'] == Product::InventoryMakeDisappear)
 		{
@@ -338,9 +356,13 @@ class Category extends BaseCategory
 		$blnDisplayableProductExists = $query->queryRow();
 
 		if ($blnDisplayableProductExists)
+		{
 			return true;
+		}
 		else
+		{
 			return false;
+		}
 	}
 
 
@@ -646,32 +668,92 @@ class Category extends BaseCategory
 	}
 
 
-	public function UpdateChildCount()
+	/**
+	 * Updates the category's child_count value
+	 *
+	 * @param bool $updateAll
+	 * We don't need to update the parent as specified at the end
+	 * of this method when it is called from updateAllChildCounts().
+	 * The parent will eventually be updated as a consequence of
+	 * traversing all the categories.
+	 *
+	 * @return void
+	 */
+	public function UpdateChildCount($updateAll = false)
 	{
 		$criteria = new CDbCriteria();
 		$criteria->alias = 'Product';
-		$criteria->join = 'LEFT JOIN xlsws_product_category_assn as ProductAssn ON ProductAssn.product_id=Product.id';
+		$criteria->join = 'LEFT JOIN xlsws_product_category_assn as ProductAssn ON ProductAssn.product_id = Product.id';
 
-		//This count shows if there are products in the category (including ones that are temporarily hidden
-		//due to hiding out of stock)
-		$criteria->condition = 'category_id = :id AND web=1
-			AND (current = 1 AND inventoried = 1 AND inventory_avail > 0)
-			AND (
-				(master_model = 1) OR
-				(master_model = 0 AND parent IS NULL)
-			)';		$criteria->params = array (':id' => $this->id);
+		// product is current, marked to be sold on Web Store and in the category
+		$strCondition = 'current = 1 AND web = 1 AND category_id = :id AND ';
+
+		// When make product disappear for out of stock items is set to ON,
+		// then inventoried items must have available inventory
+		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0) == Product::InventoryMakeDisappear)
+		{
+			$strCondition .= '((inventoried = 1 AND inventory_avail > 0) OR inventoried = 0) AND ';
+		}
+
+		// Child products are not allowed to be displayed without their masters / parents.
+		// So ignore any child products and only consider master products and regular non-matrix products
+		$strCondition .= '(master_model = 1 OR (master_model = 0 AND parent IS NULL))';
+		$criteria->condition = $strCondition;
+		$criteria->params = array (':id' => $this->id);
 
 		$intCount = Product::model()->count($criteria);
+
 		Yii::log("Calculating child count for ".$this->label." and got ".$intCount, 'info', 'application.'.__CLASS__.".".__FUNCTION__);
+
 		$this->child_count = $intCount;
+
 		if (!$this->save())
 		{
 			Yii::log("Error saving category ".$this->label." ". print_r($this->getErrors(), true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		}
 
-		if(!$this->IsPrimary() && $this->ParentObject)
+		if (!$updateAll && !$this->IsPrimary() && $this->ParentObject)
 		{
 			$this->ParentObject->UpdateChildCount();
+		}
+	}
+
+	/**
+	 * Instead of calling UpdateChildCount iteratively on Active Record
+	 * objects, we use Data Access Objects instead because they use less
+	 * PHP memory and some users have A LOT of categories.
+	 * http://www.yiiframework.com/doc/guide/1.1/en/database.dao
+	 *
+	 * @return void
+	 */
+	public static function updateAllChildCounts()
+	{
+		$arrRows = Yii::app()->db->createCommand('select `id` from `xlsws_category`')->queryAll();
+
+		foreach ($arrRows as $row)
+		{
+			$id = $row['id'];
+			$sql = 'SELECT COUNT(*) FROM `xlsws_product` as Product ';
+			$sql .= 'LEFT JOIN `xlsws_product_category_assn` as ProductAssn ON ProductAssn.product_id = Product.id ';
+
+			// product is current, marked to be sold on Web Store and in the category
+			$sql .= "WHERE current = 1 AND web = 1 AND category_id = $id AND ";
+
+			// Child products are not allowed to be displayed without their masters / parents.
+			// So ignore any child products and only consider master products and regular non-matrix products
+			$sql .= '(master_model = 1 OR (master_model = 0 AND parent IS NULL))';
+
+			// When make product disappear for out of stock items is set to ON,
+			// then inventoried items must have available inventory
+			if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0) == Product::InventoryMakeDisappear)
+			{
+				$sql .= ' AND ((inventoried = 1 AND inventory_avail > 0) OR inventoried = 0)';
+			}
+
+			$count = Yii::app()->db->createCommand($sql)->queryScalar();
+
+			$updateSql = "UPDATE `xlsws_category` SET `child_count` = $count WHERE `id` = $id";
+			_dbx($updateSql);
 		}
 	}
 
@@ -844,19 +926,5 @@ class Category extends BaseCategory
 			$this->add_Childs();
 		}
 	}
-
-//	public static function getInstance()
-//	{
-//		if (!isset(self::$objInstance))
-//		{
-//			$class = __CLASS__;
-//			self::$objInstance = new $class();
-//		}
-//		return self::$objInstance;
-//	}
-
 }
 
-//Category::$DefaultOrdering = QQ::Clause(
-//	QQ::OrderBy(QQN::Category()->Position, QQN::Category()->label)
-//);
