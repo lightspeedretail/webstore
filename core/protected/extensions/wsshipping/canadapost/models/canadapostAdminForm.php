@@ -31,7 +31,7 @@ class canadapostAdminForm extends CFormModel
 		return array(
 			'label'=>'Label',
 			'originpostcode'=>'Origin Postcode',
-			'cpc'=>'Canada Post Customer Number',
+			'cpc'=>'CPC ID',
 			'offerservices'=>'Offer these services',
 			'restrictcountry'=>'Only allow this carrier to',
 			'markup'=>'Mark up ($)',

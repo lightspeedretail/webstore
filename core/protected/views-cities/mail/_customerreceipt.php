@@ -29,10 +29,11 @@
 											<?=
 												CHtml::link(
 													Yii::t('email', 'Order #:') . ' ' . '<span>' . $cart->id_str . '</span>',
-													Yii::app()->controller->createAbsoluteUrl(
-														'cart/receipt',
-														array(
-															'getuid' => $cart->linkid)
+													_xls_url_common_to_custom(
+														Yii::app()->controller->createAbsoluteUrl(
+															'cart/receipt',
+															['getuid' => $cart->linkid]
+														)
 													),
 													array(
 														'target' => '_blank',
@@ -275,16 +276,16 @@
 					<?= Yii::t('email', 'This email is a confirmation for the order. To view details or track your order, click on the visit link:') ?><br/>
 					<?=
 						CHtml::link(
-							Yii::app()->controller->createAbsoluteUrl(
-								'cart/receipt',
-								array(
-									'getuid' => $cart->linkid
+							_xls_url_common_to_custom(
+								Yii::app()->controller->createAbsoluteUrl(
+									'cart/receipt',
+									['getuid' => $cart->linkid]
 								)
 							),
-							Yii::app()->controller->createAbsoluteUrl(
-								'cart/receipt',
-								array(
-									'getuid' => $cart->linkid
+							_xls_url_common_to_custom(
+								Yii::app()->controller->createAbsoluteUrl(
+									'cart/receipt',
+									['getuid' => $cart->linkid]
 								)
 							),
 							array(

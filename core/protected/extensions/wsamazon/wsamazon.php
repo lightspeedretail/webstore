@@ -75,7 +75,7 @@ class wsamazon extends ApplicationComponent {
 		require_once('MarketplaceWebServiceOrders/Model/MarketplaceIdList.php');
 		require_once('MarketplaceWebService/Model/IdList.php');
 		if(!defined('DATE_FORMAT'))
-			define('DATE_FORMAT', 'Y-m-d\TH:i:s\Z');
+			define('DATE_FORMAT', 'Y-m-d H:i:s');
 
 
 		$config = array (
@@ -568,7 +568,7 @@ class wsamazon extends ApplicationComponent {
 						$objP->payment_module=get_class($this);
 						$objP->payment_data='Amazon';
 						$objP->payment_amount=$objOrderTotal->getAmount();
-						$objP->datetime_posted=$order->getPurchaseDate();
+						$objP->datetime_posted= date(DATE_FORMAT, strtotime($order->getPurchaseDate()));
 						if(!$objP->save())
 							Yii::log("Error saving payment ".print_r($objP->getErrors(),true),
 								'error', 'application.'.__CLASS__.".".__FUNCTION__);;

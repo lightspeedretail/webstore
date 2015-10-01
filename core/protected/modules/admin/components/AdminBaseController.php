@@ -279,6 +279,17 @@ class AdminBaseController extends CController
 					}
 				}
 
+                if ($item->options == "INT")
+                {
+		            if ((int)$item->key_value)
+                    {
+                    $valid = true;
+                    } else {
+                    $valid = false;
+                    }
+                }
+
+
 				if ($item->options == "EMAIL")
 				{
 					$valid = $this->validateEmail($item) && $valid;
@@ -296,6 +307,11 @@ class AdminBaseController extends CController
 					{
 						Yii::app()->user->setFlash('error', 'Languages field cannot be empty when language menu is enabled');
 					}
+					elseif ($item->options == "INT")
+					{
+					    Yii::app()->user->setFlash('error', $item->title . ': ' . 'Only numbers are allowed', true);
+					}
+
 					else
 					{
 						$err = $item->getErrors();
@@ -442,7 +458,7 @@ class AdminBaseController extends CController
 			if(isset($_POST[$adminModelName]))
 			{
 				$config = $objModule->GetConfigValues();
-				$newConfig = array_replace_recursive($config, $_POST[$adminModelName]);
+				$newConfig = array_replace($config, $_POST[$adminModelName]);
 				$model->attributes = $newConfig;
 
 				$this->registerOnOff($objModule->id, 'Modules_active', _xls_number_only($_POST['Modules']['active']));

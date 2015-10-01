@@ -9,9 +9,12 @@
                     <div class="span5"><?php
 	                    switch($item->options)
 	                    {
+			                case "INT":
+		                        echo CHtml::activeTextField($item,"[$i]key_value",array('title'=>$item->helper_text, 'id'=>$item->key_name, 'pattern'=>'[0-9]+', 'title'=>'Only numbers are allowed'));
+			                    break;
+
 		                    case null:
 		                    case "NULL":
-			                case "INT":
 		                    case "PINT":
 			                    echo CHtml::activeTextField($item,"[$i]key_value",array('title'=>$item->helper_text, 'id'=>$item->key_name));
 			                    break;

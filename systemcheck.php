@@ -4,6 +4,8 @@ const DEFAULT_UPDATER_URL = 'http://updater.lightspeedretail.com';
 
 function displayHeader()
 {
+    $curver =_ws_version()
+
 	?>
 	<!DOCTYPE html>
 	<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
@@ -26,6 +28,7 @@ function displayHeader()
 			.hero-unit { padding: 20px; }
 			.hero-unit p { font-size: 0.9em; }
 			#stats { font-size: 0.7em; }
+
 		</style>
 		<script src="http://cdn.lightspeedretail.com/bootstrap/js/jquery.min.js"></script>
 		<script src="http://cdn.lightspeedretail.com/bootstrap/js/bootstrap.js"></script>
@@ -39,7 +42,11 @@ function displayHeader()
 		</div>
 	</div>
 	<div class="container">
-
+        <h2>System Check</h2>
+        <table id='header' class='table table-striped'>
+            <tr><td colspan='2'><b>SYSTEM CHECK for <?php echo $curver ?></b></td></tr>
+            <tr><td colspan='2'>The chart below shows the results of the system check and if upgrades have been performed.</td></tr>
+        </table>
 <?php
 }
 
@@ -180,34 +187,87 @@ function xls_check_file_signatures($complete = false)
 
 
 	}
+
+	$mainConfigFile = './config/main.php';
+
+	if (file_exists($mainConfigFile))
+	{
+		$hashFile = md5_file($mainConfigFile);
+		$hashes = explode(',', $fn['./core/protected/config/_main.php']);
+		if (!in_array($hashFile, $hashes))
+		{
+			$checked[$mainConfigFile] = 'modified';
+		}
+	}
+
 	return $checked;
 }
 
-function displaySystemCheckResult($checkenv)
+/**
+ * Get the list of files under custom directory
+ *
+ * @return array
+ */
+function xls_check_custom_files()
 {
-	$warning_text = "<table id='header' class='table table-striped'>";
-	?><h2>System Check</h2><?php
-	$warning_text .= "<tr><td colspan='2'><b>SYSTEM CHECK for " . _ws_version() . "</b></td></tr>";
-	$warning_text .= "<tr><td colspan='2'>The chart below shows the results of the system check and if upgrades have been performed.</td></tr></table>";
+	$result = array();
+	$result['<b>--Custom Files--</b>'] = '';
+	$iter = new RecursiveDirectoryIterator('custom');
+	foreach (new RecursiveIteratorIterator($iter) as $filename => $cursor)
+	{
+		if(is_file($filename) === true)
+		{
+			$result[$filename] = '';
+		}
+	}
+	return $result;
+}
 
-	$warning_text .=  "<table id='checklist' class='table table-striped'>";
+/**
+ * Get the list of custom view files in themes.
+ *
+ * @return array
+ */
+function xls_check_custom_view_files()
+{
+	$arrDefaultViewFiles = array (
+		'brooklyn' => array('themes/brooklyn/views/site/index.php'),
+		'brooklyn2014' => array('themes/brooklyn2014/views/site/index.php')
+	);
 
-	$checkenv = array_merge($checkenv, xls_check_file_signatures());
+	$result = array();
+	$result['<b>--Custom Theme View Files--</b>'] = '';
 
-	$warning_text .= "<tr><td colspan='2'><hr></td></tr>";
+	foreach ($arrDefaultViewFiles as $theme => $files)
+	{
+		$iter = new RecursiveDirectoryIterator('themes/' . $theme . '/views');
+		foreach (new RecursiveIteratorIterator($iter) as $filename=>$cur)
+		{
+			if(is_file($filename) === true &&
+				array_search($filename, $files) === false)
+			{
+				$result[$filename] = '';
+			}
+		}
+	}
+
+	return $result;
+}
+
+function displaySystemCheckResult($check, $tableId)
+{
+	?><?php
+	$warning_text =  "<table id=" . $tableId . " class='table table-striped'>";
+
 	$curver = _ws_version();
-	foreach ($checkenv as $key => $value) {
+	foreach ($check as $key => $value) {
 		$warning_text
 			.= "<tr><td>$key</td><td>" . (($value == "pass" || $value == $curver) ? "$value"
 				: "<font color='#cc0000'><b>$value</b></font>") . "</td></tr>";
 	}
 
-
 	$warning_text .= "</table>";
 	?>
-
-
-
 
 	<div>
 		<?php echo $warning_text; ?>
@@ -275,6 +335,11 @@ function  _ws_version()
 displayHeader();
 
 $checkenv = xls_check_server_environment();
+$checkfilesig = xls_check_file_signatures();
+$checkcustom = xls_check_custom_files();
+$checkcustomview = xls_check_custom_view_files();
 
-displaySystemCheckResult($checkenv);
-
+displaySystemCheckResult($checkenv, 'checklist');
+displaySystemCheckResult($checkfilesig, 'checklist-filesig');
+displaySystemCheckResult($checkcustom, 'check-custom');
+displaySystemCheckResult($checkcustomview, 'checklist-custom-view');

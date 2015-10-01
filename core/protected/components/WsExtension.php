@@ -357,12 +357,9 @@ class WsExtension extends CComponent
 				case 'CUS':
 					if ($this->CheckoutForm->shippingCountryCode == "US")
 					{
-						if ($this->CheckoutForm->shippingStateCode == "AK" || $this->CheckoutForm->shippingStateCode == "HI")
-						{
-							return false;
-						} else {
-							return true;
-						}
+						// These states and territories are outside the continental USA
+						$arrUSStateRestrict = array("AK", "HI", "GU", "PR", "VI");
+						return in_array($this->CheckoutForm->shippingStateCode, $arrUSStateRestrict) === false;
 					}
 					return false;
 					break;

@@ -84,33 +84,47 @@
 					</div>
 				<?php endif; ?>
 
-				<?php if (!_xls_get_conf('DISABLE_CART', false)): ?>
-					<div class="row">
-						<?php if (_xls_get_conf('ENABLE_WISH_LIST'))
-							echo CHtml::tag('div',array(
-								'id'=>'addToWishList',
-								'class'=>'wishlist span5',
-								'onClick'=>CHtml::ajax(array(
-									'url'=>array('wishlist/add'),
-									'data'=>array('id'=>$model->id,
-										'qty'=>'js:$("#'.CHtml::activeId($model,'intQty').'").val()',
-										'size'=>'js:$("#SelectSize option:selected").val()',
-										'color'=>'js:$("#SelectColor option:selected").val()'),
-									'type'=>'POST',
-										'success' => 'function(data) {
-									if (data=="multiple")
-										$("#WishitemShare").dialog("open");
-									 else alert(data); }'
-								)),
-							),CHtml::link(Yii::t('product', 'Add to Wish List'), '#'));
-						?>
+				<div class="row">
+					<?php if (_xls_get_conf('ENABLE_WISH_LIST'))
+						echo CHtml::tag(
+							'div',
+							array(
+								'id' => 'addToWishList',
+								'class' => 'wishlist span5',
+								'onClick' => CHtml::ajax(
+									array(
+										'url' => array('wishlist/add'),
+										'data' => array('id' => $model->id,
+											'qty' => 'js:$("#'.CHtml::activeId($model, 'intQty').'").val()',
+											'size' => 'js:$("#SelectSize option:selected").val()',
+											'color' => 'js:$("#SelectColor option:selected").val()'),
+										'type' => 'POST',
+											'success' => 'function(data) {
+										if (data == "multiple")
+											$("#WishitemShare").dialog("open");
+										else alert(data); }'
+									)
+								),
+							),
+							CHtml::link(
+								Yii::t(
+									'product',
+									'Add to Wish List'
+								),
+								'#'
+							)
+						);
 
-						<div class="span1 intQty" <?php echo (_xls_get_conf('SHOW_QTY_ENTRY') ? '' : 'style="display:none"'); ?>>
-								<?php echo $form->labelEx($model,'intQty'); ?>
-								<?php echo $form->textField($model,'intQty'); ?>
-						</div>
+					?>
 
-						<?= CHtml::tag('div',array(
+					<?php $qtyEntryStyle = (_xls_get_conf('SHOW_QTY_ENTRY') ? '' : 'display:none'); ?>
+					<div class="span1 intQty" style="<?php echo $qtyEntryStyle ?> ">
+							<?php echo $form->labelEx($model, 'intQty'); ?>
+							<?php echo $form->textField($model, 'intQty'); ?>
+					</div>
+
+					<?php if (!_xls_get_conf('DISABLE_CART', false)): ?>
+						<?= CHtml::tag('div', array(
 							'class'=>'addcart span5',
 							'id'=>'addToCart',
 							'onClick'=>CHtml::ajax(array(
@@ -126,7 +140,7 @@
 								'dataType'=>'json',
 								'success' => 'js:function(data){
 									if (data.action=="alert") {
-									  alert(data.errormsg);
+										alert(data.errormsg);
 									} else if (data.action=="success") {
 										animateAddToCart();
 										'.(_xls_get_conf('AFTER_ADD_CART') ?
@@ -134,36 +148,44 @@
 										'$("#shoppingcart").html(data.shoppingcart);').'
 									}}'
 							)),
-						),CHtml::link(Yii::t('product', 'Add to Cart'), '#'));
+						), CHtml::link(
+							Yii::t(
+								'product',
+								'Add to Cart'
+							),
+							'#'
+						)
+						);
 						?>
-					</div>
-
-					<div class="row">
-						<div class="span11">
-							<?php
-							$this->widget('zii.widgets.grid.CGridView', array(
-								'id' => 'autoadd',
-								'dataProvider' => $model->autoadd(),
-								'showTableOnEmpty'=>false,
-								'selectableRows'=>0,
-								'emptyText'=>'',
-								'summaryText' => Yii::t('global',
-									'The following related products will be added to your cart automatically with this purchase:'),
-								'hideHeader'=>false,
-								'columns' => array(
-									'SliderImageTag:html',
-									'TitleTag:html',
-									'Price',
-								),
-							));
-							?>
 						</div>
-					</div>
 
-				<?php endif; ?>
-
-
-
+						<div class="row">
+							<div class="span11">
+								<?php
+								$this->widget(
+									'zii.widgets.grid.CGridView',
+									array(
+										'id' => 'autoadd',
+										'dataProvider' => $model->autoadd(),
+										'showTableOnEmpty' => false,
+										'selectableRows' => 0,
+										'emptyText' => '',
+										'summaryText' => Yii::t(
+											'global',
+											'The following related products will be added to your cart automatically with this purchase:'
+										),
+										'hideHeader' => false,
+										'columns' => array(
+											'SliderImageTag:html',
+											'TitleTag:html',
+											'Price',
+										),
+									)
+								);
+								?>
+							</div>
+					<?php endif; ?>
+				</div>
 			</div>
 		</div><!-- end of top row -->
 
@@ -209,11 +231,9 @@
 				?>
 			</div>
 		</div>
-
 	</div>
 
 <?php $this->endWidget(); ?>
-
 
 <?php
 
@@ -234,4 +254,3 @@ $this->beginWidget('zii.widgets.jui.CJuiDialog',array(
 ));
 echo $this->renderPartial('/wishlist/_addtolist', array('model'=>$WishlistAddForm,'objProduct'=>$model) ,true);
 $this->endWidget('zii.widgets.jui.CJuiDialog');
-

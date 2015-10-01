@@ -1,3 +1,20 @@
+<?php function createEditButton ($model, $item) {
+ echo CHtml::ajaxLink(Yii::t('global','Edit'),array('wishlist/edititem'),
+    array(
+    'type' => 'POST',
+    'dataType'=>'json',
+    'success'=>'js:function(data){
+        $("#WishlistEditForm_qty").val(data.qty);
+        $("#WishlistEditForm_qty_received").val(data.qty_received);
+        $("#WishlistEditForm_priority").val(data.priority);
+        $("#WishlistEditForm_comment").val(data.comment);
+        $("#WishlistEditForm_code").val(data.code);
+        $("#WishlistEditForm_id").val(data.id);
+        $("#WishitemEdit").dialog("open");
+        }',
+    'data'=>array('code'=>$model->gift_code,'id'=>$item->id)
+    ), array('id'=>'editItem'.$item->id, 'class'=>'editwish'));
+} ?>
 
 <div id="wishlistdisplay" class="span12">
 
@@ -32,7 +49,9 @@
         <div class="span3">&nbsp;</div>
         <div class="span2 cart_price"><span class="cartlabel heading light"><?= Yii::t('global','Qty') ?></span></div>
         <div class="span3"><span class="cartlabel heading light"><?= Yii::t('global','Status') ?></span></div>
-        <div class="span2 centeritem"><span class="cartlabel heading light"><?= Yii::t('global','Edit') ?></span></div>
+        <?php if ($model->IsMine): ?>
+            <div class="span2 centeritem"><span class="cartlabel heading light"><?= Yii::t('global','Edit') ?></span></div>
+        <?php endif; ?>
     </div>
 
 	<?php foreach ($model->wishlistItems as $item): ?>
@@ -98,22 +117,9 @@
 			     ?>
 		        </div>
 		        <div class="span2 centeritem">
-			        <?php echo CHtml::ajaxLink(Yii::t('global','Edit'),array('wishlist/edititem'),
-				              array(
-					          'type' => 'POST',
-					          'dataType'=>'json',
-				              'success'=>'js:function(data){
-				                    $("#WishlistEditForm_qty").val(data.qty);
-				                    $("#WishlistEditForm_qty_received").val(data.qty_received);
-				                    $("#WishlistEditForm_priority").val(data.priority);
-				                    $("#WishlistEditForm_comment").val(data.comment);
-				                    $("#WishlistEditForm_code").val(data.code);
-				                    $("#WishlistEditForm_id").val(data.id);
-		                            $("#WishitemEdit").dialog("open");
-									}',
-				              'data'=>array('code'=>$model->gift_code,'id'=>$item->id)
-				              ), array('id'=>'editItem'.$item->id, 'class'=>'editwish'));
-			        ?>
+			        <?php if ($model->IsMine): ?>
+		                <?php createEditButton($model, $item);?>
+		            <?php endif; ?>
 		        </div>
 		    </div>
 		<?php endif; ?>
@@ -180,22 +186,9 @@
                             ?>
                         </div>
                         <div class="link">
-                            <?php echo CHtml::ajaxLink(Yii::t('global','Edit'),array('wishlist/edititem'),
-                                array(
-                                    'type' => 'POST',
-                                    'dataType'=>'json',
-                                    'success'=>'js:function(data){
-				                    $("#WishlistEditForm_qty").val(data.qty);
-				                    $("#WishlistEditForm_qty_received").val(data.qty_received);
-				                    $("#WishlistEditForm_priority").val(data.priority);
-				                    $("#WishlistEditForm_comment").val(data.comment);
-				                    $("#WishlistEditForm_code").val(data.code);
-				                    $("#WishlistEditForm_id").val(data.id);
-		                            $("#WishitemEdit").dialog("open");
-									}',
-                                    'data'=>array('code'=>$model->gift_code,'id'=>$item->id)
-                                ), array('id'=>'editItem'.$item->id, 'class'=>'editwish'));
-                            ?>
+                            <?php if ($model->IsMine): ?>
+		                        <?php createEditButton($model, $item);?>
+		                    <?php endif; ?>
                         </div>
                     </div>
                 </div>

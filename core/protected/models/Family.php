@@ -139,24 +139,78 @@ class Family extends BaseFamily
 
 	}
 
-
+	/**
+	 * Updates the child_count value.
+	 *
+	 * @return void
+	 */
 	public function UpdateChildCount()
 	{
-
 		$criteria = new CDbCriteria();
 		$criteria->alias = 'Product';
 
-		$criteria->condition = 'family_id = :id AND web=1
-			AND (current = 1 AND inventoried = 1 AND inventory_avail > 0)
-			AND (
-				(master_model = 1) OR
-				(master_model = 0 AND parent IS NULL)
-			)';
+		// product is current, marked to be sold on Web Store and in the family
+		$strCondition = 'current = 1 AND web = 1 AND family_id = :id AND ';
+
+		// When make product disappear for out of stock items is set to ON,
+		// then inventoried items must have available inventory
+		if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0) == Product::InventoryMakeDisappear)
+		{
+			$strCondition .= '((inventoried = 1 AND inventory_avail > 0) OR inventoried = 0) AND ';
+		}
+
+		// Child products are not allowed to be displayed without their masters / parents.
+		// So ignore any child products and only consider master products and regular non-matrix products
+		$strCondition .= '(master_model = 1 OR (master_model = 0 AND parent IS NULL))';
+
+		$criteria->condition = $strCondition;
+
 		$criteria->params = array (':id' => $this->id);
 
 		$intCount = Product::model()->count($criteria);
 		$this->child_count = $intCount;
-		$this->save();
+		if (!$this->save())
+		{
+			Yii::log("Error saving family ".$this->label." ". print_r($this->getErrors(), true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+		}
+	}
+
+	/**
+	 * Instead of calling UpdateChildCount iteratively on Active Record
+	 * objects, we use Data Access Objects instead because they use less
+	 * PHP memory and some users may have A LOT of families.
+	 * http://www.yiiframework.com/doc/guide/1.1/en/database.dao
+	 *
+	 * @return void
+	 */
+	public static function updateAllChildCounts()
+	{
+		$arrRows = Yii::app()->db->createCommand('select `id` from `xlsws_family`')->queryAll();
+
+		foreach ($arrRows as $row)
+		{
+			$id = $row['id'];
+			$sql = 'SELECT COUNT(*) FROM `xlsws_product` ';
+
+			// product is current, marked to be sold on Web Store and in the category
+			$sql .= "WHERE current = 1 AND web = 1 AND family_id = $id AND ";
+
+			// Child products are not allowed to be displayed without their masters / parents.
+			// So ignore any child products and only consider master products and regular non-matrix products
+			$sql .= '(master_model = 1 OR (master_model = 0 AND parent IS NULL))';
+
+			// When make product disappear for out of stock items is set to ON,
+			// then inventoried items must have available inventory
+			if (_xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0) == Product::InventoryMakeDisappear)
+			{
+				$sql .= ' AND ((inventoried = 1 AND inventory_avail > 0) OR inventoried = 0)';
+			}
+
+			$count = Yii::app()->db->createCommand($sql)->queryScalar();
+
+			$updateSql = "UPDATE `xlsws_family` SET `child_count` = $count WHERE `id` = $id";
+			_dbx($updateSql);
+		}
 	}
 
 	public function setLabel($str)

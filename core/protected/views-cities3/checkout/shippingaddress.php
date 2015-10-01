@@ -13,7 +13,6 @@ $form = $this->beginWidget(
 	</ol>
 </nav>
 
-
 <h1><?php echo Yii::t('checkout', 'Shipping'); ?></h1>
 <?php
 $shouldDisplayShippingAddresses = $model->shouldDisplayShippingAddresses();
@@ -34,6 +33,21 @@ $this->renderPartial("_storepickup", array(
 	<div class="error-holder"><?= $error ?></div>
 	<ol class="address-blocks">
 		<?php if(count($model->objAddresses) > 0): ?>
+			<?php if (isset($wishlist) && isset($wishlistAddress)): ?>
+				<li class="address-block address-block-pickable">
+					<p class="note">
+						<?= Yii::t('wishlist', 'Wish List: {name}', array('{name}' => $wishlist->registry_name)); ?>
+					</p>
+					<p class="webstore-label">
+						<?= $wishlistAddress->formattedblockcountry; ?>
+					</p>
+					<div class="buttons">
+						<button name="wishlistId" value="<?= $wishlist->id ?>" class="small default">
+							<?= Yii::t('checkout', 'Ship to this address'); ?>
+						</button>
+					</div>
+				</li>
+			<?php endif; ?>
 			<?php foreach ($model->objAddresses as $key => $objAddress): ?>
 				<li class="address-block address-block-pickable">
 					<p class="webstore-label">
@@ -75,7 +89,7 @@ $this->renderPartial("_storepickup", array(
 							?>
 					</p>
 					<div class="buttons">
-						<button name="Address_id" value="<?= $objAddress->id ?>" class="small <?= $key == 0 ? 'default' : ''; ?>">
+						<button name="Address_id" value="<?= $objAddress->id ?>" class="small <?= $key == 0 && !isset($wishlist) ? 'default' : ''; ?>">
 							<?php echo Yii::t('checkout', 'Ship to this address'); ?>
 						</button>
 					</div>

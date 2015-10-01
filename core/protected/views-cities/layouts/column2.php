@@ -9,27 +9,40 @@
 	        ));	?> <!-- breadcrumbs -->
 		<?= $this->renderPartial('/site/_flashmessages',null, true); ?><!-- flash messages -->
 		<div id="viewport" class="row-fluid">
-		    <?php echo $content; ?>
-	    </div>
+			<?php echo $content; ?>
+		</div>
 	</div>
 
 	<div class="span3">
+		<?php if (!_xls_get_conf('DISABLE_CART', false)): ?>
+			<?= $this->renderPartial('/site/_sidecart', null, true); ?>
 
-		<?= $this->renderPartial('/site/_sidecart',null, true); ?>
+			<?php $checkoutUrl = Yii::app()->createUrl('cart/checkout') ?>
+			<div id="shoppingcartcheckout"
+				onclick="window.location.href='<?php echo $checkoutUrl ?>'">
+				<div class="checkoutlink">
+					<?= CHtml::link(Yii::t('cart', 'Checkout'), array('cart/checkout')); ?>
+				</div>
 
-		<div id="shoppingcartcheckout" onclick="window.location.href='<?php echo Yii::app()->createUrl('cart/checkout') ?>'">
-			<div class="checkoutlink"><?php echo CHtml::link(Yii::t('cart','Checkout'),array('cart/checkout')) ?></div>
-			<div class="checkoutarrow"><?php echo CHtml::image(Yii::app()->theme->baseUrl."/css/images/checkoutarrow.png"); ?></div>
+				<div class="checkoutarrow">
+					<?= CHtml::image(Yii::app()->theme->baseUrl."/css/images/checkoutarrow.png"); ?>
+				</div>
+			</div>
+
+			<?php $cartUrl = Yii::app()->createUrl('/cart') ?>
+			<div id="shoppingcarteditcart"
+				 onclick="window.location.href='<?php echo $cartUrl ?>'">
+				<div class="editlink">
+					<?= CHtml::link(Yii::t('cart', 'Edit Cart'), array('/cart')) ?>
+				</div>
+			</div>
+		<?php endif ?>
+
+		<div id="sidebar" class="span12">
+			<?php if(_xls_get_conf('ENABLE_WISH_LIST')): ?>
+				<?= $this->renderPartial('/site/_wishlists', array(), true); ?>
+			<?php endif; ?>
 		</div>
-
-		<div id="shoppingcarteditcart" onclick="window.location.href='<?php echo Yii::app()->createUrl('/cart') ?>'">
-			<div class="editlink"><?php echo CHtml::link(Yii::t('cart','Edit Cart'),array('/cart')) ?></div>
-		</div>
-
-        <div id="sidebar" class="span12">
-	        <?php if(_xls_get_conf('ENABLE_WISH_LIST'))
-				echo $this->renderPartial('/site/_wishlists',array(),true); ?>
-	    </div>
 	</div>
 </div>
 

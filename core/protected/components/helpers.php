@@ -3256,4 +3256,16 @@ function arraySwap($array, $key1, $key2)
 	return $swappedArray;
 }
 
-
+/**
+ * Convert xml-unsafe characters using htmlspecialchars function with XML 1 flag.
+ *
+ * @param string $string
+ *
+ * @return string
+ */
+// @codingStandardsIgnoreStart
+function _xmlSpecialChars($string)
+// @codingStandardsIgnoreEnd
+{
+	return htmlspecialchars($string, ENT_XML1);
+}
