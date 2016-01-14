@@ -16,7 +16,7 @@
 		<div class="text" id="payment">
 			<?= Yii::t('checkout', "Use my shipping address as my billing address") ?>
 			<p class="address-abbr">
-				<?= $model->strShippingAddress; ?>
+				<?= CHtml::encode($model->strShippingAddress); ?>
 			</p>
 		</div>
 	<?php endif; ?>

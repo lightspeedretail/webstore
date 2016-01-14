@@ -1731,9 +1731,10 @@ function _xls_html_storepickupdetails($objCart)
 	$str = '';
 	if ($objCart->shipping->isStorePickup)
 	{
-		$str .= $objCart->shipaddress->first_name . ' ' . $objCart->shipaddress->last_name . '<br>';
-		$str .= $objCart->shipaddress->store_pickup_email ? $objCart->shipaddress->store_pickup_email : $objCart->customer->email;
-		$str .= $objCart->shipaddress->phone ? '<br>' . $objCart->shipaddress->phone : '';
+		$str .= CHtml::encode($objCart->shipaddress->first_name . ' ' . $objCart->shipaddress->last_name) . '<br>';
+		$str .= $objCart->shipaddress->store_pickup_email ?
+			CHtml::encode($objCart->shipaddress->store_pickup_email) : CHtml::encode($objCart->customer->email);
+		$str .= $objCart->shipaddress->phone ? '<br>' . CHtml::encode($objCart->shipaddress->phone) : '';
 	}
 	else
 	{
@@ -1764,11 +1765,11 @@ function _xls_html_shippingaddress($objCart)
 	}
 
 	$str = '';
-	$str .= $objCart->shipaddress->address1 . '<br>';
-	$str .= $objCart->shipaddress->address2 ? $objCart->shipaddress->address2 . '<br>' : '';
-	$str .= $objCart->shipaddress->city . ', ';
+	$str .= CHtml::encode($objCart->shipaddress->address1) . '<br>';
+	$str .= $objCart->shipaddress->address2 ? CHtml::encode($objCart->shipaddress->address2) . '<br>' : '';
+	$str .= CHtml::encode($objCart->shipaddress->city) . ', ';
 	$str .= $objCart->shipaddress->state_id ? State::CodeById($objCart->shipaddress->state_id) . ', ' : '';
-	$str .= $objCart->shipaddress->postal ? $objCart->shipaddress->postal . '<br>' : '';
+	$str .= $objCart->shipaddress->postal ? CHtml::encode($objCart->shipaddress->postal) . '<br>' : '';
 
 	if (_xls_get_conf('DEFAULT_COUNTRY') != $objCart->shipaddress->country_id)
 	{
@@ -1805,11 +1806,11 @@ function _xls_html_billingaddress($objCart)
 	}
 
 	$str = '';
-	$str .= $objCart->billaddress->address1 . '<br>';
-	$str .= $objCart->billaddress->address2 ? $objCart->billaddress->address2 . '<br>' : '';
-	$str .= $objCart->billaddress->city . ', ';
+	$str .= CHtml::encode($objCart->billaddress->address1) . '<br>';
+	$str .= $objCart->billaddress->address2 ? CHtml::encode($objCart->billaddress->address2) . '<br>' : '';
+	$str .= CHtml::encode($objCart->billaddress->city) . ', ';
 	$str .= $objCart->billaddress->state_id ? State::CodeById($objCart->billaddress->state_id) . ', ' : '';
-	$str .= $objCart->billaddress->postal ? $objCart->billaddress->postal . '<br>' : '';
+	$str .= $objCart->billaddress->postal ? CHtml::encode($objCart->billaddress->postal) . '<br>' : '';
 
 	if (_xls_get_conf('DEFAULT_COUNTRY') != $objCart->billaddress->country_id)
 	{
@@ -1818,8 +1819,6 @@ function _xls_html_billingaddress($objCart)
 
 	return $str;
 }
-
-
 
 /**
  * Truncate a string to a given length

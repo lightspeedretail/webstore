@@ -886,7 +886,7 @@ class CheckoutController extends Controller
 				'id' => $this->checkoutForm->intBillingAddress,
 				'name' => 'MultiCheckoutForm[intBillingAddress]',
 				'label' => Yii::t('checkout', 'Use this as my billing address'),
-				'address' => $this->checkoutForm->strBillingAddress
+				'address' => CHtml::encode($this->checkoutForm->strBillingAddress)
 			);
 		}
 
@@ -896,7 +896,7 @@ class CheckoutController extends Controller
 				'id' => 1,
 				'name' => 'MultiCheckoutForm[billingSameAsShipping]',
 				'label' => Yii::t('checkout', 'Use my shipping address as my billing address'),
-				'address' => $this->checkoutForm->strShippingAddress
+				'address' => CHtml::encode($this->checkoutForm->strShippingAddress)
 			);
 		}
 
@@ -918,7 +918,7 @@ class CheckoutController extends Controller
 				$arrCheckbox['id'] = $val;
 				$arrCheckbox['name'] = 'MultiCheckoutForm[intBillingAddress]';
 				$arrCheckbox['label'] = Yii::t('checkout', 'Use this as my billing address');
-				$arrCheckbox['address'] = $this->checkoutForm->strBillingAddress;
+				$arrCheckbox['address'] = CHtml::encode($this->checkoutForm->strBillingAddress);
 			}
 		}
 
@@ -1129,7 +1129,7 @@ class CheckoutController extends Controller
 			'id' => 1,
 			'name' => 'MultiCheckoutForm[billingSameAsShipping]',
 			'label' => Yii::t('checkout', 'Use my shipping address as my billing address'),
-			'address' => $this->checkoutForm->strShippingAddress
+			'address' => CHtml::encode($this->checkoutForm->strShippingAddress)
 		);
 
 		$objCart = Yii::app()->shoppingcart;
@@ -1161,7 +1161,7 @@ class CheckoutController extends Controller
 				$arrCheckbox['id'] = $val;
 				$arrCheckbox['name'] = 'MultiCheckoutForm[intBillingAddress]';
 				$arrCheckbox['label'] = Yii::t('checkout', 'Use this as my billing address');
-				$arrCheckbox['address'] = $this->checkoutForm->strBillingAddress;
+				$arrCheckbox['address'] = CHtml::encode($this->checkoutForm->strBillingAddress);
 
 				$arrAddresses = CustomerAddress::getActiveAddresses();
 

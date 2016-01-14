@@ -15,8 +15,6 @@
 	<meta property="og:image" content="<?= $this->pageImageUrl; ?>"/>
 	<meta property="og:url" content="<?= $this->CanonicalUrl; ?>"/>
 
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 	<meta name="google-site-verification" content="<?= $this->pageGoogleVerify; ?>"/>
 	<?= $this->pageGoogleFonts; ?>
 

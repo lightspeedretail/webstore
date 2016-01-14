@@ -454,11 +454,11 @@ class MultiCheckoutForm extends CheckoutForm
 	public function getHtmlShippingAddress()
 	{
 		$str = '';
-		$str .= $this->shippingAddress1 . '<br>';
-		$str .= $this->shippingAddress2 ? $this->shippingAddress2 . '<br>' : ' ';
-		$str .= $this->shippingCity. ', ';
-		$str .= $this->shippingStateCode ? $this->shippingStateCode . ', ' : '';
-		$str .= $this->shippingPostal ? $this->shippingPostal . '<br>' : '';
+		$str .= CHtml::encode($this->shippingAddress1) . '<br>';
+		$str .= $this->shippingAddress2 ? CHtml::encode($this->shippingAddress2) . '<br>' : ' ';
+		$str .= CHtml::encode($this->shippingCity) . ', ';
+		$str .= $this->shippingStateCode ? CHtml::encode($this->shippingStateCode) . ', ' : '';
+		$str .= $this->shippingPostal ? CHtml::encode($this->shippingPostal) . '<br>' : '';
 
 		// Only show the country if different from the store default.
 		if ($this->shippingCountry != Yii::app()->params['DEFAULT_COUNTRY'])

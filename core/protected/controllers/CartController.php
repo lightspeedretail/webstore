@@ -260,6 +260,7 @@ class CartController extends Controller
 			}
 		}
 
+		$objCart->printed_notes = CHtml::encode($objCart->printed_notes);
 		$this->render('receipt', array('model' => $objCart));
 	}
 

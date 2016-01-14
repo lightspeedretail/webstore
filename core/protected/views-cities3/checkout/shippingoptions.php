@@ -26,7 +26,10 @@
 <div class="address-block address-block-alter">
 	<p class="webstore-label">
 		<?php
-		echo $model->shippingFirstName . ' ' . $model->shippingLastName . '<br>' . $model->getHtmlShippingAddress();
+			echo
+				CHtml::encode($model->shippingFirstName) . ' ' .
+				CHtml::encode($model->shippingLastName) . '<br>' .
+				$model->getHtmlShippingAddress() ;
 		?>
 	</p>
 	<button type="button" class="small" onclick="window.location='<?= Yii::app()->user->IsGuest ? Yii::app()->createUrl('/checkout/shipping/') : Yii::app()->createUrl('/checkout/shippingaddress')?>'">

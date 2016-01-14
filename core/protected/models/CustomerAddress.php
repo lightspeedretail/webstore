@@ -345,52 +345,67 @@ class CustomerAddress extends BaseCustomerAddress
 				return $this->first_name." ".$this->last_name;
 
 			case 'block':
-					return $this->address1.chr(13).
-					$this->address2.chr(13).
-					$this->city.chr(13).
-					$this->state.chr(13).
-					$this->postal.chr(13).
+				return
+					$this->address1 . chr(13) .
+					$this->address2 . chr(13) .
+					$this->city . chr(13) .
+					$this->state . chr(13) .
+					$this->postal . chr(13) .
 					$this->country;
 
 			case 'htmlblock':
 				return
-				$this->address1.'<br>'.
-				(!empty($this->address2) ? $this->address2."<br>" : "").
-				$this->city.' '.
-				$this->state." ".$this->postal.'<br>'.
-				$this->country_name;
+					CHtml::encode($this->address1) . '<br>' .
+					(
+						!empty($this->address2) ?
+						CHtml::encode($this->address2) . '<br>' :
+						''
+					) .
+					CHtml::encode($this->city) . ' ' .
+					CHtml::encode($this->state) . ' ' . CHtml::encode($this->postal) . '<br>' .
+					CHtml::encode($this->country_name);
 
 			case 'shipblock':
-				return $this->first_name." ".$this->last_name.chr(13).
-					$this->address1.chr(13).
-					(!empty($this->company) ? $this->company." ".$this->address2 : $this->address2).chr(13).
-					$this->city.chr(13).
-					$this->state." ".$this->postal.chr(13).
-					$this->country;
+				return CHtml::encode($this->first_name) . ' ' .
+					CHtml::encode($this->last_name) . chr(13) .
+					CHtml::encode($this->address1) . chr(13) .
+					(
+						!empty($this->company) ?
+						CHtml::encode($this->company) . ' ' . CHtml::encode($this->address2) :
+						CHtml::encode($this->address2)
+					) . chr(13) .
+					CHtml::encode($this->city) . chr(13) .
+					CHtml::encode($this->state) . ' ' .
+					CHtml::encode($this->postal) . chr(13) .
+					CHtml::encode($this->country);
 
 			case 'formattedblock':
 				if ($this->customer_id == Yii::app()->user->id)
-					return $this->first_name." ".$this->last_name.'<br>'.
-						$this->address1.'<br>'.
-						(!empty($this->company) ? $this->company."<br>" : "").
-						(!empty($this->address2) ? $this->address2."<br>" : "").
-						$this->city.' '.
-						$this->state." ".$this->postal.'<br>'.
-						(_xls_country() != $this->country ? $this->country : "");
-				else
-					return
-						Yii::t('global','Directly to gift recipient').'<br>'.
-						$this->first_name." ".$this->last_name;
+				{
+					return CHtml::encode($this->first_name) . ' ' .
+						CHtml::encode($this->last_name) . '<br>' .
+						CHtml::encode($this->address1) . '<br>' .
+						(!empty($this->company) ? CHtml::encode($this->company) . '<br>' : '') .
+						(!empty($this->address2) ? CHtml::encode($this->address2) . '<br>' : '') .
+						CHtml::encode($this->city) . ' ' .
+						CHtml::encode($this->state) . ' ' .
+						CHtml::encode($this->postal) . '<br>' .
+						(_xls_country() != $this->country ? CHtml::encode($this->country) : '');
+				}
+
+				return Yii::t('global','Directly to gift recipient') . '<br>' .
+					CHtml::encode($this->first_name) . ' ' . CHtml::encode($this->last_name);
 
 			case 'formattedblockcountry':
 				return
-					$this->first_name." ".$this->last_name.'<br>'.
-					$this->address1.'<br>'.
-					(!empty($this->company) ? $this->company."<br>" : "").
-					(!empty($this->address2) ? $this->address2."<br>" : "").
-					$this->city.' '.
-					$this->state." ".$this->postal.'<br>'.
-					(_xls_country() != $this->country ? $this->country_name : "");
+					CHtml::encode($this->first_name) . ' ' . CHtml::encode($this->last_name) . '<br>' .
+					CHtml::encode($this->address1) . '<br>' .
+					(!empty($this->company) ? CHtml::encode($this->company) . '<br>' : '') .
+					(!empty($this->address2) ? CHtml::encode($this->address2) . '<br>' : '') .
+					CHtml::encode($this->city) . ' ' .
+					CHtml::encode($this->state) . ' ' .
+					CHtml::encode($this->postal) . '<br>' .
+					(_xls_country() != $this->country ? CHtml::encode($this->country_name) : '');
 
 			default:
 				return parent::__get($strName);

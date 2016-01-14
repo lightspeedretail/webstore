@@ -460,6 +460,55 @@ class SoapController extends CController
 		return self::OK;
 	}
 
+	/**
+	 * Removes a category from Web Store along with parent-child relationships.
+	 * Products are released from the category.
+	 * Child categories of the removed category go up one level.
+	 *
+	 * @param string $passkey
+	 * @param int $intCategoryId
+	 * @return string
+	 * @throws SoapFault
+	 * @soap
+	 */
+	public function remove_category_by_id(
+		$passkey,
+		$intCategoryId
+	)
+	{
+		self::check_passkey($passkey);
+
+		// Delete associations between products and the category.
+		ProductCategoryAssn::model()->deleteAllByAttributes(
+			array('category_id' => $intCategoryId)
+		);
+
+		// Update xlsws_category to set the category's children to be
+		// children of the category's parent.
+		// If the category is at the top level,
+		// the children become top level categories.
+		// xlsws_category_addl is a cache for adding new categories.
+		// It has no fk constraints.
+		CategoryAddl::sendCategoriesUpOneLevel($intCategoryId);
+
+		// Delete category from xlsws_category_addl.
+		CategoryAddl::model()->deleteAllByAttributes(
+			array('id' => $intCategoryId)
+		);
+
+		// Update xlsws_category to set the category's children to be
+		// children of the category's parent.
+		// If the category is at the top level,
+		// the children become top level categories.
+		Category::sendCategoriesUpOneLevel($intCategoryId);
+
+		// Delete category from xlsws_category.
+		Category::model()->deleteAllByAttributes(
+			array('id' => $intCategoryId)
+		);
+
+		return self::OK;
+	}
 
 	/**
 	 * Save/Add a category with ID.

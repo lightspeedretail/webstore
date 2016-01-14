@@ -6,7 +6,9 @@
 				<span>
 					<?php
 					if (!$cart->shipping->isStorePickup)
-						echo $cart->shipaddress->first_name . ' ' . $cart->shipaddress->last_name . '<br>' . _xls_html_shippingaddress($cart);
+						echo CHtml::encode($cart->shipaddress->first_name) . ' ' .
+							CHtml::encode($cart->shipaddress->last_name) . '<br>' .
+							_xls_html_shippingaddress($cart);
 					else
 					{
 						$module = Modules::LoadByName('storepickup');

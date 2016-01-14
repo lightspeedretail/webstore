@@ -201,7 +201,7 @@ class WsShippingEstimator extends CWidget
 			'getShippingRatesEndpoint' => Yii::app()->createUrl('cart/getshippingrates'),
 			'setShippingOptionEndpoint' => Yii::app()->createUrl('cart/chooseshippingoption'),
 			'updateOnLoad' => CPropertyValue::ensureBoolean($updateOnLoad),
-			'shippingCity' => $shippingCity,
+			'shippingCity' => CHtml::encode($shippingCity),
 			'shippingState' => $shippingStateCode,
 			'messages' => array()
 		);

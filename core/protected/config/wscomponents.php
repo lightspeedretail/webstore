@@ -89,9 +89,14 @@ function searchForComponents()
 		'sassCompiledPath' => 'webroot.runtime.sass-compiled'
 	);
 
-	$arr['clientScript'] = array(
-		'class' => 'application.extensions.minifyclientscript.MinifyClientScript'
-	);
+
+	if (isset($_SERVER['MINIFY_ASSETS']) === false ||
+		$_SERVER['MINIFY_ASSETS'] === 'True')
+	{
+		$arr['clientScript'] = array(
+			'class' => 'application.extensions.minifyclientscript.MinifyClientScript'
+		);
+	}
 
 	$arr['sprite'] = array(
 		'class' => 'application.extensions.NSprite.NSprite'

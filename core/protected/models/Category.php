@@ -100,14 +100,24 @@ class Category extends BaseCategory
 
 
 
-	public function GetBranchPath()
+	public function GetBranchPath($parsedCategories = array())
 	{
-
 		$results = array();
+
+		if (in_array($this->id, $parsedCategories))
+		{
+			return $results;
+		}
+
+		array_push($parsedCategories, $this->id);
+
 		foreach ($this->categories as $objCategory)
 		{
 			$results[] = $objCategory->id;
-			$results = array_merge($results, $objCategory->GetBranchPath());
+			$results = array_merge(
+				$results,
+				$objCategory->GetBranchPath($parsedCategories)
+			);
 		}
 
 		return $results;
@@ -522,47 +532,81 @@ class Category extends BaseCategory
 	 */
 	public function GetTrail($strType = 'all')
 	{
-		$arrPath=array();
+		$arrPath = array();
 		$objCategory = $this;
 
 		try {
-			if(!is_null($objCategory->parent))
+			if (!is_null($objCategory->parent))
+			{
+				$processedCategoryIds = array();
+				$circularReferenceDetected = false;
+
 				do {
 					if ($objCategory instanceof Category)
+					{
 						array_push(
 							$arrPath,
-							$strType=='names' ?
-							Yii::t('category', $objCategory->label) :
-							array(
-								'key' => $objCategory->id,
-								'tag' => 'c',
-								'name' => Yii::t('category', $objCategory->label),
-								'url' => $objCategory->Link,
-								'link' => $objCategory->Link)
+							$strType == 'names' ?
+								Yii::t('category', $objCategory->label) :
+								array(
+									'key' => $objCategory->id,
+									'tag' => 'c',
+									'name' => Yii::t('category', $objCategory->label),
+									'url' => $objCategory->Link,
+									'link' => $objCategory->Link
+								)
 						);
 
-					$objCategory = $objCategory->parent0;
+						// We store the ID of the category's parent. We later
+						// check to make sure that that ID is not stored in our
+						// array. If it is, it means that we have detected a
+						// circular reference in our categories.
+						array_push($processedCategoryIds, $objCategory->parent);
+						$objCategory = $objCategory->parent0;
 
-				} while (isset($objCategory->parent) && !is_null($objCategory->parent));
+						if (isset($objCategory->parent))
+						{
+							$circularReferenceDetected = in_array(
+								$objCategory->parent,
+								$processedCategoryIds
+							);
+						}
+
+						if ($circularReferenceDetected)
+						{
+							Yii::log(
+								'The category '. $objCategory->label . ' has a circular reference.',
+								'error',
+								'application.'.__CLASS__.".".__FUNCTION__
+							);
+						}
+					}
+				} while (isset($objCategory->parent) && $circularReferenceDetected === false);
+			}
 
 			if ($objCategory instanceof Category)
+			{
 				array_push(
 					$arrPath,
-					$strType=='names' ?
-					Yii::t('category', $objCategory->label) :
-					array(
-						'key' => $objCategory->id,
-						'tag' => 'c',
-						'name' => Yii::t('category', $objCategory->label),
-						'url' => $objCategory->Link,
-						'link' => $objCategory->Link)
+					$strType == 'names' ?
+						Yii::t('category', $objCategory->label) :
+						array(
+							'key' => $objCategory->id,
+							'tag' => 'c',
+							'name' => Yii::t('category', $objCategory->label),
+							'url' => $objCategory->Link,
+							'link' => $objCategory->Link)
 				);
+			}
 		}
-		catch (Exception $objExc) {
-			Yii::log('GetTrail failed, probably uploading categories out of order : ' . $objExc, 'error', 'application.'.__CLASS__.".".__FUNCTION__);
-
+		catch (Exception $objExc)
+		{
+			Yii::log(
+				'GetTrail failed, probably uploading categories out of order : ' . $objExc,
+				'error',
+				'application.'.__CLASS__.".".__FUNCTION__
+			);
 		}
-
 
 		$arrPath = array_reverse($arrPath);
 		return $arrPath;
@@ -578,16 +622,37 @@ class Category extends BaseCategory
 		$arrPath = array();
 		$objCategory = $this;
 
-		if(is_null($objCategory->parent) === false)
+		if (is_null($objCategory->parent) === false)
 		{
+			$processedCategoryIds = array();
+			$circularReferenceDetected = false;
+
 			do {
 				if ($objCategory instanceof Category)
 				{
 					$arrPath[Yii::t('category', $objCategory->label)] = $objCategory->getLinkByType($linkType);
 				}
 
+				array_push($processedCategoryIds, $objCategory->parent);
 				$objCategory = $objCategory->parent0;
-			} while (is_null($objCategory->parent) === false);
+
+				if (isset($objCategory->parent))
+				{
+					$circularReferenceDetected = in_array(
+						$objCategory->parent,
+						$processedCategoryIds
+					);
+				}
+
+				if ($circularReferenceDetected)
+				{
+					Yii::log(
+						'The category '. $objCategory->label . ' has a circular reference.',
+						'error',
+						'application.'.__CLASS__.".".__FUNCTION__
+					);
+				}
+			} while (is_null($objCategory->parent) === false && $circularReferenceDetected === false);
 		}
 
 		if ($objCategory instanceof Category)
@@ -679,8 +744,10 @@ class Category extends BaseCategory
 	 *
 	 * @return void
 	 */
-	public function UpdateChildCount($updateAll = false)
-	{
+	public function UpdateChildCount(
+		$updateAll = false,
+		$parsedCategories = array()
+	) {
 		$criteria = new CDbCriteria();
 		$criteria->alias = 'Product';
 		$criteria->join = 'LEFT JOIN xlsws_product_category_assn as ProductAssn ON ProductAssn.product_id = Product.id';
@@ -712,9 +779,28 @@ class Category extends BaseCategory
 			Yii::log("Error saving category ".$this->label." ". print_r($this->getErrors(), true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 		}
 
-		if (!$updateAll && !$this->IsPrimary() && $this->ParentObject)
+		$shouldCountParentChild = false;
+
+		if (!in_array($this->id, $parsedCategories))
 		{
-			$this->ParentObject->UpdateChildCount();
+			array_push($parsedCategories, $this->id);
+			$shouldCountParentChild = true;
+		}
+		else
+		{
+			Yii::log(
+				"The category ". $this->label. " has a circular reference.",
+				'error',
+				'application.'.__CLASS__.".".__FUNCTION__
+			);
+		}
+
+		if (!$updateAll &&
+			!$this->IsPrimary() &&
+			$this->ParentObject &&
+			$shouldCountParentChild)
+		{
+			$this->ParentObject->UpdateChildCount($updateAll, $parsedCategories);
 		}
 	}
 
@@ -755,6 +841,26 @@ class Category extends BaseCategory
 			$updateSql = "UPDATE `xlsws_category` SET `child_count` = $count WHERE `id` = $id";
 			_dbx($updateSql);
 		}
+	}
+
+	public static function sendCategoriesUpOneLevel($categoryId){
+		// Find row with categoryId
+		$parentRecord = Category::model()->findByPk($categoryId);
+
+		// Get the category's parent column,
+		// in case the category to delete has a parent
+		$parentRecordParentId = $parentRecord->parent;
+
+		$attributes = array('parent' => $parentRecordParentId);
+		$condition = 'parent = :categoryId';
+		$params = array(':categoryId' => $categoryId);
+
+		Category::model()->updateAll(
+			$attributes,
+			$condition,
+			$params
+		);
+
 	}
 
 	public static function LoadByNameParent($strName, $intParentId) {

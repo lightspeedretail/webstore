@@ -51,14 +51,14 @@
 						<span class="address-text">
 							<?=
 								(strtolower($activeAddress->address_label) != 'unlabeled address' ? $activeAddress->address_label . '<br>' : '') .
-								$activeAddress->first_name . ' ' .
-								$activeAddress->last_name . '<br>' .
-								$activeAddress->address1 .'<br>'.
-								(!empty($activeAddress->address2) ? $activeAddress->address2 . '<br>' : '') .
-								$activeAddress->city . ' ' .
-								$activeAddress->state . ' ' .
-								$activeAddress->postal . '<br>' .
-								$activeAddress->country_name;
+								CHtml::encode($activeAddress->first_name) . ' ' .
+								CHtml::encode($activeAddress->last_name) . '<br>' .
+								CHtml::encode($activeAddress->address1) .'<br>'.
+								(!empty($activeAddress->address2) ? CHtml::encode($activeAddress->address2) . '<br>' : '') .
+								CHtml::encode($activeAddress->city) . ' ' .
+								CHtml::encode($activeAddress->state) . ' ' .
+								CHtml::encode($activeAddress->postal) . '<br>' .
+								CHtml::encode($activeAddress->country_name);
 							?>
 						</span>
 						<span class="controls">

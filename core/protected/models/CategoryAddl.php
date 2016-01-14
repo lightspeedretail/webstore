@@ -23,4 +23,24 @@ class CategoryAddl extends BaseCategoryAddl
 		return CategoryAddl::model()->findByAttributes(array('name'=>$strName,'parent',$intParentId));
 
 	}
+
+	public static function sendCategoriesUpOneLevel($categoryId){
+		// Find row with categoryId
+		$parentRecord = CategoryAddl::model()->findByPk($categoryId);
+
+		// Get the category's parent column,
+		// in case the category to delete has a parent
+		$parentRecordParentId = $parentRecord->parent;
+
+		$attributes = array('parent' => $parentRecordParentId);
+		$condition = 'parent = :categoryId';
+		$params = array(':categoryId' => $categoryId);
+
+		CategoryAddl::model()->updateAll(
+			$attributes,
+			$condition,
+			$params
+		);
+	}
+
 }
