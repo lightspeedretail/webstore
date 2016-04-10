@@ -1,4 +1,9 @@
 {
+
+    "require": {
+        "yiisoft/yii": "^1.1",
+        "yiisoft/yii2": "^2.0"
+    },
     "require-dev": {
         "phploc/phploc": "*",
         "phpmd/phpmd" : "@stable",
