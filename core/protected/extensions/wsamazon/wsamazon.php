@@ -350,10 +350,9 @@ class wsamazon extends ApplicationComponent {
 
 	}
 
-
 	public function OnActionListOrders($event)
 	{
-		$checkTime = date("Y-m-d H:i:s",strtotime($this->amazon_check_time));
+		$checkTime = 'now ' . $this->amazon_check_time;
 		$checkDate = date("Y-m-d",strtotime($this->amazon_check_time));
 
 		Yii::log("Checking for new orders since ".$checkTime, 'info', 'application.'.__CLASS__.".".__FUNCTION__);

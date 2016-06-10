@@ -8,14 +8,23 @@
 				'minChars'=>2,
 				'autoFill'=>false,
 				'source'=>'js:function (query, process) {
-					$.get("'.Yii::app()->controller->createUrl("search/live").'",{q: query},function(jsdata) {
-						response = $.parseJSON(jsdata);
-						var data = new Array();
-						data.push("'.Yii::app()->controller->createUrl("search/results").'?q="+query+"|search for "+query);
-						for(var key in response.options)
-							data.push(key+"|"+response.options[key]);
-						process(data);
-					 });}',
+					$.get("'.Yii::app()->controller->createUrl("search/live").'",
+						{q: query},
+						function(jsdata) {
+							query = query
+								.replace(/&/g, "&amp;")
+								.replace(/</g, "&lt;")
+								.replace(/>/g, "&gt;")
+								.replace(/"/g, "&quot;");
+							response = $.parseJSON(jsdata);
+							var data = new Array();
+							data.push("'.Yii::app()->controller->createUrl("search/results").
+										'?q="+query+"|search for "+query);
+							for(var key in response.options)
+								data.push(key+"|"+response.options[key]);
+							process(data);
+					    });
+					}',
 				'onchange'=>'js:function(value) {
                     alert("enter");
 					}',

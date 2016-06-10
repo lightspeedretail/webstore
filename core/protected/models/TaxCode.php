@@ -54,7 +54,7 @@ class TaxCode extends BaseTaxCode
 
 	/**
 	 * Get the default tax code (always appears first sequentially)
-	 * @return $objTax the tax object
+	 * @return int
 	 */
 	public static function getDefaultCode() {
 		$objTax = TaxCode::model()->default_tax()->find();
@@ -63,7 +63,7 @@ class TaxCode extends BaseTaxCode
 
 	/**
 	 * Get the tax code defined as NoTax code (evaluated by all zeroes)
-	 * @return $objTax the tax object
+	 * @return TaxCode the tax object
 	*/
 	public static function GetNoTaxCode() {
 		return TaxCode::model()->tax_total()->notax()->find();

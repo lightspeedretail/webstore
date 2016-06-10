@@ -140,22 +140,25 @@ class WsWebApplication extends CWebApplication
 			}
 		}
 
+		$strCustomUrl = '';
+		$strLightSpeedUrl = '';
+
 		if (Yii::app()->HasCommonSSL)
 		{
 			$strCustomUrl = Yii::app()->params['LIGHTSPEED_HOSTING_CUSTOM_URL'];
 			$strLightSpeedUrl = Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL'];
 		}
-		else
-		{
-			$strCustomUrl = '';
-			$strLightSpeedUrl = '';
-		}
 
-		$httpHost = str_replace(
-			$strLightSpeedUrl,
-			$strCustomUrl,
-			$this->getRequest()->getHostInfo('http')
-		);
+		$httpHost = $this->getRequest()->getHostInfo('http');
+
+		if (!empty($strCustomUrl))
+		{
+			$httpHost = str_replace(
+				$strLightSpeedUrl,
+				$strCustomUrl,
+				$httpHost
+			);
+		}
 
 		// For specific routes, we always use HTTP.
 		if (in_array($route, $this->_arrNeverSecureRoutes))
@@ -166,12 +169,17 @@ class WsWebApplication extends CWebApplication
 
 		elseif (in_array($route, $this->_arrNeedToSecureRoutes) || in_array($strController, $this->_arrNeedToSecureControllers))
 		{
-			//Force a switch to Common SSL
-			$host = str_replace(
-				$strCustomUrl,
-				$strLightSpeedUrl,
-				$this->getRequest()->getHostInfo('https')
-			);
+			$host = $this->getRequest()->getHostInfo('https');
+
+			if (!empty($strCustomUrl))
+			{
+				//Force a switch to Common SSL
+				$host = str_replace(
+					$strCustomUrl,
+					$strLightSpeedUrl,
+					$host
+				);
+			}
 		}
 
 		elseif (in_array($strController, $this->_arrPassthroughControllers))

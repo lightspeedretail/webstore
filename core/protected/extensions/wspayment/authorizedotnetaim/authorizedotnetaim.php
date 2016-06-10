@@ -24,7 +24,7 @@ class authorizedotnetaim extends WsPayment
 		}
 		else
 		{
-			$auth_net_url = "https://secure.authorize.net/gateway/transact.dll";
+			$auth_net_url = "https://secure2.authorize.net/gateway/transact.dll";
 		}
 
 		$authnet_values = array (

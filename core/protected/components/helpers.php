@@ -171,6 +171,11 @@ function _xls_regionalize($str)
 function _xls_url_common_to_custom($url)
 // @codingStandardsIgnoreEnd
 {
+	if (empty(Yii::app()->params['LIGHTSPEED_HOSTING_CUSTOM_URL']))
+	{
+		return $url;
+	}
+
 	return str_replace(
 		"https://".Yii::app()->params['LIGHTSPEED_HOSTING_LIGHTSPEED_URL'],
 		"http://".Yii::app()->params['LIGHTSPEED_HOSTING_CUSTOM_URL'],
