@@ -1,9 +1,9 @@
 <?php
-define ('__SUBDIRECTORY__', preg_replace('/\/?\w+\.php$/', '', $_SERVER['PHP_SELF']));
-define ('__DOCROOT__', substr(dirname(__FILE__), 0, strlen(dirname(__FILE__)) - strlen(__SUBDIRECTORY__)));
-define ('__VIRTUAL_DIRECTORY__', '');
+define('__SUBDIRECTORY__', preg_replace('/\/?\w+\.php$/', '', $_SERVER['PHP_SELF']));
+define('__DOCROOT__', substr(dirname(__FILE__), 0, strlen(dirname(__FILE__)) - strlen(__SUBDIRECTORY__)));
+define('__VIRTUAL_DIRECTORY__', '');
 $strUrl = $_SERVER['SCRIPT_NAME'];
-$strUrl = str_replace("index.php","",$strUrl);
+$strUrl = str_replace("index.php", "", $strUrl);
 ?><style type="text/css">
 	.install_agreement {
 		display: block;
@@ -23,21 +23,19 @@ $strUrl = str_replace("index.php","",$strUrl);
 	<div class="hero-unit">
 		<div class="editinstructions">Your installation is complete!</div>
 			<div id="agreement" class="install_agreement">
-                <?php if (!_xls_get_conf('LIGHTSPEED_CLOUD',0)>0) { ?>
-                    <p>Web Store has been installed. If this is a new installation, then the next step will be to perform an upload from Lightspeed. Please see <a href="http://www.lightspeedretail.com/help/?p=8759">the Web Store setup guide</a> for the next steps.</p>
+                <?php if (_xls_get_conf('LIGHTSPEED_CLOUD', 0) > 0) { ?>
+	                <p>Web Store has been installed. Your tagged products, images and taxes should be uploaded and available.</p>
+	                <p>Please see <a href="https://www.lightspeedhq.com/webhelp/retail/webstore/en/content/home.html" target="_blank">the Web Store setup guide</a> for the next steps.</p>
 
-                    <p><strong>Note: If this is an upgrade of a prior version of Web Store, you will need to edit your shipping modules and turn on what delivery speeds are offered. We recommend checking your active shipping and payment modules in Admin Panel to verify settings were upgraded correctly.</strong></p>
-
-                    <p>To visit your new store, go to <?php echo CHtml::link("my home page",$strUrl); ?></p>
+	                <p><strong>Remember your Admin Panel link will be <?php echo CHtml::link(Yii::app()->createAbsoluteUrl("/admin"), Yii::app()->createAbsoluteUrl("/admin")); ?></p>
+	                <p>To visit your new store, go to <?php echo CHtml::link("my home page", $strUrl); ?>.</strong></p>
                 <?php } else { ?>
-                    <p>Web Store has been installed. Your tagged products, images and taxes should be uploaded and available.</p>
-                    <p>Please see <a href="http://www.lightspeedretail.com/cloud/help/ecommerce">the Web Store setup guide</a> for the next steps.</p>
+	                <p>Web Store has been installed. If this is a new installation, then the next step will be to perform an upload from Lightspeed. Please see <a href="https://www.lightspeedhq.com/webhelp/onsite/webstore/en/content/home.html" target="_blank">the Web Store setup guide</a> for the next steps.</p>
 
-                    <p><strong>Remember your Admin Panel link will be <?php echo CHtml::link(Yii::app()->createAbsoluteUrl("/admin"),Yii::app()->createAbsoluteUrl("/admin")); ?></p>
-	                <p>To visit your new store, go to <?php echo CHtml::link("my home page",$strUrl); ?>.</strong></p>
+	                <p><strong>Note: If this is an upgrade of a prior version of Web Store, you will need to edit your shipping modules and turn on what delivery speeds are offered. We recommend checking your active shipping and payment modules in Admin Panel to verify settings were upgraded correctly.</strong></p>
+
+	                <p>To visit your new store, go to <?php echo CHtml::link("my home page", $strUrl); ?></p>
                 <?php } ?>
 			</div>
-
 	</div>
-
 </div>

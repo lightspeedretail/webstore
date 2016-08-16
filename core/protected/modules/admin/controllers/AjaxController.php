@@ -2,39 +2,33 @@
 
 class AjaxController extends AdminBaseController
 {
-
-
 	public function accessRules()
 	{
 		return array(
 			array('allow',
-				'actions'=>array('promoset','getstates','integrationcategories',
-					'intcatsave','intsubcats','shippingset','updaterestrictions','currentcats'),
-				'roles'=>array('admin'),
+				'actions' => array('promoset', 'getstates', 'integrationcategories', 'intcatsave', 'intsubcats', 'shippingset', 'updaterestrictions', 'currentcats'),
+				'roles' => array('admin'),
 			),
 		);
 	}
 
-
 	public function actionPromoset()
 	{
-
 		$id = Yii::app()->getRequest()->getQuery('id');
 		$objPromoCode = PromoCode::model()->findByPk($id);
-
 
 		$model = new RestrictionForm();
 
 		if ($objPromoCode instanceof PromoCode)
 		{
-			$model->id=$objPromoCode->id;
-			$model->promocode=$objPromoCode->code;
-			$model->exception=$objPromoCode->exception;
+			$model->id = $objPromoCode->id;
+			$model->promocode = $objPromoCode->code;
+			$model->exception = $objPromoCode->exception;
 
-			list($model->categories,$model->families,$model->classes,$model->keywords,$model->codes) = $this->parseRestrictions($objPromoCode->lscodes);
+			list($model->categories, $model->families, $model->classes, $model->keywords, $model->codes) = $this->parseRestrictions($objPromoCode->lscodes);
 		}
-		echo $this->renderPartial("_restrictions",array('model'=>$model),true);
 
+		echo $this->renderPartial("_restrictions", array('model' => $model), true);
 	}
 
 	public function actionShippingset()
@@ -43,12 +37,15 @@ class AjaxController extends AdminBaseController
 		$moduleid = Yii::app()->getRequest()->getQuery('id');
 
 
-		if (empty($moduleid)) return;
+		if (empty($moduleid))
+		{
+			return;
+		}
 
-		$moduleid = str_replace("AdminForm","",$moduleid);
+		$moduleid = str_replace("AdminForm", "", $moduleid);
 
 
-		$objPromoCode = PromoCode::model()->findByAttributes(array('module'=>$moduleid));
+		$objPromoCode = PromoCode::model()->findByAttributes(array('module' => $moduleid));
 
 		$model = new ShippingRestrictionForm();
 
@@ -70,13 +67,13 @@ class AjaxController extends AdminBaseController
 		}
 
 		//Prepopulate if we have them
-		$model->id=$objPromoCode->id;
+		$model->id = $objPromoCode->id;
 		$model->promocode = Yii::app()->getComponent($moduleid)->AdminName;
-		$model->exception=$objPromoCode->exception;
+		$model->exception = $objPromoCode->exception;
 
-		list($model->categories,$model->families,$model->classes,$model->keywords,$model->codes) = $this->parseRestrictions($objPromoCode->lscodes);
+		list($model->categories, $model->families, $model->classes, $model->keywords, $model->codes) = $this->parseRestrictions($objPromoCode->lscodes);
 
-		echo $this->renderPartial("_restrictions",array('model'=>$model),true);
+		echo $this->renderPartial("_restrictions", array('model' => $model), true);
 
 	}
 
@@ -84,16 +81,20 @@ class AjaxController extends AdminBaseController
 	{
 		$blnShipping = false;
 
-		$errormsg = Yii::t('admin',"An error occurred saving Promo Code restrictions. Please check your System Log.");
+		$errormsg = Yii::t('admin', "An error occurred saving Promo Code restrictions. Please check your System Log.");
 
 		$arrRPost = Yii::app()->getRequest()->getPost('RestrictionForm');
 		$arrSPost = Yii::app()->getRequest()->getPost('ShippingRestrictionForm');
 
-		if (isset($arrRPost)) $arrPost = $arrRPost;
+		if (isset($arrRPost))
+		{
+			$arrPost = $arrRPost;
+		}
+
 		if (isset($arrSPost))
 		{
 			$arrPost = $arrSPost;
-			$blnShipping=true;
+			$blnShipping = true;
 		}
 
 		if(isset($arrPost['id']))
@@ -106,42 +107,75 @@ class AjaxController extends AdminBaseController
 				$lscodes = '';
 				unset($arrPost['id']);
 				$arrSections = array(
-					'category:'=>'categories',
-					'family:'=>'families',
-					'keyword:'=>'keywords',
-					'class:'=>'classes',
-					''=>'codes');
-				foreach ($arrSections as $key=>$arrSection)
-					if(isset($arrPost[$arrSection])) {
+					'category:' => 'categories',
+					'family:' => 'families',
+					'keyword:' => 'keywords',
+					'class:' => 'classes',
+					'' => 'codes'
+				);
+				foreach ($arrSections as $key => $arrSection)
+				{
+					if(isset($arrPost[$arrSection]))
+					{
 						foreach($arrPost[$arrSection] as $sectionValue)
+						{
 							$lscodes .= $key.$sectionValue.",";
+						}
+
 						unset($arrPost[$arrSection]);
 					}
+				}
 
 				//Since we're using our Promo Code restriction structure for general shipping restrictions...
 				if ($blnShipping && $objPromoCode->module != "freeshipping")
-					if (strlen($lscodes)>0) $objPromoCode->enabled=1; else $objPromoCode->enabled=0;
+				{
+					if (strlen($lscodes) > 0)
+					{
+						$objPromoCode->enabled = 1;
+					}
+					else
+					{
+						$objPromoCode->enabled = 0;
+					}
+				}
 
-				if (strlen($lscodes)>0) $lscodes = substr($lscodes,0,-1);
-				else $arrPost['exception']=0;
+				if (strlen($lscodes) > 0)
+				{
+					$lscodes = substr($lscodes, 0, -1);
+				}
+				else
+				{
+					$arrPost['exception'] = 0;
+				}
 
-				$arrPost['lscodes'] = $blnShipping==true ? "shipping:,".$lscodes : $lscodes;
+				$arrPost['lscodes'] = $blnShipping == true ? "shipping:,".$lscodes : $lscodes;
 
 				$objPromoCode->attributes = $arrPost;
 				if ($objPromoCode->validate())
 				{
 					if (!$objPromoCode->save())
+					{
 						echo $errormsg;
-					else echo "success";
+					}
+					else
+					{
+						echo "success";
+					}
 				}
 				else {
 					echo $errormsg;
-					Yii::log("Admin panel validation error saving promo code ".print_r($objPromoCode->getErrors(),true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
+					Yii::log("Admin panel validation error saving promo code ".print_r($objPromoCode->getErrors(), true), 'error', 'application.'.__CLASS__.".".__FUNCTION__);
 				}
-			} else echo $errormsg;
-		} else echo $errormsg;
-
-
+			}
+			else
+			{
+				echo $errormsg;
+			}
+		}
+		else
+		{
+			echo $errormsg;
+		}
 	}
 
 
@@ -162,15 +196,16 @@ class AjaxController extends AdminBaseController
 
 		//A model (table) for each service
 		$model = new $strModelName();
-		echo $this->renderPartial("/integration/_integratedcats",
-			array('model'=>$model,
-				'strRequestUrl'=>$strRequestUrl,
-				'strModelName'=>$strModelName,
-				'service'=>$service)
-			,true);
-
-
-
+		echo $this->renderPartial(
+			"/integration/_integratedcats",
+			array(
+				'model' => $model,
+				'strRequestUrl' => $strRequestUrl,
+				'strModelName' => $strModelName,
+				'service' => $service
+			),
+			true
+		);
 	}
 
 	/**
@@ -188,15 +223,16 @@ class AjaxController extends AdminBaseController
 
 
 		//Do we have a setting
-		$objInt = CategoryIntegration::model()->findByAttributes(array('category_id'=>$objCategory->id,'module'=>$service));
+		$objInt = CategoryIntegration::model()->findByAttributes(array('category_id' => $objCategory->id,'module' => $service));
 		if(!($objInt instanceof CategoryIntegration))
 		{
 			//We don't have a category set, but is this a child category and do we have a parent?
-			if ($objCategory->HasParent()) {
+			if ($objCategory->HasParent())
+			{
 				$objInt = CategoryIntegration::model()->findByAttributes(
-					array('category_id'=>$objCategory->parent,'module'=>$service));
+					array('category_id' => $objCategory->parent,'module' => $service)
+				);
 			}
-
 		}
 
 
@@ -204,52 +240,68 @@ class AjaxController extends AdminBaseController
 		{
 			//Look up 3rd party category tree
 			$objPicked = $strModelName::model()->findByPk($objInt->foreign_id);
-			if (!($objPicked instanceof $strModelName)) die();
+			if (!($objPicked instanceof $strModelName))
+			{
+				// ToDo: Really?
+				die();
+			}
 
-			$arrCats=array();
+			$arrCats = array();
 			$arrReturn['producttypes'] = "";
 			$lastId = 0;
-			for ($x=1; $x<=7; $x++) {
-
+			for ($x = 1; $x <= 7; $x++)
+			{
 				$strName = "name".$x;
-				$strNextName = "name".($x+1);
+				$strNextName = "name".($x + 1);
 
 				$objPickedLayer = null;
 
 				if (!is_null($objPicked->$strName))
-					$objPickedLayer = $strModelName::model()->find(array(
-						'condition'=>$strName.'=:thisname AND '.$strNextName.' is null and id> :id',
-						'params'=>array(':thisname'=>$objPicked->$strName, ':id'=>$lastId),
-					));
+				{
+					$objPickedLayer = $strModelName::model()->find(
+						array(
+							'condition' => $strName.'=:thisname AND '.$strNextName.' is null and id> :id',
+							'params' => array(':thisname' => $objPicked->$strName, ':id' => $lastId),
+						)
+					);
+				}
 
 				if ($objPickedLayer instanceof $strModelName)
 				{
 					$arrCats[$x] = $objPickedLayer->id;
-					$lastId =  $objPickedLayer->id;
+					$lastId = $objPickedLayer->id;
 					if (isset($objPickedLayer->product_type))
+					{
 						$arrReturn['producttypes'] = $this->getProductTypes($objPickedLayer->product_type);
+					}
 				}
 			}
 
-			$arrReturn['cats']=$arrCats;
+			$arrReturn['cats'] = $arrCats;
 
 			switch ($service)
 			{
 				case "google":
 					if (!is_null($objInt->extra))
-						$arrExtra = explode(",",$objInt->extra);
-					else $arrExtra = array('Unisex','Adult');
+					{
+						$arrExtra = explode(",", $objInt->extra);
+					}
+					else
+					{
+						$arrExtra = array('Unisex', 'Adult');
+					}
 
-					$arrReturn['gender']=$arrExtra[0];
-					$arrReturn['age']=$arrExtra[1];
+					$arrReturn['gender'] = $arrExtra[0];
+					$arrReturn['age'] = $arrExtra[1];
 					break;
 
 				case "amazon":
 					if (!is_null($objInt->extra))
-						$arrReturn['producttypes']=$objInt->extra;
+					{
+						$arrReturn['producttypes'] = $objInt->extra;
+					}
 					break;
 			}
-
 		}
 
 		echo json_encode($arrReturn);
@@ -267,43 +319,49 @@ class AjaxController extends AdminBaseController
 
 		$objPicked = $strModelName::model()->findByPk($intSelected);
 
-		if ($intLevel<1 || $intLevel>9) $intLevel=1;
-		$strNext = "name".($intLevel+1);
-		$strAfter = "name".($intLevel+2);
+		if ($intLevel < 1 || $intLevel > 9)
+		{
+			$intLevel = 1;
+		}
+
+		$strNext = "name".($intLevel + 1);
+		$strAfter = "name".($intLevel + 2);
 
 		$criteria = new CDbCriteria();
 		$criteria->select = 't.id,t.'.$strNext;
 		$criteria->order = $strNext;
 		$arrParam = array();
-		for($x = 1; $x<=$intLevel; $x++)
+		for($x = 1; $x <= $intLevel; $x++)
 		{
 			$criteria->AddCondition("name".$x."=:name".$x);
 			$strThis = "name".$x;
-			$arrParam[':name'.$x]=$objPicked->$strThis;
+			$arrParam[':name'.$x] = $objPicked->$strThis;
 		}
+
 		$criteria->AddCondition($strNext." is NOT NULL");
 		$criteria->AddCondition($strAfter." is NULL");
-		$criteria->params =$arrParam;
+		$criteria->params = $arrParam;
 
 		$arrReturn['cats'] = CHtml::listData($strModelName::model()->findAll($criteria), 'id', $strNext);
-		if(isset($objPicked->product_type)) $arrReturn['producttypes']=$this->getProductTypes($objPicked->product_type);
+		$arrReturn['producttypes'] = array();
+		if(isset($objPicked->product_type))
+		{
+			$arrReturn['producttypes'] = $this->getProductTypes($objPicked->product_type);
+		}
+
 		echo json_encode($arrReturn);
-
-
 	}
 
 	protected function getProductTypes($strType)
 	{
-
-
 		$arrReturn = array();
 		if(!empty($strType))
 		{
 			$result = file_get_contents(YiiBase::getPathOfAlias('ext.wsamazon.assets.xsd')."/".$strType.".xsd");
 
-			$result = str_replace(' minOccurs="0"','',$result);
+			$result = str_replace(' minOccurs="0"', '', $result);
 			preg_match_all('/<(?:"[^"]*"[\'"]*|\'[^\']*\'[\'"]*|[^\'">])+>/', $result, $matches);
-			if ($key = array_search('<xsd:element name="ProductType">',$matches[0]))
+			if ($key = array_search('<xsd:element name="ProductType">', $matches[0]))
 			{
 				$arrReturn = array();
 
@@ -311,24 +369,24 @@ class AjaxController extends AdminBaseController
 				{
 					$key++;
 
-					if (stripos($matches[0][$key],"element ref") !== false)
+					if (stripos($matches[0][$key], "element ref") !== false)
 					{
-						preg_match('/ref="(.*?)"/',$matches[0][$key],$m);
-						$arrReturn[$m[1]]=$m[1];
+						preg_match('/ref="(.*?)"/', $matches[0][$key], $m);
+						$arrReturn[$m[1]] = $m[1];
 					}
-					if (stripos($matches[0][$key],"</xsd:choice>") !== false)
-						$key=0;
 
-
-
-				} while ($key>0 && $key<count($matches[0]));
+					if (stripos($matches[0][$key], "</xsd:choice>") !== false)
+					{
+						$key = 0;
+					}
+				} while ($key > 0 && $key < count($matches[0]));
 
 				sort($arrReturn);
 
 			}
 		}
-		return $arrReturn;
 
+		return $arrReturn;
 	}
 
 
@@ -340,10 +398,9 @@ class AjaxController extends AdminBaseController
 		$service = Yii::app()->getRequest()->getQuery('service');
 		$strSelected = Yii::app()->getRequest()->getQuery('selected');
 
-		$arrSelected = explode("|",$strSelected);
-		if (count($arrSelected)>1)
+		$arrSelected = explode("|", $strSelected);
+		if (count($arrSelected) > 1)
 		{
-
 			$objCategory = Category::model()->findByPk($arrSelected[0]);
 			if ($objCategory instanceof Category)
 			{
@@ -358,50 +415,76 @@ class AjaxController extends AdminBaseController
 							" does not allow you to pick this category without choosing a further subcategory.");
 						return;
 					}
-					CategoryIntegration::model()->deleteAllByAttributes(array('category_id'=>$objCategory->id,'module'=>$service));
+
+					CategoryIntegration::model()->deleteAllByAttributes(array('category_id' => $objCategory->id, 'module' => $service));
 					$objCI = new CategoryIntegration();
 					$objCI->category_id = $objCategory->id;
-					$objCI->module=$service;
-					$objCI->foreign_id=$objIntCategory->id;
+					$objCI->module = $service;
+					$objCI->foreign_id = $objIntCategory->id;
 					switch (count($arrSelected))
 					{
-						case 4: $objCI->extra = $arrSelected[2].",".$arrSelected[3]; break;
-						case 3: $objCI->extra = $arrSelected[2]; break;
-						case 2: $objCI->extra =  null; break;
+						case 4:
+							$objCI->extra = $arrSelected[2].", ".$arrSelected[3];
+							break;
+
+						case 3:
+							$objCI->extra = $arrSelected[2];
+							break;
+
+						case 2:
+							$objCI->extra = null;
+							break;
 					}
 
 					if (!$objCI->save())
+					{
 						echo json_encode(_xls_convert_errors($objCI->getErrors()));
-					else echo json_encode("success|".$objIntCategory->name0);
-
-				} else echo json_encode(ucfirst($service)." category not found");
-			} else echo json_encode("Web Store category not found");
-		} else echo json_encode("Array error");
-
+					}
+					else
+					{
+						echo json_encode("success|".$objIntCategory->name0);
+					}
+				}
+				else
+				{
+					echo json_encode(ucfirst($service)." category not found");
+				}
+			}
+			else
+			{
+				echo json_encode("Web Store category not found");
+			}
+		}
+		else
+		{
+			echo json_encode("Array error");
+		}
 	}
 
 	public function actionGetstates()
 	{
 		$intCountry = Yii::app()->getRequest()->getPost('country_id');
-		$data = CHtml::listData(State::model()->findAllByAttributes(array('country_id'=>$intCountry,'active'=>1),array('order'=>'sort_order,state')), 'id', 'code');
+		$data = CHtml::listData(State::model()->findAllByAttributes(array('country_id' => $intCountry, 'active' => 1), array('order' => 'sort_order,state')), 'id', 'code');
 		if (empty($data))
-			$data[0]="n/a";
+		{
+			$data[0] = "n/a";
+		}
 
-		foreach($data as $key=>$val)
-			echo CHtml::tag('option', array('value'=>$key),CHtml::encode($val),true);
-
-
+		foreach($data as $key => $val)
+		{
+			echo CHtml::tag('option', array('value' => $key), CHtml::encode($val), true);
+		}
 	}
-
-
 
 	protected function parseRestrictions($strRestrictions)
 	{
-		$arrCode = explode(",",$strRestrictions);
+		$arrCode = explode(",", $strRestrictions);
 
-		if (empty($arrCode)) //no product restrictions
-			return array(array(),array(),array(),array(),array());
-
+		if (empty($arrCode))
+		{
+			//no product restrictions
+			return array(array(), array(), array(), array(), array());
+		}
 
 		$arrCategories = array();
 		$arrFamilies = array();
@@ -409,37 +492,37 @@ class AjaxController extends AdminBaseController
 		$arrKeywords = array();
 		$arrCodes = array();
 
-		foreach($arrCode as $strCode) {
-
-			if (substr($strCode, 0,9) == "category:")
-				$arrCategories[] = trim(substr($strCode,9,255));
-
-			elseif (substr($strCode, 0,6) == "class:")
-				$arrClasses[] = trim(substr($strCode,6,255));
-
-			elseif (substr($strCode, 0,7) == "family:")
-				$arrFamilies[] = trim(substr($strCode,7,255));
-
-			elseif (substr($strCode, 0,8) == "keyword:")
-				$arrKeywords[] = trim(substr($strCode,8,255));
-
+		foreach($arrCode as $strCode)
+		{
+			if (substr($strCode, 0, 9) == "category:")
+			{
+				$arrCategories[] = trim(substr($strCode, 9, 255));
+			}
+			elseif (substr($strCode, 0, 6) == "class:")
+			{
+				$arrClasses[] = trim(substr($strCode, 6, 255));
+			}
+			elseif (substr($strCode, 0, 7) == "family:")
+			{
+				$arrFamilies[] = trim(substr($strCode, 7, 255));
+			}
+			elseif (substr($strCode, 0, 8) == "keyword:")
+			{
+				$arrKeywords[] = trim(substr($strCode, 8, 255));
+			}
 			else
+			{
 				$arrCodes[] = trim($strCode);
-
-
+			}
 		}
 
-		//Yii for some reason requires the order to match the control option order, so since our controls are alphabetical, sort here
+		// Yii for some reason requires the order to match the control option order, so since our controls are alphabetical, sort here.
 		asort($arrCategories);
 		asort($arrFamilies);
 		asort($arrClasses);
 		asort($arrKeywords);
 		asort($arrCodes);
 
-		return array($arrCategories,$arrFamilies,$arrClasses,$arrKeywords,$arrCodes);
-
+		return array($arrCategories, $arrFamilies, $arrClasses, $arrKeywords, $arrCodes);
 	}
-
-
-
 }

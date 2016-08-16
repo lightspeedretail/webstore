@@ -41,7 +41,8 @@
 					var parts = item.split("|");
 					window.location.href=(parts.shift());
 					}',
-			))); ?>
+			)));
+		?>
 	<a href="<?php echo $this->createUrl('/search'); ?>" class='advanced'>+</a>
 	<?php echo CHtml::endForm(); ?>
 

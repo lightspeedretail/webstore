@@ -44,7 +44,6 @@ class SiteController extends Controller
 				{
 					$this->render("/site/index");
 				}
-
 				break;
 
 			case "*products":

@@ -75,7 +75,7 @@ class ProductController extends Controller
 
 		//Set breadcrumbs
 		$this->breadcrumbs = $model->Breadcrumbs;
-		$this->pageImageUrl = $model->SmallImageAbsolute;
+		$this->pageImageUrl = $model->ImageAbsolute;
 
 		$objWishlistAddForm = new WishlistAddForm();
 		$objWishlistAddForm->id = $this->objProduct->id;

@@ -1,7 +1,7 @@
 /* globals $ */
+'use strict';
 
 $(function() {
-    'use strict';
 
     // Should be done with a selector control such as...
     $('.instore-toggle').on('change', function () {
@@ -13,7 +13,7 @@ $(function() {
 
     });
 
-    $('input[name="MultiCheckoutForm[shippingPostal]"]').on('keyup', function () {
+    $('input[name="MultiCheckoutForm[shippingPostal]"]').focusout(function () {
         var country = $('#MultiCheckoutForm_shippingCountryCode :selected').val();
 
         if (this.value.length > 2) {

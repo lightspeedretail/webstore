@@ -1,8 +1,8 @@
 <?php
 set_time_limit(300);
-define('DBARRAY_NUM', MYSQL_NUM);
-define('DBARRAY_ASSOC', MYSQL_ASSOC);
-define('DBARRAY_BOTH', MYSQL_BOTH);
+define('DBARRAY_NUM', MYSQLI_NUM);
+define('DBARRAY_ASSOC', MYSQLI_ASSOC);
+define('DBARRAY_BOTH', MYSQLI_BOTH);
 if (!defined('DB_EXPLAIN'))
 	define('DB_EXPLAIN', false);
 if (!defined('DB_QUERIES'))
@@ -447,6 +447,7 @@ function displayFormTwo()
 			pinttimer=self.setInterval(function(){runInstall(key)},50);
 			runInstall(key);
 		}
+
 		function runInstall(key)
 		{
 
@@ -558,6 +559,7 @@ function displayFormTwo()
 				document.getElementById('quip').innerHTML = "Error, install halted.";
 
 			}
+
 			if (prunning>0) { prunning++; return; }
 			prunning=1;
 			var postvar = "online="+ online + "&total=" + total +
@@ -593,22 +595,24 @@ function displayFormTwo()
 						if (online==obj.total) {
 							clearInterval(pinttimer);
 							window.location.href = window.location.href.replace("/install.php", "/admin/license");
-						}else {
+						}
+						else
+						{
 							prunning=0;
 						}
-
 					}
-					else {
+					else
+					{
 						clearInterval(pinttimer);
 						alert(obj.result);
 					}
 				}
-				else {
+				else
+				{
 					clearInterval(pinttimer);
 					alert(data);
 				}
 			});
-
 		}
 
 		startInstall();
@@ -636,8 +640,10 @@ function displayHeader()
 				z-index: 999;
 			}
 			.header-inner {margin: 0 auto; width: 960px; }
-			.header-new .logo { float: left; padding: 24px 0 0 10px; }
-			.header-new .welcome { float: left; padding: 30px 20px 20px 10px; margin-left: 470px; font-size: 28px; }
+			.header-new .logo { float: left; padding: 24px 0 0 10px; width: 15%; }
+			.header-inner .logo a { width: 30px; height: 37px; }
+			.header-inner .logo a path.logo-flame { fill: #ed5153; }
+			.header-new .welcome { float: right; padding: 30px 20px 20px 10px; font-size: 28px; }
 			.table { width: 700px; margin: 0 auto; }
 			.hero-unit { padding: 20px; }
 			.hero-unit p { font-size: 0.9em; }
@@ -651,12 +657,31 @@ function displayHeader()
 
 	<div class="header-new">
 		<div class="header-inner">
-			<div class="logo"><img src="http://www.lightspeedretail.com/wp-content/themes/lightspeed/images/logo-mini.png"></div>
+			<div class="logo">
+				<a class="navigation-secondary-logo" href="https://www.lightspeedhq.com/" rel="home" title="Lightspeed POS">
+                    <svg class="logo-primary" viewBox="0 0 475 110" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <path class="logo-flame" d="M36.9,0.9 L41.9,9.6 C42.9,11.4 42.9,13.6 41.9,15.4 L12.1,67.1 L26.2,91.5 C28.4,95.3 32.5,97.7 36.9,97.7 C41.3,97.7 45.4,95.3 47.6,91.5 L61.7,67.1 L58,60.5 L42,88.2 C41,90 39,91.1 37,91.1 C34.9,91.1 33,90 32,88.2 L19.7,67.1 L47.4,19.1 L52.4,27.8 C53.4,29.6 53.4,31.8 52.4,33.6 L33.1,67.1 L36.9,73.7 L57.9,37.3 L71.7,61.2 C73.8,64.9 73.8,69.4 71.7,73.1 L57.7,97.4 C55.6,101.1 48.9,109.4 36.9,109.4 C24.9,109.4 18.3,101.1 16.1,97.4 L2.1,73.1 C-8.43769499e-15,69.4 -8.43769499e-15,64.9 2.1,61.2 L36.9,0.9"></path>
+                <g class="logo-text" transform="translate(102.000000, 25.000000)">
+                    <rect x="0" y="1.8" width="9.7" height="57.3"></rect>
+                    <circle cx="22.7" cy="6.6" r="5.7"></circle>
+                    <rect x="17.8" y="19.3" width="9.8" height="39.8"></rect>
+                    <path d="M53.3,18.3 C42.2,18.3 33.2,26.1 33.2,38.5 C33.2,50.9 41,58.5 53.4,58.5 C58.3,58.5 63.5,61 63.5,66.5 C63.5,72 59.1,75.1 53.4,75.1 C47.7,75.1 43,71.7 43,66.5 L33.2,66.5 C33.2,77.2 41.8,84.3 53.4,84.3 C64.9,84.3 73.3,77.5 73.3,66.5 C73.3,61.4 71.7,56.6 65.1,53.3 C71.6,50.3 73.5,43.4 73.5,38.4 C73.5,26.1 64.4,18.3 53.3,18.3 L53.3,18.3 Z M53.4,50.4 C47.7,50.4 43,45.5 43,38.5 C43,31.6 47.7,26.5 53.4,26.5 C59.1,26.5 63.7,31.7 63.7,38.5 C63.7,45.4 59,50.4 53.4,50.4 L53.4,50.4 Z"></path>
+                    <path d="M101.9,18.3 C97.4,18.3 93.1,19.7 89.5,24.2 L89.5,1.7 L79.7,1.7 L79.7,59 L89.5,59 L89.5,38.8 C89.5,32.9 93.5,28 99.3,28 C104.5,28 108.3,31.1 108.3,38.3 L108.3,59 L118.1,59 L118.1,37.6 C118.2,25.9 113.2,18.3 101.9,18.3 L101.9,18.3 Z"></path>
+                    <path d="M142,52.3 C140.8,52.3 139.8,51.9 139.2,51.1 C138.6,50.3 138.3,49.1 138.3,47.3 L138.3,27.7 L146.2,27.7 L147.1,19.2 L138.4,19.2 L138.4,8.3 L128.5,9.4 L128.5,19.3 L121,19.3 L121,27.8 L128.5,27.8 L128.5,47.6 C128.5,51.7 129.5,54.8 131.4,56.9 C133.3,59 136.2,60.1 139.9,60.1 C141.6,60.1 143.2,59.9 144.9,59.4 C146.6,58.9 148.1,58.2 149.4,57.3 L146,51 C144.7,51.9 143.3,52.3 142,52.3 L142,52.3 Z"></path>
+                    <path d="M182.3,37.7 C178.3,35.2 173.6,34.9 169,34.6 C166.3,34.4 162.2,33.8 162.2,30.3 C162.2,27.8 164.8,26.4 169.5,26.4 C173.3,26.4 176.6,27.3 179.4,29.9 L184.9,23.5 C180.3,19.5 175.6,18.3 169.3,18.3 C162,18.3 152.4,21.5 152.4,30.7 C152.4,34.5 154.4,38 157.7,40 C161.4,42.3 166.2,42.6 170.3,43.1 C173.1,43.4 177.7,44.1 176.9,48 C176.4,50.7 173.1,51.5 170.8,51.6 C168.3,51.7 165.8,51.5 163.3,50.9 C160.7,50.2 158.6,49 156.3,47.5 L151.3,53.8 C151.6,54 151.9,54.3 151.9,54.3 C158.3,59.6 167.2,61.3 175.3,59.5 C181.4,58.1 186.6,53.7 186.6,47.1 C186.8,43.4 185.6,39.7 182.3,37.7 L182.3,37.7 Z"></path>
+                    <path d="M214.6,18.3 C210.1,18.3 204.8,20.2 201.7,24.6 L201.4,19.2 L191.9,19.2 L191.9,76.5 L201.7,75.4 L201.7,54.4 C204.5,58.7 210.6,60.1 214.8,60.1 C227.5,60.1 234.9,50.6 234.9,39.1 C234.9,27.4 226.8,18.3 214.6,18.3 L214.6,18.3 Z M213.8,51.6 C207.1,51.6 202.6,45.5 202.6,39.3 C202.6,33.1 206.8,26.5 213.8,26.5 C220.9,26.5 225,33.2 225,39.3 C225.1,45.5 220.5,51.6 213.8,51.6 L213.8,51.6 Z"></path>
+                    <path d="M247.7,42.7 C248.8,47.4 253.1,51.5 260.1,51.5 C263.7,51.5 268.5,49.7 270.8,47.4 L277.1,53.6 C272.9,57.9 266,60 260,60 C247.6,60 238.6,51.8 238.6,39.1 C238.6,27.1 247.9,18.3 259.3,18.3 C271.3,18.3 281.3,26.5 280.3,42.7 L247.7,42.7 L247.7,42.7 Z M270.8,35.2 C269.7,30.5 265,26.4 259.3,26.4 C254,26.4 249.1,30 247.7,35.2 L270.8,35.2 L270.8,35.2 Z"></path>
+                    <path d="M293.1,42.7 C294.2,47.4 298.5,51.5 305.5,51.5 C309.1,51.5 313.9,49.7 316.2,47.4 L322.5,53.6 C318.3,57.9 311.4,60 305.4,60 C293,60 284,51.8 284,39.1 C284,27.1 293.3,18.3 304.7,18.3 C316.7,18.3 326.7,26.5 325.7,42.7 L293.1,42.7 L293.1,42.7 Z M316.3,35.2 C315.2,30.5 310.5,26.4 304.8,26.4 C299.5,26.4 294.6,30 293.2,35.2 L316.3,35.2 L316.3,35.2 Z"></path>
+                    <path d="M349.4,60.1 C353.9,60.1 359.2,58.2 362.3,53.8 L362.6,59.1 L372.1,59.1 L372.1,1.8 L362.3,1.8 L362.3,24 C359.5,19.7 353.3,18.4 349.1,18.4 C336.4,18.4 329.1,27.8 329.1,39.4 C329.1,51 337.2,60.1 349.4,60.1 L349.4,60.1 Z M350.1,26.8 C356.8,26.8 361.3,32.9 361.3,39.1 C361.3,45.3 357.1,51.9 350.1,51.9 C343,51.9 338.9,45.2 338.9,39.1 C338.9,32.9 343.4,26.8 350.1,26.8 L350.1,26.8 Z"></path>
+                </g>
+            </svg>
+                </a>
+			</div>
+			<div class="welcome">Web Store Installation</div>
 		</div>
-		<div class="welcome">Web Store Installation</div>
 	</div>
 	<div class="container">
-<?php
+	<?php
 }
 
 function displayFooter()
@@ -677,7 +702,7 @@ function displayFooter()
 	</script>
 	</body>
 	</html>
-<?php
+	<?php
 }
 
 

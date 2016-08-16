@@ -326,33 +326,37 @@ class AdminBaseController extends CController
 			{
 				foreach($model as $i => $item)
 				{
-					$item->attributes = $_POST['Configuration'][$i];
-					if ($item->options == "PASSWORD")
+					if (array_key_exists($i, $_POST['Configuration']))
 					{
-						$item->key_value = _xls_encrypt($item->key_value);
-					}
+						$item->attributes = $_POST['Configuration'][$i];
 
-					if ($item->save() === false)
-					{
-						Yii::app()->user->setFlash('error', print_r($item->getErrors(), true));
-					}
-					else
-					{
-						Yii::app()->user->setFlash(
-							'success',
-							Yii::t(
-								'admin',
-								'Configuration updated on {time}.',
-								array('{time}' => date('d F, Y  h:i:sa')
+						if ($item->options == "PASSWORD")
+						{
+							$item->key_value = _xls_encrypt($item->key_value);
+						}
+
+						if ($item->save() === false)
+						{
+							Yii::app()->user->setFlash('error', print_r($item->getErrors(), true));
+						}
+						else
+						{
+							Yii::app()->user->setFlash(
+								'success',
+								Yii::t(
+									'admin',
+									'Configuration updated on {time}.',
+									array('{time}' => date('d F, Y  h:i:sa'))
 								)
-							)
-						);
-						$item->postConfigurationChange();
-					}
+							);
 
-					if($item->key_name == 'EMAIL_TEST' && $item->key_value == 1)
-					{
-						$this->sendEmailTest();
+							$item->postConfigurationChange();
+						}
+
+						if($item->key_name == 'EMAIL_TEST' && $item->key_value == 1)
+						{
+							$this->sendEmailTest();
+						}
 					}
 				}
 			}

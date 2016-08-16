@@ -655,6 +655,7 @@ class Product extends BaseProduct
 	 */
 	public static function buildRequestUrl($id, $title, $code)
 	{
+		$title = str_replace(["\n","\r"], ' ', $title); // remove new lines and carriage returns
 		$strRequest = _xls_parse_language($title);
 		if (Yii::app()->params['SEO_URL_CODES'])
 		{
@@ -1786,6 +1787,21 @@ class Product extends BaseProduct
 	{
 		return CHtml::image(Images::GetLink($this->image_id,ImagesType::slider));
 
+	}
+
+	public function __set($strName, $mixValue)
+	{
+		switch (strtolower($strName))
+		{
+			case 'title':
+				$mixValue = str_replace(["\n","\r"], ' ', $mixValue);
+				break;
+
+			default:
+				break;
+		}
+
+		parent::__set($strName, $mixValue);
 	}
 
 

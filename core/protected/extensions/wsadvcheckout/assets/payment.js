@@ -1,6 +1,7 @@
 /* globals $ */
+'use strict';
+
 $(function() {
-    'use strict';
 
     // on browser refresh or in the event of an error, display the
     // subform input fields for the selected payment provider
@@ -14,7 +15,7 @@ $(function() {
         $('.subform.' + classProvider +' input').fadeIn();
     });
 
-    $('input[name="MultiCheckoutForm[billingPostal]"]').on('keyup', function () {
+    $('input[name="MultiCheckoutForm[billingPostal]"]').focusout(function () {
         var country = $('#MultiCheckoutForm_billingCountryCode :selected').val();
 
         if (this.value.length > 2) {

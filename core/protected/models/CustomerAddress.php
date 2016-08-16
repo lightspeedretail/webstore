@@ -61,14 +61,20 @@ class CustomerAddress extends BaseCustomerAddress
 		return array_merge(
 			parent::attributeLabels(),
 			array(
-				'address_label' => 'Address Label (Home, Work)',
-				'residential' => 'This is a residential address',
-				'active' => 'Show this address on checkout',
-				'address1' => 'Address',
-				'address2' => 'Address Line 2 (Apt/Unit)',
-				'makeDefaultBilling' => 'Default billing address',
-				'makeDefaultShipping' => 'Default shipping address',
-				'postal' => 'Postal / Zip Code',
+				'first_name' => Yii::t('profile', 'First Name'),
+				'last_name' => Yii::t('profile', 'Last Name'),
+				'city' => Yii::t('forms', 'City'),
+				'country_id' => Yii::t('forms', 'Country'),
+				'state_id' => Yii::t('forms', 'State/Province'),
+				'phone' => Yii::t('forms', 'Phone'),
+				'address_label' => Yii::t('profile', 'Address Label (Home, Work)'),
+				'residential' => Yii::t('profile', 'This is a residential address'),
+				'active' => Yii::t('profile', 'Show this address on checkout'),
+				'address1' => Yii::t('profile', 'Address'),
+				'address2' => Yii::t('profile', 'Address Line 2 (Apt/Unit)'),
+				'makeDefaultBilling' => Yii::t('profile', 'Default billing address'),
+				'makeDefaultShipping' => Yii::t('profile', 'Default shipping address'),
+				'postal' => Yii::t('profile', 'Postal / Zip Code'),
 			)
 		);
 	}

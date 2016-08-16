@@ -50,10 +50,15 @@ function parsePostal(country, postal)
  */
 function zippothatnow(options)
 {
+    var url = 'https://api.zippopotam.us/';
     options.postal = parsePostal(options.country, options.postal);
 
+    if (options.country === 'CA') {
+        url = '/checkout/statelookup/';
+    }
+
     $.ajax({
-        url: 'https://api.zippopotam.us/' + options.country + '/' + options.postal,
+        url:  url + options.country + '/' + options.postal,
         cache: false,
         dataType: 'json',
         async: options.async || false

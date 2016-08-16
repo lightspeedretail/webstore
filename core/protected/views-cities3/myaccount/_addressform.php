@@ -11,12 +11,15 @@
 				<label class="placeheld" for="recipient-firstname">
 					<?= Yii::t('profile', 'First Name'); ?>
 				</label>
-				<input type="text" name="first_name" placeholder="First Name" id="recipient-firstname"
-					   class="no-right-border" required="" autofocus="">
+				<input type="text" name="first_name" placeholder="<?= Yii::t('profile', 'First Name'); ?>"
+					id="recipient-firstname" class="no-right-border" required="" autofocus="">
 			</li>
 			<li class="field-container field-container-split field-container-split-latter">
-				<label class="placeheld" for="recipient-lastname"><?= Yii::t('profile', 'Last Name'); ?></label>
-				<input placeholder="Last Name" required="required" name="last_name" id="recipient-lastname" type="text">
+				<label class="placeheld" for="recipient-lastname">
+					<?= Yii::t('profile', 'Last Name'); ?>
+				</label>
+				<input placeholder="<?= Yii::t('profile', 'Last Name'); ?>" required="required" name="last_name"
+					id="recipient-lastname" type="text">
 			</li>
 			<li class="field-container-toggle">
 				<a href="#" id="recipient-company-toggle">
@@ -24,8 +27,11 @@
 				</a>
 			</li>
 			<li class="field-container company-container" style="display: none;">
-				<label class="placeheld" for="recipient-company"><?= Yii::t('profile', 'Company'); ?></label>
-				<input type="text" name="company" placeholder="Company" class="no-top-border" id="recipient-company">
+				<label class="placeheld" for="recipient-company">
+					<?= Yii::t('profile', 'Company'); ?>
+				</label>
+				<input type="text" name="company" placeholder="<?= Yii::t('profile', 'Company'); ?>"
+					class="no-top-border" id="recipient-company">
 			</li>
 		</ol>
 
@@ -34,38 +40,48 @@
 				<label class="checkbox" for="recipient-residential">
 					<input type="checkbox" name="residential"
 						   id="recipient-residential" class="label-toggle">
-					<?= Yii::t('profile', 'This is a residential address'); ?>
+					<?= Yii::t('checkout', 'This is a residential address'); ?>
 				</label>
 			</li>
 		</ol>
 
 		<ol class="field-containers-small field-container-gap">
 			<li class="field-container field-container-nobottomborder">
-				<label class="placeheld" for="recipient-address1"><?= Yii::t('profile', 'Address 1'); ?></label>
-				<input type="text" name="address1" placeholder="Mailing address" id="recipient-address1"
-					   class="no-bottom-border" required="">
+				<label class="placeheld" for="recipient-address1">
+					<?= Yii::t('profile', 'Mailing Address'); ?>
+				</label>
+				<input type="text" name="address1" placeholder="<?= Yii::t('profile', 'Mailing Address'); ?>"
+					id="recipient-address1" class="no-bottom-border" required="">
 			</li>
 			<li class="field-container">
-				<label class="placeheld" for="recipient-address2"><?= Yii::t('profile', 'Address 2'); ?></label>
-				<input type="text" name="address2" placeholder="Suite, Floor, etc." id="recipient-address2">
+				<label class="placeheld" for="recipient-address2">
+					<?= Yii::t('profile', 'Suite, Floor, etc.'); ?>
+				</label>
+				<input type="text" name="address2" placeholder="<?= Yii::t('profile', 'Suite, Floor, etc.'); ?>"
+					id="recipient-address2">
 			</li>
 			<li class="fieldgroup city-fieldgroup">
 				<ol>
 					<li class="field-container">
-						<label class="placeheld" for="recipient-zip"><?= Yii::t('profile', 'Zip'); ?></label>
-						<input type="text" name="postal" size="6" placeholder="Zip" id="recipient-zip"
-							   required="">
+						<label class="placeheld" for="recipient-zip">
+							<?= Yii::t('profile', 'Zip'); ?>
+						</label>
+						<input type="text" name="postal" size="6" placeholder="<?= Yii::t('forms', 'Zip'); ?>"
+							id="recipient-zip" required="">
 					</li>
 					<li class="field-container">
-						<label class="placeheld" for="recipient-city"><?= Yii::t('profile', 'City'); ?></label>
-						<input type="text" name="city" size="26" placeholder="City" id="recipient-city"
-							   required="">
+						<label class="placeheld" for="recipient-city">
+							<?= Yii::t('forms', 'City'); ?>
+						</label>
+						<input type="text" name="city" size="26" placeholder="<?= Yii::t('forms', 'City'); ?>"
+							id="recipient-city" required="">
 					</li>
 					<li class="field-container">
-						<label class="placeheld"
-							   for="recipient-state-code"><?= Yii::t('profile', 'State / Province'); ?></label>
-						<input type="text" size="4" placeholder="State" id="recipient-state-code"
-							   required="">
+						<label class="placeheld" for="recipient-state-code">
+							<?= Yii::t('profile', 'State'); ?>
+						</label>
+						<input type="text" size="4" placeholder="<?= Yii::t('forms', 'State/Province'); ?>"
+							id="recipient-state-code" required="">
 						<input id="recipient-state-id" type="hidden" name="state_id">
 					</li>
 				</ol>
@@ -88,10 +104,12 @@
 		<ol class="select-options">
 			<li>
 				<label class="checkbox">
-					<input type="checkbox" name="makeDefaultShipping" id="make-default-shipping" class="label-toggle"><?= Yii::t('profile', ' Default Shipping'); ?>
+					<input type="checkbox" name="makeDefaultShipping" id="make-default-shipping" class="label-toggle">
+						<?= Yii::t('profile', ' Default Shipping'); ?>
 				</label>
 				<label class="checkbox">
-					<input type="checkbox" name="makeDefaultBilling" id="make-default-billing" class="label-toggle"><?= Yii::t('profile', 'Default Billing'); ?>
+					<input type="checkbox" name="makeDefaultBilling" id="make-default-billing" class="label-toggle">
+						<?= Yii::t('profile', 'Default Billing'); ?>
 				</label>
 			</li>
 		</ol>

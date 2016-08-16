@@ -1732,6 +1732,10 @@ class CheckoutController extends Controller
 			}
 		}
 
+		// trigger email campaign
+		$objEvent = new CEventCustomer('CheckoutController', 'onUpdateCustomer', $customer);
+		_xls_raise_events('CEventCustomer', $objEvent);
+
 		$this->layout = '/layouts/checkout-confirmation';
 		$this->render(
 			'thankyou',
@@ -2051,6 +2055,96 @@ class CheckoutController extends Controller
 		}
 
 		return $url;
+	}
+
+
+	/**
+	 * Return the right province based on the end-user defined postal code.
+	 * Only meant to handle Canada, because of consistent Zippo shenanigans
+	 * with Canada.
+	 *
+	 * @return bool
+	 */
+	public function actionStateLookup()
+	{
+		if (Yii::app()->request->isAjaxRequest)
+		{
+			$country = Yii::app()->getRequest()->getQuery('country');
+			$postal = strtolower(Yii::app()->getRequest()->getQuery('postal'));
+
+			if ($country !== 'CA')
+			{
+				return false;
+			}
+
+			$abbr = null;
+			$result = [
+				'places' => [
+					['state abbreviation' => $abbr]
+				]
+			];
+
+			switch ($postal[0])
+			{
+				case 'a':
+					$abbr = 'NL';
+					break;
+				case 'b':
+					$abbr = 'NS';
+					break;
+				case 'c':
+					$abbr = 'PE';
+					break;
+				case 'e':
+					$abbr = 'NB';
+					break;
+				case 'g':
+				case 'h':
+				case 'j':
+					$abbr = 'QC';
+					break;
+				case 'k':
+				case 'l':
+				case 'm':
+				case 'n':
+				case 'p':
+					$abbr = 'ON';
+					break;
+				case 'r':
+					$abbr = 'MB';
+					break;
+				case 's':
+					$abbr = 'SK';
+					break;
+				case 't':
+					$abbr = 'AB';
+					break;
+				case 'v':
+					$abbr = 'BC';
+					break;
+				case 'y':
+					$abbr = 'YT';
+					break;
+				case 'x':
+					if ($postal[1] === 0 &&
+						($postal[2] === 'a' || $postal[2] === 'b' || $postal[2] === 'c'))
+					{
+						$abbr = 'NU';
+					}
+					else
+					{
+						$abbr = 'NT';
+					}
+					break;
+			}
+
+			$result['places'][0]['state abbreviation'] = $abbr;
+
+			echo json_encode($result);
+			return true;
+		}
+
+		return false;
 	}
 }
 

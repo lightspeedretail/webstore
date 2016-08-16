@@ -25,11 +25,11 @@ class usps extends WsShipping
 		'First-Class Mail Large Envelope',
 		'First-Class Mail Letter',
 		'First-Class Mail Parcel',
-		//'First-Class Mail Postcards',
+//		'First-Class Mail Postcards',
 		'Priority Mail{0}',
-		//'Priority Mail Express{0} Hold For Pickup',
+//		'Priority Mail Express{0} Hold For Pickup',
 		'Priority Mail Express{0}',
-		'Standard Post',
+		'USPS Retail Ground',
 		'Media Mail',
 		'Library Mail' => 'Library Mail',
 		'Priority Mail Express{0} Flat Rate Envelope',
@@ -39,39 +39,39 @@ class usps extends WsShipping
 		'Priority Mail{0} Large Flat Rate Box',
 		'Priority Mail Express{0} Sunday/Holiday Delivery',
 		'Priority Mail Express{0} Sunday/Holiday Delivery Flat Rate Envelope',
-		//'Priority Mail Express{0} Flat Rate Envelope Hold For Pickup',
+//		'Priority Mail Express{0} Flat Rate Envelope Hold For Pickup',
 		'Priority Mail{0} Small Flat Rate Box',
 		'Priority Mail{0} Padded Flat Rate Envelope',
 		'Priority Mail Express{0} Legal Flat Rate Envelope',
-		//'Priority Mail Express{0} Legal Flat Rate Envelope Hold For Pickup',
+//		'Priority Mail Express{0} Legal Flat Rate Envelope Hold For Pickup',
 		'Priority Mail Express{0} Sunday/Holiday Delivery Legal Flat Rate Envelope',
-		//'Priority Mail{0} Hold For Pickup',
-		//'Priority Mail{0} Large Flat Rate Box Hold For Pickup',
-		//'Priority Mail{0} Medium Flat Rate Box Hold For Pickup',
-		//'Priority Mail{0} Small Flat Rate Box Hold For Pickup',
-		//'Priority Mail{0} Flat Rate Envelope Hold For Pickup',
+//		'Priority Mail{0} Hold For Pickup',
+//		'Priority Mail{0} Large Flat Rate Box Hold For Pickup',
+//		'Priority Mail{0} Medium Flat Rate Box Hold For Pickup',
+//		'Priority Mail{0} Small Flat Rate Box Hold For Pickup',
+//		'Priority Mail{0} Flat Rate Envelope Hold For Pickup',
 		'Priority Mail{0} Gift Card Flat Rate Envelope',
-		//'Priority Mail{0} Gift Card Flat Rate Envelope Hold For Pickup',
+//		'Priority Mail{0} Gift Card Flat Rate Envelope Hold For Pickup',
 		'Priority Mail{0} Window Flat Rate Envelope',
-		//'Priority Mail{0} Window Flat Rate Envelope Hold For Pickup',
+//		'Priority Mail{0} Window Flat Rate Envelope Hold For Pickup',
 		'Priority Mail{0} Small Flat Rate Envelope',
 		//'Priority Mail{0} Small Flat Rate Envelope Hold For Pickup',
 		'Priority Mail{0} Legal Flat Rate Envelope',
-		//'Priority Mail{0} Legal Flat Rate Envelope Hold For Pickup',
-		//'Priority Mail{0} Padded Flat Rate Envelope Hold For Pickup',
+//		'Priority Mail{0} Legal Flat Rate Envelope Hold For Pickup',
+//		'Priority Mail{0} Padded Flat Rate Envelope Hold For Pickup',
 		'Priority Mail{0} Regional Rate Box A',
-		//'Priority Mail{0} Regional Rate Box A Hold For Pickup',
+//		'Priority Mail{0} Regional Rate Box A Hold For Pickup',
 		'Priority Mail{0} Regional Rate Box B',
-		//'Priority Mail{0} Regional Rate Box B Hold For Pickup',
-		//'First-Class Package Service Hold For Pickup',
+//		'Priority Mail{0} Regional Rate Box B Hold For Pickup',
+//		'First-Class Package Service Hold For Pickup',
 		'Priority Mail Express{0} Flat Rate Boxes',
-		//'Priority Mail Express{0} Flat Rate Boxes Hold For Pickup',
+//		'Priority Mail Express{0} Flat Rate Boxes Hold For Pickup',
 		'Priority Mail Express{0} Sunday/Holiday Delivery Flat Rate Boxes',
-		'Priority Mail{0} Regional Rate Box C',
-		//'Priority Mail{0} Regional Rate Box C Hold For Pickup',
+//		'Priority Mail{0} Regional Rate Box C',
+//		'Priority Mail{0} Regional Rate Box C Hold For Pickup',
 		'First-Class Package Service',
 		'Priority Mail Express{0} Padded Flat Rate Envelope',
-		//'Priority Mail Express{0} Padded Flat Rate Envelope Hold For Pickup',
+//		'Priority Mail Express{0} Padded Flat Rate Envelope Hold For Pickup',
 		'Priority Mail Express{0} Sunday/Holiday Delivery Padded Flat Rate Envelope',
 
 		'Priority Mail Express International',
@@ -98,7 +98,7 @@ class usps extends WsShipping
 		'Priority Mail International Padded Flat Rate Envelope',
 		'Priority Mail International DVD Flat Rate priced box',
 		'Priority Mail International Large Video Flat Rate priced box',
-		'Priority Mail Express International Flat Rate Boxes',
+//		'Priority Mail Express International Flat Rate Boxes',
 		'Priority Mail Express International Padded Flat Rate Envelope'
 	);
 
@@ -123,11 +123,15 @@ class usps extends WsShipping
 			$weight = $weight * 2.2;
 		}
 
-		//USPS wants a full country name
+		// USPS wants a full country name.
 		$objCountry = Country::Load($this->CheckoutForm->shippingCountry);
 		if($objCountry instanceof Country)
 		{
-			$country = $objCountry->country;
+			// Check the approved list first. If we get no hits, use the name we have.
+			if (!($country = $this->getUspsCountryName(strtoupper($objCountry->code))))
+			{
+				$country = $objCountry->country;
+			}
 		}
 		else
 		{
@@ -366,7 +370,7 @@ class usps extends WsShipping
 		$r .= '<Ounces>'.$this->ounces.'</Ounces>';
 		$r .= '<MailType>Package</MailType>';
 		$r .= '<ValueOfContents>'.$this->value.'</ValueOfContents>';
-		$r .= '<Country>'.$this->country.'</Country>';
+		$r .= '<Country>'._xls_replaceAccents($this->country).'</Country>';
 		$r .= '<Container>RECTANGULAR</Container>';
 		$r .= '<Size>Regular</Size>';
 		$r .= '<Width></Width>';
@@ -447,4 +451,65 @@ class usps extends WsShipping
 		return $arr;
 	}
 
+	/**
+	 * http://pe.usps.com/cpim/ftp/manuals/Imm/immctry.pdf
+	 * USPS requires specific strings for the names of some countries.
+	 * If the country name is found in the array within this method,
+	 * we send that to USPS, otherwise we send the name we already
+	 * have in the database.
+	 * Also, for mail to be sent to countries 'possessed' by the
+	 * United States, we set the country to US.
+	 *
+	 *
+	 * @param $countryCode
+	 * @return bool|mixed
+	 */
+	protected function getUspsCountryName($countryCode)
+	{
+		$arrCountryList = [
+			'CX' => 'Christmas Island (Australia)',
+			'CC' => 'Cocos Island (Australia)',
+			'CG' => 'Congo, Democratic Republic of the',
+			'CK' => 'Cook Islands (New Zealand)',
+			'TP' => 'East Timor (Timor-Leste)',
+			'GE' => 'Georgia, Republic of',
+			'GU' => 'Guam, United States (Domestic Mail)',
+			'KP' => 'Korea, Democratic People’s Republic of (North Korea)',
+			'KR' => 'Korea, Republic of (South Korea)',
+			'MO' => 'Macau (Macao)',
+			'MK' => 'Macedonia, Republic of',
+			'MH' => 'US', // Marshall Islands
+			'YT' => 'Mayotte (France)',
+			'FM' => 'US', // Micronesia
+			'MD' => 'Moldova',
+			'MC' => 'Monaco (France)',
+			'MM' => 'Myanmar (Burma)',
+			'NU' => 'Niue (New Zealand)',
+			'NF' => 'Norfolk Island (Australia)',
+			'MP' => 'US', // Northern Mariana Islands
+			'PW' => 'US', // Palau
+			'PR' => 'US', // Puerto Rico
+			'SH' => 'Saint Helena',
+			'PM' => 'Saint Pierre and Miquelon',
+			'KN' => 'Saint Kitts and Nevis',
+			'VC' => 'Saint Vincent and the Grenadines',
+			'SX' => 'Sint Maarten (Dutch)',
+			'CS' => 'Montenegro',
+			'RS' => 'Serbia, Republic of',
+			'SK' => 'Slovak Republic (Slovakia)',
+			'SY' => 'Syrian Arab Republic (Syria)',
+			'TZ' => 'Tanzania',
+			'TK' => 'Tokelau (New Zealand)',
+			'GB' => 'United Kingdom (Great Britain and Northern Ireland)',
+			'VA' => 'Vatican City',
+			'VI' => 'US', // US Virgin Islands (US)
+		];
+
+		if (!array_key_exists($countryCode, $arrCountryList))
+		{
+			return false;
+		}
+
+		return $arrCountryList[$countryCode];
+	}
 }

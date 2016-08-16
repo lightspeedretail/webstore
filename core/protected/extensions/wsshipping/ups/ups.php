@@ -234,8 +234,9 @@ class ups extends WsShipping
 			if(count($result) < 9)
 				continue;
 
-			$returnval = $result[10];
-
+			// UPS returns values 1000 and over formatted with commas, ex. 1,040.50
+			// We handle that genius here...
+			$returnval = is_numeric($result[10]) ? $result[10] : str_replace(',', '', $result[10]);
 
 			$arrReturn['price']=floatval($returnval)+ floatval($this->config['markup']);
 			$arrReturn['level']=$desc;
@@ -406,23 +407,11 @@ class ups extends WsShipping
 		return $xml;
 	}
 
+
 	/**
-	 * rate
+	 * Calculates the total shipping cost
 	 *
-	 * Based on passed address information, calculates the total shipping cost
-	 *
-	 * @param $service optional
-	 * @param $tzip
-	 * @param $tstate
-	 * @param $tcountry
-	 * @param $weight
-	 * @param $length
-	 * @param $width
-	 * @param $height
-	 * @param $residential
-	 * @param $val
-	 * @param $packagetype optional
-	 * @return $return[]
+	 * @return array|bool
 	 */
 	function rate() {
 
@@ -450,31 +439,25 @@ class ups extends WsShipping
 		$retval = array();
 
 		foreach($oXML->RatedShipment as $key=>$val)
-				$retval[''.$val->Service->Code] = floatval($val->TotalCharges->MonetaryValue);
+			$retval[''.$val->Service->Code] = floatval($val->TotalCharges->MonetaryValue);
 
 		return $retval;
 	}
 
 	function __runCurl() {
-		$y = $this->construct_request_xml();
+		$requestXml = $this->construct_request_xml();
+		Yii::log(sprintf("sending %s", $requestXml), $this->getLogLevel(), 'application.'.__CLASS__.'.'.__FUNCTION__);
 
 		$ch = curl_init();
 		curl_setopt ($ch, CURLOPT_URL,"$this->upstool");
 		curl_setopt ($ch, CURLOPT_HEADER, 0);
 		curl_setopt ($ch, CURLOPT_POST, 1);
-		curl_setopt ($ch, CURLOPT_POSTFIELDS, "$y");
+		curl_setopt ($ch, CURLOPT_POSTFIELDS, "$requestXml");
 		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
 		$this->xmlreturndata = curl_exec ($ch);
 		curl_close ($ch);
 
-
-		if(_xls_get_conf('DEBUG_SHIPPING' , false)) {
-			_xls_log(get_class($this) . " sending ".$y,true);
-			_xls_log(get_class($this) . " receiving ".$this->xmlreturndata,true);
-		}
-
+		Yii::log(sprintf("receiving %s", $this->xmlreturndata), $this->getLogLevel(), 'application.'.__CLASS__.'.'.__FUNCTION__);
 	}
-
-
 }

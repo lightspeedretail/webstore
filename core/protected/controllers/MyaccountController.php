@@ -102,6 +102,7 @@ class MyaccountController extends Controller
 
 		if ($model->save())
 		{
+			$this->triggerEmailCampaign($model, 'onUpdateCustomer');
 			$response = array('status' => 'success', 'customer' => $model);
 		}
 		else

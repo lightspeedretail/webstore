@@ -11,10 +11,10 @@
  */
 class GuestIdentity extends CUserIdentity
 {
-
 	private $_id;
 	private $_fullname;
 	private $_firstname;
+
 	/** Override __construct() because we're not passing user/pass
 	 */
 	public function __construct()
@@ -24,7 +24,11 @@ class GuestIdentity extends CUserIdentity
 		$user->last_login = new CDbExpression('NOW()');
 		if ($user->save() === false)
 		{
-			print_r($user->getErrors());
+			Yii::log(
+				sprintf("Customer could not be saved: %s", print_r($user->getErrors(), true)),
+				'error',
+				'application.'.__CLASS__.'.'.__FUNCTION__
+			);
 		}
 
 		$this->setState('fullname', 'Guest');

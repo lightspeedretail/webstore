@@ -153,8 +153,9 @@ class WsShipping extends WsExtension
 
 
 		$shipClass = get_class($this);
-
+		$arrReturn = array();
 		$arrServices = array();
+
 		if (isset($this->config['offerservices']))
 		{
 			if (is_array($this->config['offerservices']))

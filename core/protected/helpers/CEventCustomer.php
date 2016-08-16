@@ -19,12 +19,13 @@ class CEventCustomer extends CEvent
 	/**
 	 * Constructor.
 	 * @param mixed $sender sender of the event
-	 * @param customer $objCustomer error message
+	 * @param string $onAction
+	 * @param Customer $objCustomer error message
 	 */
-	public function __construct($sender,$onAction,$objCustomer)
+	public function __construct($sender, $onAction, $objCustomer)
 	{
-		$this->onAction=$onAction;
-		$this->objCustomer=$objCustomer;
+		$this->onAction = $onAction;
+		$this->objCustomer = $objCustomer;
 		parent::__construct($sender);
 	}
 }

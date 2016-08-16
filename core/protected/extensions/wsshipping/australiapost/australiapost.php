@@ -10,17 +10,10 @@ class australiapost extends WsShipping
 		'AUS_PARCEL_REGULAR_SATCHEL_3KG'=>'Parcel Regular Satchel 3kg',
 		'AUS_PARCEL_EXPRESS'=>'Parcel Express',
 		'AUS_PARCEL_EXPRESS_SATCHEL_3KG'=>'Parcel Express Satchel 3kg',
-		'INTL_SERVICE_ECI_PLATINUM'=>'Express Courier Intl Platinum',
-		'INTL_SERVICE_ECI_M'=>'Express Courier Intl Merchandise',
-		'INTL_SERVICE_ECI_D'=>'Express Courier Intl Documents',
-		'INTL_SERVICE_EPI'=>'Express Post Intl',
-		'INTL_SERVICE_PTI'=>'Pack and Track Intl',
-		'INTL_SERVICE_RPI'=>'Registered Post Intl',
-		'INTL_SERVICE_AIR_MAIL'=>'Air Mail',
-		'INTL_SERVICE_SEA_MAIL'=>'Sea Mail',
-
-
-
+		'INT_PARCEL_COR_OWN_PACKAGING' => 'International Courier',
+		'INT_PARCEL_EXP_OWN_PACKAGING' => 'International Express',
+		'INT_PARCEL_STD_OWN_PACKAGING' => 'International Standard',
+		'INT_PARCEL_AIR_OWN_PACKAGING' => 'International Economy Air',
 	);
 
 

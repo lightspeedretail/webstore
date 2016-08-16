@@ -1110,6 +1110,7 @@ class MultiCheckoutForm extends CheckoutForm
 			$objCustomer->last_name = $this->contactLastName;
 			$objCustomer->mainphone = $this->contactPhone;
 			$objCustomer->email = $this->contactEmail;
+			$objCustomer->newsletter_subscribe = $this->receiveNewsletter;
 
 			if ($objCart->shipaddress)
 			{
@@ -1145,6 +1146,7 @@ class MultiCheckoutForm extends CheckoutForm
 				$objCustomer->last_name = $this->contactLastName;
 				$objCustomer->mainphone = $this->contactPhone;
 				$objCustomer->email = $this->contactEmail;
+				$objCustomer->newsletter_subscribe = $this->receiveNewsletter;
 				if ($objCart->shipaddress)
 				{
 					if ($objCart->shipping->isStorePickup)

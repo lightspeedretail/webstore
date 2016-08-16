@@ -897,7 +897,7 @@ class Cart extends BaseCart
 	/**
 	 * Update the cart total.
 	 */
-	protected function updateTotal() {
+	public function updateTotal() {
 		$this->total = $this->getTotalWithShipping($this->shipping_sell);
 	}
 

@@ -229,6 +229,10 @@ class CartController extends Controller
 			$this->redirect($url);
 		}
 
+		// Trigger email campaign
+		$objEvent = new CEventCustomer('CartController', 'onUpdateCustomer', $objCart->customer);
+		_xls_raise_events('CEventCustomer', $objEvent);
+
 		// If we have a document that supersedes our cart, then let's copy some
 		// key display fields (just make sure we don't save it!).
 		if ($objCart->document_id > 0)
@@ -780,6 +784,7 @@ class CartController extends Controller
 						$objCustomer->last_name = $model->contactLastName;
 						$objCustomer->mainphone = $model->contactPhone;
 						$objCustomer->email = $model->contactEmail;
+						$objCustomer->newsletter_subscribe = $model->receiveNewsletter;
 						$objCustomer->save();
 					} else {
 						$intCustomerId = $objCart->customer_id;
@@ -1306,7 +1311,7 @@ class CartController extends Controller
 			CClientScript::POS_BEGIN
 		);
 
-		// Clear out anything we don't to survive the round trip.
+		// Clear out anything we don't want to survive the round trip.
 		$model->cardNumber = null;
 		$model->cardCVV = null;
 

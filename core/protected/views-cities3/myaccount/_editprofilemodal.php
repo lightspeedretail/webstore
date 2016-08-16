@@ -16,8 +16,8 @@
 					<input type="text" id="edit-last-name" name="last_name" placeholder="<?= Yii::t('forms', 'Last name'); ?>" required="" class="split-2">
 				</li>
 				<li class="field-container ">
-					<label class="placeheld"><?= Yii::t('forms', 'Email'); ?></label>
-					<input type="email" id="edit-email" name="email" required="" placeholder="<?= Yii::t('forms', 'Email'); ?>">
+					<label class="placeheld"><?= Yii::t('email', 'Email'); ?></label>
+					<input type="email" id="edit-email" name="email" required="" placeholder="<?= Yii::t('profile', 'Email'); ?>">
 				</li>
 				<li class="field-container ">
 					<label class="placeheld"><?= Yii::t('forms', 'Phone'); ?></label>
@@ -31,16 +31,11 @@
 				</li>
 			</ol>
 			<footer class="submit">
-				<input type="submit" id="save-profile" value="Save Changes">
+				<input type="submit" id="save-profile" value="<?= Yii::t('profile', 'Save Changes'); ?>">
 			</footer>
 		</form>
 		<button class="webstore-modal-close">
-			<?=
-				Yii::t(
-					'forms',
-					'Close'
-				);
-			?>
+			<?= Yii::t('forms', 'Close'); ?>
 		</button>
 	</section>
 </div>
