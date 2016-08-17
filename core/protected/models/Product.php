@@ -390,6 +390,20 @@ class Product extends BaseProduct
 		return $strOptionsArray;
 	}
 
+	/**
+	 * Get list of product color thumbnails
+	 * @return array of product color thumbnails
+	 */
+	public function getColorThumbs()
+	{
+		$objCommand = Yii::app()->db->createCommand();
+		$objCommand->select('image_path');
+		$objCommand->where('p.parent=:id AND p.inventory>0 AND p.image_id=i.id');
+		$objCommand->from('xlsws_product p, xlsws_images i');
+		$objCommand->group('p.product_color');
+		$objCommand->bindValue('id',$this->id, PDO::PARAM_STR);
+		return Images::model()->populateRecords($objCommand->QueryAll(), false);
+	}
 
 	/*
 	 * returns product photos in an array
