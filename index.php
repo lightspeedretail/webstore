@@ -1,7 +1,6 @@
 <?php
 
 // change the following paths if necessary
-$yii=dirname(__FILE__).'/core/framework/yii.php';
 $config=dirname(__FILE__).'/config/main.php';
 
 if(!file_exists($config))
@@ -14,7 +13,15 @@ if(!file_exists($config))
 //defined('YII_DEBUG') or define('YII_DEBUG',true);
 //defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL',3);
 
-require_once($yii);
+// include the customized Yii class described below
+require(__DIR__ . '/core/protected/components/Yii.php');
 
-Yii::createWebApplication($config)->run();
+require(__DIR__ . '/vendor/autoload.php');
 
+$yii2Config = require(__DIR__ . '/config/yii2/web.php');
+new yii\web\Application($yii2Config);
+
+// configuration for Yii 1 app
+$config=dirname(__FILE__).'/config/main.php';
+require_once(dirname(__FILE__).'/core/protected/components/WsWebApplication.php');
+Yii::createApplication('WsWebApplication',$config)->run();
