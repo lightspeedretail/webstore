@@ -17,6 +17,7 @@ class GoogleMerchant extends CAction
 		$intStockHandling = _xls_get_conf('INVENTORY_OUT_ALLOW_ADD', 0);
 		$intGoogleMPN = _xls_get_conf('GOOGLE_MPN', 0);
 		$strQueryAddl = ($intStockHandling == 0 ? " AND inventory_avail>0" : "");
+		ini_set('max_execution_time', 300);
 
 		header("content-type: text/xml;charset=UTF-8");
 
